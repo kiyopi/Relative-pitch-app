@@ -231,7 +231,141 @@ class PitchDetector {
 }
 ```
 
-### **3. MicrophoneController - マイク制御コンポーネント**
+### **3. MicrophoneLifecycleManager - ライフサイクル管理コンポーネント**
+**役割**: マイクロフォンライフサイクルの完全制御（ページ遷移・idle・リダイレクト対応）
+**実装**: 参照カウント管理、健康監視、セッション間使い回し、自動異常検知・復旧
+
+```typescript
+class MicrophoneLifecycleManager {
+  private static instance: MicrophoneLifecycleManager;
+  private refCount = 0;
+  private mediaStreamListeners = new Map();
+  private healthMonitorInterval = null;
+  private audioManager: AudioManager;
+
+  static getInstance(): MicrophoneLifecycleManager {
+    if (!MicrophoneLifecycleManager.instance) {
+      MicrophoneLifecycleManager.instance = new MicrophoneLifecycleManager();
+    }
+    return MicrophoneLifecycleManager.instance;
+  }
+
+  // 参照カウント管理（安全なリソース共有）
+  acquire(): Promise<MediaStreamResources> {
+    this.refCount++;
+    console.log(`🔄 [LifecycleManager] 参照カウント増加: ${this.refCount}`);
+    return this.audioManager.initialize();
+  }
+
+  release(): void {
+    this.refCount = Math.max(0, this.refCount - 1);
+    console.log(`📉 [LifecycleManager] 参照カウント減少: ${this.refCount}`);
+    
+    if (this.refCount <= 0) {
+      this.safeCleanup();
+    }
+  }
+
+  // MediaStream健康監視（自動異常検知・復旧）
+  setupMediaStreamMonitoring(mediaStream: MediaStream): void {
+    mediaStream.getTracks().forEach(track => {
+      const endedHandler = () => this.handleTrackEnded(track);
+      const muteHandler = () => this.handleTrackMuted(track);
+      const unmuteHandler = () => this.handleTrackUnmuted(track);
+      
+      track.addEventListener('ended', endedHandler);
+      track.addEventListener('mute', muteHandler);
+      track.addEventListener('unmute', unmuteHandler);
+      
+      this.mediaStreamListeners.set(track, { endedHandler, muteHandler, unmuteHandler });
+    });
+    
+    console.log(`🔍 [LifecycleManager] MediaStream監視開始: ${mediaStream.getTracks().length} tracks`);
+  }
+
+  // 3層状態管理（Page Level / Component Level / Health Monitoring）
+  checkHealthStatus(): HealthStatus {
+    return {
+      mediaStreamActive: this.audioManager.mediaStream?.active || false,
+      audioContextState: this.audioManager.audioContext?.state || 'none',
+      trackStates: this.getTrackStates(),
+      healthy: this.isSystemHealthy(),
+      refCount: this.refCount
+    };
+  }
+
+  private handleTrackEnded(track: MediaStreamTrack): void {
+    console.error('🚨 [LifecycleManager] MediaStreamTrack終了検出:', track.kind);
+    this.dispatchEvent('trackEnded', { track });
+    // 自動復旧試行
+    this.attemptAutoRecovery();
+  }
+
+  private handleTrackMuted(track: MediaStreamTrack): void {
+    console.warn('⚠️ [LifecycleManager] MediaStreamTrack muted:', track.kind);
+    this.dispatchEvent('trackMuted', { track });
+  }
+
+  private handleTrackUnmuted(track: MediaStreamTrack): void {
+    console.log('✅ [LifecycleManager] MediaStreamTrack unmuted:', track.kind);
+    this.dispatchEvent('trackUnmuted', { track });
+  }
+
+  private async attemptAutoRecovery(): Promise<boolean> {
+    console.log('🔧 [LifecycleManager] 自動復旧試行開始');
+    try {
+      await this.audioManager.forceReinitialize();
+      console.log('✅ [LifecycleManager] 自動復旧成功');
+      this.dispatchEvent('autoRecoverySuccess');
+      return true;
+    } catch (error) {
+      console.error('❌ [LifecycleManager] 自動復旧失敗:', error);
+      this.dispatchEvent('autoRecoveryFailed', { error });
+      return false;
+    }
+  }
+
+  private safeCleanup(): void {
+    console.log('🧹 [LifecycleManager] 安全クリーンアップ実行');
+    
+    // MediaStreamイベントリスナーをクリーンアップ
+    this.mediaStreamListeners.forEach((handlers, track) => {
+      track.removeEventListener('ended', handlers.endedHandler);
+      track.removeEventListener('mute', handlers.muteHandler);
+      track.removeEventListener('unmute', handlers.unmuteHandler);
+    });
+    this.mediaStreamListeners.clear();
+    
+    // AudioManager経由でリソース解放
+    this.audioManager.cleanup();
+    
+    console.log('✅ [LifecycleManager] クリーンアップ完了');
+  }
+
+  private dispatchEvent(type: string, detail?: any): void {
+    window.dispatchEvent(new CustomEvent(`pitchpro:lifecycle:${type}`, { detail }));
+  }
+
+  // SSR環境対応チェック（ブラウザ専用API安全実行）
+  static isBrowserEnvironment(): boolean {
+    return typeof window !== 'undefined' && 
+           typeof navigator !== 'undefined' && 
+           typeof AudioContext !== 'undefined';
+  }
+
+  // 安全な初期化（SSR環境では実行しない）
+  static safeInitialize(): Promise<MicrophoneLifecycleManager | null> {
+    if (!this.isBrowserEnvironment()) {
+      console.warn('🚫 [LifecycleManager] SSR環境では初期化をスキップ');
+      return Promise.resolve(null);
+    }
+    
+    return Promise.resolve(this.getInstance());
+  }
+}
+```
+
+### **4. MicrophoneController - デバイス制御コンポーネント**
 ```typescript
 class MicrophoneController {
   private static instance: MicrophoneController;
@@ -242,10 +376,10 @@ class MicrophoneController {
   private sensitivity: number = 1.0;
   private noiseGate: number = -60; // dB
   
-  // デバイス別デフォルト設定
+  // デバイス別デフォルト設定（実機検証値適用）
   private deviceDefaults = {
     iPhone: { sensitivity: 3.0, noiseGate: -50 },
-    iPad: { sensitivity: 5.0, noiseGate: -55 },
+    iPad: { sensitivity: 7.0, noiseGate: -55 },    // 実機検証値に更新
     PC: { sensitivity: 1.0, noiseGate: -60 }
   };
 
@@ -369,7 +503,7 @@ class MicrophoneController {
     return devices.filter(device => device.kind === 'audioinput');
   }
 
-  // デバイス判定
+  // デバイス判定（iPadOS 13+ 完全対応、実装済み知見活用）
   private detectDeviceType(): 'iPhone' | 'iPad' | 'PC' {
     const ua = navigator.userAgent;
     const isIPhone = /iPhone/.test(ua);
@@ -381,13 +515,19 @@ class MicrophoneController {
     return 'PC';
   }
 
-  // デバイス別デフォルト適用
+  // デバイス別デフォルト適用（実機検証値使用）
   private applyDeviceDefaults(deviceType: 'iPhone' | 'iPad' | 'PC'): void {
     const defaults = this.deviceDefaults[deviceType];
     this.sensitivity = defaults.sensitivity;
     this.noiseGate = defaults.noiseGate;
     
-    console.log(`🎤 Device: ${deviceType}, Defaults applied:`, defaults);
+    console.log(`🎤 Device: ${deviceType}, Defaults applied (実機検証値):`, defaults);
+  }
+
+  // ミュート制御（シンプル化成功事例を活用）
+  setMuted(gainNode: GainNode, muted: boolean): void {
+    gainNode.gain.value = muted ? 0 : this.sensitivity;
+    console.log(`🔇 [MicrophoneController] Mute ${muted ? 'ON' : 'OFF'}`);
   }
 
   // イベントディスパッチャー
@@ -443,7 +583,277 @@ interface MicrophoneControllerEvents {
 }
 ```
 
-### **4. NoiseFilter - 3段階ノイズリダクション**
+### **4. ErrorNotificationSystem - エラーメッセージ表示システム**
+**役割**: リアルタイムエラー通知とユーザーフィードバック（ページ内表示）
+**実装**: イベントドリブン通知、視覚的フィードバック、解決方法提示、段階的制御
+
+```typescript
+class ErrorNotificationSystem {
+  private static instance: ErrorNotificationSystem;
+  private notificationContainer: HTMLElement | null = null;
+  private activeNotifications: Map<string, NotificationElement> = new Map();
+
+  static getInstance(): ErrorNotificationSystem {
+    if (!ErrorNotificationSystem.instance) {
+      ErrorNotificationSystem.instance = new ErrorNotificationSystem();
+    }
+    return ErrorNotificationSystem.instance;
+  }
+
+  // 通知表示（shadcn/ui風スタイル）
+  showNotification(notification: NotificationConfig): string {
+    const id = `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const element = this.createNotificationElement(notification, id);
+    
+    if (!this.notificationContainer) {
+      this.createNotificationContainer();
+    }
+    
+    this.notificationContainer!.appendChild(element);
+    this.activeNotifications.set(id, element);
+    
+    // 自動消去（エラー以外）
+    if (notification.type !== 'error' && notification.autoHide !== false) {
+      setTimeout(() => this.hideNotification(id), notification.duration || 5000);
+    }
+    
+    console.log(`📢 [ErrorNotification] ${notification.type.toUpperCase()}: ${notification.message}`);
+    return id;
+  }
+
+  // マイク健康状態エラー専用（SvelteKit実装準拠）
+  showMicrophoneHealthError(errors: string[], details?: any): string {
+    return this.showNotification({
+      type: 'error',
+      title: '⚠️ マイク接続に問題があります',
+      message: 'マイクが正常に動作していません。以下の問題が検出されました：',
+      details: errors,
+      solution: 'ページを再読み込みしてマイク許可を再度取得してください。',
+      autoHide: false,
+      priority: 'high'
+    });
+  }
+
+  // 通知要素作成（shadcn/ui風デザイン）
+  private createNotificationElement(config: NotificationConfig, id: string): NotificationElement {
+    const element = document.createElement('div');
+    element.className = `notification-card ${config.type}-card`;
+    element.setAttribute('data-notification-id', id);
+    
+    element.innerHTML = `
+      <div class="card-header">
+        <h3 class="section-title">${config.title}</h3>
+        <button class="close-button" onclick="window.pitchpro.notifications.hideNotification('${id}')" aria-label="通知を閉じる">×</button>
+      </div>
+      <div class="card-content">
+        <p class="${config.type}-message">${config.message}</p>
+        ${config.details ? `
+          <ul class="error-list">
+            ${config.details.map(detail => `<li>${detail}</li>`).join('')}
+          </ul>
+        ` : ''}
+        ${config.solution ? `
+          <p class="fix-instruction">
+            <strong>解決方法:</strong> ${config.solution}
+          </p>
+        ` : ''}
+      </div>
+    `;
+
+    return element as NotificationElement;
+  }
+
+  // 通知コンテナ作成
+  private createNotificationContainer(): void {
+    this.notificationContainer = document.createElement('div');
+    this.notificationContainer.className = 'notification-container';
+    this.notificationContainer.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      max-width: 400px;
+      pointer-events: none;
+    `;
+    
+    document.body.appendChild(this.notificationContainer);
+  }
+
+  // 通知非表示
+  hideNotification(id: string): void {
+    const element = this.activeNotifications.get(id);
+    if (element) {
+      element.style.opacity = '0';
+      element.style.transform = 'translateX(100%)';
+      
+      setTimeout(() => {
+        element.remove();
+        this.activeNotifications.delete(id);
+      }, 300);
+    }
+  }
+
+  // 全通知クリア
+  clearAll(): void {
+    this.activeNotifications.forEach((element, id) => {
+      this.hideNotification(id);
+    });
+  }
+
+  // イベントリスナー統合（AudioManager等との連携）
+  setupEventListeners(): void {
+    // マイクライフサイクル管理との連携
+    window.addEventListener('pitchpro:lifecycle:trackEnded', (event) => {
+      this.showMicrophoneHealthError(['MediaStreamTrack が終了しました'], event.detail);
+    });
+
+    window.addEventListener('pitchpro:lifecycle:autoRecoveryFailed', (event) => {
+      this.showNotification({
+        type: 'error',
+        title: '🔧 自動復旧失敗',
+        message: 'マイクの自動復旧に失敗しました。手動での復旧が必要です。',
+        solution: 'ページをリロードしてマイク許可を再取得してください。',
+        autoHide: false
+      });
+    });
+
+    window.addEventListener('pitchpro:microphoneDenied', (event) => {
+      this.showNotification({
+        type: 'error',
+        title: '🚫 マイクアクセス拒否',
+        message: 'マイクへのアクセスが拒否されました。',
+        solution: 'ブラウザの設定でマイク許可を有効にしてください。',
+        autoHide: false
+      });
+    });
+  }
+
+  // CSS スタイル注入（shadcn/ui風）
+  injectStyles(): void {
+    const style = document.createElement('style');
+    style.textContent = `
+      .notification-card {
+        pointer-events: auto;
+        margin-bottom: 12px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        transform: translateX(0);
+        opacity: 1;
+      }
+
+      .error-card {
+        border: 2px solid #fbbf24 !important;
+        background: #fef3c7 !important;
+      }
+
+      .warning-card {
+        border: 2px solid #f59e0b !important;
+        background: #fef3c7 !important;
+      }
+
+      .success-card {
+        border: 2px solid #10b981 !important;
+        background: #d1fae5 !important;
+      }
+
+      .info-card {
+        border: 2px solid #3b82f6 !important;
+        background: #dbeafe !important;
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      .section-title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .close-button {
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+      }
+
+      .close-button:hover {
+        opacity: 1;
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      .card-content {
+        padding: 16px;
+      }
+
+      .error-message {
+        color: #92400e;
+        margin-bottom: 12px;
+        font-weight: 500;
+      }
+
+      .warning-message {
+        color: #92400e;
+        margin-bottom: 12px;
+      }
+
+      .success-message {
+        color: #047857;
+        margin-bottom: 12px;
+      }
+
+      .info-message {
+        color: #1d4ed8;
+        margin-bottom: 12px;
+      }
+
+      .error-list {
+        margin: 8px 0;
+        padding-left: 20px;
+        color: #92400e;
+      }
+
+      .fix-instruction {
+        margin-top: 12px;
+        padding: 8px;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 4px;
+        font-size: 14px;
+      }
+    `;
+    
+    document.head.appendChild(style);
+  }
+}
+
+// TypeScript型定義
+interface NotificationConfig {
+  type: 'error' | 'warning' | 'success' | 'info';
+  title: string;
+  message: string;
+  details?: string[];
+  solution?: string;
+  autoHide?: boolean;
+  duration?: number;
+  priority?: 'low' | 'medium' | 'high';
+}
+
+interface NotificationElement extends HTMLElement {
+  'data-notification-id': string;
+}
+```
+
+### **5. NoiseFilter - 3段階ノイズリダクション**
 ```typescript
 class NoiseFilter {
   private filterChain: AudioNode[];
@@ -869,12 +1279,16 @@ const cdnDistribution = {
 
 ```javascript
 // NPM経由 - 基本使用例
-import { PitchDetector, AudioManager } from '@pitchpro/audio-processing';
+import { PitchDetector, AudioManager, ErrorNotificationSystem } from '@pitchpro/audio-processing';
 
 const detector = new PitchDetector({
   fftSize: 4096,
   smoothing: 0.1
 });
+
+const notifications = ErrorNotificationSystem.getInstance();
+notifications.injectStyles();
+notifications.setupEventListeners();
 
 detector.start((result) => {
   console.log(`音程: ${result.note}, 精度: ${result.clarity}`);
@@ -883,7 +1297,7 @@ detector.start((result) => {
 
 ```javascript
 // マイク制御コンポーネント使用例
-import { MicrophoneController, PitchDetector } from '@pitchpro/audio-processing';
+import { MicrophoneController, PitchDetector, ErrorNotificationSystem } from '@pitchpro/audio-processing';
 
 // マイクコントローラー初期化
 const micController = MicrophoneController.getInstance();
@@ -931,7 +1345,8 @@ import {
   MicrophoneController, 
   PitchDetector,
   PitchDetectionResult,
-  MicrophoneControllerEvents 
+  MicrophoneControllerEvents,
+  ErrorNotificationSystem 
 } from '@pitchpro/audio-processing';
 
 // 型安全なイベントリスナー

@@ -31,6 +31,56 @@ class AudioManager {
 }
 ```
 
+### **マイクロフォンライフサイクル管理システム** ⭐⭐⭐⭐⭐
+- **実装場所**: `/svelte-prototype/src/lib/audio/AudioManager.js` + PitchDetector.svelte + MICROPHONE_CONTROL_SPECIFICATION.md
+- **完成度**: 95% - 3層状態管理アーキテクチャ、参照カウント、健康監視、SSR対応
+- **実用性**: 極めて高い - ページ遷移・idle・リダイレクト時の核心制御
+- **移植価値**: 必須 - ライフサイクル管理の完成形、Pure JavaScript Logic
+- **主要機能**:
+  - **参照カウント管理**: 複数コンポーネントでの安全なリソース共有・クリーンアップ
+  - **MediaStream健康監視**: track ended/mute/unmute イベント、自動異常検知・復旧
+  - **セッション間使い回し**: リソース効率化、高速復帰実現
+  - **3層状態管理**: Page Level / Component Level / Health Monitoring の分離設計
+  - **SSR無効化対応**: Tone.js + Web Audio API + navigator.mediaDevices のブラウザ専用実行制御
+```javascript
+// 参照カウント管理（安全なライフサイクル制御）
+release(analyserIds = []) {
+  this.refCount = Math.max(0, this.refCount - 1);
+  if (this.refCount <= 0) {
+    this._cleanup(); // 全リソース安全クリーンアップ
+  }
+}
+
+// MediaStream健康監視（自動異常検知）
+function setupMediaStreamMonitoring() {
+  tracks.forEach(track => {
+    track.addEventListener('ended', endedHandler);
+    track.addEventListener('mute', muteHandler);
+    track.addEventListener('unmute', unmuteHandler);
+  });
+}
+```
+
+### **マイク制御コンポーネント（デバイス最適化）** ⭐⭐⭐⭐⭐
+- **実装場所**: `/svelte-prototype/src/lib/components/PitchDetector.svelte` + AudioManager
+- **完成度**: 95% - デバイス別感度自動設定、GainNode制御、ミュート最適化
+- **実用性**: 極めて高い - 音声入力の核心技術
+- **移植価値**: 必須 - デバイス別最適化ノウハウと制御ロジック
+- **主要機能**:
+  - **デバイス別感度自動設定**: iPad 7.0x、iPhone 3.0x、PC 1.0x（実機検証値）
+  - **MediaStream状態監視**: リアルタイム track状態監視
+  - **GainNode制御**: AudioGraph内での感度調整実現
+  - **ミュート実装**: 当初複雑だったが、シンプルなGainNode制御に最適化成功
+```javascript
+// デバイス別最適化（重要な実機検証知見）
+if (isIPad || isIPadOS) return 7.0; // iPad実機検証値
+if (isIPhone) return 3.0;            // iPhone実機検証値  
+return 1.0;                          // PC標準値
+
+// ミュート制御（シンプル化成功事例）
+// 複雑な実装 → GainNode.gain.value = 0 で完結
+```
+
 ### **3段階ノイズリダクション** ⭐⭐⭐⭐
 - **実装場所**: AudioManager内フィルターチェーン
 - **完成度**: 90% - ハイパス（80Hz）→ローパス（2kHz）→ノッチ（60Hz）
@@ -112,6 +162,26 @@ sampler = new Tone.Sampler({
 - **移植価値**: 中 - デザインパターン参考、実装は要再設計
 - **移植課題**: Svelteリアクティビティ → DOM直接操作
 
+### **ページ内エラーメッセージ表示システム** ⭐⭐⭐⭐
+- **実装場所**: `/svelte-prototype/src/routes/training/random/+page.svelte` の警告カード機能
+- **完成度**: 90% - リアルタイムエラー通知、視覚的フィードバック、解決方法提示
+- **実用性**: 高い - ユーザビリティ向上の核心機能
+- **移植価値**: 高い - イベントドリブン通知システム、UIコンポーネント設計
+- **移植方針**: Web Components + Custom Events で実現
+```javascript
+// エラー状態管理とリアルタイム通知
+function handleMicrophoneHealthChange(event) {
+  const { healthy, errors, details } = event.detail;
+  microphoneHealthy = healthy;
+  microphoneErrors = errors;
+  
+  // エラー表示UI自動更新 + 段階的制御
+  if (!healthy && trainingPhase === 'guiding') {
+    trainingPhase = 'setup'; // トレーニング自動停止
+  }
+}
+```
+
 ### **VolumeBarコンポーネント** ⭐⭐⭐⭐⭐
 - **実装場所**: `/svelte-prototype/src/lib/components/VolumeBar.svelte`
 - **完成度**: 95% - iPhone WebKit問題対応済み、DOM直接操作
@@ -192,6 +262,7 @@ export const progressPercentage = derived(
 |-----|-------|-------|-----------|-------|
 | Pitchy音程検出 | 95% | ⭐⭐⭐⭐⭐ | 高 | 最高 |
 | AudioManager | 95% | ⭐⭐⭐⭐⭐ | 高 | 最高 |
+| マイクライフサイクル管理 | 95% | ⭐⭐⭐⭐⭐ | 高 | 最高 |
 | 基音再生システム | 95% | ⭐⭐⭐⭐⭐ | 高 | 最高 |
 | SessionStorage設計 | 95% | ⭐⭐⭐⭐⭐ | 中 | 最高 |
 
@@ -201,6 +272,7 @@ export const progressPercentage = derived(
 | 動的倍音補正 | 85% | ⭐⭐⭐⭐ | 高 | 高 |
 | 音域選択システム | 90% | ⭐⭐⭐⭐ | 高 | 高 |
 | EvaluationEngine | 85% | ⭐⭐⭐⭐ | 高 | 高 |
+| エラーメッセージ表示 | 90% | ⭐⭐⭐⭐ | 高 | 高 |
 | shadcn/ui CSS | 80% | ⭐⭐⭐ | 高 | 高 |
 
 ### **B級：選択的移植（要再設計）**
@@ -223,6 +295,7 @@ export const progressPercentage = derived(
 ### **Phase 1: Core Algorithm移植（1週間）**
 - Pitchy音程検出エンジン
 - AudioManager音声基盤
+- マイクロフォンライフサイクル管理システム
 - 基音再生システム
 - 動的倍音補正
 
@@ -230,6 +303,7 @@ export const progressPercentage = derived(
 - SessionStorage設計
 - EvaluationEngine
 - 音域選択システム
+- エラーメッセージ表示システム
 - 3段階ノイズフィルタ
 
 ### **Phase 3: UI Components再設計（1-2週間）**
