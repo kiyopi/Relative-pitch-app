@@ -1,12 +1,13 @@
 # 相対音感トレーニングアプリ - 技術仕様書
 
-**バージョン**: 1.0.0  
+**バージョン**: 2.0.0  
 **作成日**: 2025-08-07  
-**用途**: 音声処理・音程検出・フィルタリング技術仕様
+**更新日**: 2025-08-07  
+**用途**: 新技術スタック統合版 - Mantine採用・Cloudflare・ライブラリ化対応
 
 ---
 
-## 🎯 技術概要
+## 🎯 技術概要（v2.0.0 統合版）
 
 ### 音声処理技術スタック
 - **音程検出**: Pitchy v4 (McLeod Pitch Method)
@@ -14,6 +15,13 @@
 - **フィルタリング**: 3段階ノイズリダクション
 - **基音補正**: 動的オクターブ補正システム
 - **品質保証**: ±5セント精度達成
+
+### 新技術スタック追加（v2.0.0）
+- **✅ デザインシステム**: **Mantine v7.6.0** 採用確定
+- **✅ デプロイ**: **Cloudflare Pages** 移行確定
+- **✅ ライブラリ化**: **音響技術の完全コンポーネント化** 確定
+- **アイコン**: Tabler Icons + 音楽カスタムセット
+- **CDN**: Cloudflare CDN（グローバル配信）
 
 ---
 
@@ -439,6 +447,207 @@ interface TrainingShareContent {
 - **内容**: スコア、精度、達成バッジ、モード情報
 - **テーマ**: light/dark/gradient選択可能
 - **QRコード**: アプリURLの埋め込み（オプション）
+
+---
+
+## 🎨 12. Mantineデザインシステム技術仕様（v2.0.0 新採用）
+
+### 12.1 Mantine技術スタック
+```javascript
+// Mantine v7.6.0 統合設定
+const mantineConfig = {
+  version: "7.6.0",
+  cdn_base: "https://cdn.jsdelivr.net/npm/@mantine/core@7.6.0/",
+  styles: "styles.css",
+  icons: "tabler-icons@1.35.0",
+  
+  theme_customization: {
+    colors: {
+      // 音階専用カラーパレット
+      note_do: "#ef4444",     // ド - 赤
+      note_re: "#f97316",     // レ - オレンジ
+      note_mi: "#eab308",     // ミ - 黄色
+      note_fa: "#22c55e",     // ファ - 緑
+      note_so: "#06b6d4",     // ソ - シアン
+      note_la: "#3b82f6",     // ラ - 青
+      note_si: "#8b5cf6",     // シ - 紫
+      note_do_high: "#ec4899" // 高ド - ピンク
+    },
+    
+    spacing: {
+      training: "16px",
+      session: "24px",
+      result: "32px"
+    },
+    
+    radius: {
+      button: "8px",
+      card: "12px",
+      modal: "16px"
+    }
+  }
+};
+```
+
+### 12.2 音楽教育カスタマイゼーション
+```css
+/* 音楽教育テーマ CSS */
+:root {
+  /* Mantineカラーオーバーライド */
+  --mantine-color-blue-6: #6366f1;     /* 学習集中色 */
+  --mantine-color-green-6: #10b981;    /* 成功・正解色 */
+  --mantine-color-yellow-6: #f59e0b;   /* 注意・練習中色 */
+  --mantine-color-red-6: #ef4444;      /* エラー・要改善色 */
+  
+  /* グラデーションテーマ */
+  --gradient-learning: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  --gradient-focus: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+}
+
+/* カスタムコンポーネント */
+.training-card {
+  background: var(--mantine-color-white);
+  border: 1px solid var(--mantine-color-gray-3);
+  border-radius: var(--mantine-radius-md);
+  transition: all 0.2s ease;
+}
+
+.note-button {
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 18px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.progress-indicator {
+  background: var(--gradient-learning);
+  border-radius: 20px;
+  height: 8px;
+}
+```
+
+---
+
+## 🌍 13. Cloudflareデプロイ技術仕様（v2.0.0 新採用）
+
+### 13.1 Cloudflare Pages設定
+```yaml
+# wrangler.toml - Cloudflare設定
+name = "relative-pitch-app"
+compatibility_date = "2024-01-01"
+
+[build]
+command = "npm run build"
+publish = "dist"
+
+[build.environment_variables]
+NODE_ENV = "production"
+
+# カスタムドメイン設定
+custom_domain = "pitch.example.com"
+
+# キャッシュ最適化
+[cache]
+static_assets = "1y"    # 静的アセット
+hash_files = "1y"       # JS/CSSファイル  
+index_html = "1h"       # HTMLファイル
+```
+
+### 13.2 パフォーマンス最適化
+```javascript
+// Cloudflare最適化設定
+const cloudflareOptimization = {
+  compression: {
+    brotli: true,        // Brotli圧縮有効
+    gzip: true,          // Gzipフォールバック
+    minify: {
+      html: true,
+      css: true,
+      js: true
+    }
+  },
+  
+  caching: {
+    browser_cache_ttl: 31536000,  // 1年
+    edge_cache_ttl: 86400,        // 24時間
+    development_mode: false       // 本番時は無効
+  },
+  
+  security: {
+    always_https: true,
+    ssl_mode: "full_strict",
+    tls_version: "1.3",
+    hsts_enabled: true
+  },
+  
+  analytics: {
+    web_analytics: true,   // Cloudflare Analytics
+    performance_insights: true,
+    real_user_monitoring: true
+  }
+};
+```
+
+---
+
+## 📦 14. 音響ライブラリ完全コンポーネント化仕様（v2.0.0 新戦略）
+
+### 14.1 モジュラー設計アーキテクチャ
+```typescript
+// PitchPro.jsライブラリ構成
+interface PitchProLibrary {
+  core: {
+    AudioManager: AudioManagerClass;          // 音声リソース統一管理
+    PitchDetector: PitchDetectorClass;        // 高精度音程検出
+    NoiseFilter: NoiseFilterClass;            // 3段階フィルター
+  };
+  
+  advanced: {
+    HarmonicCorrection: HarmonicCorrectionClass; // 倍音補正
+    VoiceAnalyzer: VoiceAnalyzerClass;           // 音声分析
+    CalibrationSystem: CalibrationClass;         // デバイス最適化
+  };
+  
+  utils: {
+    FrequencyUtils: FrequencyUtilsClass;      // 周波数↔音名変換
+    MusicTheory: MusicTheoryClass;            // 音楽理論ユーティリティ
+    DeviceDetection: DeviceDetectionClass;    // デバイス判定
+  };
+}
+```
+
+### 14.2 技術共用ライブラリ化
+```json
+{
+  "name": "@pitchpro/audio-processing",
+  "version": "1.0.0",
+  "description": "高精度音程検出・音声処理ライブラリ",
+  
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js", 
+  "types": "dist/index.d.ts",
+  
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  
+  "keywords": [
+    "audio", "pitch-detection", "music", "webaudio",
+    "relative-pitch", "music-education", "voice-analysis"
+  ]
+}
+```
+
+---
+
+**この技術仕様書は、Mantineデザインシステム、Cloudflareデプロイ、音響ライブラリ完全コンポーネント化を統合した新技術スタックでの実装を完全カバーします。**
 
 #### 生成テキスト例（Twitter）
 ```
