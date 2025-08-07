@@ -97,8 +97,9 @@ class AudioManager {
       // AudioContext 初期化
       this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
       
-      // マイクアクセス
-      this.mediaStream = await navigator.mediaDevices.getUserMedia({
+      // マイクアクセス（MicrophoneControllerに委譲）
+      const micController = MicrophoneController.getInstance();
+      this.mediaStream = await micController.requestMicrophone({
         audio: {
           echoCancellation: false,
           noiseSuppression: false,
@@ -230,7 +231,219 @@ class PitchDetector {
 }
 ```
 
-### **3. NoiseFilter - 3段階ノイズリダクション**
+### **3. MicrophoneController - マイク制御コンポーネント**
+```typescript
+class MicrophoneController {
+  private static instance: MicrophoneController;
+  private mediaStream: MediaStream | null = null;
+  private isActive: boolean = false;
+  private permissionState: PermissionState = 'prompt';
+  private deviceId: string | null = null;
+  private sensitivity: number = 1.0;
+  private noiseGate: number = -60; // dB
+  
+  // デバイス別デフォルト設定
+  private deviceDefaults = {
+    iPhone: { sensitivity: 3.0, noiseGate: -50 },
+    iPad: { sensitivity: 5.0, noiseGate: -55 },
+    PC: { sensitivity: 1.0, noiseGate: -60 }
+  };
+
+  static getInstance(): MicrophoneController {
+    if (!MicrophoneController.instance) {
+      MicrophoneController.instance = new MicrophoneController();
+    }
+    return MicrophoneController.instance;
+  }
+
+  // マイク許可チェック（非侵入的）
+  async checkPermission(): Promise<PermissionState> {
+    if ('permissions' in navigator) {
+      try {
+        const result = await navigator.permissions.query({ 
+          name: 'microphone' as PermissionName 
+        });
+        this.permissionState = result.state;
+        return result.state;
+      } catch (error) {
+        console.warn('Permission API not available:', error);
+      }
+    }
+    
+    // フォールバック: localStorage チェック
+    const cachedPermission = localStorage.getItem('mic-permission');
+    if (cachedPermission === 'granted') {
+      this.permissionState = 'granted';
+      return 'granted';
+    }
+    
+    return 'prompt';
+  }
+
+  // マイクアクセス要求
+  async requestMicrophone(
+    constraints?: MediaStreamConstraints
+  ): Promise<MediaStream> {
+    if (this.mediaStream && this.isActive) {
+      return this.mediaStream;
+    }
+
+    try {
+      // デバイス検出と最適化
+      const deviceType = this.detectDeviceType();
+      this.applyDeviceDefaults(deviceType);
+      
+      // 制約設定
+      const audioConstraints = {
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: false, // 手動制御
+          sampleRate: 48000,
+          channelCount: 1,
+          ...(this.deviceId && { deviceId: this.deviceId }),
+          ...(constraints?.audio || {})
+        },
+        video: false
+      };
+
+      // マイクアクセス
+      this.mediaStream = await navigator.mediaDevices.getUserMedia(
+        audioConstraints
+      );
+      
+      this.isActive = true;
+      this.permissionState = 'granted';
+      
+      // 許可状態を保存
+      localStorage.setItem('mic-permission', 'granted');
+      localStorage.setItem('mic-permission-timestamp', Date.now().toString());
+      
+      // イベント発火
+      this.dispatchEvent('microphoneGranted', { stream: this.mediaStream });
+      
+      return this.mediaStream;
+      
+    } catch (error) {
+      this.permissionState = 'denied';
+      this.dispatchEvent('microphoneDenied', { error });
+      throw error;
+    }
+  }
+
+  // マイク停止
+  async stopMicrophone(): Promise<void> {
+    if (this.mediaStream) {
+      this.mediaStream.getTracks().forEach(track => track.stop());
+      this.mediaStream = null;
+      this.isActive = false;
+      this.dispatchEvent('microphoneStopped');
+    }
+  }
+
+  // 感度調整
+  setSensitivity(value: number): void {
+    this.sensitivity = Math.max(0.1, Math.min(10.0, value));
+    this.dispatchEvent('sensitivityChanged', { sensitivity: this.sensitivity });
+  }
+
+  // ノイズゲート設定
+  setNoiseGate(threshold: number): void {
+    this.noiseGate = Math.max(-80, Math.min(-20, threshold));
+    this.dispatchEvent('noiseGateChanged', { threshold: this.noiseGate });
+  }
+
+  // デバイス切り替え
+  async switchDevice(deviceId: string): Promise<void> {
+    this.deviceId = deviceId;
+    
+    if (this.isActive) {
+      await this.stopMicrophone();
+      await this.requestMicrophone();
+    }
+  }
+
+  // 利用可能デバイスリスト取得
+  async getAvailableDevices(): Promise<MediaDeviceInfo[]> {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    return devices.filter(device => device.kind === 'audioinput');
+  }
+
+  // デバイス判定
+  private detectDeviceType(): 'iPhone' | 'iPad' | 'PC' {
+    const ua = navigator.userAgent;
+    const isIPhone = /iPhone/.test(ua);
+    const isIPad = /iPad/.test(ua);
+    const isIPadOS = /Macintosh/.test(ua) && 'ontouchend' in document;
+    
+    if (isIPhone) return 'iPhone';
+    if (isIPad || isIPadOS) return 'iPad';
+    return 'PC';
+  }
+
+  // デバイス別デフォルト適用
+  private applyDeviceDefaults(deviceType: 'iPhone' | 'iPad' | 'PC'): void {
+    const defaults = this.deviceDefaults[deviceType];
+    this.sensitivity = defaults.sensitivity;
+    this.noiseGate = defaults.noiseGate;
+    
+    console.log(`🎤 Device: ${deviceType}, Defaults applied:`, defaults);
+  }
+
+  // イベントディスパッチャー
+  private dispatchEvent(type: string, detail?: any): void {
+    window.dispatchEvent(new CustomEvent(`pitchpro:${type}`, { detail }));
+  }
+
+  // 自動再接続機能
+  async autoReconnect(): Promise<boolean> {
+    const maxRetries = 3;
+    let retryCount = 0;
+    
+    while (retryCount < maxRetries) {
+      try {
+        await this.requestMicrophone();
+        return true;
+      } catch (error) {
+        retryCount++;
+        console.warn(`Microphone reconnect attempt ${retryCount} failed`);
+        await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+      }
+    }
+    
+    return false;
+  }
+
+  // 権限キャッシュ管理
+  isPermissionCacheValid(): boolean {
+    const timestamp = localStorage.getItem('mic-permission-timestamp');
+    if (!timestamp) return false;
+    
+    const age = Date.now() - parseInt(timestamp, 10);
+    const CACHE_DURATION = 30 * 60 * 1000; // 30分
+    
+    return age < CACHE_DURATION;
+  }
+
+  // クリーンアップ
+  cleanup(): void {
+    this.stopMicrophone();
+    localStorage.removeItem('mic-permission');
+    localStorage.removeItem('mic-permission-timestamp');
+  }
+}
+
+// TypeScript型定義
+interface MicrophoneControllerEvents {
+  'pitchpro:microphoneGranted': CustomEvent<{ stream: MediaStream }>;
+  'pitchpro:microphoneDenied': CustomEvent<{ error: Error }>;
+  'pitchpro:microphoneStopped': CustomEvent;
+  'pitchpro:sensitivityChanged': CustomEvent<{ sensitivity: number }>;
+  'pitchpro:noiseGateChanged': CustomEvent<{ threshold: number }>;
+}
+```
+
+### **4. NoiseFilter - 3段階ノイズリダクション**
 ```typescript
 class NoiseFilter {
   private filterChain: AudioNode[];
@@ -655,7 +868,7 @@ const cdnDistribution = {
 ```
 
 ```javascript
-// NPM経由
+// NPM経由 - 基本使用例
 import { PitchDetector, AudioManager } from '@pitchpro/audio-processing';
 
 const detector = new PitchDetector({
@@ -665,6 +878,77 @@ const detector = new PitchDetector({
 
 detector.start((result) => {
   console.log(`音程: ${result.note}, 精度: ${result.clarity}`);
+});
+```
+
+```javascript
+// マイク制御コンポーネント使用例
+import { MicrophoneController, PitchDetector } from '@pitchpro/audio-processing';
+
+// マイクコントローラー初期化
+const micController = MicrophoneController.getInstance();
+
+// マイク許可チェック
+const permission = await micController.checkPermission();
+if (permission !== 'granted') {
+  // マイク許可リクエスト
+  await micController.requestMicrophone();
+}
+
+// デバイス別最適化が自動適用される
+// iPhone: 感度3.0x, iPad: 感度5.0x, PC: 感度1.0x
+
+// イベントリスナー
+window.addEventListener('pitchpro:microphoneGranted', (event) => {
+  console.log('マイク許可完了', event.detail.stream);
+  
+  // 音程検出開始
+  const detector = new PitchDetector();
+  detector.start((result) => {
+    console.log(`検出: ${result.frequency}Hz`);
+  });
+});
+
+// 感度調整
+micController.setSensitivity(2.0); // 2倍に設定
+
+// ノイズゲート設定
+micController.setNoiseGate(-45); // -45dB以下をカット
+
+// デバイス切り替え
+const devices = await micController.getAvailableDevices();
+if (devices.length > 1) {
+  await micController.switchDevice(devices[1].deviceId);
+}
+
+// クリーンアップ
+micController.cleanup();
+```
+
+```typescript
+// TypeScript 型安全使用例
+import { 
+  MicrophoneController, 
+  PitchDetector,
+  PitchDetectionResult,
+  MicrophoneControllerEvents 
+} from '@pitchpro/audio-processing';
+
+// 型安全なイベントリスナー
+interface ExtendedWindow extends Window {
+  addEventListener<K extends keyof MicrophoneControllerEvents>(
+    type: K,
+    listener: (this: Window, ev: MicrophoneControllerEvents[K]) => any,
+    options?: boolean | AddEventListenerOptions
+  ): void;
+}
+
+declare const window: ExtendedWindow;
+
+window.addEventListener('pitchpro:sensitivityChanged', (event) => {
+  // TypeScriptが型を正しく推論
+  const sensitivity: number = event.detail.sensitivity;
+  console.log(`新しい感度: ${sensitivity}`);
 });
 ```
 
