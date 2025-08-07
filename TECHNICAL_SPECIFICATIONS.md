@@ -593,9 +593,125 @@ const cloudflareOptimization = {
 
 ---
 
-## 📦 14. 音響ライブラリ完全コンポーネント化仕様（v2.0.0 新戦略）
+## 🔗 14. ダイレクトアクセス機能仕様（v2.0.0 新機能）
 
-### 14.1 モジュラー設計アーキテクチャ
+### 14.1 概要とアーキテクチャ
+**ダイレクトアクセス機能**: URLを直接入力してトレーニングページにアクセスする機能
+
+```typescript
+// ダイレクトアクセス対応URL
+const directAccessURLs = [
+  '/training/random',      // ランダム基音モード
+  '/training/continuous',  // 連続チャレンジモード
+  '/training/chromatic',   // 12音階モード
+  '/settings',            // 設定ページ
+  '/about',              // アプリについて
+  '/help'                // ヘルプ
+];
+```
+
+### 14.2 マイク許可状態管理
+```typescript
+// マイク許可チェックシステム
+class PermissionChecker {
+  async checkMicrophonePermission(): Promise<boolean> {
+    // navigator.permissions API使用（対応ブラウザ）
+    if ('permissions' in navigator) {
+      const permission = await navigator.permissions.query({ 
+        name: 'microphone' as PermissionName 
+      });
+      return permission.state === 'granted';
+    }
+    
+    // フォールバック: localStorage チェック
+    const hasCompletedMicTest = localStorage.getItem('mic-test-completed');
+    return hasCompletedMicTest === 'true';
+  }
+}
+```
+
+### 14.3 自動リダイレクトフロー
+```typescript
+// SPAルーター実装
+class AppRouter {
+  async navigate(path: string) {
+    // ダイレクトアクセス判定
+    if (this.isTrainingPath(path)) {
+      const hasPermission = await this.checkMicrophonePermission();
+      
+      if (!hasPermission) {
+        // マイクテストページへリダイレクト
+        this.redirectTarget = path;
+        this.navigate('/microphone-test?redirect=' + encodeURIComponent(path));
+        return;
+      }
+    }
+    
+    // 通常のページ遷移
+    await this.executeRoute(path);
+  }
+}
+```
+
+### 14.4 URL共有・QRコード生成
+```typescript
+// 直接アクセスURL生成システム
+class URLGenerator {
+  generateTrainingURL(mode: TrainingMode, options?: TrainingOptions): string {
+    const basePath = `/training/${mode}`;
+    const params = new URLSearchParams();
+    
+    if (options) {
+      if (options.baseNote) params.set('base', options.baseNote);
+      if (options.difficulty) params.set('level', options.difficulty.toString());
+      if (options.sessionLength) params.set('length', options.sessionLength.toString());
+    }
+    
+    return `${window.location.origin}${basePath}${params.toString() ? '?' + params : ''}`;
+  }
+  
+  generateShareURL(mode: TrainingMode, score?: number): string {
+    const baseURL = this.generateTrainingURL(mode);
+    return score ? `${baseURL}&challenge_score=${score}` : baseURL;
+  }
+}
+```
+
+### 14.5 セキュリティ・検証
+```typescript
+// URL検証システム
+class URLValidator {
+  private static readonly ALLOWED_PATHS = [
+    '/', '/microphone-test', '/settings', '/about', '/help',
+    '/training/random', '/training/continuous', '/training/chromatic'
+  ];
+  
+  static isValidPath(path: string): boolean {
+    const basePath = path.split('?')[0];
+    return this.ALLOWED_PATHS.includes(basePath);
+  }
+  
+  static sanitizeParameters(params: URLSearchParams): URLSearchParams {
+    const allowedParams = ['redirect', 'base', 'level', 'length', 'shared', 'challenge_score'];
+    const sanitized = new URLSearchParams();
+    
+    allowedParams.forEach(param => {
+      const value = params.get(param);
+      if (value && this.isValidParameterValue(param, value)) {
+        sanitized.set(param, value);
+      }
+    });
+    
+    return sanitized;
+  }
+}
+```
+
+---
+
+## 📦 15. 音響ライブラリ完全コンポーネント化仕様（v2.0.0 新戦略）
+
+### 15.1 モジュラー設計アーキテクチャ
 ```typescript
 // PitchPro.jsライブラリ構成
 interface PitchProLibrary {
@@ -619,7 +735,7 @@ interface PitchProLibrary {
 }
 ```
 
-### 14.2 技術共用ライブラリ化
+### 15.2 技術共用ライブラリ化
 ```json
 {
   "name": "@pitchpro/audio-processing",
