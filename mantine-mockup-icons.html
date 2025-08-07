@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pitch Training - Mantine + 音楽教育カスタマイゼーション版（アイコン統一）</title>
+  
+  <!-- Mantine CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/@mantine/core@7.6.0/styles.css" rel="stylesheet">
+  
+  <style>
+    /* Mantine + 音楽教育カスタマイゼーション */
+    :root {
+      /* Mantine color override - 音楽教育テーマ */
+      --mantine-color-blue-6: #6366f1;     /* 学習集中色 */
+      --mantine-color-green-6: #10b981;    /* 成功・正解色 */
+      --mantine-color-yellow-6: #f59e0b;   /* 注意・練習中色 */
+      --mantine-color-red-6: #ef4444;      /* エラー・要改善色 */
+      --mantine-color-indigo-6: #6366f1;   /* プライマリー */
+      
+      /* 音階専用カラーシステム */
+      --note-do: #ef4444;
+      --note-re: #f97316;
+      --note-mi: #eab308;
+      --note-fa: #22c55e;
+      --note-so: #06b6d4;
+      --note-la: #3b82f6;
+      --note-si: #8b5cf6;
+      --note-do-high: #ec4899;
+      
+      /* 音楽教育UI専用変数 */
+      --pitch-display-size: 4rem;
+      --music-spacing: 1.5rem;
+      --gentle-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+      --music-border-radius: 16px;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* アイコンシステム */
+    .icon {
+      width: 1.25rem;
+      height: 1.25rem;
+      stroke: currentColor;
+      stroke-width: 1.5;
+      fill: none;
+      margin-right: 0.5rem;
+      vertical-align: middle;
+    }
+
+    .icon-lg {
+      width: 2rem;
+      height: 2rem;
+    }
+
+    .icon-xl {
+      width: 3rem;
+      height: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .icon-primary { color: var(--mantine-color-blue-6); }
+    .icon-success { color: var(--mantine-color-green-6); }
+    .icon-warning { color: var(--mantine-color-yellow-6); }
+    .icon-danger { color: var(--mantine-color-red-6); }
+
+    /* 音楽的グラデーション背景 */
+    .music-gradient-bg {
+      background: linear-gradient(135deg, 
+        rgba(99, 102, 241, 0.03) 0%, 
+        rgba(16, 185, 129, 0.03) 50%, 
+        rgba(139, 92, 246, 0.03) 100%);
+    }
+
+    /* ピッチ表示（メイン要素） */
+    .pitch-display-main {
+      background: radial-gradient(circle at center,
+        rgba(99, 102, 241, 0.1) 0%,
+        rgba(99, 102, 241, 0.05) 50%,
+        transparent 100%);
+      border: 3px solid rgba(99, 102, 241, 0.3);
+      border-radius: var(--music-border-radius);
+      padding: 3rem 2rem;
+      text-align: center;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pitch-display-main::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(from 0deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+      animation: pitch-pulse 4s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes pitch-pulse {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .pitch-display-main.accurate {
+      border-color: var(--note-fa);
+      background: radial-gradient(circle at center,
+        rgba(34, 197, 94, 0.15) 0%,
+        rgba(34, 197, 94, 0.05) 50%,
+        transparent 100%);
+      animation: success-glow 0.6s ease-out;
+    }
+
+    @keyframes success-glow {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+      50% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0.1); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+
+    .pitch-value {
+      font-size: var(--pitch-display-size);
+      font-weight: 800;
+      color: var(--mantine-color-blue-6);
+      text-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      letter-spacing: -0.02em;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pitch-note {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
+      opacity: 0.8;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 音階ボタングリッド */
+    .note-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin-top: var(--music-spacing);
+    }
+
+    .note-btn {
+      aspect-ratio: 1;
+      border: 2px solid;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      box-shadow: var(--gentle-shadow);
+    }
+
+    .note-btn-do { color: var(--note-do); border-color: var(--note-do); }
+    .note-btn-re { color: var(--note-re); border-color: var(--note-re); }
+    .note-btn-mi { color: var(--note-mi); border-color: var(--note-mi); }
+    .note-btn-fa { color: var(--note-fa); border-color: var(--note-fa); }
+    .note-btn-so { color: var(--note-so); border-color: var(--note-so); }
+    .note-btn-la { color: var(--note-la); border-color: var(--note-la); }
+    .note-btn-si { color: var(--note-si); border-color: var(--note-si); }
+    .note-btn-do-high { color: var(--note-do-high); border-color: var(--note-do-high); }
+
+    .note-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    .note-btn.active {
+      transform: scale(0.95);
+      box-shadow: inset 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    /* 音楽的プログレスバー */
+    .music-progress {
+      height: 12px;
+      background: linear-gradient(90deg, 
+        rgba(239, 68, 68, 0.2),
+        rgba(249, 115, 22, 0.2),
+        rgba(234, 179, 8, 0.2),
+        rgba(34, 197, 94, 0.2),
+        rgba(6, 182, 212, 0.2),
+        rgba(59, 130, 246, 0.2),
+        rgba(139, 92, 246, 0.2),
+        rgba(236, 72, 153, 0.2));
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .music-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, 
+        var(--note-do), var(--note-re), var(--note-mi), var(--note-fa),
+        var(--note-so), var(--note-la), var(--note-si), var(--note-do-high));
+      border-radius: 6px;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    /* セッション進捗ドット */
+    .session-progress {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      align-items: center;
+      padding: var(--music-spacing) 0;
+    }
+
+    .session-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #e5e7eb;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .session-dot.completed {
+      background: var(--mantine-color-green-6);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+    }
+
+    .session-dot.current {
+      background: var(--mantine-color-blue-6);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.4);
+      animation: current-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes current-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    /* カード要素の音楽的スタイル */
+    .music-card {
+      border: none;
+      border-radius: var(--music-border-radius);
+      box-shadow: var(--gentle-shadow);
+      background: white;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .music-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(99, 102, 241, 0.15);
+    }
+
+    .music-card-header {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      border-radius: var(--music-border-radius) var(--music-border-radius) 0 0;
+      padding: 1.5rem;
+      font-weight: 600;
+    }
+
+    /* フレンドリーボタン */
+    .friendly-btn {
+      border-radius: 12px;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .friendly-btn-primary {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .friendly-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    .friendly-btn-success {
+      background: linear-gradient(135deg, #10b981, #22c55e);
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .friendly-btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    /* スコア表示 */
+    .score-display {
+      background: radial-gradient(circle at center,
+        rgba(16, 185, 129, 0.1) 0%,
+        transparent 70%);
+      border: 3px solid var(--mantine-color-green-6);
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--music-spacing);
+      font-weight: 800;
+      font-size: 1.8rem;
+      color: var(--mantine-color-green-6);
+    }
+
+    /* レスポンシブ調整 */
+    @media (max-width: 768px) {
+      .pitch-value {
+        font-size: 3rem;
+      }
+      
+      .note-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+      }
+      
+      .note-btn {
+        font-size: 1rem;
+      }
+    }
+
+    /* フロート音符アニメーション */
+    .floating-notes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .floating-note {
+      position: absolute;
+      color: rgba(99, 102, 241, 0.1);
+      font-size: 2rem;
+      animation: float-up 8s linear infinite;
+    }
+
+    @keyframes float-up {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-10vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body class="music-gradient-bg">
+
+  <!-- SVGアイコン定義 -->
+  <svg style="display: none;">
+    <defs>
+      <!-- Music Icons -->
+      <g id="icon-music">
+        <path d="M9 18V5l12-2v13"></path>
+        <circle cx="6" cy="18" r="3"></circle>
+        <circle cx="18" cy="16" r="3"></circle>
+      </g>
+      
+      <g id="icon-microphone">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+        <line x1="12" y1="19" x2="12" y2="23"></line>
+        <line x1="8" y1="23" x2="16" y2="23"></line>
+      </g>
+      
+      <g id="icon-volume">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+      </g>
+      
+      <g id="icon-play">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polygon points="10 8 16 12 10 16 10 8"></polygon>
+      </g>
+      
+      <g id="icon-dice">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+        <circle cx="8.5" cy="8.5" r="1"></circle>
+        <circle cx="15.5" cy="15.5" r="1"></circle>
+      </g>
+      
+      <g id="icon-flame">
+        <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38.5-2 1-3 1.19-2.32 2.93-4.25 5-6l-.15.25c-.91 1.57-1.41 3.37-1.41 5.25A7.5 7.5 0 0 0 23 15.5c0 2-2 4.5-4 4.5s-4-2.5-4-4.5c0-.63.1-1.25.3-1.83C14.77 12.24 13.96 11 13 10c-1-.5-2 .5-2 1.5a2.5 2.5 0 0 1-2.5 2.5"></path>
+      </g>
+      
+      <g id="icon-piano">
+        <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+        <line x1="7" y1="4" x2="7" y2="12"></line>
+        <line x1="10" y1="4" x2="10" y2="12"></line>
+        <line x1="14" y1="4" x2="14" y2="12"></line>
+        <line x1="17" y1="4" x2="17" y2="12"></line>
+      </g>
+      
+      <g id="icon-chart">
+        <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline>
+      </g>
+      
+      <g id="icon-trophy">
+        <line x1="8" y1="21" x2="16" y2="21"></line>
+        <line x1="12" y1="17" x2="12" y2="21"></line>
+        <path d="M7 4V2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2"></path>
+        <path d="M7 4a4 4 0 0 0 0 8 6 6 0 0 0 10 0 4 4 0 0 0 0-8Z"></path>
+      </g>
+      
+      <g id="icon-target">
+        <circle cx="12" cy="12" r="10"></circle>
+        <circle cx="12" cy="12" r="6"></circle>
+        <circle cx="12" cy="12" r="2"></circle>
+      </g>
+      
+      <g id="icon-repeat">
+        <polyline points="17 1 21 5 17 9"></polyline>
+        <path d="M3 11v-1a4 4 0 0 1 4-4h14"></path>
+        <polyline points="7 23 3 19 7 15"></polyline>
+        <path d="M21 13v1a4 4 0 0 1-4 4H3"></path>
+      </g>
+      
+      <g id="icon-settings">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V6a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </g>
+      
+      <g id="icon-share">
+        <circle cx="18" cy="5" r="3"></circle>
+        <circle cx="6" cy="12" r="3"></circle>
+        <circle cx="18" cy="19" r="3"></circle>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+      </g>
+      
+      <g id="icon-stop">
+        <rect x="6" y="6" width="12" height="12" rx="2"></rect>
+      </g>
+      
+      <g id="icon-refresh">
+        <polyline points="23 4 23 10 17 10"></polyline>
+        <polyline points="1 20 1 14 7 14"></polyline>
+        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+      </g>
+
+      <g id="icon-gamepad">
+        <line x1="6" y1="11" x2="10" y2="11"></line>
+        <line x1="8" y1="9" x2="8" y2="13"></line>
+        <line x1="15" y1="12" x2="15.01" y2="12"></line>
+        <line x1="18" y1="10" x2="18.01" y2="10"></line>
+        <rect x="2" y="6" width="20" height="12" rx="6"></rect>
+      </g>
+
+      <g id="icon-star">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+      </g>
+    </defs>
+  </svg>
+
+  <!-- フロート音符背景 -->
+  <div class="floating-notes">
+    <div class="floating-note" style="left: 10%; animation-delay: 0s;">♪</div>
+    <div class="floating-note" style="left: 20%; animation-delay: 2s;">♫</div>
+    <div class="floating-note" style="left: 30%; animation-delay: 4s;">♪</div>
+    <div class="floating-note" style="left: 50%; animation-delay: 6s;">♫</div>
+    <div class="floating-note" style="left: 70%; animation-delay: 1s;">♪</div>
+    <div class="floating-note" style="left: 80%; animation-delay: 3s;">♫</div>
+    <div class="floating-note" style="left: 90%; animation-delay: 5s;">♪</div>
+  </div>
+
+  <!-- メインコンテンツ -->
+  <div style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+    
+    <!-- ヘッダー -->
+    <header style="text-align: center; margin-bottom: 3rem;">
+      <h1 style="font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 1rem;">
+        <svg class="icon icon-xl icon-primary"><use href="#icon-music"></use></svg>
+        相対音感トレーニング
+      </h1>
+      <p style="color: #6b7280; font-size: 1.1rem;">楽しく学んで、音感を育てよう！</p>
+    </header>
+
+    <!-- モード選択 -->
+    <div class="music-card" style="margin-bottom: 3rem;">
+      <div class="music-card-header">
+        <h2 style="margin: 0; font-size: 1.5rem; display: flex; align-items: center;">
+          <svg class="icon icon-lg"><use href="#icon-gamepad"></use></svg>
+          トレーニングモードを選択
+        </h2>
+      </div>
+      <div style="padding: 2rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+          
+          <div class="music-card" style="border: 3px solid #6366f1; background: rgba(99, 102, 241, 0.02);">
+            <div style="padding: 2rem; text-align: center;">
+              <svg class="icon icon-xl icon-primary"><use href="#icon-dice"></use></svg>
+              <h3 style="color: #6366f1; margin-bottom: 1rem;">ランダムモード</h3>
+              <p style="color: #6b7280; margin-bottom: 1.5rem;">基音がランダムに変わる基本練習<br>初心者におすすめ！</p>
+              <button class="friendly-btn friendly-btn-primary" style="width: 100%;">
+                <svg class="icon"><use href="#icon-play"></use></svg>
+                開始する
+              </button>
+            </div>
+          </div>
+
+          <div class="music-card">
+            <div style="padding: 2rem; text-align: center;">
+              <svg class="icon icon-xl icon-success"><use href="#icon-flame"></use></svg>
+              <h3 style="color: #10b981; margin-bottom: 1rem;">連続チャレンジ</h3>
+              <p style="color: #6b7280; margin-bottom: 1.5rem;">8セッション連続の集中練習<br>実力アップに最適！</p>
+              <button class="friendly-btn friendly-btn-success" style="width: 100%;">
+                <svg class="icon"><use href="#icon-repeat"></use></svg>
+                チャレンジ
+              </button>
+            </div>
+          </div>
+
+          <div class="music-card">
+            <div style="padding: 2rem; text-align: center;">
+              <svg class="icon icon-xl icon-warning"><use href="#icon-piano"></use></svg>
+              <h3 style="color: #f59e0b; margin-bottom: 1rem;">12音階モード</h3>
+              <p style="color: #6b7280; margin-bottom: 1.5rem;">全12音階の高度な練習<br>上級者向け！</p>
+              <button class="friendly-btn" style="width: 100%; background: linear-gradient(135deg, #f59e0b, #f97316); color: white;">
+                <svg class="icon"><use href="#icon-target"></use></svg>
+                マスター
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- メイン練習エリア -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+      
+      <!-- 左側：音程検出 -->
+      <div>
+        <!-- リアルタイム音程表示 -->
+        <div class="music-card" style="margin-bottom: 2rem;">
+          <div class="music-card-header">
+            <h3 style="margin: 0; display: flex; align-items: center;">
+              <svg class="icon icon-lg"><use href="#icon-chart"></use></svg>
+              リアルタイム音程検出
+            </h3>
+          </div>
+          <div style="padding: 2rem;">
+            <div class="pitch-display-main accurate">
+              <div class="pitch-value">440.0</div>
+              <div class="pitch-note" style="color: var(--note-la);">ラ (A4)</div>
+            </div>
+
+            <!-- 音量インジケーター -->
+            <div style="margin-top: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <span style="font-weight: 600; color: #374151; display: flex; align-items: center;">
+                  <svg class="icon"><use href="#icon-microphone"></use></svg>
+                  音量レベル
+                </span>
+                <span style="font-size: 0.9rem; color: #6b7280;">75%</span>
+              </div>
+              <div class="music-progress">
+                <div class="music-progress-fill" style="width: 75%;"></div>
+              </div>
+            </div>
+
+            <!-- セッション進捗 -->
+            <div style="text-align: center; margin-top: 2rem;">
+              <div style="font-weight: 600; color: #374151; margin-bottom: 1rem;">セッション進捗 (3/8)</div>
+              <div class="session-progress">
+                <div class="session-dot completed"></div>
+                <div class="session-dot completed"></div>
+                <div class="session-dot current"></div>
+                <div class="session-dot"></div>
+                <div class="session-dot"></div>
+                <div class="session-dot"></div>
+                <div class="session-dot"></div>
+                <div class="session-dot"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 基音再生エリア -->
+        <div class="music-card">
+          <div class="music-card-header">
+            <h3 style="margin: 0; display: flex; align-items: center;">
+              <svg class="icon icon-lg"><use href="#icon-piano"></use></svg>
+              基音再生
+            </h3>
+          </div>
+          <div style="padding: 2rem;">
+            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+              <button class="friendly-btn friendly-btn-primary" style="flex: 1; font-size: 1.1rem;">
+                <svg class="icon"><use href="#icon-play"></use></svg>
+                基音を再生
+              </button>
+              <button class="friendly-btn" style="background: #e5e7eb; color: #374151;">
+                <svg class="icon"><use href="#icon-refresh"></use></svg>
+                リセット
+              </button>
+            </div>
+            <div style="text-align: center; padding: 1rem; background: rgba(99, 102, 241, 0.05); border-radius: 8px;">
+              <span style="color: #6b7280;">現在の基音: </span>
+              <strong style="color: var(--note-do);">C4 (ド)</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右側：サイドバー -->
+      <div>
+        <!-- 現在のスコア -->
+        <div class="music-card" style="margin-bottom: 2rem;">
+          <div class="music-card-header">
+            <h3 style="margin: 0; display: flex; align-items: center;">
+              <svg class="icon icon-lg"><use href="#icon-trophy"></use></svg>
+              現在のスコア
+            </h3>
+          </div>
+          <div style="padding: 2rem; text-align: center;">
+            <div class="score-display">
+              85
+              <div style="font-size: 0.7rem; font-weight: normal; margin-top: 0.25rem;">点</div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; text-align: center;">
+              <div>
+                <div style="font-weight: 600; color: #6b7280; font-size: 0.9rem;">精度</div>
+                <div style="color: var(--mantine-color-green-6); font-size: 1.5rem; font-weight: 700;">92.5%</div>
+              </div>
+              <div>
+                <div style="font-weight: 600; color: #6b7280; font-size: 0.9rem;">評価</div>
+                <div style="color: var(--mantine-color-green-6); font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">
+                  Good!
+                  <svg class="icon icon-success"><use href="#icon-star"></use></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 音階ガイド -->
+        <div class="music-card" style="margin-bottom: 2rem;">
+          <div class="music-card-header">
+            <h3 style="margin: 0; display: flex; align-items: center;">
+              <svg class="icon icon-lg"><use href="#icon-music"></use></svg>
+              音階ガイド
+            </h3>
+          </div>
+          <div style="padding: 1.5rem;">
+            <div class="note-grid">
+              <div class="note-btn note-btn-do">ド</div>
+              <div class="note-btn note-btn-re">レ</div>
+              <div class="note-btn note-btn-mi">ミ</div>
+              <div class="note-btn note-btn-fa">ファ</div>
+              <div class="note-btn note-btn-so">ソ</div>
+              <div class="note-btn note-btn-la active">ラ</div>
+              <div class="note-btn note-btn-si">シ</div>
+              <div class="note-btn note-btn-do-high">ド↑</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- コントロール -->
+        <div class="music-card">
+          <div class="music-card-header">
+            <h3 style="margin: 0; display: flex; align-items: center;">
+              <svg class="icon icon-lg"><use href="#icon-gamepad"></use></svg>
+              コントロール
+            </h3>
+          </div>
+          <div style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+            <button class="friendly-btn friendly-btn-success" style="width: 100%;">
+              <svg class="icon"><use href="#icon-microphone"></use></svg>
+              練習開始
+            </button>
+            <button class="friendly-btn" style="width: 100%; background: #ef4444; color: white;">
+              <svg class="icon"><use href="#icon-stop"></use></svg>
+              停止
+            </button>
+            <button class="friendly-btn" style="width: 100%; background: #e5e7eb; color: #374151;">
+              <svg class="icon"><use href="#icon-share"></use></svg>
+              結果を共有
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 結果表示エリア -->
+    <div class="music-card">
+      <div class="music-card-header">
+        <h3 style="margin: 0; display: flex; align-items: center;">
+          <svg class="icon icon-lg"><use href="#icon-trophy"></use></svg>
+          セッション結果
+        </h3>
+      </div>
+      <div style="padding: 2rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center; margin-bottom: 2rem;">
+          <div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: #6366f1;">85</div>
+            <div style="color: #6b7280; font-weight: 600;">総合スコア</div>
+          </div>
+          <div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: #10b981;">92.5%</div>
+            <div style="color: #6b7280; font-weight: 600;">平均精度</div>
+          </div>
+          <div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: #06b6d4;">3:45</div>
+            <div style="color: #6b7280; font-weight: 600;">練習時間</div>
+          </div>
+          <div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: #f59e0b;">B+</div>
+            <div style="color: #6b7280; font-weight: 600;">総合評価</div>
+          </div>
+        </div>
+
+        <!-- 詳細進捗バー -->
+        <div style="margin-bottom: 2rem;">
+          <div class="music-progress" style="height: 24px;">
+            <div style="height: 100%; display: flex; border-radius: 6px; overflow: hidden;">
+              <div style="background: var(--mantine-color-green-6); width: 60%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.8rem;">優秀</div>
+              <div style="background: var(--mantine-color-yellow-6); width: 30%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.8rem;">良好</div>
+              <div style="background: var(--mantine-color-red-6); width: 10%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.8rem;">要改善</div>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.9rem; color: #6b7280;">
+            <span style="display: flex; align-items: center; gap: 0.25rem;">
+              <svg class="icon icon-success" style="width: 1rem; height: 1rem;"><use href="#icon-star"></use></svg>
+              優秀: 5回
+            </span>
+            <span>良好: 2回</span>
+            <span>要改善: 1回</span>
+          </div>
+        </div>
+
+        <!-- アクションボタン -->
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <button class="friendly-btn friendly-btn-primary" style="flex: 1;">
+            <svg class="icon"><use href="#icon-refresh"></use></svg>
+            もう一度
+          </button>
+          <button class="friendly-btn friendly-btn-success" style="flex: 1;">
+            <svg class="icon"><use href="#icon-play"></use></svg>
+            次のレベル
+          </button>
+          <button class="friendly-btn" style="background: #8b5cf6; color: white;">
+            <svg class="icon"><use href="#icon-share"></use></svg>
+            結果を共有
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // インタラクティブ機能のデモ
+    document.addEventListener('DOMContentLoaded', function() {
+      // 音量バーのアニメーション
+      setInterval(() => {
+        const fill = document.querySelector('.music-progress-fill');
+        const randomWidth = Math.random() * 100;
+        fill.style.width = randomWidth + '%';
+      }, 800);
+
+      // ピッチ値の変更
+      setInterval(() => {
+        const pitchValue = document.querySelector('.pitch-value');
+        const randomPitch = (440 + (Math.random() - 0.5) * 100).toFixed(1);
+        pitchValue.textContent = randomPitch;
+      }, 1500);
+
+      // 音階ボタンのインタラクション
+      document.querySelectorAll('.note-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.note-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+
+      // セッション進捗のアニメーション
+      let currentSession = 3;
+      setInterval(() => {
+        const dots = document.querySelectorAll('.session-dot');
+        dots.forEach((dot, index) => {
+          dot.classList.remove('completed', 'current');
+          if (index < currentSession - 1) {
+            dot.classList.add('completed');
+          } else if (index === currentSession - 1) {
+            dot.classList.add('current');
+          }
+        });
+        
+        currentSession = (currentSession % 8) + 1;
+      }, 3000);
+    });
+  </script>
+
+</body>
+</html>
