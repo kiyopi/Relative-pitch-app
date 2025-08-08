@@ -25,7 +25,45 @@
 - `REQUIREMENTS_SPECIFICATION.md`: 要件定義書（v1.0.0）
 - `TECHNICAL_SPECIFICATIONS.md`: 技術仕様書（v1.0.0）
 - `RELEASE_AND_MONETIZATION_PLAN.md`: リリース計画・収益化戦略書（v1.0.0）
+- `GLOSSARY.md`: プロジェクト用語集（v1.0.0）
 - `CLAUDE.md`: 開発ガイドライン（本ファイル）
+
+## 🌿 Git運用方針
+
+### ブランチ保護
+- **mainブランチ**: 直接更新禁止・安定版のみ
+- **開発作業**: 個別ブランチで実施
+- **統合**: Pull Request経由のみ
+
+### ブランチ命名規則
+```
+{type}/{scope}-{description}
+```
+
+**Type（種類）**:
+- `feature/` - 新機能開発
+- `fix/` - バグ修正  
+- `refactor/` - リファクタリング
+- `docs/` - ドキュメント更新
+- `style/` - UI/スタイル変更
+- `test/` - テスト追加・修正
+- `chore/` - 設定変更・ツール更新
+
+**Scope（対象領域）**:
+- `audio` - 音声処理関連
+- `ui` - ユーザーインターフェース
+- `training` - トレーニングモード
+- `data` - データ管理・localStorage
+- `deploy` - デプロイ・ビルド設定
+- `core` - 核心システム
+
+**命名例**:
+```bash
+feature/audio-pitchy-integration
+fix/ui-mobile-layout  
+refactor/core-typescript-migration
+docs/glossary-update
+```
 
 ---
 

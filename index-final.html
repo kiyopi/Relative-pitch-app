@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="adult" data-mode="random">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>相対音感トレーニング</title>
+  
+  <!-- Mantine CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/@mantine/core@7.6.0/styles.css" rel="stylesheet">
+  
+  <style>
+    /* === テーマカラーシステム === */
+    
+    /* 大人モード（実際のshadcn/ui準拠 + マカロン風パステル） */
+    :root,
+    [data-theme="adult"] {
+      /* shadcn/ui基本色（Neutral base） */
+      --background: #ffffff;
+      --foreground: #0a0a0a;
+      --card: #ffffff;
+      --card-foreground: #0a0a0a;
+      --popover: #ffffff;
+      --popover-foreground: #0a0a0a;
+      
+      /* マカロン風パステル調の優しいミュート色 */
+      --muted: #f0f8ff;                    /* 薄いブルー背景で変化を確認 */
+      --muted-foreground: #737373;
+      --border: #d6ebff;
+      --input: #e5e5e5;
+      --ring: #d4d4d8;
+      
+      /* セカンダリ・アクセント（パステル調） */
+      --secondary: #f5f5f5;
+      --secondary-foreground: #171717;
+      --accent: #f5f5f5;
+      --accent-foreground: #171717;
+      
+      /* UI設定 */
+      --radius: 6px;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+    
+    /* 子供モード（マカロン風パステル調 - 12歳程度向け） */
+    [data-theme="kids"] {
+      /* マカロンのbaby blueを基調とした背景 */
+      --background: #f8fcff;               /* 薄いブルー背景で変化を確認 */
+      --foreground: #525252;               /* 優しいグレーの文字色 */
+      --card: #ffffff;
+      --card-foreground: #525252;
+      
+      /* マカロンのpeach・butter系の優しいミュート色 */
+      --muted: #faf9f7;                    /* クリーム系の優しい背景 */
+      --muted-foreground: #6b6b6b;         /* 読みやすい薄文字 */
+      --border: #f0ede8;                   /* バター系の優しいボーダー */
+      --input: #f0ede8;
+      --ring: #e8e2db;
+      
+      /* セカンダリ・アクセント */
+      --secondary: #faf9f7;
+      --secondary-foreground: #525252;
+      --accent: #faf9f7;
+      --accent-foreground: #525252;
+      
+      /* より丸みのあるデザイン */
+      --radius: 12px;
+      --shadow: 0 4px 8px -2px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+      --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.06), 0 10px 10px -5px rgb(0 0 0 / 0.04);
+    }
+
+    /* === モード別テーマカラー === */
+    
+    /* ランダムモード - グリーン */
+    [data-mode="random"] {
+      --primary: hsl(142 76% 36%);
+      --primary-foreground: hsl(355 100% 97%);
+      --primary-light: hsl(142 69% 58%);
+      --primary-lighter: hsl(142 52% 96%);
+    }
+    
+    /* チャレンジモード - オレンジ */
+    [data-mode="continuous"] {
+      --primary: hsl(25 95% 53%);
+      --primary-foreground: hsl(0 0% 100%);
+      --primary-light: hsl(25 95% 70%);
+      --primary-lighter: hsl(25 100% 96%);
+    }
+    
+    /* 12音階モード - パープル */
+    [data-mode="chromatic"] {
+      --primary: hsl(262 83% 58%);
+      --primary-foreground: hsl(0 0% 100%);
+      --primary-light: hsl(262 69% 70%);
+      --primary-lighter: hsl(262 100% 96%);
+    }
+
+    /* パステル調（子供モード用）- 12歳程度に適した落ち着いた色調 */
+    [data-theme="kids"][data-mode="random"] {
+      --primary: hsl(142 55% 65%);      /* 優しいパステルグリーン */
+      --primary-light: hsl(142 45% 78%);
+      --primary-lighter: hsl(142 35% 92%);
+    }
+    
+    [data-theme="kids"][data-mode="continuous"] {
+      --primary: hsl(25 75% 72%);       /* 温かみのあるパステルオレンジ */
+      --primary-light: hsl(25 65% 82%);
+      --primary-lighter: hsl(25 50% 94%);
+    }
+    
+    [data-theme="kids"][data-mode="chromatic"] {
+      --primary: hsl(262 65% 72%);      /* 上品なパステルパープル */
+      --primary-light: hsl(262 55% 82%);
+      --primary-lighter: hsl(262 40% 94%);
+    }
+
+    /* 子供モード専用の評価カラー（マカロン風パステル） */
+    [data-theme="kids"] {
+      --success: #C1E1DC;               /* マカロンbaby blue */
+      --success-foreground: #4a5568;
+      --warning: #FFEB94;               /* マカロンbutter */
+      --warning-foreground: #744210;
+      --destructive: #FFCCAC;           /* マカロンpeach */
+      --destructive-foreground: #7c2d12;
+    }
+
+    /* 評価カラー */
+    :root {
+      --success: hsl(142 76% 36%);
+      --success-foreground: hsl(355 100% 97%);
+      --warning: hsl(38 92% 50%);
+      --warning-foreground: hsl(48 96% 89%);
+      --destructive: hsl(0 84% 60%);
+      --destructive-foreground: hsl(0 0% 98%);
+    }
+
+    /* === 基本スタイル === */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      line-height: 1.5;
+    }
+
+    /* テスト用：直接色指定 */
+    [data-theme="adult"] body {
+      background: #e6f3ff !important;
+    }
+    
+    [data-theme="kids"] body {
+      background: #ffb6c1 !important;  /* より濃いピンクで変化を確認 */
+    }
+
+    /* 絵文字スタイル */
+    .emoji-icon {
+      font-size: 1.2em;
+      display: inline-block;
+    }
+
+    /* テーマ切り替えボタン */
+    .theme-switcher {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 1000;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px 16px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--foreground);
+      transition: all 0.2s;
+    }
+
+    .theme-switcher:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-1px);
+    }
+
+    /* コンテナ */
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* ヘッダー */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 32px;
+    }
+
+    .app-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--foreground);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* カード */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow);
+    }
+
+    .card-header {
+      background: var(--muted);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 20px;
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--foreground);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* テスト用：カードヘッダーの直接色指定 */
+    [data-theme="adult"] .card-header {
+      background: #e6f3ff !important;
+      color: #1e3a8a !important;
+    }
+    
+    [data-theme="kids"] .card-header {
+      background: #ffe6f0 !important;
+      color: #be185d !important;
+    }
+
+    /* モード別カードの境界線 */
+    [data-mode="random"] .mode-card.card {
+      border: 2px solid #16a34a !important;
+    }
+    [data-mode="continuous"] .mode-card.card {
+      border: 2px solid #ea580c !important;
+    }
+    [data-mode="chromatic"] .mode-card.card {
+      border: 2px solid #7c3aed !important;
+    }
+    
+    .card-header .btn {
+      padding: 6px 12px;
+      font-size: 12px;
+      min-height: 28px;
+    }
+
+    .card-body {
+      padding: 24px;
+    }
+
+    /* ボタン */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 500;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      min-height: 36px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--primary-foreground);
+      border-color: var(--primary);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-light);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+
+    /* モード別ボタンカラー - 直接指定 */
+    [data-mode="random"] .btn-primary {
+      background: #16a34a !important;
+      border-color: #16a34a !important;
+    }
+    [data-mode="random"] .btn-primary:hover {
+      background: #15803d !important;
+    }
+
+    [data-mode="continuous"] .btn-primary {
+      background: #ea580c !important;
+      border-color: #ea580c !important;
+    }
+    [data-mode="continuous"] .btn-primary:hover {
+      background: #c2410c !important;
+    }
+
+    [data-mode="chromatic"] .btn-primary {
+      background: #7c3aed !important;
+      border-color: #7c3aed !important;
+    }
+    [data-mode="chromatic"] .btn-primary:hover {
+      background: #6d28d9 !important;
+    }
+
+    .btn-secondary {
+      background: var(--secondary);
+      color: var(--secondary-foreground);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--accent);
+      color: var(--accent-foreground);
+    }
+
+    .btn-lg {
+      padding: 12px 24px;
+      font-size: 16px;
+      min-height: 44px;
+    }
+
+    /* モード選択グリッド */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .mode-card {
+      text-align: center;
+      padding: 32px 24px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .mode-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .mode-card.active {
+      border-color: var(--primary);
+      background: var(--primary-lighter);
+    }
+
+    .mode-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 16px;
+      color: var(--primary);
+    }
+
+    .mode-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--foreground);
+      margin-bottom: 8px;
+    }
+
+    .mode-description {
+      color: var(--muted-foreground);
+      font-size: 14px;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+
+    /* 基音エリア */
+    .base-note-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+    }
+
+    .base-note-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--foreground);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .base-note-display {
+      width: 80px;
+      height: 80px;
+      margin: 16px auto;
+      color: var(--primary);
+    }
+
+    /* 統合進行ガイド（コンパクト版） */
+    .progress-guide {
+      background: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin: 16px 0;
+    }
+
+    .progress-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--foreground);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .progress-bar-container {
+      position: relative;
+      height: 32px;
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: calc(var(--radius) * 2);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .progress-sections {
+      display: flex;
+      height: 100%;
+      position: relative;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .progress-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      position: relative;
+    }
+
+    .section-base {
+      flex: 4;
+      background: var(--primary);
+    }
+
+    .section-rest {
+      flex: 1;
+      background: var(--warning);
+    }
+
+    .section-start {
+      flex: 5;
+      background: var(--success);
+    }
+
+    .start-marker {
+      position: absolute;
+      left: 8px;
+      width: 16px;
+      height: 16px;
+      color: white;
+    }
+
+    .progress-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background: linear-gradient(90deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2));
+      transition: width 0.3s ease;
+      pointer-events: none;
+    }
+
+    /* ドレミガイド */
+    .doremi-guide {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .note-indicator {
+      flex: 1;
+      height: 36px;
+      border-radius: calc(var(--radius) * 3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      background: var(--secondary);
+      color: var(--secondary-foreground);
+      border: 2px solid var(--border);
+      position: relative;
+    }
+
+    .note-indicator.active {
+      background: var(--primary);
+      color: var(--primary-foreground);
+      border-color: var(--primary);
+      transform: scale(1.1);
+      box-shadow: 0 0 0 4px var(--primary-lighter);
+      animation: currentPitch 1.5s infinite;
+      position: relative;
+      z-index: 10;
+    }
+
+    .note-indicator.singing {
+      background: var(--warning);
+      color: var(--warning-foreground);
+      border-color: var(--warning);
+      transform: scale(1.2);
+      box-shadow: 0 0 0 6px rgba(255, 193, 7, 0.3), 0 0 20px rgba(255, 193, 7, 0.4);
+      animation: singing 0.8s infinite;
+      position: relative;
+      z-index: 15;
+    }
+
+    .note-indicator.completed {
+      background: var(--success);
+      color: var(--success-foreground);
+      border-color: var(--success);
+      transform: scale(0.95);
+      opacity: 0.8;
+      position: relative;
+    }
+
+    .note-indicator.completed::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: var(--success);
+      border-radius: inherit;
+      opacity: 0.2;
+      animation: completedGlow 2s ease-out;
+    }
+
+    /* アニメーション定義 */
+    @keyframes currentPitch {
+      0%, 100% { 
+        transform: scale(1.1); 
+        box-shadow: 0 0 0 4px var(--primary-lighter);
+      }
+      50% { 
+        transform: scale(1.15); 
+        box-shadow: 0 0 0 6px var(--primary-lighter), 0 0 15px rgba(0,0,0,0.1);
+      }
+    }
+
+    @keyframes singing {
+      0%, 100% { 
+        transform: scale(1.2); 
+        box-shadow: 0 0 0 6px rgba(255, 193, 7, 0.3), 0 0 20px rgba(255, 193, 7, 0.4);
+      }
+      25% { 
+        transform: scale(1.25); 
+        box-shadow: 0 0 0 8px rgba(255, 193, 7, 0.4), 0 0 25px rgba(255, 193, 7, 0.5);
+      }
+      50% { 
+        transform: scale(1.3); 
+        box-shadow: 0 0 0 10px rgba(255, 193, 7, 0.2), 0 0 30px rgba(255, 193, 7, 0.3);
+      }
+      75% { 
+        transform: scale(1.25); 
+        box-shadow: 0 0 0 8px rgba(255, 193, 7, 0.4), 0 0 25px rgba(255, 193, 7, 0.5);
+      }
+    }
+
+    @keyframes completedGlow {
+      0% { 
+        transform: scale(0); 
+        opacity: 0.5; 
+      }
+      50% { 
+        transform: scale(1.2); 
+        opacity: 0.3; 
+      }
+      100% { 
+        transform: scale(1.5); 
+        opacity: 0; 
+      }
+    }
+
+    /* 音量メーター */
+    .volume-meter {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .volume-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--foreground);
+    }
+
+    .volume-bar {
+      height: 24px;
+      background: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: calc(var(--radius) * 2);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .volume-fill {
+      height: 100%;
+      background: linear-gradient(90deg, 
+        var(--success), 
+        var(--warning), 
+        var(--destructive));
+      transition: width 0.2s ease;
+      border-radius: calc(var(--radius) * 2);
+    }
+
+    /* 評価結果 */
+    .evaluation-section {
+      margin-top: 24px;
+    }
+
+    .evaluation-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--foreground);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .score-summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .score-item {
+      text-align: center;
+      padding: 20px 16px;
+      background: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .score-value {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--primary);
+    }
+
+    .score-label {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+
+    /* 評価チャート */
+    .evaluation-chart {
+      margin: 24px 0;
+    }
+
+    .chart-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--foreground);
+      margin-bottom: 16px;
+    }
+
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      height: 200px;
+      padding: 16px;
+      background: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      position: relative;
+    }
+
+    .bar {
+      flex: 1;
+      margin: 0 4px;
+      border-radius: var(--radius) var(--radius) 0 0;
+      position: relative;
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      min-height: 8px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 8px;
+    }
+
+    .bar-icon {
+      width: 20px;
+      height: 20px;
+      color: white;
+      position: absolute;
+      top: 8px;
+    }
+
+    .bar-label {
+      position: absolute;
+      bottom: -32px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--foreground);
+    }
+
+    /* 評価レベル別カラー - 直接指定 */
+    .bar.excellent { 
+      background: linear-gradient(180deg, #ffd700, #ffb347) !important;
+    }
+    .bar.good { 
+      background: linear-gradient(180deg, #51cf66, #40c057) !important;
+    }
+    .bar.pass { 
+      background: linear-gradient(180deg, #4c6ef5, #364fc7) !important;
+    }
+    .bar.practice { 
+      background: linear-gradient(180deg, #868e96, #6c757d) !important;
+    }
+
+    /* テーマ別評価カラー */
+    [data-theme="kids"] .bar.excellent {
+      background: linear-gradient(180deg, #FFEB94, #FDD475) !important;
+    }
+    [data-theme="kids"] .bar.good {
+      background: linear-gradient(180deg, #C1E1DC, #9bcccf) !important;
+    }
+    [data-theme="kids"] .bar.pass {
+      background: linear-gradient(180deg, #b8daff, #91bfff) !important;
+    }
+    [data-theme="kids"] .bar.practice {
+      background: linear-gradient(180deg, #FFCCAC, #ffb085) !important;
+    }
+
+    /* セッション進捗 */
+    .session-progress {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .session-title {
+      font-size: 14px;
+      color: var(--muted-foreground);
+      margin-bottom: 12px;
+    }
+
+    .session-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .session-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--muted);
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+
+    .session-dot.completed {
+      background: var(--success);
+      border-color: var(--success);
+    }
+
+    .session-dot.current {
+      background: var(--primary);
+      border-color: var(--primary);
+      transform: scale(1.4);
+      box-shadow: 0 0 0 3px var(--primary-lighter);
+    }
+
+    /* レイアウト */
+    .layout-container {
+      display: grid;
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    /* レスポンシブ */
+    @media (min-width: 1024px) {
+      .layout-container {
+        grid-template-columns: 300px 1fr;
+      }
+    }
+
+    @media (min-width: 768px) and (max-width: 1023px) and (orientation: portrait) {
+      .base-note-section {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 20px;
+        align-items: center;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .app-container {
+        padding: 16px;
+      }
+      
+      .mode-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .score-summary {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .doremi-guide {
+        flex-wrap: wrap;
+      }
+      
+      .note-indicator {
+        flex: 0 0 calc(25% - 6px);
+        min-width: 36px;
+        height: 32px;
+        font-size: 12px;
+      }
+    }
+
+    /* ページ管理 */
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* アニメーション */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-in {
+      animation: fadeIn 0.4s ease;
+    }
+
+    /* ユーティリティ */
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .gap-2 { gap: 8px; }
+    .gap-3 { gap: 12px; }
+    .gap-4 { gap: 16px; }
+    .text-center { text-align: center; }
+    .w-full { width: 100%; }
+    .mt-4 { margin-top: 16px; }
+    .mb-4 { margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+
+  <!-- テーマ切り替えボタン -->
+  <button class="theme-switcher" onclick="toggleTheme()">
+    <span id="theme-emoji">👨‍💼</span>
+    <span id="theme-text">大人モード</span>
+  </button>
+
+  <div class="app-container">
+    
+    <!-- ヘッダー -->
+    <header class="app-header">
+      <h1 class="app-title">
+        <span>🎵</span>
+        相対音感トレーニング
+      </h1>
+    </header>
+
+    <!-- ホームページ -->
+    <div id="home-page" class="page active">
+      <div class="card">
+        <div class="card-header">
+          <span>🎯</span>
+          トレーニングモード選択
+        </div>
+        <div class="card-body">
+          <div class="mode-grid">
+            
+            <!-- ランダムモード -->
+            <div class="mode-card card" data-mode="random" onclick="selectMode('random')">
+              <span class="mode-icon" style="font-size: 64px; margin-bottom: 16px; display: block;">🎲</span>
+              <h3 class="mode-title">ランダム基音モード</h3>
+              <p class="mode-description">基音がランダムに変わる基本練習</p>
+              <button class="btn btn-primary btn-lg" onclick="event.stopPropagation(); startMode('random')">開始</button>
+            </div>
+
+            <!-- 連続チャレンジ -->
+            <div class="mode-card card" data-mode="continuous" onclick="selectMode('continuous')">
+              <span class="mode-icon" style="font-size: 64px; margin-bottom: 16px; display: block;">🔥</span>
+              <h3 class="mode-title">連続チャレンジ</h3>
+              <p class="mode-description">8セッション連続トレーニング</p>
+              <button class="btn btn-primary btn-lg" onclick="event.stopPropagation(); startMode('continuous')">チャレンジ</button>
+            </div>
+
+            <!-- 12音階モード -->
+            <div class="mode-card card" data-mode="chromatic" onclick="selectMode('chromatic')">
+              <span class="mode-icon" style="font-size: 64px; margin-bottom: 16px; display: block;">🎼</span>
+              <h3 class="mode-title">12音階モード</h3>
+              <p class="mode-description">全音階マスター向け</p>
+              <button class="btn btn-primary btn-lg" onclick="event.stopPropagation(); startMode('chromatic')">上級</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- マイクテストページ -->
+    <div id="mic-test-page" class="page">
+      <div class="card">
+        <div class="card-header">
+          <span>🎤</span>
+          マイクロフォン設定
+          <button class="btn btn-secondary" style="margin-left: auto;" onclick="showPage('home-page')">
+            <span>⬅️</span>
+            戻る
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="text-center">
+            <button id="mic-permission-btn" class="btn btn-primary btn-lg" onclick="requestMicrophone()">
+              <span>🎤</span>
+              マイクを許可
+            </button>
+          </div>
+
+          <div id="mic-status" style="display: none;">
+            <div class="volume-meter">
+              <div class="volume-label">
+                <span class="flex items-center gap-2">
+                  <span>🔊</span>
+                  音量レベル
+                </span>
+                <span id="volume-percentage">0%</span>
+              </div>
+              <div class="volume-bar">
+                <div class="volume-fill" id="volume-fill" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div class="text-center mt-4">
+              <button class="btn btn-primary btn-lg" onclick="startTraining()">
+                <span>▶️</span>
+                トレーニング開始
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- トレーニングページ -->
+    <div id="training-page" class="page">
+      <div class="layout-container">
+        
+        <!-- 基音エリア -->
+        <div class="base-note-section">
+          <div class="base-note-title">
+            <span>🎹</span>
+            基音
+          </div>
+          <span class="base-note-display" style="font-size: 80px;">🎵</span>
+          <button class="btn btn-primary btn-lg w-full" onclick="playBaseNote()">
+            <span>▶️</span>
+            基音を再生
+          </button>
+        </div>
+
+        <!-- メインエリア -->
+        <div>
+          <!-- 統合進行ガイド -->
+          <div class="progress-guide">
+            <div class="progress-title">
+              <span>📊</span>
+              トレーニング進行
+            </div>
+            
+            <div class="progress-bar-container">
+              <div class="progress-sections">
+                <div class="progress-section section-base">基音再生</div>
+                <div class="progress-section section-rest">休憩</div>
+                <div class="progress-section section-start">
+                  <span class="start-marker">🎯</span>
+                  開始
+                </div>
+              </div>
+              <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+            </div>
+            
+            <div class="doremi-guide">
+              <div class="note-indicator" data-note="do">ド</div>
+              <div class="note-indicator" data-note="re">レ</div>
+              <div class="note-indicator" data-note="mi">ミ</div>
+              <div class="note-indicator" data-note="fa">ファ</div>
+              <div class="note-indicator" data-note="so">ソ</div>
+              <div class="note-indicator" data-note="la">ラ</div>
+              <div class="note-indicator" data-note="si">シ</div>
+              <div class="note-indicator" data-note="do-high">ド</div>
+            </div>
+          </div>
+
+          <!-- 音量メーター -->
+          <div class="volume-meter">
+            <div class="volume-label">
+              <span class="flex items-center gap-2">
+                <span>🎤</span>
+                音量
+              </span>
+              <span id="training-volume">0%</span>
+            </div>
+            <div class="volume-bar">
+              <div class="volume-fill" id="training-volume-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <!-- セッション進捗 -->
+          <div class="session-progress">
+            <div class="session-title">セッション進捗</div>
+            <div class="session-dots">
+              <div class="session-dot completed"></div>
+              <div class="session-dot completed"></div>
+              <div class="session-dot current"></div>
+              <div class="session-dot"></div>
+              <div class="session-dot"></div>
+              <div class="session-dot"></div>
+              <div class="session-dot"></div>
+              <div class="session-dot"></div>
+            </div>
+          </div>
+
+          <!-- 評価結果 -->
+          <div class="card evaluation-section">
+            <div class="card-header">
+              <span>📊</span>
+              セッション結果
+            </div>
+            <div class="card-body">
+              
+              <!-- スコアサマリー -->
+              <div class="score-summary">
+                <div class="score-item">
+                  <div class="score-value">76</div>
+                  <div class="score-label">スコア</div>
+                </div>
+                <div class="score-item">
+                  <div class="score-value">B</div>
+                  <div class="score-label">ランク</div>
+                </div>
+                <div class="score-item">
+                  <div class="score-value">78%</div>
+                  <div class="score-label">精度</div>
+                </div>
+                <div class="score-item">
+                  <div class="score-value">3:45</div>
+                  <div class="score-label">時間</div>
+                </div>
+              </div>
+
+              <!-- 評価チャート -->
+              <div class="evaluation-chart">
+                <div class="chart-title">各音階の評価</div>
+                <div class="bar-chart">
+                  <div class="bar excellent" style="height: 90%;" data-score="優秀">
+                    <span class="bar-icon">🏆</span>
+                    <span class="bar-label">ド</span>
+                  </div>
+                  <div class="bar good" style="height: 75%;" data-score="良好">
+                    <span class="bar-icon">🎉</span>
+                    <span class="bar-label">レ</span>
+                  </div>
+                  <div class="bar pass" style="height: 60%;" data-score="合格">
+                    <span class="bar-icon">👍</span>
+                    <span class="bar-label">ミ</span>
+                  </div>
+                  <div class="bar practice" style="height: 30%;" data-score="要練習">
+                    <span class="bar-icon">😭</span>
+                    <span class="bar-label">ファ</span>
+                  </div>
+                  <div class="bar excellent" style="height: 95%;" data-score="優秀">
+                    <span class="bar-icon">🏆</span>
+                    <span class="bar-label">ソ</span>
+                  </div>
+                  <div class="bar good" style="height: 80%;" data-score="良好">
+                    <span class="bar-icon">🎉</span>
+                    <span class="bar-label">ラ</span>
+                  </div>
+                  <div class="bar pass" style="height: 65%;" data-score="合格">
+                    <span class="bar-icon">👍</span>
+                    <span class="bar-label">シ</span>
+                  </div>
+                  <div class="bar excellent" style="height: 88%;" data-score="優秀">
+                    <span class="bar-icon">🏆</span>
+                    <span class="bar-label">ド</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- アクションボタン -->
+              <div class="flex gap-3 mt-4">
+                <button class="btn btn-secondary" style="flex: 1;">
+                  <span>🔄</span>
+                  もう一度
+                </button>
+                <button class="btn btn-primary" style="flex: 1;">
+                  <span>📤</span>
+                  結果を共有
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <script>
+    let currentMode = 'random';
+
+    // テーマ切り替え
+    function toggleTheme() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'adult' ? 'kids' : 'adult';
+      
+      console.log('テーマ切り替え:', currentTheme, '→', newTheme);
+      html.setAttribute('data-theme', newTheme);
+      console.log('data-theme属性:', html.getAttribute('data-theme'));
+      
+      // ボタン更新
+      const emoji = document.getElementById('theme-emoji');
+      const text = document.getElementById('theme-text');
+      if (newTheme === 'kids') {
+        emoji.textContent = '🧒';
+        text.textContent = '子供モード';
+      } else {
+        emoji.textContent = '👨‍💼';
+        text.textContent = '大人モード';
+      }
+      
+      localStorage.setItem('theme', newTheme);
+    }
+
+    // モード選択
+    function selectMode(mode) {
+      currentMode = mode;
+      document.documentElement.setAttribute('data-mode', mode);
+      console.log('モード変更:', mode, 'data-mode属性:', document.documentElement.getAttribute('data-mode'));
+      
+      // 選択状態の更新
+      document.querySelectorAll('.mode-card').forEach(card => {
+        card.classList.remove('active');
+      });
+      document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+      
+      // すぐにページ遷移せず、ボタンクリック時のみ遷移する
+      console.log('モード選択:', mode);
+    }
+
+    // トレーニング開始ボタンがクリックされた時
+    function startMode(mode) {
+      selectMode(mode);
+      setTimeout(() => {
+        showPage('mic-test-page');
+      }, 200);
+    }
+
+    // ページ遷移
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
+      const targetPage = document.getElementById(pageId);
+      targetPage.classList.add('active');
+      targetPage.classList.add('animate-in');
+    }
+
+    // マイク許可
+    async function requestMicrophone() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        document.getElementById('mic-status').style.display = 'block';
+        document.getElementById('mic-permission-btn').style.display = 'none';
+        animateVolume();
+      } catch (error) {
+        alert('マイクの使用を許可してください');
+      }
+    }
+
+    // トレーニング開始
+    function startTraining() {
+      showPage('training-page');
+      setTimeout(() => {
+        animateEvaluation();
+      }, 1000);
+    }
+
+    // 基音再生
+    function playBaseNote() {
+      animateProgress();
+    }
+
+    // 音量アニメーション
+    function animateVolume() {
+      setInterval(() => {
+        const volume = Math.random() * 100;
+        document.getElementById('volume-fill').style.width = volume + '%';
+        document.getElementById('volume-percentage').textContent = Math.round(volume) + '%';
+        const trainingFill = document.getElementById('training-volume-fill');
+        const trainingVolume = document.getElementById('training-volume');
+        if (trainingFill) trainingFill.style.width = volume + '%';
+        if (trainingVolume) trainingVolume.textContent = Math.round(volume) + '%';
+      }, 500);
+    }
+
+    // 進行バーアニメーション
+    function animateProgress() {
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 2;
+        const progressFill = document.getElementById('progress-fill');
+        if (progressFill) {
+          progressFill.style.width = progress + '%';
+        }
+        
+        if (progress === 40) {
+          startDoremiGuide();
+        } else if (progress >= 100) {
+          clearInterval(interval);
+        }
+      }, 50);
+    }
+
+    // ドレミガイド
+    function startDoremiGuide() {
+      const notes = document.querySelectorAll('.note-indicator');
+      let currentIndex = 0;
+      
+      const interval = setInterval(() => {
+        if (currentIndex > 0) {
+          notes[currentIndex - 1].classList.remove('active', 'singing');
+          notes[currentIndex - 1].classList.add('completed');
+        }
+        
+        if (currentIndex < notes.length) {
+          notes[currentIndex].classList.add('active');
+          // 歌声検出のシミュレーション（実際の実装では音程検出結果を使用）
+          simulateSingingDetection(notes[currentIndex], currentIndex);
+          currentIndex++;
+        } else {
+          clearInterval(interval);
+        }
+      }, 800);
+    }
+
+    // 歌声検出のシミュレーション（デモ用）
+    function simulateSingingDetection(noteElement, noteIndex) {
+      setTimeout(() => {
+        // ユーザーが歌い始めたことをシミュレート
+        noteElement.classList.add('singing');
+        
+        // 音程が正確になったことをシミュレート（ランダムな時間後）
+        const accuracyTime = 800 + Math.random() * 1200; // 0.8〜2秒
+        setTimeout(() => {
+          noteElement.classList.remove('singing');
+          noteElement.classList.add('accurate');
+          
+          // 精度表示の更新（デモ用）
+          updatePitchAccuracy(noteElement, noteIndex);
+        }, accuracyTime);
+      }, 300 + Math.random() * 500); // 0.3〜0.8秒後に歌い始める
+    }
+
+    // 音程精度表示の更新
+    function updatePitchAccuracy(noteElement, noteIndex) {
+      // 評価レベルをランダムに決定（デモ用）
+      const accuracyLevels = ['excellent', 'good', 'pass', 'practice'];
+      const randomLevel = accuracyLevels[Math.floor(Math.random() * accuracyLevels.length)];
+      
+      // 対応するバーチャートの更新
+      const bars = document.querySelectorAll('.bar');
+      if (bars[noteIndex]) {
+        bars[noteIndex].className = `bar ${randomLevel}`;
+        
+        // 高さもランダムに設定（デモ用）
+        const heights = { 
+          excellent: '90-95%', 
+          good: '75-85%', 
+          pass: '55-70%', 
+          practice: '25-40%' 
+        };
+        const heightRange = heights[randomLevel].split('-');
+        const minHeight = parseInt(heightRange[0]);
+        const maxHeight = parseInt(heightRange[1]);
+        const randomHeight = minHeight + Math.random() * (maxHeight - minHeight);
+        bars[noteIndex].style.height = randomHeight + '%';
+      }
+    }
+
+    // 現在の音程をリアルタイムで示す機能（実装予定）
+    function showCurrentPitch(detectedNote) {
+      const notes = document.querySelectorAll('.note-indicator');
+      
+      // 全ての歌唱状態をクリア
+      notes.forEach(note => {
+        note.classList.remove('singing');
+      });
+      
+      // 検出された音程にsingingクラスを追加
+      const noteMap = {
+        'C': 0, 'D': 1, 'E': 2, 'F': 3, 
+        'G': 4, 'A': 5, 'B': 6, 'C2': 7
+      };
+      
+      if (noteMap[detectedNote] !== undefined && notes[noteMap[detectedNote]]) {
+        notes[noteMap[detectedNote]].classList.add('singing');
+      }
+    }
+
+    // 評価アニメーション
+    function animateEvaluation() {
+      const bars = document.querySelectorAll('.bar');
+      bars.forEach((bar, index) => {
+        setTimeout(() => {
+          bar.style.transform = 'scaleY(1)';
+          bar.style.transformOrigin = 'bottom';
+        }, index * 150);
+      });
+    }
+
+    // 初期化
+    document.addEventListener('DOMContentLoaded', () => {
+      // テーマ復元
+      const savedTheme = localStorage.getItem('theme') || 'adult';
+      if (savedTheme === 'kids') {
+        toggleTheme();
+      }
+      
+      // デフォルトでランダムモードのカラーテーマを適用（選択状態はなし）
+      document.documentElement.setAttribute('data-mode', 'random');
+    });
+  </script>
+
+</body>
+</html>
