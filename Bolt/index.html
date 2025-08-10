@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>相対音感トレーニング - ホーム</title>
+    <link rel="stylesheet" href="styles/system.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="assets/icons/lucide-icons.js"></script>
+</head>
+<body>
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="relative z-10 p-6">
+            <div class="container flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 gradient-primary rounded-2xl flex items-center justify-center">
+                        <svg class="icon text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                            <path d="M16 18v-3a5.972 5.972 0 0 0-.75-2.906A3.005 3.005 0 0 1 19 15v3h-3zM21.5 12h-1c0-1-1-4-6-4s-6 3-6 4h-1s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">相対音感トレーニング</h1>
+                        <p class="text-purple-200">あなたの音感を科学的に向上させましょう</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="results.html" class="p-2 text-white-70 hover:text-white transition-colors" title="総合評価を見る">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                            <path d="M4 22h16"/>
+                            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                        </svg>
+                    </a>
+                    <button class="p-2 text-white-70 hover:text-white transition-colors">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        </svg>
+                    </button>
+                    <button class="p-2 text-white-70 hover:text-white transition-colors">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                            <polyline points="16,6 12,2 8,6"/>
+                            <line x1="12" y1="2" x2="12" y2="15"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="relative z-10 p-6">
+            <div class="container">
+                <!-- Stats Overview -->
+                <div class="grid grid-cols-4 gap-6 mb-12">
+                    <div class="glass-card-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <svg class="icon-lg text-green-300" viewBox="0 0 24 24">
+                                <line x1="18" y1="20" x2="18" y2="10"/>
+                                <line x1="12" y1="20" x2="12" y2="4"/>
+                                <line x1="6" y1="20" x2="6" y2="14"/>
+                            </svg>
+                            <span class="text-2xl font-bold text-white">A</span>
+                        </div>
+                        <p class="text-green-200">総合音感レベル</p>
+                    </div>
+                    <div class="glass-card-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <svg class="icon-lg text-blue-300" viewBox="0 0 24 24">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                                <path d="M4 22h16"/>
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                            </svg>
+                            <span class="text-2xl font-bold text-white">156</span>
+                        </div>
+                        <p class="text-green-200">総練習セッション数</p>
+                    </div>
+                    <div class="glass-card-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <svg class="icon-lg text-yellow-300" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10"/>
+                                <circle cx="12" cy="12" r="6"/>
+                                <circle cx="12" cy="12" r="2"/>
+                            </svg>
+                            <span class="text-2xl font-bold text-white">87.5%</span>
+                        </div>
+                        <p class="text-green-200">全体平均精度</p>
+                    </div>
+                    <div class="glass-card-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <svg class="icon-lg text-purple-200" viewBox="0 0 24 24">
+                                <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+                            </svg>
+                            <span class="text-2xl font-bold text-white">12</span>
+                        </div>
+                        <p class="text-white-70 text-sm">最高連続正解</p>
+                    </div>
+                </div>
+
+                <!-- Training Modes -->
+                <div class="mb-12">
+                    <h2 class="text-3xl font-bold text-white mb-8 text-center">トレーニングモードを選択</h2>
+                    <div class="grid grid-cols-3 gap-8">
+                        <!-- Random Mode -->
+                        <a href="mic-test.html?mode=random" class="glass-card hover-scale transition-all cursor-pointer">
+                            <div class="w-16 h-16 gradient-success rounded-2xl flex items-center justify-center mb-6 flex-shrink-0">
+                                <svg class="icon-xl text-white" viewBox="0 0 24 24" fill="currentColor">
+                                    <polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/>
+                                </svg>
+                            </div>
+                            <div class="mb-6">
+                                <h3 class="text-xl font-bold text-white mb-2">ランダム基音モード</h3>
+                                <p class="text-purple-200 text-sm mb-4">初級者向け</p>
+                                <p class="text-white-70 mb-4">C3オクターブ8音からランダムに出題</p>
+                                <div class="flex items-center justify-between text-sm mb-4">
+                                    <span class="text-white-60">1セッション</span>
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300">初級</span>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex items-center text-sm text-white-60">
+                                    <svg class="w-4 h-4 mr-2 text-green-300" viewBox="0 0 24 24">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                        <polyline points="22,4 12,14.01 9,11.01"/>
+                                    </svg>
+                                    ±50セント判定
+                                </div>
+                                <div class="flex items-center text-sm text-white-60">
+                                    <svg class="w-4 h-4 mr-2 text-green-300" viewBox="0 0 24 24">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                        <polyline points="22,4 12,14.01 9,11.01"/>
+                                    </svg>
+                                    約5.30秒ガイド
+                                </div>
+                                <div class="flex items-center text-sm text-white-60">
+                                    <svg class="w-4 h-4 mr-2 text-green-300" viewBox="0 0 24 24">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                        <polyline points="22,4 12,14.01 9,11.01"/>
+                                    </svg>
+                                    基音聴き返し可能
+                                </div>
+                            </div>
+                        </a>
+
+                        <!-- Continuous Mode -->
+                        <a href="mic-test.html?mode=continuous" class="glass-card hover-scale transition-all cursor-pointer">
+                            <div class="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mb-6 flex-shrink-0">
+                                <svg class="icon-xl text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <circle cx="12" cy="12" r="6"/>
+                                    <circle cx="12" cy="12" r="2"/>
+                                </svg>
+                            </div>
+                            <div class="mb-6">
+                                <h3 class="text-xl font-bold text-white mb-2">連続チャレンジモード</h3>
+                                <p class="text-purple-200 text-sm mb-4">中級者向け</p>
+                                <p class="text-white-70 mb-4">クロマチック12音で連続8セッション</p>
+                                <div class="flex items-center justify-between text-sm mb-4">
+                                    <span class="text-white-60">8セッション連続</span>
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300">中級</span>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex items-center text-sm text-white-60">
+                                    <svg class="w-4 h-4 mr-2 text-green-300" viewBox="0 0 24 24">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                        <polyline points="22,4 12,14.01 9,11.01"/>
+                                    </svg>
+                                    ±50セント判定
+                                </div>
+                                <div class="flex items-center text-sm text-white-60">
+                                    <svg class="w-4 h-4 mr-2 text-green-300" viewBox="0 0 24 24">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                        <polyline points="22,4 12,14.01 9,11.01"/>
+                                    </svg>
+                                    自動進行
+                                </div>
+                                <div class="flex items-center text-sm text-white-60">
+                                    <svg class="w-4 h-4 mr-2 text-green-300" viewBox="0 0 24 24">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                        <polyline points="22,4 12,14.01 9,11.01"/>
+                                    </svg>
+                                    S-E級総合評価
+                                </div>
+                            </div>
+                        </a>
+
+                        <!-- Chromatic Mode -->
+                        <a href="mic-test.html?mode=chromatic" class="glass-card hover-scale transition-all cursor-pointer">
+                            <div class="w-16 h-16 gradient-warning rounded-2xl flex items-center justify-center mb-6 flex-shrink-0">
+                                <svg class="icon-xl text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                                    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                                    <path d="M4 22h16"/>
+                                    <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                                    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                                    <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                                </svg>
+                            </div>
+                            <div class="mb-6">
+                                <h3 class="text-xl font-bold text-white mb-2">12音階モード</h3>
+                                <p class="text-purple-200 text-sm mb-4">上級者向け</p>
+                                <p class="text-white-70 mb-4">全12半音を順次使用した本格練習</p>
+                                <div class="flex items-center justify-between text-sm mb-4">
+                                    <span class="text-white-60">12-24セッション</span>
+                                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-purple-500/20 text-purple-200">上級</span>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex items-center text-sm text-white-60">
+                                    <svg class="w-4 h-4 mr-2 text-green-300" viewBox="0 0 24 24">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                        <polyline points="22,4 12,14.01 9,11.01"/>
+                                    </svg>
+                                    ±30セント判定
+                                </div>
+                                <div class="flex items-center text-sm text-white-60">
+                                    <svg class="w-4 h-4 mr-2 text-green-300" viewBox="0 0 24 24">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                        <polyline points="22,4 12,14.01 9,11.01"/>
+                                    </svg>
+                                    上昇・下降練習
+                                </div>
+                                <div class="flex items-center text-sm text-white-60">
+                                    <svg class="w-4 h-4 mr-2 text-green-300" viewBox="0 0 24 24">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                        <polyline points="22,4 12,14.01 9,11.01"/>
+                                    </svg>
+                                    プロレベル認定
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Recent Sessions -->
+                <div class="glass-card">
+                    <h3 class="text-2xl font-bold text-white mb-6 flex items-center">
+                        <svg class="icon mr-3" viewBox="0 0 24 24">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        最近のセッション
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 glass-card-sm">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center bg-green-500/20 text-green-300">
+                                    A
+                                </div>
+                                <div>
+                                    <p class="text-white font-medium">連続チャレンジモード</p>
+                                    <p class="text-white-60 text-sm">2024/01/15</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-white font-bold">89.2%</p>
+                                <p class="text-white-60 text-sm">精度</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-4 glass-card-sm">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center bg-blue-500/20 text-blue-300">
+                                    B
+                                </div>
+                                <div>
+                                    <p class="text-white font-medium">ランダム基音モード</p>
+                                    <p class="text-white-60 text-sm">2024/01/14</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-white font-bold">82.7%</p>
+                                <p class="text-white-60 text-sm">精度</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-4 glass-card-sm">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center bg-yellow-500/20 text-yellow-300">
+                                    A
+                                </div>
+                                <div>
+                                    <p class="text-white font-medium">12音階モード</p>
+                                    <p class="text-white-60 text-sm">2024/01/13</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-white font-bold">91.4%</p>
+                                <p class="text-white-60 text-sm">精度</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Initialize Lucide icons on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎵 Initializing Lucide icons...');
+            
+            // Auto-replace existing SVG icons with Lucide equivalents
+            replaceLucideIcons();
+            
+            console.log('✅ Lucide icons initialized');
+        });
+    </script>
+</body>
+</html>

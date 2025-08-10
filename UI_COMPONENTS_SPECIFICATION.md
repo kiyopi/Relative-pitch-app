@@ -50,26 +50,18 @@
 
 .progress-fill.completed {
   background: #007bff;
-  animation: completion-glow 0.6s ease;
-}
-
-@keyframes completion-glow {
-  0% { box-shadow: 0 0 0 rgba(0, 123, 255, 0.5); }
-  50% { box-shadow: 0 0 20px rgba(0, 123, 255, 0.8); }
-  100% { box-shadow: 0 0 0 rgba(0, 123, 255, 0.5); }
 }
 ```
 
 ### 動作仕様
 - **開始**: 基音再生ボタン押下時に0%から開始
 - **進行**: 2500ms（2.5秒）かけて0%→100%まで線形進行
-- **完了**: 100%到達時に光るエフェクトを0.6秒間表示
+- **完了**: 100%到達時にドレミガイドが開始
 - **リセット**: アニメーション無効化（`transition: none`）で瞬間リセット
 
 ### 色彩定義
 - **背景色**: `#e9ecef` (ライトグレー)
 - **進行色**: `#007bff` (青色)
-- **完了エフェクト**: `rgba(0, 123, 255, 0.8)` (青色グロー)
 
 ---
 
@@ -219,7 +211,6 @@
 #### アニメーション開始
 1. **準備バー完了**: 2500ms後に進行バー100%到達
 2. **同時実行**: バー完了と同時に以下を実行
-   - `progress-fill`に`completed`クラス追加
    - `doremi-main-guide`に`focus-mode`クラス追加
    - 最初の`note-circle`（ド）に`current`クラス追加
 

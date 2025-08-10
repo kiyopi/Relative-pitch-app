@@ -1,0 +1,21 @@
+{
+  // Gemini CLI環境変数設定
+  "terminal.integrated.env.osx": {
+    "GOOGLE_GENAI_USE_VERTEXAI": "true",
+    "GOOGLE_CLOUD_PROJECT": "automatic-bond-440710-n5",
+    "GOOGLE_CLOUD_LOCATION": "us-central1"
+  },
+  
+  // ターミナル起動時に.envを自動読み込み
+  "terminal.integrated.profiles.osx": {
+    "zsh-with-env": {
+      "path": "zsh",
+      "args": ["-c", "source .env && zsh"],
+      "overrideName": true
+    }
+  },
+  "terminal.integrated.defaultProfile.osx": "zsh-with-env",
+  
+  // カスタムタスク設定
+  "tasks.version": "2.0.0"
+}

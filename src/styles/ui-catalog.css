@@ -1,0 +1,463 @@
+/**
+ * 相対音感トレーニングアプリ UIカタログ スタイルシート
+ * Mantine v7.6.0 と互換性のあるカスタムスタイル
+ */
+
+/* ===== CSS変数定義 ===== */
+:root {
+  /* スペーシング */
+  --training-spacing: 16px;
+  --session-spacing: 24px;
+  --result-spacing: 32px;
+  
+  /* 音階カラー */
+  --note-do: #ef4444;      /* ド - 赤 */
+  --note-re: #f97316;      /* レ - オレンジ */
+  --note-mi: #eab308;      /* ミ - 黄色 */
+  --note-fa: #22c55e;      /* ファ - 緑 */
+  --note-so: #06b6d4;      /* ソ - シアン */
+  --note-la: #3b82f6;      /* ラ - 青 */
+  --note-si: #8b5cf6;      /* シ - 紫 */
+  --note-do-high: #ec4899; /* 高ド - ピンク */
+  
+  /* グラデーション（Boltから取り込み） */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  --gradient-warning: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-error: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+/* ===== 評価カード ===== */
+.evaluation-card {
+  background: var(--mantine-color-white);
+  border: 1px solid var(--mantine-color-gray-3);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.evaluation-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.evaluation-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--mantine-color-dark-7);
+  margin-bottom: 8px;
+}
+
+.evaluation-label {
+  font-size: 14px;
+  color: var(--mantine-color-gray-6);
+}
+
+.evaluation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin: var(--session-spacing) 0;
+}
+
+/* ===== セッション履歴 ===== */
+.session-history {
+  margin: var(--session-spacing) 0;
+}
+
+.session-history h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: var(--training-spacing);
+  color: var(--mantine-color-dark-7);
+}
+
+.session-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--mantine-color-gray-0);
+  border: 1px solid var(--mantine-color-gray-2);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--mantine-color-dark-7);
+}
+
+.session-item:hover {
+  background: var(--mantine-color-gray-1);
+  border-color: var(--mantine-color-gray-3);
+}
+
+.session-item.expanded {
+  background: var(--mantine-color-blue-0);
+  border-color: var(--mantine-color-blue-3);
+}
+
+.session-score {
+  font-weight: 600;
+  color: var(--mantine-color-blue-7);
+}
+
+.expand-icon {
+  transition: transform 0.2s ease;
+  color: var(--mantine-color-gray-5);
+}
+
+.session-detail {
+  margin: -8px 0 8px 0;
+  padding: 0 16px;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== 音階別評価 ===== */
+.note-evaluation-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: var(--training-spacing) 0;
+}
+
+@media (max-width: 768px) {
+  .note-evaluation-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ===== 統合進行バー ===== */
+.integrated-progress {
+  border: 3px solid var(--mantine-color-blue-6);
+  border-radius: 12px;
+  padding: 16px;
+  background: var(--mantine-color-blue-0);
+  margin: var(--training-spacing) 0;
+}
+
+.progress-sections {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--mantine-color-gray-7);
+}
+
+.progress-sections .section {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--mantine-color-white);
+  border: 1px solid var(--mantine-color-gray-3);
+}
+
+.progress-sections .start-marker {
+  background: var(--mantine-color-yellow-1);
+  border-color: var(--mantine-color-yellow-5);
+  font-weight: 600;
+}
+
+.progress-bar {
+  height: 40px;
+  background: var(--mantine-color-gray-2);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--gradient-primary);
+  transition: width 0.3s ease;
+  border-radius: 20px;
+}
+
+.time-indicator {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--mantine-color-gray-6);
+}
+
+/* ===== ドレミガイド円 ===== */
+.note-circles-container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: var(--training-spacing) 0;
+  flex-wrap: wrap;
+}
+
+.note-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 18px;
+  background: var(--mantine-color-gray-1);
+  border: 2px solid var(--mantine-color-gray-3);
+  color: var(--mantine-color-gray-7);
+  transition: all 0.3s ease;
+}
+
+.note-circle.active {
+  background: var(--gradient-primary);
+  color: white;
+  transform: scale(1.2);
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+}
+
+.note-circle.completed {
+  background: var(--mantine-color-pink-5);
+  color: white;
+  border-color: var(--mantine-color-pink-6);
+}
+
+/* ===== モードカード ===== */
+.mode-card {
+  background: var(--mantine-color-white);
+  border: 2px solid var(--mantine-color-gray-3);
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.mode-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-color: var(--mantine-color-blue-5);
+}
+
+.mode-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.mode-emoji {
+  font-size: 32px;
+}
+
+.mode-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--mantine-color-dark-7);
+}
+
+.mode-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--gradient-success);
+  color: white;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.mode-difficulty {
+  color: var(--mantine-color-gray-6);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.mode-description {
+  color: var(--mantine-color-gray-7);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* ===== ボタン ===== */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary {
+  background: var(--mantine-color-gray-2);
+  color: var(--mantine-color-dark-7);
+}
+
+.btn-secondary:hover {
+  background: var(--mantine-color-gray-3);
+}
+
+.btn-success {
+  background: var(--gradient-success);
+  color: white;
+}
+
+.btn-danger {
+  background: var(--gradient-error);
+  color: white;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.btn-large {
+  padding: 14px 28px;
+  font-size: 16px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== プログレスバー ===== */
+.progress-container {
+  margin: var(--training-spacing) 0;
+}
+
+.progress-label {
+  font-size: 14px;
+  color: var(--mantine-color-gray-7);
+  margin-bottom: 8px;
+}
+
+.progress-percentage {
+  font-size: 12px;
+  color: var(--mantine-color-gray-6);
+  margin-top: 4px;
+  text-align: right;
+}
+
+/* ===== 音量メーター ===== */
+.volume-meter {
+  padding: 16px;
+  background: var(--mantine-color-gray-0);
+  border-radius: 8px;
+  margin: var(--training-spacing) 0;
+}
+
+.volume-label {
+  font-size: 14px;
+  color: var(--mantine-color-gray-7);
+  margin-bottom: 8px;
+}
+
+.volume-bar {
+  height: 24px;
+  background: var(--mantine-color-gray-2);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.volume-fill {
+  height: 100%;
+  background: linear-gradient(90deg, 
+    var(--mantine-color-green-5) 0%, 
+    var(--mantine-color-yellow-5) 60%, 
+    var(--mantine-color-red-5) 100%);
+  transition: width 0.1s ease;
+}
+
+.volume-status {
+  font-size: 12px;
+  color: var(--mantine-color-gray-6);
+  margin-top: 8px;
+}
+
+/* ===== 設定項目 ===== */
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--mantine-color-gray-2);
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+/* ===== グラスカード（Boltから） ===== */
+.glass-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.glass-card-sm {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+/* ===== アニメーション ===== */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(102, 126, 234, 0.8);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+/* ===== レスポンシブ対応 ===== */
+@media (max-width: 768px) {
+  .evaluation-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .note-circles-container {
+    gap: 8px;
+  }
+  
+  .note-circle {
+    width: 50px;
+    height: 50px;
+    font-size: 16px;
+  }
+  
+  .mode-card {
+    padding: 16px;
+  }
+}

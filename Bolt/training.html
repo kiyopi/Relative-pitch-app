@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>相対音感トレーニング - トレーニング実行</title>
+    <link rel="stylesheet" href="styles/system.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="assets/icons/lucide-icons.js?v=3"></script>
+</head>
+<body>
+    <div class="min-h-screen flex flex-col p-6">
+        <div class="container flex-1 flex flex-col">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 gradient-success rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <svg class="icon-lg text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                        <line x1="12" y1="19" x2="12" y2="22"/>
+                        <line x1="8" y1="22" x2="16" y2="22"/>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-2">音程トレーニング</h1>
+                <p class="text-purple-200">セッション <span id="session-counter">1</span>/12</p>
+            </div>
+
+            <!-- Training Progress -->
+            <div class="glass-card mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-white">進行状況</h3>
+                    <span class="text-white-70" id="progress-text">1/8音</span>
+                </div>
+                <div class="progress-bar mb-4">
+                    <div id="progress-fill" class="progress-fill" style="width: 12.5%"></div>
+                </div>
+                <div class="text-center">
+                    <p class="text-white-60 text-sm">基音: <span id="base-note" class="text-white font-medium">C4</span></p>
+                </div>
+            </div>
+
+            <!-- Current Note Display -->
+            <div class="glass-card mb-6 flex-1 flex flex-col justify-center">
+                <div class="text-center mb-8">
+                    <div class="w-32 h-32 gradient-primary rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse-glow">
+                        <span id="current-note" class="text-6xl font-bold text-white">ド</span>
+                    </div>
+                    <p class="text-xl text-white mb-2">この音程で歌ってください</p>
+                    <p class="text-white-60">マイクに向かって歌うと自動で判定されます</p>
+                </div>
+
+                <!-- Audio Controls -->
+                <div class="flex justify-center space-x-4 mb-6">
+                    <button id="play-reference" class="btn btn-secondary">
+                        <svg class="icon mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="5,3 19,12 5,21"/>
+                        </svg>
+                        基音再生
+                    </button>
+                    <button id="play-target" class="btn btn-primary">
+                        <svg class="icon mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="5,3 19,12 5,21"/>
+                        </svg>
+                        目標音再生
+                    </button>
+                </div>
+
+                <!-- Pitch Detection -->
+                <div class="text-center">
+                    <div class="mb-4">
+                        <div class="text-2xl font-bold text-white mb-2">
+                            検出中: <span id="detected-frequency">0.0</span> Hz
+                        </div>
+                        <div class="text-lg">
+                            誤差: <span id="cent-error" class="font-bold">+0</span>¢
+                        </div>
+                    </div>
+                    
+                    <!-- Pitch Meter -->
+                    <div class="relative w-full max-w-md mx-auto mb-4">
+                        <div class="h-2 bg-white/20 rounded-full">
+                            <div id="pitch-indicator" class="h-2 bg-green-400 rounded-full transition-all duration-300" style="width: 50%; margin-left: 0%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-white-60 mt-1">
+                            <span>-50¢</span>
+                            <span>正確</span>
+                            <span>+50¢</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div id="note-results" class="space-y-2 mb-6">
+                <!-- Note results will be populated by JavaScript -->
+            </div>
+
+            <!-- Navigation -->
+            <div class="flex justify-between">
+                <a href="mic-test.html" class="btn btn-secondary">
+                    中断
+                </a>
+                <button id="next-note" class="btn btn-primary" disabled>
+                    次の音へ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Training state
+        let currentSession = 1;
+        let currentNoteIndex = 0;
+        let sessionResults = [];
+        let isListening = false;
+        
+        const noteNames = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド'];
+        const baseFrequencies = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25];
+        
+        // Get training mode from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const mode = urlParams.get('mode') || 'random';
+        
+        // Mock training functionality
+        function updateDisplay() {
+            document.getElementById('session-counter').textContent = currentSession;
+            document.getElementById('current-note').textContent = noteNames[currentNoteIndex];
+            document.getElementById('progress-text').textContent = `${currentNoteIndex + 1}/8音`;
+            document.getElementById('progress-fill').style.width = `${((currentNoteIndex + 1) / 8) * 100}%`;
+            
+            // Generate base note based on mode
+            let baseNote = 'C4';
+            if (mode === 'random') {
+                const notes = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4'];
+                baseNote = notes[Math.floor(Math.random() * notes.length)];
+            }
+            document.getElementById('base-note').textContent = baseNote;
+        }
+        
+        // Mock pitch detection
+        function startPitchDetection() {
+            if (isListening) return;
+            isListening = true;
+            
+            const interval = setInterval(() => {
+                const targetFreq = baseFrequencies[currentNoteIndex];
+                const detectedFreq = targetFreq + (Math.random() - 0.5) * 40;
+                const centError = Math.round(1200 * Math.log2(detectedFreq / targetFreq));
+                
+                document.getElementById('detected-frequency').textContent = detectedFreq.toFixed(1);
+                document.getElementById('cent-error').textContent = (centError > 0 ? '+' : '') + centError;
+                
+                // Update pitch indicator
+                const indicator = document.getElementById('pitch-indicator');
+                const offset = Math.max(-50, Math.min(50, centError));
+                const position = 50 + offset;
+                indicator.style.marginLeft = `${position}%`;
+                indicator.style.width = '2px';
+                
+                // Auto advance after 3 seconds
+                if (Math.abs(centError) < 25) {
+                    clearInterval(interval);
+                    isListening = false;
+                    
+                    // Add result
+                    sessionResults.push({
+                        noteIndex: currentNoteIndex,
+                        noteName: noteNames[currentNoteIndex],
+                        centError: centError,
+                        isCorrect: Math.abs(centError) < 50
+                    });
+                    
+                    // Show result
+                    addNoteResult(sessionResults[sessionResults.length - 1]);
+                    
+                    // Enable next button
+                    document.getElementById('next-note').disabled = false;
+                }
+            }, 100);
+        }
+        
+        function addNoteResult(result) {
+            const container = document.getElementById('note-results');
+            const resultElement = document.createElement('div');
+            resultElement.className = 'glass-card-sm';
+            
+            let evaluation = 'Practice';
+            let color = 'text-red-300';
+            if (Math.abs(result.centError) <= 15) {
+                evaluation = 'Excellent';
+                color = 'text-yellow-300';
+            } else if (Math.abs(result.centError) <= 25) {
+                evaluation = 'Good';
+                color = 'text-green-300';
+            } else if (Math.abs(result.centError) <= 40) {
+                evaluation = 'Pass';
+                color = 'text-blue-300';
+            }
+            
+            resultElement.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center text-xs font-bold text-white">
+                            ${result.noteIndex + 1}
+                        </span>
+                        <div>
+                            <span class="text-white font-medium">${result.noteName}</span>
+                            <span class="ml-2 font-bold ${result.centError > 0 ? 'text-red-300' : 'text-blue-300'}">
+                                ${result.centError > 0 ? '+' : ''}${result.centError}¢
+                            </span>
+                        </div>
+                    </div>
+                    <span class="text-xs font-medium ${color}">${evaluation}</span>
+                </div>
+            `;
+            
+            container.appendChild(resultElement);
+        }
+        
+        // Event listeners
+        document.getElementById('play-reference').addEventListener('click', () => {
+            // Mock audio playback
+            console.log('Playing reference tone');
+        });
+        
+        document.getElementById('play-target').addEventListener('click', () => {
+            // Mock audio playback
+            console.log('Playing target tone');
+            startPitchDetection();
+        });
+        
+        document.getElementById('next-note').addEventListener('click', () => {
+            currentNoteIndex++;
+            
+            if (currentNoteIndex >= 8) {
+                // Session complete - redirect to results
+                window.location.href = 'results.html';
+            } else {
+                // Next note
+                updateDisplay();
+                document.getElementById('next-note').disabled = true;
+            }
+        });
+        
+        // Initialize
+        updateDisplay();
+        
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', function() {
+            replaceLucideIcons();
+        });
+    </script>
+</body>
+</html>

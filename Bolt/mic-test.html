@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>相対音感トレーニング - マイクテスト</title>
+    <link rel="stylesheet" href="styles/system.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="assets/icons/lucide-icons.js"></script>
+</head>
+<body>
+    <div class="min-h-screen flex items-center justify-center p-6">
+        <div class="max-w-2xl w-full">
+            <div class="text-center mb-12">
+                <div class="w-24 h-24 gradient-blue rounded-full flex items-center justify-center mx-auto mb-6 flex-shrink-0">
+                    <svg class="icon-2xl text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                        <line x1="12" y1="19" x2="12" y2="22"/>
+                        <line x1="8" y1="22" x2="16" y2="22"/>
+                    </svg>
+                </div>
+                <h1 class="text-4xl font-bold text-white mb-4">マイクテスト</h1>
+                <p class="text-purple-200 text-xl">音声入力の確認を行います</p>
+            </div>
+
+            <div class="glass-card mb-8">
+                <div class="text-center mb-8">
+                    <div class="w-32 h-32 gradient-success rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse-glow flex-shrink-0">
+                        <svg class="icon-3xl text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">音声レベル: <span id="volume-level">0</span>%</h3>
+                    <p class="text-white-70">検出周波数: <span id="frequency-display">0.0</span> Hz</p>
+                </div>
+
+                <div class="mb-8">
+                    <div class="progress-bar mb-4">
+                        <div id="volume-bar" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <p id="mic-status" class="text-center text-white-60 text-sm">
+                        声を出してマイクをテストしてください
+                    </p>
+                </div>
+
+                <div class="flex justify-center space-x-4">
+                    <a href="index.html" class="btn btn-secondary">
+                        戻る
+                    </a>
+                    <a href="training.html" class="btn btn-primary" id="start-training">
+                        トレーニング開始
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock microphone test functionality
+        let volumeLevel = 0;
+        let frequency = 0;
+        let isActive = true;
+
+        function updateMicTest() {
+            if (isActive) {
+                // Simulate microphone input
+                volumeLevel = Math.random() * 100;
+                frequency = 200 + Math.random() * 400;
+
+                // Update UI
+                document.getElementById('volume-level').textContent = Math.round(volumeLevel);
+                document.getElementById('frequency-display').textContent = frequency.toFixed(1);
+                document.getElementById('volume-bar').style.width = volumeLevel + '%';
+
+                // Update status message
+                const statusElement = document.getElementById('mic-status');
+                if (volumeLevel > 50) {
+                    statusElement.textContent = '良好な音声レベルです';
+                    statusElement.className = 'text-center text-green-300 text-sm';
+                } else {
+                    statusElement.textContent = '声を出してマイクをテストしてください';
+                    statusElement.className = 'text-center text-white-60 text-sm';
+                }
+            }
+        }
+
+        // Start mic test simulation
+        setInterval(updateMicTest, 100);
+
+        // Get training mode from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const mode = urlParams.get('mode') || 'random';
+        
+        // Update training link with mode
+        document.getElementById('start-training').href = `training.html?mode=${mode}`;
+        
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', function() {
+            replaceLucideIcons();
+        });
+    </script>
+</body>
+</html>

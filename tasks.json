@@ -1,0 +1,58 @@
+{
+  "project": "相対音感トレーニングアプリ",
+  "current_sprint": "v1.0.0-初期実装",
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "title": "音声処理システムの実装",
+      "status": "todo",
+      "priority": "high",
+      "category": "audio",
+      "assignee": "gemini",
+      "description": "Web Audio APIとPitchyライブラリの統合",
+      "subtasks": [
+        "マイク入力の設定",
+        "ピッチ検出の実装",
+        "音声生成機能の開発"
+      ],
+      "created": "2025-01-09",
+      "due_date": "2025-01-16"
+    },
+    {
+      "id": "TASK-002",
+      "title": "統合進行ガイドシステムUI",
+      "status": "todo",
+      "priority": "high",
+      "category": "ui",
+      "assignee": "gemini",
+      "description": "7画面構成のユーザーインターフェース実装",
+      "subtasks": [
+        "レイアウト設計",
+        "レスポンシブ対応",
+        "画面遷移の実装"
+      ],
+      "created": "2025-01-09",
+      "due_date": "2025-01-20"
+    },
+    {
+      "id": "TASK-003",
+      "title": "トレーニングモード実装",
+      "status": "todo",
+      "priority": "medium",
+      "category": "training",
+      "assignee": "gemini",
+      "description": "基礎・音程・スケール・コード4モードの実装",
+      "subtasks": [
+        "基礎モード",
+        "音程モード",
+        "スケールモード",
+        "コードモード"
+      ],
+      "created": "2025-01-09",
+      "due_date": "2025-01-25"
+    }
+  ],
+  "completed_tasks": [],
+  "blocked_tasks": [],
+  "notes": "このファイルはGeminiとの共同タスク管理に使用されます"
+}

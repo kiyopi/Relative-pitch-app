@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>相対音感トレーニングアプリ - Bolt版全画面モックアップ</title>
+  
+  <!-- Mantine v7.6.0 Core CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/@mantine/core@7.6.0/styles.css" rel="stylesheet" />
+  
+  <!-- UIカタログCSS -->
+  <link rel="stylesheet" href="src/styles/ui-catalog.css">
+  
+  <style>
+    /* Bolt風のグラデーションベースデザイン */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+
+    .app-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* グラスモーフィズム効果 */
+    .screen {
+      display: none;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      margin-bottom: 24px;
+    }
+
+    .screen.active {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .screen-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .screen-title {
+      font-size: 32px;
+      font-weight: 900;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+    }
+
+    .screen-subtitle {
+      color: var(--mantine-color-gray-6);
+      font-size: 16px;
+      opacity: 0.8;
+    }
+
+    /* ナビゲーション */
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .nav-tab {
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-tab:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .nav-tab.active {
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--mantine-color-dark-7);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    /* モードカード（Bolt風） */
+    .mode-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin: 32px 0;
+    }
+
+    .mode-card-bolt {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 16px;
+      padding: 28px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mode-card-bolt::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+      transition: height 0.3s ease;
+    }
+
+    .mode-card-bolt:hover::before {
+      height: 8px;
+    }
+
+    .mode-card-bolt:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .mode-header-bolt {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .mode-emoji-bolt {
+      font-size: 36px;
+      filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+    }
+
+    .mode-title-bolt {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--mantine-color-dark-8);
+    }
+
+    .mode-badge-bolt {
+      display: inline-block;
+      padding: 6px 16px;
+      background: var(--gradient-success);
+      color: white;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .mode-difficulty-bolt {
+      color: var(--mantine-color-gray-6);
+      font-size: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mode-description-bolt {
+      color: var(--mantine-color-gray-7);
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    /* ボタン（Bolt風） */
+    .btn-bolt {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-block;
+      text-align: center;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-bolt::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn-bolt:hover::before {
+      left: 100%;
+    }
+
+    .btn-bolt-primary {
+      background: var(--gradient-primary);
+      color: white;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-bolt-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-bolt-secondary {
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--mantine-color-dark-7);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-bolt-secondary:hover {
+      background: rgba(255, 255, 255, 1);
+      transform: translateY(-2px);
+    }
+
+    /* プログレスバー（Bolt風） */
+    .progress-bar-bolt {
+      height: 12px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      overflow: hidden;
+      margin: 16px 0;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .progress-fill-bolt {
+      height: 100%;
+      background: var(--gradient-success);
+      border-radius: 6px;
+      transition: width 0.3s ease;
+      position: relative;
+    }
+
+    .progress-fill-bolt::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background-image: linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, .2) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, .2) 50%,
+        rgba(255, 255, 255, .2) 75%,
+        transparent 75%,
+        transparent
+      );
+      background-size: 16px 16px;
+      animation: move 2s linear infinite;
+    }
+
+    @keyframes move {
+      0% {
+        background-position: 0 0;
+      }
+      100% {
+        background-position: 16px 16px;
+      }
+    }
+
+    /* 統計カード（Bolt風） */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .stat-card-bolt {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card-bolt:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--mantine-color-dark-8);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--mantine-color-gray-6);
+      font-weight: 500;
+    }
+
+    /* 音階円（Bolt風） */
+    .note-circles-bolt {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 32px 0;
+      flex-wrap: wrap;
+    }
+
+    .note-circle-bolt {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      color: var(--mantine-color-gray-8);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .note-circle-bolt::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .note-circle-bolt:hover::before {
+      opacity: 1;
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .note-circle-bolt.active {
+      background: var(--gradient-primary);
+      color: white;
+      transform: scale(1.15);
+      box-shadow: 0 0 25px rgba(102, 126, 234, 0.5);
+    }
+
+    .note-circle-bolt.completed {
+      background: var(--gradient-success);
+      color: white;
+      transform: scale(1.05);
+    }
+
+    /* レスポンシブ調整 */
+    @media (max-width: 768px) {
+      .app-container {
+        padding: 12px;
+      }
+      
+      .screen {
+        padding: 20px;
+      }
+      
+      .nav-tabs {
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 8px;
+      }
+      
+      .nav-tab {
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      
+      .mode-cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* 評価アイコン（大きめ） */
+    .evaluation-icon-large {
+      font-size: 48px !important;
+      margin: 12px 0;
+      filter: drop-shadow(2px 2px 6px rgba(0, 0, 0, 0.2));
+    }
+
+    /* S-E級表示（Bolt風） */
+    .grade-display-bolt {
+      text-align: center;
+      padding: 40px 20px;
+      position: relative;
+    }
+
+    .grade-letter-bolt {
+      font-size: 96px;
+      font-weight: 900;
+      background: var(--gradient-warning);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+      filter: drop-shadow(2px 2px 8px rgba(0, 0, 0, 0.2));
+      position: relative;
+    }
+
+    .grade-letter-bolt::after {
+      content: '級';
+      position: absolute;
+      right: -40px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 32px;
+      color: var(--mantine-color-gray-6);
+    }
+
+    .grade-message-bolt {
+      font-size: 20px;
+      color: var(--mantine-color-gray-7);
+      font-weight: 600;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- ナビゲーション -->
+    <div class="nav-tabs">
+      <div class="nav-tab active" onclick="showScreen('home')">🏠 ホーム</div>
+      <div class="nav-tab" onclick="showScreen('mic-test')">🎤 マイクテスト</div>
+      <div class="nav-tab" onclick="showScreen('training')">🎵 トレーニング</div>
+      <div class="nav-tab" onclick="showScreen('session-result')">📊 セッション評価</div>
+      <div class="nav-tab" onclick="showScreen('overall-result')">🏆 総合評価</div>
+      <div class="nav-tab" onclick="showScreen('settings')">⚙️ 設定</div>
+      <div class="nav-tab" onclick="showScreen('help')">❓ ヘルプ</div>
+    </div>
+
+    <!-- 1. ホーム画面（モード選択） -->
+    <div id="home" class="screen active">
+      <div class="screen-header">
+        <h1 class="screen-title">🎵 相対音感トレーニング</h1>
+        <p class="screen-subtitle">Bolt風デザイン + Mantine v7.6.0</p>
+      </div>
+
+      <div class="mode-cards-grid">
+        <div class="mode-card-bolt">
+          <div class="mode-header-bolt">
+            <span class="mode-emoji-bolt">🎲</span>
+            <span class="mode-title-bolt">ランダム基音モード</span>
+          </div>
+          <div class="mode-badge-bolt">初級</div>
+          <div class="mode-difficulty-bolt">
+            <span>難易度:</span>
+            <span style="color: var(--mantine-color-yellow-6);">★☆☆</span>
+          </div>
+          <div class="mode-description-bolt">
+            基音がランダムに変わる基本練習<br>
+            初級者におすすめのシンプルなトレーニング
+          </div>
+          <button class="btn-bolt btn-bolt-primary">このモードで始める</button>
+        </div>
+
+        <div class="mode-card-bolt">
+          <div class="mode-header-bolt">
+            <span class="mode-emoji-bolt">🎯</span>
+            <span class="mode-title-bolt">連続チャレンジモード</span>
+          </div>
+          <div class="mode-badge-bolt">中級</div>
+          <div class="mode-difficulty-bolt">
+            <span>難易度:</span>
+            <span style="color: var(--mantine-color-orange-6);">★★☆</span>
+          </div>
+          <div class="mode-description-bolt">
+            8セッション連続トレーニング<br>
+            中級者向け集中練習モード
+          </div>
+          <button class="btn-bolt btn-bolt-primary">このモードで始める</button>
+        </div>
+
+        <div class="mode-card-bolt">
+          <div class="mode-header-bolt">
+            <span class="mode-emoji-bolt">🎼</span>
+            <span class="mode-title-bolt">12音階モード</span>
+          </div>
+          <div class="mode-badge-bolt">上級</div>
+          <div class="mode-difficulty-bolt">
+            <span>難易度:</span>
+            <span style="color: var(--mantine-color-red-6);">★★★</span>
+          </div>
+          <div class="mode-description-bolt">
+            全音階マスター向け<br>
+            上級者の総合練習
+          </div>
+          <button class="btn-bolt btn-bolt-primary">このモードで始める</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. マイクテストページ -->
+    <div id="mic-test" class="screen">
+      <div class="screen-header">
+        <h1 class="screen-title">🎤 マイクテスト</h1>
+        <p class="screen-subtitle">音声環境の確認と最適化</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card-bolt">
+          <span class="stat-value" style="color: var(--mantine-color-green-6);">✓</span>
+          <div class="stat-label">マイク許可</div>
+        </div>
+        <div class="stat-card-bolt">
+          <span class="stat-value">65%</span>
+          <div class="stat-label">音量レベル</div>
+        </div>
+        <div class="stat-card-bolt">
+          <span class="stat-value">C3-C5</span>
+          <div class="stat-label">検出音域</div>
+        </div>
+        <div class="stat-card-bolt">
+          <span class="stat-value" style="color: var(--mantine-color-green-6);">良好</span>
+          <div class="stat-label">音質</div>
+        </div>
+      </div>
+
+      <!-- 音量メーター -->
+      <div class="volume-meter">
+        <div class="volume-label">リアルタイム音量</div>
+        <div class="progress-bar-bolt">
+          <div class="progress-fill-bolt" style="width: 65%;"></div>
+        </div>
+        <div class="volume-status" style="text-align: center; margin-top: 8px; color: var(--mantine-color-green-6);">
+          ✓ 適切な音量です
+        </div>
+      </div>
+
+      <!-- 音域テスト結果 -->
+      <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 24px; margin: 24px 0;">
+        <h3 style="color: var(--mantine-color-dark-8); margin-bottom: 16px;">🎵 音域テスト結果</h3>
+        <div class="stats-grid">
+          <div class="stat-card-bolt">
+            <span class="stat-value">A2</span>
+            <div class="stat-label">最低音</div>
+          </div>
+          <div class="stat-card-bolt">
+            <span class="stat-value">F5</span>
+            <div class="stat-label">最高音</div>
+          </div>
+          <div class="stat-card-bolt">
+            <span class="stat-value">2.6</span>
+            <div class="stat-label">オクターブ</div>
+          </div>
+          <div class="stat-card-bolt">
+            <span class="stat-value">31</span>
+            <div class="stat-label">音数</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 32px;">
+        <button class="btn-bolt btn-bolt-primary">トレーニング開始</button>
+      </div>
+    </div>
+
+    <!-- 3. トレーニング画面 -->
+    <div id="training" class="screen">
+      <div class="screen-header">
+        <h1 class="screen-title">🎯 ランダム基音モード</h1>
+        <p class="screen-subtitle">セッション 1/1 - 基音を「ド」として歌いましょう</p>
+      </div>
+
+      <!-- 統合進行ガイド -->
+      <div class="integrated-progress">
+        <div class="progress-sections">
+          <div class="section base-tone">基音再生(2.0秒)</div>
+          <div class="section rest">休憩</div>
+          <div class="section start-marker">🎯開始</div>
+        </div>
+        <div class="progress-bar-bolt">
+          <div class="progress-fill-bolt" style="width: 72%;"></div>
+        </div>
+        <div class="time-indicator">
+          <span style="color: var(--mantine-color-gray-6);">0.0秒</span>
+          <span style="color: var(--mantine-color-gray-6);">2.5秒</span>
+        </div>
+      </div>
+
+      <!-- ドレミガイド -->
+      <div class="note-circles-bolt">
+        <div class="note-circle-bolt completed">ド</div>
+        <div class="note-circle-bolt completed">レ</div>
+        <div class="note-circle-bolt active">ミ</div>
+        <div class="note-circle-bolt">ファ</div>
+        <div class="note-circle-bolt">ソ</div>
+        <div class="note-circle-bolt">ラ</div>
+        <div class="note-circle-bolt">シ</div>
+        <div class="note-circle-bolt">ド</div>
+      </div>
+
+      <!-- 音量確認 -->
+      <div class="volume-meter">
+        <div class="volume-label">音量確認</div>
+        <div class="progress-bar-bolt">
+          <div class="progress-fill-bolt" style="width: 60%;"></div>
+        </div>
+        <div class="volume-status" style="text-align: center; color: var(--mantine-color-green-6);">
+          「適切な音量です」
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 32px;">
+        <button class="btn-bolt btn-bolt-secondary">🏠 ホームに戻る</button>
+      </div>
+    </div>
+
+    <!-- 4. セッション評価画面 -->
+    <div id="session-result" class="screen">
+      <div class="screen-header">
+        <h1 class="screen-title">📊 セッション評価</h1>
+        <p class="screen-subtitle">ランダム基音モード完了 - あなたの歌声を分析しました</p>
+      </div>
+
+      <div class="evaluation-grid">
+        <div class="stat-card-bolt">
+          <span class="stat-value evaluation-icon-large">🎉</span>
+          <div class="stat-label">総合評価 (Good)</div>
+        </div>
+        <div class="stat-card-bolt">
+          <span class="stat-value">±20セント</span>
+          <div class="stat-label">平均精度</div>
+        </div>
+        <div class="stat-card-bolt">
+          <span class="stat-value">2音</span>
+          <div class="stat-label">要改善（±50セント超）</div>
+        </div>
+      </div>
+
+      <!-- 音階別詳細評価 -->
+      <div style="margin: 32px 0;">
+        <h3 style="color: var(--mantine-color-dark-8); margin-bottom: 20px; text-align: center;">🎵 音階別詳細評価</h3>
+        
+        <div class="note-evaluation-grid">
+          <div class="stat-card-bolt">
+            <div style="font-weight: 600; color: var(--note-do); margin-bottom: 8px;">ド</div>
+            <div class="evaluation-icon-large" style="font-size: 32px; margin: 8px 0;">🏆</div>
+            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">-2¢</div>
+          </div>
+          <div class="stat-card-bolt">
+            <div style="font-weight: 600; color: var(--note-re); margin-bottom: 8px;">レ</div>
+            <div class="evaluation-icon-large" style="font-size: 32px; margin: 8px 0;">👍</div>
+            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">-15¢</div>
+          </div>
+          <div class="stat-card-bolt">
+            <div style="font-weight: 600; color: var(--note-mi); margin-bottom: 8px;">ミ</div>
+            <div class="evaluation-icon-large" style="font-size: 32px; margin: 8px 0;">😭</div>
+            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">-42¢</div>
+          </div>
+          <div class="stat-card-bolt">
+            <div style="font-weight: 600; color: var(--note-fa); margin-bottom: 8px;">ファ</div>
+            <div class="evaluation-icon-large" style="font-size: 32px; margin: 8px 0;">🎉</div>
+            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">+1¢</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- アドバイス -->
+      <div style="background: rgba(59, 130, 246, 0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 16px; padding: 24px; margin: 24px 0; border-left: 4px solid var(--mantine-color-blue-6);">
+        <h4 style="color: var(--mantine-color-blue-8); margin-bottom: 12px;">🎯 今回のポイント</h4>
+        <p style="color: var(--mantine-color-blue-7); font-size: 14px; margin: 0; line-height: 1.6;">
+          • 6/8音が合格ライン（±50セント以内）でした<br>
+          • 「ミ」と「シ」がやや低めの傾向（-40セント前後）<br>
+          • 継続練習で音程精度は必ず向上します！
+        </p>
+      </div>
+
+      <div style="text-align: center; margin-top: 32px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+        <button class="btn-bolt btn-bolt-primary">🔄 もう一度</button>
+        <button class="btn-bolt btn-bolt-secondary">🏠 ホームに戻る</button>
+      </div>
+    </div>
+
+    <!-- 5. 総合評価画面 -->
+    <div id="overall-result" class="screen">
+      <div class="screen-header">
+        <h1 class="screen-title">🏆 総合評価</h1>
+        <p class="screen-subtitle">連続チャレンジモード - 8セッション完了</p>
+      </div>
+
+      <!-- S-E級評価 -->
+      <div class="grade-display-bolt">
+        <div class="grade-letter-bolt">B</div>
+        <div class="grade-message-bolt">素晴らしい相対音感です！</div>
+      </div>
+
+      <!-- 統計情報 -->
+      <div class="evaluation-grid">
+        <div class="stat-card-bolt">
+          <span class="stat-value">±28セント</span>
+          <div class="stat-label">平均音程精度</div>
+        </div>
+        <div class="stat-card-bolt">
+          <span class="stat-value">6/8音</span>
+          <div class="stat-label">合格音数</div>
+        </div>
+        <div class="stat-card-bolt">
+          <span class="stat-value">3音</span>
+          <div class="stat-label">Excellent数</div>
+        </div>
+        <div class="stat-card-bolt">
+          <span class="stat-value">6/8</span>
+          <div class="stat-label">合格セッション数</div>
+        </div>
+      </div>
+
+      <!-- セッション履歴 -->
+      <div class="session-history" style="margin: 32px 0;">
+        <h3 style="color: var(--mantine-color-dark-7); margin-bottom: 20px; text-align: center;">📋 セッション履歴</h3>
+        
+        <div class="session-item" onclick="toggleSessionDetail(1)" style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 12px;">
+          <span>セッション 1</span>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <span class="session-score">±22セント</span>
+            <span style="font-size: 20px;">🎉</span>
+            <span class="expand-icon">▼</span>
+          </div>
+        </div>
+        <div class="session-detail" id="session-1-detail" style="display: none;">
+          <div style="padding: 16px; background: rgba(255, 255, 255, 0.8); border-radius: 8px; margin: 8px 0;">
+            <p><strong>評価:</strong> 🎉 Good</p>
+            <p><strong>平均精度:</strong> ±22セント</p>
+          </div>
+        </div>
+
+        <div class="session-item" onclick="toggleSessionDetail(2)" style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 12px;">
+          <span>セッション 2</span>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <span class="session-score">±35セント</span>
+            <span style="font-size: 20px;">👍</span>
+            <span class="expand-icon">▼</span>
+          </div>
+        </div>
+        <div class="session-detail" id="session-2-detail" style="display: none;">
+          <div style="padding: 16px; background: rgba(255, 255, 255, 0.8); border-radius: 8px; margin: 8px 0;">
+            <p><strong>評価:</strong> 👍 Pass</p>
+            <p><strong>平均精度:</strong> ±35セント</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 32px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+        <button class="btn-bolt btn-bolt-primary">📤 結果を共有</button>
+        <button class="btn-bolt btn-bolt-secondary">🔄 もう一度8セッション</button>
+        <button class="btn-bolt btn-bolt-secondary">🏠 ホームに戻る</button>
+      </div>
+    </div>
+
+    <!-- 6. 設定画面 -->
+    <div id="settings" class="screen">
+      <div class="screen-header">
+        <h1 class="screen-title">⚙️ 設定</h1>
+        <p class="screen-subtitle">アプリケーション設定</p>
+      </div>
+
+      <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 24px; margin: 24px 0;">
+        <h3 style="color: var(--mantine-color-dark-8); margin-bottom: 20px;">🎵 音声設定</h3>
+        
+        <div class="setting-item">
+          <span>判定基準</span>
+          <select style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--mantine-color-gray-3); background: white;">
+            <option>標準（±50セント）</option>
+            <option>やや甘い（±60セント）</option>
+            <option>厳しい（±30セント）</option>
+          </select>
+        </div>
+        
+        <div class="setting-item">
+          <span>基音音量</span>
+          <input type="range" min="0" max="100" value="70" style="flex-grow: 1; margin-left: 16px;">
+        </div>
+      </div>
+
+      <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 24px; margin: 24px 0;">
+        <h3 style="color: var(--mantine-color-dark-8); margin-bottom: 20px;">🎨 表示設定</h3>
+        
+        <div class="setting-item">
+          <span>テーマ</span>
+          <select style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--mantine-color-gray-3); background: white;">
+            <option selected>Bolt風グラデーション</option>
+            <option>ライト</option>
+            <option>ダーク</option>
+          </select>
+        </div>
+        
+        <div class="setting-item">
+          <span>アニメーション</span>
+          <select style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--mantine-color-gray-3); background: white;">
+            <option selected>有効</option>
+            <option>無効</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="text-align: center;">
+        <button class="btn-bolt btn-bolt-primary">💾 設定を保存</button>
+      </div>
+    </div>
+
+    <!-- 7. ヘルプ・アバウト画面 -->
+    <div id="help" class="screen">
+      <div class="screen-header">
+        <h1 class="screen-title">❓ ヘルプ・アバウト</h1>
+        <p class="screen-subtitle">アプリの使い方とよくある質問</p>
+      </div>
+
+      <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 24px; margin: 24px 0;">
+        <h3 style="color: var(--mantine-color-dark-8); margin-bottom: 16px;">📖 使い方ガイド</h3>
+        <div style="color: var(--mantine-color-gray-7); font-size: 14px; line-height: 1.6;">
+          <p><strong>1. モード選択</strong><br>
+          あなたのレベルに合ったモードを選択してください。</p>
+          
+          <p><strong>2. マイクテスト</strong><br>
+          最初にマイクの設定と音域を確認します。</p>
+          
+          <p><strong>3. トレーニング実行</strong><br>
+          基音を聞いてから、ドレミファソラシドを順番に歌います。</p>
+          
+          <p><strong>4. 評価確認</strong><br>
+          各音階の精度と改善点を確認できます。</p>
+        </div>
+      </div>
+
+      <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 24px; margin: 24px 0;">
+        <h3 style="color: var(--mantine-color-dark-8); margin-bottom: 16px;">ℹ️ アプリ情報</h3>
+        <div class="stats-grid">
+          <div class="stat-card-bolt">
+            <span class="stat-value">v1.3.0</span>
+            <div class="stat-label">バージョン</div>
+          </div>
+          <div class="stat-card-bolt">
+            <span class="stat-value">Mantine</span>
+            <div class="stat-label">UIライブラリ</div>
+          </div>
+          <div class="stat-card-bolt">
+            <span class="stat-value">Pitchy v4</span>
+            <div class="stat-label">音程検出</div>
+          </div>
+          <div class="stat-card-bolt">
+            <span class="stat-value">Bolt風</span>
+            <div class="stat-label">デザイン</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // 画面切り替え機能
+    function showScreen(screenId) {
+      // 全画面を非表示
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+      });
+      
+      // 選択画面を表示
+      document.getElementById(screenId).classList.add('active');
+      
+      // タブの状態更新
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      event.target.classList.add('active');
+    }
+
+    // セッション詳細の展開/折りたたみ機能
+    function toggleSessionDetail(sessionNumber) {
+      const detailElement = document.getElementById(`session-${sessionNumber}-detail`);
+      const sessionItem = event.currentTarget;
+      const expandIcon = sessionItem.querySelector('.expand-icon');
+      
+      if (detailElement.style.display === 'none' || !detailElement.style.display) {
+        detailElement.style.display = 'block';
+        sessionItem.classList.add('expanded');
+        expandIcon.style.transform = 'rotate(180deg)';
+      } else {
+        detailElement.style.display = 'none';
+        sessionItem.classList.remove('expanded');
+        expandIcon.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // プログレスバーアニメーション
+    function animateProgress() {
+      const progressBars = document.querySelectorAll('.progress-fill-bolt');
+      progressBars.forEach(bar => {
+        const width = bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => {
+          bar.style.width = width;
+        }, 100);
+      });
+    }
+
+    // ドレミガイドアニメーション
+    function animateNoteCircles() {
+      const circles = document.querySelectorAll('.note-circle-bolt');
+      let index = 0;
+      
+      const interval = setInterval(() => {
+        if (circles[index]) {
+          circles[index].classList.remove('completed');
+          circles[index].classList.add('active');
+          
+          if (index > 0 && circles[index - 1]) {
+            circles[index - 1].classList.remove('active');
+            circles[index - 1].classList.add('completed');
+          }
+        }
+        
+        index++;
+        if (index >= circles.length) {
+          clearInterval(interval);
+          setTimeout(() => {
+            circles.forEach(circle => {
+              circle.classList.remove('active', 'completed');
+            });
+          }, 1000);
+        }
+      }, 600);
+    }
+
+    // 初期化
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('🎵 相対音感トレーニングアプリ - Bolt版全画面モックアップ初期化完了');
+      console.log('✅ Bolt風デザイン + Mantine v7.6.0 + UIカタログ統合');
+      
+      // 定期的にアニメーションを実行
+      setInterval(() => {
+        if (document.getElementById('training').classList.contains('active')) {
+          animateNoteCircles();
+        }
+      }, 8000);
+      
+      setTimeout(animateProgress, 1000);
+    });
+  </script>
+</body>
+</html>

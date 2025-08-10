@@ -1,0 +1,18 @@
+[
+  {
+    "key": "cmd+shift+g",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Gemini Chat"
+  },
+  {
+    "key": "cmd+shift+q",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Gemini: 相対音感アプリ質問"
+  },
+  {
+    "key": "cmd+shift+r",
+    "command": "workbench.action.tasks.runTask",
+    "args": "Gemini: コードレビュー",
+    "when": "editorTextFocus"
+  }
+]

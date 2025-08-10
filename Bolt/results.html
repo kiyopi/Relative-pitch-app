@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>相対音感トレーニング - 総合評価</title>
+    <link rel="stylesheet" href="styles/system.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="assets/icons/lucide-icons.js?v=3"></script>
+</head>
+<body>
+    <div class="min-h-screen p-6">
+        <div class="container">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="w-24 h-24 gradient-warning rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg class="icon-xl text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                        <path d="M4 22h16"/>
+                        <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                        <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                    </svg>
+                </div>
+                <h1 class="text-4xl font-bold text-white mb-4">総合評価</h1>
+                <p class="text-green-200 text-xl">12セッション完了 - あなたの音感レベルを分析しました</p>
+            </div>
+
+            <!-- Overall Statistics -->
+            <div class="glass-card mb-8">
+                <div class="grid grid-cols-4 gap-6 mb-8">
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-white mb-2">B</div>
+                        <p class="text-green-200">総合グレード</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-white mb-2">±22.1</div>
+                        <p class="text-green-200">平均誤差（セント）</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-white mb-2">85.7%</div>
+                        <p class="text-green-200">セッション平均精度</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-white mb-2">92/96</div>
+                        <p class="text-green-200">正解音数</p>
+                    </div>
+                </div>
+
+                <!-- Grade Distribution -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold text-white mb-4">評価分布</h3>
+                    <div class="flex space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded-full bg-yellow-400"></div>
+                            <span class="text-white">Excellent: 5セッション</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded-full bg-green-400"></div>
+                            <span class="text-white">Good: 2セッション</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded-full bg-blue-400"></div>
+                            <span class="text-white">Pass: 3セッション</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded-full bg-red-400"></div>
+                            <span class="text-white">Practice: 2セッション</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sessions Overview -->
+            <div class="glass-card mb-8">
+                <h3 class="text-2xl font-bold text-white mb-6">12セッション概要</h3>
+                <p class="text-white-70 text-sm mb-4">
+                    <span class="lg:hidden">セッションをタップして詳細分析を表示</span>
+                    <span class="hidden lg:inline">セッションをクリックして詳細分析を表示</span>
+                </p>
+                <div class="grid grid-cols-12 gap-3" id="sessions-grid">
+                    <!-- Sessions will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Detailed Analysis -->
+            <div class="glass-card mb-8">
+                <h3 class="text-xl font-bold text-white mb-6">
+                    詳細分析 - セッション<span id="selected-session">1</span>
+                </h3>
+                <div class="mb-4 p-3 glass-card-sm" id="session-info">
+                    <!-- Session info will be populated by JavaScript -->
+                </div>
+                <div class="space-y-2" id="note-results">
+                    <!-- Note results will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Performance Chart -->
+            <div class="glass-card mb-8">
+                <h3 class="text-2xl font-bold text-white mb-6">セッション別パフォーマンス</h3>
+                <div class="flex items-end space-x-1 h-32" id="performance-chart">
+                    <!-- Chart will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-center space-x-4">
+                <a href="index.html" class="btn btn-secondary">
+                    ホームに戻る
+                </a>
+                <a href="mic-test.html" class="btn btn-primary">
+                    再チャレンジ
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock session data
+        const mockSessionsData = [
+            { session: 1, baseNote: 'C4', accuracy: 87.5, averageCentError: 12.1 },
+            { session: 2, baseNote: 'D4', accuracy: 82.3, averageCentError: 28.4 },
+            { session: 3, baseNote: 'E4', accuracy: 89.1, averageCentError: 14.7 },
+            { session: 4, baseNote: 'F4', accuracy: 91.2, averageCentError: 10.8 },
+            { session: 5, baseNote: 'G4', accuracy: 78.9, averageCentError: 30.2 },
+            { session: 6, baseNote: 'A4', accuracy: 88.7, averageCentError: 18.9 },
+            { session: 7, baseNote: 'B4', accuracy: 92.4, averageCentError: 11.3 },
+            { session: 8, baseNote: 'C5', accuracy: 85.6, averageCentError: 22.7 },
+            { session: 9, baseNote: 'C#4', accuracy: 84.2, averageCentError: 26.1 },
+            { session: 10, baseNote: 'D#4', accuracy: 73.8, averageCentError: 45.3 },
+            { session: 11, baseNote: 'F#4', accuracy: 90.3, averageCentError: 13.9 },
+            { session: 12, baseNote: 'G#4', accuracy: 62.1, averageCentError: 48.7 }
+        ];
+
+        // Simple pseudo-random number generator with seed
+        function seededRandom(seed) {
+            const x = Math.sin(seed) * 10000;
+            return x - Math.floor(x);
+        }
+
+        // Generate session-specific note results with consistent seed
+        function generateSessionNoteResults(sessionData) {
+            const noteNames = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド'];
+            const baseFreqs = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25];
+            
+            // セッション番号をシードとして使用して一貫したデータを生成
+            let seed = sessionData.session * 1000;
+            
+            return noteNames.map((noteName, index) => {
+                // シード基づく擬似ランダム生成で一貫した結果を保証
+                const baseError = sessionData.averageCentError;
+                const variation = (seededRandom(seed + index * 10) - 0.5) * 0.8 * baseError;
+                const sign = seededRandom(seed + index * 10 + 5) > 0.5 ? 1 : -1;
+                const absError = Math.max(1, Math.abs(baseError + variation));
+                const centError = Math.round(absError * sign);
+                
+                const targetFreq = baseFreqs[index];
+                const userFreq = targetFreq * Math.pow(2, centError / 1200);
+                
+                return {
+                    noteIndex: index,
+                    noteName: noteName,
+                    targetFrequency: targetFreq,
+                    userFrequency: userFreq,
+                    centError: centError,
+                    isCorrect: Math.abs(centError) <= 50
+                };
+            });
+        }
+
+        let selectedSessionForAnalysis = 1;
+
+        // Get evaluation level and color (仕様書準拠)
+        function getSessionEvaluationLabel(averageCentError) {
+            if (averageCentError <= 15) return 'Excellent';      // ±15セント以内
+            if (averageCentError <= 25) return 'Good';           // 15セント超～25セント以内  
+            if (averageCentError <= 40) return 'Pass';           // 25セント超～40セント以内
+            return 'Practice';                                   // 41セント以上
+        }
+
+        function getSessionEvaluationColor(label) {
+            switch (label) {
+                case 'Excellent': return 'gradient-warning';
+                case 'Good': return 'gradient-success'; 
+                case 'Pass': return 'gradient-blue';
+                default: return 'gradient-error';
+            }
+        }
+
+        function getEvaluationIcon(label) {
+            // Lucideアイコンを使用（直感的なアイコン配置）
+            switch (label) {
+                case 'Excellent': return lucideIcon('trophy', 'icon-md text-white');     // ±15セント以内 - トロフィー
+                case 'Good': return lucideIcon('star', 'icon-md text-white');            // 15～25セント - 星  
+                case 'Pass': return lucideIcon('thumbs-up', 'icon-md text-white');       // 25～40セント - 親指UP
+                default: return lucideIcon('frown', 'icon-md text-white');               // 41セント以上 - 困り顔
+            }
+        }
+
+        // Initialize sessions grid
+        function initializeSessionsGrid() {
+            const grid = document.getElementById('sessions-grid');
+            grid.innerHTML = '';
+
+            mockSessionsData.forEach((session) => {
+                const label = getSessionEvaluationLabel(session.averageCentError);
+                const colorClass = getSessionEvaluationColor(label);
+                const icon = getEvaluationIcon(label);
+                
+
+                const sessionElement = document.createElement('div');
+                sessionElement.className = `aspect-square rounded-lg cursor-pointer transition-all hover-scale active:scale-95 flex flex-col items-center justify-center text-center relative ${colorClass} ${
+                    selectedSessionForAnalysis === session.session ? 'ring-2 scale-105' : ''
+                }`;
+                
+                sessionElement.innerHTML = `
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <div class="text-white font-bold text-sm mb-1">${session.session}</div>
+                        <div class="mb-1">${icon}</div>
+                    </div>
+                `;
+
+                sessionElement.addEventListener('click', () => {
+                    selectedSessionForAnalysis = session.session;
+                    updateSelectedSession();
+                    initializeSessionsGrid(); // Refresh to update selection
+                });
+
+                grid.appendChild(sessionElement);
+            });
+        }
+
+        // Update selected session details
+        function updateSelectedSession() {
+            const selectedSession = mockSessionsData.find(s => s.session === selectedSessionForAnalysis);
+            if (!selectedSession) return;
+
+            document.getElementById('selected-session').textContent = selectedSession.session;
+
+            // セッションの評価ラベルを取得
+            const label = getSessionEvaluationLabel(selectedSession.averageCentError);
+
+            // Update session info
+            const sessionInfo = document.getElementById('session-info');
+            sessionInfo.innerHTML = `
+                <div class="flex justify-between text-sm">
+                    <span class="text-white-70">基音:</span>
+                    <span class="text-white font-medium">${selectedSession.baseNote}</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-white-70">精度:</span>
+                    <span class="text-white font-medium">${selectedSession.accuracy}%</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-white-70">評価:</span>
+                    <span class="font-medium ${
+                        label === 'Excellent' ? 'text-yellow-300' : 
+                        label === 'Good' ? 'text-green-300' :
+                        label === 'Pass' ? 'text-blue-300' :
+                        'text-red-300'
+                    }">${label}</span>
+                </div>
+            `;
+
+            // Update note results
+            const noteResults = document.getElementById('note-results');
+            noteResults.innerHTML = '';
+
+            const sessionNoteResults = generateSessionNoteResults(selectedSession);
+            sessionNoteResults.forEach((note, index) => {
+                const getEvaluationLevel = (centError) => {
+                    const absError = Math.abs(centError);
+                    // 直感的なアイコン配置で統一評価基準
+                    if (absError <= 15) return { level: 'excellent', color: 'text-yellow-300', label: 'Excellent', icon: lucideIcon('trophy', 'icon-xs text-yellow-300') };
+                    if (absError <= 25) return { level: 'good', color: 'text-green-300', label: 'Good', icon: lucideIcon('star', 'icon-xs text-green-300') };
+                    if (absError <= 40) return { level: 'pass', color: 'text-blue-300', label: 'Pass', icon: lucideIcon('thumbs-up', 'icon-xs text-blue-300') };
+                    return { level: 'practice', color: 'text-red-300', label: 'Practice', icon: lucideIcon('frown', 'icon-xs text-red-300') };
+                };
+
+                const evaluation = getEvaluationLevel(note.centError);
+
+                const noteElement = document.createElement('div');
+                noteElement.className = 'glass-card-sm hover:bg-white/10 transition-colors';
+                noteElement.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center text-xs font-bold text-white">
+                                ${note.noteIndex + 1}
+                            </span>
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-white font-medium">${note.noteName}</span>
+                                    <span class="font-bold ${note.centError > 0 ? 'text-red-300' : 'text-blue-300'}">
+                                        ${note.centError > 0 ? '+' : ''}${note.centError}¢
+                                    </span>
+                                </div>
+                                <div class="text-xs text-white-60">
+                                    ${note.targetFrequency.toFixed(0)}Hz → ${note.userFrequency.toFixed(0)}Hz
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            ${evaluation.icon}
+                            <span class="text-xs font-medium ${evaluation.color}">${evaluation.label}</span>
+                        </div>
+                    </div>
+                `;
+
+                noteResults.appendChild(noteElement);
+            });
+        }
+
+        // Initialize performance chart
+        function initializePerformanceChart() {
+            const chart = document.getElementById('performance-chart');
+            chart.innerHTML = '';
+
+            mockSessionsData.forEach((session, index) => {
+                const barElement = document.createElement('div');
+                barElement.className = 'flex-1 flex flex-col items-center';
+                barElement.innerHTML = `
+                    <div class="w-full gradient-primary rounded-t" style="height: ${(session.accuracy / 100) * 100}%"></div>
+                    <span class="text-white-60 text-xs mt-2 transform rotate-45 origin-bottom-left">${session.session}</span>
+                `;
+                chart.appendChild(barElement);
+            });
+        }
+
+        // Initialize page
+        function initializePage() {
+            initializeSessionsGrid();
+            updateSelectedSession();
+            initializePerformanceChart();
+        }
+
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', function() {
+            replaceLucideIcons();
+        });
+
+        // Start initialization
+        initializePage();
+    </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Gemini: Today's Tasks",
+            "type": "shell",
+            "command": "./gemini-tasks.sh",
+            "args": ["today"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Gemini: Progress Report",
+            "type": "shell",
+            "command": "./gemini-tasks.sh",
+            "args": ["progress"],
+            "group": "test"
+        },
+        {
+            "label": "Gemini: Weekly Report",
+            "type": "shell",
+            "command": "./gemini-tasks.sh",
+            "args": ["report"],
+            "group": "test"
+        }
+    ]
+}

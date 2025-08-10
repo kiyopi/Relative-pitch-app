@@ -298,6 +298,33 @@
       background: var(--mantine-color-gray-0);
       border-radius: 6px;
       margin-bottom: 8px;
+      color: var(--mantine-color-dark-7);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .session-item:hover {
+      background: var(--mantine-color-gray-1);
+      transform: translateY(-1px);
+    }
+    
+    .session-detail {
+      background: var(--mantine-color-blue-0);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border-left: 4px solid var(--mantine-color-blue-6);
+    }
+    
+    .expand-icon {
+      margin-left: 8px;
+      font-size: 12px;
+      color: var(--mantine-color-gray-6);
+      transition: transform 0.2s ease;
+    }
+    
+    .session-item.expanded .expand-icon {
+      transform: rotate(180deg);
     }
 
     .session-score {
@@ -426,7 +453,7 @@
     <div id="mic-test" class="screen">
       <div class="screen-header">
         <h1 class="screen-title">🎤 トレーニング前の準備</h1>
-        <p class="screen-subtitle">マイク設定と音域確認を行います</p>
+        <p class="screen-subtitle">マイク設定と音域テストを行います</p>
       </div>
 
       <div style="margin-bottom: var(--session-spacing);">
@@ -448,23 +475,96 @@
         </div>
       </div>
 
-      <div style="background: var(--mantine-color-yellow-0); border-radius: 8px; padding: var(--training-spacing); margin-bottom: var(--session-spacing); border-left: 4px solid var(--mantine-color-yellow-6);">
-        <h4 style="color: var(--mantine-color-yellow-8); margin-bottom: 8px;">📢 発声テスト</h4>
-        <p style="color: var(--mantine-color-yellow-8); margin: 0;">
-          「ドー」を3秒間発声してください。<br>
-          音域と音量を確認しています。
-        </p>
+      <!-- 音域テスト機能 -->
+      <div style="background: var(--mantine-color-blue-0); border-radius: 8px; padding: var(--training-spacing); margin-bottom: var(--session-spacing); border-left: 4px solid var(--mantine-color-blue-6);">
+        <h4 style="color: var(--mantine-color-blue-8); margin-bottom: 12px;">🎵 音域テスト</h4>
+        
+        <!-- テスト進行状況 -->
+        <div style="display: flex; justify-content: center; margin-bottom: 16px;">
+          <div style="display: flex; gap: 12px;">
+            <span style="padding: 4px 12px; background: var(--mantine-color-blue-6); color: white; border-radius: 20px; font-size: 12px;">低音テスト完了</span>
+            <span style="padding: 4px 12px; background: var(--mantine-color-yellow-6); color: white; border-radius: 20px; font-size: 12px;">高音テスト中</span>
+            <span style="padding: 4px 12px; background: var(--mantine-color-gray-4); color: white; border-radius: 20px; font-size: 12px;">結果表示</span>
+          </div>
+        </div>
+
+        <!-- 現在のテスト音 -->
+        <div style="text-align: center; margin-bottom: 16px;">
+          <div style="width: 80px; height: 80px; background: white; border-radius: 50%; border: 3px solid var(--mantine-color-blue-6); margin: 0 auto 8px auto; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div style="font-size: 20px; font-weight: 700; color: var(--mantine-color-blue-8); line-height: 1;">D5</div>
+            <div style="font-size: 11px; color: var(--mantine-color-gray-6); line-height: 1;">587 Hz</div>
+          </div>
+          <div style="font-size: 14px; color: var(--mantine-color-blue-8);">
+            この音に合わせて「ラ」で歌ってください
+          </div>
+        </div>
+
+        <!-- 検出状況 -->
+        <div style="background: white; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 14px; font-weight: 600;">検出状況</span>
+            <span style="color: var(--mantine-color-green-6); font-size: 14px; font-weight: 600;">✅ 成功</span>
+          </div>
+          <div style="font-size: 12px; color: var(--mantine-color-gray-6);">
+            検出音程: D5 (589Hz) | 誤差: +7¢ | 3秒後に次の音に進みます
+          </div>
+        </div>
+      </div>
+
+      <!-- 音域テスト結果 -->
+      <div style="background: var(--mantine-color-green-0); border-radius: 8px; padding: var(--training-spacing); margin-bottom: var(--session-spacing); border-left: 4px solid var(--mantine-color-green-6);">
+        <h4 style="color: var(--mantine-color-green-8); margin-bottom: 12px;">🎯 あなたの音域</h4>
+        
+        <!-- 音域表示 -->
+        <div style="text-align: center; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 8px;">
+            <div style="text-align: center;">
+              <div style="font-size: 18px; font-weight: 700; color: var(--mantine-color-green-8);">A2</div>
+              <div style="font-size: 12px; color: var(--mantine-color-gray-6);">最低音</div>
+            </div>
+            <div style="flex: 1; height: 4px; background: linear-gradient(90deg, var(--mantine-color-green-6), var(--mantine-color-blue-6)); border-radius: 2px;"></div>
+            <div style="text-align: center;">
+              <div style="font-size: 18px; font-weight: 700; color: var(--mantine-color-blue-8);">F5</div>
+              <div style="font-size: 12px; color: var(--mantine-color-gray-6);">最高音</div>
+            </div>
+          </div>
+          <div style="font-size: 14px; color: var(--mantine-color-gray-7);">
+            <strong>2.6オクターブ</strong> (31音)
+          </div>
+        </div>
+
+        <!-- 推奨基音 -->
+        <div>
+          <h5 style="color: var(--mantine-color-green-8); margin-bottom: 8px;">💡 推奨基音</h5>
+          <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 8px;">
+            <span style="padding: 6px 12px; background: var(--mantine-color-green-6); color: white; border-radius: 20px; font-size: 12px; font-weight: 600;">C3</span>
+            <span style="padding: 6px 12px; background: var(--mantine-color-green-6); color: white; border-radius: 20px; font-size: 12px; font-weight: 600;">D3</span>
+            <span style="padding: 6px 12px; background: var(--mantine-color-green-6); color: white; border-radius: 20px; font-size: 12px; font-weight: 600;">E3</span>
+            <span style="padding: 6px 12px; background: var(--mantine-color-gray-4); color: white; border-radius: 20px; font-size: 12px;">F3</span>
+            <span style="padding: 6px 12px; background: var(--mantine-color-gray-4); color: white; border-radius: 20px; font-size: 12px;">G3</span>
+          </div>
+          <p style="font-size: 12px; color: var(--mantine-color-green-7); margin: 0; text-align: center;">
+            快適に歌える基音は <strong>C3 - E3</strong> です。<br>
+            初心者モードではこれらの基音が自動選択されます。
+          </p>
+        </div>
       </div>
 
       <div class="progress-container">
         <div style="font-size: 14px; color: var(--mantine-color-gray-6); margin-bottom: 8px;">準備進行状況</div>
         <div class="progress-bar">
-          <div class="progress-fill" style="width: 80%;"></div>
+          <div class="progress-fill" style="width: 100%; background: var(--mantine-color-green-6);"></div>
+        </div>
+        <div style="font-size: 12px; color: var(--mantine-color-green-6); margin-top: 4px; text-align: center;">
+          ✅ マイク許可完了 ✅ 音量調整完了 ✅ 音域テスト完了
         </div>
       </div>
 
       <div style="margin-top: var(--session-spacing);">
         <button class="btn btn-large btn-success">✅ 準備完了 - トレーニング開始</button>
+        <div style="text-align: center; margin-top: 8px;">
+          <button class="btn btn-small btn-secondary">🔄 音域テストをやり直す</button>
+        </div>
       </div>
     </div>
 
@@ -520,98 +620,102 @@
       </div>
 
       <div style="text-align: center; margin-top: var(--session-spacing);">
-        <button class="btn btn-secondary">🔄 リセット</button>
+        <button class="btn btn-secondary">🏠 ホームに戻る</button>
       </div>
     </div>
 
-    <!-- 4. セッション評価画面 -->
+    <!-- 4. セッション評価画面（ランダム基音モード用） -->
     <div id="session-result" class="screen">
       <div class="screen-header">
         <h1 class="screen-title">📊 セッション評価</h1>
-        <p class="screen-subtitle">セッション 3/8 完了 - あなたの歌声を分析しました</p>
+        <p class="screen-subtitle">ランダム基音モード完了 - あなたの歌声を分析しました</p>
       </div>
 
       <div class="evaluation-grid">
         <div class="evaluation-card">
-          <div class="evaluation-value">82</div>
-          <div class="evaluation-label">総合スコア</div>
+          <div class="evaluation-value" style="font-size: 32px;">🎉</div>
+          <div class="evaluation-label">総合評価 (Good)</div>
         </div>
         <div class="evaluation-card">
-          <div class="evaluation-value" style="color: var(--mantine-color-green-6);">B級</div>
-          <div class="evaluation-label">評価ランク</div>
-        </div>
-        <div class="evaluation-card">
-          <div class="evaluation-value">78.5%</div>
+          <div class="evaluation-value">±20セント</div>
           <div class="evaluation-label">平均精度</div>
         </div>
         <div class="evaluation-card">
-          <div class="evaluation-value">5.2秒</div>
-          <div class="evaluation-label">完了時間</div>
+          <div class="evaluation-value">2音</div>
+          <div class="evaluation-label">要改善（±50セント超）</div>
         </div>
       </div>
 
       <div style="margin: var(--session-spacing) 0;">
-        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: var(--training-spacing);">🎵 音階別詳細評価</h3>
+        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: var(--training-spacing); color: var(--mantine-color-dark-7);">🎵 音階別詳細評価</h3>
         
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
           <div class="session-item" style="flex-direction: column; text-align: center;">
             <div style="font-weight: 600; color: var(--note-do);">ド</div>
-            <div style="font-size: 20px; font-weight: 700; color: var(--mantine-color-green-6);">95</div>
-            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">261.5Hz<br>-2¢</div>
+            <div style="font-size: 24px;">🏆</div>
+            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">-2¢</div>
           </div>
           <div class="session-item" style="flex-direction: column; text-align: center;">
             <div style="font-weight: 600; color: var(--note-re);">レ</div>
-            <div style="font-size: 20px; font-weight: 700; color: var(--mantine-color-blue-6);">78</div>
-            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">289.2Hz<br>-15¢</div>
+            <div style="font-size: 24px;">👍</div>
+            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">-15¢</div>
           </div>
           <div class="session-item" style="flex-direction: column; text-align: center;">
             <div style="font-weight: 600; color: var(--note-mi);">ミ</div>
-            <div style="font-size: 20px; font-weight: 700; color: var(--mantine-color-yellow-6);">65</div>
-            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">315.8Hz<br>-42¢</div>
+            <div style="font-size: 24px;">😭</div>
+            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">-42¢</div>
           </div>
           <div class="session-item" style="flex-direction: column; text-align: center;">
             <div style="font-weight: 600; color: var(--note-fa);">ファ</div>
-            <div style="font-size: 20px; font-weight: 700; color: var(--mantine-color-green-6);">88</div>
-            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">350.1Hz<br>+1¢</div>
+            <div style="font-size: 24px;">🎉</div>
+            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">+1¢</div>
           </div>
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px;">
           <div class="session-item" style="flex-direction: column; text-align: center;">
             <div style="font-weight: 600; color: var(--note-so);">ソ</div>
-            <div style="font-size: 20px; font-weight: 700; color: var(--mantine-color-blue-6);">72</div>
-            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">385.5Hz<br>-17¢</div>
+            <div style="font-size: 24px;">👍</div>
+            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">-17¢</div>
           </div>
           <div class="session-item" style="flex-direction: column; text-align: center;">
             <div style="font-weight: 600; color: var(--note-la);">ラ</div>
-            <div style="font-size: 20px; font-weight: 700; color: var(--mantine-color-green-6);">91</div>
-            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">441.2Hz<br>+5¢</div>
+            <div style="font-size: 24px;">🎉</div>
+            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">+5¢</div>
           </div>
           <div class="session-item" style="flex-direction: column; text-align: center;">
             <div style="font-weight: 600; color: var(--note-si);">シ</div>
-            <div style="font-size: 20px; font-weight: 700; color: var(--mantine-color-yellow-6);">68</div>
-            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">486.2Hz<br>-38¢</div>
+            <div style="font-size: 24px;">😭</div>
+            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">-38¢</div>
           </div>
           <div class="session-item" style="flex-direction: column; text-align: center;">
             <div style="font-weight: 600; color: var(--note-do-high);">ド</div>
-            <div style="font-size: 20px; font-weight: 700; color: var(--mantine-color-green-6);">89</div>
-            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">524.8Hz<br>+6¢</div>
+            <div style="font-size: 24px;">🎉</div>
+            <div style="font-size: 12px; color: var(--mantine-color-gray-6);">+6¢</div>
           </div>
         </div>
       </div>
 
       <div style="background: var(--mantine-color-blue-0); border-radius: 8px; padding: var(--training-spacing); margin: var(--session-spacing) 0; border-left: 4px solid var(--mantine-color-blue-6);">
-        <h4 style="color: var(--mantine-color-blue-8); margin-bottom: 8px;">💡 改善アドバイス</h4>
+        <h4 style="color: var(--mantine-color-blue-8); margin-bottom: 8px;">🎯 今回のポイント</h4>
         <p style="color: var(--mantine-color-blue-7); font-size: 14px; margin: 0;">
-          • レとシの音程が低めです。もう少し高く意識してみましょう<br>
-          • ミの音程が大きくずれています。基音との関係を意識して練習しましょう<br>
-          • ド・ファ・ラは非常に正確です！この調子で継続しましょう
+          • 6/8音が合格ライン（±50セント以内）でした<br>
+          • 「ミ」と「シ」がやや低めの傾向（-40セント前後）<br>
+          • 継続練習で音程精度は必ず向上します！
         </p>
       </div>
 
+
+      <div style="background: var(--mantine-color-gray-0); border-radius: 8px; padding: 12px; margin: var(--session-spacing) 0;">
+        <div style="font-size: 12px; color: var(--mantine-color-gray-7); text-align: center;">
+          <strong>評価アイコンの意味：</strong>
+          🏆 Excellent (優秀) | 🎉 Good (良好) | 👍 Pass (合格) | 😭 Need Work (要練習)
+        </div>
+      </div>
+
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--training-spacing);">
-        <button class="btn btn-secondary">🔄 もう一度</button>
-        <button class="btn btn-primary">➡️ 次のセッション</button>
+        <button class="btn btn-secondary">🎲 新しい基音で練習</button>
+        <button class="btn btn-primary">🏠 ホームへ戻る</button>
       </div>
 
       <div style="margin-top: var(--training-spacing); text-align: center;">
@@ -633,16 +737,16 @@
 
       <div class="evaluation-grid">
         <div class="evaluation-card">
-          <div class="evaluation-value">78.5</div>
-          <div class="evaluation-label">総合平均スコア</div>
+          <div class="evaluation-value">±28セント</div>
+          <div class="evaluation-label">平均音程精度</div>
         </div>
         <div class="evaluation-card">
-          <div class="evaluation-value">82.3%</div>
-          <div class="evaluation-label">総合精度</div>
+          <div class="evaluation-value">6/8音</div>
+          <div class="evaluation-label">合格音数</div>
         </div>
         <div class="evaluation-card">
-          <div class="evaluation-value">42分</div>
-          <div class="evaluation-label">総プレイ時間</div>
+          <div class="evaluation-value">3音</div>
+          <div class="evaluation-label">Excellent数</div>
         </div>
         <div class="evaluation-card">
           <div class="evaluation-value">6/8</div>
@@ -651,62 +755,186 @@
       </div>
 
       <div class="session-history">
-        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: var(--training-spacing);">📋 セッション履歴</h3>
+        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: var(--training-spacing); color: var(--mantine-color-dark-7);">📋 セッション履歴</h3>
         
-        <div class="session-item">
+        <div class="session-item" onclick="toggleSessionDetail(1)">
           <span>セッション 1</span>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <span class="session-score">85点</span>
-            <span class="grade-badge grade-b">B級</span>
+            <span class="session-score">±22セント</span>
+            <span style="font-size: 20px;">🎉</span>
+            <span class="expand-icon">▼</span>
           </div>
         </div>
-        <div class="session-item">
+        <div class="session-detail" id="session-1-detail" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h5 style="margin: 0; color: var(--mantine-color-blue-8);">📊 セッション 1 詳細</h5>
+            <span style="font-size: 12px; color: var(--mantine-color-blue-6);">基音: G3 (196Hz)</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px;">
+            <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+              <div style="font-weight: 600; font-size: 14px; color: var(--note-do);">ド</div>
+              <div style="font-size: 16px;">🏆</div>
+              <div style="font-size: 10px; color: var(--mantine-color-gray-6);">+2¢</div>
+            </div>
+            <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+              <div style="font-weight: 600; font-size: 14px; color: var(--note-re);">レ</div>
+              <div style="font-size: 16px;">🎉</div>
+              <div style="font-size: 10px; color: var(--mantine-color-gray-6);">-12¢</div>
+            </div>
+            <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+              <div style="font-weight: 600; font-size: 14px; color: var(--note-mi);">ミ</div>
+              <div style="font-size: 16px;">🎉</div>
+              <div style="font-size: 10px; color: var(--mantine-color-gray-6);">+8¢</div>
+            </div>
+            <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+              <div style="font-weight: 600; font-size: 14px; color: var(--note-fa);">ファ</div>
+              <div style="font-size: 16px;">🎉</div>
+              <div style="font-size: 10px; color: var(--mantine-color-gray-6);">-5¢</div>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px;">
+            <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+              <div style="font-weight: 600; font-size: 14px; color: var(--note-so);">ソ</div>
+              <div style="font-size: 16px;">👍</div>
+              <div style="font-size: 10px; color: var(--mantine-color-gray-6);">-28¢</div>
+            </div>
+            <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+              <div style="font-weight: 600; font-size: 14px; color: var(--note-la);">ラ</div>
+              <div style="font-size: 16px;">🎉</div>
+              <div style="font-size: 10px; color: var(--mantine-color-gray-6);">+15¢</div>
+            </div>
+            <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+              <div style="font-weight: 600; font-size: 14px; color: var(--note-si);">シ</div>
+              <div style="font-size: 16px;">🎉</div>
+              <div style="font-size: 10px; color: var(--mantine-color-gray-6);">+3¢</div>
+            </div>
+            <div style="text-align: center; padding: 8px; background: white; border-radius: 6px;">
+              <div style="font-weight: 600; font-size: 14px; color: var(--note-do-high);">ド</div>
+              <div style="font-size: 16px;">🎉</div>
+              <div style="font-size: 10px; color: var(--mantine-color-gray-6);">-7¢</div>
+            </div>
+          </div>
+          <div style="font-size: 12px; color: var(--mantine-color-blue-7);">
+            💡 <strong>Good評価!</strong> ソの音程がやや低めでした。他は非常に良好です。
+          </div>
+        </div>
+        <div class="session-item" onclick="toggleSessionDetail(2)">
           <span>セッション 2</span>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <span class="session-score">72点</span>
-            <span class="grade-badge grade-c">C級</span>
+            <span class="session-score">±35セント</span>
+            <span style="font-size: 20px;">👍</span>
+            <span class="expand-icon">▼</span>
           </div>
         </div>
-        <div class="session-item">
+        <div class="session-detail" id="session-2-detail" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h5 style="margin: 0; color: var(--mantine-color-blue-8);">📊 セッション 2 詳細</h5>
+            <span style="font-size: 12px; color: var(--mantine-color-blue-6);">基音: E3 (165Hz)</span>
+          </div>
+          <div style="font-size: 12px; color: var(--mantine-color-blue-7);">
+            💡 <strong>Pass評価.</strong> ミとシで大きく外れました。基音との関係を意識して練習しましょう。
+          </div>
+        </div>
+        <div class="session-item" onclick="toggleSessionDetail(3)">
           <span>セッション 3</span>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <span class="session-score">82点</span>
-            <span class="grade-badge grade-b">B級</span>
+            <span class="session-score">±25セント</span>
+            <span style="font-size: 20px;">🎉</span>
+            <span class="expand-icon">▼</span>
           </div>
         </div>
-        <div class="session-item">
+        <div class="session-detail" id="session-3-detail" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h5 style="margin: 0; color: var(--mantine-color-blue-8);">📊 セッション 3 詳細</h5>
+            <span style="font-size: 12px; color: var(--mantine-color-blue-6);">基音: A3 (220Hz)</span>
+          </div>
+          <div style="font-size: 12px; color: var(--mantine-color-blue-7);">
+            💡 <strong>Good評価!</strong> 全体的に安定していました。この調子で継続しましょう。
+          </div>
+        </div>
+        <div class="session-item" onclick="toggleSessionDetail(4)">
           <span>セッション 4</span>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <span class="session-score">76点</span>
-            <span class="grade-badge grade-c">C級</span>
+            <span class="session-score">±31セント</span>
+            <span style="font-size: 20px;">👍</span>
+            <span class="expand-icon">▼</span>
           </div>
         </div>
-        <div class="session-item">
+        <div class="session-detail" id="session-4-detail" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h5 style="margin: 0; color: var(--mantine-color-blue-8);">📊 セッション 4 詳細</h5>
+            <span style="font-size: 12px; color: var(--mantine-color-blue-6);">基音: F3 (175Hz)</span>
+          </div>
+          <div style="font-size: 12px; color: var(--mantine-color-blue-7);">
+            💡 <strong>Pass評価.</strong> レとファの音程を重点的に練習してみましょう。
+          </div>
+        </div>
+        <div class="session-item" onclick="toggleSessionDetail(5)">
           <span>セッション 5</span>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <span class="session-score">88点</span>
-            <span class="grade-badge grade-a">A級</span>
+            <span class="session-score">±18セント</span>
+            <span style="font-size: 20px;">🏆</span>
+            <span class="expand-icon">▼</span>
           </div>
         </div>
-        <div class="session-item">
+        <div class="session-detail" id="session-5-detail" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h5 style="margin: 0; color: var(--mantine-color-blue-8);">📊 セッション 5 詳細</h5>
+            <span style="font-size: 12px; color: var(--mantine-color-blue-6);">基音: D3 (147Hz)</span>
+          </div>
+          <div style="font-size: 12px; color: var(--mantine-color-blue-7);">
+            💡 <strong>Excellent評価!</strong> 全音階で高精度を達成しました。素晴らしい相対音感です！
+          </div>
+        </div>
+        <div class="session-item" onclick="toggleSessionDetail(6)">
           <span>セッション 6</span>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <span class="session-score">79点</span>
-            <span class="grade-badge grade-b">B級</span>
+            <span class="session-score">±28セント</span>
+            <span style="font-size: 20px;">🎉</span>
+            <span class="expand-icon">▼</span>
           </div>
         </div>
-        <div class="session-item">
+        <div class="session-detail" id="session-6-detail" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h5 style="margin: 0; color: var(--mantine-color-blue-8);">📊 セッション 6 詳細</h5>
+            <span style="font-size: 12px; color: var(--mantine-color-blue-6);">基音: B3 (247Hz)</span>
+          </div>
+          <div style="font-size: 12px; color: var(--mantine-color-blue-7);">
+            💡 <strong>Good評価!</strong> 高音域でも良好な精度でした。
+          </div>
+        </div>
+        <div class="session-item" onclick="toggleSessionDetail(7)">
           <span>セッション 7</span>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <span class="session-score">74点</span>
-            <span class="grade-badge grade-c">C級</span>
+            <span class="session-score">±33セント</span>
+            <span style="font-size: 20px;">👍</span>
+            <span class="expand-icon">▼</span>
           </div>
         </div>
-        <div class="session-item">
+        <div class="session-detail" id="session-7-detail" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h5 style="margin: 0; color: var(--mantine-color-blue-8);">📊 セッション 7 詳細</h5>
+            <span style="font-size: 12px; color: var(--mantine-color-blue-6);">基音: C4 (262Hz)</span>
+          </div>
+          <div style="font-size: 12px; color: var(--mantine-color-blue-7);">
+            💡 <strong>Pass評価.</strong> 高音域では少し苦戦しました。練習を継続しましょう。
+          </div>
+        </div>
+        <div class="session-item" onclick="toggleSessionDetail(8)">
           <span>セッション 8</span>
           <div style="display: flex; gap: 8px; align-items: center;">
-            <span class="session-score">82点</span>
-            <span class="grade-badge grade-b">B級</span>
+            <span class="session-score">±25セント</span>
+            <span style="font-size: 20px;">🎉</span>
+            <span class="expand-icon">▼</span>
+          </div>
+        </div>
+        <div class="session-detail" id="session-8-detail" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h5 style="margin: 0; color: var(--mantine-color-blue-8);">📊 セッション 8 詳細</h5>
+            <span style="font-size: 12px; color: var(--mantine-color-blue-6);">基音: G♭3 (185Hz)</span>
+          </div>
+          <div style="font-size: 12px; color: var(--mantine-color-blue-7);">
+            💡 <strong>Good評価!</strong> 最終セッションを良い成績で完走しました！
           </div>
         </div>
       </div>
@@ -744,9 +972,7 @@
         <div class="setting-item">
           <span>基音聴き返し</span>
           <select style="padding: 4px 8px; border-radius: 4px; border: 1px solid var(--mantine-color-gray-3);">
-            <option selected>初心者モードのみ</option>
-            <option>全モード許可</option>
-            <option>完全禁止</option>
+            <option selected>完全廃止（絶対音感依存防止）</option>
           </select>
         </div>
       </div>
@@ -892,6 +1118,23 @@
         tab.classList.remove('active');
       });
       event.target.classList.add('active');
+    }
+
+    // セッション詳細の展開/折りたたみ機能
+    function toggleSessionDetail(sessionNumber) {
+      const detailElement = document.getElementById(`session-${sessionNumber}-detail`);
+      const sessionItem = event.currentTarget;
+      const expandIcon = sessionItem.querySelector('.expand-icon');
+      
+      if (detailElement.style.display === 'none' || !detailElement.style.display) {
+        detailElement.style.display = 'block';
+        sessionItem.classList.add('expanded');
+        expandIcon.style.transform = 'rotate(180deg)';
+      } else {
+        detailElement.style.display = 'none';
+        sessionItem.classList.remove('expanded');
+        expandIcon.style.transform = 'rotate(0deg)';
+      }
     }
 
     // 初期化
