@@ -76,7 +76,9 @@ const LUCIDE_ICONS = {
   
   'book-open': `<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>`,
   
-  'frown': `<circle cx="12" cy="12" r="10"/><path d="m16 16c0 0-1.5-2-4-2s-4 2-4 2"/><circle cx="9" cy="9" r=".5"/><circle cx="15" cy="9" r=".5"/>`,
+  'frown': `<circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="15.01"/>`,
+  'alert-circle': `<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>`,
+  'triangle-alert': `<path d="M21.73 18L13.73 4a2 2 0 0 0-3.46 0L2.27 18a2 2 0 0 0 1.73 3h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>`,
 };
 
 /**
@@ -93,7 +95,8 @@ function lucideIcon(name, className = 'icon', size = 24) {
     return `<div class="${className}" style="width:${size}px;height:${size}px;background:#f00;"></div>`;
   }
   
-  return `<svg class="${className}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconPath}</svg>`;
+  // Add xmlns for better compatibility
+  return `<svg xmlns="http://www.w3.org/2000/svg" class="${className}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconPath}</svg>`;
 }
 
 /**

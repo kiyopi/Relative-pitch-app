@@ -166,6 +166,12 @@ body {
 .text-yellow-300 { color: #fde047; }
 .text-red-300 { color: #fca5a5; }
 
+/* 明るい文字色（ボタン用） */
+.text-yellow-200 { color: #fef08a; }
+.text-green-200 { color: #bbf7d0; }
+.text-blue-200 { color: #bfdbfe; }
+.text-red-200 { color: #fecaca; }
+
 /* ==========================================================================
    Layout System
    ========================================================================== */
@@ -515,7 +521,10 @@ body {
 
 .opacity-0 { opacity: 0; }
 .opacity-50 { opacity: 0.5; }
+.opacity-80 { opacity: 0.8; }
 .opacity-100 { opacity: 1; }
+
+.hover\:opacity-100:hover { opacity: 1; }
 
 .transition-all { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 .transition-colors { transition: color 0.3s, background-color 0.3s, border-color 0.3s; }
