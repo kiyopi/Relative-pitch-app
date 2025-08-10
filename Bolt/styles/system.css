@@ -298,6 +298,15 @@ body {
 .icon-xl { width: 2.5rem; height: 2.5rem; }   /* 40px - 64pxコンテナに適合 */
 .icon-2xl { width: 3rem; height: 3rem; }      /* 48px - より大きなコンテナ用 */
 .icon-3xl { width: 4rem; height: 4rem; }      /* 64px - 最大サイズ用 */
+.icon-4xl { width: 5rem; height: 5rem; }      /* 80px - 超大サイズ用 */
+
+/* レスポンシブアイコンサイズ */
+@media (min-width: 768px) {
+  .md\\:icon-4xl { 
+    width: 5rem !important; 
+    height: 5rem !important; 
+  }
+}
 
 /* Gradients */
 .gradient-primary {
