@@ -215,3 +215,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 15:08:10] コミット: Fix createGlassGradient function scope error in charts
+
+- Move createGlassGradient to global scope to fix ReferenceError
+- Remove duplicate function definitions in mobile and accuracy charts
+- Ensure consistent glass gradient effects across all chart types
+- Maintain transparency and gradient visual effects
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
