@@ -610,6 +610,36 @@ body {
 .app-icon-medium { border-radius: var(--radius-2xl); }  /* 33-80px */
 .app-icon-large  { border-radius: var(--radius-3xl); }  /* 81px以上 */
 
+/* ==========================================================================
+   Page Header Icon System
+   ========================================================================== */
+.page-header-icon {
+  width: 6rem; /* 96px */
+  height: 6rem; /* 96px */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin: 0 auto 1.5rem auto;
+}
+
+.page-header-icon-purple {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+}
+
+.page-header-icon-blue {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.page-header-icon-green {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.page-header-icon-orange {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
 /* Aspect Ratio */
 .aspect-square {
   aspect-ratio: 1 / 1;

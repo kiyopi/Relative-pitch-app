@@ -233,11 +233,12 @@ function initializeLucideIcons() {
     const iconName = element.getAttribute('data-lucide');
     const className = element.className || 'icon';
     const size = element.dataset.size || '24';
+    const strokeWidth = element.getAttribute('data-stroke-width') || '1.5';
     
     if (iconName && LUCIDE_ICONS[iconName]) {
-      element.outerHTML = lucideIcon(iconName, className, parseInt(size));
+      element.outerHTML = lucideIcon(iconName, className, parseInt(size), parseFloat(strokeWidth));
       replacedCount++;
-      console.log(`✅ [LUCIDE] "${iconName}" replaced (${replacedCount}/${iconElements.length})`);
+      console.log(`✅ [LUCIDE] "${iconName}" replaced (stroke: ${strokeWidth}) (${replacedCount}/${iconElements.length})`);
     } else {
       console.warn(`❌ [LUCIDE] Icon "${iconName}" not found`);
       // Show available icons for debugging on first failure

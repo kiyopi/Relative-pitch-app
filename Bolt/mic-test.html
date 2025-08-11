@@ -16,13 +16,8 @@
     <div class="min-h-screen flex items-center justify-center p-6">
         <div class="max-w-2xl w-full">
             <div class="text-center mb-12">
-                <div class="w-24 h-24 gradient-blue rounded-full flex items-center justify-center mx-auto mb-6 flex-shrink-0">
-                    <svg class="icon-2xl text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
-                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                        <line x1="12" y1="19" x2="12" y2="22"/>
-                        <line x1="8" y1="22" x2="16" y2="22"/>
-                    </svg>
+                <div class="page-header-icon page-header-icon-blue">
+                    <i data-lucide="mic" class="icon-2xl text-white" data-stroke-width="2"></i>
                 </div>
                 <h1 class="text-4xl font-bold text-white mb-4">マイクテスト</h1>
                 <p class="text-purple-200 text-xl">音声入力の確認を行います</p>
@@ -101,9 +96,14 @@
         // Update training link with mode
         document.getElementById('start-training').href = `training.html?mode=${mode}`;
         
-        // Initialize Lucide icons
+        // Initialize Lucide icons with enhanced system
         document.addEventListener('DOMContentLoaded', function() {
-            replaceLucideIcons();
+            console.log('📄 [MIC-TEST] DOM Content Loaded - starting icon initialization');
+            if (typeof initializeLucideIcons === 'function') {
+                initializeLucideIcons();
+            } else {
+                console.error('❌ [MIC-TEST] initializeLucideIcons function not found');
+            }
         });
     </script>
 </body>
