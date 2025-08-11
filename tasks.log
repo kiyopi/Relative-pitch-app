@@ -288,3 +288,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 16:13:21] コミット: Add iPad-specific handling to prevent error trend chart animations
+
+- Add tablet detection for devices 768-1024px width (iPad range)
+- Force iPad to use mobile bar chart version with animation control
+- Update chart descriptions to reflect iPad using bar chart layout
+- Ensure only PC (>1024px) uses line chart with potential animations
+- Fix iPad scroll-triggered animation issues
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

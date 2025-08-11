@@ -494,8 +494,8 @@
             // グラフの説明を動的に設定
             const descriptionElement = document.getElementById('chart-description');
             if (descriptionElement) {
-                if (isMobile || isTablet) {
-                    // モバイル版・iPad版（横向きバーチャート）の説明
+                if (isMobile) {
+                    // モバイル版（横向きバーチャート）の説明
                     descriptionElement.innerHTML = `
                         <div class="font-semibold text-white-70">【グラフの見方】</div>
                         <div class="mt-1">縦軸: セッション番号（S1～S12） / 横軸: 平均誤差（セント）</div>
@@ -503,7 +503,7 @@
                         <div class="mt-1">0に近いほど正確な音程です</div>
                     `;
                 } else {
-                    // PC版（ラインチャート）の説明
+                    // PC版・iPad版（ラインチャート）の説明
                     descriptionElement.innerHTML = `
                         <div class="font-semibold text-white-70">【グラフの見方】</div>
                         <div class="mt-1">横軸: セッション別8音 / 縦軸: 誤差（セント）</div>
@@ -518,17 +518,17 @@
                 window.errorTrendChartInstance.destroy();
             }
             
-            if (isMobile || isTablet) {
-                // モバイル版・iPad版: Stacked Bar Chart（アニメーション制御付き）
+            if (isMobile) {
+                // モバイル版: Stacked Bar Chart（アニメーション制御付き）
                 initializeMobileStackedBarChart(ctx);
             } else {
-                // PC版: Line Chart
-                initializePCLineChart(ctx);
+                // PC版・iPad版: Line Chart（iPad版はアニメーション無効）
+                initializePCLineChart(ctx, isTablet);
             }
         }
         
         // PC版: Line Chart実装
-        function initializePCLineChart(ctx) {
+        function initializePCLineChart(ctx, isTabletDevice = false) {
             // X軸ラベル: セッション1の8音、セッション2の8音...という形式
             const noteNames = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド\''];
             const labels = [];
@@ -600,6 +600,9 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: isTabletDevice ? false : {
+                        duration: 800
+                    },
                     plugins: {
                         legend: {
                             display: false
