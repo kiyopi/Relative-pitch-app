@@ -454,11 +454,11 @@
             else if (color === '#3b82f6') { r = 59; g = 130; b = 246; } // Pass - 青
             else { r = 239; g = 68; b = 68; } // Practice - 赤
             
-            // グラス効果: 均等なグラデーションで安定性を確保
+            // グラス効果: 均等なグラデーションで安定性を確保（終点を明るく調整）
             gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.9)`); // 開始点（明るい）
             gradient.addColorStop(0.3, `rgba(${Math.min(255, r + 40)}, ${Math.min(255, g + 40)}, ${Math.min(255, b + 40)}, 0.8)`); // 明るい部分
             gradient.addColorStop(0.7, `rgba(${r}, ${g}, ${b}, 0.7)`); // 中央
-            gradient.addColorStop(1, `rgba(${Math.max(0, r - 30)}, ${Math.max(0, g - 30)}, ${Math.max(0, b - 30)}, 0.6)`); // 終点（暗い）
+            gradient.addColorStop(1, `rgba(${Math.max(0, r - 10)}, ${Math.max(0, g - 10)}, ${Math.max(0, b - 10)}, 0.75)`); // 終点（明るく調整）
             
             return gradient;
         }

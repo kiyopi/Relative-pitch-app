@@ -225,3 +225,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 15:14:08] コミット: Optimize gradient direction for consistent glass effects across devices
+
+- Add chartType parameter to createGlassGradient for mobile/PC differentiation
+- Fix PC version gradient direction to prevent dark area stretching
+- Use fixed 200px gradient size for consistent appearance regardless of bar length
+- Ensure uniform glass gradient effects on both error trend and evaluation distribution charts
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
