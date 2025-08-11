@@ -21,19 +21,18 @@
             <!-- Header -->
             <div class="text-center mb-8">
                 <div class="flex justify-center mb-6">
-                    <div class="w-24 h-24 gradient-warning rounded-full flex items-center justify-center">
-                    <svg class="icon-xl text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-                        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-                        <path d="M4 22h16"/>
-                        <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-                        <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
-                        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
-                    </svg>
+                    <div class="w-24 h-24 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);">
+                        <i data-lucide="file-chart-column-increasing" class="icon-xl text-white"></i>
                     </div>
                 </div>
                 <h1 class="text-4xl font-bold text-white mb-4">総合評価</h1>
-                <p class="text-green-200 text-xl">12セッション完了 - あなたの音感レベルを分析しました</p>
+                <p class="text-green-200 text-xl mb-6">12セッション完了 - あなたの音感レベルを分析しました</p>
+                
+                <!-- 総合評価アイコン -->
+                <div class="flex justify-center items-center mb-2">
+                    <i data-lucide="trophy" class="icon-4xl text-yellow-300 md:w-20 md:h-20"></i>
+                </div>
+                <div class="text-3xl font-bold text-yellow-300 mb-4" id="overall-grade">S級</div>
             </div>
 
             <!-- Overall Statistics -->
@@ -107,6 +106,14 @@
 
             <!-- Action Buttons -->
             <div class="flex justify-center space-x-4">
+                <a href="records.html" class="btn" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white;">
+                    <svg class="icon-sm mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 3h18v18H3z"/>
+                        <path d="M21 9H3"/>
+                        <path d="M9 21V9"/>
+                    </svg>
+                    記録を見る
+                </a>
                 <a href="index.html" class="btn btn-secondary">
                     ホームに戻る
                 </a>

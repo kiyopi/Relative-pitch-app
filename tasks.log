@@ -419,3 +419,26 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 17:44:49] コミット: Fix session navigation and improve mobile title layout
+
+- Prevent duplicate event listener registration with navigationEventListenersAdded flag
+- Remove debug console.log statements
+- Change detailed analysis title to 2-line centered layout for mobile
+- Add flex-shrink-0 to navigation buttons to prevent compression
+- Add flex-1 and px-2 to title area for better responsive spacing
+- Fix one-skip navigation issue caused by duplicate event handlers
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 18:50:57] コミット: Update REQUIREMENTS_SPECIFICATION.md v1.1.2: Technology stack alignment and hook-free design
+
+- Update technology stack to match TECHNICAL_SPECIFICATIONS.md (Mantine + Cloudflare Pages)
+- Add detailed explanation of hook-free design concept with specific flow
+- Enhance voice range test functionality specification
+- Add reference links to technical specifications instead of duplicating details
+- Update version to 1.1.2 with comprehensive changelog
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
