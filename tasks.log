@@ -409,3 +409,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 17:35:56] コミット: Fix navigation button styling and add debug logging
+
+- Change navigation buttons from bg-white/10 to glass-card-sm class
+- Apply consistent glass effect styling to navigation buttons
+- Add console.log debugging to track session navigation behavior
+- Investigate potential one-skip issue in session navigation
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

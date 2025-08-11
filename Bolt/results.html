@@ -81,15 +81,16 @@
             <!-- Detailed Analysis -->
             <div class="glass-card mb-8">
                 <div class="flex items-center justify-between mb-6">
-                    <button id="prev-session-btn" class="glass-card-sm hover:bg-white/10 transition-colors cursor-pointer">
+                    <button id="prev-session-btn" class="glass-card-sm hover:bg-white/10 transition-colors cursor-pointer flex-shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
                             <path d="m15 18-6-6 6-6"/>
                         </svg>
                     </button>
-                    <h3 class="text-xl font-bold text-white">
-                        詳細分析 - セッション<span id="selected-session">1</span>
+                    <h3 class="text-xl font-bold text-white text-center flex-1 px-2">
+                        <div>詳細分析</div>
+                        <div class="text-lg mt-1">セッション<span id="selected-session">1</span></div>
                     </h3>
-                    <button id="next-session-btn" class="glass-card-sm hover:bg-white/10 transition-colors cursor-pointer">
+                    <button id="next-session-btn" class="glass-card-sm hover:bg-white/10 transition-colors cursor-pointer flex-shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
                             <path d="m9 18 6-6-6-6"/>
                         </svg>
@@ -1043,7 +1044,6 @@
         // セッションナビゲーション機能
         function navigateToSession(direction) {
             const totalSessions = mockSessionsData.length;
-            console.log('現在のセッション:', selectedSessionForAnalysis, '方向:', direction);
             
             if (direction === 'prev') {
                 selectedSessionForAnalysis = selectedSessionForAnalysis > 1 
@@ -1055,11 +1055,12 @@
                     : 1; // 最後から最初へループ
             }
             
-            console.log('新しいセッション:', selectedSessionForAnalysis);
-            
             updateSelectedSession();
             initializeSessionsGrid(); // グリッドの選択状態も更新
         }
+
+        // グローバルフラグでイベントリスナーの重複登録を防ぐ
+        let navigationEventListenersAdded = false;
 
         // Initialize page
         function initializePage() {
@@ -1069,25 +1070,30 @@
             initializeSessionsGrid();
             updateSelectedSession();
             
-            // ナビゲーションボタンのイベントリスナーを設定
-            const prevBtn = document.getElementById('prev-session-btn');
-            const nextBtn = document.getElementById('next-session-btn');
-            
-            if (prevBtn) {
-                prevBtn.addEventListener('click', () => navigateToSession('prev'));
-            }
-            if (nextBtn) {
-                nextBtn.addEventListener('click', () => navigateToSession('next'));
-            }
-            
-            // キーボードショートカット（左右矢印キー）
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'ArrowLeft') {
-                    navigateToSession('prev');
-                } else if (e.key === 'ArrowRight') {
-                    navigateToSession('next');
+            // イベントリスナーは初回のみ設定
+            if (!navigationEventListenersAdded) {
+                // ナビゲーションボタンのイベントリスナーを設定
+                const prevBtn = document.getElementById('prev-session-btn');
+                const nextBtn = document.getElementById('next-session-btn');
+                
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', () => navigateToSession('prev'));
                 }
-            });
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => navigateToSession('next'));
+                }
+                
+                // キーボードショートカット（左右矢印キー）
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') {
+                        navigateToSession('prev');
+                    } else if (e.key === 'ArrowRight') {
+                        navigateToSession('next');
+                    }
+                });
+                
+                navigationEventListenersAdded = true;
+            }
             
             // 初回初期化完了をマーク
             chartsInitialized = true;
