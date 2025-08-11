@@ -378,8 +378,8 @@ class TrainingRecordsManager {
 
         // Lucideアイコンを再初期化
         setTimeout(() => {
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
+            if (typeof initializeLucideIcons === 'function') {
+                initializeLucideIcons();
             }
         }, 100);
     }
@@ -397,6 +397,7 @@ class TrainingRecordsManager {
     showPremiumModal() {
         alert('🎉 プレミアム版の詳細機能を準備中です！\n\n✨ 全履歴表示\n📊 詳細分析\n🤖 AI推奨機能\n🎯 目標達成管理\n\nお楽しみに！');
     }
+
 }
 
 // 進捗共有機能
@@ -426,17 +427,5 @@ function setGoal() {
 // 初期化
 let recordsManager;
 document.addEventListener('DOMContentLoaded', () => {
-    // Lucideアイコンを初期化
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
-    
     recordsManager = new TrainingRecordsManager();
-    
-    // 初期化後にもう一度アイコンを確認
-    setTimeout(() => {
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
-    }, 500);
 });

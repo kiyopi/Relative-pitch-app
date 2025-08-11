@@ -115,6 +115,12 @@ const LUCIDE_ICONS = {
   'frown': `<circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="15.01"/>`,
   'alert-circle': `<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>`,
   'triangle-alert': `<path d="M21.73 18L13.73 4a2 2 0 0 0-3.46 0L2.27 18a2 2 0 0 0 1.73 3h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>`,
+  
+  // Navigation arrows
+  'chevron-left': `<polyline points="15,18 9,12 15,6"/>`,
+  'chevron-right': `<polyline points="9,6 15,12 9,18"/>`,
+  'arrow-left': `<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/>`,
+  'arrow-right': `<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/>`,
 };
 
 /**
@@ -205,6 +211,35 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = { lucideIcon, replaceLucideIcons, LUCIDE_ICONS };
 }
 
+/**
+ * Initialize all Lucide icons on the page
+ * Replaces all elements with data-lucide attribute
+ */
+function initializeLucideIcons() {
+  const iconElements = document.querySelectorAll('[data-lucide]');
+  console.log(`🔧 Initializing ${iconElements.length} Lucide icons...`);
+  
+  iconElements.forEach((element, index) => {
+    const iconName = element.getAttribute('data-lucide');
+    const className = element.className || 'icon';
+    const size = element.dataset.size || '24';
+    
+    if (iconName && LUCIDE_ICONS[iconName]) {
+      element.outerHTML = lucideIcon(iconName, className, parseInt(size));
+      console.log(`✅ Icon ${index + 1}/${iconElements.length}: "${iconName}" replaced`);
+    } else {
+      console.warn(`❌ Icon ${index + 1}/${iconElements.length}: "${iconName}" not found`);
+      // Show available icons for debugging
+      if (index === 0) {
+        console.log('Available icons:', Object.keys(LUCIDE_ICONS).slice(0, 10), '...');
+      }
+    }
+  });
+  
+  console.log(`🎉 Lucide icon initialization complete`);
+}
+
 // Global functions for direct HTML use
 window.lucideIcon = lucideIcon;
 window.replaceLucideIcons = replaceLucideIcons;
+window.initializeLucideIcons = initializeLucideIcons;

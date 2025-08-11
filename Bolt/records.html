@@ -193,9 +193,16 @@
     <script>
         // Lucideアイコンの初期化
         document.addEventListener('DOMContentLoaded', function() {
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
+            if (typeof initializeLucideIcons === 'function') {
+                initializeLucideIcons();
             }
+            
+            // 動的コンテンツ生成後にも再初期化
+            setTimeout(() => {
+                if (typeof initializeLucideIcons === 'function') {
+                    initializeLucideIcons();
+                }
+            }, 1000);
         });
     </script>
 </body>
