@@ -365,3 +365,15 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 16:52:35] コミット: Simplify chart animation control: Fix scroll-triggered re-animation issue
+
+- Replace complex flag-based animation control with Chart.js global defaults
+- Use chartsInitialized flag to enable animations only on first load
+- Set Chart.defaults.animation = false after initial animation completion
+- Remove scroll event listeners that caused animation conflicts
+- Simplify resize event handling for better reliability
+- Enhance iPad session button compatibility with Safari-specific CSS
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

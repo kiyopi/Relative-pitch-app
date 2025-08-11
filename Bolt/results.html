@@ -380,11 +380,11 @@
             sessionNoteResults.forEach((note, index) => {
                 const getEvaluationLevel = (centError) => {
                     const absError = Math.abs(centError);
-                    // 直感的なアイコン配置で統一評価基準
-                    if (absError <= 15) return { level: 'excellent', color: 'text-yellow-300', label: 'Excellent', icon: lucideIcon('trophy', 'text-yellow-300', 12) };
-                    if (absError <= 25) return { level: 'good', color: 'text-green-300', label: 'Good', icon: lucideIcon('star', 'text-green-300', 12) };
-                    if (absError <= 40) return { level: 'pass', color: 'text-blue-300', label: 'Pass', icon: lucideIcon('thumbs-up', 'text-blue-300', 12) };
-                    return { level: 'practice', color: 'text-red-300', label: 'Practice', icon: lucideIcon('triangle-alert', 'text-red-300', 12) };
+                    // 直感的なアイコン配置で統一評価基準（アイコンサイズを20pxに拡大）
+                    if (absError <= 15) return { level: 'excellent', color: 'text-yellow-300', label: 'Excellent', icon: lucideIcon('trophy', 'text-yellow-300', 20) };
+                    if (absError <= 25) return { level: 'good', color: 'text-green-300', label: 'Good', icon: lucideIcon('star', 'text-green-300', 20) };
+                    if (absError <= 40) return { level: 'pass', color: 'text-blue-300', label: 'Pass', icon: lucideIcon('thumbs-up', 'text-blue-300', 20) };
+                    return { level: 'practice', color: 'text-red-300', label: 'Practice', icon: lucideIcon('triangle-alert', 'text-red-300', 20) };
                 };
 
                 const evaluation = getEvaluationLevel(note.centError);
@@ -409,9 +409,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="flex items-center space-x-1">
+                        <div class="flex flex-col items-center">
                             ${evaluation.icon}
-                            <span class="text-xs font-medium ${evaluation.color}">${evaluation.label}</span>
+                            <span class="text-xs font-medium ${evaluation.color} mt-1">${evaluation.label}</span>
                         </div>
                     </div>
                 `;
