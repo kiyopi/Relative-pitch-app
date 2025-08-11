@@ -505,6 +505,11 @@
                 });
             });
             
+            // データの最大値・最小値を計算
+            const maxValue = Math.max(...allData);
+            const minValue = Math.min(...allData);
+            const maxAbsValue = Math.max(Math.abs(maxValue), Math.abs(minValue));
+            
             // 1つのデータセットで全96音を表示
             const dataset = {
                 label: '音程誤差',
@@ -604,14 +609,8 @@
                         y: {
                             display: true,
                             position: 'left',
-                            min: (() => {
-                                const maxError = Math.max(...mockSessionsData.map(s => s.averageCentError));
-                                return -maxError - 5;
-                            })(),
-                            max: (() => {
-                                const maxError = Math.max(...mockSessionsData.map(s => s.averageCentError));
-                                return maxError + 5;
-                            })(),
+                            min: -maxAbsValue - 10, // 実データの最大絶対値 + マージン
+                            max: maxAbsValue + 10,  // 実データの最大絶対値 + マージン
                             grid: {
                                 color: (context) => {
                                     if (context.tick && context.tick.value === 0) {
