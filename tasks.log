@@ -256,3 +256,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 15:32:27] コミット: Remove mix-blend-mode for better iPad compatibility
+
+- Remove mix-blend-mode: overlay that causes display issues on iPad Safari
+- Enhance text-shadow and drop-shadow for better contrast (0 1px 3px rgba(0,0,0,0.8))
+- Add brightness(1.2) filter to improve text and icon visibility
+- Ensure consistent session button appearance across all devices
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

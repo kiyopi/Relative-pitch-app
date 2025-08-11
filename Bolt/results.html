@@ -768,14 +768,17 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     animation: {
-                        onComplete: null,
-                        onProgress: null,
-                        animateRotate: true,
-                        animateScale: true,
+                        onComplete: function() {
+                            // 初回アニメーション完了後は無効化
+                            this.options.animation = false;
+                        },
                         duration: 1000, // 初回表示時のアニメーション時間
                         resize: {
                             duration: 0 // リサイズ時はアニメーション無効
                         }
+                    },
+                    interaction: {
+                        intersect: false // スクロール時の再アニメーション防止
                     },
                     layout: {
                         padding: {
@@ -928,14 +931,17 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     animation: {
-                        onComplete: null,
-                        onProgress: null,
-                        animateRotate: true,
-                        animateScale: true,
+                        onComplete: function() {
+                            // 初回アニメーション完了後は無効化
+                            this.options.animation = false;
+                        },
                         duration: 1000, // 初回表示時のアニメーション時間
                         resize: {
                             duration: 0 // リサイズ時はアニメーション無効
                         }
+                    },
+                    interaction: {
+                        intersect: false // スクロール時の再アニメーション防止
                     },
                     layout: {
                         padding: {
