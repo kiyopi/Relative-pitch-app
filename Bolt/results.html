@@ -632,101 +632,56 @@
             });
         }
         
-        // モバイル版: Stacked Bar Chart実装
+        // モバイル版: 縦型Stacked Bar Chart実装
         function initializeMobileStackedBarChart(ctx) {
-            const labels = [];
-            const excellentData = [];
-            const goodData = [];
-            const passData = [];
-            const practiceData = [];
+            const labels = ['Excellent', 'Good', 'Pass', 'Practice'];
+            const datasets = [];
             
-            // 各セッションの評価別平均誤差を計算
+            // 各セッションのデータセットを作成
             mockSessionsData.forEach((session) => {
-                labels.push(`S${session.session}`);
-                
-                const sessionNoteResults = generateSessionNoteResults(session);
                 const evaluation = getSessionEvaluationLabel(session.averageCentError);
                 
-                // 各ランクの平均誤差を設定（実際のセッション評価に基づく）
+                // 各評価レベルに対する値を設定
+                const data = labels.map(label => {
+                    if (label === evaluation) {
+                        return session.averageCentError;
+                    }
+                    return 0;
+                });
+                
+                // セッションごとのバーカラーを評価に基づいて設定
+                let barColor;
                 switch (evaluation) {
-                    case 'Excellent':
-                        excellentData.push(session.averageCentError);
-                        goodData.push(0);
-                        passData.push(0);
-                        practiceData.push(0);
-                        break;
-                    case 'Good':
-                        excellentData.push(0);
-                        goodData.push(session.averageCentError);
-                        passData.push(0);
-                        practiceData.push(0);
-                        break;
-                    case 'Pass':
-                        excellentData.push(0);
-                        goodData.push(0);
-                        passData.push(session.averageCentError);
-                        practiceData.push(0);
-                        break;
-                    default: // Practice
-                        excellentData.push(0);
-                        goodData.push(0);
-                        passData.push(0);
-                        practiceData.push(session.averageCentError);
-                        break;
+                    case 'Excellent': barColor = '#fbbf24'; break;
+                    case 'Good': barColor = '#22c55e'; break;
+                    case 'Pass': barColor = '#3b82f6'; break;
+                    default: barColor = '#ef4444';
                 }
+                
+                datasets.push({
+                    label: `S${session.session}`,
+                    data: data,
+                    backgroundColor: barColor,
+                    borderColor: '#ffffff',
+                    borderWidth: 0.5,
+                    barPercentage: 0.9,
+                    categoryPercentage: 0.9
+                });
             });
             
             new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
-                    datasets: [
-                        {
-                            label: 'Excellent',
-                            data: excellentData,
-                            backgroundColor: '#fbbf24',
-                            borderColor: '#ffffff',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Good', 
-                            data: goodData,
-                            backgroundColor: '#22c55e',
-                            borderColor: '#ffffff',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Pass',
-                            data: passData,
-                            backgroundColor: '#3b82f6',
-                            borderColor: '#ffffff',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Practice',
-                            data: practiceData,
-                            backgroundColor: '#ef4444',
-                            borderColor: '#ffffff',
-                            borderWidth: 1
-                        }
-                    ]
+                    datasets: datasets
                 },
                 options: {
+                    indexAxis: 'y', // 横向きバーチャート
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            display: true,
-                            position: 'bottom',
-                            labels: {
-                                color: '#ffffff',
-                                font: {
-                                    size: 10
-                                },
-                                usePointStyle: true,
-                                pointStyle: 'rect',
-                                padding: 10
-                            }
+                            display: false // レジェンドは非表示（12セッション分は多すぎる）
                         },
                         tooltip: {
                             backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -737,16 +692,17 @@
                             callbacks: {
                                 title: function(tooltipItems) {
                                     if (tooltipItems.length > 0) {
-                                        const sessionIndex = tooltipItems[0].dataIndex;
-                                        const session = mockSessionsData[sessionIndex];
+                                        const datasetIndex = tooltipItems[0].datasetIndex;
+                                        const session = mockSessionsData[datasetIndex];
                                         return `セッション${session.session} (${session.baseNote})`;
                                     }
                                     return '';
                                 },
                                 label: function(context) {
-                                    const value = context.parsed.y;
+                                    const value = context.parsed.x;
+                                    const label = context.label;
                                     if (value > 0) {
-                                        return `${context.dataset.label}: ±${value}セント`;
+                                        return `${label}: ±${value}セント`;
                                     }
                                     return null;
                                 }
@@ -756,30 +712,31 @@
                     scales: {
                         x: {
                             stacked: true,
+                            display: true,
                             grid: {
                                 color: 'rgba(255, 255, 255, 0.1)'
                             },
                             ticks: {
                                 color: 'rgba(255, 255, 255, 0.6)',
                                 font: {
-                                    size: 10
+                                    size: 9
+                                },
+                                callback: function(value) {
+                                    return value > 0 ? `${value}¢` : '';
                                 }
-                            }
+                            },
+                            max: 60 // 最大値を固定
                         },
                         y: {
                             stacked: true,
-                            display: true,
-                            position: 'left',
                             grid: {
                                 color: 'rgba(255, 255, 255, 0.1)'
                             },
                             ticks: {
                                 color: 'rgba(255, 255, 255, 0.6)',
                                 font: {
-                                    size: 10
-                                },
-                                callback: function(value) {
-                                    return `±${value}¢`;
+                                    size: 11,
+                                    weight: 'bold'
                                 }
                             }
                         }
