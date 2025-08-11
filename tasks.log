@@ -299,3 +299,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 16:17:54] コミット: Change iPad to use line chart with disabled animations
+
+- iPad now uses PC-style line chart instead of mobile bar chart
+- Completely disable animations for iPad (animation: false)
+- Keep mobile devices using animated bar chart
+- Update chart descriptions to reflect iPad using line chart layout
+- Ensure iPad has no scroll-triggered animations whatsoever
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -164,6 +164,29 @@
             errorTrend: false,
             accuracy: false
         };
+        
+        // スクロールアニメーション制御
+        let scrollAnimationFrame = null;
+        
+        function handleScrollAnimation() {
+            if (scrollAnimationFrame) return;
+            
+            scrollAnimationFrame = requestAnimationFrame(() => {
+                // 誤差推移チャート
+                if (window.errorTrendChartInstance && chartsAnimated.errorTrend) {
+                    window.errorTrendChartInstance.options.animation = false;
+                    window.errorTrendChartInstance.update('none');
+                }
+                
+                // 評価分布チャート
+                if (window.accuracyChartInstance && chartsAnimated.accuracy) {
+                    window.accuracyChartInstance.options.animation = false;
+                    window.accuracyChartInstance.update('none');
+                }
+                
+                scrollAnimationFrame = null;
+            });
+        }
 
         // Get evaluation level and color (仕様書準拠)
         function getSessionEvaluationLabel(averageCentError) {
@@ -777,7 +800,7 @@
                     indexAxis: 'y', // 横向きバーチャート
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: chartsAnimated.errorTrend ? false : {
+                    animation: {
                         duration: 1000,
                         onComplete: function() {
                             chartsAnimated.errorTrend = true;
@@ -933,7 +956,7 @@
                     indexAxis: 'y', // 横向きバーチャート
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: chartsAnimated.accuracy ? false : {
+                    animation: {
                         duration: 1000,
                         onComplete: function() {
                             chartsAnimated.accuracy = true;
@@ -1028,6 +1051,9 @@
             }, 250);
         });
 
+        // スクロールイベントリスナーを追加
+        window.addEventListener('scroll', handleScrollAnimation, { passive: true });
+        
         // Initialize Lucide icons
         document.addEventListener('DOMContentLoaded', function() {
             replaceLucideIcons();
