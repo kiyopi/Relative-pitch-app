@@ -51,14 +51,15 @@
   - マイク使用許可の取得（簡素化実装、フックなし設計※）
   - リアルタイム周波数表示（Hz）
   - 音量レベルメーター表示
-  - **音域テスト機能**（重要）:
+  - **音域テスト機能**（必須）:
     - 低音テスト: C3（130Hz）から下降測定
     - 高音テスト: C5（523Hz）まで上昇測定
     - 快適音域の自動判定（最低音～最高音の範囲）
     - 推奨基音の算出・提案
+    - 結果のlocalStorage保存
   - デバイス別感度調整（PC: 1.0x、iPhone: 3.0x、iPad: 7.0x）
 
-※**フックなし設計とは**: マイクテスト→音域テスト（スキップ可能）→トレーニング開始という直線的なフロー設計。ページ遷移後はユーザーが基音を鳴らして開始ボタンでセッション開始する簡潔な操作。追加の確認画面や複雑な設定を排除し、学習意欲を維持したままスムーズにトレーニング開始できる。
+※**フックなし設計とは**: マイクテスト→音域テスト（必須）→トレーニング開始という直線的なフロー設計。ページ遷移後はユーザーが基音を鳴らして開始ボタンでセッション開始する簡潔な操作。追加の確認画面や複雑な設定を排除し、学習意欲を維持したままスムーズにトレーニング開始できる。
 
 #### 2.1.2 基本トレーニング方法
 - **トレーニングの流れ**:
@@ -146,8 +147,8 @@
 - **外れ値検出**: 技術的誤差の統計的処理
 
 ##### Lucideアイコン仕様
-- **評価レベル別**: award(Excellent), thumbs-up(Good), check(Pass), frown(Practice)
-- **ランク別**: trophy(S), award(A), star(B), check-circle(C), target(D), book-open(E)
+- **音感精度評価**: trophy(Excellent), star(Good), thumbs-up(Pass), triangle-alert(Practice)
+- **S-E級ランク別**: crown(S), trophy(A), star(B), check-circle(C), target(D), book-open(E)
 - **UI要素**: mic, volume-2, bar-chart-3, trending-up, music-note
 
 ### 2.3 共有機能
@@ -338,6 +339,13 @@
 - **音源再生**: Tone.js
 - **画像生成**: html2canvas
 - **SNS共有**: react-share（フレームワーク依存）
+
+### 5.4 コア機能リポジトリ
+- **音声処理コアライブラリ**: [pitchpro-audio-processing](https://github.com/kiyopi/pitchpro-audio-processing.git)
+  - 音程検出エンジン
+  - リアルタイム音声処理
+  - 音域測定機能
+  - 基音生成・管理
 
 ---
 

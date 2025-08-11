@@ -338,9 +338,238 @@ const audioConstraints = {
 
 ---
 
-## 🛠️ 7. エラーハンドリング・フォールバック
+## 🎵 7. 音域適応型基音選択システム
 
-### 7.1 Pitchyライブラリフォールバック
+### 7.1 音域テスト結果の活用
+```typescript
+interface VoiceRangeData {
+  lowestNote: NoteInfo;      // 最低音
+  highestNote: NoteInfo;     // 最高音 
+  comfortableRange: {        // 快適音域
+    low: string;
+    high: string;
+    octaveSpan: number;
+  };
+}
+
+interface NoteInfo {
+  noteName: string;          // "C3", "G4" etc
+  frequency: number;         // Hz
+  octave: number;           // オクターブ番号
+  midiNumber: number;       // MIDI番号
+}
+```
+
+### 7.2 モード別基音選択アルゴリズム
+
+#### 7.2.1 ランダム基音モード（初級）
+```typescript
+function selectRandomRootNotes(voiceRange: VoiceRangeData): string[] {
+  // 快適音域内のオクターブから8音を選択
+  const comfortableOctave = determineComfortableOctave(voiceRange);
+  
+  return [
+    `C${comfortableOctave}`, `D${comfortableOctave}`, 
+    `E${comfortableOctave}`, `F${comfortableOctave}`,
+    `G${comfortableOctave}`, `A${comfortableOctave}`,
+    `B${comfortableOctave}`, `C${comfortableOctave + 1}`
+  ];
+}
+
+function determineComfortableOctave(voiceRange: VoiceRangeData): number {
+  // ドレミファソラシドがすべて快適音域に収まるオクターブを選択
+  const lowOctave = voiceRange.comfortableRange.low.slice(-1);
+  const highOctave = voiceRange.comfortableRange.high.slice(-1);
+  
+  // 1オクターブ+1音（C-C）が収まる範囲を計算
+  if (parseInt(highOctave) - parseInt(lowOctave) >= 1) {
+    return parseInt(lowOctave);
+  }
+  
+  // デフォルトは3（多くの人に適合）
+  return 3;
+}
+```
+
+#### 7.2.2 連続チャレンジモード（中級）
+```typescript
+function selectContinuousRootNotes(voiceRange: VoiceRangeData): string[] {
+  // クロマチック12音を快適音域内で選択
+  const octave = determineComfortableOctave(voiceRange);
+  
+  return [
+    `C${octave}`, `C#${octave}`, `D${octave}`, `D#${octave}`,
+    `E${octave}`, `F${octave}`, `F#${octave}`, `G${octave}`,
+    `G#${octave}`, `A${octave}`, `A#${octave}`, `B${octave}`
+  ];
+}
+```
+
+#### 7.2.3 12音階モード（上級）
+```typescript
+function selectChromaticRootNote(
+  voiceRange: VoiceRangeData, 
+  direction: 'ascending' | 'descending' | 'both'
+): string {
+  const range = voiceRange.comfortableRange;
+  
+  switch (direction) {
+    case 'ascending':
+      // 最低音付近から開始（上昇練習）
+      return adjustToComfortableRange(range.low, 'up');
+      
+    case 'descending':  
+      // 最高音付近から開始（下降練習）
+      return adjustToComfortableRange(range.high, 'down');
+      
+    case 'both':
+      // 中央付近から開始（上昇下降両方）
+      const midOctave = Math.floor(
+        (parseInt(range.low.slice(-1)) + parseInt(range.high.slice(-1))) / 2
+      );
+      return `G${midOctave}`; // 中央のG音
+  }
+}
+
+function adjustToComfortableRange(note: string, direction: 'up' | 'down'): string {
+  // ドレミファソラシドが収まるよう微調整
+  const octave = parseInt(note.slice(-1));
+  const noteName = note.slice(0, -1);
+  
+  if (direction === 'up' && ['A', 'B'].includes(noteName)) {
+    return `C${octave + 1}`; // A,Bの場合は次のオクターブのCに調整
+  }
+  
+  if (direction === 'down' && ['C', 'D'].includes(noteName)) {
+    return `G${octave - 1}`; // C,Dの場合は前のオクターブのGに調整
+  }
+  
+  return note;
+}
+```
+
+### 7.3 音域データの管理
+
+#### 7.3.1 localStorage保存形式
+```typescript
+// pitchpro_voiceRange キーで保存
+interface StoredVoiceRange {
+  version: string;
+  testDate: string;
+  results: VoiceRangeData;
+  recommendedRootNotes: {
+    random: string[];      // ランダムモード用
+    continuous: string[];  // 連続モード用  
+    chromatic: {          // 12音階モード用
+      ascending: string;
+      descending: string;
+      both: string;
+    };
+  };
+  isValid: boolean;       // 7日間有効
+  expiresAt: string;
+}
+```
+
+#### 7.3.2 フォールバック機能
+```typescript
+function getRootNotes(mode: TrainingMode): string[] {
+  const storedRange = localStorage.getItem('pitchpro_voiceRange');
+  
+  if (!storedRange || isExpired(storedRange)) {
+    // 音域データなし・期限切れの場合はデフォルト値
+    return getDefaultRootNotes(mode);
+  }
+  
+  const voiceRange = JSON.parse(storedRange);
+  return voiceRange.recommendedRootNotes[mode];
+}
+
+function getDefaultRootNotes(mode: TrainingMode): string[] {
+  // デフォルト値（一般的な声域）
+  const defaults = {
+    random: ['C3', 'D3', 'E3', 'F3', 'G3', 'A3', 'B3', 'C4'],
+    continuous: ['C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3'],
+    chromatic: {
+      ascending: 'C3',
+      descending: 'C4', 
+      both: 'G3'
+    }
+  };
+  
+  return defaults[mode];
+}
+```
+
+### 7.4 音域テスト必須化への対応
+
+#### 7.4.1 フロー制御
+```typescript
+function checkVoiceRangeRequired(): boolean {
+  const voiceRange = localStorage.getItem('pitchpro_voiceRange');
+  
+  // 音域データがない、または期限切れの場合は必須
+  if (!voiceRange) return true;
+  
+  const data = JSON.parse(voiceRange);
+  const now = new Date();
+  const expiresAt = new Date(data.expiresAt);
+  
+  return now > expiresAt; // 期限切れなら必須
+}
+
+function redirectToVoiceTest(targetMode: string): void {
+  // 目的のモードをセッションストレージに保存
+  sessionStorage.setItem('pendingTrainingMode', targetMode);
+  
+  // 音域テストページにリダイレクト
+  window.location.href = '/mic-test?required=voice-range';
+}
+
+function returnToPendingMode(): void {
+  const pendingMode = sessionStorage.getItem('pendingTrainingMode');
+  if (pendingMode) {
+    sessionStorage.removeItem('pendingTrainingMode');
+    window.location.href = `/training/${pendingMode}`;
+  } else {
+    window.location.href = '/'; // ホームに戻る
+  }
+}
+```
+
+#### 7.4.2 UI表示の調整
+```typescript
+// 音域テスト必須時のメッセージ表示
+const VoiceRangeRequiredNotice: React.FC = () => {
+  return (
+    <Alert icon={<MicIcon />} color="blue" variant="light">
+      <Text size="sm">
+        最適なトレーニングのため、音域テストが必要です。
+        <br />
+        あなたの声域に合わせた基音を自動選択いたします。
+      </Text>
+    </Alert>
+  );
+};
+```
+
+### 7.5 パフォーマンス考慮事項
+
+#### 7.5.1 計算の最適化
+- 音域データの事前計算・キャッシュ
+- 基音選択結果のメモ化
+- localStorage読み込みの最小化
+
+#### 7.5.2 エラーハンドリング
+- 音域データ破損時のフォールバック
+- 計算エラー時のデフォルト値使用
+- 音域外の基音検出時の自動補正
+
+---
+
+## 🛠️ 8. エラーハンドリング・フォールバック
+
+### 8.1 Pitchyライブラリフォールバック
 ```javascript
 // Pitchy読み込み失敗時は従来のFFTピーク検出に自動フォールバック
 let pitchDetector = null;
@@ -353,7 +582,7 @@ try {
 }
 ```
 
-### 7.2 音程検出エラー対応
+### 8.2 音程検出エラー対応
 - **無効周波数**: clarity < 0.1 または範囲外の場合はスキップ
 - **検出不能**: 前回値を使用または「検出中...」表示
 - **急激変化**: 安定化システムで段階的変化に制限
@@ -362,13 +591,13 @@ try {
 
 ## 📱 8. ブラウザ・デバイス対応
 
-### 8.1 対応ブラウザ
+### 14.1 対応ブラウザ
 - **Chrome/Edge**: 完全対応
 - **Firefox**: 完全対応  
 - **Safari**: 完全対応（出力先接続による対応済み）
 - **モバイル Safari**: マイクアクセス許可必要
 
-### 8.2 デバイス別最適化
+### 14.2 デバイス別最適化
 - **PC**: 標準設定（感度1.0x）
 - **iPhone**: 高感度設定（感度3.0x）
 - **iPad**: 超高感度設定（感度7.0x）
@@ -377,21 +606,21 @@ try {
 
 ## 🔍 9. デバッグ・監視機能
 
-### 9.1 リアルタイム検出ログ
+### 14.1 リアルタイム検出ログ
 ```javascript
 if (frameCount % 60 === 0) { // 1秒に1回
   console.log(`🔍 Pitchy検出: pitch=${pitch?.toFixed(1)}Hz, clarity=${clarity?.toFixed(3)}`);
 }
 ```
 
-### 9.2 補正ログ
+### 14.2 補正ログ
 ```javascript
 if (frameCount % 60 === 0) {
   console.log(`🔧 動的オクターブ補正: ${pitch.toFixed(1)}Hz → ${correctedPitch.toFixed(1)}Hz`);
 }
 ```
 
-### 9.3 フィルター効果監視
+### 14.3 フィルター効果監視
 - フィルター前後の周波数スペクトラム可視化
 - ノイズ成分の定量的分析
 - 音量レベル改善の数値表示
@@ -400,7 +629,7 @@ if (frameCount % 60 === 0) {
 
 ## 📊 10. データ永続化・共有仕様
 
-### 10.1 localStorage データ構造
+### 14.1 localStorage データ構造
 
 #### メインデータ (TrainingProgress)
 ```typescript
@@ -442,7 +671,7 @@ interface TrainingProgress {
 'completed-cycle-{timestamp}'            // 完了サイクルの記録
 ```
 
-### 10.2 S-E級総合評価システム
+### 14.2 S-E級総合評価システム
 
 ```javascript
 function calculateOverallGrade(sessionHistory: SessionResult[]): Grade {
@@ -464,7 +693,7 @@ function calculateOverallGrade(sessionHistory: SessionResult[]): Grade {
 }
 ```
 
-### 10.3 健康確認システム
+### 14.3 健康確認システム
 
 #### チェック項目
 - **セッションID妥当性**: 1-8の範囲内確認
@@ -477,13 +706,13 @@ function calculateOverallGrade(sessionHistory: SessionResult[]): Grade {
 
 ## 🌐 11. SNS共有機能仕様
 
-### 11.1 対象SNSプラットフォーム
+### 14.1 対象SNSプラットフォーム
 - **Twitter/X**: テキスト + 画像投稿
 - **Facebook**: テキスト + 画像投稿  
 - **LINE**: テキスト + 画像共有
 - **Instagram Stories**: 画像 + テキスト投稿
 
-### 11.2 共有データ構造
+### 14.2 共有データ構造
 ```typescript
 interface ShareData {
   text: string;           // 共有テキスト
@@ -504,7 +733,7 @@ interface TrainingShareContent {
 }
 ```
 
-### 11.3 結果画像生成システム
+### 14.3 結果画像生成システム
 
 #### 画像仕様
 - **サイズ**: 1080x1080px（Instagram最適）
@@ -516,7 +745,7 @@ interface TrainingShareContent {
 
 ## 🎨 12. Mantineデザインシステム技術仕様（v2.0.0 新採用）
 
-### 12.1 Mantine技術スタック
+### 14.1 Mantine技術スタック
 ```javascript
 // Mantine v7.6.0 統合設定
 const mantineConfig = {
@@ -553,7 +782,7 @@ const mantineConfig = {
 };
 ```
 
-### 12.2 音楽教育カスタマイゼーション
+### 14.2 音楽教育カスタマイゼーション
 ```css
 /* 音楽教育テーマ CSS */
 :root {
@@ -597,7 +826,7 @@ const mantineConfig = {
 
 ## 🌍 13. Cloudflareデプロイ技術仕様（v2.0.0 新採用）
 
-### 13.1 Cloudflare Pages設定
+### 14.1 Cloudflare Pages設定
 ```yaml
 # wrangler.toml - Cloudflare設定
 name = "relative-pitch-app"
@@ -620,7 +849,7 @@ hash_files = "1y"       # JS/CSSファイル
 index_html = "1h"       # HTMLファイル
 ```
 
-### 13.2 パフォーマンス最適化
+### 14.2 パフォーマンス最適化
 ```javascript
 // Cloudflare最適化設定
 const cloudflareOptimization = {
@@ -841,7 +1070,7 @@ interface PitchProLibrary {
 #相対音感 #音楽トレーニング #PitchTraining
 ```
 
-### 11.4 共有分析・統計
+### 14.4 共有分析・統計
 ```typescript
 interface ShareEvent {
   platform: 'twitter' | 'facebook' | 'line' | 'instagram';
