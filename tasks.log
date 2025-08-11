@@ -518,3 +518,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 21:23:47] コミット: results.htmlにもLucideアイコン初期化システム適用: 統一した初期化方式
+
+- results.htmlでもrecords.htmlと同様の多段階初期化システム実装
+- DOMContentLoaded + window.load + 再試行機能で確実な初期化
+- [RESULTS]タグ付きデバッグログで他ページと区別
+- 動的コンテンツ更新後のアイコン再初期化機能追加
+- 全ページでのLucideアイコン表示問題を統一的に解決
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

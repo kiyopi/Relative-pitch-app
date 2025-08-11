@@ -128,17 +128,21 @@ const LUCIDE_ICONS = {
  * @param {string} name - Icon name
  * @param {string} className - CSS classes
  * @param {number} size - Icon size (default: 24)
+ * @param {number} strokeWidth - Stroke width (default: 1.5)
  * @returns {string} SVG HTML string
  */
-function lucideIcon(name, className = 'icon', size = 24) {
+function lucideIcon(name, className = 'icon', size = 24, strokeWidth = 1.5) {
   const iconPath = LUCIDE_ICONS[name];
   if (!iconPath) {
     console.warn(`Lucide icon "${name}" not found`);
     return `<div class="${className}" style="width:${size}px;height:${size}px;background:#f00;"></div>`;
   }
   
+  // デフォルトで1.5のストロークを使用（より洗練された見た目）
+  const finalStrokeWidth = strokeWidth;
+  
   // Add xmlns for better compatibility
-  return `<svg xmlns="http://www.w3.org/2000/svg" class="${className}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconPath}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" class="${className}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${finalStrokeWidth}" stroke-linecap="round" stroke-linejoin="round">${iconPath}</svg>`;
 }
 
 /**
