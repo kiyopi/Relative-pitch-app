@@ -632,24 +632,19 @@
             });
         }
         
-        // モバイル版: 縦型Stacked Bar Chart実装
+        // モバイル版: 横向きバーチャート実装（セッション別）
         function initializeMobileStackedBarChart(ctx) {
-            const labels = ['Excellent', 'Good', 'Pass', 'Practice'];
-            const datasets = [];
+            const labels = [];
+            const data = [];
+            const backgroundColors = [];
             
-            // 各セッションのデータセットを作成
+            // 各セッションのデータを準備
             mockSessionsData.forEach((session) => {
+                labels.push(`S${session.session}`);
+                data.push(session.averageCentError);
+                
+                // 評価レベルに基づく色
                 const evaluation = getSessionEvaluationLabel(session.averageCentError);
-                
-                // 各評価レベルに対する値を設定
-                const data = labels.map(label => {
-                    if (label === evaluation) {
-                        return session.averageCentError;
-                    }
-                    return 0;
-                });
-                
-                // セッションごとのバーカラーを評価に基づいて設定
                 let barColor;
                 switch (evaluation) {
                     case 'Excellent': barColor = '#fbbf24'; break;
@@ -657,31 +652,38 @@
                     case 'Pass': barColor = '#3b82f6'; break;
                     default: barColor = '#ef4444';
                 }
-                
-                datasets.push({
-                    label: `S${session.session}`,
-                    data: data,
-                    backgroundColor: barColor,
-                    borderColor: '#ffffff',
-                    borderWidth: 0.5,
-                    barPercentage: 0.9,
-                    categoryPercentage: 0.9
-                });
+                backgroundColors.push(barColor);
             });
             
             new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
-                    datasets: datasets
+                    datasets: [{
+                        label: '平均誤差',
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderColor: '#ffffff',
+                        borderWidth: 0.5,
+                        barPercentage: 0.6,  // バーの高さを60%に
+                        categoryPercentage: 0.8  // カテゴリ間隔を80%に
+                    }]
                 },
                 options: {
                     indexAxis: 'y', // 横向きバーチャート
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            left: 0,
+                            right: 10,  // 右側のパディングを最小限に
+                            top: 0,
+                            bottom: 0
+                        }
+                    },
                     plugins: {
                         legend: {
-                            display: false // レジェンドは非表示（12セッション分は多すぎる）
+                            display: false
                         },
                         tooltip: {
                             backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -692,52 +694,55 @@
                             callbacks: {
                                 title: function(tooltipItems) {
                                     if (tooltipItems.length > 0) {
-                                        const datasetIndex = tooltipItems[0].datasetIndex;
-                                        const session = mockSessionsData[datasetIndex];
-                                        return `セッション${session.session} (${session.baseNote})`;
+                                        const index = tooltipItems[0].dataIndex;
+                                        const session = mockSessionsData[index];
+                                        return `セッション${session.session}`;
                                     }
                                     return '';
                                 },
                                 label: function(context) {
-                                    const value = context.parsed.x;
-                                    const label = context.label;
-                                    if (value > 0) {
-                                        return `${label}: ±${value}セント`;
-                                    }
-                                    return null;
+                                    const index = context.dataIndex;
+                                    const session = mockSessionsData[index];
+                                    const evaluation = getSessionEvaluationLabel(session.averageCentError);
+                                    return [
+                                        `基音: ${session.baseNote}`,
+                                        `誤差: ±${context.parsed.x}セント`,
+                                        `評価: ${evaluation}`
+                                    ];
                                 }
                             }
                         }
                     },
                     scales: {
                         x: {
-                            stacked: true,
                             display: true,
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
+                                color: 'rgba(255, 255, 255, 0.1)',
+                                drawBorder: false
                             },
                             ticks: {
                                 color: 'rgba(255, 255, 255, 0.6)',
                                 font: {
-                                    size: 9
+                                    size: 8  // フォントサイズを小さく
                                 },
+                                maxTicksLimit: 5,  // 表示するティック数を制限
                                 callback: function(value) {
-                                    return value > 0 ? `${value}¢` : '';
+                                    return `${value}¢`;
                                 }
                             },
-                            max: 60 // 最大値を固定
+                            max: 50,  // 最大値を50セントに
+                            min: 0
                         },
                         y: {
-                            stacked: true,
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
+                                display: false  // Y軸のグリッドを非表示
                             },
                             ticks: {
-                                color: 'rgba(255, 255, 255, 0.6)',
+                                color: 'rgba(255, 255, 255, 0.7)',
                                 font: {
-                                    size: 11,
-                                    weight: 'bold'
-                                }
+                                    size: 9  // フォントサイズを小さく
+                                },
+                                padding: 2  // パディングを最小限に
                             }
                         }
                     }
