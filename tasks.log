@@ -310,3 +310,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 16:20:33] コミット: Implement requestAnimationFrame-based scroll animation control
+
+- Add handleScrollAnimation function using requestAnimationFrame for performance
+- Disable chart animations on scroll after initial animation completes
+- Use chart.update('none') for immediate updates without animation
+- Add passive scroll listener for better performance
+- Ensure smooth scrolling without unwanted chart re-animations
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
