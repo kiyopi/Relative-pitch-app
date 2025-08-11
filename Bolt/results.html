@@ -872,9 +872,9 @@
             });
             
             // グラス効果用のグラデーション作成（評価分布用）
-            function createEvaluationGlassGradient(ctx, color, barWidth = 300) {
-                // バーの実際の幅に基づいてグラデーションを作成
-                const gradient = ctx.createLinearGradient(0, 0, barWidth, 0);
+            function createEvaluationGlassGradient(ctx, color) {
+                // モバイル版誤差推移と同じ固定値を使用して一貫性を保つ
+                const gradient = ctx.createLinearGradient(0, 0, 200, 0);
                 
                 let r, g, b;
                 if (color === '#fbbf24') { r = 251; g = 191; b = 36; } // Excellent - 黄色
@@ -908,16 +908,10 @@
                         label: 'セッション数',
                         data: data,
                         backgroundColor: function(context) {
-                            if (context.parsed !== undefined && context.chart.getDatasetMeta) {
+                            if (context.parsed !== undefined) {
                                 const index = context.dataIndex;
                                 const baseColor = backgroundColors[index];
-                                
-                                // バーの実際の幅を計算
-                                const meta = context.chart.getDatasetMeta(0);
-                                const chartArea = context.chart.chartArea;
-                                const barWidth = chartArea ? (chartArea.right - chartArea.left) * 0.8 : 300;
-                                
-                                return createEvaluationGlassGradient(context.chart.ctx, baseColor, barWidth);
+                                return createEvaluationGlassGradient(context.chart.ctx, baseColor);
                             }
                             return backgroundColors;
                         },
