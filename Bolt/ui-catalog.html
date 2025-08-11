@@ -127,10 +127,26 @@
 &lt;/div&gt;</div>
             </section>
 
-            <!-- 2. 評価アイコン -->
+            <!-- 2. 評価アイコンシステム -->
             <section class="catalog-section">
-                <h2 class="text-2xl font-bold text-white mb-4">⭐ 評価アイコン</h2>
-                <p class="text-white-70 mb-6">音感精度に応じた4段階評価アイコン（stroke-width: 1.5）</p>
+                <h2 class="text-2xl font-bold text-white mb-4">⭐ 評価アイコンシステム</h2>
+                <p class="text-white-70 mb-6">S級総合評価と音感精度4段階評価アイコン（stroke-width: 1.5）</p>
+                
+                <!-- S級総合評価アイコン -->
+                <h3 class="text-xl font-medium text-white mb-4">👑 S級総合評価アイコン</h3>
+                <div class="component-grid grid-cols-1 md:grid-cols-1 max-w-md mx-auto mb-8">
+                    <div class="component-item text-center">
+                        <div class="mb-4">
+                            <i data-lucide="crown" class="text-yellow-300" style="width: 80px; height: 80px; transform: scale(1.5);"></i>
+                        </div>
+                        <h3 class="text-yellow-300 font-bold text-xl">S級</h3>
+                        <p class="text-white-60 text-sm">総合評価最高ランク</p>
+                        <p class="text-white-60 text-xs">crown（王冠）</p>
+                    </div>
+                </div>
+                
+                <!-- 音感精度評価アイコン -->
+                <h3 class="text-xl font-medium text-white mb-4">🎵 音感精度評価アイコン</h3>
                 
                 <div class="component-grid grid-cols-2 md:grid-cols-4">
                     <div class="component-item text-center">
@@ -171,6 +187,11 @@
                 </div>
                 
                 <div class="code-sample">
+<!-- S級総合評価 -->
+&lt;i data-lucide="crown" class="icon-4xl text-yellow-300" 
+   style="transform: scale(1.5);"&gt;&lt;/i&gt;
+
+<!-- 音感精度評価 -->
 &lt;i data-lucide="trophy" class="icon-4xl text-yellow-300"&gt;&lt;/i&gt;</div>
             </section>
 
