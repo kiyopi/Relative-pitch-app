@@ -48,9 +48,8 @@
                         <div class="relative bg-white/5 rounded-lg p-0 md:p-4" id="error-trend-container" style="height: 280px;">
                             <canvas id="error-trend-chart"></canvas>
                         </div>
-                        <div class="text-xs text-white-60 text-center mt-2">
-                            <div>プラス(+) = 音が高い / マイナス(-) = 音が低い</div>
-                            <div class="mt-1">0に近いほど正確な音程です</div>
+                        <div class="text-xs text-white-60 text-center mt-2" id="chart-description">
+                            <!-- グラフの説明はJavaScriptで動的に設定 -->
                         </div>
                     </div>
                     
@@ -444,6 +443,26 @@
             
             // レスポンシブ設定: モバイル判定
             const isMobile = window.innerWidth < 768;
+            
+            // グラフの説明を動的に設定
+            const descriptionElement = document.getElementById('chart-description');
+            if (descriptionElement) {
+                if (isMobile) {
+                    descriptionElement.innerHTML = `
+                        <div class="font-semibold text-white-70">【グラフの見方】</div>
+                        <div class="mt-1">縦軸: セッション番号（S1～S12） / 横軸: 平均誤差（セント）</div>
+                        <div>プラス(+) = 音が高い / マイナス(-) = 音が低い</div>
+                        <div class="mt-1">0に近いほど正確な音程です</div>
+                    `;
+                } else {
+                    descriptionElement.innerHTML = `
+                        <div class="font-semibold text-white-70">【グラフの見方】</div>
+                        <div class="mt-1">横軸: セッション別8音 / 縦軸: 誤差（セント）</div>
+                        <div>プラス(+) = 音が高い / マイナス(-) = 音が低い</div>
+                        <div class="mt-1">0に近いほど正確な音程です</div>
+                    `;
+                }
+            }
             
             if (isMobile) {
                 // モバイル版: Stacked Bar Chart
