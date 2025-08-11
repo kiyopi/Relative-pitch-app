@@ -88,3 +88,10 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - afterFit: X軸幅を画面の50%に制限
 - onResize: リサイズ時の動的調整
 - 最大値を実データに基づいて自動設定
+[2025-08-11 12:22:41] コミット: モバイル版グラフ収まり修正: シンプルな解決策
+
+- コンテナにoverflow:hidden追加
+- canvasにmax-width:100%設定
+- 不要な自動調整機能を削除
+- シンプルなスケール設定に変更
+- グリッドの境界線を非表示
