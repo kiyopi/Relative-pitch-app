@@ -1150,14 +1150,15 @@
                 if (typeof gradientIcon === 'function') {
                     const crownElement = document.getElementById('s-grade-crown');
                     if (crownElement) {
-                        const goldCrown = gradientIcon('crown', 'gold', 'icon-4xl', 80, 1.5);
+                        // サイズを100pxに拡大、ストローク幅を1.75に
+                        const goldCrown = gradientIcon('crown', 'gold', 'icon-4xl', 100, 1.75);
                         crownElement.innerHTML = goldCrown;
-                        // 1.5倍スケールを適用
+                        // 1.5倍スケールを適用してさらに大きく（合計150px相当）
                         const svg = crownElement.querySelector('svg');
                         if (svg) {
                             svg.style.transform = 'scale(1.5)';
                         }
-                        console.log('✨ [RESULTS] Gold gradient crown applied');
+                        console.log('✨ [RESULTS] Gold gradient crown applied with size 100px, stroke 1.75');
                     }
                 } else {
                     console.warn('❌ [RESULTS] gradientIcon function not available');

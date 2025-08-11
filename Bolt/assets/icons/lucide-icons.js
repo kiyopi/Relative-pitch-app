@@ -19,8 +19,8 @@ const LUCIDE_ICONS = {
   
   target: `<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>`,
   
-  // Records page icons
-  crown: `<path d="M2 4s3 2 6 2 6-2 6-2L12 18 2 4z"/><path d="M16 4s3 2 6 2"/><path d="M8 4s-3 2-6 2"/>`,
+  // Records page icons - crownを単一パスに統合
+  crown: `<path d="M2 4l10 14L22 4s-3 2-6 2-6-2-6-2-3 2-6 2-6-2-6-2z"/>`,
   
   lock: `<rect x="3" y="11" width="18" height="10" rx="2" ry="2"/><circle cx="12" cy="7" r="4"/>`,
   
