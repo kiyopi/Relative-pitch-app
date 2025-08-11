@@ -882,11 +882,11 @@
                 else if (color === '#3b82f6') { r = 59; g = 130; b = 246; } // Pass - 青
                 else { r = 239; g = 68; b = 68; } // Practice - 赤
                 
-                // グラス効果: より明るい部分を広く、暗い部分を狭く
-                gradient.addColorStop(0, `rgba(${Math.min(255, r + 20)}, ${Math.min(255, g + 20)}, ${Math.min(255, b + 20)}, 0.9)`); // 明るい開始
-                gradient.addColorStop(0.6, `rgba(${r}, ${g}, ${b}, 0.8)`); // メイン色域を広く
-                gradient.addColorStop(0.9, `rgba(${r}, ${g}, ${b}, 0.7)`); // 終わりに向かって少し暗く
-                gradient.addColorStop(1, `rgba(${Math.max(0, r - 15)}, ${Math.max(0, g - 15)}, ${Math.max(0, b - 15)}, 0.6)`); // 暗い部分を最小に
+                // グラス効果: より明るい部分を広く、暗い部分を狭く（透明度を下げて濃く）
+                gradient.addColorStop(0, `rgba(${Math.min(255, r + 20)}, ${Math.min(255, g + 20)}, ${Math.min(255, b + 20)}, 1.0)`); // 完全不透明で明るい開始
+                gradient.addColorStop(0.6, `rgba(${r}, ${g}, ${b}, 0.95)`); // メイン色域をより濃く
+                gradient.addColorStop(0.9, `rgba(${r}, ${g}, ${b}, 0.85)`); // 終わりに向かって少し暗く
+                gradient.addColorStop(1, `rgba(${Math.max(0, r - 15)}, ${Math.max(0, g - 15)}, ${Math.max(0, b - 15)}, 0.75)`); // 暗い部分も濃く
                 
                 return gradient;
             }

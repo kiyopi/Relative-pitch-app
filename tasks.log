@@ -173,3 +173,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 14:19:30] コミット: チャート改善: アイコンセンタリング・グラデーション最適化・アニメーション調整
+
+- 総合評価見出しのランクアイコンを完全センタリング
+- 評価分布チャートのグラデーション配色改善（明るい部分拡大・暗い部分縮小）
+- アニメーション対応の動的グラデーション幅計算で一貫した表示品質を実現
+- モバイル版チャートに初回表示時のみアニメーション追加
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
