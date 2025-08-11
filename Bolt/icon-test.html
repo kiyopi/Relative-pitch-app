@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucide Icons Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: white; }
+        .test-item { margin: 10px 0; padding: 10px; border: 1px solid #333; }
+        .icon { display: inline-block; vertical-align: middle; }
+        .icon-sm { width: 16px; height: 16px; }
+    </style>
+</head>
+<body>
+    <h1>Lucide Icons Test</h1>
+    
+    <div class="test-item">
+        <h3>Test 1: Basic Icon (before initialization)</h3>
+        <i data-lucide="home" class="icon-sm"></i> Home Icon
+    </div>
+    
+    <div class="test-item">
+        <h3>Test 2: Multiple Icons</h3>
+        <i data-lucide="crown" class="icon-sm"></i> Crown
+        <i data-lucide="lock" class="icon-sm"></i> Lock
+        <i data-lucide="play" class="icon-sm"></i> Play
+        <i data-lucide="target" class="icon-sm"></i> Target
+    </div>
+    
+    <div class="test-item">
+        <h3>Test 3: Script Loading Status</h3>
+        <div id="debug-info"></div>
+    </div>
+
+    <!-- Load the icon script -->
+    <script src="assets/icons/lucide-icons.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const debugDiv = document.getElementById('debug-info');
+            
+            // Check if functions are loaded
+            debugDiv.innerHTML = `
+                <p>LUCIDE_ICONS object: ${typeof LUCIDE_ICONS !== 'undefined' ? '✅ Loaded' : '❌ Not found'}</p>
+                <p>lucideIcon function: ${typeof lucideIcon !== 'undefined' ? '✅ Loaded' : '❌ Not found'}</p>
+                <p>initializeLucideIcons function: ${typeof initializeLucideIcons !== 'undefined' ? '✅ Loaded' : '❌ Not found'}</p>
+                <p>Available icons count: ${typeof LUCIDE_ICONS !== 'undefined' ? Object.keys(LUCIDE_ICONS).length : 'Unknown'}</p>
+            `;
+            
+            // Test manual icon creation
+            if (typeof lucideIcon === 'function') {
+                const testIcon = lucideIcon('home', 'icon-sm', 16);
+                debugDiv.innerHTML += `<p>Manual icon creation: ${testIcon ? '✅ Success' : '❌ Failed'}</p>`;
+                debugDiv.innerHTML += `<div>Manual Home Icon: ${testIcon}</div>`;
+            }
+            
+            // Try to initialize icons
+            if (typeof initializeLucideIcons === 'function') {
+                console.log('🚀 Starting icon initialization...');
+                initializeLucideIcons();
+                debugDiv.innerHTML += `<p>Icon initialization: ✅ Executed</p>`;
+            } else {
+                debugDiv.innerHTML += `<p>Icon initialization: ❌ Function not available</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

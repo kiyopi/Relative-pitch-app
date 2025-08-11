@@ -188,22 +188,56 @@
         </div>
     </div>
 
-    <!-- JavaScript -->
-    <script src="js/records.js"></script>
+    <!-- JavaScript - アイコン初期化システム -->
     <script>
-        // Lucideアイコンの初期化
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof initializeLucideIcons === 'function') {
-                initializeLucideIcons();
-            }
+        // 初期化状態の管理
+        let iconInitializationAttempts = 0;
+        const maxAttempts = 5;
+        
+        // Lucideアイコンの初期化関数
+        function initializePageIcons() {
+            iconInitializationAttempts++;
+            console.log(`🚀 Icon initialization attempt ${iconInitializationAttempts}/${maxAttempts}`);
             
-            // 動的コンテンツ生成後にも再初期化
-            setTimeout(() => {
-                if (typeof initializeLucideIcons === 'function') {
-                    initializeLucideIcons();
+            // 必要な要素が存在するかチェック
+            const iconElements = document.querySelectorAll('[data-lucide]');
+            console.log(`Found ${iconElements.length} icon elements`);
+            
+            if (typeof initializeLucideIcons === 'function') {
+                console.log('✅ initializeLucideIcons function available');
+                initializeLucideIcons();
+                return true;
+            } else {
+                console.error('❌ initializeLucideIcons function not found');
+                
+                // 再試行
+                if (iconInitializationAttempts < maxAttempts) {
+                    console.log(`⏰ Retrying in 200ms... (attempt ${iconInitializationAttempts + 1}/${maxAttempts})`);
+                    setTimeout(initializePageIcons, 200);
                 }
-            }, 1000);
+                return false;
+            }
+        }
+        
+        // 複数のタイミングで初期化を試行
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOM Content Loaded - starting icon initialization');
+            initializePageIcons();
         });
+        
+        window.addEventListener('load', function() {
+            console.log('🌍 Window loaded - ensuring icons are initialized');
+            initializePageIcons();
+        });
+        
+        // Records.js完了後の再初期化
+        setTimeout(() => {
+            console.log('🔄 Final icon re-initialization after all scripts loaded');
+            initializePageIcons();
+        }, 2000);
     </script>
+    
+    <!-- Records Manager -->
+    <script src="js/records.js"></script>
 </body>
 </html>

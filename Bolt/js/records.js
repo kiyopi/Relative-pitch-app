@@ -378,8 +378,11 @@ class TrainingRecordsManager {
 
         // Lucideアイコンを再初期化
         setTimeout(() => {
+            console.log('🔄 Re-initializing icons after renderRecentSessions...');
             if (typeof initializeLucideIcons === 'function') {
                 initializeLucideIcons();
+            } else {
+                console.error('❌ initializeLucideIcons function not available in renderRecentSessions');
             }
         }, 100);
     }

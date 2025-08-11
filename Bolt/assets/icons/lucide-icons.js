@@ -217,8 +217,14 @@ if (typeof module !== 'undefined' && module.exports) {
  */
 function initializeLucideIcons() {
   const iconElements = document.querySelectorAll('[data-lucide]');
-  console.log(`🔧 Initializing ${iconElements.length} Lucide icons...`);
+  console.log(`🔧 [LUCIDE] Initializing ${iconElements.length} icons...`);
   
+  if (iconElements.length === 0) {
+    console.warn('⚠️ [LUCIDE] No elements with data-lucide attribute found');
+    return;
+  }
+  
+  let replacedCount = 0;
   iconElements.forEach((element, index) => {
     const iconName = element.getAttribute('data-lucide');
     const className = element.className || 'icon';
@@ -226,17 +232,18 @@ function initializeLucideIcons() {
     
     if (iconName && LUCIDE_ICONS[iconName]) {
       element.outerHTML = lucideIcon(iconName, className, parseInt(size));
-      console.log(`✅ Icon ${index + 1}/${iconElements.length}: "${iconName}" replaced`);
+      replacedCount++;
+      console.log(`✅ [LUCIDE] "${iconName}" replaced (${replacedCount}/${iconElements.length})`);
     } else {
-      console.warn(`❌ Icon ${index + 1}/${iconElements.length}: "${iconName}" not found`);
-      // Show available icons for debugging
-      if (index === 0) {
-        console.log('Available icons:', Object.keys(LUCIDE_ICONS).slice(0, 10), '...');
+      console.warn(`❌ [LUCIDE] Icon "${iconName}" not found`);
+      // Show available icons for debugging on first failure
+      if (index === 0 && iconElements.length > 1) {
+        console.log('Available icons:', Object.keys(LUCIDE_ICONS).slice(0, 15));
       }
     }
   });
   
-  console.log(`🎉 Lucide icon initialization complete`);
+  console.log(`🎉 [LUCIDE] Initialization complete: ${replacedCount}/${iconElements.length} icons replaced`);
 }
 
 // Global functions for direct HTML use

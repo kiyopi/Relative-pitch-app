@@ -485,3 +485,15 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 21:12:51] コミット: Lucideアイコン初期化システム完全修正: ローカルファイル対応とデバッグ機能追加
+
+- グローバルinitializeLucideIcons関数をlucide-icons.jsに追加
+- data-lucide属性の自動検出と置換機能実装
+- 詳細なデバッグログでアイコン置換状況を可視化
+- records.htmlとrecords.jsの初期化方法を統一
+- ナビゲーション矢印アイコン追加（chevron-left/right, arrow-left/right）
+- 動的コンテンツ生成後の再初期化機能強化
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
