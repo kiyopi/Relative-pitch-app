@@ -321,3 +321,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 16:27:20] コミット: Implement Chart.js global animation control approach
+
+- Replace requestAnimationFrame method with Chart.js global defaults control
+- Use Chart.defaults.animation = false to disable all Chart.js animations globally
+- Allow initial animations only, then disable all future animations
+- Remove scroll event listeners in favor of global animation control
+- Ensure no animations occur on scroll, resize, or any other events
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

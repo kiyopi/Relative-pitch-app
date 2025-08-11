@@ -608,8 +608,11 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: isTabletDevice ? false : {
-                        duration: 800
+                    animation: {
+                        duration: 800,
+                        onComplete: function() {
+                            this.options.animation = false;
+                        }
                     },
                     plugins: {
                         legend: {
@@ -785,14 +788,17 @@
                     indexAxis: 'y', // 横向きバーチャート
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: chartsInitialized.errorTrend ? false : {
+                    animation: {
                         duration: 1000,
                         onComplete: function() {
-                            chartsInitialized.errorTrend = true;
-                            // アニメーション完了後にグローバル設定を無効化
-                            setTimeout(() => {
-                                disableAllAnimations();
-                            }, 100);
+                            // アニメーション完了後、このチャートインスタンスのアニメーションを無効化
+                            this.options.animation = false;
+                            this.options.transitions = {
+                                active: { animation: { duration: 0 } },
+                                resize: { animation: { duration: 0 } },
+                                show: { animation: { duration: 0 } },
+                                hide: { animation: { duration: 0 } }
+                            };
                         }
                     },
                     layout: {
@@ -945,16 +951,16 @@
                     indexAxis: 'y', // 横向きバーチャート
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: chartsInitialized.accuracy ? false : {
+                    animation: {
                         duration: 1000,
                         onComplete: function() {
-                            chartsInitialized.accuracy = true;
-                            // 両方のチャートが初期化済みならグローバル設定を無効化
-                            if (chartsInitialized.errorTrend && chartsInitialized.accuracy) {
-                                setTimeout(() => {
-                                    disableAllAnimations();
-                                }, 100);
-                            }
+                            this.options.animation = false;
+                            this.options.transitions = {
+                                active: { animation: { duration: 0 } },
+                                resize: { animation: { duration: 0 } },
+                                show: { animation: { duration: 0 } },
+                                hide: { animation: { duration: 0 } }
+                            };
                         }
                     },
                     layout: {
