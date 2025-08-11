@@ -144,3 +144,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 13:45:01] コミット: 評価分布チャートを横向きバーチャートに統一・Chart.jsインスタンス管理改善
+
+- ドーナツチャートから横向きバーチャートに変更（全デバイス統一）
+- グラス効果と角丸を追加してデザイン統一
+- Chart.jsインスタンスの適切な破棄・再作成でキャッシュ問題解決
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
