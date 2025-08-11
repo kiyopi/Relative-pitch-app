@@ -132,9 +132,10 @@ const LUCIDE_ICONS = {
  * @param {string} className - CSS classes
  * @param {number} size - Icon size (default: 24)
  * @param {number} strokeWidth - Stroke width (default: 1.5)
+ * @param {string} gradient - Gradient definition (optional)
  * @returns {string} SVG HTML string
  */
-function lucideIcon(name, className = 'icon', size = 24, strokeWidth = 1.5) {
+function lucideIcon(name, className = 'icon', size = 24, strokeWidth = 1.5, gradient = null) {
   const iconPath = LUCIDE_ICONS[name];
   if (!iconPath) {
     console.warn(`Lucide icon "${name}" not found`);
@@ -144,8 +145,23 @@ function lucideIcon(name, className = 'icon', size = 24, strokeWidth = 1.5) {
   // デフォルトで1.5のストロークを使用（より洗練された見た目）
   const finalStrokeWidth = strokeWidth;
   
+  // グラデーション定義
+  let gradientDef = '';
+  let strokeColor = 'currentColor';
+  
+  if (gradient) {
+    const gradientId = `gradient-${name}-${Math.random().toString(36).substr(2, 9)}`;
+    gradientDef = `
+      <defs>
+        <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+          ${gradient}
+        </linearGradient>
+      </defs>`;
+    strokeColor = `url(#${gradientId})`;
+  }
+  
   // Add xmlns for better compatibility
-  return `<svg xmlns="http://www.w3.org/2000/svg" class="${className}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${finalStrokeWidth}" stroke-linecap="round" stroke-linejoin="round">${iconPath}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" class="${className}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${strokeColor}" stroke-width="${finalStrokeWidth}" stroke-linecap="round" stroke-linejoin="round">${gradientDef}${iconPath}</svg>`;
 }
 
 /**
@@ -254,7 +270,39 @@ function initializeLucideIcons() {
   console.log(`🎉 [LUCIDE] Initialization complete: ${replacedCount}/${iconElements.length} icons replaced`);
 }
 
+/**
+ * Common gradient definitions for icons
+ */
+const ICON_GRADIENTS = {
+  gold: '<stop offset="0%" stop-color="#ffd700"/><stop offset="100%" stop-color="#ff8c00"/>',
+  royal: '<stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#6366f1"/>',
+  success: '<stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#059669"/>',
+  warning: '<stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#d97706"/>',
+  error: '<stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#dc2626"/>',
+  rainbow: '<stop offset="0%" stop-color="#ff6b6b"/><stop offset="33%" stop-color="#ffd93d"/><stop offset="66%" stop-color="#6bcf7f"/><stop offset="100%" stop-color="#4d96ff"/>'
+};
+
+/**
+ * Create gradient icon with predefined gradient
+ * @param {string} name - Icon name
+ * @param {string} gradientName - Predefined gradient name
+ * @param {string} className - CSS classes
+ * @param {number} size - Icon size
+ * @param {number} strokeWidth - Stroke width
+ * @returns {string} SVG HTML with gradient
+ */
+function gradientIcon(name, gradientName = 'gold', className = 'icon', size = 24, strokeWidth = 1.5) {
+  const gradient = ICON_GRADIENTS[gradientName];
+  if (!gradient) {
+    console.warn(`Gradient "${gradientName}" not found`);
+    return lucideIcon(name, className, size, strokeWidth);
+  }
+  return lucideIcon(name, className, size, strokeWidth, gradient);
+}
+
 // Global functions for direct HTML use
 window.lucideIcon = lucideIcon;
+window.gradientIcon = gradientIcon;
 window.replaceLucideIcons = replaceLucideIcons;
 window.initializeLucideIcons = initializeLucideIcons;
+window.ICON_GRADIENTS = ICON_GRADIENTS;

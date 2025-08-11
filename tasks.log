@@ -611,3 +611,31 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 21:49:38] コミット: S級総合評価アイコンをcrownに変更: Excellentとの区別を明確化
+
+**アイコン変更理由:**
+- S級とExcellentが同じtrophyアイコンで混乱していた問題を解決
+- S級により特別感のあるcrown（王冠）アイコンを採用
+- 階層的な評価システムの視覚的区別を明確化
+
+**変更内容:**
+- results.html: S級総合評価アイコンをtrophyからcrownに変更
+- ui-catalog.html: 評価アイコンシステムを2つに分離
+  - S級総合評価アイコン（crown）
+  - 音感精度評価アイコン（trophy/star/thumbs-up/triangle-alert）
+
+**視覚的改善:**
+- crown: 王冠による最高位の象徴で特別感を演出
+- 1.5倍スケールでより印象的な表示
+- UIカタログでの明確な説明とコードサンプル更新
+
+**アイコン階層:**
+- S級（総合評価）: crown（王冠）- 最高位
+- Excellent（音感精度）: trophy（トロフィー）- 優秀
+- Good: star（星）- 良好
+- Pass: thumbs-up（親指UP）- 合格
+- Practice: triangle-alert（警告）- 要練習
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

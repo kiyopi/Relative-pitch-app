@@ -381,7 +381,59 @@
                 </div>
             </section>
 
-            <!-- 7. インタラクティブコンポーネント -->
+            <!-- 7. グラデーションアイコン -->
+            <section class="catalog-section">
+                <h2 class="text-2xl font-bold text-white mb-4">🌈 グラデーションアイコン</h2>
+                <p class="text-white-70 mb-6">SVGグラデーション効果を適用したLucideアイコン</p>
+                
+                <div class="component-grid grid-cols-2 md:grid-cols-3">
+                    <div class="component-item text-center">
+                        <div class="mb-4" id="gold-crown-demo"></div>
+                        <h3 class="text-white font-medium">Gold Crown</h3>
+                        <p class="text-white-60 text-sm">S級専用ゴールドグラデーション</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="mb-4" id="royal-trophy-demo"></div>
+                        <h3 class="text-white font-medium">Royal Trophy</h3>
+                        <p class="text-white-60 text-sm">紫ロイヤルグラデーション</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="mb-4" id="success-star-demo"></div>
+                        <h3 class="text-white font-medium">Success Star</h3>
+                        <p class="text-white-60 text-sm">緑成功グラデーション</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="mb-4" id="warning-alert-demo"></div>
+                        <h3 class="text-white font-medium">Warning Alert</h3>
+                        <p class="text-white-60 text-sm">オレンジ警告グラデーション</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="mb-4" id="rainbow-palette-demo"></div>
+                        <h3 class="text-white font-medium">Rainbow Palette</h3>
+                        <p class="text-white-60 text-sm">レインボーグラデーション</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="mb-4" id="error-frown-demo"></div>
+                        <h3 class="text-white font-medium">Error Frown</h3>
+                        <p class="text-white-60 text-sm">赤エラーグラデーション</p>
+                    </div>
+                </div>
+                
+                <div class="code-sample">
+// JavaScript でグラデーションアイコンを生成
+const goldCrown = gradientIcon('crown', 'gold', 'icon-4xl', 64, 2);
+const royalTrophy = gradientIcon('trophy', 'royal', 'icon-4xl', 64, 2);
+
+// HTML に挿入
+document.getElementById('demo').innerHTML = goldCrown;</div>
+            </section>
+
+            <!-- 8. インタラクティブコンポーネント -->
             <section class="catalog-section">
                 <h2 class="text-2xl font-bold text-white mb-4">⚡ インタラクティブコンポーネント</h2>
                 <p class="text-white-70 mb-6">ユーザーインタラクションを伴うUI要素</p>
@@ -451,6 +503,33 @@
             } else {
                 console.error('❌ [UI-CATALOG] initializeLucideIcons function not found');
             }
+            
+            // グラデーションアイコンのデモ生成
+            setTimeout(() => {
+                if (typeof gradientIcon === 'function') {
+                    document.getElementById('gold-crown-demo').innerHTML = 
+                        gradientIcon('crown', 'gold', 'icon-4xl', 64, 1.5);
+                    
+                    document.getElementById('royal-trophy-demo').innerHTML = 
+                        gradientIcon('trophy', 'royal', 'icon-4xl', 64, 1.5);
+                    
+                    document.getElementById('success-star-demo').innerHTML = 
+                        gradientIcon('star', 'success', 'icon-4xl', 64, 1.5);
+                    
+                    document.getElementById('warning-alert-demo').innerHTML = 
+                        gradientIcon('triangle-alert', 'warning', 'icon-4xl', 64, 1.5);
+                    
+                    document.getElementById('rainbow-palette-demo').innerHTML = 
+                        gradientIcon('palette', 'rainbow', 'icon-4xl', 64, 1.5);
+                    
+                    document.getElementById('error-frown-demo').innerHTML = 
+                        gradientIcon('frown', 'error', 'icon-4xl', 64, 1.5);
+                    
+                    console.log('✨ [UI-CATALOG] Gradient icon demos generated');
+                } else {
+                    console.warn('❌ [UI-CATALOG] gradientIcon function not available');
+                }
+            }, 1500);
         });
     </script>
 </body>

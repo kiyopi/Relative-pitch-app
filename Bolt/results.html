@@ -29,8 +29,8 @@
                 <p class="text-green-200 text-xl mb-6">12セッション完了 - あなたの音感レベルを分析しました</p>
                 
                 <!-- 総合評価アイコン -->
-                <div class="flex justify-center items-center mb-2">
-                    <i data-lucide="crown" class="icon-4xl text-yellow-300" style="width: 60px; height: 60px; transform: scale(1.5);"></i>
+                <div class="flex justify-center items-center mb-2" id="s-grade-crown">
+                    <!-- グラデーション付きクラウンアイコンがJavaScriptで生成されます -->
                 </div>
                 <div class="text-3xl font-bold text-yellow-300 mb-4" id="overall-grade">S級</div>
             </div>
@@ -1144,6 +1144,25 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('📄 [RESULTS] DOM Content Loaded - starting icon initialization');
             initializeResultsPageIcons();
+            
+            // S級クラウンアイコンにグラデーションを適用
+            setTimeout(() => {
+                if (typeof gradientIcon === 'function') {
+                    const crownElement = document.getElementById('s-grade-crown');
+                    if (crownElement) {
+                        const goldCrown = gradientIcon('crown', 'gold', 'icon-4xl', 80, 1.5);
+                        crownElement.innerHTML = goldCrown;
+                        // 1.5倍スケールを適用
+                        const svg = crownElement.querySelector('svg');
+                        if (svg) {
+                            svg.style.transform = 'scale(1.5)';
+                        }
+                        console.log('✨ [RESULTS] Gold gradient crown applied');
+                    }
+                } else {
+                    console.warn('❌ [RESULTS] gradientIcon function not available');
+                }
+            }, 1000);
         });
         
         window.addEventListener('load', function() {
