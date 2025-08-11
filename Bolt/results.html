@@ -466,6 +466,11 @@
                 }
             }
             
+            // 既存のチャートインスタンスを破棄
+            if (window.errorTrendChartInstance) {
+                window.errorTrendChartInstance.destroy();
+            }
+            
             if (isMobile) {
                 // モバイル版: Stacked Bar Chart
                 initializeMobileStackedBarChart(ctx);
@@ -532,7 +537,7 @@
                 }
             };
             
-            new Chart(ctx, {
+            window.errorTrendChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
@@ -707,7 +712,7 @@
             // グラフの最大値を計算
             const maxValue = Math.max(...data);
             
-            new Chart(ctx, {
+            window.errorTrendChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
@@ -829,6 +834,11 @@
                 return;
             }
             
+            // 既存のチャートインスタンスを破棄
+            if (window.accuracyChartInstance) {
+                window.accuracyChartInstance.destroy();
+            }
+            
             // 評価レベル別にセッション数をカウント
             const evaluationCounts = {
                 'Excellent': 0,
@@ -842,52 +852,64 @@
                 evaluationCounts[label]++;
             });
             
-            new Chart(ctx, {
-                type: 'doughnut',
+            // グラス効果用のグラデーション作成（評価分布用）
+            function createEvaluationGlassGradient(ctx, color) {
+                const gradient = ctx.createLinearGradient(0, 0, 200, 0); // 横向きグラデーション
+                
+                let r, g, b;
+                if (color === '#fbbf24') { r = 251; g = 191; b = 36; } // Excellent - 黄色
+                else if (color === '#22c55e') { r = 34; g = 197; b = 94; } // Good - 緑
+                else if (color === '#3b82f6') { r = 59; g = 130; b = 246; } // Pass - 青
+                else { r = 239; g = 68; b = 68; } // Practice - 赤
+                
+                // グラス効果
+                gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.9)`);
+                gradient.addColorStop(0.3, `rgba(${Math.min(255, r + 40)}, ${Math.min(255, g + 40)}, ${Math.min(255, b + 40)}, 0.8)`);
+                gradient.addColorStop(0.7, `rgba(${r}, ${g}, ${b}, 0.7)`);
+                gradient.addColorStop(1, `rgba(${Math.max(0, r - 30)}, ${Math.max(0, g - 30)}, ${Math.max(0, b - 30)}, 0.6)`);
+                
+                return gradient;
+            }
+            
+            const labels = ['Excellent', 'Good', 'Pass', 'Practice'];
+            const data = [
+                evaluationCounts['Excellent'],
+                evaluationCounts['Good'],
+                evaluationCounts['Pass'],
+                evaluationCounts['Practice']
+            ];
+            const backgroundColors = ['#fbbf24', '#22c55e', '#3b82f6', '#ef4444'];
+            
+            window.accuracyChartInstance = new Chart(ctx, {
+                type: 'bar',
                 data: {
-                    labels: ['Excellent', 'Good', 'Pass', 'Practice'],
+                    labels: labels,
                     datasets: [{
-                        data: [
-                            evaluationCounts['Excellent'],
-                            evaluationCounts['Good'],
-                            evaluationCounts['Pass'],
-                            evaluationCounts['Practice']
-                        ],
-                        backgroundColor: [
-                            '#fbbf24', // 黄色 - Excellent
-                            '#22c55e', // 緑色 - Good  
-                            '#3b82f6', // 青色 - Pass
-                            '#ef4444'  // 赤色 - Practice
-                        ],
-                        borderColor: '#ffffff',
-                        borderWidth: 2,
-                        hoverOffset: 10
+                        label: 'セッション数',
+                        data: data,
+                        backgroundColor: function(context) {
+                            if (context.parsed !== undefined) {
+                                const index = context.dataIndex;
+                                const baseColor = backgroundColors[index];
+                                return createEvaluationGlassGradient(context.chart.ctx, baseColor);
+                            }
+                            return backgroundColors;
+                        },
+                        borderColor: 'rgba(255, 255, 255, 0.3)',
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.9
                     }]
                 },
                 options: {
+                    indexAxis: 'y', // 横向きバーチャート
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'right',
-                            labels: {
-                                color: '#ffffff',
-                                font: {
-                                    size: 12
-                                },
-                                usePointStyle: true,
-                                pointStyle: 'circle',
-                                padding: 15,
-                                generateLabels: function(chart) {
-                                    const data = chart.data;
-                                    return data.labels.map((label, i) => ({
-                                        text: `${label} (${data.datasets[0].data[i]})`,
-                                        fillStyle: data.datasets[0].backgroundColor[i],
-                                        hidden: false,
-                                        index: i
-                                    }));
-                                }
-                            }
+                            display: false // 凡例を非表示（ラベルで十分）
                         },
                         tooltip: {
                             backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -898,14 +920,51 @@
                             callbacks: {
                                 label: function(context) {
                                     const total = mockSessionsData.length;
-                                    const value = context.parsed;
+                                    const value = context.parsed.x;
                                     const percentage = ((value / total) * 100).toFixed(1);
                                     return `${context.label}: ${value}セッション (${percentage}%)`;
                                 }
                             }
                         }
                     },
-                    cutout: '50%', // ドーナツチャートの中央の穴のサイズ
+                    scales: {
+                        x: {
+                            display: true,
+                            grid: {
+                                display: true,
+                                color: 'rgba(255, 255, 255, 0.1)',
+                                drawBorder: true,
+                                borderColor: 'rgba(255, 255, 255, 0.2)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.6)',
+                                font: {
+                                    size: 10
+                                },
+                                stepSize: 1,
+                                callback: function(value) {
+                                    return Math.floor(value) === value ? value : '';
+                                }
+                            },
+                            min: 0
+                        },
+                        y: {
+                            grid: {
+                                display: true,
+                                color: 'rgba(255, 255, 255, 0.05)',
+                                drawBorder: true,
+                                borderColor: 'rgba(255, 255, 255, 0.2)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                font: {
+                                    size: 10
+                                },
+                                padding: 3,
+                                autoSkip: false
+                            }
+                        }
+                    }
                 }
             });
         }
