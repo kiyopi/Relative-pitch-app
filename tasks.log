@@ -332,3 +332,15 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 16:34:20] コミット: Restore initial animations while disabling subsequent ones
+
+- Enable initial animations for all devices (iPhone, iPad, PC)
+- Use onComplete callbacks to disable animations after first display
+- Add transitions control to prevent resize/scroll animations
+- Mobile charts: 1000ms initial animation, then disabled
+- Desktop/iPad line charts: 800ms initial animation, then disabled
+- Ensure smooth first impression with no unwanted re-animations
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

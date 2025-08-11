@@ -159,19 +159,11 @@
 
         let selectedSessionForAnalysis = 1;
         
-        // アニメーション制御 - より厳格なアプローチ
-        let chartsInitialized = {
+        // アニメーション制御フラグ
+        let animationCompleted = {
             errorTrend: false,
             accuracy: false
         };
-        
-        // Chart.jsのグローバル設定でアニメーションを制御
-        function disableAllAnimations() {
-            Chart.defaults.animation = false;
-            Chart.defaults.animations = false;
-            Chart.defaults.responsive = true;
-            Chart.defaults.maintainAspectRatio = false;
-        }
 
         // Get evaluation level and color (仕様書準拠)
         function getSessionEvaluationLabel(averageCentError) {
@@ -610,8 +602,8 @@
                     maintainAspectRatio: false,
                     animation: {
                         duration: 800,
-                        onComplete: function() {
-                            this.options.animation = false;
+                        onComplete: () => {
+                            animationCompleted.errorTrend = true;
                         }
                     },
                     plugins: {
@@ -790,15 +782,8 @@
                     maintainAspectRatio: false,
                     animation: {
                         duration: 1000,
-                        onComplete: function() {
-                            // アニメーション完了後、このチャートインスタンスのアニメーションを無効化
-                            this.options.animation = false;
-                            this.options.transitions = {
-                                active: { animation: { duration: 0 } },
-                                resize: { animation: { duration: 0 } },
-                                show: { animation: { duration: 0 } },
-                                hide: { animation: { duration: 0 } }
-                            };
+                        onComplete: () => {
+                            animationCompleted.errorTrend = true;
                         }
                     },
                     layout: {
@@ -953,14 +938,8 @@
                     maintainAspectRatio: false,
                     animation: {
                         duration: 1000,
-                        onComplete: function() {
-                            this.options.animation = false;
-                            this.options.transitions = {
-                                active: { animation: { duration: 0 } },
-                                resize: { animation: { duration: 0 } },
-                                show: { animation: { duration: 0 } },
-                                hide: { animation: { duration: 0 } }
-                            };
+                        onComplete: () => {
+                            animationCompleted.accuracy = true;
                         }
                     },
                     layout: {
@@ -1050,6 +1029,20 @@
                 // 画面サイズが変わった時は全チャートを再初期化
                 initializePage();
             }, 250);
+        });
+
+        // スクロールイベントリスナー
+        window.addEventListener('scroll', () => {
+            // 誤差推移チャート
+            if (window.errorTrendChartInstance && animationCompleted.errorTrend) {
+                window.errorTrendChartInstance.options.animation = false;
+                window.errorTrendChartInstance.update();
+            }
+            // 評価分布チャート
+            if (window.accuracyChartInstance && animationCompleted.accuracy) {
+                window.accuracyChartInstance.options.animation = false;
+                window.accuracyChartInstance.update();
+            }
         });
 
         // Initialize Lucide icons
