@@ -355,3 +355,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 16:44:29] コミット: Use update('none') for immediate chart updates without animation
+
+- Change from update() to update('none') for instant redraw
+- Add animation disabling to resize event handler before re-initialization
+- Ensure all chart updates after initial animation use immediate mode
+- Prevent any animations during scroll, resize, or other events
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

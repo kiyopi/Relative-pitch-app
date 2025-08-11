@@ -159,11 +159,8 @@
 
         let selectedSessionForAnalysis = 1;
         
-        // アニメーション制御フラグ
-        let animationCompleted = {
-            errorTrend: false,
-            accuracy: false
-        };
+        // Chart.jsのグローバルアニメーション設定を使用してスクロール時の再アニメーションを防ぐ
+        let chartsInitialized = false;
 
         // Get evaluation level and color (仕様書準拠)
         function getSessionEvaluationLabel(averageCentError) {
@@ -256,24 +253,40 @@
                 sessionElement.innerHTML = `
                     <div class="absolute inset-0 rounded-lg" style="
                         opacity: ${isSelected ? '1' : '0.7'};
-                        background-color: rgba(255, 255, 255, 0.15);
-                        background-image: linear-gradient(135deg, ${getGlassBackground(label, isSelected)});
+                        background: linear-gradient(135deg, ${getGlassBackground(label, isSelected)});
                         backdrop-filter: blur(8px);
                         -webkit-backdrop-filter: blur(8px);
                         -moz-backdrop-filter: blur(8px);
                         border: 1px solid rgba(255, 255, 255, ${isSelected ? '0.4' : '0.3'});
-                        will-change: transform;
+                        border-radius: 12px;
+                        will-change: transform, opacity;
                         -webkit-transform: translateZ(0);
                         transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        -webkit-perspective: 1000px;
+                        perspective: 1000px;
                     "></div>
                     <div class="relative z-10 flex flex-col items-center justify-center h-full" style="
                         opacity: 1;
                         will-change: transform;
                         -webkit-transform: translateZ(0);
                         transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        pointer-events: none;
                     ">
-                        <div class="${textColor} font-bold text-sm mb-1" style="text-shadow: 0 1px 3px rgba(0,0,0,0.8); filter: brightness(1.2);">${session.session}</div>
-                        <div class="mb-1" style="filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)) brightness(1.2);">${icon}</div>
+                        <div class="${textColor} font-bold text-sm mb-1" style="
+                            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+                            filter: brightness(1.2);
+                            -webkit-font-smoothing: antialiased;
+                            -moz-osx-font-smoothing: grayscale;
+                        ">${session.session}</div>
+                        <div class="mb-1" style="
+                            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)) brightness(1.2);
+                            -webkit-backface-visibility: hidden;
+                            backface-visibility: hidden;
+                        ">${icon}</div>
                     </div>
                 `;
 
@@ -600,10 +613,11 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: {
+                    animation: chartsInitialized ? false : {
                         duration: 800,
                         onComplete: () => {
-                            animationCompleted.errorTrend = true;
+                            // 初回アニメーション完了後はグローバルに無効化
+                            Chart.defaults.animation = false;
                         }
                     },
                     plugins: {
@@ -780,10 +794,11 @@
                     indexAxis: 'y', // 横向きバーチャート
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: {
+                    animation: chartsInitialized ? false : {
                         duration: 1000,
                         onComplete: () => {
-                            animationCompleted.errorTrend = true;
+                            // 初回アニメーション完了後はグローバルに無効化
+                            Chart.defaults.animation = false;
                         }
                     },
                     layout: {
@@ -936,10 +951,11 @@
                     indexAxis: 'y', // 横向きバーチャート
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: {
+                    animation: chartsInitialized ? false : {
                         duration: 1000,
                         onComplete: () => {
-                            animationCompleted.accuracy = true;
+                            // 初回アニメーション完了後はグローバルに無効化
+                            Chart.defaults.animation = false;
                         }
                     },
                     layout: {
@@ -1019,6 +1035,9 @@
             initializeAccuracyChart();
             initializeSessionsGrid();
             updateSelectedSession();
+            
+            // 初回初期化完了をマーク
+            chartsInitialized = true;
         }
 
         // ウィンドウリサイズ時の再描画対応
@@ -1026,31 +1045,9 @@
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(function() {
-                // アニメーション無効化してから再初期化
-                if (window.errorTrendChartInstance && animationCompleted.errorTrend) {
-                    window.errorTrendChartInstance.options.animation = false;
-                }
-                if (window.accuracyChartInstance && animationCompleted.accuracy) {
-                    window.accuracyChartInstance.options.animation = false;
-                }
-                
-                // 画面サイズが変わった時は全チャートを再初期化
+                // 画面サイズが変わった時は全チャートを再初期化（アニメーションは無効）
                 initializePage();
             }, 250);
-        });
-
-        // スクロールイベントリスナー
-        window.addEventListener('scroll', () => {
-            // 誤差推移チャート
-            if (window.errorTrendChartInstance && animationCompleted.errorTrend) {
-                window.errorTrendChartInstance.options.animation = false;
-                window.errorTrendChartInstance.update('none');
-            }
-            // 評価分布チャート
-            if (window.accuracyChartInstance && animationCompleted.accuracy) {
-                window.accuracyChartInstance.options.animation = false;
-                window.accuracyChartInstance.update('none');
-            }
         });
 
         // Initialize Lucide icons
