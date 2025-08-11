@@ -811,3 +811,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-12 05:24:36] コミット: セント表記優先原則を要件定義書に追加: 評価表示での音程精度フィードバック方針明確化
+
+- 4.1項にセント表記優先原則を追加
+- ％や点数表記の曖昧性に配慮した設計方針を明文化
+- 学習効果を重視したセント値による具体的なフィードバック方針
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
