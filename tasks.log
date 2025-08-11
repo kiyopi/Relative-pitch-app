@@ -377,3 +377,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 17:07:33] コミット: Improve evaluation display in detailed analysis section
+
+- Change evaluation layout from horizontal to vertical (icon above text)
+- Increase icon size from 12px to 20px for better visibility
+- Add margin-top spacing between icon and label text
+- Creates cleaner, more readable evaluation display for each note
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
