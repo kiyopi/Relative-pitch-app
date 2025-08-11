@@ -48,7 +48,7 @@
                         <div class="relative bg-white/5 rounded-lg p-0 md:p-4" id="error-trend-container" style="height: 280px;">
                             <canvas id="error-trend-chart"></canvas>
                         </div>
-                        <div class="text-xs text-white-60 text-center mt-2" id="chart-description">
+                        <div class="text-xs text-white-60 text-center mt-2" id="chart-description" style="min-height: 80px; height: auto;">
                             <!-- グラフの説明はJavaScriptで動的に設定 -->
                         </div>
                     </div>
@@ -443,7 +443,6 @@
             
             // レスポンシブ設定: モバイル判定
             const isMobile = window.innerWidth < 768;
-            console.log(`画面幅: ${window.innerWidth}px, モバイル判定: ${isMobile}`);
             
             // グラフの説明を動的に設定
             const descriptionElement = document.getElementById('chart-description');
