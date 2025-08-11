@@ -1145,23 +1145,23 @@
             console.log('📄 [RESULTS] DOM Content Loaded - starting icon initialization');
             initializeResultsPageIcons();
             
-            // S級クラウンアイコンにグラデーションを適用
+            // S級クラウンアイコンに通常のcrownアイコンを適用（グラデーションなし）
             setTimeout(() => {
-                if (typeof gradientIcon === 'function') {
+                if (typeof lucideIcon === 'function') {
                     const crownElement = document.getElementById('s-grade-crown');
                     if (crownElement) {
-                        // サイズを100pxに拡大、ストローク幅を1.75に
-                        const goldCrown = gradientIcon('crown', 'gold', 'icon-4xl', 100, 1.75);
-                        crownElement.innerHTML = goldCrown;
-                        // 1.5倍スケールを適用してさらに大きく（合計150px相当）
+                        // サイズを120pxに拡大、ストローク幅を1.75に
+                        const crownIcon = lucideIcon('crown', 'icon-4xl text-yellow-300', 120, 1.75);
+                        crownElement.innerHTML = crownIcon;
+                        // 1.5倍スケールを適用してさらに大きく（合計180px相当）
                         const svg = crownElement.querySelector('svg');
                         if (svg) {
                             svg.style.transform = 'scale(1.5)';
                         }
-                        console.log('✨ [RESULTS] Gold gradient crown applied with size 100px, stroke 1.75');
+                        console.log('✨ [RESULTS] Crown icon applied with size 120px, stroke 1.75, scale 1.5');
                     }
                 } else {
-                    console.warn('❌ [RESULTS] gradientIcon function not available');
+                    console.warn('❌ [RESULTS] lucideIcon function not available');
                 }
             }, 1000);
         });
