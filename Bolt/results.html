@@ -80,9 +80,21 @@
 
             <!-- Detailed Analysis -->
             <div class="glass-card mb-8">
-                <h3 class="text-xl font-bold text-white mb-6">
-                    詳細分析 - セッション<span id="selected-session">1</span>
-                </h3>
+                <div class="flex items-center justify-between mb-6">
+                    <button id="prev-session-btn" class="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                            <path d="m15 18-6-6 6-6"/>
+                        </svg>
+                    </button>
+                    <h3 class="text-xl font-bold text-white">
+                        詳細分析 - セッション<span id="selected-session">1</span>
+                    </h3>
+                    <button id="next-session-btn" class="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </button>
+                </div>
                 <div class="mb-4 text-center" id="session-info">
                     <!-- Session info will be populated by JavaScript -->
                 </div>
@@ -1028,6 +1040,24 @@
             });
         }
 
+        // セッションナビゲーション機能
+        function navigateToSession(direction) {
+            const totalSessions = mockSessionsData.length;
+            
+            if (direction === 'prev') {
+                selectedSessionForAnalysis = selectedSessionForAnalysis > 1 
+                    ? selectedSessionForAnalysis - 1 
+                    : totalSessions; // 最初から最後へループ
+            } else if (direction === 'next') {
+                selectedSessionForAnalysis = selectedSessionForAnalysis < totalSessions 
+                    ? selectedSessionForAnalysis + 1 
+                    : 1; // 最後から最初へループ
+            }
+            
+            updateSelectedSession();
+            initializeSessionsGrid(); // グリッドの選択状態も更新
+        }
+
         // Initialize page
         function initializePage() {
             initializeOverallStats();
@@ -1035,6 +1065,26 @@
             initializeAccuracyChart();
             initializeSessionsGrid();
             updateSelectedSession();
+            
+            // ナビゲーションボタンのイベントリスナーを設定
+            const prevBtn = document.getElementById('prev-session-btn');
+            const nextBtn = document.getElementById('next-session-btn');
+            
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => navigateToSession('prev'));
+            }
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => navigateToSession('next'));
+            }
+            
+            // キーボードショートカット（左右矢印キー）
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') {
+                    navigateToSession('prev');
+                } else if (e.key === 'ArrowRight') {
+                    navigateToSession('next');
+                }
+            });
             
             // 初回初期化完了をマーク
             chartsInitialized = true;

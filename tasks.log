@@ -387,3 +387,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 17:19:20] コミット: Improve evaluation display alignment and spacing
+
+- Increase spacing between icon and text from mt-1 to mt-2
+- Add min-width: 60px to ensure consistent column width
+- Add text-center and justify-center for proper center alignment
+- Fix text alignment issues regardless of label length (Excellent vs Pass)
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
