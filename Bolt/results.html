@@ -1116,9 +1116,39 @@
             }, 250);
         });
 
-        // Initialize Lucide icons
+        // Initialize Lucide icons with enhanced system
+        let iconInitializationAttempts = 0;
+        const maxAttempts = 5;
+        
+        function initializeResultsPageIcons() {
+            iconInitializationAttempts++;
+            console.log(`🚀 [RESULTS] Icon initialization attempt ${iconInitializationAttempts}/${maxAttempts}`);
+            
+            if (typeof initializeLucideIcons === 'function') {
+                console.log('✅ [RESULTS] initializeLucideIcons function available');
+                initializeLucideIcons();
+                return true;
+            } else {
+                console.error('❌ [RESULTS] initializeLucideIcons function not found');
+                
+                // 再試行
+                if (iconInitializationAttempts < maxAttempts) {
+                    console.log(`⏰ [RESULTS] Retrying in 200ms... (attempt ${iconInitializationAttempts + 1}/${maxAttempts})`);
+                    setTimeout(initializeResultsPageIcons, 200);
+                }
+                return false;
+            }
+        }
+        
+        // Multiple initialization triggers
         document.addEventListener('DOMContentLoaded', function() {
-            replaceLucideIcons();
+            console.log('📄 [RESULTS] DOM Content Loaded - starting icon initialization');
+            initializeResultsPageIcons();
+        });
+        
+        window.addEventListener('load', function() {
+            console.log('🌍 [RESULTS] Window loaded - ensuring icons are initialized');
+            initializeResultsPageIcons();
         });
 
         // Start initialization
