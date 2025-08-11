@@ -188,3 +188,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 14:37:05] コミット: 評価分布チャートのグラデーション安定化: 動的計算を固定値に変更して均等表示を実現
+
+- 複雑なバー幅計算による不安定なグラデーションを修正
+- モバイル版誤差推移と同じ固定200px方式に統一
+- アニメーション中のグラデーション乱れを解消
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
