@@ -336,6 +336,146 @@ const audioConstraints = {
 };
 ```
 
+### 6.7 総合評価グラフ表示システム（Chart.js）
+
+#### 6.7.1 Chart.jsライブラリ統合
+```javascript
+// Chart.js v4.4.0 CDN使用
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+
+// レスポンシブ対応グラフ初期化
+function initializeCharts() {
+  const isMobile = window.innerWidth < 768;
+  const isTablet = window.innerWidth >= 768 && window.innerWidth <= 1024;
+  
+  initializeErrorTrendChart(isMobile, isTablet);
+  initializeAccuracyChart();
+}
+```
+
+#### 6.7.2 セント誤差推移グラフ
+```javascript
+// PC/iPad版: Line Chart（セッション×音階の詳細表示）
+function initializePCLineChart(ctx, isTablet) {
+  return new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: generateSessionLabels(), // S1-1, S1-2, ..., S12-8
+      datasets: [{
+        label: '音程誤差 (セント)',
+        data: sessionErrorData,
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        tension: 0.3,
+        pointRadius: 3,
+        pointHoverRadius: 5
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: !isTablet, // iPad版はアニメーション無効
+      scales: {
+        y: {
+          min: -50,
+          max: 50,
+          grid: { color: 'rgba(255,255,255,0.1)' },
+          ticks: { color: '#9ca3af' }
+        }
+      }
+    }
+  });
+}
+
+// モバイル版: Horizontal Bar Chart（セッション別平均誤差）
+function initializeMobileStackedBarChart(ctx) {
+  return new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['S1', 'S2', ..., 'S12'],
+      datasets: [{
+        label: '平均誤差 (セント)',
+        data: sessionAverageErrors,
+        backgroundColor: function(context) {
+          // セント誤差に応じた色分け
+          const value = context.parsed.x;
+          if (Math.abs(value) <= 15) return '#22c55e'; // Excellent
+          if (Math.abs(value) <= 25) return '#3b82f6'; // Good  
+          if (Math.abs(value) <= 40) return '#f59e0b'; // Pass
+          return '#ef4444'; // Practice
+        }
+      }]
+    },
+    options: {
+      indexAxis: 'y', // 横向きバー
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 1500 }
+    }
+  });
+}
+```
+
+#### 6.7.3 評価分布グラフ
+```javascript
+function initializeAccuracyChart() {
+  const evaluationCounts = calculateEvaluationDistribution();
+  
+  return new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Excellent', 'Good', 'Pass', 'Practice'],
+      datasets: [{
+        label: 'セッション数',
+        data: [
+          evaluationCounts.excellent,
+          evaluationCounts.good,
+          evaluationCounts.pass,
+          evaluationCounts.practice
+        ],
+        backgroundColor: function(context) {
+          // グラス風グラデーション効果
+          const colors = ['#fbbf24', '#22c55e', '#3b82f6', '#ef4444'];
+          return createGlassGradient(context.chart.ctx, colors[context.dataIndex]);
+        }
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (context) => `${context.parsed.y} セッション (${((context.parsed.y / totalSessions) * 100).toFixed(1)}%)`
+          }
+        }
+      }
+    }
+  });
+}
+
+// グラス風グラデーション生成
+function createGlassGradient(ctx, baseColor) {
+  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient.addColorStop(0, baseColor + '90'); // 90% opacity
+  gradient.addColorStop(0.5, baseColor + '60'); // 60% opacity  
+  gradient.addColorStop(1, baseColor + '30'); // 30% opacity
+  return gradient;
+}
+```
+
+#### 6.7.4 レスポンシブ対応
+- **モバイル（<768px）**: 横向きバーチャート、簡略表示
+- **タブレット（768-1024px）**: 折れ線グラフ、アニメーション無効
+- **PC（>1024px）**: 折れ線グラフ、フルアニメーション
+- **リサイズ対応**: ウィンドウサイズ変更時の自動再描画
+
+#### 6.7.5 パフォーマンス最適化
+- **データ圧縮**: 96音データポイントの効率的処理
+- **アニメーション制御**: デバイス別の最適化
+- **メモリ管理**: チャートインスタンスの適切な破棄
+
 ---
 
 ## 🎵 7. 音域適応型基音選択システム

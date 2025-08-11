@@ -143,6 +143,20 @@
           "C": { "attempts": 8, "avgError": 12.5, "successRate": 1.0 },
           "D": { "attempts": 8, "avgError": 18.3, "successRate": 0.875 },
           // ... 他の音階
+        },
+        "chartData": {
+          "errorTrendData": [
+            // セッション×音階の96データポイント（12セッション × 8音階）
+            { "sessionId": 1, "noteIndex": 0, "centError": 12.5, "noteName": "C" },
+            { "sessionId": 1, "noteIndex": 1, "centError": -8.2, "noteName": "D" },
+            // ... 残り94データポイント
+          ],
+          "evaluationDistribution": {
+            "excellent": 45,  // Excellentの音階数
+            "good": 32,       // Goodの音階数  
+            "pass": 15,       // Passの音階数
+            "practice": 4     // Practiceの音階数
+          }
         }
       },
       "shared": false
