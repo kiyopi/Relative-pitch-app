@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="styles/system.css">
     
     <!-- アイコンライブラリ -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="assets/icons/lucide-icons.js"></script>
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
@@ -189,7 +189,14 @@
     </div>
 
     <!-- JavaScript -->
-    <script src="js/lucide-icons.js"></script>
     <script src="js/records.js"></script>
+    <script>
+        // Lucideアイコンの初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+    </script>
 </body>
 </html>

@@ -377,9 +377,11 @@ class TrainingRecordsManager {
         }).join('');
 
         // Lucideアイコンを再初期化
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
+        setTimeout(() => {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }, 100);
     }
 
     // イベントリスナーを設定
@@ -424,5 +426,17 @@ function setGoal() {
 // 初期化
 let recordsManager;
 document.addEventListener('DOMContentLoaded', () => {
+    // Lucideアイコンを初期化
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+    
     recordsManager = new TrainingRecordsManager();
+    
+    // 初期化後にもう一度アイコンを確認
+    setTimeout(() => {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }, 500);
 });

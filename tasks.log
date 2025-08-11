@@ -442,3 +442,18 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 20:58:36] コミット: Implement training records page with monetization strategy
+
+- Add comprehensive training records management system (/records)
+- Create TrainingRecordsManager class with localStorage integration
+- Implement freemium model with 7-day free history limit
+- Add Chart.js-based accuracy trend visualization
+- Design premium feature previews with strategic paywall placement
+- Update REQUIREMENTS_SPECIFICATION.md v1.1.2 with records functionality
+- Add navigation links from home and results pages to records
+- Enhance results.html header with file-chart-column-increasing icon and trophy grade display
+- Prepare foundation for future subscription monetization phases
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
