@@ -344,3 +344,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 16:39:00] コミット: Implement simple animation control with scroll event listener
+
+- Simplify animation control using basic animationCompleted flags
+- Use onComplete callbacks only to set completion flags
+- Add scroll event listener to disable animations after completion
+- Remove complex transitions and instance modifications
+- Follow user-suggested pattern for reliable animation control
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

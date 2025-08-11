@@ -1026,6 +1026,14 @@
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(function() {
+                // アニメーション無効化してから再初期化
+                if (window.errorTrendChartInstance && animationCompleted.errorTrend) {
+                    window.errorTrendChartInstance.options.animation = false;
+                }
+                if (window.accuracyChartInstance && animationCompleted.accuracy) {
+                    window.accuracyChartInstance.options.animation = false;
+                }
+                
                 // 画面サイズが変わった時は全チャートを再初期化
                 initializePage();
             }, 250);
@@ -1036,12 +1044,12 @@
             // 誤差推移チャート
             if (window.errorTrendChartInstance && animationCompleted.errorTrend) {
                 window.errorTrendChartInstance.options.animation = false;
-                window.errorTrendChartInstance.update();
+                window.errorTrendChartInstance.update('none');
             }
             // 評価分布チャート
             if (window.accuracyChartInstance && animationCompleted.accuracy) {
                 window.accuracyChartInstance.options.animation = false;
-                window.accuracyChartInstance.update();
+                window.accuracyChartInstance.update('none');
             }
         });
 
