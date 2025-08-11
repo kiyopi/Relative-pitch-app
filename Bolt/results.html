@@ -871,25 +871,6 @@
                 evaluationCounts[label]++;
             });
             
-            // グラス効果用のグラデーション作成（評価分布用）
-            function createEvaluationGlassGradient(ctx, color, barWidth = 200) {
-                // PC版では動的バー幅、モバイル版では固定200pxを使用
-                const gradient = ctx.createLinearGradient(0, 0, barWidth, 0);
-                
-                let r, g, b;
-                if (color === '#fbbf24') { r = 251; g = 191; b = 36; } // Excellent - 黄色
-                else if (color === '#22c55e') { r = 34; g = 197; b = 94; } // Good - 緑
-                else if (color === '#3b82f6') { r = 59; g = 130; b = 246; } // Pass - 青
-                else { r = 239; g = 68; b = 68; } // Practice - 赤
-                
-                // グラス効果: 透明度をより明確に変化させて濃厚な表示
-                gradient.addColorStop(0, `rgba(${Math.min(255, r + 30)}, ${Math.min(255, g + 30)}, ${Math.min(255, b + 30)}, 1.0)`); // 完全不透明で明るい開始
-                gradient.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, 0.9)`); // メイン色域
-                gradient.addColorStop(0.8, `rgba(${r}, ${g}, ${b}, 0.8)`); // 少し透明に
-                gradient.addColorStop(1, `rgba(${Math.max(0, r - 20)}, ${Math.max(0, g - 20)}, ${Math.max(0, b - 20)}, 0.7)`); // 暗い部分
-                
-                return gradient;
-            }
             
             const labels = ['Excellent', 'Good', 'Pass', 'Practice'];
             const data = [
@@ -911,17 +892,7 @@
                             if (context.parsed !== undefined) {
                                 const index = context.dataIndex;
                                 const baseColor = backgroundColors[index];
-                                
-                                // PC版では動的バー幅計算、モバイル版では固定値を使用
-                                const isMobile = window.innerWidth < 768;
-                                if (isMobile) {
-                                    return createEvaluationGlassGradient(context.chart.ctx, baseColor);
-                                } else {
-                                    // PC版: バーの実際の幅を計算
-                                    const chartArea = context.chart.chartArea;
-                                    const barWidth = chartArea ? (chartArea.right - chartArea.left) * 0.8 : 400;
-                                    return createEvaluationGlassGradient(context.chart.ctx, baseColor, barWidth);
-                                }
+                                return createGlassGradient(context.chart.ctx, baseColor);
                             }
                             return backgroundColors;
                         },
