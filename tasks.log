@@ -245,3 +245,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 15:28:43] コミット: Fix iPad session button display issues with enhanced GPU rendering
+
+- Add hardware acceleration with will-change and translateZ(0) for consistent rendering
+- Include fallback background-color for cases where gradients fail
+- Switch from background to background-image for better compatibility
+- Add cross-browser backdrop-filter support with -moz- prefix
+- Ensure consistent glass effects across iPhone, iPad, and PC
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
