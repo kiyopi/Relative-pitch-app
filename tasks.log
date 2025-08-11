@@ -129,3 +129,8 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - Y軸を対称的な動的スケールに変更
 - 上下10セントのマージンを追加
 - すべてのプロットが確実に画面内に表示
+[2025-08-11 13:06:06] コミット: モバイル版チャートフォントサイズを10pxに統一: 横軸・縦軸の可読性向上
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
