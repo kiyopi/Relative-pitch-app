@@ -45,7 +45,7 @@
                     <!-- Error Trend Chart -->
                     <div>
                         <h3 class="text-xl font-bold text-white mb-4">誤差推移</h3>
-                        <div class="relative bg-white/5 rounded-lg p-4" style="height: 200px;">
+                        <div class="relative bg-white/5 rounded-lg p-2 md:p-4" style="height: 200px;">
                             <canvas id="error-trend-chart"></canvas>
                         </div>
                         <div class="text-xs text-white-60 text-center mt-2">
@@ -665,21 +665,28 @@
                         backgroundColor: backgroundColors,
                         borderColor: '#ffffff',
                         borderWidth: 0.5,
-                        barPercentage: 0.6,  // バーの高さを60%に
-                        categoryPercentage: 0.8  // カテゴリ間隔を80%に
+                        barPercentage: 0.5,  // バーの高さを50%に縮小
+                        categoryPercentage: 0.7,  // カテゴリ間隔を70%に縮小
+                        maxBarThickness: 12  // バーの最大幅を12pxに制限
                     }]
                 },
                 options: {
                     indexAxis: 'y', // 横向きバーチャート
                     responsive: true,
                     maintainAspectRatio: false,
+                    aspectRatio: window.innerWidth < 400 ? 1.2 : 1.5,  // モバイルサイズに応じて調整
+                    onResize: function(chart, size) {
+                        // リサイズ時に自動調整
+                        chart.options.scales.x.ticks.display = size.width > 250;
+                    },
                     layout: {
                         padding: {
                             left: 0,
-                            right: 10,  // 右側のパディングを最小限に
+                            right: 0,  // 右側のパディングを0に
                             top: 0,
                             bottom: 0
-                        }
+                        },
+                        autoPadding: true  // 自動パディング調整を有効化
                     },
                     plugins: {
                         legend: {
@@ -716,22 +723,31 @@
                     scales: {
                         x: {
                             display: true,
+                            bounds: 'ticks',  // ティックの範囲でバウンド
                             grid: {
                                 color: 'rgba(255, 255, 255, 0.1)',
-                                drawBorder: false
+                                drawBorder: false,
+                                display: false  // X軸のグリッドも非表示
                             },
                             ticks: {
                                 color: 'rgba(255, 255, 255, 0.6)',
                                 font: {
-                                    size: 8  // フォントサイズを小さく
+                                    size: 8
                                 },
-                                maxTicksLimit: 5,  // 表示するティック数を制限
+                                autoSkip: true,  // 自動的にラベルをスキップ
+                                autoSkipPadding: 5,  // スキップ時のパディング
+                                maxRotation: 0,  // ラベルを回転させない
+                                minRotation: 0,
                                 callback: function(value) {
                                     return `${value}¢`;
                                 }
                             },
-                            max: 50,  // 最大値を50セントに
-                            min: 0
+                            // 最大値を動的に設定
+                            max: Math.max(...data) + 5,
+                            min: 0,
+                            afterFit: function(scaleInstance) {
+                                scaleInstance.width = Math.min(scaleInstance.width, window.innerWidth * 0.5);  // 幅を画面の50%に制限
+                            }
                         },
                         y: {
                             grid: {
@@ -740,10 +756,12 @@
                             ticks: {
                                 color: 'rgba(255, 255, 255, 0.7)',
                                 font: {
-                                    size: 9  // フォントサイズを小さく
+                                    size: 8  // フォントサイズをさらに小さく
                                 },
-                                padding: 2  // パディングを最小限に
-                            }
+                                padding: 1,  // パディングをさらに削減
+                                mirror: false  // ラベルを内側に配置しない
+                            },
+                            position: 'left'
                         }
                     }
                 }
