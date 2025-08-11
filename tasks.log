@@ -277,3 +277,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 16:04:50] コミット: Implement global flag-based animation control for charts
+
+- Add chartsAnimated global object to track animation state
+- Use conditional animation settings based on animation flags
+- Simplify animation logic with upfront decision making
+- Ensure animations only run once per chart regardless of resize/redraw
+- Apply fix to both error trend and evaluation distribution charts
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

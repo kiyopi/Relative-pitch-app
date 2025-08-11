@@ -487,14 +487,15 @@
                 return;
             }
             
-            // レスポンシブ設定: モバイル判定
+            // レスポンシブ設定: デバイス判定
             const isMobile = window.innerWidth < 768;
+            const isTablet = window.innerWidth >= 768 && window.innerWidth <= 1024; // iPad対応
             
             // グラフの説明を動的に設定
             const descriptionElement = document.getElementById('chart-description');
             if (descriptionElement) {
-                if (isMobile) {
-                    // モバイル版（横向きバーチャート）の説明
+                if (isMobile || isTablet) {
+                    // モバイル版・iPad版（横向きバーチャート）の説明
                     descriptionElement.innerHTML = `
                         <div class="font-semibold text-white-70">【グラフの見方】</div>
                         <div class="mt-1">縦軸: セッション番号（S1～S12） / 横軸: 平均誤差（セント）</div>
@@ -502,7 +503,7 @@
                         <div class="mt-1">0に近いほど正確な音程です</div>
                     `;
                 } else {
-                    // PC版・iPad版（ラインチャート）の説明
+                    // PC版（ラインチャート）の説明
                     descriptionElement.innerHTML = `
                         <div class="font-semibold text-white-70">【グラフの見方】</div>
                         <div class="mt-1">横軸: セッション別8音 / 縦軸: 誤差（セント）</div>
@@ -517,8 +518,8 @@
                 window.errorTrendChartInstance.destroy();
             }
             
-            if (isMobile) {
-                // モバイル版: Stacked Bar Chart
+            if (isMobile || isTablet) {
+                // モバイル版・iPad版: Stacked Bar Chart（アニメーション制御付き）
                 initializeMobileStackedBarChart(ctx);
             } else {
                 // PC版: Line Chart
