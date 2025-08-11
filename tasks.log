@@ -266,3 +266,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 15:40:01] コミット: Fix mobile chart animations to run only on initial display
+
+- Add onComplete callback to disable animations after first run
+- Remove unnecessary animation properties (animateRotate, animateScale)
+- Add interaction.intersect: false to prevent scroll-triggered animations
+- Apply fix to both error trend and evaluation distribution charts
+- Ensure smooth scrolling without unwanted re-animations
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

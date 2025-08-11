@@ -158,6 +158,12 @@
         }
 
         let selectedSessionForAnalysis = 1;
+        
+        // アニメーション制御フラグ
+        let chartsAnimated = {
+            errorTrend: false,
+            accuracy: false
+        };
 
         // Get evaluation level and color (仕様書準拠)
         function getSessionEvaluationLabel(averageCentError) {
@@ -767,18 +773,11 @@
                     indexAxis: 'y', // 横向きバーチャート
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: {
+                    animation: chartsAnimated.errorTrend ? false : {
+                        duration: 1000,
                         onComplete: function() {
-                            // 初回アニメーション完了後は無効化
-                            this.options.animation = false;
-                        },
-                        duration: 1000, // 初回表示時のアニメーション時間
-                        resize: {
-                            duration: 0 // リサイズ時はアニメーション無効
+                            chartsAnimated.errorTrend = true;
                         }
-                    },
-                    interaction: {
-                        intersect: false // スクロール時の再アニメーション防止
                     },
                     layout: {
                         padding: {
@@ -930,18 +929,11 @@
                     indexAxis: 'y', // 横向きバーチャート
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: {
+                    animation: chartsAnimated.accuracy ? false : {
+                        duration: 1000,
                         onComplete: function() {
-                            // 初回アニメーション完了後は無効化
-                            this.options.animation = false;
-                        },
-                        duration: 1000, // 初回表示時のアニメーション時間
-                        resize: {
-                            duration: 0 // リサイズ時はアニメーション無効
+                            chartsAnimated.accuracy = true;
                         }
-                    },
-                    interaction: {
-                        intersect: false // スクロール時の再アニメーション防止
                     },
                     layout: {
                         padding: {
