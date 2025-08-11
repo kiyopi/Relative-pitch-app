@@ -555,3 +555,30 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 21:41:58] コミット: ページヘッダーアイコン仕様書作成と専用スタイルクラス実装: 統一されたデザインシステム
+
+**仕様書更新:**
+- UI_COMPONENTS_SPECIFICATION.md v1.1.0に更新
+- ページヘッダーアイコンの詳細仕様を追加
+- サイズ、ストローク、背景グラデーションの統一規格定義
+
+**専用スタイルクラス実装:**
+- system.cssに`.page-header-icon`ベースクラス追加
+- 色別バリアント: purple/blue/green/orangeグラデーション
+- 96px統一サイズ、中央配置、flex-shrink-0設定
+
+**HTML更新:**
+- results.html: page-header-icon-purple適用
+- mic-test.html: page-header-icon-blue適用、Lucideアイコン化
+
+**技術的改善:**
+- data-stroke-width属性の完全サポート
+- getAttribute()でより確実な属性取得
+- デバッグログにstroke-width情報追加
+- 全ページでのアイコン初期化システム統一
+
+これでページ間でのヘッダーアイコンスタイルが完全統一されました。
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

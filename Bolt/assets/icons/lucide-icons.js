@@ -121,6 +121,9 @@ const LUCIDE_ICONS = {
   'chevron-right': `<polyline points="9,6 15,12 9,18"/>`,
   'arrow-left': `<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/>`,
   'arrow-right': `<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/>`,
+  
+  // Design & UI
+  'palette': `<circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="11.5" r=".5"/><circle cx="12.5" cy="16.5" r=".5"/><circle cx="13.5" cy="13.5" r=".5"/><circle cx="9.5" cy="4.5" r=".5"/><circle cx="11.5" cy="2.5" r=".5"/><path d="M2 12s3.09-6 10-6c7.21 0 10 6 10 6s-3.09 6-10 6C5.09 18 2 12 2 12z"/>`,
 };
 
 /**
