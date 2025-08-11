@@ -206,3 +206,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-11 14:56:01] コミット: 評価分布チャートのグラデーション統一: 誤差推移と同じ関数を使用して安定性向上
+
+- 独自のcreateEvaluationGlassGradient関数を削除
+- 誤差推移で実績のあるcreateGlassGradient関数を共用
+- iPhoneの短いバーでも正常なグラデーション表示を実現
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
