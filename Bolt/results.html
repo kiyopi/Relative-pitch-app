@@ -11,6 +11,9 @@
     
     <!-- Lucide Icons -->
     <script src="assets/icons/lucide-icons.js?v=6"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 </head>
 <body>
     <div class="min-h-screen p-6">
@@ -33,45 +36,31 @@
 
             <!-- Overall Statistics -->
             <div class="glass-card mb-8">
-                <div class="grid grid-cols-4 gap-6 mb-8">
-                    <div class="text-center">
-                        <div class="text-4xl font-bold text-white mb-2">B</div>
-                        <p class="text-green-200">総合グレード</p>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-4xl font-bold text-white mb-2">±22.1</div>
-                        <p class="text-green-200">平均誤差（セント）</p>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-4xl font-bold text-white mb-2">85.7%</div>
-                        <p class="text-green-200">セッション平均精度</p>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-4xl font-bold text-white mb-2">92/96</div>
-                        <p class="text-green-200">正解音数</p>
-                    </div>
+                <div class="grid grid-cols-4 gap-6 mb-8" id="overall-stats">
+                    <!-- Stats will be populated by JavaScript -->
                 </div>
 
-                <!-- Grade Distribution -->
-                <div class="mb-8">
-                    <h3 class="text-xl font-bold text-white mb-4">評価分布</h3>
-                    <div class="flex space-x-4">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-4 h-4 rounded-full bg-yellow-400"></div>
-                            <span class="text-white">Excellent: 5セッション</span>
+                <!-- Performance Charts -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Error Trend Chart -->
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-4">誤差推移</h3>
+                        <div class="relative bg-white/5 rounded-lg p-4" style="height: 200px;">
+                            <canvas id="error-trend-chart"></canvas>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="w-4 h-4 rounded-full bg-green-400"></div>
-                            <span class="text-white">Good: 2セッション</span>
+                        <div class="text-xs text-white-60 text-center mt-2">
+                            <div>プラス(+) = 音が高い / マイナス(-) = 音が低い</div>
+                            <div class="mt-1">0に近いほど正確な音程です</div>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="w-4 h-4 rounded-full bg-blue-400"></div>
-                            <span class="text-white">Pass: 3セッション</span>
+                    </div>
+                    
+                    <!-- Accuracy Chart -->
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-4">評価分布</h3>
+                        <div class="bg-white/5 rounded-lg p-4" style="height: 200px;">
+                            <canvas id="accuracy-chart" width="400" height="200"></canvas>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <div class="w-4 h-4 rounded-full bg-red-400"></div>
-                            <span class="text-white">Practice: 2セッション</span>
-                        </div>
+                        <div class="text-xs text-white-60 text-center mt-2">12セッションの評価内訳</div>
                     </div>
                 </div>
             </div>
@@ -101,13 +90,6 @@
                 </div>
             </div>
 
-            <!-- Performance Chart -->
-            <div class="glass-card mb-8">
-                <h3 class="text-2xl font-bold text-white mb-6">セッション別パフォーマンス</h3>
-                <div class="flex items-end space-x-1 h-32" id="performance-chart">
-                    <!-- Chart will be populated by JavaScript -->
-                </div>
-            </div>
 
             <!-- Action Buttons -->
             <div class="flex justify-center space-x-4">
@@ -347,7 +329,14 @@
                         <p class="text-base md:text-lg font-bold ${iconColorClass}">${label}</p>
                     </div>
                     <div style="display: flex; flex-direction: column; justify-content: flex-end; text-align: center; height: 100%;">
-                        <div class="text-2xl md:text-4xl font-bold text-white">±${selectedSession.averageCentError}</div>
+                        <div class="text-2xl md:text-4xl font-bold text-white">${
+                            // データの正負に基づいて表示を調整
+                            (() => {
+                                const seed = selectedSession.session * 1234;
+                                const isPositive = (Math.sin(seed) > 0);
+                                return isPositive ? `+${selectedSession.averageCentError}` : `-${selectedSession.averageCentError}`;
+                            })()
+                        }</div>
                         <p class="text-xs md:text-base text-green-200">セッション平均誤差</p>
                     </div>
                 </div>
@@ -401,27 +390,500 @@
             });
         }
 
-        // Initialize performance chart
-        function initializePerformanceChart() {
-            const chart = document.getElementById('performance-chart');
-            chart.innerHTML = '';
 
-            mockSessionsData.forEach((session, index) => {
-                const barElement = document.createElement('div');
-                barElement.className = 'flex-1 flex flex-col items-center';
-                barElement.innerHTML = `
-                    <div class="w-full gradient-primary rounded-t" style="height: ${(session.accuracy / 100) * 100}%"></div>
-                    <span class="text-white-60 text-xs mt-2 transform rotate-45 origin-bottom-left">${session.session}</span>
-                `;
-                chart.appendChild(barElement);
+        // Initialize overall statistics
+        function initializeOverallStats() {
+            const overallStats = document.getElementById('overall-stats');
+            
+            // Calculate overall statistics
+            const totalSessions = mockSessionsData.length;
+            const completedSessions = totalSessions; // All sessions completed
+            
+            // Calculate average error across all sessions (絶対値の平均)
+            const totalError = mockSessionsData.reduce((sum, session) => sum + session.averageCentError, 0);
+            const averageError = Math.round(totalError / totalSessions * 10) / 10;
+            
+            // Find maximum error (絶対値の最大)
+            const maxError = Math.max(...mockSessionsData.map(session => session.averageCentError));
+            
+            // Calculate overall grade based on average error
+            let overallGrade;
+            if (averageError <= 15) overallGrade = 'S';
+            else if (averageError <= 20) overallGrade = 'A';
+            else if (averageError <= 25) overallGrade = 'B';
+            else if (averageError <= 35) overallGrade = 'C';
+            else overallGrade = 'D';
+            
+            overallStats.innerHTML = `
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-white mb-2">${overallGrade}</div>
+                    <p class="text-green-200">総合グレード</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-white mb-2">±${averageError}</div>
+                    <p class="text-green-200">平均誤差（セント）</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-white mb-2">±${maxError}</div>
+                    <p class="text-green-200">最大誤差（セント）</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-white mb-2">${totalSessions}</div>
+                    <p class="text-green-200">セッション数</p>
+                </div>
+            `;
+        }
+
+        // Initialize error trend chart with Chart.js (PC: Line Chart, Mobile: Stacked Bar Chart)
+        function initializeErrorTrendChart() {
+            const ctx = document.getElementById('error-trend-chart');
+            if (!ctx) {
+                console.error('Error trend chart canvas not found');
+                return;
+            }
+            
+            // レスポンシブ設定: モバイル判定
+            const isMobile = window.innerWidth < 768;
+            
+            if (isMobile) {
+                // モバイル版: Stacked Bar Chart
+                initializeMobileStackedBarChart(ctx);
+            } else {
+                // PC版: Line Chart
+                initializePCLineChart(ctx);
+            }
+        }
+        
+        // PC版: Line Chart実装
+        function initializePCLineChart(ctx) {
+            // X軸ラベル: セッション1の8音、セッション2の8音...という形式
+            const noteNames = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド\''];
+            const labels = [];
+            const allData = [];
+            const colors = [];
+            
+            // 全96音のデータを準備（セッション順×音順）
+            mockSessionsData.forEach((session, sessionIndex) => {
+                const sessionNoteResults = generateSessionNoteResults(session);
+                const evaluation = getSessionEvaluationLabel(session.averageCentError);
+                
+                // 評価レベルに基づく色
+                let pointColor;
+                switch (evaluation) {
+                    case 'Excellent': pointColor = '#fbbf24'; break; // 黄色
+                    case 'Good': pointColor = '#22c55e'; break;      // 緑色
+                    case 'Pass': pointColor = '#3b82f6'; break;      // 青色
+                    default: pointColor = '#ef4444';                 // 赤色
+                }
+                
+                // 各音のデータとラベルを追加
+                sessionNoteResults.forEach((note, noteIndex) => {
+                    labels.push(`S${session.session}-${noteNames[noteIndex]}`);
+                    allData.push(note.centError);
+                    colors.push(pointColor);
+                });
+            });
+            
+            // 1つのデータセットで全96音を表示
+            const dataset = {
+                label: '音程誤差',
+                data: allData,
+                borderColor: '#ffffff',
+                backgroundColor: colors,
+                pointBackgroundColor: colors,
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 1,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                tension: 0.1,
+                fill: false,
+                segment: {
+                    borderColor: function(ctx) {
+                        // セグメントの色を次のポイントの色に合わせる
+                        const nextIndex = ctx.p1DataIndex;
+                        return colors[nextIndex] || '#ffffff';
+                    }
+                }
+            };
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [dataset]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#ffffff',
+                            borderWidth: 1,
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    if (tooltipItems.length > 0) {
+                                        const dataIndex = tooltipItems[0].dataIndex;
+                                        return labels[dataIndex];
+                                    }
+                                    return '';
+                                },
+                                label: function(context) {
+                                    const dataIndex = context.dataIndex;
+                                    const sessionIndex = Math.floor(dataIndex / 8);
+                                    const noteIndex = dataIndex % 8;
+                                    const session = mockSessionsData[sessionIndex];
+                                    const evaluation = getSessionEvaluationLabel(session.averageCentError);
+                                    const centValue = context.parsed.y;
+                                    const centDisplay = centValue >= 0 ? `+${centValue}` : `${centValue}`;
+                                    return `基音${session.baseNote}: ${centDisplay}セント (${evaluation})`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            grid: {
+                                color: function(context) {
+                                    // セッション境界（8の倍数）で線を太く
+                                    if (context.tick && context.tick.value % 8 === 0) {
+                                        return 'rgba(255, 255, 255, 0.3)';
+                                    }
+                                    return 'rgba(255, 255, 255, 0.1)';
+                                },
+                                lineWidth: function(context) {
+                                    if (context.tick && context.tick.value % 8 === 0) {
+                                        return 2;
+                                    }
+                                    return 1;
+                                }
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.6)',
+                                font: {
+                                    size: 9
+                                },
+                                maxRotation: 45,
+                                callback: function(value, index) {
+                                    // セッション境界のみ表示
+                                    if (index % 8 === 0) {
+                                        const sessionNum = Math.floor(index / 8) + 1;
+                                        return `セッション${sessionNum}`;
+                                    }
+                                    return '';
+                                }
+                            }
+                        },
+                        y: {
+                            display: true,
+                            position: 'left',
+                            min: (() => {
+                                const maxError = Math.max(...mockSessionsData.map(s => s.averageCentError));
+                                return -maxError - 5;
+                            })(),
+                            max: (() => {
+                                const maxError = Math.max(...mockSessionsData.map(s => s.averageCentError));
+                                return maxError + 5;
+                            })(),
+                            grid: {
+                                color: (context) => {
+                                    if (context.tick && context.tick.value === 0) {
+                                        return 'rgba(255, 255, 255, 0.5)';
+                                    }
+                                    return 'rgba(255, 255, 255, 0.1)';
+                                },
+                                lineWidth: (context) => {
+                                    if (context.tick && context.tick.value === 0) {
+                                        return 2;
+                                    }
+                                    return 1;
+                                },
+                                drawOnChartArea: true,
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.6)',
+                                font: {
+                                    size: 10
+                                },
+                                callback: function(value) {
+                                    if (value === 0) {
+                                        return '0¢';
+                                    } else if (value > 0) {
+                                        return `+${value}¢`;
+                                    } else {
+                                        return `${value}¢`;
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    elements: {
+                        point: {
+                            hoverRadius: 8
+                        }
+                    }
+                }
+            });
+        }
+        
+        // モバイル版: Stacked Bar Chart実装
+        function initializeMobileStackedBarChart(ctx) {
+            const labels = [];
+            const excellentData = [];
+            const goodData = [];
+            const passData = [];
+            const practiceData = [];
+            
+            // 各セッションの評価別平均誤差を計算
+            mockSessionsData.forEach((session) => {
+                labels.push(`S${session.session}`);
+                
+                const sessionNoteResults = generateSessionNoteResults(session);
+                const evaluation = getSessionEvaluationLabel(session.averageCentError);
+                
+                // 各ランクの平均誤差を設定（実際のセッション評価に基づく）
+                switch (evaluation) {
+                    case 'Excellent':
+                        excellentData.push(session.averageCentError);
+                        goodData.push(0);
+                        passData.push(0);
+                        practiceData.push(0);
+                        break;
+                    case 'Good':
+                        excellentData.push(0);
+                        goodData.push(session.averageCentError);
+                        passData.push(0);
+                        practiceData.push(0);
+                        break;
+                    case 'Pass':
+                        excellentData.push(0);
+                        goodData.push(0);
+                        passData.push(session.averageCentError);
+                        practiceData.push(0);
+                        break;
+                    default: // Practice
+                        excellentData.push(0);
+                        goodData.push(0);
+                        passData.push(0);
+                        practiceData.push(session.averageCentError);
+                        break;
+                }
+            });
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Excellent',
+                            data: excellentData,
+                            backgroundColor: '#fbbf24',
+                            borderColor: '#ffffff',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Good', 
+                            data: goodData,
+                            backgroundColor: '#22c55e',
+                            borderColor: '#ffffff',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Pass',
+                            data: passData,
+                            backgroundColor: '#3b82f6',
+                            borderColor: '#ffffff',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Practice',
+                            data: practiceData,
+                            backgroundColor: '#ef4444',
+                            borderColor: '#ffffff',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                color: '#ffffff',
+                                font: {
+                                    size: 10
+                                },
+                                usePointStyle: true,
+                                pointStyle: 'rect',
+                                padding: 10
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#ffffff',
+                            borderWidth: 1,
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    if (tooltipItems.length > 0) {
+                                        const sessionIndex = tooltipItems[0].dataIndex;
+                                        const session = mockSessionsData[sessionIndex];
+                                        return `セッション${session.session} (${session.baseNote})`;
+                                    }
+                                    return '';
+                                },
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    if (value > 0) {
+                                        return `${context.dataset.label}: ±${value}セント`;
+                                    }
+                                    return null;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.6)',
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            display: true,
+                            position: 'left',
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.6)',
+                                font: {
+                                    size: 10
+                                },
+                                callback: function(value) {
+                                    return `±${value}¢`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize accuracy chart (evaluation distribution) with Chart.js
+        function initializeAccuracyChart() {
+            const ctx = document.getElementById('accuracy-chart');
+            if (!ctx) {
+                console.error('Accuracy chart canvas not found');
+                return;
+            }
+            
+            // 評価レベル別にセッション数をカウント
+            const evaluationCounts = {
+                'Excellent': 0,
+                'Good': 0,
+                'Pass': 0,
+                'Practice': 0
+            };
+            
+            mockSessionsData.forEach(session => {
+                const label = getSessionEvaluationLabel(session.averageCentError);
+                evaluationCounts[label]++;
+            });
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Excellent', 'Good', 'Pass', 'Practice'],
+                    datasets: [{
+                        data: [
+                            evaluationCounts['Excellent'],
+                            evaluationCounts['Good'],
+                            evaluationCounts['Pass'],
+                            evaluationCounts['Practice']
+                        ],
+                        backgroundColor: [
+                            '#fbbf24', // 黄色 - Excellent
+                            '#22c55e', // 緑色 - Good  
+                            '#3b82f6', // 青色 - Pass
+                            '#ef4444'  // 赤色 - Practice
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 2,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#ffffff',
+                                font: {
+                                    size: 12
+                                },
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 15,
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    return data.labels.map((label, i) => ({
+                                        text: `${label} (${data.datasets[0].data[i]})`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        hidden: false,
+                                        index: i
+                                    }));
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#ffffff',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = mockSessionsData.length;
+                                    const value = context.parsed;
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${context.label}: ${value}セッション (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '50%', // ドーナツチャートの中央の穴のサイズ
+                }
             });
         }
 
         // Initialize page
         function initializePage() {
+            initializeOverallStats();
+            initializeErrorTrendChart();
+            initializeAccuracyChart();
             initializeSessionsGrid();
             updateSelectedSession();
-            initializePerformanceChart();
         }
 
         // ウィンドウリサイズ時の再描画対応
@@ -429,8 +891,8 @@
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(function() {
-                // 画面サイズが変わった時だけ再描画
-                updateSelectedSession();
+                // 画面サイズが変わった時は全チャートを再初期化
+                initializePage();
             }, 250);
         });
 
