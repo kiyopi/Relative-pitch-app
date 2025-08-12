@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>8va相対音感トレーニング - 総合評価</title>
-    <link rel="stylesheet" href="styles/system.css?v=3">
+    <link rel="stylesheet" href="styles/system.css?v=4">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -115,53 +115,112 @@
             font-size: 1rem;
         }
         
-        /* rank-sectionスタイル（3つの縦セクション構成） */
+        /* rank-sectionスタイル（新横一列レイアウト） */
         .rank-section {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 30px;
+            text-align: center;
             margin-bottom: 40px;
             padding-bottom: 32px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .rank-left,
-        .rank-right {
-            text-align: center;
-            flex: 1;
-            max-width: 120px;
+        .rank-mode {
+            margin-bottom: 24px;
         }
         
-        .rank-center {
-            display: flex;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        
-        .stat-value-rank {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 2px;
-            transition: transform 0.2s ease;
-        }
-        
-        .stat-label-rank {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 1.1;
+        .rank-section .mode-title {
+            font-size: 2.0rem !important;
+            font-weight: 700;
+            color: white;
             margin: 0;
         }
         
+        .rank-content-row {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+        }
+        
+        .rank-icon {
+            flex-shrink: 0;
+        }
+        
+        .rank-stats-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+        
+        .rank-stat-item {
+            text-align: center;
+            min-width: 80px;
+        }
+        
+        .stat-value-rank {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 4px;
+            transition: transform 0.2s ease;
+            line-height: 1;
+        }
+        
+        .stat-value-rank.grade-value {
+            font-size: 2.5rem;
+            color: #fbbf24; /* グレードは黄色 */
+        }
+        
+        .stat-value-rank.avg-error {
+            color: #fbbf24; /* 平均誤差もグレードと同じ黄色 */
+        }
+        
+        .stat-label-rank {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.1;
+            margin: 0;
+            white-space: nowrap;
+        }
+        
         .rank-circle {
-            width: 120px;
-            height: 120px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .rank-content-row {
+                gap: 20px;
+            }
+            
+            .rank-stats-row {
+                gap: 20px;
+            }
+            
+            .rank-circle {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .rank-circle i {
+                width: 48px !important;
+                height: 48px !important;
+            }
+            
+            .stat-value-rank {
+                font-size: 1.5rem;
+            }
+            
+            .stat-value-rank.grade-value {
+                font-size: 2rem;
+            }
         }
         
         .share-buttons {
@@ -262,27 +321,39 @@
                 <div class="share-card">
                     <!-- rank-section -->
                     <section class="rank-section">
-                        <!-- 左セクション -->
-                        <div class="rank-left">
-                            <div class="stat-value-rank grade-value">B</div>
-                            <div class="stat-label-rank">総合グレード</div>
-                            <div class="stat-value-rank avg-error" style="margin-top: 8px;">±0.0</div>
-                            <div class="stat-label-rank">平均誤差（セント）</div>
+                        <!-- モード名 -->
+                        <div class="rank-mode">
+                            <h3 class="mode-title">ランダム基音モード</h3>
                         </div>
                         
-                        <!-- 中央アイコン -->
-                        <div class="rank-center">
-                            <div class="rank-circle" style="background: linear-gradient(135deg, #fbbf24, #d97706);">
-                                <i data-lucide="crown" style="width: 64px; height: 64px; color: white;"></i>
+                        <!-- グレードアイコンと統計情報を横一列に -->
+                        <div class="rank-content-row">
+                            <!-- グレードアイコン -->
+                            <div class="rank-icon">
+                                <div class="rank-circle" style="background: linear-gradient(135deg, #fbbf24, #d97706);">
+                                    <i data-lucide="crown" style="width: 64px; height: 64px; color: white;"></i>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <!-- 右セクション -->
-                        <div class="rank-right">
-                            <div class="stat-value-rank session-count">0</div>
-                            <div class="stat-label-rank">セッション数</div>
-                            <div class="stat-value-rank max-error" style="margin-top: 8px;">±0.0</div>
-                            <div class="stat-label-rank">最大誤差（セント）</div>
+                            
+                            <!-- 統計情報 -->
+                            <div class="rank-stats-row">
+                                <div class="rank-stat-item">
+                                    <div class="stat-value-rank grade-value">B</div>
+                                    <div class="stat-label-rank">総合グレード</div>
+                                </div>
+                                <div class="rank-stat-item">
+                                    <div class="stat-value-rank avg-error" style="color: #fbbf24;">±0.0</div>
+                                    <div class="stat-label-rank">平均誤差（セント）</div>
+                                </div>
+                                <div class="rank-stat-item">
+                                    <div class="stat-value-rank max-error">±0.0</div>
+                                    <div class="stat-label-rank">最大誤差（セント）</div>
+                                </div>
+                                <div class="rank-stat-item">
+                                    <div class="stat-value-rank session-count">0</div>
+                                    <div class="stat-label-rank">セッション数</div>
+                                </div>
+                            </div>
                         </div>
                     </section>
                     
@@ -1654,15 +1725,12 @@
                 const sessionsElement = document.querySelector('#overall-stats > div:nth-child(4) .stat-value');
                 const sessionsValue = sessionsElement ? parseInt(sessionsElement.getAttribute('data-value')) : 12;
                 
-                // セッション数アニメーション
-                if (sessionCount) {
-                    animateCountUp({
-                        textContent: '',
-                        set textContent(val) { sessionCount.textContent = val; }
-                    }, sessionsValue, 1000, false);
+                // グレード表示（最初にアニメーション）
+                if (gradeValue) {
+                    animateGradeDisplay(gradeValue, grade);
                 }
                 
-                // 平均誤差アニメーション
+                // 平均誤差アニメーション（グレードと同じタイミング）
                 if (avgError) {
                     animateCountUp({
                         textContent: '',
@@ -1680,9 +1748,14 @@
                     }, 150);
                 }
                 
-                // グレード表示（アニメーション）
-                if (gradeValue) {
-                    animateGradeDisplay(gradeValue, grade);
+                // セッション数アニメーション
+                if (sessionCount) {
+                    setTimeout(() => {
+                        animateCountUp({
+                            textContent: '',
+                            set textContent(val) { sessionCount.textContent = val; }
+                        }, sessionsValue, 1000, false);
+                    }, 300);
                 }
             }, 800);
         }
