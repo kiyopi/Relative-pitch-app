@@ -1,6 +1,6 @@
 /**
  * TypeScript type definitions for Lucide Icons
- * 相対音感トレーニングアプリ用
+ * 8va相対音感トレーニングアプリ用
  */
 
 export type LucideIconName = 

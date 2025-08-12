@@ -830,3 +830,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-12 06:56:03] コミット: APP仕様書の改善: 相対音感原則の例外規定と詳細な画面遷移図を追加
+
+- 評価表示ページでのセント誤差・音階別精度・基音表示を例外として許可
+- 画面遷移図にセッション評価・総合評価・トレーニング記録の詳細フローを追加
+- ランダム基音モードの特殊な評価フロー（セッション毎評価→総合評価）を明確化
+- SNS共有とトレーニング記録への遷移パスを網羅
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

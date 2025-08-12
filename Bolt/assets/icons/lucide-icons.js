@@ -1,5 +1,5 @@
 /**
- * Lucide Icons for 相対音感トレーニングアプリ
+ * Lucide Icons for 8va相対音感トレーニングアプリ
  * Vanilla TypeScript implementation
  */
 
