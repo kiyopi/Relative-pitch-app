@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="styles/system.css">
     
     <!-- アイコンライブラリ -->
-    <script src="assets/icons/lucide-icons.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
@@ -203,18 +203,12 @@
             const iconElements = document.querySelectorAll('[data-lucide]');
             console.log(`Found ${iconElements.length} icon elements`);
             
-            if (typeof initializeLucideIcons === 'function') {
-                console.log('✅ initializeLucideIcons function available');
-                initializeLucideIcons();
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+                console.log('✅ [RECORDS] Lucide icons initialized');
                 return true;
             } else {
-                console.error('❌ initializeLucideIcons function not found');
-                
-                // 再試行
-                if (iconInitializationAttempts < maxAttempts) {
-                    console.log(`⏰ Retrying in 200ms... (attempt ${iconInitializationAttempts + 1}/${maxAttempts})`);
-                    setTimeout(initializePageIcons, 200);
-                }
+                console.error('❌ [RECORDS] Lucide library not loaded');
                 return false;
             }
         }

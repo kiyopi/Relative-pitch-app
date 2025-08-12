@@ -10,10 +10,232 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     
     <!-- Lucide Icons -->
-    <script src="assets/icons/lucide-icons.js?v=6"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <style>
+        /* 背景グラデーションアニメーション */
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* フローティングアニメーション */
+        .page-header-icon {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* SNSシェアセクション */
+        .share-section {
+            margin: 2rem 0;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .share-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .share-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 11s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { 
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+                opacity: 1;
+            }
+            9.1% { 
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+                opacity: 1;
+            }
+            9.2% { 
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+                opacity: 0;
+            }
+            99.9% { 
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+                opacity: 0;
+            }
+            100% { 
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+                opacity: 1;
+            }
+        }
+        
+        .share-card h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        
+        .share-card p {
+            color: white;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+        
+        /* rank-sectionスタイル */
+        .rank-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 40px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .rank-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .rank-info {
+            text-align: center;
+        }
+        
+        .rank-grade {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 8px;
+        }
+        
+        .rank-score {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+        
+        .rank-message {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+        }
+        
+        .share-buttons {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .share-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .share-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+        
+        .share-btn svg {
+            width: 24px;
+            height: 24px;
+            z-index: 1;
+        }
+        
+        .share-btn.twitter:hover {
+            box-shadow: 0 8px 25px rgba(29, 161, 242, 0.4), 0 0 30px rgba(29, 161, 242, 0.3);
+        }
+        
+        .share-btn.line:hover {
+            box-shadow: 0 8px 25px rgba(0, 195, 0, 0.4), 0 0 30px rgba(0, 195, 0, 0.3);
+        }
+        
+        .share-btn.facebook:hover {
+            box-shadow: 0 8px 25px rgba(24, 119, 242, 0.4), 0 0 30px rgba(24, 119, 242, 0.3);
+        }
+        
+        .share-btn.copy:hover {
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4), 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+        
+        @media (max-width: 640px) {
+            .share-btn {
+                width: 48px;
+                height: 48px;
+            }
+            
+            .share-btn svg {
+                width: 20px;
+                height: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="min-h-screen p-6">
@@ -32,6 +254,49 @@
                 <div class="flex justify-center items-center mb-6" id="s-grade-crown">
                 </div>
                 <div class="text-3xl font-bold text-yellow-300 mb-4" id="overall-grade">S級</div>
+            </div>
+
+            <!-- SNSシェアセクション -->
+            <div class="share-section" id="share-section">
+                <div class="share-card">
+                    <!-- rank-section -->
+                    <section class="rank-section">
+                        <div class="rank-circle" style="background: linear-gradient(135deg, #fbbf24, #d97706);">
+                            <i data-lucide="crown" style="width: 64px; height: 64px; color: white;"></i>
+                        </div>
+                        <div class="rank-info">
+                            <div class="rank-grade" style="font-size: 2rem; color: white;">B級</div>
+                            <div class="rank-score" style="color: #fbbf24;">0.0点</div>
+                            <div class="rank-message">良好！安定した音感です</div>
+                        </div>
+                    </section>
+                    
+                    <h3>みんなに成果をシェアしよう！</h3>
+                    <p id="share-message">あなたの音感レベル【B級】を友達に自慢しましょう</p>
+                    <div class="share-buttons">
+                        <a href="#" class="share-btn twitter" onclick="shareToTwitter(event)" title="Xでシェア">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="share-btn line" onclick="shareToLine(event)" title="LINEで送る">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.348 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="share-btn facebook" onclick="shareToFacebook(event)" title="Facebookでシェア">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </a>
+                        <button class="share-btn copy" onclick="copyShareText(event)" title="リンクをコピー">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- Overall Statistics -->
@@ -437,6 +702,11 @@
 
                 noteResults.appendChild(noteElement);
             });
+            
+            // 詳細分析のアイコンを再初期化
+            setTimeout(() => {
+                initializeLucideIcons();
+            }, 50);
         }
 
 
@@ -469,15 +739,15 @@
                     <p class="text-green-200">総合グレード</p>
                 </div>
                 <div class="text-center">
-                    <div class="text-4xl font-bold text-white mb-2">±${averageError}</div>
+                    <div class="text-4xl font-bold text-white mb-2 stat-value" data-value="${averageError}">±${averageError}</div>
                     <p class="text-green-200">平均誤差（セント）</p>
                 </div>
                 <div class="text-center">
-                    <div class="text-4xl font-bold text-white mb-2">±${maxError}</div>
+                    <div class="text-4xl font-bold text-white mb-2 stat-value" data-value="${maxError}">±${maxError}</div>
                     <p class="text-green-200">最大誤差（セント）</p>
                 </div>
                 <div class="text-center">
-                    <div class="text-4xl font-bold text-white mb-2">${totalSessions}</div>
+                    <div class="text-4xl font-bold text-white mb-2 stat-value" data-value="${totalSessions}">${totalSessions}</div>
                     <p class="text-green-200">セッション数</p>
                 </div>
             `;
@@ -1076,6 +1346,11 @@
             initializeSessionsGrid();
             updateSelectedSession();
             
+            // セッショングリッド生成後にアイコンを再初期化
+            setTimeout(() => {
+                initializeLucideIcons();
+            }, 100);
+            
             // イベントリスナーは初回のみ設定
             if (!navigationEventListenersAdded) {
                 // ナビゲーションボタンのイベントリスナーを設定
@@ -1115,61 +1390,252 @@
             }, 250);
         });
 
-        // Initialize Lucide icons with enhanced system
-        let iconInitializationAttempts = 0;
-        const maxAttempts = 5;
-        
-        function initializeResultsPageIcons() {
-            iconInitializationAttempts++;
-            console.log(`🚀 [RESULTS] Icon initialization attempt ${iconInitializationAttempts}/${maxAttempts}`);
-            
-            if (typeof initializeLucideIcons === 'function') {
-                console.log('✅ [RESULTS] initializeLucideIcons function available');
-                initializeLucideIcons();
-                return true;
+        // Initialize Lucide icons - simple version like final-result.html
+        function initializeLucideIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+                console.log('✅ [RESULTS] Lucide icons initialized');
             } else {
-                console.error('❌ [RESULTS] initializeLucideIcons function not found');
+                console.error('❌ [RESULTS] Lucide library not loaded');
+            }
+        }
+        
+        // Helper function to create Lucide icons for standard system
+        function lucideIcon(iconName, colorClass = '', size = 24) {
+            return `<i data-lucide="${iconName}" class="${colorClass}" style="width: ${size}px; height: ${size}px;"></i>`;
+        }
+        
+        // カウントアップアニメーション関数
+        function animateCountUp(element, targetValue, duration = 1000, isDecimal = false) {
+            const startTime = performance.now();
+            const startValue = 0;
+            
+            function updateValue(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
                 
-                // 再試行
-                if (iconInitializationAttempts < maxAttempts) {
-                    console.log(`⏰ [RESULTS] Retrying in 200ms... (attempt ${iconInitializationAttempts + 1}/${maxAttempts})`);
-                    setTimeout(initializeResultsPageIcons, 200);
+                // イージング関数（ease-out-cubic）
+                const easedProgress = 1 - Math.pow(1 - progress, 3);
+                const currentValue = startValue + (targetValue - startValue) * easedProgress;
+                
+                if (isDecimal) {
+                    element.textContent = currentValue.toFixed(1);
+                } else {
+                    element.textContent = Math.round(currentValue);
                 }
-                return false;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateValue);
+                } else {
+                    // 最終値を確実に設定
+                    if (isDecimal) {
+                        element.textContent = targetValue.toFixed(1);
+                    } else {
+                        element.textContent = targetValue;
+                    }
+                }
+            }
+            
+            requestAnimationFrame(updateValue);
+        }
+        
+        // 統計情報のアニメーション
+        function animateStatistics() {
+            // Overall Statisticsの数値をアニメーション
+            setTimeout(() => {
+                const statElements = document.querySelectorAll('#overall-stats .stat-value');
+                console.log('Found stat elements:', statElements.length);
+                
+                statElements.forEach((element, index) => {
+                    const dataValue = element.getAttribute('data-value');
+                    const value = parseFloat(dataValue);
+                    console.log(`Element ${index}: data-value="${dataValue}", value=${value}`);
+                    
+                    if (!isNaN(value)) {
+                        const isDecimal = dataValue.includes('.');
+                        const hasPrefix = element.textContent.includes('±');
+                        
+                        // 一旦0に設定
+                        if (hasPrefix) {
+                            element.textContent = isDecimal ? '±0.0' : '±0';
+                        } else {
+                            element.textContent = isDecimal ? '0.0' : '0';
+                        }
+                        
+                        setTimeout(() => {
+                            animateCountUp({
+                                textContent: '',
+                                set textContent(val) {
+                                    if (hasPrefix) {
+                                        element.textContent = '±' + val;
+                                    } else {
+                                        element.textContent = val;
+                                    }
+                                }
+                            }, value, 1200, isDecimal);
+                        }, index * 150);
+                    } else if (dataValue && isNaN(value)) {
+                        // 文字（グレードなど）の場合は遅延表示
+                        element.textContent = '';
+                        setTimeout(() => {
+                            element.textContent = dataValue;
+                        }, index * 150 + 600);
+                    }
+                });
+            }, 100);
+            
+            // 総合評価点数のアニメーション（S級の横の数字）
+            const gradeScore = document.querySelector('#overall-grade');
+            if (gradeScore && gradeScore.textContent.includes('級')) {
+                // もし点数が表示されている場合はそれもアニメーション
+                const scoreMatch = gradeScore.textContent.match(/(\d+\.?\d*)/);
+                if (scoreMatch) {
+                    const score = parseFloat(scoreMatch[1]);
+                    const gradeText = gradeScore.textContent.replace(scoreMatch[0], '');
+                    gradeScore.textContent = '0' + gradeText;
+                    setTimeout(() => {
+                        animateCountUp({
+                            textContent: '',
+                            set textContent(val) {
+                                gradeScore.textContent = val + gradeText;
+                            }
+                        }, score, 1500, true);
+                    }, 300);
+                }
             }
         }
         
         // Multiple initialization triggers
         document.addEventListener('DOMContentLoaded', function() {
             console.log('📄 [RESULTS] DOM Content Loaded - starting icon initialization');
-            initializeResultsPageIcons();
+            initializeLucideIcons();
             
-            // S級クラウンアイコンに通常のcrownアイコンを適用（グラデーションなし）
-            setTimeout(() => {
-                if (typeof lucideIcon === 'function') {
-                    const crownElement = document.getElementById('s-grade-crown');
-                    if (crownElement) {
-                        // サイズを120pxに拡大、ストローク幅を1.75に
-                        const crownIcon = lucideIcon('crown', 'icon-4xl text-yellow-300', 120, 1.75);
-                        crownElement.innerHTML = crownIcon;
-                        // 1.5倍スケールを適用してさらに大きく（合計180px相当）
-                        const svg = crownElement.querySelector('svg');
-                        if (svg) {
-                            svg.style.transform = 'scale(1.5)';
-                        }
-                        console.log('✨ [RESULTS] Crown icon applied with size 120px, stroke 1.75, scale 1.5');
-                    }
-                } else {
-                    console.warn('❌ [RESULTS] lucideIcon function not available');
-                }
-            }, 1000);
         });
         
         window.addEventListener('load', function() {
             console.log('🌍 [RESULTS] Window loaded - ensuring icons are initialized');
-            initializeResultsPageIcons();
+            initializeLucideIcons();
+            
+            // 統計データが生成されるまで待ってからアニメーション開始
+            setTimeout(() => {
+                // 再度統計データを初期化してからアニメーション
+                initializeOverallStats();
+                
+                
+                setTimeout(() => {
+                    animateStatistics();
+                    updateShareMessage();  // シェアメッセージも更新
+                    animateRankSection();  // ランクセクションのアニメーション
+                }, 100);
+            }, 1200);
         });
 
+        // SNSシェア機能
+        function getShareText() {
+            const gradeElement = document.querySelector('#overall-stats > div:first-child .text-4xl');
+            const grade = gradeElement ? gradeElement.textContent : 'B';
+            const errorElement = document.querySelector('#overall-stats > div:nth-child(2) .text-4xl');
+            const error = errorElement ? errorElement.textContent : '±19.8';
+            const sessionsElement = document.querySelector('#overall-stats > div:nth-child(4) .text-4xl');
+            const sessions = sessionsElement ? sessionsElement.textContent : '12';
+            
+            return `🎵 8va相対音感トレーニングで【${grade}級】獲得！\n平均誤差: ${error}セント\n${sessions}セッション完走しました！\n\n#相対音感 #音感トレーニング #8va`;
+        }
+        
+        function updateShareMessage() {
+            const gradeElement = document.querySelector('#overall-stats > div:first-child .text-4xl');
+            const grade = gradeElement ? gradeElement.textContent : 'B';
+            const messageElement = document.getElementById('share-message');
+            if (messageElement) {
+                messageElement.textContent = `あなたの音感レベル【${grade}級】を友達に自慢しましょう`;
+            }
+        }
+        
+        function shareToTwitter(event) {
+            event.preventDefault();
+            const text = encodeURIComponent(getShareText());
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=550,height=450');
+        }
+        
+        function shareToLine(event) {
+            event.preventDefault();
+            const text = encodeURIComponent(getShareText() + '\n' + window.location.href);
+            window.open(`https://social-plugins.line.me/lineit/share?text=${text}`, '_blank', 'width=550,height=450');
+        }
+        
+        function shareToFacebook(event) {
+            event.preventDefault();
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=550,height=450');
+        }
+        
+        function copyShareText(event) {
+            event.preventDefault();
+            const text = getShareText() + '\n' + window.location.href;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    // ボタンのテキストを一時的に変更
+                    const btn = event.currentTarget;
+                    const originalHTML = btn.innerHTML;
+                    btn.innerHTML = `
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    `;
+                    btn.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = originalHTML;
+                        btn.style.background = '';
+                    }, 2000);
+                }).catch(err => {
+                    console.error('コピーに失敗しました:', err);
+                });
+            } else {
+                // 旧式のコピー方法
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+            }
+        }
+        
+        // Rank section animation
+        function animateRankSection() {
+            const rankCircle = document.querySelector('.rank-circle');
+            const rankScore = document.querySelector('.rank-score');
+            
+            if (!rankCircle || !rankScore) return;
+            
+            // サークルのスケールアニメーション
+            rankCircle.style.transform = 'scale(0)';
+            rankCircle.style.transition = 'transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            
+            setTimeout(() => {
+                rankCircle.style.transform = 'scale(1)';
+            }, 300);
+            
+            // スコアカウントアップ
+            setTimeout(() => {
+                const targetScore = 76.3;
+                let currentScore = 0;
+                const increment = targetScore / 60;
+                
+                const scoreAnimation = setInterval(() => {
+                    currentScore += increment;
+                    if (currentScore >= targetScore) {
+                        currentScore = targetScore;
+                        clearInterval(scoreAnimation);
+                    }
+                    rankScore.textContent = currentScore.toFixed(1) + '点';
+                }, 16);
+            }, 800);
+        }
+        
         // Start initialization
         initializePage();
     </script>

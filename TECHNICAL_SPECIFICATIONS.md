@@ -1,8 +1,8 @@
 # 8va相対音感トレーニングアプリ - 技術仕様書
 
-**バージョン**: 2.0.0  
+**バージョン**: 2.1.0  
 **作成日**: 2025-08-07  
-**更新日**: 2025-08-07  
+**更新日**: 2025-08-12  
 **用途**: 新技術スタック統合版 - Mantine採用・Cloudflare・ライブラリ化対応
 
 ---
@@ -880,6 +880,73 @@ interface TrainingShareContent {
 - **内容**: スコア、精度、達成バッジ、モード情報
 - **テーマ**: light/dark/gradient選択可能
 - **QRコード**: アプリURLの埋め込み（オプション）
+
+---
+
+## 🎨 11. Lucideアイコンシステム統一仕様（v2.1.0 実装完了）
+
+### 11.1 アイコンシステムの標準化
+
+**従来の問題点**
+- 独自アイコンシステムによる初期化の複雑化
+- `initializeLucideIcons`関数の不安定な動作
+- アイコンサイズ制御の困難さ
+- `lucideIcon`関数の依存関係問題
+
+**新統一仕様**
+```javascript
+// 標準Lucideライブラリ読み込み
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+// シンプルな初期化（全ファイル統一）
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+        console.log('✅ Lucide icons initialized');
+    } else {
+        console.error('❌ Lucide library not loaded');
+    }
+});
+
+// ヘルパー関数（動的アイコン生成用）
+function lucideIcon(iconName, colorClass = '', size = 24) {
+    return `<i data-lucide="${iconName}" class="${colorClass}" style="width: ${size}px; height: ${size}px;"></i>`;
+}
+```
+
+### 11.2 動的アイコン再初期化システム
+
+**問題**: 動的に生成されたアイコンが表示されない
+
+**解決策**: コンテンツ更新後の再初期化
+```javascript
+// セッショングリッド更新後
+initializeSessionsGrid();
+setTimeout(() => {
+    lucide.createIcons(); // 再初期化
+}, 100);
+
+// 詳細分析更新後  
+updateSelectedSession();
+setTimeout(() => {
+    lucide.createIcons(); // 再初期化
+}, 50);
+```
+
+### 11.3 統一適用ファイル
+
+**完了済み**:
+- ✅ `results.html` - クラウンアイコン64px表示対応
+- ✅ `index.html` - メインページ
+- ✅ `mic-test.html` - マイクテスト 
+- ✅ `training.html` - トレーニング実行
+- ✅ `records.html` - 記録閲覧
+
+**技術効果**:
+- アイコン表示問題の根絶
+- 初期化エラーの解消  
+- 統一されたサイズ制御
+- 保守性の大幅改善
 
 ---
 

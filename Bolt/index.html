@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     
     <!-- Lucide Icons -->
-    <script src="assets/icons/lucide-icons.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
     <div class="min-h-screen">
@@ -346,14 +346,16 @@
     </div>
     
     <script>
-        // Initialize Lucide icons on page load
+        // Initialize Lucide icons - simple version like final-result.html
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🎵 Initializing Lucide icons...');
             
-            // Auto-replace existing SVG icons with Lucide equivalents
-            replaceLucideIcons();
-            
-            console.log('✅ Lucide icons initialized');
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+                console.log('✅ Lucide icons initialized');
+            } else {
+                console.error('❌ Lucide library not loaded');
+            }
         });
     </script>
 </body>

@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     
     <!-- Lucide Icons -->
-    <script src="assets/icons/lucide-icons.js?v=3"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
     <div class="min-h-screen flex flex-col p-6">
@@ -249,9 +249,14 @@
         // Initialize
         updateDisplay();
         
-        // Initialize Lucide icons
+        // Initialize Lucide icons - simple version like final-result.html
         document.addEventListener('DOMContentLoaded', function() {
-            replaceLucideIcons();
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+                console.log('✅ [TRAINING] Lucide icons initialized');
+            } else {
+                console.error('❌ [TRAINING] Lucide library not loaded');
+            }
         });
     </script>
 </body>

@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     
     <!-- Lucide Icons -->
-    <script src="assets/icons/lucide-icons.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
     <div class="min-h-screen flex items-center justify-center p-6">
@@ -24,8 +24,8 @@
             </div>
 
             <div class="glass-card mb-8">
-                <div class="text-center mb-8">
-                    <div class="w-32 h-32 gradient-success rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse-glow flex-shrink-0">
+                <div class="flex flex-col items-center mb-8">
+                    <div class="w-32 h-32 gradient-success rounded-full flex items-center justify-center mb-6 animate-pulse-glow">
                         <svg class="icon-3xl text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
                             <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
@@ -96,13 +96,14 @@
         // Update training link with mode
         document.getElementById('start-training').href = `training.html?mode=${mode}`;
         
-        // Initialize Lucide icons with enhanced system
+        // Initialize Lucide icons - simple version like final-result.html
         document.addEventListener('DOMContentLoaded', function() {
             console.log('📄 [MIC-TEST] DOM Content Loaded - starting icon initialization');
-            if (typeof initializeLucideIcons === 'function') {
-                initializeLucideIcons();
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+                console.log('✅ [MIC-TEST] Lucide icons initialized');
             } else {
-                console.error('❌ [MIC-TEST] initializeLucideIcons function not found');
+                console.error('❌ [MIC-TEST] Lucide library not loaded');
             }
         });
     </script>
