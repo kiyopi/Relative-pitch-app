@@ -169,7 +169,7 @@
         }
         
         .stat-value-rank.grade-value {
-            font-size: 2.5rem;
+            font-size: 2.0rem;
             color: #fbbf24; /* グレードは黄色 */
         }
         
@@ -178,7 +178,7 @@
         }
         
         .stat-label-rank {
-            font-size: 0.65rem;
+            font-size: 1rem;
             color: rgba(255, 255, 255, 0.7);
             line-height: 1.1;
             margin: 0;
@@ -342,11 +342,11 @@
                                     <div class="stat-label-rank">総合グレード</div>
                                 </div>
                                 <div class="rank-stat-item">
-                                    <div class="stat-value-rank avg-error" style="color: #fbbf24;">±0.0</div>
+                                    <div class="stat-value-rank avg-error" style="color: #fbbf24;">±0.0¢</div>
                                     <div class="stat-label-rank">平均誤差（セント）</div>
                                 </div>
                                 <div class="rank-stat-item">
-                                    <div class="stat-value-rank max-error">±0.0</div>
+                                    <div class="stat-value-rank max-error">±0.0¢</div>
                                     <div class="stat-label-rank">最大誤差（セント）</div>
                                 </div>
                                 <div class="rank-stat-item">
@@ -1545,7 +1545,7 @@
                         
                         // 一旦0に設定
                         if (hasPrefix) {
-                            element.textContent = isDecimal ? '±0.0' : '±0';
+                            element.textContent = isDecimal ? '±0.0¢' : '±0¢';
                         } else {
                             element.textContent = isDecimal ? '0.0' : '0';
                         }
@@ -1555,7 +1555,7 @@
                                 textContent: '',
                                 set textContent(val) {
                                     if (hasPrefix) {
-                                        element.textContent = '±' + val;
+                                        element.textContent = '±' + val + '¢';
                                     } else {
                                         element.textContent = val;
                                     }
@@ -1734,7 +1734,7 @@
                 if (avgError) {
                     animateCountUp({
                         textContent: '',
-                        set textContent(val) { avgError.textContent = '±' + val; }
+                        set textContent(val) { avgError.textContent = '±' + val + '¢'; }
                     }, avgValue, 1200, true);
                 }
                 
@@ -1743,7 +1743,7 @@
                     setTimeout(() => {
                         animateCountUp({
                             textContent: '',
-                            set textContent(val) { maxError.textContent = '±' + val; }
+                            set textContent(val) { maxError.textContent = '±' + val + '¢'; }
                         }, maxValue, 1200, true);
                     }, 150);
                 }
