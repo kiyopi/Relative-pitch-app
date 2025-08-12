@@ -115,15 +115,43 @@
             font-size: 1rem;
         }
         
-        /* rank-sectionスタイル */
+        /* rank-sectionスタイル（3つの縦セクション構成） */
         .rank-section {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 32px;
+            gap: 30px;
             margin-bottom: 40px;
             padding-bottom: 32px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .rank-left,
+        .rank-right {
+            text-align: center;
+            flex: 1;
+            max-width: 120px;
+        }
+        
+        .rank-center {
+            display: flex;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .stat-value-rank {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 2px;
+            transition: transform 0.2s ease;
+        }
+        
+        .stat-label-rank {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.1;
+            margin: 0;
         }
         
         .rank-circle {
@@ -134,29 +162,6 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-        
-        .rank-info {
-            text-align: center;
-        }
-        
-        .rank-grade {
-            font-size: 3rem;
-            font-weight: 700;
-            color: #3b82f6;
-            margin-bottom: 8px;
-        }
-        
-        .rank-score {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 8px;
-        }
-        
-        .rank-message {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1rem;
         }
         
         .share-buttons {
@@ -250,10 +255,6 @@
                 <h1 class="text-4xl font-bold text-white mb-4">総合評価</h1>
                 <p class="text-green-200 text-xl mb-6">12セッション完了 - あなたの音感レベルを分析しました</p>
                 
-                <!-- 総合評価アイコン -->
-                <div class="flex justify-center items-center mb-6" id="s-grade-crown">
-                </div>
-                <div class="text-3xl font-bold text-yellow-300 mb-4" id="overall-grade">S級</div>
             </div>
 
             <!-- SNSシェアセクション -->
@@ -261,13 +262,27 @@
                 <div class="share-card">
                     <!-- rank-section -->
                     <section class="rank-section">
-                        <div class="rank-circle" style="background: linear-gradient(135deg, #fbbf24, #d97706);">
-                            <i data-lucide="crown" style="width: 64px; height: 64px; color: white;"></i>
+                        <!-- 左セクション -->
+                        <div class="rank-left">
+                            <div class="stat-value-rank grade-value">B</div>
+                            <div class="stat-label-rank">総合グレード</div>
+                            <div class="stat-value-rank avg-error" style="margin-top: 8px;">±0.0</div>
+                            <div class="stat-label-rank">平均誤差（セント）</div>
                         </div>
-                        <div class="rank-info">
-                            <div class="rank-grade" style="font-size: 2rem; color: white;">B級</div>
-                            <div class="rank-score" style="color: #fbbf24;">0.0点</div>
-                            <div class="rank-message">良好！安定した音感です</div>
+                        
+                        <!-- 中央アイコン -->
+                        <div class="rank-center">
+                            <div class="rank-circle" style="background: linear-gradient(135deg, #fbbf24, #d97706);">
+                                <i data-lucide="crown" style="width: 64px; height: 64px; color: white;"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- 右セクション -->
+                        <div class="rank-right">
+                            <div class="stat-value-rank session-count">0</div>
+                            <div class="stat-label-rank">セッション数</div>
+                            <div class="stat-value-rank max-error" style="margin-top: 8px;">±0.0</div>
+                            <div class="stat-label-rank">最大誤差（セント）</div>
                         </div>
                     </section>
                     
@@ -299,13 +314,15 @@
                 </div>
             </div>
 
-            <!-- Overall Statistics -->
-            <div class="glass-card mb-8" style="max-width: 100vw; overflow-x: hidden;">
+            <!-- Overall Statistics (hidden - moved to rank-section) -->
+            <div class="glass-card mb-8" id="overall-stats-container" style="display: none; max-width: 100vw; overflow-x: hidden;">
                 <div class="grid grid-cols-4 gap-6 mb-8" id="overall-stats">
                     <!-- Stats will be populated by JavaScript -->
                 </div>
+            </div>
 
-                <!-- Performance Charts -->
+            <!-- Performance Charts -->
+            <div class="glass-card mb-8" style="max-width: 100vw; overflow-x: hidden;">
                 <div class="block md:grid md:grid-cols-2 gap-4 md:gap-8">
                     <!-- Error Trend Chart -->
                     <div class="mb-8 md:mb-0">
@@ -739,15 +756,15 @@
                     <p class="text-green-200">総合グレード</p>
                 </div>
                 <div class="text-center">
-                    <div class="text-4xl font-bold text-white mb-2 stat-value" data-value="${averageError}">±${averageError}</div>
+                    <div class="text-4xl font-bold text-white mb-2 stat-value" data-value="${averageError}">±0.0</div>
                     <p class="text-green-200">平均誤差（セント）</p>
                 </div>
                 <div class="text-center">
-                    <div class="text-4xl font-bold text-white mb-2 stat-value" data-value="${maxError}">±${maxError}</div>
+                    <div class="text-4xl font-bold text-white mb-2 stat-value" data-value="${maxError}">±0.0</div>
                     <p class="text-green-200">最大誤差（セント）</p>
                 </div>
                 <div class="text-center">
-                    <div class="text-4xl font-bold text-white mb-2 stat-value" data-value="${totalSessions}">${totalSessions}</div>
+                    <div class="text-4xl font-bold text-white mb-2 stat-value" data-value="${totalSessions}">0</div>
                     <p class="text-green-200">セッション数</p>
                 </div>
             `;
@@ -1607,9 +1624,12 @@
         // Rank section animation
         function animateRankSection() {
             const rankCircle = document.querySelector('.rank-circle');
-            const rankScore = document.querySelector('.rank-score');
+            const gradeValue = document.querySelector('.grade-value');
+            const sessionCount = document.querySelector('.session-count');
+            const avgError = document.querySelector('.avg-error');
+            const maxError = document.querySelector('.max-error');
             
-            if (!rankCircle || !rankScore) return;
+            if (!rankCircle) return;
             
             // サークルのスケールアニメーション
             rankCircle.style.transform = 'scale(0)';
@@ -1619,21 +1639,84 @@
                 rankCircle.style.transform = 'scale(1)';
             }, 300);
             
-            // スコアカウントアップ
+            // 統計値のカウントアップアニメーション
             setTimeout(() => {
-                const targetScore = 76.3;
-                let currentScore = 0;
-                const increment = targetScore / 60;
+                // 実際のデータ値を取得（Overall Statisticsから）
+                const gradeElement = document.querySelector('#overall-stats > div:first-child .text-4xl');
+                const grade = gradeElement ? gradeElement.textContent : 'B';
                 
-                const scoreAnimation = setInterval(() => {
-                    currentScore += increment;
-                    if (currentScore >= targetScore) {
-                        currentScore = targetScore;
-                        clearInterval(scoreAnimation);
-                    }
-                    rankScore.textContent = currentScore.toFixed(1) + '点';
-                }, 16);
+                const avgElement = document.querySelector('#overall-stats > div:nth-child(2) .stat-value');
+                const avgValue = avgElement ? parseFloat(avgElement.getAttribute('data-value')) : 23.6;
+                
+                const maxElement = document.querySelector('#overall-stats > div:nth-child(3) .stat-value');
+                const maxValue = maxElement ? parseFloat(maxElement.getAttribute('data-value')) : 48.7;
+                
+                const sessionsElement = document.querySelector('#overall-stats > div:nth-child(4) .stat-value');
+                const sessionsValue = sessionsElement ? parseInt(sessionsElement.getAttribute('data-value')) : 12;
+                
+                // セッション数アニメーション
+                if (sessionCount) {
+                    animateCountUp({
+                        textContent: '',
+                        set textContent(val) { sessionCount.textContent = val; }
+                    }, sessionsValue, 1000, false);
+                }
+                
+                // 平均誤差アニメーション
+                if (avgError) {
+                    animateCountUp({
+                        textContent: '',
+                        set textContent(val) { avgError.textContent = '±' + val; }
+                    }, avgValue, 1200, true);
+                }
+                
+                // 最大誤差アニメーション
+                if (maxError) {
+                    setTimeout(() => {
+                        animateCountUp({
+                            textContent: '',
+                            set textContent(val) { maxError.textContent = '±' + val; }
+                        }, maxValue, 1200, true);
+                    }, 150);
+                }
+                
+                // グレード表示（アニメーション）
+                if (gradeValue) {
+                    animateGradeDisplay(gradeValue, grade);
+                }
             }, 800);
+        }
+        
+        // グレード専用アニメーション関数
+        function animateGradeDisplay(element, finalGrade) {
+            const grades = ['E', 'D', 'C', 'B', 'A', 'S'];
+            const finalIndex = grades.indexOf(finalGrade);
+            
+            if (finalIndex === -1) {
+                element.textContent = finalGrade;
+                return;
+            }
+            
+            let currentIndex = 0;
+            element.textContent = grades[currentIndex];
+            
+            const gradeInterval = setInterval(() => {
+                currentIndex++;
+                if (currentIndex <= finalIndex) {
+                    element.textContent = grades[currentIndex];
+                    
+                    if (currentIndex === finalIndex) {
+                        clearInterval(gradeInterval);
+                        // 最終グレードに達したら少し強調
+                        element.style.transform = 'scale(1.1)';
+                        setTimeout(() => {
+                            element.style.transform = 'scale(1)';
+                        }, 200);
+                    }
+                } else {
+                    clearInterval(gradeInterval);
+                }
+            }, 100); // 100msごとにグレードを上げる
         }
         
         // Start initialization
