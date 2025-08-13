@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>8va相対音感トレーニング - セッション評価</title>
+    <link rel="stylesheet" href="styles/system.css?v=4">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <style>
+        /* score-sectionスタイル */
+        .score-section {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* 背景グラデーションアニメーション - iOS対応版 */
+        body {
+            position: relative;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            -webkit-overflow-scrolling: touch;
+            background: #0f172a; /* フォールバック */
+        }
+        
+        /* 疑似要素で背景アニメーション */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            -webkit-animation: gradientShift 15s ease infinite;
+            z-index: -1;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            will-change: background-position;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @-webkit-keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* フローティングアニメーション */
+        .page-header-icon {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* 進行バー */
+        .progress-section {
+            margin-bottom: 2rem;
+        }
+        
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            height: 12px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 9999px;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen p-6">
+        <div class="container">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="flex justify-center mb-6">
+                    <div class="page-header-icon" style="width: 6rem; height: 6rem; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #1d4ed8); display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="circle-check-big" class="icon-2xl text-white"></i>
+                    </div>
+                </div>
+                <h1 class="text-4xl font-bold text-white mb-4">セッション 1 完了！</h1>
+                <p class="text-green-200 text-xl mb-6">基音 C4 - 8音の評価結果</p>
+            </div>
+
+            <!-- 進行バー -->
+            <div class="glass-card progress-section">
+                <div class="progress-container">
+                    <div class="progress-bar-fill" style="width: 25%;"></div>
+                </div>
+                <div class="progress-text">セッション 2 / 8</div>
+            </div>
+
+            <!-- セッション概要 -->
+            <div class="glass-card mb-8">
+                <div class="score-section">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; align-items: end; min-height: 80px;">
+                        <div style="display: flex; flex-direction: column; justify-content: flex-end; text-align: center; height: 100%;">
+                            <div class="text-4xl md:text-6xl font-bold text-white">C4</div>
+                            <p class="text-sm md:text-2xl text-green-200">基音</p>
+                        </div>
+                        <div style="display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center; height: 100%;">
+                            <div class="mb-2">
+                                <div style="width: 100px; height: 100px; background: rgba(251, 191, 36, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 1px solid rgba(251, 191, 36, 0.3);">
+                                    <i data-lucide="trophy" class="text-yellow-300" style="width: 64px; height: 64px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; justify-content: flex-end; text-align: center; height: 100%;">
+                            <div class="text-4xl md:text-6xl font-bold text-white" id="average-error">+0.0¢</div>
+                            <p class="text-sm md:text-2xl text-green-200">セッション平均誤差</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 評価分布バー -->
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; padding: 0 1rem;">
+                    <!-- Excellent -->
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <i data-lucide="trophy" class="text-yellow-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+                        <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="flex: 1; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden;">
+                                <div style="width: 37.5%; height: 100%; background: #fbbf24; border-radius: 3px;"></div>
+                            </div>
+                            <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">3</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Good -->
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <i data-lucide="star" class="text-green-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+                        <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="flex: 1; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden;">
+                                <div style="width: 25%; height: 100%; background: #86efac; border-radius: 3px;"></div>
+                            </div>
+                            <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">2</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Pass -->
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <i data-lucide="thumbs-up" class="text-blue-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+                        <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="flex: 1; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden;">
+                                <div style="width: 37.5%; height: 100%; background: #93c5fd; border-radius: 3px;"></div>
+                            </div>
+                            <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">3</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Practice -->
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <i data-lucide="triangle-alert" class="text-red-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+                        <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="flex: 1; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden;">
+                                <div style="width: 0%; height: 100%; background: #fca5a5; border-radius: 3px;"></div>
+                            </div>
+                            <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 詳細分析 -->
+            <div class="glass-card mb-8">
+                <h3 class="text-xl font-bold text-white mb-6 text-center">詳細分析</h3>
+                <div class="space-y-2" id="note-results">
+                    <!-- Note results will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <section class="final-actions">
+                <a href="training.html" class="btn btn-primary btn-large">
+                    <i data-lucide="arrow-right" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                    <span>次の基音へ</span>
+                </a>
+                <a href="index.html" class="btn btn-secondary btn-large">
+                    <i data-lucide="home" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                    <span>ホームに戻る</span>
+                </a>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Mock session data for current session
+        const currentSessionData = {
+            session: 2,
+            baseNote: 'C4',
+            totalSessions: 8,
+            noteResults: [
+                { noteIndex: 0, noteName: 'ド', targetFrequency: 261.63, userFrequency: 265.2, centError: 24, isCorrect: true },
+                { noteIndex: 1, noteName: 'レ', targetFrequency: 293.66, userFrequency: 290.1, centError: -21, isCorrect: true },
+                { noteIndex: 2, noteName: 'ミ', targetFrequency: 329.63, userFrequency: 335.8, centError: 32, isCorrect: true },
+                { noteIndex: 3, noteName: 'ファ', targetFrequency: 349.23, userFrequency: 348.0, centError: -6, isCorrect: true },
+                { noteIndex: 4, noteName: 'ソ', targetFrequency: 392.00, userFrequency: 388.5, centError: -16, isCorrect: true },
+                { noteIndex: 5, noteName: 'ラ', targetFrequency: 440.00, userFrequency: 445.2, centError: 20, isCorrect: true },
+                { noteIndex: 6, noteName: 'シ', targetFrequency: 493.88, userFrequency: 490.0, centError: -14, isCorrect: true },
+                { noteIndex: 7, noteName: 'ド\'', targetFrequency: 523.25, userFrequency: 528.6, centError: 18, isCorrect: true }
+            ]
+        };
+
+        // Helper function to create Lucide icons
+        function lucideIcon(iconName, colorClass = '', size = 24) {
+            return `<i data-lucide="${iconName}" class="${colorClass}" style="width: ${size}px; height: ${size}px;"></i>`;
+        }
+
+        // Get evaluation level for a note
+        function getEvaluationLevel(centError) {
+            const absError = Math.abs(centError);
+            if (absError <= 15) return { level: 'excellent', color: 'text-yellow-300', label: 'Excellent', icon: lucideIcon('trophy', 'text-yellow-300', 28) };
+            if (absError <= 25) return { level: 'good', color: 'text-green-300', label: 'Good', icon: lucideIcon('star', 'text-green-300', 28) };
+            if (absError <= 40) return { level: 'pass', color: 'text-blue-300', label: 'Pass', icon: lucideIcon('thumbs-up', 'text-blue-300', 28) };
+            return { level: 'practice', color: 'text-red-300', label: 'Practice', icon: lucideIcon('triangle-alert', 'text-red-300', 28) };
+        }
+
+        // Display note results
+        function displayNoteResults() {
+            const noteResults = document.getElementById('note-results');
+            noteResults.innerHTML = '';
+
+            currentSessionData.noteResults.forEach((note) => {
+                const evaluation = getEvaluationLevel(note.centError);
+
+                const noteElement = document.createElement('div');
+                noteElement.className = 'glass-card-sm hover:bg-white/10 transition-colors';
+                noteElement.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div>
+                                <div class="text-lg font-bold text-white">${note.noteName}</div>
+                            </div>
+                            <div>
+                                <div class="text-base text-white-60 font-medium">目標 ${note.targetFrequency.toFixed(0)}Hz</div>
+                                <div class="text-base text-white-60 font-medium">実音 ${note.userFrequency.toFixed(0)}Hz</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="font-bold text-2xl ${note.centError > 0 ? 'text-red-300' : 'text-blue-300'}">
+                                ${note.centError > 0 ? '+' : ''}${note.centError}¢
+                            </div>
+                            <div class="flex items-center justify-center" style="min-width: 36px;">
+                                ${evaluation.icon}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                noteResults.appendChild(noteElement);
+            });
+        }
+
+        // Update progress bar
+        function updateProgressBar() {
+            const progressPercent = (currentSessionData.session / currentSessionData.totalSessions) * 100;
+            const progressBar = document.querySelector('.progress-bar-fill');
+            if (progressBar) {
+                setTimeout(() => {
+                    progressBar.style.width = `${progressPercent}%`;
+                }, 300);
+            }
+        }
+
+        // Animate average error
+        function animateAverageError() {
+            const element = document.getElementById('average-error');
+            if (!element) return;
+            
+            const targetValue = 12.1;
+            const isPositive = true; // サンプルデータではプラス
+            let currentValue = 0;
+            const increment = targetValue / 60; // 1秒で完了
+            
+            const animation = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= targetValue) {
+                    currentValue = targetValue;
+                    clearInterval(animation);
+                    
+                    // アニメーション完了時に色変更
+                    setTimeout(() => {
+                        element.classList.remove('text-white');
+                        element.classList.add('text-yellow-300');
+                    }, 200);
+                }
+                element.textContent = (isPositive ? '+' : '-') + currentValue.toFixed(1) + '¢';
+            }, 16); // 60fps
+        }
+
+        // Initialize page
+        function initializePage() {
+            displayNoteResults();
+            updateProgressBar();
+            
+            // Initialize Lucide icons with stroke width 1.5 as default
+            setTimeout(() => {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons({
+                        strokeWidth: 1.5  // デフォルト: 1.5、強調時: 1.75
+                    });
+                }
+            }, 100);
+            
+            // Start average error animation
+            setTimeout(animateAverageError, 500);
+        }
+
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', initializePage);
+        window.addEventListener('load', () => {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons({
+                    strokeWidth: 1.5  // デフォルト: 1.5、強調時: 1.75
+                });
+            }
+        });
+    </script>
+</body>
+</html>
