@@ -170,7 +170,7 @@
         
         .stat-value-rank.grade-value {
             font-size: 2.0rem;
-            color: #fbbf24; /* グレードは黄色 */
+            color: #ffffff; /* グレードは白色 */
         }
         
         .stat-value-rank.avg-error {
@@ -354,11 +354,17 @@
                                     <div class="stat-label-rank">セッション数</div>
                                 </div>
                             </div>
+                            
+                            <!-- ランク取得メッセージ -->
+                            <div class="rank-achievement-message" style="margin-top: 16px; margin-bottom: 8px; text-align: center;">
+                                <p id="share-message" style="color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; margin: 0;">
+                                    B級ランク取得！グッドプレイヤー！
+                                </p>
+                            </div>
                         </div>
                     </section>
                     
-                    <h3>みんなに成果をシェアしよう！</h3>
-                    <p id="share-message">あなたの音感レベル【B級】を友達に自慢しましょう</p>
+                    <h3 style="margin-top: 16px;">みんなに成果をシェアしよう！</h3>
                     <div class="share-buttons">
                         <a href="#" class="share-btn twitter" onclick="shareToTwitter(event)" title="Xでシェア">
                             <svg viewBox="0 0 24 24" fill="currentColor">
@@ -1634,8 +1640,29 @@
             const gradeElement = document.querySelector('#overall-stats > div:first-child .text-4xl');
             const grade = gradeElement ? gradeElement.textContent : 'B';
             const messageElement = document.getElementById('share-message');
+            
             if (messageElement) {
-                messageElement.textContent = `あなたの音感レベル【${grade}級】を友達に自慢しましょう`;
+                let message = '';
+                switch(grade) {
+                    case 'S':
+                        message = 'S級ランク取得！パーフェクトマスター！';
+                        break;
+                    case 'A':
+                        message = 'A級ランク取得！エクセレントプレイヤー！';
+                        break;
+                    case 'B':
+                        message = 'B級ランク取得！グッドプレイヤー！';
+                        break;
+                    case 'C':
+                        message = 'C級ランク取得！練習の成果が出ています！';
+                        break;
+                    case 'D':
+                        message = 'D級ランク取得！もう少しで上達します！';
+                        break;
+                    default:
+                        message = `${grade}級ランク取得！おめでとうございます！`;
+                }
+                messageElement.textContent = message;
             }
         }
         
