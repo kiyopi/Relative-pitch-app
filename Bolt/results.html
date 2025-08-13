@@ -234,9 +234,8 @@
             width: 56px;
             height: 56px;
             border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -244,24 +243,15 @@
             text-decoration: none;
             position: relative;
             overflow: hidden;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        
-        .share-btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 50%;
-            padding: 1px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
+            /* システム統一ガラス効果を適用 */
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--glass-border);
         }
         
         .share-btn:hover {
+            background: var(--glass-hover);
+            border-color: rgba(255, 255, 255, 0.4);
             transform: translateY(-3px) scale(1.1);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 255, 255, 0.2);
         }
@@ -298,6 +288,7 @@
                 width: 20px;
                 height: 20px;
             }
+            
         }
     </style>
 </head>
@@ -463,19 +454,19 @@
 
 
             <!-- Action Buttons -->
-            <div class="flex flex-col md:flex-row justify-center space-y-3 md:space-y-0 md:space-x-4">
-                <a href="records.html" class="btn btn-primary min-w-0" style="white-space: nowrap; font-size: 0.875rem; padding: 0.75rem 1rem;">
-                    <svg class="icon-sm mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
+            <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+                <a href="records.html" class="btn btn-primary btn-large">
+                    <svg class="icon-sm mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
                         <path d="M3 3h18v18H3z"/>
                         <path d="M21 9H3"/>
                         <path d="M9 21V9"/>
                     </svg>
                     記録を見る
                 </a>
-                <a href="index.html" class="btn btn-secondary min-w-0" style="white-space: nowrap; font-size: 0.875rem; padding: 0.75rem 1rem;">
+                <a href="index.html" class="btn btn-secondary btn-large">
                     ホームに戻る
                 </a>
-                <a href="mic-test.html" class="btn btn-primary min-w-0" style="white-space: nowrap; font-size: 0.875rem; padding: 0.75rem 1rem;">
+                <a href="mic-test.html" class="btn btn-primary btn-large">
                     再チャレンジ
                 </a>
             </div>

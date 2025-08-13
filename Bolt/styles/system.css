@@ -280,6 +280,10 @@ body {
 .btn-success:hover {
   background: linear-gradient(135deg, var(--success-600), var(--primary-600));
 }
+.btn-large {
+  padding: var(--space-4) var(--space-10);
+  font-size: 1rem;
+}
 
 /* Icons */
 .icon {
