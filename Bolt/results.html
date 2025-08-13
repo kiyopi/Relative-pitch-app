@@ -754,11 +754,11 @@
             sessionNoteResults.forEach((note, index) => {
                 const getEvaluationLevel = (centError) => {
                     const absError = Math.abs(centError);
-                    // 直感的なアイコン配置で統一評価基準（アイコンサイズを20pxに拡大）
-                    if (absError <= 15) return { level: 'excellent', color: 'text-yellow-300', label: 'Excellent', icon: lucideIcon('trophy', 'text-yellow-300', 20) };
-                    if (absError <= 25) return { level: 'good', color: 'text-green-300', label: 'Good', icon: lucideIcon('star', 'text-green-300', 20) };
-                    if (absError <= 40) return { level: 'pass', color: 'text-blue-300', label: 'Pass', icon: lucideIcon('thumbs-up', 'text-blue-300', 20) };
-                    return { level: 'practice', color: 'text-red-300', label: 'Practice', icon: lucideIcon('triangle-alert', 'text-red-300', 20) };
+                    // 直感的なアイコン配置で統一評価基準（アイコンサイズを28pxに拡大）
+                    if (absError <= 15) return { level: 'excellent', color: 'text-yellow-300', label: 'Excellent', icon: lucideIcon('trophy', 'text-yellow-300', 28) };
+                    if (absError <= 25) return { level: 'good', color: 'text-green-300', label: 'Good', icon: lucideIcon('star', 'text-green-300', 28) };
+                    if (absError <= 40) return { level: 'pass', color: 'text-blue-300', label: 'Pass', icon: lucideIcon('thumbs-up', 'text-blue-300', 28) };
+                    return { level: 'practice', color: 'text-red-300', label: 'Practice', icon: lucideIcon('triangle-alert', 'text-red-300', 28) };
                 };
 
                 const evaluation = getEvaluationLevel(note.centError);
@@ -776,13 +776,12 @@
                                 <div class="text-base text-white-60 font-medium">実音 ${note.userFrequency.toFixed(0)}Hz</div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-3">
                             <div class="font-bold text-2xl ${note.centError > 0 ? 'text-red-300' : 'text-blue-300'}">
                                 ${note.centError > 0 ? '+' : ''}${note.centError}¢
                             </div>
-                            <div class="flex flex-col items-center justify-center" style="min-width: 60px;">
+                            <div class="flex items-center justify-center" style="min-width: 36px;">
                                 ${evaluation.icon}
-                                <span class="text-xs font-medium ${evaluation.color} mt-1 text-center">${evaluation.label}</span>
                             </div>
                         </div>
                     </div>
