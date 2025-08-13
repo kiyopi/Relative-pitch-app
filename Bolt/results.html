@@ -885,6 +885,8 @@
                 return;
             }
             
+            console.log('🎯 Initializing error trend chart, animated:', errorTrendChartAnimated);
+            
             // レスポンシブ設定: デバイス判定
             const isMobile = window.innerWidth < 768;
             const isTablet = window.innerWidth >= 768 && window.innerWidth <= 1024; // iPad対応
@@ -1001,6 +1003,7 @@
                     animation: errorTrendChartAnimated ? false : {
                         duration: 800,
                         onComplete: () => {
+                            console.log('✅ Error trend chart animation completed (PC Line)');
                             errorTrendChartAnimated = true;
                         }
                     },
@@ -1181,6 +1184,7 @@
                     animation: errorTrendChartAnimated ? false : {
                         duration: 1000,
                         onComplete: () => {
+                            console.log('✅ Error trend chart animation completed (Mobile Bar)');
                             errorTrendChartAnimated = true;
                         }
                     },
@@ -1279,6 +1283,8 @@
                 return;
             }
             
+            console.log('📈 Initializing accuracy chart, animated:', accuracyChartAnimated);
+            
             // 既存のチャートインスタンスを破棄
             if (window.accuracyChartInstance) {
                 window.accuracyChartInstance.destroy();
@@ -1337,6 +1343,7 @@
                     animation: accuracyChartAnimated ? false : {
                         duration: 1000,
                         onComplete: () => {
+                            console.log('✅ Accuracy chart animation completed');
                             accuracyChartAnimated = true;
                         }
                     },
@@ -1433,49 +1440,63 @@
         
         // グラフセクションの表示監視
         function observeChartsSection() {
-            // 誤差推移チャートの監視
-            const errorTrendChart = document.getElementById('error-trend-chart');
-            const errorTrendSection = errorTrendChart ? errorTrendChart.closest('.glass-card') : null;
+            // 誤差推移チャートのコンテナを直接監視
+            const errorTrendContainer = document.getElementById('error-trend-container');
             
-            // 評価分布チャートの監視
+            // 評価分布チャートの親要素を直接監視
             const accuracyChart = document.getElementById('accuracy-chart');
-            const accuracySection = accuracyChart ? accuracyChart.closest('.glass-card') : null;
+            const accuracyContainer = accuracyChart ? accuracyChart.parentElement : null;
             
-            if (!errorTrendSection || !accuracySection) {
-                // チャートセクションが見つからない場合は即座にチャートを初期化
+            console.log('📊 Charts setup:', {
+                errorTrendContainer: !!errorTrendContainer,
+                accuracyContainer: !!accuracyContainer,
+                errorTrendAnimated: errorTrendChartAnimated,
+                accuracyAnimated: accuracyChartAnimated
+            });
+            
+            if (!errorTrendContainer && !accuracyContainer) {
+                // チャートコンテナが見つからない場合は即座にチャートを初期化
+                console.log('⚠️ No chart containers found, initializing immediately');
                 initializeErrorTrendChart();
                 initializeAccuracyChart();
                 return;
             }
             
             // 誤差推移チャート用のオブザーバー
-            const errorTrendObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting && !errorTrendChartAnimated) {
-                        initializeErrorTrendChart();
-                        errorTrendObserver.unobserve(entry.target);
-                    }
+            if (errorTrendContainer) {
+                const errorTrendObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting && !errorTrendChartAnimated) {
+                            console.log('🎯 Error trend chart visible, initializing...');
+                            initializeErrorTrendChart();
+                            errorTrendObserver.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.2,
+                    rootMargin: '0px 0px -10% 0px'
                 });
-            }, {
-                threshold: 0.2,
-                rootMargin: '0px 0px -10% 0px'
-            });
+                
+                errorTrendObserver.observe(errorTrendContainer);
+            }
             
             // 評価分布チャート用のオブザーバー
-            const accuracyObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting && !accuracyChartAnimated) {
-                        initializeAccuracyChart();
-                        accuracyObserver.unobserve(entry.target);
-                    }
+            if (accuracyContainer) {
+                const accuracyObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting && !accuracyChartAnimated) {
+                            console.log('📈 Accuracy chart visible, initializing...');
+                            initializeAccuracyChart();
+                            accuracyObserver.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.2,
+                    rootMargin: '0px 0px -10% 0px'
                 });
-            }, {
-                threshold: 0.2,
-                rootMargin: '0px 0px -10% 0px'
-            });
-            
-            errorTrendObserver.observe(errorTrendSection);
-            accuracyObserver.observe(accuracySection);
+                
+                accuracyObserver.observe(accuracyContainer);
+            }
         }
 
         // Initialize page
