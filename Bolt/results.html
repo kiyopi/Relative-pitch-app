@@ -537,10 +537,13 @@
 
         let selectedSessionForAnalysis = 1;
         
-        // Chart.jsのグローバルアニメーション設定を使用してスクロール時の再アニメーションを防ぐ
-        let chartsInitialized = false;
+        // Chart.jsアニメーション制御フラグ
         let errorTrendChartAnimated = false;
         let accuracyChartAnimated = false;
+        
+        // オブザーバー管理
+        let errorTrendObserver = null;
+        let accuracyObserver = null;
 
         // Get evaluation level and color (仕様書準拠)
         function getSessionEvaluationLabel(averageCentError) {
@@ -1462,9 +1465,19 @@
                 return;
             }
             
-            // 誤差推移チャート用のオブザーバー
-            if (errorTrendContainer) {
-                const errorTrendObserver = new IntersectionObserver((entries) => {
+            // 既存のオブザーバーをクリーンアップ
+            if (errorTrendObserver) {
+                errorTrendObserver.disconnect();
+                errorTrendObserver = null;
+            }
+            if (accuracyObserver) {
+                accuracyObserver.disconnect();
+                accuracyObserver = null;
+            }
+            
+            // 誤差推移チャート用のオブザーバー（まだアニメーション済みでない場合のみ）
+            if (errorTrendContainer && !errorTrendChartAnimated) {
+                errorTrendObserver = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting && !errorTrendChartAnimated) {
                             console.log('🎯 Error trend chart visible, initializing...');
@@ -1480,9 +1493,9 @@
                 errorTrendObserver.observe(errorTrendContainer);
             }
             
-            // 評価分布チャート用のオブザーバー
-            if (accuracyContainer) {
-                const accuracyObserver = new IntersectionObserver((entries) => {
+            // 評価分布チャート用のオブザーバー（まだアニメーション済みでない場合のみ）
+            if (accuracyContainer && !accuracyChartAnimated) {
+                accuracyObserver = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting && !accuracyChartAnimated) {
                             console.log('📈 Accuracy chart visible, initializing...');
@@ -1537,9 +1550,6 @@
                 
                 navigationEventListenersAdded = true;
             }
-            
-            // 初回初期化完了をマーク
-            chartsInitialized = true;
         }
 
         // ウィンドウリサイズ時の再描画対応
@@ -1547,8 +1557,21 @@
         window.addEventListener('resize', function() {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(function() {
-                // 画面サイズが変わった時は全チャートを再初期化（アニメーションは無効）
-                initializePage();
+                // リサイズ時はアニメーション状態を保持して再初期化
+                console.log('🔄 Resize detected, reinitializing charts with animation state preserved');
+                
+                // 既にアニメーション済みの場合は強制的にアニメーション無効で再初期化
+                if (errorTrendChartAnimated) {
+                    initializeErrorTrendChart();
+                }
+                if (accuracyChartAnimated) {
+                    initializeAccuracyChart();
+                }
+                
+                // まだアニメーションしていない場合は監視を継続
+                if (!errorTrendChartAnimated || !accuracyChartAnimated) {
+                    observeChartsSection();
+                }
             }, 250);
         });
 
