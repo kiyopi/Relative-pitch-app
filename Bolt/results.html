@@ -356,7 +356,7 @@
                             </div>
                             
                             <!-- ランク取得メッセージ -->
-                            <div class="rank-achievement-message" style="margin-top: 16px; margin-bottom: 8px; text-align: center;">
+                            <div class="rank-achievement-message" style="margin-top: 0px; margin-bottom: 0px; text-align: center;">
                                 <p id="share-message" style="color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; margin: 0;">
                                     B級ランク取得！グッドプレイヤー！
                                 </p>
@@ -364,7 +364,7 @@
                         </div>
                     </section>
                     
-                    <h3 style="margin-top: 16px;">みんなに成果をシェアしよう！</h3>
+                    <h3 style="margin-top: 0px; margin-bottom: 24px;">みんなに成果をシェアしよう！</h3>
                     <div class="share-buttons">
                         <a href="#" class="share-btn twitter" onclick="shareToTwitter(event)" title="Xでシェア">
                             <svg viewBox="0 0 24 24" fill="currentColor">
@@ -539,6 +539,8 @@
         
         // Chart.jsのグローバルアニメーション設定を使用してスクロール時の再アニメーションを防ぐ
         let chartsInitialized = false;
+        let errorTrendChartAnimated = false;
+        let accuracyChartAnimated = false;
 
         // Get evaluation level and color (仕様書準拠)
         function getSessionEvaluationLabel(averageCentError) {
@@ -996,11 +998,10 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: chartsInitialized ? false : {
+                    animation: errorTrendChartAnimated ? false : {
                         duration: 800,
                         onComplete: () => {
-                            // 初回アニメーション完了後はグローバルに無効化
-                            Chart.defaults.animation = false;
+                            errorTrendChartAnimated = true;
                         }
                     },
                     plugins: {
@@ -1177,11 +1178,10 @@
                     indexAxis: 'y', // 横向きバーチャート
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: chartsInitialized ? false : {
+                    animation: errorTrendChartAnimated ? false : {
                         duration: 1000,
                         onComplete: () => {
-                            // 初回アニメーション完了後はグローバルに無効化
-                            Chart.defaults.animation = false;
+                            errorTrendChartAnimated = true;
                         }
                     },
                     layout: {
@@ -1334,11 +1334,10 @@
                     indexAxis: 'y', // 横向きバーチャート
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: chartsInitialized ? false : {
+                    animation: accuracyChartAnimated ? false : {
                         duration: 1000,
                         onComplete: () => {
-                            // 初回アニメーション完了後はグローバルに無効化
-                            Chart.defaults.animation = false;
+                            accuracyChartAnimated = true;
                         }
                     },
                     layout: {
@@ -1431,14 +1430,62 @@
 
         // グローバルフラグでイベントリスナーの重複登録を防ぐ
         let navigationEventListenersAdded = false;
+        
+        // グラフセクションの表示監視
+        function observeChartsSection() {
+            // 誤差推移チャートの監視
+            const errorTrendChart = document.getElementById('error-trend-chart');
+            const errorTrendSection = errorTrendChart ? errorTrendChart.closest('.glass-card') : null;
+            
+            // 評価分布チャートの監視
+            const accuracyChart = document.getElementById('accuracy-chart');
+            const accuracySection = accuracyChart ? accuracyChart.closest('.glass-card') : null;
+            
+            if (!errorTrendSection || !accuracySection) {
+                // チャートセクションが見つからない場合は即座にチャートを初期化
+                initializeErrorTrendChart();
+                initializeAccuracyChart();
+                return;
+            }
+            
+            // 誤差推移チャート用のオブザーバー
+            const errorTrendObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !errorTrendChartAnimated) {
+                        initializeErrorTrendChart();
+                        errorTrendObserver.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.2,
+                rootMargin: '0px 0px -10% 0px'
+            });
+            
+            // 評価分布チャート用のオブザーバー
+            const accuracyObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !accuracyChartAnimated) {
+                        initializeAccuracyChart();
+                        accuracyObserver.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.2,
+                rootMargin: '0px 0px -10% 0px'
+            });
+            
+            errorTrendObserver.observe(errorTrendSection);
+            accuracyObserver.observe(accuracySection);
+        }
 
         // Initialize page
         function initializePage() {
             initializeOverallStats();
-            initializeErrorTrendChart();
-            initializeAccuracyChart();
             initializeSessionsGrid();
             updateSelectedSession();
+            
+            // グラフセクションの表示監視を開始
+            observeChartsSection();
             
             // セッショングリッド生成後にアイコンを再初期化
             setTimeout(() => {
