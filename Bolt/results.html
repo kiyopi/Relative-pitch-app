@@ -767,18 +767,13 @@
                 noteElement.className = 'glass-card-sm hover:bg-white/10 transition-colors';
                 noteElement.innerHTML = `
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <span class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-base font-bold text-white">
-                                ${note.noteIndex + 1}
-                            </span>
-                            <div class="flex items-center gap-4">
-                                <div>
-                                    <div class="text-lg font-bold text-white">${note.noteName}</div>
-                                </div>
-                                <div>
-                                    <div class="text-base text-white-60 font-medium">目標 ${note.targetFrequency.toFixed(0)}Hz</div>
-                                    <div class="text-base text-white-60 font-medium">実音 ${note.userFrequency.toFixed(0)}Hz</div>
-                                </div>
+                        <div class="flex items-center gap-4">
+                            <div>
+                                <div class="text-lg font-bold text-white">${note.noteName}</div>
+                            </div>
+                            <div>
+                                <div class="text-base text-white-60 font-medium">目標 ${note.targetFrequency.toFixed(0)}Hz</div>
+                                <div class="text-base text-white-60 font-medium">実音 ${note.userFrequency.toFixed(0)}Hz</div>
                             </div>
                         </div>
                         <div class="flex items-center gap-4">
