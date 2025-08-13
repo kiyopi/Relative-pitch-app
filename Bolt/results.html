@@ -243,14 +243,15 @@
             text-decoration: none;
             position: relative;
             overflow: hidden;
-            /* システム統一ガラス効果を適用 */
-            background: var(--glass-bg);
+            /* iPad対応: グラデーション背景を使用 */
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
             backdrop-filter: blur(8px);
-            border: 1px solid var(--glass-border);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
         }
         
         .share-btn:hover {
-            background: var(--glass-hover);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.15));
             border-color: rgba(255, 255, 255, 0.4);
             transform: translateY(-3px) scale(1.1);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 255, 255, 0.2);
