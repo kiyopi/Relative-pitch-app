@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8va相対音感トレーニング</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.344.0/lucide.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Debug Navigation -->
+    <nav class="debug-nav">
+        <h4>Debug Nav</h4>
+        <div class="nav-grid">
+            <a href="index.html" class="nav-btn current">
+                <i data-lucide="home" style="width: 12px; height: 12px;"></i>
+                <span>ホーム</span>
+            </a>
+            <a href="mic-test.html" class="nav-btn">
+                <i data-lucide="mic" style="width: 12px; height: 12px;"></i>
+                <span>マイクテスト</span>
+            </a>
+            <a href="training.html" class="nav-btn">
+                <i data-lucide="target" style="width: 12px; height: 12px;"></i>
+                <span>トレーニング</span>
+            </a>
+            <a href="session-result.html" class="nav-btn">
+                <i data-lucide="check-circle" style="width: 12px; height: 12px;"></i>
+                <span>セッション結果</span>
+            </a>
+            <a href="final-result.html" class="nav-btn">
+                <i data-lucide="trophy" style="width: 12px; height: 12px;"></i>
+                <span>総合結果</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- ヘッダーセクション -->
+        <header class="page-header">
+            <div class="page-header-icon page-header-icon-purple">
+                <i data-lucide="music" 
+                   style="width: 48px; height: 48px; color: white; stroke-width: 2;"></i>
+            </div>
+            <h1 class="page-title">8va相対音感トレーニング</h1>
+            <p class="page-subtitle">科学的根拠に基づいた効果的な相対音感トレーニングシステム</p>
+            <p class="page-description">基準音に対する音程の関係を正確に認識する能力を向上させます</p>
+        </header>
+
+        <!-- トレーニングモード選択 -->
+        <section class="hero-section">
+            <div class="modes-grid">
+                <!-- ランダム基音モード -->
+                <div class="mode-card beginner">
+                    <div class="card-header">
+                        <div class="mode-icon">
+                            <i data-lucide="shuffle" style="width: 24px; height: 24px; color: white;"></i>
+                        </div>
+                        <span class="difficulty-badge beginner">初級</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="mode-title">ランダム基音モード</h3>
+                        <p class="mode-subtitle">初級者向け</p>
+                        <p class="mode-description">カラオケなどで音程を合わせて歌えるようになる基礎トレーニング</p>
+                        
+                        <div class="features">
+                            <div class="feature-highlight">
+                                <i data-lucide="sparkles" style="width: 16px; height: 16px; color: #fbbf24;"></i>
+                                <span>8セッション</span>
+                            </div>
+                            <ul class="feature-list">
+                                <li>
+                                    <i data-lucide="check" style="width: 12px; height: 12px; color: #86efac;"></i>
+                                    基本的な相対音感
+                                </li>
+                                <li>
+                                    <i data-lucide="check" style="width: 12px; height: 12px; color: #86efac;"></i>
+                                    音程の安定化
+                                </li>
+                                <li>
+                                    <i data-lucide="check" style="width: 12px; height: 12px; color: #86efac;"></i>
+                                    セッション別評価
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="mic-test.html" class="btn btn-primary">
+                            <span>始める</span>
+                            <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 連続チャレンジモード -->
+                <div class="mode-card intermediate">
+                    <div class="card-header">
+                        <div class="mode-icon">
+                            <i data-lucide="zap" style="width: 24px; height: 24px; color: white;"></i>
+                        </div>
+                        <span class="difficulty-badge intermediate">中級</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="mode-title">連続チャレンジモード</h3>
+                        <p class="mode-subtitle">中級者向け</p>
+                        <p class="mode-description">半音も含めた音を聞き分け、集中力を維持しながら相対音感を鍛える</p>
+                        
+                        <div class="features">
+                            <div class="feature-highlight">
+                                <i data-lucide="sparkles" style="width: 16px; height: 16px; color: #fbbf24;"></i>
+                                <span>12セッション連続</span>
+                            </div>
+                            <ul class="feature-list">
+                                <li>
+                                    <i data-lucide="check" style="width: 12px; height: 12px; color: #86efac;"></i>
+                                    クロマチック12音
+                                </li>
+                                <li>
+                                    <i data-lucide="check" style="width: 12px; height: 12px; color: #86efac;"></i>
+                                    連続集中練習
+                                </li>
+                                <li>
+                                    <i data-lucide="check" style="width: 12px; height: 12px; color: #86efac;"></i>
+                                    総合評価
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="mic-test.html" class="btn btn-secondary">
+                            <span>始める</span>
+                            <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 12音階モード -->
+                <div class="mode-card advanced">
+                    <div class="card-header">
+                        <div class="mode-icon">
+                            <i data-lucide="crown" style="width: 24px; height: 24px; color: white;"></i>
+                        </div>
+                        <span class="difficulty-badge advanced">上級</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="mode-title">12音階モード</h3>
+                        <p class="mode-subtitle">上級者向け</p>
+                        <p class="mode-description">すべての音に対して完璧な相対音感を習得するプロレベル練習</p>
+                        
+                        <div class="features">
+                            <div class="feature-highlight">
+                                <i data-lucide="sparkles" style="width: 16px; height: 16px; color: #fbbf24;"></i>
+                                <span>12-24セッション</span>
+                            </div>
+                            <ul class="feature-list">
+                                <li>
+                                    <i data-lucide="check" style="width: 12px; height: 12px; color: #86efac;"></i>
+                                    上昇・下降・両方向
+                                </li>
+                                <li>
+                                    <i data-lucide="check" style="width: 12px; height: 12px; color: #86efac;"></i>
+                                    プロレベル判定
+                                </li>
+                                <li>
+                                    <i data-lucide="check" style="width: 12px; height: 12px; color: #86efac;"></i>
+                                    S級認定
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="mic-test.html" class="btn btn-primary">
+                            <span>始める</span>
+                            <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 理論説明セクション -->
+        <section class="theory-section">
+            <div class="theory-card">
+                <div class="theory-icon">
+                    <i data-lucide="brain" style="width: 28px; height: 28px; color: #fbbf24;"></i>
+                </div>
+                <div class="theory-content">
+                    <h4>脳内ピアノ理論</h4>
+                    <p>相対音感の向上は歌唱力だけでなく、円滑な人間関係構築にも効果があることが知られています。音楽は人と人をつなぐ普遍的な言語なのです。</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        lucide.createIcons();
+        
+        // カードホバーエフェクト
+        document.querySelectorAll('.mode-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-12px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

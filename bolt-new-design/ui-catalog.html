@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UIカタログ - 8va相対音感トレーニング</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.344.0/lucide.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .catalog-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .catalog-header h1 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .catalog-header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+        }
+
+        .catalog-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .catalog-section h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 12px;
+        }
+
+        .color-group {
+            margin-bottom: 32px;
+        }
+
+        .color-group h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 16px;
+        }
+
+        .color-samples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .color-sample {
+            height: 80px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .component-group {
+            margin-bottom: 32px;
+        }
+
+        .component-group h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 16px;
+        }
+
+        .component-samples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .card-samples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .sample-card {
+            max-width: none;
+        }
+
+        .icon-group {
+            margin-bottom: 32px;
+        }
+
+        .icon-group h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 16px;
+        }
+
+        .icon-samples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 16px;
+        }
+
+        .icon-item {
+            text-align: center;
+            padding: 16px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .catalog-icon {
+            width: 32px;
+            height: 32px;
+            color: #3b82f6;
+            margin-bottom: 8px;
+        }
+
+        .icon-item span {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .evaluation-samples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .eval-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid;
+        }
+
+        .eval-item.excellent {
+            background: rgba(251, 191, 36, 0.1);
+            border-color: rgba(251, 191, 36, 0.3);
+        }
+
+        .eval-item.good {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .eval-item.pass {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .eval-item.practice {
+            background: rgba(107, 114, 128, 0.1);
+            border-color: rgba(107, 114, 128, 0.3);
+        }
+
+        .eval-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .eval-info {
+            flex: 1;
+        }
+
+        .eval-grade {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .eval-range {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 2px;
+        }
+
+        .eval-score {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .progress-samples {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .doremi-sample {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 12px;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            .catalog-section {
+                padding: 20px;
+            }
+
+            .color-samples {
+                grid-template-columns: 1fr;
+            }
+
+            .component-samples {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .evaluation-samples {
+                grid-template-columns: 1fr;
+            }
+
+            .icon-samples {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="catalog-header">
+            <h1>UIカタログ</h1>
+            <p>8va相対音感トレーニングアプリのデザインシステム</p>
+        </div>
+
+        <!-- カラーパレット -->
+        <section class="catalog-section">
+            <h2>🎨 カラーパレット</h2>
+            
+            <div class="color-group">
+                <h3>グラデーション</h3>
+                <div class="color-samples">
+                    <div class="color-sample" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <span>メイングラデーション</span>
+                    </div>
+                    <div class="color-sample" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+                        <span>プライマリ</span>
+                    </div>
+                    <div class="color-sample" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                        <span>オレンジ</span>
+                    </div>
+                    <div class="color-sample" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                        <span>パープル</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="color-group">
+                <h3>評価色</h3>
+                <div class="color-samples">
+                    <div class="color-sample" style="background: #fbbf24;">
+                        <span>優秀 (Excellent)</span>
+                    </div>
+                    <div class="color-sample" style="background: #22c55e;">
+                        <span>良好 (Good)</span>
+                    </div>
+                    <div class="color-sample" style="background: #3b82f6;">
+                        <span>合格 (Pass)</span>
+                    </div>
+                    <div class="color-sample" style="background: #6b7280;">
+                        <span>要練習 (Practice)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ボタンコンポーネント -->
+        <section class="catalog-section">
+            <h2>🔘 ボタンコンポーネント</h2>
+            
+            <div class="component-group">
+                <h3>プライマリボタン</h3>
+                <div class="component-samples">
+                    <button class="btn btn-primary">プライマリ</button>
+                    <button class="btn btn-primary btn-large">
+                        <i data-lucide="play" class="btn-icon"></i>
+                        大きなボタン
+                    </button>
+                </div>
+            </div>
+
+            <div class="component-group">
+                <h3>セカンダリボタン</h3>
+                <div class="component-samples">
+                    <button class="btn btn-outline">アウトライン</button>
+                    <button class="btn btn-ghost">
+                        <i data-lucide="home" class="btn-icon"></i>
+                        ゴースト
+                    </button>
+                </div>
+            </div>
+
+            <div class="component-group">
+                <h3>カラーバリエーション</h3>
+                <div class="component-samples">
+                    <button class="btn btn-success">成功</button>
+                    <button class="btn btn-orange">オレンジ</button>
+                    <button class="btn btn-purple">パープル</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- カードコンポーネント -->
+        <section class="catalog-section">
+            <h2>🃏 カードコンポーネント</h2>
+            
+            <div class="component-group">
+                <h3>ガラスモーフィズムカード</h3>
+                <div class="card-samples">
+                    <div class="mode-card sample-card">
+                        <div class="card-header">
+                            <i data-lucide="music" class="mode-icon"></i>
+                            <span class="badge badge-blue">サンプル</span>
+                        </div>
+                        <div class="card-content">
+                            <h3>カードタイトル</h3>
+                            <p class="description">カードの説明文がここに入ります。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="component-group">
+                <h3>結果カード</h3>
+                <div class="card-samples">
+                    <div class="result-card">
+                        <h4>結果表示</h4>
+                        <div class="result-row">
+                            <span>項目名</span>
+                            <span class="result-value">値</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- アイコンセット -->
+        <section class="catalog-section">
+            <h2>🎯 アイコンセット</h2>
+            
+            <div class="icon-group">
+                <h3>音楽系アイコン</h3>
+                <div class="icon-samples">
+                    <div class="icon-item">
+                        <i data-lucide="music" class="catalog-icon"></i>
+                        <span>music</span>
+                    </div>
+                    <div class="icon-item">
+                        <i data-lucide="mic" class="catalog-icon"></i>
+                        <span>mic</span>
+                    </div>
+                    <div class="icon-item">
+                        <i data-lucide="volume-2" class="catalog-icon"></i>
+                        <span>volume-2</span>
+                    </div>
+                    <div class="icon-item">
+                        <i data-lucide="play" class="catalog-icon"></i>
+                        <span>play</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="icon-group">
+                <h3>評価系アイコン</h3>
+                <div class="icon-samples">
+                    <div class="icon-item">
+                        <i data-lucide="crown" class="catalog-icon"></i>
+                        <span>crown (S級)</span>
+                    </div>
+                    <div class="icon-item">
+                        <i data-lucide="trophy" class="catalog-icon"></i>
+                        <span>trophy (A級)</span>
+                    </div>
+                    <div class="icon-item">
+                        <i data-lucide="star" class="catalog-icon"></i>
+                        <span>star (B級)</span>
+                    </div>
+                    <div class="icon-item">
+                        <i data-lucide="thumbs-up" class="catalog-icon"></i>
+                        <span>thumbs-up</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="icon-group">
+                <h3>UI系アイコン</h3>
+                <div class="icon-samples">
+                    <div class="icon-item">
+                        <i data-lucide="home" class="catalog-icon"></i>
+                        <span>home</span>
+                    </div>
+                    <div class="icon-item">
+                        <i data-lucide="settings" class="catalog-icon"></i>
+                        <span>settings</span>
+                    </div>
+                    <div class="icon-item">
+                        <i data-lucide="share" class="catalog-icon"></i>
+                        <span>share</span>
+                    </div>
+                    <div class="icon-item">
+                        <i data-lucide="arrow-right" class="catalog-icon"></i>
+                        <span>arrow-right</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 評価システム -->
+        <section class="catalog-section">
+            <h2>⭐ 評価システム</h2>
+            
+            <div class="evaluation-samples">
+                <div class="eval-item excellent">
+                    <i data-lucide="trophy" class="eval-icon"></i>
+                    <div class="eval-info">
+                        <div class="eval-grade">優秀 (Excellent)</div>
+                        <div class="eval-range">±15セント以内</div>
+                        <div class="eval-score">100点</div>
+                    </div>
+                </div>
+                <div class="eval-item good">
+                    <i data-lucide="star" class="eval-icon"></i>
+                    <div class="eval-info">
+                        <div class="eval-grade">良好 (Good)</div>
+                        <div class="eval-range">±25セント以内</div>
+                        <div class="eval-score">80点</div>
+                    </div>
+                </div>
+                <div class="eval-item pass">
+                    <i data-lucide="thumbs-up" class="eval-icon"></i>
+                    <div class="eval-info">
+                        <div class="eval-grade">合格 (Pass)</div>
+                        <div class="eval-range">±40セント以内</div>
+                        <div class="eval-score">60点</div>
+                    </div>
+                </div>
+                <div class="eval-item practice">
+                    <i data-lucide="triangle-alert" class="eval-icon"></i>
+                    <div class="eval-info">
+                        <div class="eval-grade">要練習 (Practice)</div>
+                        <div class="eval-range">±41セント以上</div>
+                        <div class="eval-score">30点</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 進行表示 -->
+        <section class="catalog-section">
+            <h2>📊 進行表示</h2>
+            
+            <div class="component-group">
+                <h3>プログレスバー</h3>
+                <div class="progress-samples">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 65%"></div>
+                    </div>
+                    <div class="progress-bar progress-orange">
+                        <div class="progress-fill" style="width: 45%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="component-group">
+                <h3>ドレミガイド</h3>
+                <div class="doremi-sample">
+                    <div class="note-circles">
+                        <div class="note-circle completed">ド</div>
+                        <div class="note-circle completed">レ</div>
+                        <div class="note-circle current">ミ</div>
+                        <div class="note-circle">ファ</div>
+                        <div class="note-circle">ソ</div>
+                        <div class="note-circle">ラ</div>
+                        <div class="note-circle">シ</div>
+                        <div class="note-circle">ド</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

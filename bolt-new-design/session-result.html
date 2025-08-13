@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>セッション結果 - 8va相対音感トレーニング</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.344.0/lucide.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Debug Navigation -->
+    <nav class="debug-nav">
+        <h4>Debug Nav</h4>
+        <div class="nav-grid">
+            <a href="index.html" class="nav-btn">
+                <i data-lucide="home" style="width: 12px; height: 12px;"></i>
+                <span>ホーム</span>
+            </a>
+            <a href="mic-test.html" class="nav-btn">
+                <i data-lucide="mic" style="width: 12px; height: 12px;"></i>
+                <span>マイクテスト</span>
+            </a>
+            <a href="training.html" class="nav-btn">
+                <i data-lucide="target" style="width: 12px; height: 12px;"></i>
+                <span>トレーニング</span>
+            </a>
+            <a href="session-result.html" class="nav-btn current">
+                <i data-lucide="check-circle" style="width: 12px; height: 12px;"></i>
+                <span>セッション結果</span>
+            </a>
+            <a href="final-result.html" class="nav-btn">
+                <i data-lucide="trophy" style="width: 12px; height: 12px;"></i>
+                <span>総合結果</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- ヘッダー -->
+        <header class="page-header">
+            <div class="page-header-icon page-header-icon-green">
+                <i data-lucide="check-circle" 
+                   style="width: 48px; height: 48px; color: white; stroke-width: 2;"></i>
+            </div>
+            <h1 class="page-title">セッション 1 完了！</h1>
+            <p class="page-description">良好</p>
+        </header>
+
+        <!-- メイン結果カード -->
+        <main class="result-main">
+            <div class="glass-card">
+                <!-- 総合スコア -->
+                <section class="score-section">
+                    <div class="score-icon">
+                        <i data-lucide="star" style="width: 32px; height: 32px; color: #22c55e;"></i>
+                    </div>
+                    <div class="score-value">76.3点</div>
+                    <div class="score-detail">平均誤差: ±28.5セント</div>
+                </section>
+
+                <!-- 評価分布 -->
+                <section class="distribution-section">
+                    <h3>音階別評価</h3>
+                    <div class="distribution-grid">
+                        <div class="distribution-item excellent">
+                            <i data-lucide="trophy" style="width: 24px; height: 24px; color: #fbbf24; margin-bottom: 8px;"></i>
+                            <span class="dist-label">優秀</span>
+                            <span class="dist-count">2</span>
+                        </div>
+                        <div class="distribution-item good">
+                            <i data-lucide="star" style="width: 24px; height: 24px; color: #22c55e; margin-bottom: 8px;"></i>
+                            <span class="dist-label">良好</span>
+                            <span class="dist-count">3</span>
+                        </div>
+                        <div class="distribution-item pass">
+                            <i data-lucide="thumbs-up" style="width: 24px; height: 24px; color: #3b82f6; margin-bottom: 8px;"></i>
+                            <span class="dist-label">合格</span>
+                            <span class="dist-count">2</span>
+                        </div>
+                        <div class="distribution-item practice">
+                            <i data-lucide="triangle-alert" style="width: 24px; height: 24px; color: #ef4444; margin-bottom: 8px;"></i>
+                            <span class="dist-label">要練習</span>
+                            <span class="dist-count">1</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 音階別詳細結果 -->
+                <section class="notes-section">
+                    <h3>音階別詳細結果</h3>
+                    <div class="notes-grid">
+                        <div class="note-result excellent">
+                            <div class="note-name">ド</div>
+                            <i data-lucide="trophy" class="note-icon" style="width: 32px; height: 32px; color: white; margin: 8px 0; stroke-width: 2.5;"></i>
+                            <div class="note-error">+5¢</div>
+                            <div class="note-score">100点</div>
+                        </div>
+                        <div class="note-result good">
+                            <div class="note-name">レ</div>
+                            <i data-lucide="star" class="note-icon" style="width: 32px; height: 32px; color: white; margin: 8px 0; stroke-width: 2.5;"></i>
+                            <div class="note-error">-18¢</div>
+                            <div class="note-score">85点</div>
+                        </div>
+                        <div class="note-result pass">
+                            <div class="note-name">ミ</div>
+                            <i data-lucide="thumbs-up" class="note-icon" style="width: 32px; height: 32px; color: white; margin: 8px 0; stroke-width: 2.5;"></i>
+                            <div class="note-error">+35¢</div>
+                            <div class="note-score">65点</div>
+                        </div>
+                        <div class="note-result practice">
+                            <div class="note-name">ファ</div>
+                            <i data-lucide="triangle-alert" class="note-icon" style="width: 32px; height: 32px; color: white; margin: 8px 0; stroke-width: 2.5;"></i>
+                            <div class="note-error">+52¢</div>
+                            <div class="note-score">35点</div>
+                        </div>
+                        <div class="note-result good">
+                            <div class="note-name">ソ</div>
+                            <i data-lucide="star" class="note-icon" style="width: 32px; height: 32px; color: white; margin: 8px 0; stroke-width: 2.5;"></i>
+                            <div class="note-error">-22¢</div>
+                            <div class="note-score">80点</div>
+                        </div>
+                        <div class="note-result excellent">
+                            <div class="note-name">ラ</div>
+                            <i data-lucide="trophy" class="note-icon" style="width: 32px; height: 32px; color: white; margin: 8px 0; stroke-width: 2.5;"></i>
+                            <div class="note-error">+8¢</div>
+                            <div class="note-score">95点</div>
+                        </div>
+                        <div class="note-result good">
+                            <div class="note-name">シ</div>
+                            <i data-lucide="star" class="note-icon" style="width: 32px; height: 32px; color: white; margin: 8px 0; stroke-width: 2.5;"></i>
+                            <div class="note-error">-25¢</div>
+                            <div class="note-score">75点</div>
+                        </div>
+                        <div class="note-result pass">
+                            <div class="note-name">ド</div>
+                            <i data-lucide="thumbs-up" class="note-icon" style="width: 32px; height: 32px; color: white; margin: 8px 0; stroke-width: 2.5;"></i>
+                            <div class="note-error">+38¢</div>
+                            <div class="note-score">60点</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- アクションボタン -->
+                <section class="action-buttons">
+                    <a href="index.html" class="btn btn-outline">
+                        <i data-lucide="home" style="width: 16px; height: 16px;"></i>
+                        <span>ホームに戻る</span>
+                    </a>
+                    <a href="final-result.html" class="btn btn-primary btn-large">
+                        <span>次のセッション</span>
+                        <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+                    </a>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        lucide.createIcons();
+        
+        // スコアアニメーション
+        function animateScore() {
+            const scoreValue = document.querySelector('.score-value');
+            const targetScore = 76.3;
+            let currentScore = 0;
+            const increment = targetScore / 60; // 1秒で完了
+            
+            const animation = setInterval(() => {
+                currentScore += increment;
+                if (currentScore >= targetScore) {
+                    currentScore = targetScore;
+                    clearInterval(animation);
+                }
+                scoreValue.textContent = currentScore.toFixed(1) + '点';
+            }, 16); // 60fps
+        }
+        
+        // ページ読み込み時にアニメーション開始
+        window.addEventListener('load', () => {
+            setTimeout(animateScore, 500);
+        });
+    </script>
+</body>
+</html>

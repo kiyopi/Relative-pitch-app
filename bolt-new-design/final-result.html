@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>総合結果 - 8va相対音感トレーニング</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.344.0/lucide.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Debug Navigation -->
+    <nav class="debug-nav">
+        <h4>Debug Nav</h4>
+        <div class="nav-grid">
+            <a href="index.html" class="nav-btn">
+                <i data-lucide="home" style="width: 12px; height: 12px;"></i>
+                <span>ホーム</span>
+            </a>
+            <a href="mic-test.html" class="nav-btn">
+                <i data-lucide="mic" style="width: 12px; height: 12px;"></i>
+                <span>マイクテスト</span>
+            </a>
+            <a href="training.html" class="nav-btn">
+                <i data-lucide="target" style="width: 12px; height: 12px;"></i>
+                <span>トレーニング</span>
+            </a>
+            <a href="session-result.html" class="nav-btn">
+                <i data-lucide="check-circle" style="width: 12px; height: 12px;"></i>
+                <span>セッション結果</span>
+            </a>
+            <a href="final-result.html" class="nav-btn current">
+                <i data-lucide="trophy" style="width: 12px; height: 12px;"></i>
+                <span>総合結果</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- ヘッダー -->
+        <header class="page-header">
+            <div class="page-header-icon page-header-icon-orange">
+                <i data-lucide="trophy" 
+                   style="width: 48px; height: 48px; color: white; stroke-width: 2;"></i>
+            </div>
+            <h1 class="page-title">ランダム基音モード 完了！</h1>
+            <p class="page-description">8セッション完了</p>
+        </header>
+
+        <!-- メイン結果カード -->
+        <main class="final-main">
+            <div class="glass-card">
+                <!-- 総合ランク -->
+                <section class="rank-section">
+                    <div class="rank-circle rank-b">
+                        <i data-lucide="star" style="width: 48px; height: 48px; color: white;"></i>
+                    </div>
+                    <div class="rank-info">
+                        <div class="rank-grade">B級</div>
+                        <div class="rank-score">76.3点</div>
+                        <div class="rank-message">良好！安定した音感です</div>
+                    </div>
+                </section>
+
+                <!-- 統計情報 -->
+                <section class="stats-grid">
+                    <div class="stat-card">
+                        <i data-lucide="trending-up" style="width: 24px; height: 24px; color: #3b82f6; margin-bottom: 8px;"></i>
+                        <div class="stat-label">総セッション数</div>
+                        <div class="stat-value">8</div>
+                    </div>
+                    <div class="stat-card">
+                        <i data-lucide="trophy" style="width: 24px; height: 24px; color: #3b82f6; margin-bottom: 8px;"></i>
+                        <div class="stat-label">優秀セッション</div>
+                        <div class="stat-value">3</div>
+                    </div>
+                </section>
+
+                <!-- セッション評価分布 -->
+                <section class="distribution-section">
+                    <h3>セッション評価分布</h3>
+                    <div class="distribution-grid">
+                        <div class="distribution-item excellent">
+                            <i data-lucide="trophy" style="width: 28px; height: 28px; color: #f59e0b; margin-bottom: 8px; stroke-width: 2.5;"></i>
+                            <span class="dist-label">優秀</span>
+                            <span class="dist-count">3</span>
+                            <span class="dist-percent">38%</span>
+                        </div>
+                        <div class="distribution-item good">
+                            <i data-lucide="star" style="width: 28px; height: 28px; color: #16a34a; margin-bottom: 8px; stroke-width: 2.5;"></i>
+                            <span class="dist-label">良好</span>
+                            <span class="dist-count">3</span>
+                            <span class="dist-percent">38%</span>
+                        </div>
+                        <div class="distribution-item pass">
+                            <i data-lucide="thumbs-up" style="width: 28px; height: 28px; color: #2563eb; margin-bottom: 8px; stroke-width: 2.5;"></i>
+                            <span class="dist-label">合格</span>
+                            <span class="dist-count">2</span>
+                            <span class="dist-percent">25%</span>
+                        </div>
+                        <div class="distribution-item practice">
+                            <i data-lucide="triangle-alert" style="width: 28px; height: 28px; color: #ef4444; margin-bottom: 8px; stroke-width: 2.5;"></i>
+                            <span class="dist-label">要練習</span>
+                            <span class="dist-count">0</span>
+                            <span class="dist-percent">0%</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- セッション履歴 -->
+                <section class="history-section">
+                    <h3>セッション履歴</h3>
+                    <div class="session-grid">
+                        <div class="session-item excellent">
+                            <div class="session-number">S1</div>
+                            <div class="session-score">85点</div>
+                        </div>
+                        <div class="session-item good">
+                            <div class="session-number">S2</div>
+                            <div class="session-score">76点</div>
+                        </div>
+                        <div class="session-item excellent">
+                            <div class="session-number">S3</div>
+                            <div class="session-score">92点</div>
+                        </div>
+                        <div class="session-item pass">
+                            <div class="session-number">S4</div>
+                            <div class="session-score">68点</div>
+                        </div>
+                        <div class="session-item good">
+                            <div class="session-number">S5</div>
+                            <div class="session-score">78点</div>
+                        </div>
+                        <div class="session-item excellent">
+                            <div class="session-number">S6</div>
+                            <div class="session-score">88点</div>
+                        </div>
+                        <div class="session-item good">
+                            <div class="session-number">S7</div>
+                            <div class="session-score">74点</div>
+                        </div>
+                        <div class="session-item pass">
+                            <div class="session-number">S8</div>
+                            <div class="session-score">65点</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- アクションボタン -->
+                <section class="final-actions">
+                    <a href="index.html" class="btn btn-outline">
+                        <i data-lucide="home" style="width: 16px; height: 16px;"></i>
+                        <span>ホームに戻る</span>
+                    </a>
+                    <a href="#" class="btn btn-success">
+                        <i data-lucide="share" style="width: 16px; height: 16px;"></i>
+                        <span>結果を共有</span>
+                    </a>
+                    <a href="training.html" class="btn btn-primary btn-large">
+                        <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
+                        <span>もう一度挑戦</span>
+                    </a>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        lucide.createIcons();
+        
+        // ランクアニメーション
+        function animateRank() {
+            const rankCircle = document.querySelector('.rank-circle');
+            const rankScore = document.querySelector('.rank-score');
+            
+            // スケールアニメーション
+            rankCircle.style.transform = 'scale(0)';
+            rankCircle.style.transition = 'transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            
+            setTimeout(() => {
+                rankCircle.style.transform = 'scale(1)';
+            }, 300);
+            
+            // スコアカウントアップ
+            setTimeout(() => {
+                const targetScore = 76.3;
+                let currentScore = 0;
+                const increment = targetScore / 60;
+                
+                const scoreAnimation = setInterval(() => {
+                    currentScore += increment;
+                    if (currentScore >= targetScore) {
+                        currentScore = targetScore;
+                        clearInterval(scoreAnimation);
+                    }
+                    rankScore.textContent = currentScore.toFixed(1) + '点';
+                }, 16);
+            }, 800);
+        }
+        
+        // ページ読み込み時にアニメーション開始
+        window.addEventListener('load', () => {
+            setTimeout(animateRank, 500);
+        });
+    </script>
+</body>
+</html>

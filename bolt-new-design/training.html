@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>トレーニング - 8va相対音感トレーニング</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.344.0/lucide.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Debug Navigation -->
+    <nav class="debug-nav">
+        <h4>Debug Nav</h4>
+        <div class="nav-grid">
+            <a href="index.html" class="nav-btn">
+                <i data-lucide="home" style="width: 12px; height: 12px;"></i>
+                <span>ホーム</span>
+            </a>
+            <a href="mic-test.html" class="nav-btn">
+                <i data-lucide="mic" style="width: 12px; height: 12px;"></i>
+                <span>マイクテスト</span>
+            </a>
+            <a href="training.html" class="nav-btn current">
+                <i data-lucide="target" style="width: 12px; height: 12px;"></i>
+                <span>トレーニング</span>
+            </a>
+            <a href="session-result.html" class="nav-btn">
+                <i data-lucide="check-circle" style="width: 12px; height: 12px;"></i>
+                <span>セッション結果</span>
+            </a>
+            <a href="final-result.html" class="nav-btn">
+                <i data-lucide="trophy" style="width: 12px; height: 12px;"></i>
+                <span>総合結果</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- ヘッダー -->
+        <header class="page-header">
+            <div class="page-header-icon page-header-icon-green">
+                <i data-lucide="target" 
+                   style="width: 48px; height: 48px; color: white; stroke-width: 2;"></i>
+            </div>
+            <div class="header-nav">
+                <a href="index.html" class="nav-btn">
+                    <i data-lucide="home" style="width: 16px; height: 16px;"></i>
+                    <span>ホーム</span>
+                </a>
+                <div class="session-badge">
+                    セッション 1/8
+                </div>
+            </div>
+            <h1 class="page-title">ランダム基音モード</h1>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main class="training-main">
+            <!-- 基音エリア -->
+            <section class="base-note-section">
+                <div class="glass-card base-note-card">
+                    <div class="card-icon">
+                        <i data-lucide="music" style="width: 32px; height: 32px; color: #60a5fa;"></i>
+                    </div>
+                    <h2>基音</h2>
+                    <button class="btn btn-primary btn-large" id="play-base-note">
+                        <i data-lucide="volume-2" style="width: 16px; height: 16px;"></i>
+                        <span>基音スタート</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 統合ガイドエリア -->
+            <section class="guide-section">
+                <div class="glass-card guide-card">
+                    <!-- 進行バー -->
+                    <div class="progress-section">
+                        <div class="progress-labels">
+                            <span>基音再生(2.0秒)</span>
+                            <span>休憩</span>
+                            <span>開始</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                            <div class="progress-marker">🎯</div>
+                        </div>
+                        <div class="progress-status">
+                            <span>↑現在位置</span>
+                            <span>↑ 0.5秒 ガイド開始</span>
+                        </div>
+                    </div>
+
+                    <!-- ドレミガイド -->
+                    <div class="doremi-guide">
+                        <div class="note-circles">
+                            <div class="note-circle" data-note="ド">ド</div>
+                            <div class="note-circle" data-note="レ">レ</div>
+                            <div class="note-circle" data-note="ミ">ミ</div>
+                            <div class="note-circle" data-note="ファ">ファ</div>
+                            <div class="note-circle" data-note="ソ">ソ</div>
+                            <div class="note-circle" data-note="ラ">ラ</div>
+                            <div class="note-circle" data-note="シ">シ</div>
+                            <div class="note-circle" data-note="ド">ド</div>
+                        </div>
+                        <div class="note-labels">
+                            <span>ド</span>
+                            <span>レ</span>
+                            <span>ミ</span>
+                            <span>ファ</span>
+                            <span>ソ</span>
+                            <span>ラ</span>
+                            <span>シ</span>
+                            <span>ド</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 音量確認セクション -->
+            <section class="volume-section">
+                <div class="glass-card volume-card">
+                    <h3>音量確認</h3>
+                    <div class="volume-meter">
+                        <div class="volume-bar">
+                            <div class="volume-fill" id="volume-fill"></div>
+                        </div>
+                        <span class="volume-percentage" id="volume-percentage">60%</span>
+                    </div>
+                    <p class="volume-status" id="volume-status">適切な音量です</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        lucide.createIcons();
+
+        // 基音再生ボタンの処理
+        document.getElementById('play-base-note').addEventListener('click', function() {
+            startTraining();
+        });
+
+        function startTraining() {
+            const button = document.getElementById('play-base-note');
+            const progressFill = document.getElementById('progress-fill');
+            
+            // ボタンを無効化
+            button.disabled = true;
+            button.innerHTML = '<i data-lucide="volume-2" style="width: 16px; height: 16px;"></i><span>再生中...</span>';
+            
+            // 進行バーアニメーション
+            progressFill.style.width = '0%';
+            progressFill.style.transition = 'width 2.5s linear';
+            
+            setTimeout(() => {
+                progressFill.style.width = '100%';
+            }, 100);
+            
+            // ドレミガイド開始
+            setTimeout(() => {
+                startDoremiGuide();
+            }, 2500);
+        }
+
+        function startDoremiGuide() {
+            const circles = document.querySelectorAll('.note-circle');
+            let currentIndex = 0;
+            
+            const interval = setInterval(() => {
+                if (currentIndex > 0) {
+                    circles[currentIndex - 1].classList.remove('current');
+                    circles[currentIndex - 1].classList.add('completed');
+                }
+                
+                if (currentIndex < circles.length) {
+                    circles[currentIndex].classList.add('current');
+                    currentIndex++;
+                } else {
+                    clearInterval(interval);
+                    // トレーニング完了後の処理
+                    setTimeout(() => {
+                        window.location.href = 'session-result.html';
+                    }, 1000);
+                }
+            }, 662.5); // 5.3秒 ÷ 8音 = 662.5ms
+        }
+
+        // 音量メーターのシミュレーション
+        function updateVolumeLevel() {
+            const volumeFill = document.getElementById('volume-fill');
+            const volumePercentage = document.getElementById('volume-percentage');
+            const volumeStatus = document.getElementById('volume-status');
+            
+            // ランダムな音量レベル（50-80%）
+            const level = Math.floor(Math.random() * 30) + 50;
+            
+            volumeFill.style.width = level + '%';
+            volumePercentage.textContent = level + '%';
+            
+            if (level >= 70) {
+                volumeStatus.textContent = '適切な音量です';
+                volumeStatus.style.color = '#22c55e';
+            } else if (level >= 40) {
+                volumeStatus.textContent = 'もう少し大きく';
+                volumeStatus.style.color = '#f59e0b';
+            } else {
+                volumeStatus.textContent = '音量が小さすぎます';
+                volumeStatus.style.color = '#ef4444';
+            }
+        }
+
+        // 音量レベルを定期的に更新
+        setInterval(updateVolumeLevel, 500);
+    </script>
+</body>
+</html>

@@ -840,3 +840,143 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-12 09:16:27] コミット: アプリタイトルを「8va相対音感トレーニング」に統一変更
+
+- 全仕様書のタイトルを8va相対音感トレーニングに更新
+- HTML/CSS/JSファイル内のアプリ名を統一更新
+- ブランドアイデンティティの確立
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-12 17:29:06] コミット: Lucideアイコンシステム統一: 独自システムから標準CDN版に移行
+
+主な変更点:
+- 全HTMLファイルでassets/icons/lucide-icons.js → unpkg CDN版に変更
+- 複雑な初期化システム → シンプルなlucide.createIcons()に統一
+- results.htmlでクラウンアイコン64px表示問題を解決
+- 動的アイコン生成時の再初期化システム実装
+- lucideIcon()ヘルパー関数を標準システム対応版に更新
+
+技術効果:
+- アイコン表示問題の根絶
+- 初期化エラーの解消
+- 統一されたサイズ制御
+- 保守性の大幅改善
+
+対象ファイル:
+- index.html, mic-test.html, training.html, records.html, results.html
+- TECHNICAL_SPECIFICATIONS.md (v2.1.0更新)
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-12 18:27:01] コミット: rank-sectionレイアウト大幅改善とグレードアニメーション実装
+
+主な変更点:
+- rank-sectionを3つの縦セクション構成に変更（左統計｜中央アイコン｜右統計）
+- Overall Statisticsの情報をrank-section内に統合移動
+- S-Eグレード専用アニメーション実装（E→D→C→B→A→S順次表示）
+- 統計値の初期表示を0.0に統一（リロード時の表示一貫性向上）
+- ヘッダー部分の重複S級表示を削除
+- Performance Charts表示問題を修正（グラフセクションを独立化）
+
+レイアウト構成:
+```
+[総合グレード]    [👑]    [セッション数]
+[平均誤差]              [最大誤差]
+```
+
+技術改善:
+- グレード表示消失問題の解消
+- アニメーション体験の統一化
+- レイアウト制御の簡素化
+- 視覚的階層の最適化
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-13 08:21:44] コミット: results.html: グレードアイコン下の縦配置レイアウトに変更とタイトル文字調整
+
+- rank-sectionを縦配置レイアウトに変更（グレードアイコンの下に統計情報）
+- ランダム基音モードのタイトルを2.0rem、太字に変更
+- 平均誤差をグレードと同じ黄色で表示
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-13 08:59:25] コミット: results.html: 統計情報フォントサイズ調整と¢単位追加
+
+- 総合グレード「B」を2.0remに変更
+- 統計情報の補足文を1remに変更
+- 平均誤差・最大誤差に¢単位を追加（HTML初期値とJavaScriptアニメーション両方）
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-13 09:17:55] コミット: results.html: グレード表示とランク取得メッセージの改善
+
+- Bグレードを白色に変更（平均誤差の黄色を目立たせる）
+- ランク取得メッセージをrank-stats-rowの下に移動
+- 各ランクに応じたメッセージを表示（S級: パーフェクトマスター、A級: エクセレント等）
+- 絵文字を削除してシンプルなメッセージに変更
+- マージンを適切に調整（ランク取得メッセージとシェアセクション間）
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-13 09:45:32] コミット: results.html: グラフアニメーションを個別制御に変更
+
+- 誤差推移チャートと評価分布チャートのアニメーションを別々に制御
+- errorTrendChartAnimated, accuracyChartAnimatedフラグを個別に追加
+- 各チャート用の独立したIntersection Observerを設定
+- モバイル版でも各グラフが表示された時点で個別にアニメーション開始
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-13 09:55:30] コミット: results.html: グラフアニメーション問題修正とデバッグ機能追加
+
+- 各チャートコンテナを直接監視する方式に変更（同一セクション問題解決）
+- errorTrendContainer と accuracyContainer を個別に監視
+- デバッグログ追加：初期化・完了タイミングを可視化
+- PC版・モバイル版のアニメーション制御を完全独立化
+- コンソールで📊🎯📈絵文字付きログを確認可能
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-13 10:10:40] コミット: results.html: モバイル版グラフアニメーション問題修正
+
+- 不要なchartsInitializedフラグを削除（古い処理のクリーンアップ）
+- リサイズ処理を改善：アニメーション状態を保持
+- オブザーバー重複登録防止機能追加
+- アニメーション済みチャートは監視対象から除外
+- デバッグログ強化（🔄リサイズ検出）
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-13 10:22:33] コミット: results.html: アクションボタンのモバイル対応とスタイル統一
+
+- モバイル版で縦積みレイアウトに変更（flex-col）
+- テキスト折り返し防止（white-space: nowrap）
+- フォントサイズとパディングを調整（0.875rem, 0.75rem 1rem）
+- 記録を見るボタンをbtn-primaryクラスに統一
+- 再チャレンジボタンと同じホバー効果を適用
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-13 10:57:06] コミット: ボタンスタイルをfinal-result.htmlと統一し余分な修正を削除
+
+- system.cssにbtn-largeクラス追加（var(--space-4) var(--space-10)）
+- results.htmlの全ボタンをbtn-largeに統一
+- 余分なインラインスタイル（font-size, padding, margin等）を削除
+- iPhone用強制マージンCSSを削除
+- システム統一のガラス効果をSNSアイコンに適用
+- webkit-mask問題を解決
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
