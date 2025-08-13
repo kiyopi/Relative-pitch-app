@@ -242,16 +242,13 @@
             color: white;
             text-decoration: none;
             position: relative;
-            overflow: hidden;
-            /* iPad対応: グラデーション背景を使用 */
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            /* btn-secondaryと同じシンプルな背景 */
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         
         .share-btn:hover {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.15));
+            background: rgba(255, 255, 255, 0.3);
             border-color: rgba(255, 255, 255, 0.4);
             transform: translateY(-3px) scale(1.1);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 255, 255, 0.2);
