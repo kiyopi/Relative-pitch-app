@@ -18,17 +18,32 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     
     <style>
-        /* 背景グラデーションアニメーション */
+        /* 背景グラデーションアニメーション - iOS対応版 */
         body {
+            position: relative;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            -webkit-overflow-scrolling: touch;
+            background: #0f172a; /* フォールバック */
+        }
+        
+        /* 疑似要素で背景アニメーション */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
             -webkit-animation: gradientShift 15s ease infinite;
+            z-index: -1;
             transform: translateZ(0);
             -webkit-transform: translateZ(0);
-            min-height: 100vh;
-            min-height: -webkit-fill-available;
-            -webkit-overflow-scrolling: touch;
+            -webkit-backface-visibility: hidden;
+            will-change: background-position;
         }
         
         @keyframes gradientShift {
