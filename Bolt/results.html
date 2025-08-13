@@ -195,6 +195,11 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
         
+        .rank-circle-icon {
+            width: 64px;
+            height: 64px;
+        }
+        
         @media (max-width: 768px) {
             .rank-content-row {
                 gap: 20px;
@@ -205,13 +210,13 @@
             }
             
             .rank-circle {
-                width: 80px;
-                height: 80px;
+                width: 90px;
+                height: 90px;
             }
             
-            .rank-circle i {
-                width: 48px !important;
-                height: 48px !important;
+            .rank-circle-icon {
+                width: 54px !important;
+                height: 54px !important;
             }
             
             .stat-value-rank {
@@ -320,7 +325,7 @@
                             <!-- グレードアイコン -->
                             <div class="rank-icon">
                                 <div class="rank-circle" style="background: linear-gradient(135deg, #fbbf24, #d97706);">
-                                    <i data-lucide="crown" style="width: 64px; height: 64px; color: white;"></i>
+                                    <i data-lucide="crown" class="rank-circle-icon" style="color: white;"></i>
                                 </div>
                             </div>
                             
