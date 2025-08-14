@@ -1223,3 +1223,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-15 08:44:35] コミット: 詳細分析メッセージの誤差データ深掘り実装: 実データに基づく具体的フィードバック生成
+
+- generateDetailedAnalysis関数: 平均誤差・最大誤差・Excellence Rateの詳細分析
+- generatePracticeGuidance関数: 成績レベル別の具体的練習指導
+- モード別特化メッセージでトレーニング方法の最適化
+- 抽象的なフィードバックから実データ活用型の有益な情報提供へ改善
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -1977,12 +1977,119 @@
             }
         }
         
-        // 詳細分析メッセージ生成
+        // ピンポイント分析: 最大・最小誤差の特定
+        function findExtremeErrors(sessionData) {
+            let maxErrorInfo = { error: 0, session: 0, note: '', sessionNote: '' };
+            let minErrorInfo = { error: 999, session: 0, note: '', sessionNote: '' };
+            
+            sessionData.forEach((session, sessionIndex) => {
+                const noteResults = generateSessionNoteResults(session);
+                noteResults.forEach(note => {
+                    const absError = Math.abs(note.centError);
+                    
+                    // 最大誤差の更新
+                    if (absError > maxErrorInfo.error) {
+                        maxErrorInfo = {
+                            error: absError,
+                            rawError: note.centError,
+                            session: sessionIndex + 1,
+                            note: note.noteName,
+                            sessionNote: session.baseNote
+                        };
+                    }
+                    
+                    // 最小誤差の更新（0でない値のみ）
+                    if (absError < minErrorInfo.error && absError > 0) {
+                        minErrorInfo = {
+                            error: absError,
+                            rawError: note.centError,
+                            session: sessionIndex + 1,
+                            note: note.noteName,
+                            sessionNote: session.baseNote
+                        };
+                    }
+                });
+            });
+            
+            return { maxError: maxErrorInfo, minError: minErrorInfo };
+        }
+        
+        // セッション別パフォーマンス分析
+        function analyzeSessionPerformance(sessionData) {
+            const sessionStats = sessionData.map((session, index) => {
+                const noteResults = generateSessionNoteResults(session);
+                const errors = noteResults.map(note => Math.abs(note.centError));
+                const avgError = errors.reduce((sum, err) => sum + err, 0) / errors.length;
+                
+                return {
+                    session: index + 1,
+                    baseNote: session.baseNote,
+                    avgError: avgError,
+                    noteCount: noteResults.length
+                };
+            });
+            
+            // 最良・最悪セッションを特定
+            const bestSession = sessionStats.reduce((min, current) => 
+                current.avgError < min.avgError ? current : min
+            );
+            const worstSession = sessionStats.reduce((max, current) => 
+                current.avgError > max.avgError ? current : max
+            );
+            
+            return { sessionStats, bestSession, worstSession };
+        }
+        
+        // 音程別弱点分析
+        function analyzeNoteWeaknesses(sessionData) {
+            const noteStats = {};
+            
+            sessionData.forEach(session => {
+                const noteResults = generateSessionNoteResults(session);
+                noteResults.forEach(note => {
+                    if (!noteStats[note.noteName]) {
+                        noteStats[note.noteName] = {
+                            errors: [],
+                            totalError: 0,
+                            count: 0
+                        };
+                    }
+                    
+                    const absError = Math.abs(note.centError);
+                    noteStats[note.noteName].errors.push(absError);
+                    noteStats[note.noteName].totalError += absError;
+                    noteStats[note.noteName].count++;
+                });
+            });
+            
+            // 平均誤差を計算してソート
+            const noteRankings = Object.keys(noteStats).map(noteName => ({
+                note: noteName,
+                avgError: noteStats[noteName].totalError / noteStats[noteName].count,
+                count: noteStats[noteName].count
+            })).sort((a, b) => b.avgError - a.avgError);
+            
+            return {
+                weakest: noteRankings.slice(0, 3),  // TOP3弱点
+                strongest: noteRankings.slice(-3).reverse()  // TOP3得意
+            };
+        }
+        
+        // 詳細分析メッセージ生成（ピンポイント情報付き）
         function generateDetailedAnalysis(gradeResult, mode) {
             const metrics = gradeResult.metrics;
             const avgError = Math.abs(metrics.original.avgCentError);
             const maxError = Math.abs(metrics.original.maxCentError);
             const excellenceRate = metrics.original.excellenceRate;
+            
+            // ピンポイント分析の実行
+            const extremeErrors = findExtremeErrors(mockSessionsData);
+            const sessionPerf = analyzeSessionPerformance(mockSessionsData);
+            const noteWeaknesses = analyzeNoteWeaknesses(mockSessionsData);
+            
+            // 高度な分析の実行
+            const timeSeriesAnalysis = analyzeTimeSeriesPerformance(mockSessionsData);
+            const relativePitchPatterns = analyzeRelativePitchPatterns(mockSessionsData);
             
             // 基本的な分析コンポーネント
             const analysisComponents = [];
@@ -1998,20 +2105,58 @@
                 analysisComponents.push("平均誤差±" + avgError.toFixed(1) + "¢は改善が必要で、基本的な音程感覚の定着に集中しましょう");
             }
             
-            // 2. 最大誤差の分析
-            if (maxError > 50) {
-                analysisComponents.push("最大誤差" + (maxError > 0 ? "+" : "") + maxError.toFixed(1) + "¢は注意が必要で、特定の音程で大きなずれが発生しています");
-            } else if (maxError > 30) {
-                analysisComponents.push("最大誤差" + (maxError > 0 ? "+" : "") + maxError.toFixed(1) + "¢は許容範囲内ですが、安定性の向上が望まれます");
+            // 2. 最大誤差のピンポイント特定
+            const maxErrInfo = extremeErrors.maxError;
+            const maxErrSign = maxErrInfo.rawError > 0 ? '+' : '';
+            analysisComponents.push(`最大誤差${maxErrSign}${maxErrInfo.rawError.toFixed(1)}¢はセッション${maxErrInfo.session}の${maxErrInfo.note}音で発生しており、この音程の集中練習が効果的です`);
+            
+            // 3. 最小誤差の褒賞
+            const minErrInfo = extremeErrors.minError;
+            const minErrSign = minErrInfo.rawError > 0 ? '+' : '';
+            if (minErrInfo.error < 10) {
+                analysisComponents.push(`最高精度${minErrSign}${minErrInfo.rawError.toFixed(1)}¢をセッション${minErrInfo.session}の${minErrInfo.note}音で達成しており、この精度の再現性向上が鍵となります`);
             }
             
-            // 3. Excellence Rate分析
+            // 4. セッション別パフォーマンス
+            analysisComponents.push(`セッション別では${sessionPerf.bestSession.session}番目（基音${sessionPerf.bestSession.baseNote}）が平均±${sessionPerf.bestSession.avgError.toFixed(1)}¢で最良成績、${sessionPerf.worstSession.session}番目（基音${sessionPerf.worstSession.baseNote}）が平均±${sessionPerf.worstSession.avgError.toFixed(1)}¢で要改善です`);
+            
+            // 5. 音程別弱点分析
+            if (noteWeaknesses.weakest.length > 0) {
+                const weakNote = noteWeaknesses.weakest[0];
+                const strongNote = noteWeaknesses.strongest[0];
+                analysisComponents.push(`音程別では${weakNote.note}音が平均±${weakNote.avgError.toFixed(1)}¢で最も苦手、${strongNote.note}音が平均±${strongNote.avgError.toFixed(1)}¢で最も安定しています`);
+            }
+            
+            // 6. Excellence Rate分析
             if (excellenceRate >= 80) {
                 analysisComponents.push("Excellence Rate " + excellenceRate.toFixed(1) + "%は優秀で、±20¢以内の高精度な発声が安定しています");
             } else if (excellenceRate >= 60) {
                 analysisComponents.push("Excellence Rate " + excellenceRate.toFixed(1) + "%は良好ですが、より多くの音程で高精度を目指しましょう");
             } else {
                 analysisComponents.push("Excellence Rate " + excellenceRate.toFixed(1) + "%は改善が必要で、基本的な音程の安定化が重要です");
+            }
+            
+            // 7. 時系列進歩分析
+            if (timeSeriesAnalysis.improvementTrend > 5) {
+                analysisComponents.push(`学習効果: 前半±${timeSeriesAnalysis.earlyAvg.toFixed(1)}¢から後半±${timeSeriesAnalysis.lateAvg.toFixed(1)}¢へと±${timeSeriesAnalysis.improvementTrend.toFixed(1)}¢の顕著な改善が見られ、継続練習の効果が現れています`);
+            } else if (timeSeriesAnalysis.improvementTrend < -5) {
+                analysisComponents.push(`注意事項: 前半±${timeSeriesAnalysis.earlyAvg.toFixed(1)}¢から後半±${timeSeriesAnalysis.lateAvg.toFixed(1)}¢へと±${Math.abs(timeSeriesAnalysis.improvementTrend).toFixed(1)}¢の精度低下が見られ、集中力の維持や練習方法の見直しが必要です`);
+            } else {
+                analysisComponents.push(`一貫性: 前半後半を通じて安定した成績を維持しており、±${Math.abs(timeSeriesAnalysis.improvementTrend).toFixed(1)}¢の変動に収まっています`);
+            }
+            
+            // 8. 疲労効果分析
+            if (timeSeriesAnalysis.avgFatigueEffect > 3) {
+                analysisComponents.push(`疲労パターン: セッション内で平均±${timeSeriesAnalysis.avgFatigueEffect.toFixed(1)}¢の精度低下が検出されており、短時間集中型の練習が効果的です`);
+            } else if (timeSeriesAnalysis.avgFatigueEffect < -3) {
+                analysisComponents.push(`ウォームアップ効果: セッション内で平均±${Math.abs(timeSeriesAnalysis.avgFatigueEffect).toFixed(1)}¢の精度向上が見られ、継続練習による調子の向上が確認できます`);
+            }
+            
+            // 9. 相対音感パターン分析
+            if (relativePitchPatterns.mostDifficult.length > 0) {
+                const difficultInterval = relativePitchPatterns.mostDifficult[0];
+                const easyInterval = relativePitchPatterns.easiest[0];
+                analysisComponents.push(`音程間隔特性: ${difficultInterval.intervalName}（±${difficultInterval.avgError.toFixed(1)}¢）が最も困難で、${easyInterval.intervalName}（±${easyInterval.avgError.toFixed(1)}¢）が最も得意な音程間隔です。困難な音程間隔の集中練習が全体向上の鍵となります`);
             }
             
             // モード別の特化分析
@@ -2026,16 +2171,40 @@
             return analysisComponents.join("。") + "。";
         }
         
-        // 練習指導メッセージ生成
+        // 練習指導メッセージ生成（ピンポイント改善指導付き）
         function generatePracticeGuidance(gradeResult, mode) {
             const metrics = gradeResult.metrics;
             const avgError = Math.abs(metrics.original.avgCentError);
             const maxError = Math.abs(metrics.original.maxCentError);
             const excellenceRate = metrics.original.excellenceRate;
             
+            // ピンポイント分析データを取得
+            const extremeErrors = findExtremeErrors(mockSessionsData);
+            const sessionPerf = analyzeSessionPerformance(mockSessionsData);
+            const noteWeaknesses = analyzeNoteWeaknesses(mockSessionsData);
+            
             const guidance = [];
             
-            // 精度レベル別の基本練習法
+            // 1. 最優先改善ポイント（最大誤差の特定練習）
+            const maxErrInfo = extremeErrors.maxError;
+            if (maxErrInfo.error > 30) {
+                guidance.push(`最優先課題: ${maxErrInfo.note}音で${Math.abs(maxErrInfo.rawError).toFixed(1)}¢の大きな誤差が発生しているため、この音程を重点的に練習してください。基音${maxErrInfo.sessionNote}から${maxErrInfo.note}音への音程関係を楽器で確認しながら反復練習が効果的です`);
+            }
+            
+            // 2. 音程別弱点に基づく練習指導
+            if (noteWeaknesses.weakest.length > 0) {
+                const weakNote = noteWeaknesses.weakest[0];
+                const strongNote = noteWeaknesses.strongest[0];
+                guidance.push(`音程別改善: ${weakNote.note}音が平均±${weakNote.avgError.toFixed(1)}¢で最も苦手です。得意な${strongNote.note}音（±${strongNote.avgError.toFixed(1)}¢）から${weakNote.note}音への音程移動を段階的に練習しましょう`);
+            }
+            
+            // 3. セッション品質に基づく練習戦略
+            const perfGap = sessionPerf.worstSession.avgError - sessionPerf.bestSession.avgError;
+            if (perfGap > 15) {
+                guidance.push(`一貫性向上: セッション間で±${perfGap.toFixed(1)}¢の成績差があります。基音${sessionPerf.bestSession.baseNote}での良好な感覚を基音${sessionPerf.worstSession.baseNote}にも応用する練習で安定性を高めましょう`);
+            }
+            
+            // 4. 精度レベル別の基本練習法
             if (avgError > 30) {
                 guidance.push("基本練習: 楽器と一緒に歌って音程を耳で確認する練習を毎日10分行いましょう");
             } else if (avgError > 20) {
@@ -2044,14 +2213,20 @@
                 guidance.push("上級練習: 楽器なしでの音程記憶と相対音感による音程関係の構築を重点的に");
             }
             
-            // Excellence Rate改善法
+            // 5. Excellence Rate改善法
             if (excellenceRate < 60) {
                 guidance.push("安定性強化: 同じ音程を5回連続で正確に歌える練習で筋肉記憶を定着させてください");
             } else if (excellenceRate < 80) {
                 guidance.push("精度向上: ±10¢以内を目標とした高精度練習で更なる向上を目指しましょう");
             }
             
-            // モード特化練習法
+            // 6. 成功体験の再現指導
+            const minErrInfo = extremeErrors.minError;
+            if (minErrInfo.error < 10) {
+                guidance.push(`成功再現: セッション${minErrInfo.session}の${minErrInfo.note}音で達成した±${minErrInfo.error.toFixed(1)}¢の高精度を他の音程でも再現できるよう、その時の発声感覚を意識的に記憶して応用練習を行いましょう`);
+            }
+            
+            // 7. モード特化練習法
             if (mode === 8) {
                 guidance.push("推奨練習: ドレミファソラシドの基本音階を楽器と合わせて歌う練習を重点的に");
             } else if (mode === 12) {
@@ -2060,12 +2235,129 @@
                 guidance.push("推奨練習: 12音律システムの完全習得と長期記憶の定着を目指した集中練習");
             }
             
-            // 技術的改善提案
-            if (maxError > 50) {
-                guidance.push("重点改善: 特に苦手な音程を集中的に練習し、段階的な難易度調整を行ってください");
-            }
-            
             return guidance.join("。") + "。";
+        }
+
+        // 時系列パフォーマンス分析
+        function analyzeTimeSeriesPerformance(sessionData) {
+            const sessionMetrics = sessionData.map((session, index) => {
+                const noteResults = generateSessionNoteResults(session);
+                const errors = noteResults.map(note => Math.abs(note.centError));
+                const avgError = errors.reduce((sum, err) => sum + err, 0) / errors.length;
+                const excellentCount = errors.filter(err => err <= 20).length;
+                const excellenceRate = excellentCount / errors.length;
+                
+                return {
+                    session: index + 1,
+                    avgError: avgError,
+                    excellenceRate: excellenceRate,
+                    baseNote: session.baseNote
+                };
+            });
+            
+            // 進歩傾向の分析
+            const earlyAvg = sessionMetrics.slice(0, Math.ceil(sessionMetrics.length / 2))
+                .reduce((sum, s) => sum + s.avgError, 0) / Math.ceil(sessionMetrics.length / 2);
+            const lateAvg = sessionMetrics.slice(Math.floor(sessionMetrics.length / 2))
+                .reduce((sum, s) => sum + s.avgError, 0) / Math.floor(sessionMetrics.length / 2);
+            
+            const improvementTrend = earlyAvg - lateAvg;  // 正の値は改善
+            
+            // 疲労効果の検出（セッション内での精度低下）
+            const fatiguePattern = sessionData.map((session, sessionIndex) => {
+                const noteResults = generateSessionNoteResults(session);
+                const firstHalf = noteResults.slice(0, Math.ceil(noteResults.length / 2));
+                const secondHalf = noteResults.slice(Math.floor(noteResults.length / 2));
+                
+                const firstHalfAvg = firstHalf.reduce((sum, note) => sum + Math.abs(note.centError), 0) / firstHalf.length;
+                const secondHalfAvg = secondHalf.reduce((sum, note) => sum + Math.abs(note.centError), 0) / secondHalf.length;
+                
+                return {
+                    session: sessionIndex + 1,
+                    fatigueEffect: secondHalfAvg - firstHalfAvg  // 正の値は疲労
+                };
+            });
+            
+            const avgFatigueEffect = fatiguePattern.reduce((sum, f) => sum + f.fatigueEffect, 0) / fatiguePattern.length;
+            
+            return {
+                sessionMetrics,
+                improvementTrend,
+                avgFatigueEffect,
+                earlyAvg,
+                lateAvg
+            };
+        }
+        
+        // 相対音感パターン分析
+        function analyzeRelativePitchPatterns(sessionData) {
+            const intervalAnalysis = {};
+            const noteToSemitone = {
+                'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
+                'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11
+            };
+            
+            sessionData.forEach(session => {
+                const baseNoteName = session.baseNote.replace(/[0-9]/g, '');
+                const baseSemitone = noteToSemitone[baseNoteName];
+                const noteResults = generateSessionNoteResults(session);
+                
+                noteResults.forEach(note => {
+                    const targetNoteName = note.noteName.replace(/[0-9]/g, '');
+                    const targetSemitone = noteToSemitone[targetNoteName];
+                    
+                    // 音程間隔を計算（0-11半音）
+                    let interval = (targetSemitone - baseSemitone + 12) % 12;
+                    
+                    if (!intervalAnalysis[interval]) {
+                        intervalAnalysis[interval] = {
+                            semitones: interval,
+                            intervalName: getIntervalName(interval),
+                            errors: [],
+                            avgError: 0,
+                            count: 0
+                        };
+                    }
+                    
+                    intervalAnalysis[interval].errors.push(Math.abs(note.centError));
+                    intervalAnalysis[interval].count++;
+                });
+            });
+            
+            // 各音程間隔の平均誤差を計算
+            Object.keys(intervalAnalysis).forEach(interval => {
+                const data = intervalAnalysis[interval];
+                data.avgError = data.errors.reduce((sum, err) => sum + err, 0) / data.errors.length;
+            });
+            
+            // 困難な音程間隔をランキング
+            const intervalRanking = Object.values(intervalAnalysis)
+                .sort((a, b) => b.avgError - a.avgError);
+            
+            return {
+                intervalAnalysis,
+                mostDifficult: intervalRanking.slice(0, 3),
+                easiest: intervalRanking.slice(-3).reverse()
+            };
+        }
+        
+        // 音程間隔名の取得
+        function getIntervalName(semitones) {
+            const intervalNames = {
+                0: 'ユニゾン',
+                1: '短2度',
+                2: '長2度', 
+                3: '短3度',
+                4: '長3度',
+                5: '完全4度',
+                6: '増4度/減5度',
+                7: '完全5度',
+                8: '短6度',
+                9: '長6度',
+                10: '短7度',
+                11: '長7度'
+            };
+            return intervalNames[semitones] || '不明';
         }
 
         // 12音別成績データの分析
