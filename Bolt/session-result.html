@@ -231,6 +231,60 @@
             color: rgba(255, 255, 255, 0.8);
             font-size: 0.875rem;
         }
+        
+        /* ランク説明ポップオーバー - 画面中央配置 */
+        .rank-popover {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+        }
+        
+        .rank-popover.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .rank-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 8px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .rank-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* ？アイコン - グラススタイル */
+        .rank-info-btn {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all 0.2s ease;
+        }
+        
+        .rank-info-btn:hover {
+            background: rgba(255, 255, 255, 0.2) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
@@ -268,10 +322,51 @@
                 <div class="score-section">
                     <div class="score-grid">
                         <!-- トロフィーアイコン（中央） -->
-                        <div class="trophy-section" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                            <div class="mb-2">
-                                <div style="width: 100px; height: 100px; background: rgba(251, 191, 36, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 1px solid rgba(251, 191, 36, 0.3);">
+                        <div class="trophy-section" style="display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: flex-end;">
+                            <div>
+                                <div style="position: relative; width: 100px; height: 100px; background: rgba(251, 191, 36, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 1px solid rgba(251, 191, 36, 0.3);">
                                     <i data-lucide="trophy" class="text-yellow-300" style="width: 64px; height: 64px;"></i>
+                                    <!-- 精度ランク説明アイコン -->
+                                    <button class="rank-info-btn" onclick="toggleRankPopover()" style="position: absolute; bottom: -12px; right: -12px; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                        <i data-lucide="help-circle" class="text-white" style="width: 14px; height: 14px;"></i>
+                                    </button>
+                                    
+                                    <!-- 精度ランク説明ポップオーバー -->
+                                    <div id="rank-popover" class="rank-popover">
+                                        <h4 style="color: white; font-size: 1rem; font-weight: 600; margin-bottom: 12px;">精度ランク</h4>
+                                        
+                                        <div class="rank-item">
+                                            <i data-lucide="trophy" class="text-yellow-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+                                            <div>
+                                                <div style="color: #fcd34d; font-weight: 500; font-size: 0.875rem;">Excellent</div>
+                                                <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.75rem;">±15セント以内</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="rank-item">
+                                            <i data-lucide="star" class="text-green-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+                                            <div>
+                                                <div style="color: #86efac; font-weight: 500; font-size: 0.875rem;">Good</div>
+                                                <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.75rem;">15～25セント</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="rank-item">
+                                            <i data-lucide="thumbs-up" class="text-blue-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+                                            <div>
+                                                <div style="color: #7dd3fc; font-weight: 500; font-size: 0.875rem;">Pass</div>
+                                                <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.75rem;">25～40セント</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="rank-item">
+                                            <i data-lucide="triangle-alert" class="text-red-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+                                            <div>
+                                                <div style="color: #fca5a5; font-weight: 500; font-size: 0.875rem;">Practice</div>
+                                                <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.75rem;">40セント以上</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <p class="text-lg text-white font-medium mt-4">素晴らしい精度！</p>
                             </div>
@@ -484,6 +579,22 @@
             // Start average error animation
             setTimeout(animateAverageError, 500);
         }
+
+        // ランク説明ポップオーバー制御
+        function toggleRankPopover() {
+            const popover = document.getElementById('rank-popover');
+            popover.classList.toggle('show');
+        }
+        
+        // ポップオーバー外クリックで閉じる
+        document.addEventListener('click', function(event) {
+            const popover = document.getElementById('rank-popover');
+            const button = document.querySelector('.rank-info-btn');
+            
+            if (popover && !popover.contains(event.target) && !button.contains(event.target)) {
+                popover.classList.remove('show');
+            }
+        });
 
         // Initialize on DOM ready
         document.addEventListener('DOMContentLoaded', initializePage);

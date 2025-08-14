@@ -453,9 +453,11 @@
                         <i data-lucide="microscope" style="width: 28px; height: 28px; color: #fbbf24;"></i>
                         <h2 style="color: white; font-size: 1.75rem; font-weight: 700; margin: 0;">詳細分析レポート</h2>
                     </div>
-                    <p style="color: #94a3b8; font-size: 1rem; margin: 0;">
-                        あなたの相対音感を科学的に分析し、具体的な改善方法をご提案します
-                    </p>
+                    <div style="background: rgba(0, 0, 0, 0.4); padding: 1rem; border-radius: 8px; backdrop-filter: blur(10px);">
+                        <p style="color: #e2e8f0; font-size: 1rem; margin: 0; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
+                            あなたの相対音感を科学的に分析し、具体的な改善方法をご提案します
+                        </p>
+                    </div>
                 </div>
                 
                 <!-- モード別フィードバック -->
@@ -1910,22 +1912,22 @@
             // モード別のフィードバック内容定義
             const modeSpecificFeedback = {
                 8: {
-                    focus: '基本的な音程感覚の定着',
-                    message: 'まずは8つの自然音階での相対音感を身につけましょう。カラオケや合唱で音程を合わせて歌えるレベルを目指します。',
+                    focus: '基本的な音程感覚の定着度',
+                    message: generateDetailedAnalysis(gradeResult, 8),
                     nextStep: '連続チャレンジモードで半音を含む12音への挑戦',
-                    practiceAdvice: '毎日5分の短時間練習で継続性を重視'
+                    practiceAdvice: generatePracticeGuidance(gradeResult, 8)
                 },
                 12: {
-                    focus: '12音すべてへの対応力向上',
-                    message: '半音を含む全ての音に対する相対音感を強化中です。実用的な相対音感レベルの習得を目指します。',
+                    focus: '12音すべてへの対応力向上度',
+                    message: generateDetailedAnalysis(gradeResult, 12),
                     nextStep: '12音階モードでの上昇・下降パターンマスター',
-                    practiceAdvice: '週3回・15分の集中練習で12音律システムを完成'
+                    practiceAdvice: generatePracticeGuidance(gradeResult, 12)
                 },
                 24: {
-                    focus: 'プロレベルの完璧な12音律システム',
-                    message: '音楽プロフェッショナル向けの最高精度を目指します。上昇・下降両パターンでの完璧な習得が目標です。',
+                    focus: 'プロレベルの完璧な12音律システム習得度',
+                    message: generateDetailedAnalysis(gradeResult, 24),
                     nextStep: 'マスターレベル達成後の実践的音楽活動への応用',
-                    practiceAdvice: '上昇・下降両パターンでの完璧な習得が目標'
+                    practiceAdvice: generatePracticeGuidance(gradeResult, 24)
                 }
             };
             
@@ -1975,6 +1977,97 @@
             }
         }
         
+        // 詳細分析メッセージ生成
+        function generateDetailedAnalysis(gradeResult, mode) {
+            const metrics = gradeResult.metrics;
+            const avgError = Math.abs(metrics.original.avgCentError);
+            const maxError = Math.abs(metrics.original.maxCentError);
+            const excellenceRate = metrics.original.excellenceRate;
+            
+            // 基本的な分析コンポーネント
+            const analysisComponents = [];
+            
+            // 1. 平均誤差の分析
+            if (avgError <= 10) {
+                analysisComponents.push("平均誤差±" + avgError.toFixed(1) + "¢は極めて優秀で、プロフェッショナルレベルの精度です");
+            } else if (avgError <= 20) {
+                analysisComponents.push("平均誤差±" + avgError.toFixed(1) + "¢は安定した良好な成績で、音程感覚が定着しています");
+            } else if (avgError <= 30) {
+                analysisComponents.push("平均誤差±" + avgError.toFixed(1) + "¢は標準的な成績ですが、さらなる精度向上の余地があります");
+            } else {
+                analysisComponents.push("平均誤差±" + avgError.toFixed(1) + "¢は改善が必要で、基本的な音程感覚の定着に集中しましょう");
+            }
+            
+            // 2. 最大誤差の分析
+            if (maxError > 50) {
+                analysisComponents.push("最大誤差" + (maxError > 0 ? "+" : "") + maxError.toFixed(1) + "¢は注意が必要で、特定の音程で大きなずれが発生しています");
+            } else if (maxError > 30) {
+                analysisComponents.push("最大誤差" + (maxError > 0 ? "+" : "") + maxError.toFixed(1) + "¢は許容範囲内ですが、安定性の向上が望まれます");
+            }
+            
+            // 3. Excellence Rate分析
+            if (excellenceRate >= 80) {
+                analysisComponents.push("Excellence Rate " + excellenceRate.toFixed(1) + "%は優秀で、±20¢以内の高精度な発声が安定しています");
+            } else if (excellenceRate >= 60) {
+                analysisComponents.push("Excellence Rate " + excellenceRate.toFixed(1) + "%は良好ですが、より多くの音程で高精度を目指しましょう");
+            } else {
+                analysisComponents.push("Excellence Rate " + excellenceRate.toFixed(1) + "%は改善が必要で、基本的な音程の安定化が重要です");
+            }
+            
+            // モード別の特化分析
+            if (mode === 8) {
+                analysisComponents.push("ランダム基音モードでは自然な音階（ドレミファソラシ）の定着度が重要です");
+            } else if (mode === 12) {
+                analysisComponents.push("連続チャレンジモードでは半音を含む12音への適応力が試されています");
+            } else if (mode === 24) {
+                analysisComponents.push("12音階モードでは完璧な12音律システムの習得が求められます");
+            }
+            
+            return analysisComponents.join("。") + "。";
+        }
+        
+        // 練習指導メッセージ生成
+        function generatePracticeGuidance(gradeResult, mode) {
+            const metrics = gradeResult.metrics;
+            const avgError = Math.abs(metrics.original.avgCentError);
+            const maxError = Math.abs(metrics.original.maxCentError);
+            const excellenceRate = metrics.original.excellenceRate;
+            
+            const guidance = [];
+            
+            // 精度レベル別の基本練習法
+            if (avgError > 30) {
+                guidance.push("基本練習: 楽器と一緒に歌って音程を耳で確認する練習を毎日10分行いましょう");
+            } else if (avgError > 20) {
+                guidance.push("中級練習: ピアノなしで歌った後に楽器で確認する練習で独立性を高めましょう");
+            } else {
+                guidance.push("上級練習: 楽器なしでの音程記憶と相対音感による音程関係の構築を重点的に");
+            }
+            
+            // Excellence Rate改善法
+            if (excellenceRate < 60) {
+                guidance.push("安定性強化: 同じ音程を5回連続で正確に歌える練習で筋肉記憶を定着させてください");
+            } else if (excellenceRate < 80) {
+                guidance.push("精度向上: ±10¢以内を目標とした高精度練習で更なる向上を目指しましょう");
+            }
+            
+            // モード特化練習法
+            if (mode === 8) {
+                guidance.push("推奨練習: ドレミファソラシドの基本音階を楽器と合わせて歌う練習を重点的に");
+            } else if (mode === 12) {
+                guidance.push("推奨練習: 半音階（クロマチック）練習で#♭音程への適応力を向上させましょう");
+            } else if (mode === 24) {
+                guidance.push("推奨練習: 12音律システムの完全習得と長期記憶の定着を目指した集中練習");
+            }
+            
+            // 技術的改善提案
+            if (maxError > 50) {
+                guidance.push("重点改善: 特に苦手な音程を集中的に練習し、段階的な難易度調整を行ってください");
+            }
+            
+            return guidance.join("。") + "。";
+        }
+
         // 12音別成績データの分析
         function analyzeTonePerformance(sessionData) {
             const toneData = {};

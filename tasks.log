@@ -1064,3 +1064,162 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 [2025-08-13 18:19:54] コミット: 作業履歴更新: iOS/モバイル対応改善と詳細分析セクション最終調整
 [2025-08-14 00:49:03] コミット: session-result.html完成: セッション評価ページの機能とデザイン実装
 [2025-08-14 01:08:02] コミット: 進行バーに次の基音へボタン追加: レイアウト改善とユーザビリティ向上
+[2025-08-14 09:51:42] コミット: モバイル版進行バーレイアウト修正: iPhone対応で縦並び配置に変更
+[2025-08-14 10:41:52] コミット: session-result.html: iPhoneレイアウトはみ出し問題を修正
+
+- レスポンシブレイアウト実装: iPhone縦並び、PC横3列維持
+- フォントサイズ段階調整: iPhone 2rem, タブレット 3rem, PC 4rem
+- 進行バー横並び修正: PC版で進行バーとボタンの適切な配置
+- 余白最適化: iPhone用パディング・マージン縮小
+- 見出しスタイル統一: ui-catalog.htmlに準拠
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-14 10:52:38] コミット: session-result.html: モバイルレスポンシブ調整とデバッグ表示追加
+
+- メディアクエリブレークポイント拡張: 375px → 480px
+- フォントサイズ指定強化: より具体的なセレクターで!important適用
+- デバッグ用境界線追加: モバイルスタイル適用確認用
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-14 11:18:25] コミット: session-result.html: PC表示崩れ完全修正とレイアウト最適化
+
+- Grid Areas実装でPC配置明確化: 左基音-中央トロフィー-右誤差
+- デバッグ要素完全削除: 赤い境界線等の開発用スタイル除去
+- フォントサイズ最適化: C4/誤差 2.5rem、ラベル 1.125rem
+- 下揃え配置: align-items end で統一感向上
+- レスポンシブ安定化: Grid vs Flex競合解消
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-15 07:06:21] コミット: 動的グレード計算システムの実装と仕様書整理
+
+## 実装内容
+- results.html: 固定グレード「B」を動的計算に変更
+- 4つの核心洞察に基づく包括的評価ロジック実装
+- モード別評価基準（8/12/24セッション対応）
+- デバイス品質検出と技術制約調整機能
+
+## 仕様書整理
+- 重要仕様書4つを新規作成
+  - CORE_INSIGHTS_REFERENCE.md: 核心的設計思想
+  - DYNAMIC_GRADE_LOGIC_SPECIFICATION.md: 動的計算ロジック
+  - OVERALL_EVALUATION_MOCKUP_ANALYSIS.md: 総合評価分析
+  - SPECIFICATION_INDEX.md: 仕様書管理インデックス
+
+- 重複仕様書4つをアーカイブ化
+  - archived_specifications/へ移動
+
+- CLAUDE.md更新: 重要参照文書リスト追加
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-15 07:41:17] コミット: 3モードテストシステムの実装
+
+## 新機能
+- URLパラメータによるモード切り替え (?mode=8/12/24)
+- 3つのモード別モックデータ
+  - 8セッション（初級・ランダム基音）: 寛容な評価基準
+  - 12セッション（中級・連続チャレンジ）: 標準的な評価基準
+  - 24セッション（上級・12音階）: 厳格な評価基準
+
+## 開発用機能
+- テストモードインジケーター（画面右上）
+- 切り替えリンク（ページ下部、開発環境のみ表示）
+- 安全な本番環境対応（URLパラメータなしで実データ使用）
+
+## 仕様書更新
+- VOICE_RANGE_TEST_SPECIFICATION.md: デバイス品質判定機能追記
+
+## テスト方法
+GitHub Pages: https://kiyopi.github.io/Relative-pitch-app/Bolt/results.html?mode=[8|12|24]
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-15 07:43:32] コミット: メインタイトルの動的更新とフォントサイズ調整
+
+## 修正内容
+- メインタイトル（モード名）の動的更新機能追加
+  - ?mode=8: ランダム基音モード
+  - ?mode=12: 連続チャレンジモード
+  - ?mode=24: 12音階モード
+
+- フォントサイズ調整: 2.0rem → 1.6rem
+  - 長いモード名でもバランス良く表示
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-15 07:51:32] コミット: GitHub Pagesでテストモード切り替えボタン表示対応
+
+## 修正内容
+- GitHub Pages上でもテストモード切り替えリンクを表示
+- localhost + github.io ドメインで切り替えボタンを有効化
+- 本番環境では引き続き非表示（安全性確保）
+
+## 確認方法
+GitHub Pages: https://kiyopi.github.io/Relative-pitch-app/Bolt/results.html
+ページ下部に切り替えボタンが表示されます
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-15 08:16:01] コミット: 12音別成績分析機能の実装
+
+## 新機能
+- 12音律分析セクション追加
+  - 各基音（C/C#/D...）の個別成績表示
+  - 5段階評価: 優秀/良好/標準/要改善/未テスト
+  - 視覚的グリッドレイアウト
+
+## 弱点特定システム
+- 練習推奨基音の自動特定
+- 未テスト基音の表示
+- 具体的な練習指導メッセージ
+- 週2-3回の集中練習推奨
+
+## デザイン統一
+- グラスカードデザイン適用
+- パープルグラデーションアイコン
+- 既存ページとの色彩統一
+
+## 12音律理論対応
+- ±20¢以内の優秀音判定
+- 基音別平均誤差計算
+- 科学的根拠に基づく具体的フィードバック
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-15 08:23:31] コミット: ファーストルックと詳細分析のレイアウト整理
+
+## UX改善
+- SNS共有エリア（ファーストルック）の情報を絞り込み
+  - モード名、グレード、核心統計のみ表示
+  - 投稿したくなる情報に集約
+
+## 詳細分析レポートセクション新設
+- 明確なタイトル「詳細分析レポート」
+- 説明文で目的を明確化
+- モード別フィードバック → 詳細エリアに移動
+- 12音律分析 → 詳細エリアに移動
+
+## 情報階層の最適化
+- ファーストルック: 即座に共有したい成果
+- 詳細分析: じっくり分析したい改善指導
+- セッション別: 個別データの詳細確認
+
+## 視覚的改善
+- セクション分離の明確化
+- 顕微鏡アイコンで分析感を演出
+- 統一されたデザインシステム維持
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
