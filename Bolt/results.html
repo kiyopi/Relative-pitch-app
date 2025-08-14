@@ -2186,8 +2186,11 @@
                     updateShareMessage();  // シェアメッセージも更新
                     animateRankSection();  // ランクセクションのアニメーション
                     
-                    // テストモード切り替えリンクを表示（開発時のみ）
-                    if (testMode || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    // テストモード切り替えリンクを表示（開発時またはGitHub Pages）
+                    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                    const isGitHubPages = window.location.hostname.includes('github.io');
+                    
+                    if (testMode || isLocalhost || isGitHubPages) {
                         const testLinks = document.getElementById('test-mode-links');
                         if (testLinks) {
                             testLinks.style.display = 'block';
