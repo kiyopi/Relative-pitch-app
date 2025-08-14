@@ -23,7 +23,7 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        /* レスポンシブレイアウト */
+        /* レスポンシブレイアウト - 再設計版 */
         .score-grid {
             display: flex;
             flex-direction: column;
@@ -32,32 +32,23 @@
             min-height: 80px;
         }
         
+        /* 基本フォントサイズ（モバイル） */
+        .score-base-note {
+            font-size: 1.75rem; /* 28px */
+            line-height: 1.2;
+            font-weight: bold;
+        }
+        
+        .score-error {
+            font-size: 1.75rem; /* 28px */
+            line-height: 1.2;
+            font-weight: bold;
+        }
+        
         /* モバイル (480px以下) */
         @media (max-width: 480px) {
             .score-grid {
                 gap: 1rem;
-                /* デバッグ用: 一時的に背景色を追加 */
-                background: rgba(255, 0, 0, 0.1) !important;
-                border: 1px solid red !important;
-            }
-            
-            .score-base-note {
-                font-size: 2rem !important; /* text-2xl */
-                line-height: 1.2 !important;
-            }
-            
-            .score-error {
-                font-size: 2rem !important; /* text-2xl */
-                line-height: 1.2 !important;
-            }
-            
-            /* より強い指定でモバイル対応 */
-            .score-grid > div .score-base-note {
-                font-size: 2rem !important;
-            }
-            
-            .score-grid > div .score-error {
-                font-size: 2rem !important;
             }
             
             .score-section {
@@ -73,11 +64,11 @@
             }
             
             .score-base-note {
-                font-size: 3rem !important; /* text-3xl */
+                font-size: 2.5rem; /* 40px */
             }
             
             .score-error {
-                font-size: 3rem !important; /* text-3xl */
+                font-size: 2.5rem; /* 40px */
             }
         }
         
@@ -85,17 +76,43 @@
         @media (min-width: 768px) {
             .score-grid {
                 display: grid;
-                grid-template-columns: 1fr 1fr 1fr;
-                gap: 2rem;
+                grid-template-columns: 1fr auto 1fr;
+                grid-template-areas: "left center right";
                 align-items: end;
+                gap: 2rem;
+                max-width: 800px;
+                margin: 0 auto;
+            }
+            
+            .base-note-section {
+                grid-area: left;
+                justify-self: center;
+            }
+            
+            .trophy-section {
+                grid-area: center;
+            }
+            
+            .error-section {
+                grid-area: right;
+                justify-self: center;
             }
             
             .score-base-note {
-                font-size: 4rem !important; /* text-4xl */
+                font-size: 2.5rem; /* 40px */
             }
             
             .score-error {
-                font-size: 4rem !important; /* text-4xl */
+                font-size: 2.5rem; /* 40px */
+            }
+            
+            /* ラベルフォントを大きく */
+            .base-note-section p {
+                font-size: 1.125rem; /* 18px */
+            }
+            
+            .error-section p {
+                font-size: 1.125rem; /* 18px */
             }
         }
         
@@ -179,12 +196,18 @@
             }
             
             .glass-card {
-                padding: 1rem;
+                padding: 1.25rem;
+                margin-bottom: 1.5rem;
             }
             
             .container {
                 padding-left: 1rem;
                 padding-right: 1rem;
+            }
+            
+            /* 評価分布見出しの余白調整 */
+            .glass-card h3 {
+                margin-bottom: 1rem;
             }
         }
         
@@ -244,8 +267,8 @@
             <div class="glass-card mb-8">
                 <div class="score-section">
                     <div class="score-grid">
-                        <!-- トロフィーアイコン（モバイル最上位） -->
-                        <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                        <!-- トロフィーアイコン（中央） -->
+                        <div class="trophy-section" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                             <div class="mb-2">
                                 <div style="width: 100px; height: 100px; background: rgba(251, 191, 36, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 1px solid rgba(251, 191, 36, 0.3);">
                                     <i data-lucide="trophy" class="text-yellow-300" style="width: 64px; height: 64px;"></i>
@@ -253,14 +276,14 @@
                                 <p class="text-lg text-white font-medium mt-4">素晴らしい精度！</p>
                             </div>
                         </div>
-                        <!-- C4 基音 -->
-                        <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                            <div class="score-base-note font-bold text-white">C4</div>
+                        <!-- C4 基音（左） -->
+                        <div class="base-note-section" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                            <div class="score-base-note text-white">C4</div>
                             <p class="text-sm text-green-200">基音</p>
                         </div>
-                        <!-- 平均誤差 -->
-                        <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                            <div class="score-error font-bold text-white" id="average-error">+0.0¢</div>
+                        <!-- 平均誤差（右） -->
+                        <div class="error-section" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                            <div class="score-error text-white" id="average-error">+0.0¢</div>
                             <p class="text-sm text-green-200">セッション平均誤差</p>
                         </div>
                     </div>
