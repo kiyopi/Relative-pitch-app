@@ -361,7 +361,7 @@
                             <!-- 統計情報 -->
                             <div class="rank-stats-row">
                                 <div class="rank-stat-item">
-                                    <div class="stat-value-rank grade-value">B</div>
+                                    <div class="stat-value-rank grade-value" id="dynamic-grade">B</div>
                                     <div class="stat-label-rank">総合グレード</div>
                                 </div>
                                 <div class="rank-stat-item">
@@ -1450,6 +1450,18 @@
             });
         }
 
+        // 動的グレード表示の更新
+        function updateGradeDisplay() {
+            const gradeResult = calculateDynamicGrade(mockSessionsData);
+            
+            // グレード表示更新
+            const gradeElement = document.querySelector('.grade-value');
+            if (gradeElement) {
+                gradeElement.textContent = gradeResult.grade;
+                console.log(`✅ Grade updated to: ${gradeResult.grade}`, gradeResult);
+            }
+        }
+
         // セッションナビゲーション機能
         function navigateToSession(direction) {
             const totalSessions = mockSessionsData.length;
@@ -1751,6 +1763,7 @@
                 
                 
                 setTimeout(() => {
+                    updateGradeDisplay();   // 動的グレード計算を実行
                     animateStatistics();
                     updateShareMessage();  // シェアメッセージも更新
                     animateRankSection();  // ランクセクションのアニメーション
