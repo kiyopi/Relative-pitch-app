@@ -12,6 +12,7 @@
 - **ユーザーの快適音域の特定**: 無理なく歌える音域を自動検出
 - **個別最適化**: ユーザーに最適な基音を提案
 - **トレーニング精度向上**: 音域に適した基音でより効果的な練習を実現
+- **デバイス品質判定**: 測定精度に影響するデバイス性能を事前に検出
 
 ### 実装場所
 マイクテストページ（`/microphone-test`）の準備プロセス内
@@ -239,12 +240,122 @@ class RangeTestErrorHandler {
 
 ---
 
+## 🔍 デバイス品質判定機能
+
+### 判定タイミング
+マイク許可直後、音域テスト開始前に実施
+
+### 判定内容
+```javascript
+function detectDeviceQuality() {
+  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const sampleRate = audioContext.sampleRate;
+  const userAgent = navigator.userAgent.toLowerCase();
+  const isMobile = /mobile|android|iphone|ipad/.test(userAgent);
+  
+  // デバイス品質判定
+  let quality = {
+    level: '',           // 'high' | 'medium' | 'low'
+    sampleRate: sampleRate,
+    deviceType: isMobile ? 'mobile' : 'desktop',
+    adjustmentFactor: 1.0,
+    accuracyRange: '',
+    userMessage: ''
+  };
+  
+  if (sampleRate >= 48000 && !isMobile) {
+    quality.level = 'high';
+    quality.adjustmentFactor = 1.0;
+    quality.accuracyRange = '±10¢';
+    quality.userMessage = '高精度での測定が可能です。プロフェッショナルレベルの精度で音程を検出できます。';
+  }
+  else if (sampleRate >= 44100) {
+    quality.level = 'medium';
+    quality.adjustmentFactor = 1.15;
+    quality.accuracyRange = '±15¢';
+    quality.userMessage = '標準的な精度で測定します。一般的な音楽練習には十分な精度です。';
+  }
+  else {
+    quality.level = 'low';
+    quality.adjustmentFactor = 1.3;
+    quality.accuracyRange = '±25¢';
+    quality.userMessage = '基本的な精度での測定となります。相対的な音程の改善に注目してください。';
+  }
+  
+  return quality;
+}
+```
+
+### UI表示
+```javascript
+// マイクテスト画面での表示例
+function displayDeviceQuality(quality) {
+  const qualityDisplay = {
+    high: {
+      icon: '✨',
+      color: '#22c55e',
+      label: '高精度デバイス'
+    },
+    medium: {
+      icon: '📱',
+      color: '#3b82f6',
+      label: '標準デバイス'
+    },
+    low: {
+      icon: '⚠️',
+      color: '#f59e0b',
+      label: '基本デバイス'
+    }
+  };
+  
+  const info = qualityDisplay[quality.level];
+  
+  // UIに表示
+  return `
+    <div class="device-quality-info">
+      <span class="quality-icon">${info.icon}</span>
+      <span class="quality-label" style="color: ${info.color}">
+        ${info.label}
+      </span>
+      <p class="quality-message">${quality.userMessage}</p>
+      <small>測定精度: ${quality.accuracyRange}</small>
+    </div>
+  `;
+}
+```
+
+### データ保存
+```javascript
+// LocalStorageに保存して全画面で利用
+function saveDeviceQuality(quality) {
+  const deviceInfo = {
+    level: quality.level,
+    adjustmentFactor: quality.adjustmentFactor,
+    accuracyRange: quality.accuracyRange,
+    detectedAt: new Date().toISOString(),
+    sampleRate: quality.sampleRate,
+    deviceType: quality.deviceType
+  };
+  
+  localStorage.setItem('deviceQuality', JSON.stringify(deviceInfo));
+}
+```
+
+### トレーニング時の活用
+- **session.html**: 保存された調整係数を使用してリアルタイム評価
+- **results.html**: 事前に調整済みの結果を表示
+- **全体的な一貫性**: すべての画面で同じ基準を使用
+
+---
+
 ## 📈 期待される効果
 
 ### ユーザー体験の向上
 - **個別最適化**: 各ユーザーの音域に適したトレーニング
 - **成功率向上**: 無理のない音域での練習により挫折率低下
 - **継続性**: 快適な音域での練習により長期継続が可能
+- **透明性**: デバイス性能による測定精度の事前開示
+- **公平性**: デバイス格差を考慮した評価基準
 
 ### トレーニング精度の向上
 - **基音最適化**: 推奨基音によりより正確な相対音感練習

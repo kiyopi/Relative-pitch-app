@@ -378,6 +378,22 @@
                                 </div>
                             </div>
                             
+                            <!-- モード別フィードバック -->
+                            <div id="mode-feedback" style="display: none; margin-top: 1rem; padding: 1rem; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 8px;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                                    <i data-lucide="info" style="width: 18px; height: 18px; color: #3b82f6;"></i>
+                                    <h4 style="margin: 0; color: #3b82f6; font-size: 1rem; font-weight: 600;" id="mode-title">モード情報</h4>
+                                </div>
+                                <p style="margin: 0 0 0.5rem; color: #94a3b8; font-size: 0.875rem;" id="mode-focus"></p>
+                                <p style="margin: 0 0 0.5rem; color: #cbd5e1; font-size: 0.875rem;" id="mode-message"></p>
+                                <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(148, 163, 184, 0.2);">
+                                    <p style="margin: 0; color: #22c55e; font-size: 0.875rem; font-weight: 500;">
+                                        <i data-lucide="arrow-right" style="display: inline-block; width: 14px; height: 14px; vertical-align: middle; margin-right: 0.25rem;"></i>
+                                        <span id="mode-next-step"></span>
+                                    </p>
+                                </div>
+                            </div>
+                            
                             <!-- ランク取得メッセージ -->
                             <div class="rank-achievement-message" style="margin-top: 0px; margin-bottom: 0px; text-align: center;">
                                 <p id="share-message" style="color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; margin: 0;">
@@ -504,25 +520,154 @@
                     <span>再チャレンジ</span>
                 </a>
             </section>
+            
+            <!-- テストモード切り替えリンク（開発用） -->
+            <div id="test-mode-links" style="display: none; margin-top: 2rem; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px; text-align: center;">
+                <p style="color: #fbbf24; margin-bottom: 1rem; font-size: 0.875rem;">🔧 開発用テストモード切り替え</p>
+                <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="?mode=8" class="btn btn-sm" style="background: rgba(251, 191, 36, 0.2); border: 1px solid #fbbf24;">
+                        8セッション（初級）
+                    </a>
+                    <a href="?mode=12" class="btn btn-sm" style="background: rgba(251, 191, 36, 0.2); border: 1px solid #fbbf24;">
+                        12セッション（中級）
+                    </a>
+                    <a href="?mode=24" class="btn btn-sm" style="background: rgba(251, 191, 36, 0.2); border: 1px solid #fbbf24;">
+                        24セッション（上級）
+                    </a>
+                    <a href="results.html" class="btn btn-sm" style="background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e;">
+                        本番モード
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Mock session data
-        const mockSessionsData = [
-            { session: 1, baseNote: 'C4', accuracy: 87.5, averageCentError: 12.1 },
-            { session: 2, baseNote: 'D4', accuracy: 82.3, averageCentError: 28.4 },
-            { session: 3, baseNote: 'E4', accuracy: 89.1, averageCentError: 14.7 },
-            { session: 4, baseNote: 'F4', accuracy: 91.2, averageCentError: 10.8 },
-            { session: 5, baseNote: 'G4', accuracy: 78.9, averageCentError: 30.2 },
-            { session: 6, baseNote: 'A4', accuracy: 88.7, averageCentError: 18.9 },
-            { session: 7, baseNote: 'B4', accuracy: 92.4, averageCentError: 11.3 },
-            { session: 8, baseNote: 'C5', accuracy: 85.6, averageCentError: 22.7 },
-            { session: 9, baseNote: 'C#4', accuracy: 84.2, averageCentError: 26.1 },
-            { session: 10, baseNote: 'D#4', accuracy: 73.8, averageCentError: 45.3 },
-            { session: 11, baseNote: 'F#4', accuracy: 90.3, averageCentError: 13.9 },
-            { session: 12, baseNote: 'G#4', accuracy: 62.1, averageCentError: 48.7 }
-        ];
+        // テストモード判定（URLパラメータ）
+        const urlParams = new URLSearchParams(window.location.search);
+        const testMode = urlParams.get('mode'); // ?mode=8, ?mode=12, ?mode=24
+        
+        // モード別モックデータ生成
+        function getMockDataForMode(mode) {
+            const modeNum = parseInt(mode) || 12;
+            
+            // 8セッション用（初級・ランダム基音）- 自然音階のみ
+            const mockData8Sessions = [
+                { session: 1, baseNote: 'C4', accuracy: 88.5, averageCentError: 35.2 },
+                { session: 2, baseNote: 'D4', accuracy: 85.3, averageCentError: 42.1 },
+                { session: 3, baseNote: 'E4', accuracy: 82.1, averageCentError: 48.7 },
+                { session: 4, baseNote: 'F4', accuracy: 86.2, averageCentError: 38.5 },
+                { session: 5, baseNote: 'G4', accuracy: 79.9, averageCentError: 52.3 },
+                { session: 6, baseNote: 'A4', accuracy: 84.7, averageCentError: 44.2 },
+                { session: 7, baseNote: 'B4', accuracy: 87.4, averageCentError: 36.8 },
+                { session: 8, baseNote: 'C5', accuracy: 83.6, averageCentError: 46.5 }
+            ];
+            
+            // 12セッション用（中級・連続チャレンジ）- 半音含む
+            const mockData12Sessions = [
+                { session: 1, baseNote: 'C4', accuracy: 87.5, averageCentError: 25.1 },
+                { session: 2, baseNote: 'D4', accuracy: 82.3, averageCentError: 35.4 },
+                { session: 3, baseNote: 'E4', accuracy: 89.1, averageCentError: 22.7 },
+                { session: 4, baseNote: 'F4', accuracy: 91.2, averageCentError: 18.8 },
+                { session: 5, baseNote: 'G4', accuracy: 78.9, averageCentError: 42.2 },
+                { session: 6, baseNote: 'A4', accuracy: 88.7, averageCentError: 28.9 },
+                { session: 7, baseNote: 'B4', accuracy: 92.4, averageCentError: 21.3 },
+                { session: 8, baseNote: 'C5', accuracy: 85.6, averageCentError: 32.7 },
+                { session: 9, baseNote: 'C#4', accuracy: 84.2, averageCentError: 38.1 },
+                { session: 10, baseNote: 'D#4', accuracy: 73.8, averageCentError: 55.3 },
+                { session: 11, baseNote: 'F#4', accuracy: 90.3, averageCentError: 23.9 },
+                { session: 12, baseNote: 'G#4', accuracy: 62.1, averageCentError: 58.7 }
+            ];
+            
+            // 24セッション用（上級・12音階）- 完全クロマチック
+            const mockData24Sessions = [
+                { session: 1, baseNote: 'C4', accuracy: 92.5, averageCentError: 15.1 },
+                { session: 2, baseNote: 'C#4', accuracy: 88.3, averageCentError: 22.4 },
+                { session: 3, baseNote: 'D4', accuracy: 91.1, averageCentError: 16.7 },
+                { session: 4, baseNote: 'D#4', accuracy: 85.2, averageCentError: 28.8 },
+                { session: 5, baseNote: 'E4', accuracy: 93.9, averageCentError: 12.2 },
+                { session: 6, baseNote: 'F4', accuracy: 94.7, averageCentError: 10.9 },
+                { session: 7, baseNote: 'F#4', accuracy: 87.4, averageCentError: 24.3 },
+                { session: 8, baseNote: 'G4', accuracy: 90.6, averageCentError: 18.7 },
+                { session: 9, baseNote: 'G#4', accuracy: 82.2, averageCentError: 35.1 },
+                { session: 10, baseNote: 'A4', accuracy: 91.8, averageCentError: 17.3 },
+                { session: 11, baseNote: 'A#4', accuracy: 86.3, averageCentError: 26.9 },
+                { session: 12, baseNote: 'B4', accuracy: 95.1, averageCentError: 9.7 },
+                { session: 13, baseNote: 'C5', accuracy: 89.5, averageCentError: 20.1 },
+                { session: 14, baseNote: 'C#5', accuracy: 84.3, averageCentError: 31.4 },
+                { session: 15, baseNote: 'D5', accuracy: 90.1, averageCentError: 19.7 },
+                { session: 16, baseNote: 'D#5', accuracy: 79.2, averageCentError: 41.8 },
+                { session: 17, baseNote: 'E5', accuracy: 92.9, averageCentError: 14.2 },
+                { session: 18, baseNote: 'F5', accuracy: 93.7, averageCentError: 13.9 },
+                { session: 19, baseNote: 'F#5', accuracy: 85.4, averageCentError: 29.3 },
+                { session: 20, baseNote: 'G5', accuracy: 88.6, averageCentError: 23.7 },
+                { session: 21, baseNote: 'G#5', accuracy: 78.2, averageCentError: 43.1 },
+                { session: 22, baseNote: 'A5', accuracy: 89.8, averageCentError: 21.3 },
+                { session: 23, baseNote: 'A#5', accuracy: 83.3, averageCentError: 33.9 },
+                { session: 24, baseNote: 'B5', accuracy: 91.1, averageCentError: 17.7 }
+            ];
+            
+            // モードに応じたデータを返す
+            switch(modeNum) {
+                case 8:
+                    console.log('🎯 Test Mode: 8 sessions (初級・ランダム基音)');
+                    return mockData8Sessions;
+                case 24:
+                    console.log('🎯 Test Mode: 24 sessions (上級・12音階)');
+                    return mockData24Sessions;
+                case 12:
+                default:
+                    console.log('🎯 Test Mode: 12 sessions (中級・連続チャレンジ)');
+                    return mockData12Sessions;
+            }
+        }
+        
+        // 実データ取得関数（将来の実装用）
+        function getActualSessionData() {
+            // localStorageまたはAPIから実データを取得
+            const savedData = localStorage.getItem('sessionResults');
+            if (savedData) {
+                return JSON.parse(savedData);
+            }
+            
+            // デフォルトは12セッションモック
+            return getMockDataForMode('12');
+        }
+        
+        // メインデータの選択
+        const mockSessionsData = testMode ? 
+            getMockDataForMode(testMode) : 
+            getActualSessionData();
+        
+        // テストモード表示（開発用）
+        if (testMode) {
+            console.log(`⚠️ テストモード有効: ${testMode}セッション`);
+            console.log('🔗 切り替えリンク:');
+            console.log('  - 8セッション: results.html?mode=8');
+            console.log('  - 12セッション: results.html?mode=12');
+            console.log('  - 24セッション: results.html?mode=24');
+            console.log('  - 本番モード: results.html');
+            
+            // テストモードインジケータを表示
+            document.addEventListener('DOMContentLoaded', () => {
+                const testIndicator = document.createElement('div');
+                testIndicator.style.cssText = `
+                    position: fixed;
+                    top: 10px;
+                    right: 10px;
+                    background: rgba(251, 191, 36, 0.9);
+                    color: black;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    font-weight: bold;
+                    z-index: 10000;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                `;
+                testIndicator.textContent = `TEST MODE: ${testMode} sessions`;
+                document.body.appendChild(testIndicator);
+            });
+        }
 
         // Simple pseudo-random number generator with seed
         function seededRandom(seed) {
@@ -1450,6 +1595,219 @@
             });
         }
 
+        // 動的グレード計算システム
+        function detectMode(sessionData) {
+            const sessionCount = sessionData.length;
+            
+            const modeMap = {
+                8: {
+                    mode: 'random',
+                    name: 'ランダム基音モード',
+                    level: '初級',
+                    target: 'カラオケ・合唱レベル'
+                },
+                12: {
+                    mode: 'continuous',
+                    name: '連続チャレンジモード', 
+                    level: '中級',
+                    target: '実用的相対音感レベル'
+                },
+                24: {
+                    mode: 'chromatic',
+                    name: '12音階モード',
+                    level: '上級', 
+                    target: 'プロフェッショナルレベル'
+                }
+            };
+            
+            if (sessionCount <= 8) return { ...modeMap[8], actualSessions: sessionCount };
+            if (sessionCount <= 12) return { ...modeMap[12], actualSessions: sessionCount };
+            return { ...modeMap[24], actualSessions: sessionCount };
+        }
+
+        function detectDeviceQuality() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const sampleRate = audioContext.sampleRate;
+                const userAgent = navigator.userAgent.toLowerCase();
+                const isMobile = /mobile|android|iphone|ipad/.test(userAgent);
+                
+                let quality, factor, accuracy, message;
+                
+                if (sampleRate >= 48000 && !isMobile) {
+                    quality = 'high';
+                    factor = 1.0;
+                    accuracy = '±10¢';
+                    message = '高精度での測定が可能です';
+                }
+                else if (sampleRate >= 44100) {
+                    quality = 'medium';
+                    factor = 1.15;
+                    accuracy = '±15¢';
+                    message = '一般的な精度で測定中（約±15¢の誤差を含む可能性）';
+                }
+                else {
+                    quality = 'low';
+                    factor = 1.3;
+                    accuracy = '±25¢';
+                    message = '限定的精度での測定（約±25¢の誤差を含む可能性）。相対的な改善傾向に注目してください';
+                }
+                
+                return { quality, factor, accuracy, message, sampleRate };
+                
+            } catch (error) {
+                console.warn('AudioContext detection failed:', error);
+                return {
+                    quality: 'medium',
+                    factor: 1.15,
+                    accuracy: '±15¢',
+                    message: '標準精度で測定中',
+                    sampleRate: 'unknown'
+                };
+            }
+        }
+
+        function calculateBasicMetrics(sessionData) {
+            let totalError = 0;
+            let totalNotes = 0;
+            let excellentNotes = 0;
+            let errors = [];
+            
+            sessionData.forEach(session => {
+                const noteResults = generateSessionNoteResults(session);
+                
+                noteResults.forEach(note => {
+                    const absError = Math.abs(note.centError);
+                    
+                    totalError += absError;
+                    totalNotes++;
+                    errors.push(absError);
+                    
+                    if (absError <= 20) {
+                        excellentNotes++;
+                    }
+                });
+            });
+            
+            const avgError = totalError / totalNotes;
+            const excellenceRate = excellentNotes / totalNotes;
+            
+            return {
+                avgError: Math.round(avgError * 10) / 10,
+                excellenceRate: Math.round(excellenceRate * 1000) / 1000,
+                totalNotes,
+                excellentNotes
+            };
+        }
+
+        function applyTechnicalAdjustment(basicMetrics, deviceInfo) {
+            const adjustedMetrics = {
+                avgError: basicMetrics.avgError / deviceInfo.factor,
+                excellenceRate: basicMetrics.excellenceRate,
+                totalNotes: basicMetrics.totalNotes,
+                excellentNotes: basicMetrics.excellentNotes
+            };
+            
+            return {
+                raw: basicMetrics,
+                adjusted: adjustedMetrics,
+                adjustmentInfo: {
+                    factor: deviceInfo.factor,
+                    quality: deviceInfo.quality,
+                    explanation: `${deviceInfo.quality}デバイスのため、${deviceInfo.factor}倍の調整を適用`
+                }
+            };
+        }
+
+        function getModeSpecificThresholds(actualSessions) {
+            let sessionCount;
+            if (actualSessions <= 8) sessionCount = 8;
+            else if (actualSessions <= 12) sessionCount = 12;
+            else sessionCount = 24;
+            
+            const thresholds = {
+                8: {
+                    S: { avgError: 30, excellence: 0.75 },
+                    A: { avgError: 40, excellence: 0.65 },
+                    B: { avgError: 50, excellence: 0.55 },
+                    C: { avgError: 60, excellence: 0.45 },
+                    D: { avgError: 70, excellence: 0.35 },
+                    E: { avgError: 80, excellence: 0.25 }
+                },
+                
+                12: {
+                    S: { avgError: 25, excellence: 0.80 },
+                    A: { avgError: 35, excellence: 0.70 },
+                    B: { avgError: 45, excellence: 0.60 },
+                    C: { avgError: 55, excellence: 0.50 },
+                    D: { avgError: 65, excellence: 0.40 },
+                    E: { avgError: 75, excellence: 0.30 }
+                },
+                
+                24: {
+                    S: { avgError: 20, excellence: 0.85 },
+                    A: { avgError: 30, excellence: 0.75 },
+                    B: { avgError: 40, excellence: 0.65 },
+                    C: { avgError: 50, excellence: 0.55 },
+                    D: { avgError: 60, excellence: 0.45 },
+                    E: { avgError: 70, excellence: 0.35 }
+                }
+            };
+            
+            return {
+                thresholds: thresholds[sessionCount],
+                sessionCount,
+                explanation: `${sessionCount}セッション${sessionCount === 8 ? '（初級）' : sessionCount === 12 ? '（中級）' : '（上級）'}基準適用`
+            };
+        }
+
+        function determineGrade(adjustedMetrics, thresholds) {
+            const grades = ['S', 'A', 'B', 'C', 'D', 'E'];
+            
+            for (const grade of grades) {
+                const threshold = thresholds[grade];
+                
+                if (adjustedMetrics.avgError <= threshold.avgError && 
+                    adjustedMetrics.excellenceRate >= threshold.excellence) {
+                    return {
+                        grade,
+                        achievedBy: {
+                            avgError: adjustedMetrics.avgError <= threshold.avgError,
+                            excellence: adjustedMetrics.excellenceRate >= threshold.excellence
+                        },
+                        thresholds: threshold
+                    };
+                }
+            }
+            
+            return {
+                grade: 'E',
+                achievedBy: {
+                    avgError: false,
+                    excellence: false
+                },
+                thresholds: thresholds.E
+            };
+        }
+
+        function calculateDynamicGrade(sessionData) {
+            const modeInfo = detectMode(sessionData);
+            const deviceInfo = detectDeviceQuality();
+            const basicMetrics = calculateBasicMetrics(sessionData);
+            const metricsWithAdjustment = applyTechnicalAdjustment(basicMetrics, deviceInfo);
+            const thresholdInfo = getModeSpecificThresholds(modeInfo.actualSessions);
+            const gradeResult = determineGrade(metricsWithAdjustment.adjusted, thresholdInfo.thresholds);
+            
+            return {
+                grade: gradeResult.grade,
+                modeInfo,
+                deviceInfo,
+                metrics: metricsWithAdjustment,
+                thresholdInfo,
+                gradeResult
+            };
+        }
+
         // 動的グレード表示の更新
         function updateGradeDisplay() {
             const gradeResult = calculateDynamicGrade(mockSessionsData);
@@ -1459,6 +1817,59 @@
             if (gradeElement) {
                 gradeElement.textContent = gradeResult.grade;
                 console.log(`✅ Grade updated to: ${gradeResult.grade}`, gradeResult);
+            }
+            
+            // モード別フィードバック表示
+            showModeFeedback(gradeResult.modeInfo);
+        }
+        
+        // モード別フィードバックの表示
+        function showModeFeedback(modeInfo) {
+            const feedbackEl = document.getElementById('mode-feedback');
+            if (!feedbackEl) return;
+            
+            // モード別のフィードバック内容定義
+            const modeSpecificFeedback = {
+                8: {
+                    focus: '基本的な音程感覚の定着',
+                    message: 'まずは8つの自然音階での相対音感を身につけましょう。カラオケや合唱で音程を合わせて歌えるレベルを目指します。',
+                    nextStep: '連続チャレンジモードで半音を含む12音への挑戦',
+                    practiceAdvice: '毎日5分の短時間練習で継続性を重視'
+                },
+                12: {
+                    focus: '12音すべてへの対応力向上',
+                    message: '半音を含む全ての音に対する相対音感を強化中です。実用的な相対音感レベルの習得を目指します。',
+                    nextStep: '12音階モードでの上昇・下降パターンマスター',
+                    practiceAdvice: '週3回・15分の集中練習で12音律システムを完成'
+                },
+                24: {
+                    focus: 'プロレベルの完璧な12音律システム',
+                    message: '音楽プロフェッショナル向けの最高精度を目指します。上昇・下降両パターンでの完璧な習得が目標です。',
+                    nextStep: 'マスターレベル達成後の実践的音楽活動への応用',
+                    practiceAdvice: '上昇・下降両パターンでの完璧な習得が目標'
+                }
+            };
+            
+            // 実際のセッション数から最も近いモードを判定
+            let targetMode = 12; // デフォルト
+            if (modeInfo.actualSessions <= 8) targetMode = 8;
+            else if (modeInfo.actualSessions <= 12) targetMode = 12;
+            else targetMode = 24;
+            
+            const feedback = modeSpecificFeedback[targetMode];
+            
+            // DOM要素に反映
+            document.getElementById('mode-title').textContent = `${modeInfo.name} (${modeInfo.level})`;
+            document.getElementById('mode-focus').textContent = `📍 ${feedback.focus}`;
+            document.getElementById('mode-message').textContent = feedback.message;
+            document.getElementById('mode-next-step').textContent = feedback.nextStep;
+            
+            // フィードバックセクションを表示
+            feedbackEl.style.display = 'block';
+            
+            // アイコンを再初期化
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
             }
         }
 
@@ -1767,6 +2178,14 @@
                     animateStatistics();
                     updateShareMessage();  // シェアメッセージも更新
                     animateRankSection();  // ランクセクションのアニメーション
+                    
+                    // テストモード切り替えリンクを表示（開発時のみ）
+                    if (testMode || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                        const testLinks = document.getElementById('test-mode-links');
+                        if (testLinks) {
+                            testLinks.style.display = 'block';
+                        }
+                    }
                 }, 100);
             }, 1200);
         });
