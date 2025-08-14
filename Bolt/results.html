@@ -379,18 +379,62 @@
                             </div>
                             
                             <!-- モード別フィードバック -->
-                            <div id="mode-feedback" style="display: none; margin-top: 1rem; padding: 1rem; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 8px;">
-                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-                                    <i data-lucide="info" style="width: 18px; height: 18px; color: #3b82f6;"></i>
-                                    <h4 style="margin: 0; color: #3b82f6; font-size: 1rem; font-weight: 600;" id="mode-title">モード情報</h4>
+                            <div id="mode-feedback" class="glass-card" style="display: none; margin-top: 2rem; padding: 1.5rem;">
+                                <div class="feedback-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                                    <div class="feedback-icon" style="width: 40px; height: 40px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                        <i data-lucide="target" style="width: 20px; height: 20px; color: white;"></i>
+                                    </div>
+                                    <div>
+                                        <h4 style="margin: 0; color: white; font-size: 1.125rem; font-weight: 600;" id="mode-title">モード情報</h4>
+                                        <p style="margin: 0; color: #94a3b8; font-size: 0.875rem;" id="mode-focus"></p>
+                                    </div>
                                 </div>
-                                <p style="margin: 0 0 0.5rem; color: #94a3b8; font-size: 0.875rem;" id="mode-focus"></p>
-                                <p style="margin: 0 0 0.5rem; color: #cbd5e1; font-size: 0.875rem;" id="mode-message"></p>
-                                <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(148, 163, 184, 0.2);">
-                                    <p style="margin: 0; color: #22c55e; font-size: 0.875rem; font-weight: 500;">
-                                        <i data-lucide="arrow-right" style="display: inline-block; width: 14px; height: 14px; vertical-align: middle; margin-right: 0.25rem;"></i>
-                                        <span id="mode-next-step"></span>
-                                    </p>
+                                
+                                <div class="feedback-content" style="margin-bottom: 1.25rem;">
+                                    <p style="margin: 0; color: #cbd5e1; font-size: 0.9375rem; line-height: 1.6;" id="mode-message"></p>
+                                </div>
+                                
+                                <div class="feedback-next-step" style="padding: 1rem; background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.05)); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 12px;">
+                                    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                                        <div style="width: 28px; height: 28px; background: rgba(34, 197, 94, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.125rem;">
+                                            <i data-lucide="arrow-right" style="width: 14px; height: 14px; color: #22c55e;"></i>
+                                        </div>
+                                        <div>
+                                            <h5 style="margin: 0 0 0.25rem; color: #22c55e; font-size: 0.875rem; font-weight: 600;">次のステップ</h5>
+                                            <p style="margin: 0; color: #a7f3d0; font-size: 0.875rem; line-height: 1.5;" id="mode-next-step"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 12音別成績分析 -->
+                            <div id="tone-analysis" class="glass-card" style="display: none; margin-top: 2rem; padding: 1.5rem;">
+                                <div class="analysis-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                                    <div class="analysis-icon" style="width: 40px; height: 40px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                        <i data-lucide="bar-chart-3" style="width: 20px; height: 20px; color: white;"></i>
+                                    </div>
+                                    <div>
+                                        <h4 style="margin: 0; color: white; font-size: 1.125rem; font-weight: 600;">12音律分析</h4>
+                                        <p style="margin: 0; color: #94a3b8; font-size: 0.875rem;">各基音での習熟度と弱点の特定</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="tone-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem;" id="tone-performance-grid">
+                                    <!-- 動的に生成される12音の成績 -->
+                                </div>
+                                
+                                <div class="weakness-analysis" style="padding: 1rem; background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.05)); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px;">
+                                    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                                        <div style="width: 28px; height: 28px; background: rgba(239, 68, 68, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.125rem;">
+                                            <i data-lucide="alert-triangle" style="width: 14px; height: 14px; color: #f87171;"></i>
+                                        </div>
+                                        <div>
+                                            <h5 style="margin: 0 0 0.5rem; color: #f87171; font-size: 0.875rem; font-weight: 600;">弱点分析</h5>
+                                            <div id="weakness-details" style="color: #fca5a5; font-size: 0.875rem; line-height: 1.5;">
+                                                <!-- 動的に生成される弱点分析 -->
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -522,23 +566,35 @@
             </section>
             
             <!-- テストモード切り替えリンク（開発用） -->
-            <div id="test-mode-links" style="display: none; margin-top: 2rem; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px; text-align: center;">
-                <p style="color: #fbbf24; margin-bottom: 1rem; font-size: 0.875rem;">🔧 開発用テストモード切り替え</p>
-                <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
-                    <a href="?mode=8" class="btn btn-sm" style="background: rgba(251, 191, 36, 0.2); border: 1px solid #fbbf24;">
-                        8セッション（初級）
-                    </a>
-                    <a href="?mode=12" class="btn btn-sm" style="background: rgba(251, 191, 36, 0.2); border: 1px solid #fbbf24;">
-                        12セッション（中級）
-                    </a>
-                    <a href="?mode=24" class="btn btn-sm" style="background: rgba(251, 191, 36, 0.2); border: 1px solid #fbbf24;">
-                        24セッション（上級）
-                    </a>
-                    <a href="results.html" class="btn btn-sm" style="background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e;">
-                        本番モード
-                    </a>
+            <section class="section" id="test-mode-links" style="display: none;">
+                <div class="glass-card" style="padding: 2rem; text-align: center; border: 1px solid rgba(251, 191, 36, 0.3);">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+                        <i data-lucide="settings" style="width: 20px; height: 20px; color: #fbbf24;"></i>
+                        <h3 style="color: #fbbf24; margin: 0; font-size: 1.125rem; font-weight: 600;">開発用テストモード</h3>
+                    </div>
+                    <p style="color: #94a3b8; margin-bottom: 1.5rem; font-size: 0.875rem;">
+                        異なるセッション数での動的グレード計算とフィードバックをテストできます
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <a href="?mode=8" class="btn btn-secondary" style="min-width: 140px;">
+                            <i data-lucide="play-circle" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                            8セッション（初級）
+                        </a>
+                        <a href="?mode=12" class="btn btn-secondary" style="min-width: 140px;">
+                            <i data-lucide="play-circle" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                            12セッション（中級）
+                        </a>
+                        <a href="?mode=24" class="btn btn-secondary" style="min-width: 140px;">
+                            <i data-lucide="play-circle" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                            24セッション（上級）
+                        </a>
+                        <a href="results.html" class="btn btn-primary" style="min-width: 140px;">
+                            <i data-lucide="database" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                            本番モード
+                        </a>
+                    </div>
                 </div>
-            </div>
+            </section>
         </div>
     </div>
 
@@ -1828,6 +1884,9 @@
             
             // モード別フィードバック表示
             showModeFeedback(gradeResult.modeInfo);
+            
+            // 12音別分析表示
+            showToneAnalysis(gradeResult);
         }
         
         // モード別フィードバックの表示
@@ -1878,6 +1937,220 @@
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
             }
+        }
+        
+        // 12音別成績分析の表示
+        function showToneAnalysis(gradeResult) {
+            const analysisEl = document.getElementById('tone-analysis');
+            if (!analysisEl) return;
+            
+            // 12音別成績データを生成
+            const tonePerformance = analyzeTonePerformance(mockSessionsData);
+            
+            // グリッド表示の生成
+            generateToneGrid(tonePerformance);
+            
+            // 弱点分析の生成
+            generateWeaknessAnalysis(tonePerformance);
+            
+            // セクションを表示
+            analysisEl.style.display = 'block';
+            
+            // アイコンを再初期化
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        // 12音別成績データの分析
+        function analyzeTonePerformance(sessionData) {
+            const toneData = {};
+            const toneNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+            
+            // 初期化
+            toneNames.forEach(tone => {
+                toneData[tone] = {
+                    sessions: 0,
+                    totalError: 0,
+                    avgError: 0,
+                    excellentNotes: 0,
+                    totalNotes: 0,
+                    excellenceRate: 0,
+                    performance: 'unknown'
+                };
+            });
+            
+            // セッションデータから各基音の成績を計算
+            sessionData.forEach(session => {
+                const baseTone = session.baseNote.replace(/[0-9]/g, ''); // C4 → C
+                if (toneData[baseTone]) {
+                    const noteResults = generateSessionNoteResults(session);
+                    
+                    toneData[baseTone].sessions++;
+                    
+                    noteResults.forEach(note => {
+                        const absError = Math.abs(note.centError);
+                        toneData[baseTone].totalError += absError;
+                        toneData[baseTone].totalNotes++;
+                        
+                        if (absError <= 20) {
+                            toneData[baseTone].excellentNotes++;
+                        }
+                    });
+                }
+            });
+            
+            // 平均値と評価を計算
+            Object.keys(toneData).forEach(tone => {
+                const data = toneData[tone];
+                if (data.totalNotes > 0) {
+                    data.avgError = data.totalError / data.totalNotes;
+                    data.excellenceRate = data.excellentNotes / data.totalNotes;
+                    
+                    // パフォーマンス評価
+                    if (data.avgError <= 25 && data.excellenceRate >= 0.7) {
+                        data.performance = 'excellent';
+                    } else if (data.avgError <= 40 && data.excellenceRate >= 0.5) {
+                        data.performance = 'good';
+                    } else if (data.avgError <= 60) {
+                        data.performance = 'average';
+                    } else {
+                        data.performance = 'weak';
+                    }
+                } else {
+                    data.performance = 'untested';
+                }
+            });
+            
+            return toneData;
+        }
+        
+        // 12音グリッドの生成
+        function generateToneGrid(toneData) {
+            const gridEl = document.getElementById('tone-performance-grid');
+            if (!gridEl) return;
+            
+            const toneNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+            
+            gridEl.innerHTML = '';
+            
+            toneNames.forEach(tone => {
+                const data = toneData[tone];
+                const { color, icon, label } = getTonePerformanceStyle(data.performance);
+                
+                const toneCard = document.createElement('div');
+                toneCard.style.cssText = `
+                    padding: 0.75rem;
+                    background: ${color.bg};
+                    border: 1px solid ${color.border};
+                    border-radius: 8px;
+                    text-align: center;
+                `;
+                
+                toneCard.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <i data-lucide="${icon}" style="width: 16px; height: 16px; color: ${color.text};"></i>
+                        <span style="font-weight: 600; color: white; font-size: 0.875rem;">${tone}</span>
+                    </div>
+                    <div style="color: ${color.text}; font-size: 0.75rem; margin-bottom: 0.25rem;">${label}</div>
+                    ${data.sessions > 0 ? `
+                        <div style="color: #94a3b8; font-size: 0.7rem;">
+                            ±${Math.round(data.avgError)}¢ | ${Math.round(data.excellenceRate * 100)}%
+                        </div>
+                    ` : `
+                        <div style="color: #64748b; font-size: 0.7rem;">未テスト</div>
+                    `}
+                `;
+                
+                gridEl.appendChild(toneCard);
+            });
+        }
+        
+        // パフォーマンススタイルの取得
+        function getTonePerformanceStyle(performance) {
+            const styles = {
+                excellent: {
+                    color: { bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.3)', text: '#22c55e' },
+                    icon: 'check-circle',
+                    label: '優秀'
+                },
+                good: {
+                    color: { bg: 'rgba(59, 130, 246, 0.15)', border: 'rgba(59, 130, 246, 0.3)', text: '#3b82f6' },
+                    icon: 'thumbs-up',
+                    label: '良好'
+                },
+                average: {
+                    color: { bg: 'rgba(251, 191, 36, 0.15)', border: 'rgba(251, 191, 36, 0.3)', text: '#fbbf24' },
+                    icon: 'minus',
+                    label: '標準'
+                },
+                weak: {
+                    color: { bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 0.3)', text: '#ef4444' },
+                    icon: 'alert-circle',
+                    label: '要改善'
+                },
+                untested: {
+                    color: { bg: 'rgba(100, 116, 139, 0.15)', border: 'rgba(100, 116, 139, 0.3)', text: '#64748b' },
+                    icon: 'help-circle',
+                    label: '未テスト'
+                }
+            };
+            
+            return styles[performance] || styles.untested;
+        }
+        
+        // 弱点分析の生成
+        function generateWeaknessAnalysis(toneData) {
+            const weaknessEl = document.getElementById('weakness-details');
+            if (!weaknessEl) return;
+            
+            // 弱点基音の特定（要改善・未テスト除く）
+            const weakTones = Object.entries(toneData)
+                .filter(([tone, data]) => data.performance === 'weak' && data.sessions > 0)
+                .sort((a, b) => b[1].avgError - a[1].avgError)
+                .slice(0, 3);
+            
+            // 未テスト基音の特定
+            const untestedTones = Object.entries(toneData)
+                .filter(([tone, data]) => data.performance === 'untested')
+                .map(([tone]) => tone);
+            
+            let analysisContent = '';
+            
+            if (weakTones.length > 0) {
+                const toneList = weakTones.map(([tone, data]) => 
+                    `<strong>${tone}基音</strong>（平均±${Math.round(data.avgError)}¢）`
+                ).join('、');
+                
+                analysisContent += `
+                    <p style="margin: 0 0 0.75rem;">
+                        <strong>練習推奨基音:</strong> ${toneList}
+                    </p>
+                    <p style="margin: 0 0 0.75rem;">
+                        これらの基音での集中練習を週2-3回行うことで、全体的な精度向上が期待できます。
+                    </p>
+                `;
+            }
+            
+            if (untestedTones.length > 0) {
+                const untestedList = untestedTones.join('、');
+                analysisContent += `
+                    <p style="margin: 0;">
+                        <strong>未テスト基音:</strong> ${untestedList}<br>
+                        12音律システムの完成のため、これらの基音でのトレーニングも重要です。
+                    </p>
+                `;
+            }
+            
+            if (weakTones.length === 0 && untestedTones.length === 0) {
+                analysisContent = `
+                    <p style="margin: 0; color: #22c55e;">
+                        🎉 全ての基音で良好な成績です！12音律システムが順調に発達しています。
+                    </p>
+                `;
+            }
+            
+            weaknessEl.innerHTML = analysisContent;
         }
 
         // セッションナビゲーション機能
