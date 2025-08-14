@@ -23,6 +23,68 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
+        /* レスポンシブレイアウト */
+        .score-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+            min-height: 80px;
+        }
+        
+        /* iPhone (375px以下) */
+        @media (max-width: 375px) {
+            .score-grid {
+                gap: 1rem;
+            }
+            
+            .score-base-note {
+                font-size: 2rem !important; /* text-2xl */
+            }
+            
+            .score-error {
+                font-size: 2rem !important; /* text-2xl */
+            }
+            
+            .score-section {
+                margin-bottom: 24px;
+                padding-bottom: 24px;
+            }
+        }
+        
+        /* タブレット (376px-767px) */
+        @media (min-width: 376px) and (max-width: 767px) {
+            .score-grid {
+                gap: 1.25rem;
+            }
+            
+            .score-base-note {
+                font-size: 3rem !important; /* text-3xl */
+            }
+            
+            .score-error {
+                font-size: 3rem !important; /* text-3xl */
+            }
+        }
+        
+        /* PC (768px以上) */
+        @media (min-width: 768px) {
+            .score-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 2rem;
+                align-items: end;
+            }
+            
+            .score-base-note {
+                font-size: 4rem !important; /* text-4xl */
+            }
+            
+            .score-error {
+                font-size: 4rem !important; /* text-4xl */
+            }
+        }
+        
         /* 背景グラデーションアニメーション - iOS対応版 */
         body {
             position: relative;
@@ -78,6 +140,40 @@
             margin-bottom: 2rem;
         }
         
+        .progress-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .progress-layout {
+                flex-direction: row;
+                align-items: center;
+                gap: 1.5rem;
+            }
+            
+            .progress-text {
+                text-align: left !important;
+            }
+        }
+        
+        /* iPhone用の余白最適化 */
+        @media (max-width: 375px) {
+            .progress-section {
+                margin-bottom: 1.5rem;
+            }
+            
+            .glass-card {
+                padding: 1rem;
+            }
+            
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+        
         .progress-container {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 9999px;
@@ -116,14 +212,14 @@
 
             <!-- 進行バー -->
             <div class="glass-card progress-section">
-                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
-                    <div class="flex-1">
+                <div class="progress-layout">
+                    <div style="flex: 1;">
                         <div class="progress-container">
                             <div class="progress-bar-fill" style="width: 25%;"></div>
                         </div>
-                        <div class="progress-text">セッション 2 / 8</div>
+                        <div class="progress-text" style="text-align: center;">セッション 2 / 8</div>
                     </div>
-                    <a href="training.html" class="btn btn-primary self-center sm:self-auto" style="white-space: nowrap;">
+                    <a href="training.html" class="btn btn-primary" style="white-space: nowrap; align-self: center;">
                         <i data-lucide="arrow-right" style="width: 16px; height: 16px; margin-right: 8px;"></i>
                         <span>次の基音へ</span>
                     </a>
@@ -133,24 +229,31 @@
             <!-- セッション概要 -->
             <div class="glass-card mb-8">
                 <div class="score-section">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; align-items: end; min-height: 80px;">
-                        <div style="display: flex; flex-direction: column; justify-content: flex-end; text-align: center; height: 100%;">
-                            <div class="text-4xl md:text-6xl font-bold text-white">C4</div>
-                            <p class="text-sm md:text-2xl text-green-200">基音</p>
-                        </div>
-                        <div style="display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center; height: 100%;">
+                    <div class="score-grid">
+                        <!-- トロフィーアイコン（モバイル最上位） -->
+                        <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                             <div class="mb-2">
                                 <div style="width: 100px; height: 100px; background: rgba(251, 191, 36, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 1px solid rgba(251, 191, 36, 0.3);">
                                     <i data-lucide="trophy" class="text-yellow-300" style="width: 64px; height: 64px;"></i>
                                 </div>
+                                <p class="text-lg text-white font-medium mt-4">素晴らしい精度！</p>
                             </div>
                         </div>
-                        <div style="display: flex; flex-direction: column; justify-content: flex-end; text-align: center; height: 100%;">
-                            <div class="text-4xl md:text-6xl font-bold text-white" id="average-error">+0.0¢</div>
-                            <p class="text-sm md:text-2xl text-green-200">セッション平均誤差</p>
+                        <!-- C4 基音 -->
+                        <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                            <div class="score-base-note font-bold text-white">C4</div>
+                            <p class="text-sm text-green-200">基音</p>
+                        </div>
+                        <!-- 平均誤差 -->
+                        <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                            <div class="score-error font-bold text-white" id="average-error">+0.0¢</div>
+                            <p class="text-sm text-green-200">セッション平均誤差</p>
                         </div>
                     </div>
                 </div>
+                
+                <!-- 評価分布見出し -->
+                <h3 class="text-xl font-medium text-white mb-4 text-center">評価分布</h3>
                 
                 <!-- 評価分布バー -->
                 <div style="display: flex; flex-direction: column; gap: 0.75rem; padding: 0 1rem;">
@@ -202,7 +305,7 @@
 
             <!-- 詳細分析 -->
             <div class="glass-card mb-8">
-                <h3 class="text-xl font-bold text-white mb-6 text-center">詳細分析</h3>
+                <h3 class="text-xl font-medium text-white mb-6 text-center">詳細分析</h3>
                 <div class="space-y-2" id="note-results">
                     <!-- Note results will be populated by JavaScript -->
                 </div>
