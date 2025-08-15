@@ -1,0 +1,3244 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>8va相対音感トレーニング - 総合評価</title>
+    <link rel="stylesheet" href="styles/system.css?v=4">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <style>
+        /* 背景グラデーションアニメーション - iOS対応版 */
+        body {
+            position: relative;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            -webkit-overflow-scrolling: touch;
+            background: #0f172a; /* フォールバック */
+        }
+        
+        /* 疑似要素で背景アニメーション */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            -webkit-animation: gradientShift 15s ease infinite;
+            z-index: -1;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            will-change: background-position;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @-webkit-keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* フローティングアニメーション */
+        .page-header-icon {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* SNSシェアセクション */
+        .share-section {
+            margin: 2rem 0;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .share-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .share-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 11s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { 
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+                opacity: 1;
+            }
+            9.1% { 
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+                opacity: 1;
+            }
+            9.2% { 
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+                opacity: 0;
+            }
+            99.9% { 
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+                opacity: 0;
+            }
+            100% { 
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+                opacity: 1;
+            }
+        }
+        
+        .share-card h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        
+        .share-card p {
+            color: white;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+        
+        /* rank-sectionスタイル（新横一列レイアウト） */
+        .rank-section {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .rank-mode {
+            margin-bottom: 24px;
+        }
+        
+        .rank-section .mode-title {
+            font-size: 1.6rem !important;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+        }
+        
+        .rank-content-row {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+        }
+        
+        .rank-icon {
+            flex-shrink: 0;
+        }
+        
+        .rank-stats-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+        
+        .rank-stat-item {
+            text-align: center;
+            min-width: 80px;
+        }
+        
+        .stat-value-rank {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 4px;
+            transition: transform 0.2s ease;
+            line-height: 1;
+        }
+        
+        .stat-value-rank.grade-value {
+            font-size: 2.0rem;
+            color: #ffffff; /* グレードは白色 */
+        }
+        
+        .stat-value-rank.avg-error {
+            color: #fbbf24; /* 平均誤差もグレードと同じ黄色 */
+        }
+        
+        .stat-label-rank {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.1;
+            margin: 0;
+            white-space: nowrap;
+        }
+        
+        .rank-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .rank-circle-icon {
+            width: 64px;
+            height: 64px;
+        }
+        
+        @media (max-width: 768px) {
+            .rank-content-row {
+                gap: 20px;
+            }
+            
+            .rank-stats-row {
+                gap: 20px;
+            }
+            
+            .rank-circle {
+                width: 90px;
+                height: 90px;
+            }
+            
+            .rank-circle-icon {
+                width: 54px !important;
+                height: 54px !important;
+            }
+            
+            .stat-value-rank {
+                font-size: 1.5rem;
+            }
+            
+            .stat-value-rank.grade-value {
+                font-size: 2rem;
+            }
+        }
+        
+        .share-buttons {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .share-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            position: relative;
+            /* btn-secondaryと同じシンプルな背景 */
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .share-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+        
+        .share-btn svg {
+            width: 24px;
+            height: 24px;
+            z-index: 1;
+        }
+        
+        .share-btn.twitter:hover {
+            box-shadow: 0 8px 25px rgba(29, 161, 242, 0.4), 0 0 30px rgba(29, 161, 242, 0.3);
+        }
+        
+        .share-btn.line:hover {
+            box-shadow: 0 8px 25px rgba(0, 195, 0, 0.4), 0 0 30px rgba(0, 195, 0, 0.3);
+        }
+        
+        .share-btn.facebook:hover {
+            box-shadow: 0 8px 25px rgba(24, 119, 242, 0.4), 0 0 30px rgba(24, 119, 242, 0.3);
+        }
+        
+        .share-btn.copy:hover {
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4), 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+        
+        @media (max-width: 640px) {
+            .share-btn {
+                width: 48px;
+                height: 48px;
+            }
+            
+            .share-btn svg {
+                width: 20px;
+                height: 20px;
+            }
+            
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen p-6">
+        <div class="container">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="flex justify-center mb-6">
+                    <div class="page-header-icon page-header-icon-purple">
+                        <i data-lucide="file-chart-column-increasing" class="icon-2xl text-white" data-stroke-width="2"></i>
+                    </div>
+                </div>
+                <h1 class="text-4xl font-bold text-white mb-4">総合評価</h1>
+                <p class="text-green-200 text-xl mb-6">12セッション完了 - あなたの音感レベルを分析しました</p>
+                
+            </div>
+
+            <!-- SNSシェアセクション -->
+            <div class="share-section" id="share-section">
+                <div class="share-card">
+                    <!-- rank-section -->
+                    <section class="rank-section">
+                        <!-- モード名 -->
+                        <div class="rank-mode">
+                            <h3 class="mode-title" id="main-mode-title">ランダム基音モード</h3>
+                        </div>
+                        
+                        <!-- グレードアイコンと統計情報を横一列に -->
+                        <div class="rank-content-row">
+                            <!-- グレードアイコン -->
+                            <div class="rank-icon">
+                                <div class="rank-circle" style="background: linear-gradient(135deg, #fbbf24, #d97706);">
+                                    <i data-lucide="crown" class="rank-circle-icon" style="color: white;"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- 統計情報 -->
+                            <div class="rank-stats-row">
+                                <div class="rank-stat-item">
+                                    <div class="stat-value-rank grade-value" id="dynamic-grade">B</div>
+                                    <div class="stat-label-rank">総合グレード</div>
+                                </div>
+                                <div class="rank-stat-item">
+                                    <div class="stat-value-rank avg-error" style="color: #fbbf24;">±0.0¢</div>
+                                    <div class="stat-label-rank">平均誤差（セント）</div>
+                                </div>
+                                <div class="rank-stat-item">
+                                    <div class="stat-value-rank max-error">+0.0¢</div>
+                                    <div class="stat-label-rank">最大誤差（セント）</div>
+                                </div>
+                                <div class="rank-stat-item">
+                                    <div class="stat-value-rank session-count">0</div>
+                                    <div class="stat-label-rank">セッション数</div>
+                                </div>
+                            </div>
+                            
+                            <!-- ランク取得メッセージ -->
+                            <div class="rank-achievement-message" style="margin-top: 0px; margin-bottom: 0px; text-align: center;">
+                                <p id="share-message" style="color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; margin: 0;">
+                                    B級ランク取得！グッドプレイヤー！
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <h3 style="margin-top: 0px; margin-bottom: 24px;">みんなに成果をシェアしよう！</h3>
+                    <div class="share-buttons">
+                        <a href="#" class="share-btn twitter" onclick="shareToTwitter(event)" title="Xでシェア">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="share-btn line" onclick="shareToLine(event)" title="LINEで送る">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.348 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="share-btn facebook" onclick="shareToFacebook(event)" title="Facebookでシェア">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </a>
+                        <button class="share-btn copy" onclick="copyShareText(event)" title="リンクをコピー">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overall Statistics (hidden - moved to rank-section) -->
+            <div class="glass-card mb-8" id="overall-stats-container" style="display: none; max-width: 100vw; overflow-x: hidden;">
+                <div class="grid grid-cols-4 gap-6 mb-8" id="overall-stats">
+                    <!-- Stats will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Performance Charts -->
+            <div class="glass-card mb-8" style="max-width: 100vw; overflow-x: hidden;">
+                <div class="block md:grid md:grid-cols-2 gap-4 md:gap-8">
+                    <!-- Error Trend Chart -->
+                    <div class="mb-8 md:mb-0">
+                        <h3 class="text-xl font-bold text-white mb-4">誤差推移</h3>
+                        <div class="relative bg-white/5 rounded-lg p-0 md:p-4" id="error-trend-container" style="height: 280px;">
+                            <canvas id="error-trend-chart"></canvas>
+                        </div>
+                        <div class="text-xs text-white-60 text-center mt-2" id="chart-description" style="min-height: 80px; height: auto;">
+                            <!-- グラフの説明はJavaScriptで動的に設定 -->
+                        </div>
+                    </div>
+                    
+                    <!-- Accuracy Chart -->
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-4">評価分布</h3>
+                        <div class="bg-white/5 rounded-lg" style="height: 200px;">
+                            <canvas id="accuracy-chart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="text-xs text-white-60 text-center mt-2">12セッションの評価内訳</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 詳細分析レポート -->
+            <div class="glass-card mb-8" style="padding: 2rem;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1rem;">
+                        <i data-lucide="microscope" style="width: 28px; height: 28px; color: #fbbf24;"></i>
+                        <h2 style="color: white; font-size: 1.75rem; font-weight: 700; margin: 0;">詳細分析レポート</h2>
+                    </div>
+                    <div style="background: rgba(0, 0, 0, 0.4); padding: 1rem; border-radius: 8px; backdrop-filter: blur(10px);">
+                        <p style="color: #e2e8f0; font-size: 1rem; margin: 0; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);">
+                            あなたの相対音感を科学的に分析し、具体的な改善方法をご提案します
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- モード別フィードバック -->
+                <div id="mode-feedback" class="glass-card" style="display: none; margin-bottom: 2rem; padding: 1.5rem;">
+                    <div class="feedback-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div class="feedback-icon" style="width: 40px; height: 40px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="target" style="width: 20px; height: 20px; color: white;"></i>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0; color: white; font-size: 1.125rem; font-weight: 600;" id="mode-title">モード情報</h4>
+                            <p style="margin: 0; color: #94a3b8; font-size: 0.875rem;" id="mode-focus"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="feedback-content" style="margin-bottom: 1.25rem;">
+                        <p style="margin: 0; color: #cbd5e1; font-size: 0.9375rem; line-height: 1.6;" id="mode-message"></p>
+                    </div>
+                    
+                    <div class="feedback-next-step" style="padding: 1rem; background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.05)); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 12px;">
+                        <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                            <div style="width: 28px; height: 28px; background: rgba(34, 197, 94, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.125rem;">
+                                <i data-lucide="arrow-right" style="width: 14px; height: 14px; color: #22c55e;"></i>
+                            </div>
+                            <div>
+                                <h5 style="margin: 0 0 0.25rem; color: #22c55e; font-size: 0.875rem; font-weight: 600;">次のステップ</h5>
+                                <p style="margin: 0; color: #a7f3d0; font-size: 0.875rem; line-height: 1.5;" id="mode-next-step"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Phase 1: ピンポイント分析表示エリア -->
+                <div id="detailed-analysis" class="glass-card" style="display: block; margin-bottom: 2rem; padding: 1.5rem;">
+                    <div class="analysis-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div class="analysis-icon" style="width: 40px; height: 40px; background: linear-gradient(135deg, #ef4444, #dc2626); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="crosshair" style="width: 20px; height: 20px; color: white;"></i>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0; color: white; font-size: 1.125rem; font-weight: 600;">ピンポイント分析</h4>
+                            <p style="margin: 0; color: #94a3b8; font-size: 0.875rem;">最大・最小誤差の具体的特定</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-content" style="margin-bottom: 1.25rem;">
+                        <p style="margin: 0; color: #cbd5e1; font-size: 0.9375rem; line-height: 1.6;" id="detailed-analysis-content">最大誤差-52.3¢はセッション3のF#音で発生しており、この音程の集中練習が効果的です。最高精度+1.2¢をセッション1のC音で達成しており、この精度の再現性向上が鍵となります。平均誤差±22.8¢の分析から、基本的な音程感覚は身についていますが、特定の音程で大きなばらつきが見られます。</p>
+                    </div>
+                </div>
+                
+                <!-- Phase 1: 練習指導表示エリア -->
+                <div id="practice-guidance" class="glass-card" style="display: block; margin-bottom: 2rem; padding: 1.5rem;">
+                    <div class="guidance-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div class="guidance-icon" style="width: 40px; height: 40px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="lightbulb" style="width: 20px; height: 20px; color: white;"></i>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0; color: white; font-size: 1.125rem; font-weight: 600;">練習指導</h4>
+                            <p style="margin: 0; color: #94a3b8; font-size: 0.875rem;">具体的な改善アクション</p>
+                        </div>
+                    </div>
+                    
+                    <div class="guidance-content" style="margin-bottom: 1.25rem;">
+                        <!-- 最優先課題 -->
+                        <div id="priority-guidance" style="display: block; margin-bottom: 0.75rem; padding: 0.75rem; background: rgba(239, 68, 68, 0.1); border-radius: 8px; border-left: 3px solid #ef4444;">
+                            <div style="color: #f87171; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">最優先課題</div>
+                            <div style="color: #cbd5e1; font-size: 0.9375rem; line-height: 1.6;" id="priority-text">F#音で52.3¢の大きな誤差が発生しているため、この音程を重点的に練習してください。基音C3からF#音への音程関係を楽器で確認しながら反復練習が効果的です。</div>
+                        </div>
+                        
+                        <!-- 成功再現指導 -->
+                        <div id="success-guidance" style="display: block; margin-bottom: 0.75rem; padding: 0.75rem; background: rgba(34, 197, 94, 0.1); border-radius: 8px; border-left: 3px solid #22c55e;">
+                            <div style="color: #4ade80; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">成功再現</div>
+                            <div style="color: #cbd5e1; font-size: 0.9375rem; line-height: 1.6;" id="success-text">セッション1のC音で達成した±1.2¢の高精度を他の音程でも再現できるよう応用練習を行いましょう。</div>
+                        </div>
+                        
+                        <!-- 基本練習 -->
+                        <div id="basic-guidance" style="display: block; margin-bottom: 0.75rem; padding: 0.75rem; background: rgba(59, 130, 246, 0.1); border-radius: 8px; border-left: 3px solid #3b82f6;">
+                            <div style="color: #60a5fa; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">基本練習</div>
+                            <div style="color: #cbd5e1; font-size: 0.9375rem; line-height: 1.6;" id="basic-text">ピアノなしで歌った後に楽器で確認する練習で独立性を高めましょう。</div>
+                        </div>
+                        
+                        <!-- Excellence向上練習 -->
+                        <div id="excellence-guidance" style="display: block; margin-bottom: 0.75rem; padding: 0.75rem; background: rgba(168, 85, 247, 0.1); border-radius: 8px; border-left: 3px solid #a855f7;">
+                            <div style="color: #c084fc; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">精度向上練習</div>
+                            <div style="color: #cbd5e1; font-size: 0.9375rem; line-height: 1.6;" id="excellence-text">現在のExcellence Rate 45.2%を70%以上に向上させるため、±15セント以内の精度を目指した集中練習が必要です。</div>
+                        </div>
+                        
+                        <!-- モード別練習 -->
+                        <div id="mode-guidance" style="display: block; margin-bottom: 0.75rem; padding: 0.75rem; background: rgba(245, 158, 11, 0.1); border-radius: 8px; border-left: 3px solid #f59e0b;">
+                            <div style="color: #fbbf24; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">12音階モード練習</div>
+                            <div style="color: #cbd5e1; font-size: 0.9375rem; line-height: 1.6;" id="mode-practice-text">上昇・下降パターンでの12音すべての音程関係を体系的にマスターする練習に重点を置きましょう。</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 12音別成績分析 -->
+                <div id="tone-analysis" class="glass-card" style="display: none; margin-bottom: 2rem; padding: 1.5rem;">
+                    <div class="analysis-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div class="analysis-icon" style="width: 40px; height: 40px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="bar-chart-3" style="width: 20px; height: 20px; color: white;"></i>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0; color: white; font-size: 1.125rem; font-weight: 600;">12音律分析</h4>
+                            <p style="margin: 0; color: #94a3b8; font-size: 0.875rem;">各基音での習熟度と弱点の特定</p>
+                        </div>
+                    </div>
+                    
+                    <div class="tone-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem;" id="tone-performance-grid">
+                        <!-- 動的に生成される12音の成績 -->
+                    </div>
+                    
+                    <div class="weakness-analysis" style="padding: 1rem; background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.05)); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px;">
+                        <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                            <div style="width: 28px; height: 28px; background: rgba(239, 68, 68, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.125rem;">
+                                <i data-lucide="alert-triangle" style="width: 14px; height: 14px; color: #f87171;"></i>
+                            </div>
+                            <div>
+                                <h5 style="margin: 0 0 0.5rem; color: #f87171; font-size: 0.875rem; font-weight: 600;">弱点分析</h5>
+                                <div id="weakness-details" style="color: #fca5a5; font-size: 0.875rem; line-height: 1.5;">
+                                    <!-- 動的に生成される弱点分析 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sessions Overview -->
+            <div class="glass-card mb-8">
+                <h3 class="text-2xl font-bold text-white mb-6">セッション別成績</h3>
+                <p class="text-white-70 text-sm mb-4">
+                    <span class="lg:hidden">セッションをタップして詳細分析を表示</span>
+                    <span class="hidden lg:inline">セッションをクリックして詳細分析を表示</span>
+                </p>
+                <div class="grid grid-cols-12 gap-3" id="sessions-grid">
+                    <!-- Sessions will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Detailed Analysis -->
+            <div class="glass-card mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <button id="prev-session-btn" class="glass-card-sm hover:bg-white/10 transition-colors cursor-pointer flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                            <path d="m15 18-6-6 6-6"/>
+                        </svg>
+                    </button>
+                    <h3 class="text-xl font-bold text-white text-center flex-1 px-2">
+                        <div>詳細分析</div>
+                        <div class="text-lg mt-1">セッション<span id="selected-session">1</span></div>
+                    </h3>
+                    <button id="next-session-btn" class="glass-card-sm hover:bg-white/10 transition-colors cursor-pointer flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="mb-4 text-center" id="session-info">
+                    <!-- Session info will be populated by JavaScript -->
+                </div>
+                <div class="space-y-2" id="note-results">
+                    <!-- Note results will be populated by JavaScript -->
+                </div>
+            </div>
+
+
+            <!-- Action Buttons -->
+            <section class="final-actions">
+                <a href="records.html" class="btn btn-primary btn-large">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; margin-right: 8px;">
+                        <path d="M3 3h18v18H3z"/>
+                        <path d="M21 9H3"/>
+                        <path d="M9 21V9"/>
+                    </svg>
+                    <span>記録を見る</span>
+                </a>
+                <a href="index.html" class="btn btn-secondary btn-large">
+                    <i data-lucide="home" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                    <span>ホームに戻る</span>
+                </a>
+                <a href="mic-test.html" class="btn btn-primary btn-large">
+                    <i data-lucide="rotate-ccw" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                    <span>再チャレンジ</span>
+                </a>
+            </section>
+            
+            <!-- テストモード切り替えリンク（開発用） -->
+            <section class="section" id="test-mode-links" style="display: none;">
+                <div class="glass-card" style="padding: 2rem; text-align: center; border: 1px solid rgba(251, 191, 36, 0.3);">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+                        <i data-lucide="settings" style="width: 20px; height: 20px; color: #fbbf24;"></i>
+                        <h3 style="color: #fbbf24; margin: 0; font-size: 1.125rem; font-weight: 600;">開発用テストモード</h3>
+                    </div>
+                    <p style="color: #94a3b8; margin-bottom: 1.5rem; font-size: 0.875rem;">
+                        異なるセッション数での動的グレード計算とフィードバックをテストできます
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <a href="?mode=8" class="btn btn-secondary" style="min-width: 140px;">
+                            <i data-lucide="play-circle" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                            8セッション（初級）
+                        </a>
+                        <a href="?mode=12" class="btn btn-secondary" style="min-width: 140px;">
+                            <i data-lucide="play-circle" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                            12セッション（中級）
+                        </a>
+                        <a href="?mode=24" class="btn btn-secondary" style="min-width: 140px;">
+                            <i data-lucide="play-circle" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                            24セッション（上級）
+                        </a>
+                        <a href="results.html" class="btn btn-primary" style="min-width: 140px;">
+                            <i data-lucide="database" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                            本番モード
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // テストモード判定（URLパラメータ）
+        const urlParams = new URLSearchParams(window.location.search);
+        const testMode = urlParams.get('mode'); // ?mode=8, ?mode=12, ?mode=24
+        
+        // モード別モックデータ生成
+        function getMockDataForMode(mode) {
+            const modeNum = parseInt(mode) || 12;
+            
+            // 8セッション用（初級・ランダム基音）- 自然音階のみ
+            const mockData8Sessions = [
+                { session: 1, baseNote: 'C4', accuracy: 88.5, averageCentError: 35.2 },
+                { session: 2, baseNote: 'D4', accuracy: 85.3, averageCentError: 42.1 },
+                { session: 3, baseNote: 'E4', accuracy: 82.1, averageCentError: 48.7 },
+                { session: 4, baseNote: 'F4', accuracy: 86.2, averageCentError: 38.5 },
+                { session: 5, baseNote: 'G4', accuracy: 79.9, averageCentError: 52.3 },
+                { session: 6, baseNote: 'A4', accuracy: 84.7, averageCentError: 44.2 },
+                { session: 7, baseNote: 'B4', accuracy: 87.4, averageCentError: 36.8 },
+                { session: 8, baseNote: 'C5', accuracy: 83.6, averageCentError: 46.5 }
+            ];
+            
+            // 12セッション用（中級・連続チャレンジ）- 半音含む
+            const mockData12Sessions = [
+                { session: 1, baseNote: 'C4', accuracy: 87.5, averageCentError: 25.1 },
+                { session: 2, baseNote: 'D4', accuracy: 82.3, averageCentError: 35.4 },
+                { session: 3, baseNote: 'E4', accuracy: 89.1, averageCentError: 22.7 },
+                { session: 4, baseNote: 'F4', accuracy: 91.2, averageCentError: 18.8 },
+                { session: 5, baseNote: 'G4', accuracy: 78.9, averageCentError: 42.2 },
+                { session: 6, baseNote: 'A4', accuracy: 88.7, averageCentError: 28.9 },
+                { session: 7, baseNote: 'B4', accuracy: 92.4, averageCentError: 21.3 },
+                { session: 8, baseNote: 'C5', accuracy: 85.6, averageCentError: 32.7 },
+                { session: 9, baseNote: 'C#4', accuracy: 84.2, averageCentError: 38.1 },
+                { session: 10, baseNote: 'D#4', accuracy: 73.8, averageCentError: 55.3 },
+                { session: 11, baseNote: 'F#4', accuracy: 90.3, averageCentError: 23.9 },
+                { session: 12, baseNote: 'G#4', accuracy: 62.1, averageCentError: 58.7 }
+            ];
+            
+            // 24セッション用（上級・12音階）- 完全クロマチック
+            const mockData24Sessions = [
+                { session: 1, baseNote: 'C4', accuracy: 92.5, averageCentError: 15.1 },
+                { session: 2, baseNote: 'C#4', accuracy: 88.3, averageCentError: 22.4 },
+                { session: 3, baseNote: 'D4', accuracy: 91.1, averageCentError: 16.7 },
+                { session: 4, baseNote: 'D#4', accuracy: 85.2, averageCentError: 28.8 },
+                { session: 5, baseNote: 'E4', accuracy: 93.9, averageCentError: 12.2 },
+                { session: 6, baseNote: 'F4', accuracy: 94.7, averageCentError: 10.9 },
+                { session: 7, baseNote: 'F#4', accuracy: 87.4, averageCentError: 24.3 },
+                { session: 8, baseNote: 'G4', accuracy: 90.6, averageCentError: 18.7 },
+                { session: 9, baseNote: 'G#4', accuracy: 82.2, averageCentError: 35.1 },
+                { session: 10, baseNote: 'A4', accuracy: 91.8, averageCentError: 17.3 },
+                { session: 11, baseNote: 'A#4', accuracy: 86.3, averageCentError: 26.9 },
+                { session: 12, baseNote: 'B4', accuracy: 95.1, averageCentError: 9.7 },
+                { session: 13, baseNote: 'C5', accuracy: 89.5, averageCentError: 20.1 },
+                { session: 14, baseNote: 'C#5', accuracy: 84.3, averageCentError: 31.4 },
+                { session: 15, baseNote: 'D5', accuracy: 90.1, averageCentError: 19.7 },
+                { session: 16, baseNote: 'D#5', accuracy: 79.2, averageCentError: 41.8 },
+                { session: 17, baseNote: 'E5', accuracy: 92.9, averageCentError: 14.2 },
+                { session: 18, baseNote: 'F5', accuracy: 93.7, averageCentError: 13.9 },
+                { session: 19, baseNote: 'F#5', accuracy: 85.4, averageCentError: 29.3 },
+                { session: 20, baseNote: 'G5', accuracy: 88.6, averageCentError: 23.7 },
+                { session: 21, baseNote: 'G#5', accuracy: 78.2, averageCentError: 43.1 },
+                { session: 22, baseNote: 'A5', accuracy: 89.8, averageCentError: 21.3 },
+                { session: 23, baseNote: 'A#5', accuracy: 83.3, averageCentError: 33.9 },
+                { session: 24, baseNote: 'B5', accuracy: 91.1, averageCentError: 17.7 }
+            ];
+            
+            // モードに応じたデータを返す
+            switch(modeNum) {
+                case 8:
+                    console.log('🎯 Test Mode: 8 sessions (初級・ランダム基音)');
+                    return mockData8Sessions;
+                case 24:
+                    console.log('🎯 Test Mode: 24 sessions (上級・12音階)');
+                    return mockData24Sessions;
+                case 12:
+                default:
+                    console.log('🎯 Test Mode: 12 sessions (中級・連続チャレンジ)');
+                    return mockData12Sessions;
+            }
+        }
+        
+        // 実データ取得関数（将来の実装用）
+        function getActualSessionData() {
+            // localStorageまたはAPIから実データを取得
+            const savedData = localStorage.getItem('sessionResults');
+            if (savedData) {
+                return JSON.parse(savedData);
+            }
+            
+            // デフォルトは12セッションモック
+            return getMockDataForMode('12');
+        }
+        
+        // メインデータの選択
+        const mockSessionsData = testMode ? 
+            getMockDataForMode(testMode) : 
+            getActualSessionData();
+        
+        // テストモード表示（開発用）
+        if (testMode) {
+            console.log(`⚠️ テストモード有効: ${testMode}セッション`);
+            console.log('🔗 切り替えリンク:');
+            console.log('  - 8セッション: results.html?mode=8');
+            console.log('  - 12セッション: results.html?mode=12');
+            console.log('  - 24セッション: results.html?mode=24');
+            console.log('  - 本番モード: results.html');
+            
+            // テストモードインジケータを表示
+            document.addEventListener('DOMContentLoaded', () => {
+                const testIndicator = document.createElement('div');
+                testIndicator.style.cssText = `
+                    position: fixed;
+                    top: 10px;
+                    right: 10px;
+                    background: rgba(251, 191, 36, 0.9);
+                    color: black;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    font-weight: bold;
+                    z-index: 10000;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                `;
+                testIndicator.textContent = `TEST MODE: ${testMode} sessions`;
+                document.body.appendChild(testIndicator);
+            });
+        }
+
+        // Simple pseudo-random number generator with seed
+        function seededRandom(seed) {
+            const x = Math.sin(seed) * 10000;
+            return x - Math.floor(x);
+        }
+
+        // Generate session-specific note results with consistent seed
+        function generateSessionNoteResults(sessionData) {
+            const noteNames = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド'];
+            const baseFreqs = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25];
+            
+            // セッション番号をシードとして使用して一貫したデータを生成
+            let seed = sessionData.session * 1000;
+            
+            return noteNames.map((noteName, index) => {
+                // シード基づく擬似ランダム生成で一貫した結果を保証
+                const baseError = sessionData.averageCentError;
+                const variation = (seededRandom(seed + index * 10) - 0.5) * 0.8 * baseError;
+                const sign = seededRandom(seed + index * 10 + 5) > 0.5 ? 1 : -1;
+                const absError = Math.max(1, Math.abs(baseError + variation));
+                const centError = Math.round(absError * sign);
+                
+                const targetFreq = baseFreqs[index];
+                const userFreq = targetFreq * Math.pow(2, centError / 1200);
+                
+                return {
+                    noteIndex: index,
+                    noteName: noteName,
+                    targetFrequency: targetFreq,
+                    userFrequency: userFreq,
+                    centError: centError,
+                    isCorrect: Math.abs(centError) <= 50
+                };
+            });
+        }
+
+        let selectedSessionForAnalysis = 1;
+        
+        // Chart.jsアニメーション制御フラグ
+        let errorTrendChartAnimated = false;
+        let accuracyChartAnimated = false;
+        
+        // オブザーバー管理
+        let errorTrendObserver = null;
+        let accuracyObserver = null;
+
+        // Get evaluation level and color (仕様書準拠)
+        function getSessionEvaluationLabel(averageCentError) {
+            if (averageCentError <= 15) return 'Excellent';      // ±15セント以内
+            if (averageCentError <= 25) return 'Good';           // 15セント超～25セント以内  
+            if (averageCentError <= 40) return 'Pass';           // 25セント超～40セント以内
+            return 'Practice';                                   // 41セント以上
+        }
+
+        function getSessionEvaluationColor(label) {
+            switch (label) {
+                case 'Excellent': return 'gradient-warning';
+                case 'Good': return 'gradient-success'; 
+                case 'Pass': return 'gradient-blue';
+                default: return 'gradient-error';
+            }
+        }
+
+        function getGlassBackground(label, isSelected = false) {
+            const opacity1 = isSelected ? 0.6 : 0.45;
+            const opacity2 = isSelected ? 0.8 : 0.65;
+            
+            switch (label) {
+                case 'Excellent': return `rgba(251, 191, 36, ${opacity1}), rgba(245, 158, 11, ${opacity2})`; // 黄色系
+                case 'Good': return `rgba(74, 222, 128, ${opacity1}), rgba(34, 197, 94, ${opacity2})`; // 緑色系
+                case 'Pass': return `rgba(59, 130, 246, ${opacity1}), rgba(29, 78, 216, ${opacity2})`; // 青色系
+                case 'Practice': return `rgba(239, 68, 68, ${opacity1}), rgba(220, 38, 38, ${opacity2})`; // 赤色系
+                default: return `rgba(255, 255, 255, ${opacity1 * 0.8}), rgba(255, 255, 255, ${opacity2 * 0.8})`;
+            }
+        }
+
+        function getEvaluationIcon(label, colorClass = 'text-white', size = 24) {
+            // Lucideアイコンを使用（直感的なアイコン配置）
+            switch (label) {
+                case 'Excellent': return lucideIcon('trophy', colorClass, size);     // ±15セント以内 - トロフィー
+                case 'Good': return lucideIcon('star', colorClass, size);            // 15～25セント - 星  
+                case 'Pass': return lucideIcon('thumbs-up', colorClass, size);       // 25～40セント - 親指UP
+                case 'Practice': return lucideIcon('triangle-alert', colorClass, size); // 41セント以上 - 三角警告
+                default: return lucideIcon('alert-circle', colorClass, size);        // フォールバック
+            }
+        }
+
+        // Initialize sessions grid
+        function initializeSessionsGrid() {
+            const grid = document.getElementById('sessions-grid');
+            grid.innerHTML = '';
+
+            mockSessionsData.forEach((session) => {
+                const label = getSessionEvaluationLabel(session.averageCentError);
+                const colorClass = getSessionEvaluationColor(label);
+                
+                // アイコン用の色クラスを設定
+                let iconColorClass = 'text-white';
+                switch (label) {
+                    case 'Excellent': iconColorClass = 'text-yellow-200'; break;
+                    case 'Good': iconColorClass = 'text-green-200'; break;
+                    case 'Pass': iconColorClass = 'text-blue-200'; break;
+                    case 'Practice': iconColorClass = 'text-red-200'; break;
+                }
+                
+                const icon = getEvaluationIcon(label, iconColorClass, 24); // 12セッション概要は24px
+                
+
+                const sessionElement = document.createElement('div');
+                sessionElement.className = `aspect-square rounded-lg cursor-pointer transition-all hover-scale active:scale-95 flex flex-col items-center justify-center text-center relative ${
+                    selectedSessionForAnalysis === session.session ? 'scale-105' : ''
+                }`;
+                
+                // 選択時の枠線をオーバーレイ効果付きで追加
+                if (selectedSessionForAnalysis === session.session) {
+                    sessionElement.style.boxShadow = '0 0 0 2px rgba(255, 255, 255, 0.6), 0 4px 6px rgba(0, 0, 0, 0.1)';
+                    sessionElement.style.position = 'relative';
+                } else {
+                    sessionElement.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+                }
+                
+                // 背景とコンテンツを分離
+                const isSelected = selectedSessionForAnalysis === session.session;
+                sessionElement.style.position = 'relative';
+                
+                // 文字色を各ボタンの色に合わせて設定
+                let textColor = 'text-white';
+                switch (label) {
+                    case 'Excellent': textColor = 'text-yellow-200'; break;
+                    case 'Good': textColor = 'text-green-200'; break;
+                    case 'Pass': textColor = 'text-blue-200'; break;
+                    case 'Practice': textColor = 'text-red-200'; break;
+                }
+                
+                sessionElement.innerHTML = `
+                    <div class="absolute inset-0 rounded-lg" style="
+                        opacity: ${isSelected ? '1' : '0.7'};
+                        background: linear-gradient(135deg, ${getGlassBackground(label, isSelected)});
+                        backdrop-filter: blur(8px);
+                        -webkit-backdrop-filter: blur(8px);
+                        -moz-backdrop-filter: blur(8px);
+                        border: 1px solid rgba(255, 255, 255, ${isSelected ? '0.4' : '0.3'});
+                        border-radius: 12px;
+                        will-change: transform, opacity;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        -webkit-perspective: 1000px;
+                        perspective: 1000px;
+                    "></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full" style="
+                        opacity: 1;
+                        will-change: transform;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        pointer-events: none;
+                    ">
+                        <div class="${textColor} font-bold text-sm mb-1" style="
+                            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+                            filter: brightness(1.2);
+                            -webkit-font-smoothing: antialiased;
+                            -moz-osx-font-smoothing: grayscale;
+                        ">${session.session}</div>
+                        <div class="mb-1" style="
+                            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)) brightness(1.2);
+                            -webkit-backface-visibility: hidden;
+                            backface-visibility: hidden;
+                        ">${icon}</div>
+                    </div>
+                `;
+
+                // ホバー効果 - 背景のみの透明度変化
+                sessionElement.addEventListener('mouseenter', () => {
+                    if (selectedSessionForAnalysis !== session.session) {
+                        const bgElement = sessionElement.querySelector('.absolute.inset-0');
+                        if (bgElement) {
+                            bgElement.style.opacity = '1';
+                        }
+                        sessionElement.style.transform = 'scale(1.05)';
+                    }
+                });
+                
+                sessionElement.addEventListener('mouseleave', () => {
+                    if (selectedSessionForAnalysis !== session.session) {
+                        const bgElement = sessionElement.querySelector('.absolute.inset-0');
+                        if (bgElement) {
+                            bgElement.style.opacity = '0.7';
+                        }
+                        sessionElement.style.transform = 'scale(1)';
+                    }
+                });
+                
+                sessionElement.addEventListener('click', () => {
+                    selectedSessionForAnalysis = session.session;
+                    updateSelectedSession();
+                    initializeSessionsGrid(); // Refresh to update selection
+                });
+
+                grid.appendChild(sessionElement);
+            });
+        }
+
+        // Update selected session details
+        function updateSelectedSession() {
+            const selectedSession = mockSessionsData.find(s => s.session === selectedSessionForAnalysis);
+            if (!selectedSession) return;
+
+            document.getElementById('selected-session').textContent = selectedSession.session;
+
+            // セッションの評価ラベルを取得
+            const label = getSessionEvaluationLabel(selectedSession.averageCentError);
+
+            // Update session info - 1行中央寄せレイアウト
+            const sessionInfo = document.getElementById('session-info');
+            
+            // アイコンの色クラスを設定
+            let iconColorClass = 'text-white';
+            switch (label) {
+                case 'Excellent': iconColorClass = 'text-yellow-300'; break;
+                case 'Good': iconColorClass = 'text-green-300'; break;
+                case 'Pass': iconColorClass = 'text-blue-300'; break;
+                case 'Practice': iconColorClass = 'text-red-300'; break;
+            }
+            
+            // 画面サイズに応じてアイコンサイズを動的に決定
+            const isDesktop = window.innerWidth >= 768;
+            const iconSize = isDesktop ? 80 : 32; // PC版80px、モバイル版32px
+            const largeIcon = getEvaluationIcon(label, iconColorClass, iconSize);
+            
+            sessionInfo.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; align-items: end; min-height: 80px;">
+                    <div style="display: flex; flex-direction: column; justify-content: flex-end; text-align: center; height: 100%;">
+                        <div class="text-2xl md:text-4xl font-bold text-white">${selectedSession.baseNote}</div>
+                        <p class="text-xs md:text-base text-green-200">基音</p>
+                    </div>
+                    <div style="display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center; height: 100%;">
+                        <div class="mb-2">${largeIcon}</div>
+                        <p class="text-base md:text-lg font-bold ${iconColorClass}">${label}</p>
+                    </div>
+                    <div style="display: flex; flex-direction: column; justify-content: flex-end; text-align: center; height: 100%;">
+                        <div class="text-2xl md:text-4xl font-bold text-white">${
+                            // データの正負に基づいて表示を調整
+                            (() => {
+                                const seed = selectedSession.session * 1234;
+                                const isPositive = (Math.sin(seed) > 0);
+                                return isPositive ? `+${selectedSession.averageCentError}` : `-${selectedSession.averageCentError}`;
+                            })()
+                        }</div>
+                        <p class="text-xs md:text-base text-green-200">セッション平均誤差</p>
+                    </div>
+                </div>
+            `;
+
+            // Update note results
+            const noteResults = document.getElementById('note-results');
+            noteResults.innerHTML = '';
+
+            const sessionNoteResults = generateSessionNoteResults(selectedSession);
+            sessionNoteResults.forEach((note, index) => {
+                const getEvaluationLevel = (centError) => {
+                    const absError = Math.abs(centError);
+                    // 直感的なアイコン配置で統一評価基準（アイコンサイズを28pxに拡大）
+                    if (absError <= 15) return { level: 'excellent', color: 'text-yellow-300', label: 'Excellent', icon: lucideIcon('trophy', 'text-yellow-300', 28) };
+                    if (absError <= 25) return { level: 'good', color: 'text-green-300', label: 'Good', icon: lucideIcon('star', 'text-green-300', 28) };
+                    if (absError <= 40) return { level: 'pass', color: 'text-blue-300', label: 'Pass', icon: lucideIcon('thumbs-up', 'text-blue-300', 28) };
+                    return { level: 'practice', color: 'text-red-300', label: 'Practice', icon: lucideIcon('triangle-alert', 'text-red-300', 28) };
+                };
+
+                const evaluation = getEvaluationLevel(note.centError);
+
+                const noteElement = document.createElement('div');
+                noteElement.className = 'glass-card-sm hover:bg-white/10 transition-colors';
+                noteElement.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div>
+                                <div class="text-lg font-bold text-white">${note.noteName}</div>
+                            </div>
+                            <div>
+                                <div class="text-base text-white-60 font-medium">目標 ${note.targetFrequency.toFixed(0)}Hz</div>
+                                <div class="text-base text-white-60 font-medium">実音 ${note.userFrequency.toFixed(0)}Hz</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="font-bold text-2xl ${note.centError > 0 ? 'text-red-300' : 'text-blue-300'}">
+                                ${note.centError > 0 ? '+' : ''}${note.centError}¢
+                            </div>
+                            <div class="flex items-center justify-center" style="min-width: 36px;">
+                                ${evaluation.icon}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                noteResults.appendChild(noteElement);
+            });
+            
+            // 詳細分析のアイコンを再初期化
+            setTimeout(() => {
+                initializeLucideIcons();
+            }, 50);
+        }
+
+
+        // Initialize overall statistics
+        function initializeOverallStats() {
+            const overallStats = document.getElementById('overall-stats');
+            
+            // Calculate overall statistics
+            const totalSessions = mockSessionsData.length;
+            const completedSessions = totalSessions; // All sessions completed
+            
+            // Calculate average error across all sessions (絶対値の平均)
+            const totalError = mockSessionsData.reduce((sum, session) => sum + session.averageCentError, 0);
+            const averageError = Math.round(totalError / totalSessions * 10) / 10;
+            
+            // Find maximum error with sign (プラスかマイナスを保持)
+            const errors = mockSessionsData.map(session => {
+                // セッション番号に基づいてプラス/マイナスを決定
+                const seed = session.session * 1234;
+                const isPositive = (Math.sin(seed) > 0);
+                return isPositive ? session.averageCentError : -session.averageCentError;
+            });
+            // 絶対値が最大のものを選択（符号付き）
+            const maxError = errors.reduce((max, curr) => 
+                Math.abs(curr) > Math.abs(max) ? curr : max, 0);
+            
+            // Calculate overall grade based on average error
+            let overallGrade;
+            if (averageError <= 15) overallGrade = 'S';
+            else if (averageError <= 20) overallGrade = 'A';
+            else if (averageError <= 25) overallGrade = 'B';
+            else if (averageError <= 35) overallGrade = 'C';
+            else overallGrade = 'D';
+            
+            overallStats.innerHTML = `
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-white mb-2">${overallGrade}</div>
+                    <p class="text-green-200">総合グレード</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-white mb-2 stat-value" data-value="${averageError}">±0.0</div>
+                    <p class="text-green-200">平均誤差（セント）</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-white mb-2 stat-value" data-value="${maxError}">${maxError >= 0 ? '+' : ''}0.0</div>
+                    <p class="text-green-200">最大誤差（セント）</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-white mb-2 stat-value" data-value="${totalSessions}">0</div>
+                    <p class="text-green-200">セッション数</p>
+                </div>
+            `;
+        }
+
+        // グラス効果用のグラデーションを作成（グローバル関数）
+        function createGlassGradient(ctx, color, chartType = 'mobile') {
+            // 固定幅でグラデーションを作成して安定性を確保
+            let gradient;
+            if (chartType === 'mobile') {
+                // モバイル版: 横向きグラデーション（固定幅200px）
+                gradient = ctx.createLinearGradient(0, 0, 200, 0);
+            } else {
+                // PC版: 縦向きグラデーション（固定高さ200px）で統一
+                gradient = ctx.createLinearGradient(0, 0, 0, 200);
+            }
+            
+            // 元の色をRGBに変換してアルファ値を調整
+            let r, g, b;
+            if (color === '#fbbf24') { r = 251; g = 191; b = 36; } // Excellent - 黄色
+            else if (color === '#22c55e') { r = 34; g = 197; b = 94; } // Good - 緑
+            else if (color === '#3b82f6') { r = 59; g = 130; b = 246; } // Pass - 青
+            else { r = 239; g = 68; b = 68; } // Practice - 赤
+            
+            // グラス効果: 均等なグラデーションで安定性を確保（終点を明るく調整）
+            gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.9)`); // 開始点（明るい）
+            gradient.addColorStop(0.3, `rgba(${Math.min(255, r + 40)}, ${Math.min(255, g + 40)}, ${Math.min(255, b + 40)}, 0.8)`); // 明るい部分
+            gradient.addColorStop(0.7, `rgba(${r}, ${g}, ${b}, 0.7)`); // 中央
+            gradient.addColorStop(1, `rgba(${Math.max(0, r - 10)}, ${Math.max(0, g - 10)}, ${Math.max(0, b - 10)}, 0.75)`); // 終点（明るく調整）
+            
+            return gradient;
+        }
+
+        // Initialize error trend chart with Chart.js (PC: Line Chart, Mobile: Stacked Bar Chart)
+        function initializeErrorTrendChart() {
+            const ctx = document.getElementById('error-trend-chart');
+            if (!ctx) {
+                console.error('Error trend chart canvas not found');
+                return;
+            }
+            
+            console.log('🎯 Initializing error trend chart, animated:', errorTrendChartAnimated);
+            
+            // レスポンシブ設定: デバイス判定
+            const isMobile = window.innerWidth < 768;
+            const isTablet = window.innerWidth >= 768 && window.innerWidth <= 1024; // iPad対応
+            
+            // グラフの説明を動的に設定
+            const descriptionElement = document.getElementById('chart-description');
+            if (descriptionElement) {
+                if (isMobile) {
+                    // モバイル版（横向きバーチャート）の説明
+                    descriptionElement.innerHTML = `
+                        <div class="font-semibold text-white-70">【グラフの見方】</div>
+                        <div class="mt-1">縦軸: セッション番号（S1～S12） / 横軸: 平均誤差（セント）</div>
+                        <div>プラス(+) = 音が高い / マイナス(-) = 音が低い</div>
+                        <div class="mt-1">0に近いほど正確な音程です</div>
+                    `;
+                } else {
+                    // PC版・iPad版（ラインチャート）の説明
+                    descriptionElement.innerHTML = `
+                        <div class="font-semibold text-white-70">【グラフの見方】</div>
+                        <div class="mt-1">横軸: セッション別8音 / 縦軸: 誤差（セント）</div>
+                        <div>プラス(+) = 音が高い / マイナス(-) = 音が低い</div>
+                        <div class="mt-1">0に近いほど正確な音程です</div>
+                    `;
+                }
+            }
+            
+            // 既存のチャートインスタンスを破棄
+            if (window.errorTrendChartInstance) {
+                window.errorTrendChartInstance.destroy();
+            }
+            
+            if (isMobile) {
+                // モバイル版: Stacked Bar Chart（アニメーション制御付き）
+                initializeMobileStackedBarChart(ctx);
+            } else {
+                // PC版・iPad版: Line Chart（iPad版はアニメーション無効）
+                initializePCLineChart(ctx, isTablet);
+            }
+        }
+        
+        // PC版: Line Chart実装
+        function initializePCLineChart(ctx, isTabletDevice = false) {
+            // X軸ラベル: セッション1の8音、セッション2の8音...という形式
+            const noteNames = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド\''];
+            const labels = [];
+            const allData = [];
+            const colors = [];
+            
+            // 全96音のデータを準備（セッション順×音順）
+            mockSessionsData.forEach((session, sessionIndex) => {
+                const sessionNoteResults = generateSessionNoteResults(session);
+                const evaluation = getSessionEvaluationLabel(session.averageCentError);
+                
+                // 評価レベルに基づく色
+                let pointColor;
+                switch (evaluation) {
+                    case 'Excellent': pointColor = '#fbbf24'; break; // 黄色
+                    case 'Good': pointColor = '#22c55e'; break;      // 緑色
+                    case 'Pass': pointColor = '#3b82f6'; break;      // 青色
+                    default: pointColor = '#ef4444';                 // 赤色
+                }
+                
+                // 各音のデータとラベルを追加
+                sessionNoteResults.forEach((note, noteIndex) => {
+                    labels.push(`S${session.session}-${noteNames[noteIndex]}`);
+                    allData.push(note.centError);
+                    colors.push(pointColor);
+                });
+            });
+            
+            // データの最大値・最小値を計算
+            const maxValue = Math.max(...allData);
+            const minValue = Math.min(...allData);
+            const maxAbsValue = Math.max(Math.abs(maxValue), Math.abs(minValue));
+            
+            // 1つのデータセットで全96音を表示
+            const dataset = {
+                label: '音程誤差',
+                data: allData,
+                borderColor: 'rgba(255, 255, 255, 0.6)', // 透明度60%
+                backgroundColor: colors,
+                pointBackgroundColor: colors,
+                pointBorderColor: 'rgba(255, 255, 255, 0.6)', // 透明度60%
+                pointBorderWidth: 1,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                tension: 0.1,
+                fill: false,
+                segment: {
+                    borderColor: function(ctx) {
+                        // セグメントの色を次のポイントの色に合わせて透明度60%適用
+                        const nextIndex = ctx.p1DataIndex;
+                        const baseColor = colors[nextIndex] || '#ffffff';
+                        
+                        // カラーコードをRGBAに変換して透明度60%適用
+                        if (baseColor === '#fbbf24') return 'rgba(251, 191, 36, 0.6)';
+                        else if (baseColor === '#22c55e') return 'rgba(34, 197, 94, 0.6)';
+                        else if (baseColor === '#3b82f6') return 'rgba(59, 130, 246, 0.6)';
+                        else if (baseColor === '#ef4444') return 'rgba(239, 68, 68, 0.6)';
+                        else return 'rgba(255, 255, 255, 0.6)';
+                    }
+                }
+            };
+            
+            window.errorTrendChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [dataset]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: errorTrendChartAnimated ? false : {
+                        duration: 800,
+                        onComplete: () => {
+                            console.log('✅ Error trend chart animation completed (PC Line)');
+                            errorTrendChartAnimated = true;
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#ffffff',
+                            borderWidth: 1,
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    if (tooltipItems.length > 0) {
+                                        const dataIndex = tooltipItems[0].dataIndex;
+                                        return labels[dataIndex];
+                                    }
+                                    return '';
+                                },
+                                label: function(context) {
+                                    const dataIndex = context.dataIndex;
+                                    const sessionIndex = Math.floor(dataIndex / 8);
+                                    const noteIndex = dataIndex % 8;
+                                    const session = mockSessionsData[sessionIndex];
+                                    const evaluation = getSessionEvaluationLabel(session.averageCentError);
+                                    const centValue = context.parsed.y;
+                                    const centDisplay = centValue >= 0 ? `+${centValue}` : `${centValue}`;
+                                    return `基音${session.baseNote}: ${centDisplay}セント (${evaluation})`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            grid: {
+                                color: function(context) {
+                                    // セッション境界（8の倍数）で線を太く
+                                    if (context.tick && context.tick.value % 8 === 0) {
+                                        return 'rgba(255, 255, 255, 0.3)';
+                                    }
+                                    return 'rgba(255, 255, 255, 0.1)';
+                                },
+                                lineWidth: function(context) {
+                                    if (context.tick && context.tick.value % 8 === 0) {
+                                        return 2;
+                                    }
+                                    return 1;
+                                }
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.6)',
+                                font: {
+                                    size: 9
+                                },
+                                maxRotation: 45,
+                                callback: function(value, index) {
+                                    // セッション境界のみ表示
+                                    if (index % 8 === 0) {
+                                        const sessionNum = Math.floor(index / 8) + 1;
+                                        return `セッション${sessionNum}`;
+                                    }
+                                    return '';
+                                }
+                            }
+                        },
+                        y: {
+                            display: true,
+                            position: 'left',
+                            min: -maxAbsValue - 10, // 実データの最大絶対値 + マージン
+                            max: maxAbsValue + 10,  // 実データの最大絶対値 + マージン
+                            grid: {
+                                color: (context) => {
+                                    if (context.tick && context.tick.value === 0) {
+                                        return 'rgba(255, 255, 255, 0.5)';
+                                    }
+                                    return 'rgba(255, 255, 255, 0.1)';
+                                },
+                                lineWidth: (context) => {
+                                    if (context.tick && context.tick.value === 0) {
+                                        return 2;
+                                    }
+                                    return 1;
+                                },
+                                drawOnChartArea: true,
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.6)',
+                                font: {
+                                    size: 10
+                                },
+                                callback: function(value) {
+                                    if (value === 0) {
+                                        return '0¢';
+                                    } else if (value > 0) {
+                                        return `+${value}¢`;
+                                    } else {
+                                        return `${value}¢`;
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    elements: {
+                        point: {
+                            hoverRadius: 8
+                        }
+                    }
+                }
+            });
+        }
+        
+        // モバイル版: 横向きバーチャート実装（セッション別）
+        function initializeMobileStackedBarChart(ctx) {
+            // コンテナの幅を制限
+            const container = document.getElementById('error-trend-container');
+            if (container) {
+                const viewportWidth = window.innerWidth;
+                const maxWidth = Math.min(viewportWidth - 48, 350); // 最大350pxに制限
+                container.style.width = `${maxWidth}px`;
+                container.style.maxWidth = '100%';
+            }
+            
+            const labels = [];
+            const data = [];
+            const backgroundColors = [];
+            
+            // 各セッションのデータを準備
+            mockSessionsData.forEach((session) => {
+                labels.push(`S${session.session}`);
+                data.push(session.averageCentError);
+                
+                // 評価レベルに基づく色
+                const evaluation = getSessionEvaluationLabel(session.averageCentError);
+                let barColor;
+                switch (evaluation) {
+                    case 'Excellent': barColor = '#fbbf24'; break;
+                    case 'Good': barColor = '#22c55e'; break;
+                    case 'Pass': barColor = '#3b82f6'; break;
+                    default: barColor = '#ef4444';
+                }
+                backgroundColors.push(barColor);
+            });
+            
+            
+            // グラフの最大値を計算
+            const maxValue = Math.max(...data);
+            
+            window.errorTrendChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '平均誤差',
+                        data: data,
+                        backgroundColor: function(context) {
+                            if (context.parsed !== undefined) {
+                                const index = context.dataIndex;
+                                const baseColor = backgroundColors[index];
+                                return createGlassGradient(context.chart.ctx, baseColor, 'mobile');
+                            }
+                            return backgroundColors;
+                        },
+                        borderColor: 'rgba(255, 255, 255, 0.3)', // 薄い白ボーダーでグラス効果を強化
+                        borderWidth: 1,
+                        borderRadius: 8, // バーを角丸に
+                        borderSkipped: false, // 全ての角を丸くする
+                        barPercentage: 0.7,  // バーの高さを70%に
+                        categoryPercentage: 0.9  // カテゴリ間隔を90%に
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // 横向きバーチャート
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: errorTrendChartAnimated ? false : {
+                        duration: 1000,
+                        onComplete: () => {
+                            console.log('✅ Error trend chart animation completed (Mobile Bar)');
+                            errorTrendChartAnimated = true;
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            left: 0,
+                            right: 0,
+                            top: 0,
+                            bottom: 0
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#ffffff',
+                            borderWidth: 1,
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    if (tooltipItems.length > 0) {
+                                        const index = tooltipItems[0].dataIndex;
+                                        const session = mockSessionsData[index];
+                                        return `セッション${session.session}`;
+                                    }
+                                    return '';
+                                },
+                                label: function(context) {
+                                    const index = context.dataIndex;
+                                    const session = mockSessionsData[index];
+                                    const evaluation = getSessionEvaluationLabel(session.averageCentError);
+                                    return [
+                                        `基音: ${session.baseNote}`,
+                                        `誤差: ±${context.parsed.x}セント`,
+                                        `評価: ${evaluation}`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            grid: {
+                                display: true,  // グリッド線を表示
+                                color: 'rgba(255, 255, 255, 0.1)',
+                                drawBorder: true,
+                                borderColor: 'rgba(255, 255, 255, 0.2)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.6)',
+                                font: {
+                                    size: 10
+                                },
+                                stepSize: 10,
+                                callback: function(value) {
+                                    // 10の倍数のみ表示
+                                    if (value % 10 === 0) {
+                                        return value;
+                                    }
+                                    return '';
+                                }
+                            },
+                            suggestedMax: maxValue + 5,
+                            min: 0
+                        },
+                        y: {
+                            grid: {
+                                display: true,  // グリッド線を表示
+                                color: 'rgba(255, 255, 255, 0.05)',
+                                drawBorder: true,
+                                borderColor: 'rgba(255, 255, 255, 0.2)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                font: {
+                                    size: 10  // フォントサイズを10pxに統一
+                                },
+                                padding: 3,
+                                autoSkip: false  // ラベルを省略しない
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize accuracy chart (evaluation distribution) with Chart.js
+        function initializeAccuracyChart() {
+            const ctx = document.getElementById('accuracy-chart');
+            if (!ctx) {
+                console.error('Accuracy chart canvas not found');
+                return;
+            }
+            
+            console.log('📈 Initializing accuracy chart, animated:', accuracyChartAnimated);
+            
+            // 既存のチャートインスタンスを破棄
+            if (window.accuracyChartInstance) {
+                window.accuracyChartInstance.destroy();
+            }
+            
+            // 評価レベル別にセッション数をカウント
+            const evaluationCounts = {
+                'Excellent': 0,
+                'Good': 0,
+                'Pass': 0,
+                'Practice': 0
+            };
+            
+            mockSessionsData.forEach(session => {
+                const label = getSessionEvaluationLabel(session.averageCentError);
+                evaluationCounts[label]++;
+            });
+            
+            
+            const labels = ['Excellent', 'Good', 'Pass', 'Practice'];
+            const data = [
+                evaluationCounts['Excellent'],
+                evaluationCounts['Good'],
+                evaluationCounts['Pass'],
+                evaluationCounts['Practice']
+            ];
+            const backgroundColors = ['#fbbf24', '#22c55e', '#3b82f6', '#ef4444'];
+            
+            window.accuracyChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'セッション数',
+                        data: data,
+                        backgroundColor: function(context) {
+                            if (context.parsed !== undefined) {
+                                const index = context.dataIndex;
+                                const baseColor = backgroundColors[index];
+                                return createGlassGradient(context.chart.ctx, baseColor, 'mobile');
+                            }
+                            return backgroundColors;
+                        },
+                        borderColor: 'rgba(255, 255, 255, 0.3)',
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.9
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // 横向きバーチャート
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: accuracyChartAnimated ? false : {
+                        duration: 1000,
+                        onComplete: () => {
+                            console.log('✅ Accuracy chart animation completed');
+                            accuracyChartAnimated = true;
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            left: 0,
+                            right: 0,
+                            top: 0,
+                            bottom: 0
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false // 凡例を非表示（ラベルで十分）
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#ffffff',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = mockSessionsData.length;
+                                    const value = context.parsed.x;
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${context.label}: ${value}セッション (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            grid: {
+                                display: true,
+                                color: 'rgba(255, 255, 255, 0.1)',
+                                drawBorder: true,
+                                borderColor: 'rgba(255, 255, 255, 0.2)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.6)',
+                                font: {
+                                    size: 14
+                                },
+                                stepSize: 1,
+                                callback: function(value) {
+                                    return Math.floor(value) === value ? value : '';
+                                }
+                            },
+                            min: 0
+                        },
+                        y: {
+                            grid: {
+                                display: true,
+                                color: 'rgba(255, 255, 255, 0.05)',
+                                drawBorder: true,
+                                borderColor: 'rgba(255, 255, 255, 0.2)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                font: {
+                                    size: 14
+                                },
+                                padding: 3,
+                                autoSkip: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 動的グレード計算システム
+        function detectMode(sessionData) {
+            const sessionCount = sessionData.length;
+            
+            const modeMap = {
+                8: {
+                    mode: 'random',
+                    name: 'ランダム基音モード',
+                    level: '初級',
+                    target: 'カラオケ・合唱レベル'
+                },
+                12: {
+                    mode: 'continuous',
+                    name: '連続チャレンジモード', 
+                    level: '中級',
+                    target: '実用的相対音感レベル'
+                },
+                24: {
+                    mode: 'chromatic',
+                    name: '12音階モード',
+                    level: '上級', 
+                    target: 'プロフェッショナルレベル'
+                }
+            };
+            
+            if (sessionCount <= 8) return { ...modeMap[8], actualSessions: sessionCount };
+            if (sessionCount <= 12) return { ...modeMap[12], actualSessions: sessionCount };
+            return { ...modeMap[24], actualSessions: sessionCount };
+        }
+
+        function detectDeviceQuality() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const sampleRate = audioContext.sampleRate;
+                const userAgent = navigator.userAgent.toLowerCase();
+                const isMobile = /mobile|android|iphone|ipad/.test(userAgent);
+                
+                let quality, factor, accuracy, message;
+                
+                if (sampleRate >= 48000 && !isMobile) {
+                    quality = 'high';
+                    factor = 1.0;
+                    accuracy = '±10¢';
+                    message = '高精度での測定が可能です';
+                }
+                else if (sampleRate >= 44100) {
+                    quality = 'medium';
+                    factor = 1.15;
+                    accuracy = '±15¢';
+                    message = '一般的な精度で測定中（約±15¢の誤差を含む可能性）';
+                }
+                else {
+                    quality = 'low';
+                    factor = 1.3;
+                    accuracy = '±25¢';
+                    message = '限定的精度での測定（約±25¢の誤差を含む可能性）。相対的な改善傾向に注目してください';
+                }
+                
+                return { quality, factor, accuracy, message, sampleRate };
+                
+            } catch (error) {
+                console.warn('AudioContext detection failed:', error);
+                return {
+                    quality: 'medium',
+                    factor: 1.15,
+                    accuracy: '±15¢',
+                    message: '標準精度で測定中',
+                    sampleRate: 'unknown'
+                };
+            }
+        }
+
+        function calculateBasicMetrics(sessionData) {
+            let totalError = 0;
+            let totalNotes = 0;
+            let excellentNotes = 0;
+            let errors = [];
+            
+            sessionData.forEach(session => {
+                const noteResults = generateSessionNoteResults(session);
+                
+                noteResults.forEach(note => {
+                    const absError = Math.abs(note.centError);
+                    
+                    totalError += absError;
+                    totalNotes++;
+                    errors.push(absError);
+                    
+                    if (absError <= 20) {
+                        excellentNotes++;
+                    }
+                });
+            });
+            
+            const avgError = totalError / totalNotes;
+            const excellenceRate = excellentNotes / totalNotes;
+            
+            return {
+                avgError: Math.round(avgError * 10) / 10,
+                excellenceRate: Math.round(excellenceRate * 1000) / 1000,
+                totalNotes,
+                excellentNotes
+            };
+        }
+
+        function applyTechnicalAdjustment(basicMetrics, deviceInfo) {
+            const adjustedMetrics = {
+                avgError: basicMetrics.avgError / deviceInfo.factor,
+                excellenceRate: basicMetrics.excellenceRate,
+                totalNotes: basicMetrics.totalNotes,
+                excellentNotes: basicMetrics.excellentNotes
+            };
+            
+            return {
+                raw: basicMetrics,
+                adjusted: adjustedMetrics,
+                adjustmentInfo: {
+                    factor: deviceInfo.factor,
+                    quality: deviceInfo.quality,
+                    explanation: `${deviceInfo.quality}デバイスのため、${deviceInfo.factor}倍の調整を適用`
+                }
+            };
+        }
+
+        function getModeSpecificThresholds(actualSessions) {
+            let sessionCount;
+            if (actualSessions <= 8) sessionCount = 8;
+            else if (actualSessions <= 12) sessionCount = 12;
+            else sessionCount = 24;
+            
+            const thresholds = {
+                8: {
+                    S: { avgError: 30, excellence: 0.75 },
+                    A: { avgError: 40, excellence: 0.65 },
+                    B: { avgError: 50, excellence: 0.55 },
+                    C: { avgError: 60, excellence: 0.45 },
+                    D: { avgError: 70, excellence: 0.35 },
+                    E: { avgError: 80, excellence: 0.25 }
+                },
+                
+                12: {
+                    S: { avgError: 25, excellence: 0.80 },
+                    A: { avgError: 35, excellence: 0.70 },
+                    B: { avgError: 45, excellence: 0.60 },
+                    C: { avgError: 55, excellence: 0.50 },
+                    D: { avgError: 65, excellence: 0.40 },
+                    E: { avgError: 75, excellence: 0.30 }
+                },
+                
+                24: {
+                    S: { avgError: 20, excellence: 0.85 },
+                    A: { avgError: 30, excellence: 0.75 },
+                    B: { avgError: 40, excellence: 0.65 },
+                    C: { avgError: 50, excellence: 0.55 },
+                    D: { avgError: 60, excellence: 0.45 },
+                    E: { avgError: 70, excellence: 0.35 }
+                }
+            };
+            
+            return {
+                thresholds: thresholds[sessionCount],
+                sessionCount,
+                explanation: `${sessionCount}セッション${sessionCount === 8 ? '（初級）' : sessionCount === 12 ? '（中級）' : '（上級）'}基準適用`
+            };
+        }
+
+        function determineGrade(adjustedMetrics, thresholds) {
+            const grades = ['S', 'A', 'B', 'C', 'D', 'E'];
+            
+            for (const grade of grades) {
+                const threshold = thresholds[grade];
+                
+                if (adjustedMetrics.avgError <= threshold.avgError && 
+                    adjustedMetrics.excellenceRate >= threshold.excellence) {
+                    return {
+                        grade,
+                        achievedBy: {
+                            avgError: adjustedMetrics.avgError <= threshold.avgError,
+                            excellence: adjustedMetrics.excellenceRate >= threshold.excellence
+                        },
+                        thresholds: threshold
+                    };
+                }
+            }
+            
+            return {
+                grade: 'E',
+                achievedBy: {
+                    avgError: false,
+                    excellence: false
+                },
+                thresholds: thresholds.E
+            };
+        }
+
+        function calculateDynamicGrade(sessionData) {
+            const modeInfo = detectMode(sessionData);
+            const deviceInfo = detectDeviceQuality();
+            const basicMetrics = calculateBasicMetrics(sessionData);
+            const metricsWithAdjustment = applyTechnicalAdjustment(basicMetrics, deviceInfo);
+            const thresholdInfo = getModeSpecificThresholds(modeInfo.actualSessions);
+            const gradeResult = determineGrade(metricsWithAdjustment.adjusted, thresholdInfo.thresholds);
+            
+            return {
+                grade: gradeResult.grade,
+                modeInfo,
+                deviceInfo,
+                metrics: metricsWithAdjustment,
+                thresholdInfo,
+                gradeResult
+            };
+        }
+
+        // 動的グレード表示の更新
+        function updateGradeDisplay() {
+            console.log('🚀 [DEBUG] updateGradeDisplay called');
+            
+            const gradeResult = calculateDynamicGrade(mockSessionsData);
+            console.log('🚀 [DEBUG] gradeResult:', gradeResult);
+            
+            // グレード表示更新
+            const gradeElement = document.querySelector('.grade-value');
+            if (gradeElement) {
+                gradeElement.textContent = gradeResult.grade;
+                console.log(`✅ Grade updated to: ${gradeResult.grade}`, gradeResult);
+            }
+            
+            // メインタイトル更新
+            const mainTitleElement = document.getElementById('main-mode-title');
+            if (mainTitleElement) {
+                mainTitleElement.textContent = gradeResult.modeInfo.name;
+                console.log(`✅ Main title updated to: ${gradeResult.modeInfo.name}`);
+            }
+            
+            console.log('🎯 [DEBUG] About to call showModeFeedback');
+            // モード別フィードバック表示
+            showModeFeedback(gradeResult.modeInfo, gradeResult);
+            
+            console.log('🎯 [DEBUG] About to call showToneAnalysis');
+            // 12音別分析表示
+            showToneAnalysis(gradeResult);
+            
+            console.log('🚀 [DEBUG] updateGradeDisplay completed');
+        }
+        
+        // モード別フィードバックの表示（簡略化版）
+        function showModeFeedback(modeInfo, gradeResult) {
+            console.log('📋 [DEBUG] showModeFeedback called with:', {modeInfo, gradeResult});
+            
+            const feedbackEl = document.getElementById('mode-feedback');
+            if (!feedbackEl) {
+                console.error('📋 [ERROR] mode-feedback element not found');
+                return;
+            }
+            
+            // 基本情報のみ設定（複雑な分析は段階的に追加）
+            const modeSpecificFeedback = {
+                8: {
+                    focus: '基本的な音程感覚の定着度',
+                    nextStep: '連続チャレンジモードで半音を含む12音への挑戦'
+                },
+                12: {
+                    focus: '12音すべてへの対応力向上度',
+                    nextStep: '12音階モードでの上昇・下降パターンマスター'
+                },
+                24: {
+                    focus: 'プロレベルの完璧な12音律システム習得度',
+                    nextStep: 'マスターレベル達成後の実践的音楽活動への応用'
+                }
+            };
+            
+            // 実際のセッション数から最も近いモードを判定
+            let targetMode = 12; // デフォルト
+            if (modeInfo.actualSessions <= 8) targetMode = 8;
+            else if (modeInfo.actualSessions <= 12) targetMode = 12;
+            else targetMode = 24;
+            
+            const feedback = modeSpecificFeedback[targetMode];
+            
+            // DOM要素に基本情報のみ反映
+            const modeTitle = document.getElementById('mode-title');
+            const modeFocus = document.getElementById('mode-focus');
+            const modeMessage = document.getElementById('mode-message');
+            const modeNextStep = document.getElementById('mode-next-step');
+            
+            if (modeTitle) modeTitle.textContent = `${modeInfo.name} (${modeInfo.level})`;
+            if (modeFocus) modeFocus.textContent = `📍 ${feedback.focus}`;
+            
+            // 安全にデータにアクセス
+            let avgErrorText = '基本的な音程感覚の分析を実行中';
+            if (gradeResult && gradeResult.metrics && gradeResult.metrics.raw && typeof gradeResult.metrics.raw.avgError === 'number') {
+                avgErrorText = `平均誤差±${Math.abs(gradeResult.metrics.raw.avgError).toFixed(1)}¢の成績です。`;
+            }
+            if (modeMessage) modeMessage.textContent = avgErrorText;
+            if (modeNextStep) modeNextStep.textContent = feedback.nextStep;
+            
+            // フィードバックセクションを表示
+            feedbackEl.style.display = 'block';
+            
+            // Phase 1: ピンポイント分析の表示
+            showDetailedAnalysis(gradeResult, modeInfo);
+            
+            // Phase 1: 練習指導の表示
+            showPracticeGuidance(gradeResult, modeInfo);
+        }
+        
+        // Phase 1: ピンポイント分析の表示関数（HTML生成回避版）
+        function showDetailedAnalysis(gradeResult, modeInfo) {
+            console.log('🎯 [DEBUG] showDetailedAnalysis called', gradeResult, modeInfo);
+            
+            const analysisEl = document.getElementById('detailed-analysis');
+            const contentEl = document.getElementById('detailed-analysis-content');
+            
+            console.log('🎯 [DEBUG] Analysis elements found:', {analysisEl: !!analysisEl, contentEl: !!contentEl});
+            
+            if (!analysisEl || !contentEl) {
+                console.error('🎯 [ERROR] Analysis elements not found');
+                return;
+            }
+            
+            // Phase 1機能: 詳細分析データを生成
+            const analysisText = generateDetailedAnalysis(gradeResult, modeInfo);
+            console.log('🎯 [DEBUG] Generated analysis text:', analysisText);
+            
+            // 分析結果をテキストのみで表示（HTML生成なし）
+            contentEl.textContent = analysisText;
+            analysisEl.style.display = 'block';
+            
+            console.log('✅ [DEBUG] Analysis displayed successfully');
+            
+            // アイコンを再初期化
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        // Phase 1: 練習指導の表示関数（HTML生成回避版）
+        function showPracticeGuidance(gradeResult, modeInfo) {
+            console.log('💡 [DEBUG] showPracticeGuidance called', gradeResult, modeInfo);
+            
+            const guidanceEl = document.getElementById('practice-guidance');
+            
+            console.log('💡 [DEBUG] Guidance element found:', !!guidanceEl);
+            
+            if (!guidanceEl) {
+                console.error('💡 [ERROR] Guidance element not found');
+                return;
+            }
+            
+            // Phase 1機能: 練習指導データを生成
+            const guidanceText = generatePracticeGuidance(gradeResult, modeInfo);
+            console.log('💡 [DEBUG] Generated guidance text:', guidanceText);
+            
+            // 指導内容を事前定義された要素に分割表示
+            updateGuidanceElements(guidanceText, gradeResult);
+            
+            guidanceEl.style.display = 'block';
+            
+            console.log('✅ [DEBUG] Guidance displayed successfully');
+            
+            // アイコンを再初期化
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        // 練習指導要素の更新（HTML生成回避）
+        function updateGuidanceElements(guidanceText, gradeResult) {
+            // 既存のgeneratePracticeGuidance関数からデータを直接取得
+            if (!gradeResult || !gradeResult.metrics || !gradeResult.metrics.raw) {
+                return;
+            }
+            
+            const metrics = gradeResult.metrics;
+            const avgError = Math.abs(metrics.raw.avgError || 0);
+            const excellenceRate = metrics.raw.excellenceRate || 0;
+            
+            // Phase 1: ピンポイント分析データを活用
+            const extremeErrors = findExtremeErrors(mockSessionsData);
+            
+            // 1. 最優先課題（最大誤差の特定練習）
+            if (extremeErrors && extremeErrors.maxError && extremeErrors.maxError.error > 30) {
+                const maxErrInfo = extremeErrors.maxError;
+                const priorityEl = document.getElementById('priority-guidance');
+                const priorityText = document.getElementById('priority-text');
+                
+                if (priorityEl && priorityText) {
+                    priorityText.textContent = `${maxErrInfo.note}音で${Math.abs(maxErrInfo.rawError).toFixed(1)}¢の大きな誤差が発生しているため、この音程を重点的に練習してください。基音${maxErrInfo.sessionNote}から${maxErrInfo.note}音への音程関係を楽器で確認しながら反復練習が効果的です。`;
+                    priorityEl.style.display = 'block';
+                }
+            }
+            
+            // 2. 成功再現指導（最小誤差）
+            if (extremeErrors && extremeErrors.minError && extremeErrors.minError.error < 20) {
+                const minErrInfo = extremeErrors.minError;
+                const successEl = document.getElementById('success-guidance');
+                const successText = document.getElementById('success-text');
+                
+                if (successEl && successText) {
+                    successText.textContent = `セッション${minErrInfo.session}の${minErrInfo.note}音で達成した±${minErrInfo.error.toFixed(1)}¢の高精度を他の音程でも再現できるよう応用練習を行いましょう。`;
+                    successEl.style.display = 'block';
+                }
+            }
+            
+            // 3. 精度レベル別の基本練習法
+            const basicEl = document.getElementById('basic-guidance');
+            const basicText = document.getElementById('basic-text');
+            
+            if (basicEl && basicText) {
+                let basicPractice = '';
+                if (avgError > 30) {
+                    basicPractice = '楽器と一緒に歌って音程を耳で確認する練習を毎日10分行いましょう。';
+                } else if (avgError > 20) {
+                    basicPractice = 'ピアノなしで歌った後に楽器で確認する練習で独立性を高めましょう。';
+                } else {
+                    basicPractice = '楽器なしでの音程記憶と相対音感による音程関係の構築を重点的に行いましょう。';
+                }
+                basicText.textContent = basicPractice;
+                basicEl.style.display = 'block';
+            }
+            
+            // 4. Excellence Rate改善法
+            if (excellenceRate < 60) {
+                const excellenceEl = document.getElementById('excellence-guidance');
+                const excellenceText = document.getElementById('excellence-text');
+                
+                if (excellenceEl && excellenceText) {
+                    excellenceText.textContent = `現在のExcellence Rate ${excellenceRate.toFixed(1)}%を70%以上に向上させるため、±15セント以内の精度を目指した集中練習が必要です。`;
+                    excellenceEl.style.display = 'block';
+                }
+            }
+        }
+        
+        // 12音別成績分析の表示
+        function showToneAnalysis(gradeResult) {
+            const analysisEl = document.getElementById('tone-analysis');
+            if (!analysisEl) return;
+            
+            // 12音別成績データを生成
+            const tonePerformance = analyzeTonePerformance(mockSessionsData);
+            
+            // グリッド表示の生成
+            generateToneGrid(tonePerformance);
+            
+            // 弱点分析の生成
+            generateWeaknessAnalysis(tonePerformance);
+            
+            // セクションを表示
+            analysisEl.style.display = 'block';
+            
+            // アイコンを再初期化
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        // ピンポイント分析: 最大・最小誤差の特定
+        function findExtremeErrors(sessionData) {
+            let maxErrorInfo = { error: 0, session: 0, note: '', sessionNote: '' };
+            let minErrorInfo = { error: 999, session: 0, note: '', sessionNote: '' };
+            
+            sessionData.forEach((session, sessionIndex) => {
+                const noteResults = generateSessionNoteResults(session);
+                noteResults.forEach(note => {
+                    const absError = Math.abs(note.centError);
+                    
+                    // 最大誤差の更新
+                    if (absError > maxErrorInfo.error) {
+                        maxErrorInfo = {
+                            error: absError,
+                            rawError: note.centError,
+                            session: sessionIndex + 1,
+                            note: note.noteName,
+                            sessionNote: session.baseNote
+                        };
+                    }
+                    
+                    // 最小誤差の更新（0でない値のみ）
+                    if (absError < minErrorInfo.error && absError > 0) {
+                        minErrorInfo = {
+                            error: absError,
+                            rawError: note.centError,
+                            session: sessionIndex + 1,
+                            note: note.noteName,
+                            sessionNote: session.baseNote
+                        };
+                    }
+                });
+            });
+            
+            return { maxError: maxErrorInfo, minError: minErrorInfo };
+        }
+        
+        // セッション別パフォーマンス分析
+        function analyzeSessionPerformance(sessionData) {
+            const sessionStats = sessionData.map((session, index) => {
+                const noteResults = generateSessionNoteResults(session);
+                const errors = noteResults.map(note => Math.abs(note.centError));
+                const avgError = errors.reduce((sum, err) => sum + err, 0) / errors.length;
+                
+                return {
+                    session: index + 1,
+                    baseNote: session.baseNote,
+                    avgError: avgError,
+                    noteCount: noteResults.length
+                };
+            });
+            
+            // 最良・最悪セッションを特定
+            const bestSession = sessionStats.reduce((min, current) => 
+                current.avgError < min.avgError ? current : min
+            );
+            const worstSession = sessionStats.reduce((max, current) => 
+                current.avgError > max.avgError ? current : max
+            );
+            
+            return { sessionStats, bestSession, worstSession };
+        }
+        
+        // 音程別弱点分析
+        function analyzeNoteWeaknesses(sessionData) {
+            const noteStats = {};
+            
+            sessionData.forEach(session => {
+                const noteResults = generateSessionNoteResults(session);
+                noteResults.forEach(note => {
+                    if (!noteStats[note.noteName]) {
+                        noteStats[note.noteName] = {
+                            errors: [],
+                            totalError: 0,
+                            count: 0
+                        };
+                    }
+                    
+                    const absError = Math.abs(note.centError);
+                    noteStats[note.noteName].errors.push(absError);
+                    noteStats[note.noteName].totalError += absError;
+                    noteStats[note.noteName].count++;
+                });
+            });
+            
+            // 平均誤差を計算してソート
+            const noteRankings = Object.keys(noteStats).map(noteName => ({
+                note: noteName,
+                avgError: noteStats[noteName].totalError / noteStats[noteName].count,
+                count: noteStats[noteName].count
+            })).sort((a, b) => b.avgError - a.avgError);
+            
+            return {
+                weakest: noteRankings.slice(0, 3),  // TOP3弱点
+                strongest: noteRankings.slice(-3).reverse()  // TOP3得意
+            };
+        }
+        
+        // 詳細分析メッセージ生成（簡略化版）
+        function generateDetailedAnalysis(gradeResult, mode) {
+            // 安全にデータにアクセス
+            if (!gradeResult || !gradeResult.metrics || !gradeResult.metrics.raw) {
+                return "データ分析中です。しばらくお待ちください。";
+            }
+            
+            const metrics = gradeResult.metrics;
+            const avgError = Math.abs(metrics.raw.avgError || 0);
+            const excellenceRate = metrics.raw.excellenceRate || 0;
+            
+            // Phase 1: ピンポイント分析を有効化
+            const extremeErrors = findExtremeErrors(mockSessionsData);
+            
+            // Phase 2以降は段階的に追加予定
+            // const sessionPerf = analyzeSessionPerformance(mockSessionsData);
+            // const noteWeaknesses = analyzeNoteWeaknesses(mockSessionsData);
+            // const timeSeriesAnalysis = analyzeTimeSeriesPerformance(mockSessionsData);
+            // const relativePitchPatterns = analyzeRelativePitchPatterns(mockSessionsData);
+            
+            // 基本的な分析のみ（簡略化版）
+            const analysisComponents = [];
+            
+            // 1. 平均誤差の分析
+            if (avgError <= 10) {
+                analysisComponents.push("平均誤差±" + avgError.toFixed(1) + "¢は極めて優秀で、プロフェッショナルレベルの精度です");
+            } else if (avgError <= 20) {
+                analysisComponents.push("平均誤差±" + avgError.toFixed(1) + "¢は安定した良好な成績で、音程感覚が定着しています");
+            } else if (avgError <= 30) {
+                analysisComponents.push("平均誤差±" + avgError.toFixed(1) + "¢は標準的な成績ですが、さらなる精度向上の余地があります");
+            } else {
+                analysisComponents.push("平均誤差±" + avgError.toFixed(1) + "¢は改善が必要で、基本的な音程感覚の定着に集中しましょう");
+            }
+            
+            // 2. ピンポイント分析による具体的問題特定
+            if (extremeErrors && extremeErrors.maxError && extremeErrors.maxError.error > 0) {
+                const maxErrInfo = extremeErrors.maxError;
+                const maxErrSign = maxErrInfo.rawError > 0 ? '+' : '';
+                analysisComponents.push(`最大誤差${maxErrSign}${maxErrInfo.rawError.toFixed(1)}¢はセッション${maxErrInfo.session}の${maxErrInfo.note}音で発生しており、この音程の集中練習が効果的です`);
+            }
+            
+            // 3. 最高精度の成功体験特定
+            if (extremeErrors && extremeErrors.minError && extremeErrors.minError.error < 10) {
+                const minErrInfo = extremeErrors.minError;
+                const minErrSign = minErrInfo.rawError > 0 ? '+' : '';
+                analysisComponents.push(`最高精度${minErrSign}${minErrInfo.rawError.toFixed(1)}¢をセッション${minErrInfo.session}の${minErrInfo.note}音で達成しており、この精度の再現性向上が鍵となります`);
+            }
+            
+            // 4. Excellence Rate分析
+            if (excellenceRate >= 80) {
+                analysisComponents.push("Excellence Rate " + excellenceRate.toFixed(1) + "%は優秀で、±20¢以内の高精度な発声が安定しています");
+            } else if (excellenceRate >= 60) {
+                analysisComponents.push("Excellence Rate " + excellenceRate.toFixed(1) + "%は良好ですが、より多くの音程で高精度を目指しましょう");
+            } else {
+                analysisComponents.push("Excellence Rate " + excellenceRate.toFixed(1) + "%は改善が必要で、基本的な音程の安定化が重要です");
+            }
+            
+            // モード別の特化分析
+            if (mode === 8) {
+                analysisComponents.push("ランダム基音モードでは自然な音階（ドレミファソラシ）の定着度が重要です");
+            } else if (mode === 12) {
+                analysisComponents.push("連続チャレンジモードでは半音を含む12音への適応力が試されています");
+            } else if (mode === 24) {
+                analysisComponents.push("12音階モードでは完璧な12音律システムの習得が求められます");
+            }
+            
+            return analysisComponents.join("。") + "。";
+        }
+        
+        // 練習指導メッセージ生成（簡略化版）
+        function generatePracticeGuidance(gradeResult, mode) {
+            // 安全にデータにアクセス
+            if (!gradeResult || !gradeResult.metrics || !gradeResult.metrics.raw) {
+                return "練習指導データを準備中です。";
+            }
+            
+            const metrics = gradeResult.metrics;
+            const avgError = Math.abs(metrics.raw.avgError || 0);
+            const excellenceRate = metrics.raw.excellenceRate || 0;
+            
+            // Phase 1: ピンポイント分析データを活用
+            const extremeErrors = findExtremeErrors(mockSessionsData);
+            
+            const guidance = [];
+            
+            // 1. 最優先改善ポイント（最大誤差の特定練習）
+            if (extremeErrors && extremeErrors.maxError && extremeErrors.maxError.error > 30) {
+                const maxErrInfo = extremeErrors.maxError;
+                guidance.push(`最優先課題: ${maxErrInfo.note}音で${Math.abs(maxErrInfo.rawError).toFixed(1)}¢の大きな誤差が発生しているため、この音程を重点的に練習してください。基音${maxErrInfo.sessionNote}から${maxErrInfo.note}音への音程関係を楽器で確認しながら反復練習が効果的です`);
+            }
+            
+            // 精度レベル別の基本練習法
+            if (avgError > 30) {
+                guidance.push("基本練習: 楽器と一緒に歌って音程を耳で確認する練習を毎日10分行いましょう");
+            } else if (avgError > 20) {
+                guidance.push("中級練習: ピアノなしで歌った後に楽器で確認する練習で独立性を高めましょう");
+            } else {
+                guidance.push("上級練習: 楽器なしでの音程記憶と相対音感による音程関係の構築を重点的に");
+            }
+            
+            // Excellence Rate改善法
+            if (excellenceRate < 60) {
+                guidance.push("安定性強化: 同じ音程を5回連続で正確に歌える練習で筋肉記憶を定着させてください");
+            } else if (excellenceRate < 80) {
+                guidance.push("精度向上: ±10¢以内を目標とした高精度練習で更なる向上を目指しましょう");
+            }
+            
+            // 2. 成功体験の再現指導
+            if (extremeErrors && extremeErrors.minError && extremeErrors.minError.error < 10) {
+                const minErrInfo = extremeErrors.minError;
+                guidance.push(`成功再現: セッション${minErrInfo.session}の${minErrInfo.note}音で達成した±${minErrInfo.error.toFixed(1)}¢の高精度を他の音程でも再現できるよう、その時の発声感覚を意識的に記憶して応用練習を行いましょう`);
+            }
+            
+            // モード特化練習法
+            if (mode === 8) {
+                guidance.push("推奨練習: ドレミファソラシドの基本音階を楽器と合わせて歌う練習を重点的に");
+            } else if (mode === 12) {
+                guidance.push("推奨練習: 半音階（クロマチック）練習で#♭音程への適応力を向上させましょう");
+            } else if (mode === 24) {
+                guidance.push("推奨練習: 12音律システムの完全習得と長期記憶の定着を目指した集中練習");
+            }
+            
+            return guidance.join("。") + "。";
+        }
+
+        // 時系列パフォーマンス分析
+        function analyzeTimeSeriesPerformance(sessionData) {
+            const sessionMetrics = sessionData.map((session, index) => {
+                const noteResults = generateSessionNoteResults(session);
+                const errors = noteResults.map(note => Math.abs(note.centError));
+                const avgError = errors.reduce((sum, err) => sum + err, 0) / errors.length;
+                const excellentCount = errors.filter(err => err <= 20).length;
+                const excellenceRate = excellentCount / errors.length;
+                
+                return {
+                    session: index + 1,
+                    avgError: avgError,
+                    excellenceRate: excellenceRate,
+                    baseNote: session.baseNote
+                };
+            });
+            
+            // 進歩傾向の分析
+            const earlyAvg = sessionMetrics.slice(0, Math.ceil(sessionMetrics.length / 2))
+                .reduce((sum, s) => sum + s.avgError, 0) / Math.ceil(sessionMetrics.length / 2);
+            const lateAvg = sessionMetrics.slice(Math.floor(sessionMetrics.length / 2))
+                .reduce((sum, s) => sum + s.avgError, 0) / Math.floor(sessionMetrics.length / 2);
+            
+            const improvementTrend = earlyAvg - lateAvg;  // 正の値は改善
+            
+            // 疲労効果の検出（セッション内での精度低下）
+            const fatiguePattern = sessionData.map((session, sessionIndex) => {
+                const noteResults = generateSessionNoteResults(session);
+                const firstHalf = noteResults.slice(0, Math.ceil(noteResults.length / 2));
+                const secondHalf = noteResults.slice(Math.floor(noteResults.length / 2));
+                
+                const firstHalfAvg = firstHalf.reduce((sum, note) => sum + Math.abs(note.centError), 0) / firstHalf.length;
+                const secondHalfAvg = secondHalf.reduce((sum, note) => sum + Math.abs(note.centError), 0) / secondHalf.length;
+                
+                return {
+                    session: sessionIndex + 1,
+                    fatigueEffect: secondHalfAvg - firstHalfAvg  // 正の値は疲労
+                };
+            });
+            
+            const avgFatigueEffect = fatiguePattern.reduce((sum, f) => sum + f.fatigueEffect, 0) / fatiguePattern.length;
+            
+            return {
+                sessionMetrics,
+                improvementTrend,
+                avgFatigueEffect,
+                earlyAvg,
+                lateAvg
+            };
+        }
+        
+        // 相対音感パターン分析
+        function analyzeRelativePitchPatterns(sessionData) {
+            const intervalAnalysis = {};
+            const noteToSemitone = {
+                'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
+                'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11
+            };
+            
+            sessionData.forEach(session => {
+                const baseNoteName = session.baseNote.replace(/[0-9]/g, '');
+                const baseSemitone = noteToSemitone[baseNoteName];
+                const noteResults = generateSessionNoteResults(session);
+                
+                noteResults.forEach(note => {
+                    const targetNoteName = note.noteName.replace(/[0-9]/g, '');
+                    const targetSemitone = noteToSemitone[targetNoteName];
+                    
+                    // 音程間隔を計算（0-11半音）
+                    let interval = (targetSemitone - baseSemitone + 12) % 12;
+                    
+                    if (!intervalAnalysis[interval]) {
+                        intervalAnalysis[interval] = {
+                            semitones: interval,
+                            intervalName: getIntervalName(interval),
+                            errors: [],
+                            avgError: 0,
+                            count: 0
+                        };
+                    }
+                    
+                    intervalAnalysis[interval].errors.push(Math.abs(note.centError));
+                    intervalAnalysis[interval].count++;
+                });
+            });
+            
+            // 各音程間隔の平均誤差を計算
+            Object.keys(intervalAnalysis).forEach(interval => {
+                const data = intervalAnalysis[interval];
+                data.avgError = data.errors.reduce((sum, err) => sum + err, 0) / data.errors.length;
+            });
+            
+            // 困難な音程間隔をランキング
+            const intervalRanking = Object.values(intervalAnalysis)
+                .sort((a, b) => b.avgError - a.avgError);
+            
+            return {
+                intervalAnalysis,
+                mostDifficult: intervalRanking.slice(0, 3),
+                easiest: intervalRanking.slice(-3).reverse()
+            };
+        }
+        
+        // 音程間隔名の取得
+        function getIntervalName(semitones) {
+            const intervalNames = {
+                0: 'ユニゾン',
+                1: '短2度',
+                2: '長2度', 
+                3: '短3度',
+                4: '長3度',
+                5: '完全4度',
+                6: '増4度/減5度',
+                7: '完全5度',
+                8: '短6度',
+                9: '長6度',
+                10: '短7度',
+                11: '長7度'
+            };
+            return intervalNames[semitones] || '不明';
+        }
+
+        // 12音別成績データの分析
+        function analyzeTonePerformance(sessionData) {
+            const toneData = {};
+            const toneNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+            
+            // 初期化
+            toneNames.forEach(tone => {
+                toneData[tone] = {
+                    sessions: 0,
+                    totalError: 0,
+                    avgError: 0,
+                    excellentNotes: 0,
+                    totalNotes: 0,
+                    excellenceRate: 0,
+                    performance: 'unknown'
+                };
+            });
+            
+            // セッションデータから各基音の成績を計算
+            sessionData.forEach(session => {
+                const baseTone = session.baseNote.replace(/[0-9]/g, ''); // C4 → C
+                if (toneData[baseTone]) {
+                    const noteResults = generateSessionNoteResults(session);
+                    
+                    toneData[baseTone].sessions++;
+                    
+                    noteResults.forEach(note => {
+                        const absError = Math.abs(note.centError);
+                        toneData[baseTone].totalError += absError;
+                        toneData[baseTone].totalNotes++;
+                        
+                        if (absError <= 20) {
+                            toneData[baseTone].excellentNotes++;
+                        }
+                    });
+                }
+            });
+            
+            // 平均値と評価を計算
+            Object.keys(toneData).forEach(tone => {
+                const data = toneData[tone];
+                if (data.totalNotes > 0) {
+                    data.avgError = data.totalError / data.totalNotes;
+                    data.excellenceRate = data.excellentNotes / data.totalNotes;
+                    
+                    // パフォーマンス評価
+                    if (data.avgError <= 25 && data.excellenceRate >= 0.7) {
+                        data.performance = 'excellent';
+                    } else if (data.avgError <= 40 && data.excellenceRate >= 0.5) {
+                        data.performance = 'good';
+                    } else if (data.avgError <= 60) {
+                        data.performance = 'average';
+                    } else {
+                        data.performance = 'weak';
+                    }
+                } else {
+                    data.performance = 'untested';
+                }
+            });
+            
+            return toneData;
+        }
+        
+        // 12音グリッドの生成
+        function generateToneGrid(toneData) {
+            const gridEl = document.getElementById('tone-performance-grid');
+            if (!gridEl) return;
+            
+            const toneNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+            
+            gridEl.innerHTML = '';
+            
+            toneNames.forEach(tone => {
+                const data = toneData[tone];
+                const { color, icon, label } = getTonePerformanceStyle(data.performance);
+                
+                const toneCard = document.createElement('div');
+                toneCard.style.cssText = `
+                    padding: 0.75rem;
+                    background: ${color.bg};
+                    border: 1px solid ${color.border};
+                    border-radius: 8px;
+                    text-align: center;
+                `;
+                
+                toneCard.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <i data-lucide="${icon}" style="width: 16px; height: 16px; color: ${color.text};"></i>
+                        <span style="font-weight: 600; color: white; font-size: 0.875rem;">${tone}</span>
+                    </div>
+                    <div style="color: ${color.text}; font-size: 0.75rem; margin-bottom: 0.25rem;">${label}</div>
+                    ${data.sessions > 0 ? `
+                        <div style="color: #94a3b8; font-size: 0.7rem;">
+                            ±${Math.round(data.avgError)}¢ | ${Math.round(data.excellenceRate * 100)}%
+                        </div>
+                    ` : `
+                        <div style="color: #64748b; font-size: 0.7rem;">未テスト</div>
+                    `}
+                `;
+                
+                gridEl.appendChild(toneCard);
+            });
+        }
+        
+        // パフォーマンススタイルの取得
+        function getTonePerformanceStyle(performance) {
+            const styles = {
+                excellent: {
+                    color: { bg: 'rgba(34, 197, 94, 0.15)', border: 'rgba(34, 197, 94, 0.3)', text: '#22c55e' },
+                    icon: 'check-circle',
+                    label: '優秀'
+                },
+                good: {
+                    color: { bg: 'rgba(59, 130, 246, 0.15)', border: 'rgba(59, 130, 246, 0.3)', text: '#3b82f6' },
+                    icon: 'thumbs-up',
+                    label: '良好'
+                },
+                average: {
+                    color: { bg: 'rgba(251, 191, 36, 0.15)', border: 'rgba(251, 191, 36, 0.3)', text: '#fbbf24' },
+                    icon: 'minus',
+                    label: '標準'
+                },
+                weak: {
+                    color: { bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 0.3)', text: '#ef4444' },
+                    icon: 'alert-circle',
+                    label: '要改善'
+                },
+                untested: {
+                    color: { bg: 'rgba(100, 116, 139, 0.15)', border: 'rgba(100, 116, 139, 0.3)', text: '#64748b' },
+                    icon: 'help-circle',
+                    label: '未テスト'
+                }
+            };
+            
+            return styles[performance] || styles.untested;
+        }
+        
+        // 弱点分析の生成
+        function generateWeaknessAnalysis(toneData) {
+            const weaknessEl = document.getElementById('weakness-details');
+            if (!weaknessEl) return;
+            
+            // 弱点基音の特定（要改善・未テスト除く）
+            const weakTones = Object.entries(toneData)
+                .filter(([tone, data]) => data.performance === 'weak' && data.sessions > 0)
+                .sort((a, b) => b[1].avgError - a[1].avgError)
+                .slice(0, 3);
+            
+            // 未テスト基音の特定
+            const untestedTones = Object.entries(toneData)
+                .filter(([tone, data]) => data.performance === 'untested')
+                .map(([tone]) => tone);
+            
+            let analysisContent = '';
+            
+            if (weakTones.length > 0) {
+                const toneList = weakTones.map(([tone, data]) => 
+                    `<strong>${tone}基音</strong>（平均±${Math.round(data.avgError)}¢）`
+                ).join('、');
+                
+                analysisContent += `
+                    <p style="margin: 0 0 0.75rem;">
+                        <strong>練習推奨基音:</strong> ${toneList}
+                    </p>
+                    <p style="margin: 0 0 0.75rem;">
+                        これらの基音での集中練習を週2-3回行うことで、全体的な精度向上が期待できます。
+                    </p>
+                `;
+            }
+            
+            if (untestedTones.length > 0) {
+                const untestedList = untestedTones.join('、');
+                analysisContent += `
+                    <p style="margin: 0;">
+                        <strong>未テスト基音:</strong> ${untestedList}<br>
+                        12音律システムの完成のため、これらの基音でのトレーニングも重要です。
+                    </p>
+                `;
+            }
+            
+            if (weakTones.length === 0 && untestedTones.length === 0) {
+                analysisContent = `
+                    <p style="margin: 0; color: #22c55e;">
+                        🎉 全ての基音で良好な成績です！12音律システムが順調に発達しています。
+                    </p>
+                `;
+            }
+            
+            weaknessEl.innerHTML = analysisContent;
+        }
+
+        // セッションナビゲーション機能
+        function navigateToSession(direction) {
+            const totalSessions = mockSessionsData.length;
+            
+            if (direction === 'prev') {
+                selectedSessionForAnalysis = selectedSessionForAnalysis > 1 
+                    ? selectedSessionForAnalysis - 1 
+                    : totalSessions; // 最初から最後へループ
+            } else if (direction === 'next') {
+                selectedSessionForAnalysis = selectedSessionForAnalysis < totalSessions 
+                    ? selectedSessionForAnalysis + 1 
+                    : 1; // 最後から最初へループ
+            }
+            
+            updateSelectedSession();
+            initializeSessionsGrid(); // グリッドの選択状態も更新
+        }
+
+        // グローバルフラグでイベントリスナーの重複登録を防ぐ
+        let navigationEventListenersAdded = false;
+        
+        // グラフセクションの表示監視
+        function observeChartsSection() {
+            // 誤差推移チャートのコンテナを直接監視
+            const errorTrendContainer = document.getElementById('error-trend-container');
+            
+            // 評価分布チャートの親要素を直接監視
+            const accuracyChart = document.getElementById('accuracy-chart');
+            const accuracyContainer = accuracyChart ? accuracyChart.parentElement : null;
+            
+            console.log('📊 Charts setup:', {
+                errorTrendContainer: !!errorTrendContainer,
+                accuracyContainer: !!accuracyContainer,
+                errorTrendAnimated: errorTrendChartAnimated,
+                accuracyAnimated: accuracyChartAnimated
+            });
+            
+            if (!errorTrendContainer && !accuracyContainer) {
+                // チャートコンテナが見つからない場合は即座にチャートを初期化
+                console.log('⚠️ No chart containers found, initializing immediately');
+                initializeErrorTrendChart();
+                initializeAccuracyChart();
+                return;
+            }
+            
+            // 既存のオブザーバーをクリーンアップ
+            if (errorTrendObserver) {
+                errorTrendObserver.disconnect();
+                errorTrendObserver = null;
+            }
+            if (accuracyObserver) {
+                accuracyObserver.disconnect();
+                accuracyObserver = null;
+            }
+            
+            // 誤差推移チャート用のオブザーバー（まだアニメーション済みでない場合のみ）
+            if (errorTrendContainer && !errorTrendChartAnimated) {
+                errorTrendObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting && !errorTrendChartAnimated) {
+                            console.log('🎯 Error trend chart visible, initializing...');
+                            initializeErrorTrendChart();
+                            errorTrendObserver.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.2,
+                    rootMargin: '0px 0px -10% 0px'
+                });
+                
+                errorTrendObserver.observe(errorTrendContainer);
+            }
+            
+            // 評価分布チャート用のオブザーバー（まだアニメーション済みでない場合のみ）
+            if (accuracyContainer && !accuracyChartAnimated) {
+                accuracyObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting && !accuracyChartAnimated) {
+                            console.log('📈 Accuracy chart visible, initializing...');
+                            initializeAccuracyChart();
+                            accuracyObserver.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.2,
+                    rootMargin: '0px 0px -10% 0px'
+                });
+                
+                accuracyObserver.observe(accuracyContainer);
+            }
+        }
+
+        // Initialize page
+        function initializePage() {
+            initializeOverallStats();
+            initializeSessionsGrid();
+            updateSelectedSession();
+            
+            // グラフセクションの表示監視を開始
+            observeChartsSection();
+            
+            // セッショングリッド生成後にアイコンを再初期化
+            setTimeout(() => {
+                initializeLucideIcons();
+            }, 100);
+            
+            // イベントリスナーは初回のみ設定
+            if (!navigationEventListenersAdded) {
+                // ナビゲーションボタンのイベントリスナーを設定
+                const prevBtn = document.getElementById('prev-session-btn');
+                const nextBtn = document.getElementById('next-session-btn');
+                
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', () => navigateToSession('prev'));
+                }
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => navigateToSession('next'));
+                }
+                
+                // キーボードショートカット（左右矢印キー）
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') {
+                        navigateToSession('prev');
+                    } else if (e.key === 'ArrowRight') {
+                        navigateToSession('next');
+                    }
+                });
+                
+                navigationEventListenersAdded = true;
+            }
+        }
+
+        // ウィンドウリサイズ時の再描画対応
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                // リサイズ時はアニメーション状態を保持して再初期化
+                console.log('🔄 Resize detected, reinitializing charts with animation state preserved');
+                
+                // 既にアニメーション済みの場合は強制的にアニメーション無効で再初期化
+                if (errorTrendChartAnimated) {
+                    initializeErrorTrendChart();
+                }
+                if (accuracyChartAnimated) {
+                    initializeAccuracyChart();
+                }
+                
+                // まだアニメーションしていない場合は監視を継続
+                if (!errorTrendChartAnimated || !accuracyChartAnimated) {
+                    observeChartsSection();
+                }
+            }, 250);
+        });
+
+        // Initialize Lucide icons - simple version like final-result.html
+        function initializeLucideIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+                console.log('✅ [RESULTS] Lucide icons initialized');
+            } else {
+                console.error('❌ [RESULTS] Lucide library not loaded');
+            }
+        }
+        
+        // Helper function to create Lucide icons for standard system
+        function lucideIcon(iconName, colorClass = '', size = 24) {
+            return `<i data-lucide="${iconName}" class="${colorClass}" style="width: ${size}px; height: ${size}px;"></i>`;
+        }
+        
+        // カウントアップアニメーション関数
+        function animateCountUp(element, targetValue, duration = 1000, isDecimal = false) {
+            const startTime = performance.now();
+            const startValue = 0;
+            
+            function updateValue(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // イージング関数（ease-out-cubic）
+                const easedProgress = 1 - Math.pow(1 - progress, 3);
+                const currentValue = startValue + (targetValue - startValue) * easedProgress;
+                
+                if (isDecimal) {
+                    element.textContent = currentValue.toFixed(1);
+                } else {
+                    element.textContent = Math.round(currentValue);
+                }
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateValue);
+                } else {
+                    // 最終値を確実に設定
+                    if (isDecimal) {
+                        element.textContent = targetValue.toFixed(1);
+                    } else {
+                        element.textContent = targetValue;
+                    }
+                }
+            }
+            
+            requestAnimationFrame(updateValue);
+        }
+        
+        // 統計情報のアニメーション
+        function animateStatistics() {
+            // Overall Statisticsの数値をアニメーション
+            setTimeout(() => {
+                const statElements = document.querySelectorAll('#overall-stats .stat-value');
+                console.log('Found stat elements:', statElements.length);
+                
+                statElements.forEach((element, index) => {
+                    const dataValue = element.getAttribute('data-value');
+                    const value = parseFloat(dataValue);
+                    console.log(`Element ${index}: data-value="${dataValue}", value=${value}`);
+                    
+                    if (!isNaN(value)) {
+                        const isDecimal = dataValue.includes('.');
+                        const hasPrefix = element.textContent.includes('±') || element.textContent.includes('+') || element.textContent.includes('-');
+                        const actualValue = parseFloat(dataValue);
+                        let prefix = '';
+                        
+                        // 最大誤差の場合は符号を判定
+                        if (element.parentElement.textContent.includes('最大誤差')) {
+                            prefix = actualValue >= 0 ? '+' : '';
+                        } else if (element.textContent.includes('±')) {
+                            prefix = '±';
+                        }
+                        
+                        // 一旦0に設定
+                        if (prefix) {
+                            element.textContent = isDecimal ? prefix + '0.0¢' : prefix + '0¢';
+                        } else {
+                            element.textContent = isDecimal ? '0.0' : '0';
+                        }
+                        
+                        setTimeout(() => {
+                            animateCountUp({
+                                textContent: '',
+                                set textContent(val) {
+                                    if (element.parentElement.textContent.includes('最大誤差')) {
+                                        // 最大誤差は符号付き
+                                        const sign = actualValue >= 0 ? '+' : '-';
+                                        element.textContent = sign + val + '¢';
+                                    } else if (prefix === '±') {
+                                        element.textContent = '±' + val + '¢';
+                                    } else {
+                                        element.textContent = val;
+                                    }
+                                }
+                            }, Math.abs(value), 1200, isDecimal);
+                        }, index * 150);
+                    } else if (dataValue && isNaN(value)) {
+                        // 文字（グレードなど）の場合は遅延表示
+                        element.textContent = '';
+                        setTimeout(() => {
+                            element.textContent = dataValue;
+                        }, index * 150 + 600);
+                    }
+                });
+            }, 100);
+            
+            // 総合評価点数のアニメーション（S級の横の数字）
+            const gradeScore = document.querySelector('#overall-grade');
+            if (gradeScore && gradeScore.textContent.includes('級')) {
+                // もし点数が表示されている場合はそれもアニメーション
+                const scoreMatch = gradeScore.textContent.match(/(\d+\.?\d*)/);
+                if (scoreMatch) {
+                    const score = parseFloat(scoreMatch[1]);
+                    const gradeText = gradeScore.textContent.replace(scoreMatch[0], '');
+                    gradeScore.textContent = '0' + gradeText;
+                    setTimeout(() => {
+                        animateCountUp({
+                            textContent: '',
+                            set textContent(val) {
+                                gradeScore.textContent = val + gradeText;
+                            }
+                        }, score, 1500, true);
+                    }, 300);
+                }
+            }
+        }
+        
+        // Multiple initialization triggers
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 [RESULTS] DOM Content Loaded - starting icon initialization');
+            initializeLucideIcons();
+            
+        });
+        
+        window.addEventListener('load', function() {
+            console.log('🌍 [RESULTS] Window loaded - ensuring icons are initialized');
+            initializeLucideIcons();
+            
+            // 統計データが生成されるまで待ってからアニメーション開始
+            setTimeout(() => {
+                // 再度統計データを初期化してからアニメーション
+                initializeOverallStats();
+                
+                
+                setTimeout(() => {
+                    updateGradeDisplay();   // 動的グレード計算を実行
+                    animateStatistics();
+                    updateShareMessage();  // シェアメッセージも更新
+                    animateRankSection();  // ランクセクションのアニメーション
+                    
+                    // テストモード切り替えリンクを表示（開発時またはGitHub Pages）
+                    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                    const isGitHubPages = window.location.hostname.includes('github.io');
+                    
+                    if (testMode || isLocalhost || isGitHubPages) {
+                        const testLinks = document.getElementById('test-mode-links');
+                        if (testLinks) {
+                            testLinks.style.display = 'block';
+                        }
+                    }
+                }, 100);
+            }, 1200);
+        });
+
+        // SNSシェア機能
+        function getShareText() {
+            const gradeElement = document.querySelector('#overall-stats > div:first-child .text-4xl');
+            const grade = gradeElement ? gradeElement.textContent : 'B';
+            const errorElement = document.querySelector('#overall-stats > div:nth-child(2) .text-4xl');
+            const error = errorElement ? errorElement.textContent : '±19.8';
+            const sessionsElement = document.querySelector('#overall-stats > div:nth-child(4) .text-4xl');
+            const sessions = sessionsElement ? sessionsElement.textContent : '12';
+            
+            return `🎵 8va相対音感トレーニングで【${grade}級】獲得！\n平均誤差: ${error}セント\n${sessions}セッション完走しました！\n\n#相対音感 #音感トレーニング #8va`;
+        }
+        
+        function updateShareMessage() {
+            const gradeElement = document.querySelector('#overall-stats > div:first-child .text-4xl');
+            const grade = gradeElement ? gradeElement.textContent : 'B';
+            const messageElement = document.getElementById('share-message');
+            
+            if (messageElement) {
+                let message = '';
+                switch(grade) {
+                    case 'S':
+                        message = 'S級ランク取得！パーフェクトマスター！';
+                        break;
+                    case 'A':
+                        message = 'A級ランク取得！エクセレントプレイヤー！';
+                        break;
+                    case 'B':
+                        message = 'B級ランク取得！グッドプレイヤー！';
+                        break;
+                    case 'C':
+                        message = 'C級ランク取得！練習の成果が出ています！';
+                        break;
+                    case 'D':
+                        message = 'D級ランク取得！もう少しで上達します！';
+                        break;
+                    default:
+                        message = `${grade}級ランク取得！おめでとうございます！`;
+                }
+                messageElement.textContent = message;
+            }
+        }
+        
+        function shareToTwitter(event) {
+            event.preventDefault();
+            const text = encodeURIComponent(getShareText());
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=550,height=450');
+        }
+        
+        function shareToLine(event) {
+            event.preventDefault();
+            const text = encodeURIComponent(getShareText() + '\n' + window.location.href);
+            window.open(`https://social-plugins.line.me/lineit/share?text=${text}`, '_blank', 'width=550,height=450');
+        }
+        
+        function shareToFacebook(event) {
+            event.preventDefault();
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=550,height=450');
+        }
+        
+        function copyShareText(event) {
+            event.preventDefault();
+            const text = getShareText() + '\n' + window.location.href;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    // ボタンのテキストを一時的に変更
+                    const btn = event.currentTarget;
+                    const originalHTML = btn.innerHTML;
+                    btn.innerHTML = `
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    `;
+                    btn.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = originalHTML;
+                        btn.style.background = '';
+                    }, 2000);
+                }).catch(err => {
+                    console.error('コピーに失敗しました:', err);
+                });
+            } else {
+                // 旧式のコピー方法
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+            }
+        }
+        
+        // Rank section animation
+        function animateRankSection() {
+            const rankCircle = document.querySelector('.rank-circle');
+            const gradeValue = document.querySelector('.grade-value');
+            const sessionCount = document.querySelector('.session-count');
+            const avgError = document.querySelector('.avg-error');
+            const maxError = document.querySelector('.max-error');
+            
+            if (!rankCircle) return;
+            
+            // サークルのスケールアニメーション
+            rankCircle.style.transform = 'scale(0)';
+            rankCircle.style.transition = 'transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            
+            setTimeout(() => {
+                rankCircle.style.transform = 'scale(1)';
+            }, 300);
+            
+            // 統計値のカウントアップアニメーション
+            setTimeout(() => {
+                // 実際のデータ値を取得（Overall Statisticsから）
+                const gradeElement = document.querySelector('#overall-stats > div:first-child .text-4xl');
+                const grade = gradeElement ? gradeElement.textContent : 'B';
+                
+                const avgElement = document.querySelector('#overall-stats > div:nth-child(2) .stat-value');
+                const avgValue = avgElement ? parseFloat(avgElement.getAttribute('data-value')) : 23.6;
+                
+                const maxElement = document.querySelector('#overall-stats > div:nth-child(3) .stat-value');
+                const maxValue = maxElement ? parseFloat(maxElement.getAttribute('data-value')) : 48.7;
+                // maxValueには符号が含まれている（正負の値）
+                
+                const sessionsElement = document.querySelector('#overall-stats > div:nth-child(4) .stat-value');
+                const sessionsValue = sessionsElement ? parseInt(sessionsElement.getAttribute('data-value')) : 12;
+                
+                // グレード表示（最初にアニメーション）
+                if (gradeValue) {
+                    animateGradeDisplay(gradeValue, grade);
+                }
+                
+                // 平均誤差アニメーション（グレードと同じタイミング）
+                if (avgError) {
+                    animateCountUp({
+                        textContent: '',
+                        set textContent(val) { avgError.textContent = '±' + val + '¢'; }
+                    }, avgValue, 1200, true);
+                }
+                
+                // 最大誤差アニメーション（符号付き）
+                if (maxError) {
+                    setTimeout(() => {
+                        const sign = maxValue >= 0 ? '+' : '-';
+                        animateCountUp({
+                            textContent: '',
+                            set textContent(val) { maxError.textContent = sign + val + '¢'; }
+                        }, Math.abs(maxValue), 1200, true);
+                    }, 150);
+                }
+                
+                // セッション数アニメーション
+                if (sessionCount) {
+                    setTimeout(() => {
+                        animateCountUp({
+                            textContent: '',
+                            set textContent(val) { sessionCount.textContent = val; }
+                        }, sessionsValue, 1000, false);
+                    }, 300);
+                }
+            }, 800);
+        }
+        
+        // グレード専用アニメーション関数
+        function animateGradeDisplay(element, finalGrade) {
+            const grades = ['E', 'D', 'C', 'B', 'A', 'S'];
+            const finalIndex = grades.indexOf(finalGrade);
+            
+            if (finalIndex === -1) {
+                element.textContent = finalGrade;
+                return;
+            }
+            
+            let currentIndex = 0;
+            element.textContent = grades[currentIndex];
+            
+            const gradeInterval = setInterval(() => {
+                currentIndex++;
+                if (currentIndex <= finalIndex) {
+                    element.textContent = grades[currentIndex];
+                    
+                    if (currentIndex === finalIndex) {
+                        clearInterval(gradeInterval);
+                        // 最終グレードに達したら少し強調
+                        element.style.transform = 'scale(1.1)';
+                        setTimeout(() => {
+                            element.style.transform = 'scale(1)';
+                        }, 200);
+                    }
+                } else {
+                    clearInterval(gradeInterval);
+                }
+            }, 100); // 100msごとにグレードを上げる
+        }
+        
+        // Start initialization
+        initializePage();
+    </script>
+</body>
+</html>
