@@ -1272,3 +1272,21 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-15 09:06:07] コミット: データ構造エラー修正: metrics.originalからmetrics.rawに修正
+
+【修正内容】
+- TypeError: gradeResult.metrics.original.avgCentError未定義エラーの修正
+- applyTechnicalAdjustment関数の戻り値構造を正しく理解
+- {raw, adjusted, adjustmentInfo}構造でoriginal→rawに変更
+- 全ての分析関数で安全なデータアクセスパターンを適用
+
+【データ構造】
+- calculateBasicMetrics: {avgError, excellenceRate, totalNotes, excellentNotes}
+- applyTechnicalAdjustment: {raw: 元データ, adjusted: 調整済み, adjustmentInfo: 調整情報}
+- 正しいアクセス: metrics.raw.avgError (metrics.original.avgCentErrorではない)
+
+データ構造の理解不足によるランタイムエラーを完全修正
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
