@@ -489,6 +489,68 @@
                     </div>
                 </div>
                 
+                <!-- Phase 1: ピンポイント分析表示エリア -->
+                <div id="detailed-analysis" class="glass-card" style="display: none; margin-bottom: 2rem; padding: 1.5rem;">
+                    <div class="analysis-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div class="analysis-icon" style="width: 40px; height: 40px; background: linear-gradient(135deg, #ef4444, #dc2626); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="crosshair" style="width: 20px; height: 20px; color: white;"></i>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0; color: white; font-size: 1.125rem; font-weight: 600;">ピンポイント分析</h4>
+                            <p style="margin: 0; color: #94a3b8; font-size: 0.875rem;">最大・最小誤差の具体的特定</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-content" style="margin-bottom: 1.25rem;">
+                        <p style="margin: 0; color: #cbd5e1; font-size: 0.9375rem; line-height: 1.6;" id="detailed-analysis-content">分析データを読み込み中...</p>
+                    </div>
+                </div>
+                
+                <!-- Phase 1: 練習指導表示エリア -->
+                <div id="practice-guidance" class="glass-card" style="display: none; margin-bottom: 2rem; padding: 1.5rem;">
+                    <div class="guidance-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div class="guidance-icon" style="width: 40px; height: 40px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="lightbulb" style="width: 20px; height: 20px; color: white;"></i>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0; color: white; font-size: 1.125rem; font-weight: 600;">練習指導</h4>
+                            <p style="margin: 0; color: #94a3b8; font-size: 0.875rem;">具体的な改善アクション</p>
+                        </div>
+                    </div>
+                    
+                    <div class="guidance-content" style="margin-bottom: 1.25rem;">
+                        <!-- 最優先課題 -->
+                        <div id="priority-guidance" style="display: none; margin-bottom: 0.75rem; padding: 0.75rem; background: rgba(239, 68, 68, 0.1); border-radius: 8px; border-left: 3px solid #ef4444;">
+                            <div style="color: #f87171; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">最優先課題</div>
+                            <div style="color: #cbd5e1; font-size: 0.9375rem; line-height: 1.6;" id="priority-text">-</div>
+                        </div>
+                        
+                        <!-- 成功再現指導 -->
+                        <div id="success-guidance" style="display: none; margin-bottom: 0.75rem; padding: 0.75rem; background: rgba(34, 197, 94, 0.1); border-radius: 8px; border-left: 3px solid #22c55e;">
+                            <div style="color: #4ade80; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">成功再現</div>
+                            <div style="color: #cbd5e1; font-size: 0.9375rem; line-height: 1.6;" id="success-text">-</div>
+                        </div>
+                        
+                        <!-- 基本練習 -->
+                        <div id="basic-guidance" style="display: none; margin-bottom: 0.75rem; padding: 0.75rem; background: rgba(59, 130, 246, 0.1); border-radius: 8px; border-left: 3px solid #3b82f6;">
+                            <div style="color: #60a5fa; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">基本練習</div>
+                            <div style="color: #cbd5e1; font-size: 0.9375rem; line-height: 1.6;" id="basic-text">-</div>
+                        </div>
+                        
+                        <!-- Excellence向上練習 -->
+                        <div id="excellence-guidance" style="display: none; margin-bottom: 0.75rem; padding: 0.75rem; background: rgba(168, 85, 247, 0.1); border-radius: 8px; border-left: 3px solid #a855f7;">
+                            <div style="color: #c084fc; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">精度向上練習</div>
+                            <div style="color: #cbd5e1; font-size: 0.9375rem; line-height: 1.6;" id="excellence-text">-</div>
+                        </div>
+                        
+                        <!-- モード別練習 -->
+                        <div id="mode-guidance" style="display: none; margin-bottom: 0.75rem; padding: 0.75rem; background: rgba(245, 158, 11, 0.1); border-radius: 8px; border-left: 3px solid #f59e0b;">
+                            <div style="color: #fbbf24; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">モード別練習</div>
+                            <div style="color: #cbd5e1; font-size: 0.9375rem; line-height: 1.6;" id="mode-practice-text">-</div>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- 12音別成績分析 -->
                 <div id="tone-analysis" class="glass-card" style="display: none; margin-bottom: 2rem; padding: 1.5rem;">
                     <div class="analysis-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
@@ -1952,6 +2014,119 @@
             
             // フィードバックセクションを表示
             feedbackEl.style.display = 'block';
+            
+            // Phase 1: ピンポイント分析の表示
+            showDetailedAnalysis(gradeResult, modeInfo);
+            
+            // Phase 1: 練習指導の表示
+            showPracticeGuidance(gradeResult, modeInfo);
+        }
+        
+        // Phase 1: ピンポイント分析の表示関数（HTML生成回避版）
+        function showDetailedAnalysis(gradeResult, modeInfo) {
+            const analysisEl = document.getElementById('detailed-analysis');
+            const contentEl = document.getElementById('detailed-analysis-content');
+            
+            if (!analysisEl || !contentEl) return;
+            
+            // Phase 1機能: 詳細分析データを生成
+            const analysisText = generateDetailedAnalysis(gradeResult, modeInfo);
+            
+            // 分析結果をテキストのみで表示（HTML生成なし）
+            contentEl.textContent = analysisText;
+            analysisEl.style.display = 'block';
+            
+            // アイコンを再初期化
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        // Phase 1: 練習指導の表示関数（HTML生成回避版）
+        function showPracticeGuidance(gradeResult, modeInfo) {
+            const guidanceEl = document.getElementById('practice-guidance');
+            
+            if (!guidanceEl) return;
+            
+            // Phase 1機能: 練習指導データを生成
+            const guidanceText = generatePracticeGuidance(gradeResult, modeInfo);
+            
+            // 指導内容を事前定義された要素に分割表示
+            updateGuidanceElements(guidanceText, gradeResult);
+            
+            guidanceEl.style.display = 'block';
+            
+            // アイコンを再初期化
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        // 練習指導要素の更新（HTML生成回避）
+        function updateGuidanceElements(guidanceText, gradeResult) {
+            // 既存のgeneratePracticeGuidance関数からデータを直接取得
+            if (!gradeResult || !gradeResult.metrics || !gradeResult.metrics.raw) {
+                return;
+            }
+            
+            const metrics = gradeResult.metrics;
+            const avgError = Math.abs(metrics.raw.avgError || 0);
+            const excellenceRate = metrics.raw.excellenceRate || 0;
+            
+            // Phase 1: ピンポイント分析データを活用
+            const extremeErrors = findExtremeErrors(mockSessionsData);
+            
+            // 1. 最優先課題（最大誤差の特定練習）
+            if (extremeErrors && extremeErrors.maxError && extremeErrors.maxError.error > 30) {
+                const maxErrInfo = extremeErrors.maxError;
+                const priorityEl = document.getElementById('priority-guidance');
+                const priorityText = document.getElementById('priority-text');
+                
+                if (priorityEl && priorityText) {
+                    priorityText.textContent = `${maxErrInfo.note}音で${Math.abs(maxErrInfo.rawError).toFixed(1)}¢の大きな誤差が発生しているため、この音程を重点的に練習してください。基音${maxErrInfo.sessionNote}から${maxErrInfo.note}音への音程関係を楽器で確認しながら反復練習が効果的です。`;
+                    priorityEl.style.display = 'block';
+                }
+            }
+            
+            // 2. 成功再現指導（最小誤差）
+            if (extremeErrors && extremeErrors.minError && extremeErrors.minError.error < 20) {
+                const minErrInfo = extremeErrors.minError;
+                const successEl = document.getElementById('success-guidance');
+                const successText = document.getElementById('success-text');
+                
+                if (successEl && successText) {
+                    successText.textContent = `セッション${minErrInfo.session}の${minErrInfo.note}音で達成した±${minErrInfo.error.toFixed(1)}¢の高精度を他の音程でも再現できるよう応用練習を行いましょう。`;
+                    successEl.style.display = 'block';
+                }
+            }
+            
+            // 3. 精度レベル別の基本練習法
+            const basicEl = document.getElementById('basic-guidance');
+            const basicText = document.getElementById('basic-text');
+            
+            if (basicEl && basicText) {
+                let basicPractice = '';
+                if (avgError > 30) {
+                    basicPractice = '楽器と一緒に歌って音程を耳で確認する練習を毎日10分行いましょう。';
+                } else if (avgError > 20) {
+                    basicPractice = 'ピアノなしで歌った後に楽器で確認する練習で独立性を高めましょう。';
+                } else {
+                    basicPractice = '楽器なしでの音程記憶と相対音感による音程関係の構築を重点的に行いましょう。';
+                }
+                basicText.textContent = basicPractice;
+                basicEl.style.display = 'block';
+            }
+            
+            // 4. Excellence Rate改善法
+            if (excellenceRate < 60) {
+                const excellenceEl = document.getElementById('excellence-guidance');
+                const excellenceText = document.getElementById('excellence-text');
+                
+                if (excellenceEl && excellenceText) {
+                    excellenceText.textContent = `現在のExcellence Rate ${excellenceRate.toFixed(1)}%を70%以上に向上させるため、±15セント以内の精度を目指した集中練習が必要です。`;
+                    excellenceEl.style.display = 'block';
+                }
+            }
         }
         
         // 12音別成績分析の表示

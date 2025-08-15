@@ -171,10 +171,24 @@ function analyzeFunction(sessionData) {
 }
 ```
 
-### HTMLスクリプト生成回避
-- 既存DOM要素への数値・テキスト挿入を優先
-- `document.getElementById().textContent`の活用
-- 新規DOM生成は最小限に留める
+### HTML動的生成回避ポリシー（重要）
+**基本方針**: レイアウト変更対応とスクリプト簡略化のため
+
+- ✅ **推奨**: 事前定義されたHTML要素への数値・テキスト挿入
+  - `document.getElementById().textContent = value`
+  - `document.getElementById().style.display = 'block'`
+  - 固定レイアウトへのデータ反映
+
+- ❌ **回避**: JavaScriptでのHTML文字列生成・DOM操作
+  - `innerHTML = '<div>...</div>'`のような動的HTML生成
+  - `createElement()` + `appendChild()`による構造変更
+  - 複雑なDOM操作
+
+**理由**: 
+1. レイアウト変更への柔軟な対応
+2. スクリプトの可読性・保守性向上  
+3. デザインとロジックの分離
+4. エラー発生リスクの軽減
 
 ### 段階的統合の検証手順
 1. 関数単体でのデータ処理確認
