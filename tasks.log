@@ -1422,3 +1422,30 @@ JavaScript動作に依存しないレイアウト確認
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-15 10:50:24] コミット: results-static.htmlスタイル統一: ガラスカード・白テキストに変更
+
+【スタイル統一】
+- カラフルな背景色・境界線を削除
+- 全セクションをglass-cardクラスに統一
+- テキストをtext-white・text-white-70に統一
+
+【変更対象】
+- ピンポイント分析: text-white-70でコンテンツ表示
+- 練習指導5カテゴリ:
+  - 最優先課題: glass-card + text-white構造
+  - 成功再現: glass-card + text-white構造
+  - 基本練習: glass-card + text-white構造
+  - 精度向上: glass-card + text-white構造
+  - 12音階モード: glass-card + text-white構造
+
+【構造統一】
+<div class="glass-card">
+  <h4 class="text-white font-medium">タイトル</h4>
+  <p class="text-white-70">コンテンツ</p>
+</div>
+
+スタイルの乱れを解消し視認性向上
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
