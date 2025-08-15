@@ -2024,17 +2024,27 @@
         
         // Phase 1: ピンポイント分析の表示関数（HTML生成回避版）
         function showDetailedAnalysis(gradeResult, modeInfo) {
+            console.log('🎯 [DEBUG] showDetailedAnalysis called', gradeResult, modeInfo);
+            
             const analysisEl = document.getElementById('detailed-analysis');
             const contentEl = document.getElementById('detailed-analysis-content');
             
-            if (!analysisEl || !contentEl) return;
+            console.log('🎯 [DEBUG] Analysis elements found:', {analysisEl: !!analysisEl, contentEl: !!contentEl});
+            
+            if (!analysisEl || !contentEl) {
+                console.error('🎯 [ERROR] Analysis elements not found');
+                return;
+            }
             
             // Phase 1機能: 詳細分析データを生成
             const analysisText = generateDetailedAnalysis(gradeResult, modeInfo);
+            console.log('🎯 [DEBUG] Generated analysis text:', analysisText);
             
             // 分析結果をテキストのみで表示（HTML生成なし）
             contentEl.textContent = analysisText;
             analysisEl.style.display = 'block';
+            
+            console.log('✅ [DEBUG] Analysis displayed successfully');
             
             // アイコンを再初期化
             if (typeof lucide !== 'undefined') {
@@ -2044,17 +2054,27 @@
         
         // Phase 1: 練習指導の表示関数（HTML生成回避版）
         function showPracticeGuidance(gradeResult, modeInfo) {
+            console.log('💡 [DEBUG] showPracticeGuidance called', gradeResult, modeInfo);
+            
             const guidanceEl = document.getElementById('practice-guidance');
             
-            if (!guidanceEl) return;
+            console.log('💡 [DEBUG] Guidance element found:', !!guidanceEl);
+            
+            if (!guidanceEl) {
+                console.error('💡 [ERROR] Guidance element not found');
+                return;
+            }
             
             // Phase 1機能: 練習指導データを生成
             const guidanceText = generatePracticeGuidance(gradeResult, modeInfo);
+            console.log('💡 [DEBUG] Generated guidance text:', guidanceText);
             
             // 指導内容を事前定義された要素に分割表示
             updateGuidanceElements(guidanceText, gradeResult);
             
             guidanceEl.style.display = 'block';
+            
+            console.log('✅ [DEBUG] Guidance displayed successfully');
             
             // アイコンを再初期化
             if (typeof lucide !== 'undefined') {
