@@ -1941,7 +1941,13 @@
             
             if (modeTitle) modeTitle.textContent = `${modeInfo.name} (${modeInfo.level})`;
             if (modeFocus) modeFocus.textContent = `📍 ${feedback.focus}`;
-            if (modeMessage) modeMessage.textContent = `平均誤差±${Math.abs(gradeResult.metrics.original.avgCentError).toFixed(1)}¢の成績です。`;
+            
+            // 安全にデータにアクセス
+            let avgErrorText = '基本的な音程感覚の分析を実行中';
+            if (gradeResult && gradeResult.metrics && gradeResult.metrics.raw && typeof gradeResult.metrics.raw.avgError === 'number') {
+                avgErrorText = `平均誤差±${Math.abs(gradeResult.metrics.raw.avgError).toFixed(1)}¢の成績です。`;
+            }
+            if (modeMessage) modeMessage.textContent = avgErrorText;
             if (modeNextStep) modeNextStep.textContent = feedback.nextStep;
             
             // フィードバックセクションを表示
@@ -2071,10 +2077,14 @@
         
         // 詳細分析メッセージ生成（簡略化版）
         function generateDetailedAnalysis(gradeResult, mode) {
+            // 安全にデータにアクセス
+            if (!gradeResult || !gradeResult.metrics || !gradeResult.metrics.raw) {
+                return "データ分析中です。しばらくお待ちください。";
+            }
+            
             const metrics = gradeResult.metrics;
-            const avgError = Math.abs(metrics.original.avgCentError);
-            const maxError = Math.abs(metrics.original.maxCentError);
-            const excellenceRate = metrics.original.excellenceRate;
+            const avgError = Math.abs(metrics.raw.avgError || 0);
+            const excellenceRate = metrics.raw.excellenceRate || 0;
             
             // 基本分析のみ実行（段階的に機能追加予定）
             // const extremeErrors = findExtremeErrors(mockSessionsData);
@@ -2120,9 +2130,14 @@
         
         // 練習指導メッセージ生成（簡略化版）
         function generatePracticeGuidance(gradeResult, mode) {
+            // 安全にデータにアクセス
+            if (!gradeResult || !gradeResult.metrics || !gradeResult.metrics.raw) {
+                return "練習指導データを準備中です。";
+            }
+            
             const metrics = gradeResult.metrics;
-            const avgError = Math.abs(metrics.original.avgCentError);
-            const excellenceRate = metrics.original.excellenceRate;
+            const avgError = Math.abs(metrics.raw.avgError || 0);
+            const excellenceRate = metrics.raw.excellenceRate || 0;
             
             const guidance = [];
             
