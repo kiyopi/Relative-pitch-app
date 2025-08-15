@@ -1898,36 +1898,30 @@
             }
             
             // モード別フィードバック表示
-            showModeFeedback(gradeResult.modeInfo);
+            showModeFeedback(gradeResult.modeInfo, gradeResult);
             
             // 12音別分析表示
             showToneAnalysis(gradeResult);
         }
         
-        // モード別フィードバックの表示
-        function showModeFeedback(modeInfo) {
+        // モード別フィードバックの表示（簡略化版）
+        function showModeFeedback(modeInfo, gradeResult) {
             const feedbackEl = document.getElementById('mode-feedback');
             if (!feedbackEl) return;
             
-            // モード別のフィードバック内容定義
+            // 基本情報のみ設定（複雑な分析は段階的に追加）
             const modeSpecificFeedback = {
                 8: {
                     focus: '基本的な音程感覚の定着度',
-                    message: generateDetailedAnalysis(gradeResult, 8),
-                    nextStep: '連続チャレンジモードで半音を含む12音への挑戦',
-                    practiceAdvice: generatePracticeGuidance(gradeResult, 8)
+                    nextStep: '連続チャレンジモードで半音を含む12音への挑戦'
                 },
                 12: {
                     focus: '12音すべてへの対応力向上度',
-                    message: generateDetailedAnalysis(gradeResult, 12),
-                    nextStep: '12音階モードでの上昇・下降パターンマスター',
-                    practiceAdvice: generatePracticeGuidance(gradeResult, 12)
+                    nextStep: '12音階モードでの上昇・下降パターンマスター'
                 },
                 24: {
                     focus: 'プロレベルの完璧な12音律システム習得度',
-                    message: generateDetailedAnalysis(gradeResult, 24),
-                    nextStep: 'マスターレベル達成後の実践的音楽活動への応用',
-                    practiceAdvice: generatePracticeGuidance(gradeResult, 24)
+                    nextStep: 'マスターレベル達成後の実践的音楽活動への応用'
                 }
             };
             
@@ -1939,19 +1933,19 @@
             
             const feedback = modeSpecificFeedback[targetMode];
             
-            // DOM要素に反映
-            document.getElementById('mode-title').textContent = `${modeInfo.name} (${modeInfo.level})`;
-            document.getElementById('mode-focus').textContent = `📍 ${feedback.focus}`;
-            document.getElementById('mode-message').textContent = feedback.message;
-            document.getElementById('mode-next-step').textContent = feedback.nextStep;
+            // DOM要素に基本情報のみ反映
+            const modeTitle = document.getElementById('mode-title');
+            const modeFocus = document.getElementById('mode-focus');
+            const modeMessage = document.getElementById('mode-message');
+            const modeNextStep = document.getElementById('mode-next-step');
+            
+            if (modeTitle) modeTitle.textContent = `${modeInfo.name} (${modeInfo.level})`;
+            if (modeFocus) modeFocus.textContent = `📍 ${feedback.focus}`;
+            if (modeMessage) modeMessage.textContent = `平均誤差±${Math.abs(gradeResult.metrics.original.avgCentError).toFixed(1)}¢の成績です。`;
+            if (modeNextStep) modeNextStep.textContent = feedback.nextStep;
             
             // フィードバックセクションを表示
             feedbackEl.style.display = 'block';
-            
-            // アイコンを再初期化
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
         }
         
         // 12音別成績分析の表示
@@ -2075,23 +2069,21 @@
             };
         }
         
-        // 詳細分析メッセージ生成（ピンポイント情報付き）
+        // 詳細分析メッセージ生成（簡略化版）
         function generateDetailedAnalysis(gradeResult, mode) {
             const metrics = gradeResult.metrics;
             const avgError = Math.abs(metrics.original.avgCentError);
             const maxError = Math.abs(metrics.original.maxCentError);
             const excellenceRate = metrics.original.excellenceRate;
             
-            // ピンポイント分析の実行
-            const extremeErrors = findExtremeErrors(mockSessionsData);
-            const sessionPerf = analyzeSessionPerformance(mockSessionsData);
-            const noteWeaknesses = analyzeNoteWeaknesses(mockSessionsData);
+            // 基本分析のみ実行（段階的に機能追加予定）
+            // const extremeErrors = findExtremeErrors(mockSessionsData);
+            // const sessionPerf = analyzeSessionPerformance(mockSessionsData);
+            // const noteWeaknesses = analyzeNoteWeaknesses(mockSessionsData);
+            // const timeSeriesAnalysis = analyzeTimeSeriesPerformance(mockSessionsData);
+            // const relativePitchPatterns = analyzeRelativePitchPatterns(mockSessionsData);
             
-            // 高度な分析の実行
-            const timeSeriesAnalysis = analyzeTimeSeriesPerformance(mockSessionsData);
-            const relativePitchPatterns = analyzeRelativePitchPatterns(mockSessionsData);
-            
-            // 基本的な分析コンポーネント
+            // 基本的な分析のみ（簡略化版）
             const analysisComponents = [];
             
             // 1. 平均誤差の分析
@@ -2105,58 +2097,13 @@
                 analysisComponents.push("平均誤差±" + avgError.toFixed(1) + "¢は改善が必要で、基本的な音程感覚の定着に集中しましょう");
             }
             
-            // 2. 最大誤差のピンポイント特定
-            const maxErrInfo = extremeErrors.maxError;
-            const maxErrSign = maxErrInfo.rawError > 0 ? '+' : '';
-            analysisComponents.push(`最大誤差${maxErrSign}${maxErrInfo.rawError.toFixed(1)}¢はセッション${maxErrInfo.session}の${maxErrInfo.note}音で発生しており、この音程の集中練習が効果的です`);
-            
-            // 3. 最小誤差の褒賞
-            const minErrInfo = extremeErrors.minError;
-            const minErrSign = minErrInfo.rawError > 0 ? '+' : '';
-            if (minErrInfo.error < 10) {
-                analysisComponents.push(`最高精度${minErrSign}${minErrInfo.rawError.toFixed(1)}¢をセッション${minErrInfo.session}の${minErrInfo.note}音で達成しており、この精度の再現性向上が鍵となります`);
-            }
-            
-            // 4. セッション別パフォーマンス
-            analysisComponents.push(`セッション別では${sessionPerf.bestSession.session}番目（基音${sessionPerf.bestSession.baseNote}）が平均±${sessionPerf.bestSession.avgError.toFixed(1)}¢で最良成績、${sessionPerf.worstSession.session}番目（基音${sessionPerf.worstSession.baseNote}）が平均±${sessionPerf.worstSession.avgError.toFixed(1)}¢で要改善です`);
-            
-            // 5. 音程別弱点分析
-            if (noteWeaknesses.weakest.length > 0) {
-                const weakNote = noteWeaknesses.weakest[0];
-                const strongNote = noteWeaknesses.strongest[0];
-                analysisComponents.push(`音程別では${weakNote.note}音が平均±${weakNote.avgError.toFixed(1)}¢で最も苦手、${strongNote.note}音が平均±${strongNote.avgError.toFixed(1)}¢で最も安定しています`);
-            }
-            
-            // 6. Excellence Rate分析
+            // 2. Excellence Rate分析
             if (excellenceRate >= 80) {
                 analysisComponents.push("Excellence Rate " + excellenceRate.toFixed(1) + "%は優秀で、±20¢以内の高精度な発声が安定しています");
             } else if (excellenceRate >= 60) {
                 analysisComponents.push("Excellence Rate " + excellenceRate.toFixed(1) + "%は良好ですが、より多くの音程で高精度を目指しましょう");
             } else {
                 analysisComponents.push("Excellence Rate " + excellenceRate.toFixed(1) + "%は改善が必要で、基本的な音程の安定化が重要です");
-            }
-            
-            // 7. 時系列進歩分析
-            if (timeSeriesAnalysis.improvementTrend > 5) {
-                analysisComponents.push(`学習効果: 前半±${timeSeriesAnalysis.earlyAvg.toFixed(1)}¢から後半±${timeSeriesAnalysis.lateAvg.toFixed(1)}¢へと±${timeSeriesAnalysis.improvementTrend.toFixed(1)}¢の顕著な改善が見られ、継続練習の効果が現れています`);
-            } else if (timeSeriesAnalysis.improvementTrend < -5) {
-                analysisComponents.push(`注意事項: 前半±${timeSeriesAnalysis.earlyAvg.toFixed(1)}¢から後半±${timeSeriesAnalysis.lateAvg.toFixed(1)}¢へと±${Math.abs(timeSeriesAnalysis.improvementTrend).toFixed(1)}¢の精度低下が見られ、集中力の維持や練習方法の見直しが必要です`);
-            } else {
-                analysisComponents.push(`一貫性: 前半後半を通じて安定した成績を維持しており、±${Math.abs(timeSeriesAnalysis.improvementTrend).toFixed(1)}¢の変動に収まっています`);
-            }
-            
-            // 8. 疲労効果分析
-            if (timeSeriesAnalysis.avgFatigueEffect > 3) {
-                analysisComponents.push(`疲労パターン: セッション内で平均±${timeSeriesAnalysis.avgFatigueEffect.toFixed(1)}¢の精度低下が検出されており、短時間集中型の練習が効果的です`);
-            } else if (timeSeriesAnalysis.avgFatigueEffect < -3) {
-                analysisComponents.push(`ウォームアップ効果: セッション内で平均±${Math.abs(timeSeriesAnalysis.avgFatigueEffect).toFixed(1)}¢の精度向上が見られ、継続練習による調子の向上が確認できます`);
-            }
-            
-            // 9. 相対音感パターン分析
-            if (relativePitchPatterns.mostDifficult.length > 0) {
-                const difficultInterval = relativePitchPatterns.mostDifficult[0];
-                const easyInterval = relativePitchPatterns.easiest[0];
-                analysisComponents.push(`音程間隔特性: ${difficultInterval.intervalName}（±${difficultInterval.avgError.toFixed(1)}¢）が最も困難で、${easyInterval.intervalName}（±${easyInterval.avgError.toFixed(1)}¢）が最も得意な音程間隔です。困難な音程間隔の集中練習が全体向上の鍵となります`);
             }
             
             // モード別の特化分析
@@ -2171,40 +2118,15 @@
             return analysisComponents.join("。") + "。";
         }
         
-        // 練習指導メッセージ生成（ピンポイント改善指導付き）
+        // 練習指導メッセージ生成（簡略化版）
         function generatePracticeGuidance(gradeResult, mode) {
             const metrics = gradeResult.metrics;
             const avgError = Math.abs(metrics.original.avgCentError);
-            const maxError = Math.abs(metrics.original.maxCentError);
             const excellenceRate = metrics.original.excellenceRate;
-            
-            // ピンポイント分析データを取得
-            const extremeErrors = findExtremeErrors(mockSessionsData);
-            const sessionPerf = analyzeSessionPerformance(mockSessionsData);
-            const noteWeaknesses = analyzeNoteWeaknesses(mockSessionsData);
             
             const guidance = [];
             
-            // 1. 最優先改善ポイント（最大誤差の特定練習）
-            const maxErrInfo = extremeErrors.maxError;
-            if (maxErrInfo.error > 30) {
-                guidance.push(`最優先課題: ${maxErrInfo.note}音で${Math.abs(maxErrInfo.rawError).toFixed(1)}¢の大きな誤差が発生しているため、この音程を重点的に練習してください。基音${maxErrInfo.sessionNote}から${maxErrInfo.note}音への音程関係を楽器で確認しながら反復練習が効果的です`);
-            }
-            
-            // 2. 音程別弱点に基づく練習指導
-            if (noteWeaknesses.weakest.length > 0) {
-                const weakNote = noteWeaknesses.weakest[0];
-                const strongNote = noteWeaknesses.strongest[0];
-                guidance.push(`音程別改善: ${weakNote.note}音が平均±${weakNote.avgError.toFixed(1)}¢で最も苦手です。得意な${strongNote.note}音（±${strongNote.avgError.toFixed(1)}¢）から${weakNote.note}音への音程移動を段階的に練習しましょう`);
-            }
-            
-            // 3. セッション品質に基づく練習戦略
-            const perfGap = sessionPerf.worstSession.avgError - sessionPerf.bestSession.avgError;
-            if (perfGap > 15) {
-                guidance.push(`一貫性向上: セッション間で±${perfGap.toFixed(1)}¢の成績差があります。基音${sessionPerf.bestSession.baseNote}での良好な感覚を基音${sessionPerf.worstSession.baseNote}にも応用する練習で安定性を高めましょう`);
-            }
-            
-            // 4. 精度レベル別の基本練習法
+            // 精度レベル別の基本練習法
             if (avgError > 30) {
                 guidance.push("基本練習: 楽器と一緒に歌って音程を耳で確認する練習を毎日10分行いましょう");
             } else if (avgError > 20) {
@@ -2213,20 +2135,14 @@
                 guidance.push("上級練習: 楽器なしでの音程記憶と相対音感による音程関係の構築を重点的に");
             }
             
-            // 5. Excellence Rate改善法
+            // Excellence Rate改善法
             if (excellenceRate < 60) {
                 guidance.push("安定性強化: 同じ音程を5回連続で正確に歌える練習で筋肉記憶を定着させてください");
             } else if (excellenceRate < 80) {
                 guidance.push("精度向上: ±10¢以内を目標とした高精度練習で更なる向上を目指しましょう");
             }
             
-            // 6. 成功体験の再現指導
-            const minErrInfo = extremeErrors.minError;
-            if (minErrInfo.error < 10) {
-                guidance.push(`成功再現: セッション${minErrInfo.session}の${minErrInfo.note}音で達成した±${minErrInfo.error.toFixed(1)}¢の高精度を他の音程でも再現できるよう、その時の発声感覚を意識的に記憶して応用練習を行いましょう`);
-            }
-            
-            // 7. モード特化練習法
+            // モード特化練習法
             if (mode === 8) {
                 guidance.push("推奨練習: ドレミファソラシドの基本音階を楽器と合わせて歌う練習を重点的に");
             } else if (mode === 12) {
