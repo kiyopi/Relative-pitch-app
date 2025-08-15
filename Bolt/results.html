@@ -1943,7 +1943,10 @@
 
         // 動的グレード表示の更新
         function updateGradeDisplay() {
+            console.log('🚀 [DEBUG] updateGradeDisplay called');
+            
             const gradeResult = calculateDynamicGrade(mockSessionsData);
+            console.log('🚀 [DEBUG] gradeResult:', gradeResult);
             
             // グレード表示更新
             const gradeElement = document.querySelector('.grade-value');
@@ -1959,17 +1962,26 @@
                 console.log(`✅ Main title updated to: ${gradeResult.modeInfo.name}`);
             }
             
+            console.log('🎯 [DEBUG] About to call showModeFeedback');
             // モード別フィードバック表示
             showModeFeedback(gradeResult.modeInfo, gradeResult);
             
+            console.log('🎯 [DEBUG] About to call showToneAnalysis');
             // 12音別分析表示
             showToneAnalysis(gradeResult);
+            
+            console.log('🚀 [DEBUG] updateGradeDisplay completed');
         }
         
         // モード別フィードバックの表示（簡略化版）
         function showModeFeedback(modeInfo, gradeResult) {
+            console.log('📋 [DEBUG] showModeFeedback called with:', {modeInfo, gradeResult});
+            
             const feedbackEl = document.getElementById('mode-feedback');
-            if (!feedbackEl) return;
+            if (!feedbackEl) {
+                console.error('📋 [ERROR] mode-feedback element not found');
+                return;
+            }
             
             // 基本情報のみ設定（複雑な分析は段階的に追加）
             const modeSpecificFeedback = {

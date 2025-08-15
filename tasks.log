@@ -1357,3 +1357,23 @@ Phase 1機能が画面に正常表示される状態に到達
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-15 10:01:26] コミット: デバッグログ追加: Phase 1機能の表示問題調査
+
+【デバッグ機能追加】
+- showDetailedAnalysis関数にコンソールログ追加
+- showPracticeGuidance関数にコンソールログ追加
+- HTML要素の存在確認ログ
+- 生成されたテキスト内容の確認ログ
+- エラー発生時の詳細ログ
+
+【調査対象】
+- Phase 1機能が呼び出されているか
+- HTML要素が正しく見つかっているか
+- 分析テキストが正常に生成されているか
+- display:blockが正しく設定されているか
+
+コンソールログでPhase 1機能の動作状況を詳細追跡可能
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
