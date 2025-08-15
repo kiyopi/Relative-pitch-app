@@ -1398,3 +1398,27 @@ Phase 1機能が呼ばれない原因の特定を可能にする
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-15 10:26:21] コミット: レイアウト確認用results-static.html作成: Phase 1機能の期待表示を実現
+
+【作成内容】
+- results.htmlをコピーしてresults-static.html作成
+- Phase 1機能セクションをdisplay:blockに変更
+- ダミーデータでピンポイント分析・練習指導を表示
+
+【表示内容】
+- ピンポイント分析: 最大・最小誤差の具体的特定
+- 練習指導5カテゴリ:
+  - 最優先課題（赤）: F#音52.3¢誤差改善
+  - 成功再現（緑）: C音1.2¢高精度再現
+  - 基本練習（青）: ピアノなし練習法
+  - 精度向上（紫）: Excellence Rate向上
+  - 12音階モード（黄）: 上昇下降パターン
+
+【目的】
+JavaScript動作に依存しないレイアウト確認
+期待される最終表示の可視化
+デザイン・配色・レスポンシブ対応確認
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
