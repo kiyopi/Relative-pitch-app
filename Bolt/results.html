@@ -2086,8 +2086,10 @@
             const avgError = Math.abs(metrics.raw.avgError || 0);
             const excellenceRate = metrics.raw.excellenceRate || 0;
             
-            // 基本分析のみ実行（段階的に機能追加予定）
-            // const extremeErrors = findExtremeErrors(mockSessionsData);
+            // Phase 1: ピンポイント分析を有効化
+            const extremeErrors = findExtremeErrors(mockSessionsData);
+            
+            // Phase 2以降は段階的に追加予定
             // const sessionPerf = analyzeSessionPerformance(mockSessionsData);
             // const noteWeaknesses = analyzeNoteWeaknesses(mockSessionsData);
             // const timeSeriesAnalysis = analyzeTimeSeriesPerformance(mockSessionsData);
@@ -2107,7 +2109,21 @@
                 analysisComponents.push("平均誤差±" + avgError.toFixed(1) + "¢は改善が必要で、基本的な音程感覚の定着に集中しましょう");
             }
             
-            // 2. Excellence Rate分析
+            // 2. ピンポイント分析による具体的問題特定
+            if (extremeErrors && extremeErrors.maxError && extremeErrors.maxError.error > 0) {
+                const maxErrInfo = extremeErrors.maxError;
+                const maxErrSign = maxErrInfo.rawError > 0 ? '+' : '';
+                analysisComponents.push(`最大誤差${maxErrSign}${maxErrInfo.rawError.toFixed(1)}¢はセッション${maxErrInfo.session}の${maxErrInfo.note}音で発生しており、この音程の集中練習が効果的です`);
+            }
+            
+            // 3. 最高精度の成功体験特定
+            if (extremeErrors && extremeErrors.minError && extremeErrors.minError.error < 10) {
+                const minErrInfo = extremeErrors.minError;
+                const minErrSign = minErrInfo.rawError > 0 ? '+' : '';
+                analysisComponents.push(`最高精度${minErrSign}${minErrInfo.rawError.toFixed(1)}¢をセッション${minErrInfo.session}の${minErrInfo.note}音で達成しており、この精度の再現性向上が鍵となります`);
+            }
+            
+            // 4. Excellence Rate分析
             if (excellenceRate >= 80) {
                 analysisComponents.push("Excellence Rate " + excellenceRate.toFixed(1) + "%は優秀で、±20¢以内の高精度な発声が安定しています");
             } else if (excellenceRate >= 60) {
@@ -2139,7 +2155,16 @@
             const avgError = Math.abs(metrics.raw.avgError || 0);
             const excellenceRate = metrics.raw.excellenceRate || 0;
             
+            // Phase 1: ピンポイント分析データを活用
+            const extremeErrors = findExtremeErrors(mockSessionsData);
+            
             const guidance = [];
+            
+            // 1. 最優先改善ポイント（最大誤差の特定練習）
+            if (extremeErrors && extremeErrors.maxError && extremeErrors.maxError.error > 30) {
+                const maxErrInfo = extremeErrors.maxError;
+                guidance.push(`最優先課題: ${maxErrInfo.note}音で${Math.abs(maxErrInfo.rawError).toFixed(1)}¢の大きな誤差が発生しているため、この音程を重点的に練習してください。基音${maxErrInfo.sessionNote}から${maxErrInfo.note}音への音程関係を楽器で確認しながら反復練習が効果的です`);
+            }
             
             // 精度レベル別の基本練習法
             if (avgError > 30) {
@@ -2155,6 +2180,12 @@
                 guidance.push("安定性強化: 同じ音程を5回連続で正確に歌える練習で筋肉記憶を定着させてください");
             } else if (excellenceRate < 80) {
                 guidance.push("精度向上: ±10¢以内を目標とした高精度練習で更なる向上を目指しましょう");
+            }
+            
+            // 2. 成功体験の再現指導
+            if (extremeErrors && extremeErrors.minError && extremeErrors.minError.error < 10) {
+                const minErrInfo = extremeErrors.minError;
+                guidance.push(`成功再現: セッション${minErrInfo.session}の${minErrInfo.note}音で達成した±${minErrInfo.error.toFixed(1)}¢の高精度を他の音程でも再現できるよう、その時の発声感覚を意識的に記憶して応用練習を行いましょう`);
             }
             
             // モード特化練習法
