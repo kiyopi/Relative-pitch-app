@@ -2133,8 +2133,9 @@
             const modeMessage = document.getElementById('mode-message');
             const modeNextStep = document.getElementById('mode-next-step');
             
-            if (modeTitle) modeTitle.textContent = `${modeInfo.name} (${modeInfo.level})`;
-            if (modeFocus) modeFocus.textContent = `📍 ${feedback.focus}`;
+            // 選択肢B: フォーカス「📍 12音すべてへの対応力向上度」のみ表示
+            if (modeTitle) modeTitle.textContent = `📍 ${feedback.focus}`;
+            if (modeFocus) modeFocus.style.display = 'none'; // 重複を避けるため非表示
             
             // 安全にデータにアクセス
             let avgErrorText = '基本的な音程感覚の分析を実行中';
@@ -2281,10 +2282,17 @@
             }
         }
         
-        // 12音別成績分析の表示
+        // 12音別成績分析の表示（連続チャレンジモード=12セッション以上のみ）
         function showToneAnalysis(gradeResult) {
             const analysisEl = document.getElementById('tone-analysis');
             if (!analysisEl) return;
+            
+            // セッション数チェック: 12セッション以上（連続チャレンジモード）の時のみ表示
+            const sessionCount = mockSessionsData.length;
+            if (sessionCount < 12) {
+                analysisEl.style.display = 'none';
+                return;
+            }
             
             // 12音別成績データを生成
             const tonePerformance = analyzeTonePerformance(mockSessionsData);
