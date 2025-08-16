@@ -1449,3 +1449,90 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-15 11:00:35] コミット: results-static.html: 説明文の視認性改善
+
+【修正内容】
+- ピンポイント分析の説明文「最大・最小誤差の具体的特定」を白色に変更
+- 練習指導の説明文「具体的な改善アクション」を白色に変更
+- color: #94a3b8（薄いグレー）→ color: white に修正
+
+【視認性向上】
+薄すぎて読めない説明文を明瞭な白色に統一し、
+ユーザビリティを改善
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-15 11:19:59] コミット: Phase 1-5表示エリア完全実装とスタイル統一
+
+- results-static.htmlに全Phase(1-5)の表示エリアを追加
+- Phase 2: セッション別パフォーマンス分析
+- Phase 3: 音程別弱点ランキング
+- Phase 4: 時系列パフォーマンス分析
+- Phase 5: 相対音感パターン分析
+- results.htmlのスタイル修正（#94a3b8→white）
+- ガラスカードデザインで統一されたレイアウト
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-15 12:01:24] コミット: 12音律分析セクションのガラスカードスタイル統一
+
+- 12音グリッドをガラスカードデザインに変更
+- 色付き背景を削除してガラス効果に統一
+- テキスト色をすべて白に統一
+- 弱点分析セクションもガラスカードに変更
+- パフォーマンス表示に絵文字追加（🟢優秀 🔵良好 🟡標準 🔴要改善 ⚪未テスト）
+- 弱点分析項目に絵文字追加（🔍弱点分析 🎯練習推奨基音 📝未テスト基音）
+- results.htmlとresults-static.html両ファイル対応
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-15 12:19:35] コミット: 連続チャレンジモード表示制御とモードタイトル改善
+
+- モードタイトルを「📍 12音すべてへの対応力向上度」のみ表示（選択肢B）
+- 冗長な「連続チャレンジモード (中級)」見出しを削除
+- 12音律分析セクションを12セッション以上でのみ表示
+- 8セッション以下では12音律分析を非表示に制御
+- 精査結果の反映: 適切なタイミングでの自動表示機能実装
+- results.htmlとresults-static.html両ファイル対応
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-16 10:51:15] コミット: Phase 1モード別分析機能の実装とデバッグパネル追加
+
+🎯 Phase 1: generateDetailedAnalysisのモード別分岐実装
+- 8セッション（基本モード）: ドレミファソラシド特化分析
+- 12セッション（12音特化）: 半音階対応力・#♭音程・12音カバレッジ
+- 24セッション（プロモード）: 演奏レベル精密分析
+
+🔍 12音特化機能:
+- 半音階対応力の専用評価
+- #♭音程の特別処理と分析
+- 12音カバレッジ計算
+- 12音システム理解度評価
+
+🛠️ デバッグパネル追加:
+- debug-panel.html: モード別Phase内容の確認ツール
+- 3モードの比較表示
+- 問題点の可視化（❌未特化 ⚠️部分対応 ✅対応済み）
+
+📊 実装改善:
+- セッション数による動的モード判定
+- findExtremeErrors既存機能の活用
+- モード別フォーカス「📍 12音すべてへの対応力向上度」への対応
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-16 10:57:22] コミット: SyntaxError修正: JavaScript構文エラーの解決
+
+- generateDetailedAnalysis関数の閉じ括弧不足を修正
+- 古いコード（generateDetailedAnalysisOLD）を削除
+- JavaScript構文エラー解消
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

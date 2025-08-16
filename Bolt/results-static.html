@@ -565,17 +565,17 @@
                     
                     <div class="glass-card" style="margin-bottom: 0.75rem;">
                         <h4 class="text-white font-medium">最良セッション</h4>
-                        <p class="text-white-70">セッション5（基音C3）が平均±12.4¢で最良成績を記録しています。この感覚を他のセッションにも応用しましょう。</p>
+                        <p class="text-white-70" id="best-session-text">セッション5（基音C3）が平均±12.4¢で最良成績を記録しています。この感覚を他のセッションにも応用しましょう。</p>
                     </div>
                     
                     <div class="glass-card" style="margin-bottom: 0.75rem;">
                         <h4 class="text-white font-medium">最悪セッション</h4>
-                        <p class="text-white-70">セッション2（基音F#3）が平均±38.7¢で要改善です。増4度の音程関係に重点的な練習が必要です。</p>
+                        <p class="text-white-70" id="worst-session-text">セッション2（基音F#3）が平均±38.7¢で要改善です。増4度の音程関係に重点的な練習が必要です。</p>
                     </div>
                     
                     <div class="glass-card">
                         <h4 class="text-white font-medium">一貫性向上</h4>
-                        <p class="text-white-70">セッション間で±26.3¢の成績差があります。基音C3での良好な感覚を基音F#3にも応用する練習で安定性を高めましょう。</p>
+                        <p class="text-white-70" id="consistency-text">セッション間で±26.3¢の成績差があります。基音C3での良好な感覚を基音F#3にも応用する練習で安定性を高めましょう。</p>
                     </div>
                 </div>
                 
@@ -593,21 +593,25 @@
                     
                     <div class="glass-card" style="margin-bottom: 0.75rem;">
                         <h4 class="text-white font-medium">🔴 苦手音程TOP3</h4>
-                        <p class="text-white-70">1. F#音: 平均±45.2¢（増4度/減5度の特殊音程）</p>
-                        <p class="text-white-70">2. B音: 平均±38.7¢（導音の不安定性）</p>
-                        <p class="text-white-70">3. D#音: 平均±32.1¢（短3度の精度不足）</p>
+                        <div id="weak-notes-list">
+                            <p class="text-white-70">1. F#音: 平均±45.2¢（増4度/減5度の特殊音程）</p>
+                            <p class="text-white-70">2. B音: 平均±38.7¢（導音の不安定性）</p>
+                            <p class="text-white-70">3. D#音: 平均±32.1¢（短3度の精度不足）</p>
+                        </div>
                     </div>
                     
                     <div class="glass-card" style="margin-bottom: 0.75rem;">
                         <h4 class="text-white font-medium">🟢 得意音程TOP3</h4>
-                        <p class="text-white-70">1. C音: 平均±8.3¢（基準音として安定）</p>
-                        <p class="text-white-70">2. G音: 平均±11.2¢（完全5度の明確性）</p>
-                        <p class="text-white-70">3. E音: 平均±14.5¢（長3度の把握良好）</p>
+                        <div id="strong-notes-list">
+                            <p class="text-white-70">1. C音: 平均±8.3¢（基準音として安定）</p>
+                            <p class="text-white-70">2. G音: 平均±11.2¢（完全5度の明確性）</p>
+                            <p class="text-white-70">3. E音: 平均±14.5¢（長3度の把握良好）</p>
+                        </div>
                     </div>
                     
                     <div class="glass-card">
                         <h4 class="text-white font-medium">音程別改善戦略</h4>
-                        <p class="text-white-70">F#音が平均±45.2¢で最も苦手です。得意なC音（±8.3¢）からF#音への音程移動を段階的に練習しましょう。</p>
+                        <p class="text-white-70" id="note-improvement-strategy">F#音が平均±45.2¢で最も苦手です。得意なC音（±8.3¢）からF#音への音程移動を段階的に練習しましょう。</p>
                     </div>
                 </div>
                 
@@ -625,17 +629,17 @@
                     
                     <div class="glass-card" style="margin-bottom: 0.75rem;">
                         <h4 class="text-white font-medium">学習効果</h4>
-                        <p class="text-white-70">前半±28.3¢から後半±19.7¢へと±8.6¢の顕著な改善が見られ、継続練習の効果が現れています。</p>
+                        <p class="text-white-70" id="learning-effect-text">前半±28.3¢から後半±19.7¢へと±8.6¢の顕著な改善が見られ、継続練習の効果が現れています。</p>
                     </div>
                     
                     <div class="glass-card" style="margin-bottom: 0.75rem;">
                         <h4 class="text-white font-medium">疲労パターン</h4>
-                        <p class="text-white-70">セッション内で平均±4.2¢の精度低下が検出されており、短時間集中型の練習が効果的です。</p>
+                        <p class="text-white-70" id="fatigue-pattern-text">セッション内で平均±4.2¢の精度低下が検出されており、短時間集中型の練習が効果的です。</p>
                     </div>
                     
                     <div class="glass-card">
                         <h4 class="text-white font-medium">練習最適化</h4>
-                        <p class="text-white-70">1セッション15分以内、休憩を挿んで1日3セッションの練習パターンが最も効果的です。</p>
+                        <p class="text-white-70" id="practice-optimization-text">1セッション15分以内、休憩を挿んで1日3セッションの練習パターンが最も効果的です。</p>
                     </div>
                 </div>
                 
@@ -653,21 +657,25 @@
                     
                     <div class="glass-card" style="margin-bottom: 0.75rem;">
                         <h4 class="text-white font-medium">🔴 困難な音程間隔</h4>
-                        <p class="text-white-70">● 増四度/減五度（±42.1¢）: 最も困難な特殊音程</p>
-                        <p class="text-white-70">● 短三度（±35.3¢）: 半音の把握不足</p>
-                        <p class="text-white-70">● 短六度（±31.2¢）: 幅広い音程の難しさ</p>
+                        <div id="difficult-intervals-list">
+                            <p class="text-white-70">● 増四度/減五度（±42.1¢）: 最も困難な特殊音程</p>
+                            <p class="text-white-70">● 短三度（±35.3¢）: 半音の把握不足</p>
+                            <p class="text-white-70">● 短六度（±31.2¢）: 幅広い音程の難しさ</p>
+                        </div>
                     </div>
                     
                     <div class="glass-card" style="margin-bottom: 0.75rem;">
                         <h4 class="text-white font-medium">🟢 得意な音程間隔</h4>
-                        <p class="text-white-70">● 完全四度（±13.7¢）: 最も安定した音程感覚</p>
-                        <p class="text-white-70">● 完全五度（±15.2¢）: 明確な音程把握</p>
-                        <p class="text-white-70">● 長三度（±18.4¢）: 調性感として良好</p>
+                        <div id="easy-intervals-list">
+                            <p class="text-white-70">● 完全四度（±13.7¢）: 最も安定した音程感覚</p>
+                            <p class="text-white-70">● 完全五度（±15.2¢）: 明確な音程把握</p>
+                            <p class="text-white-70">● 長三度（±18.4¢）: 調性感として良好</p>
+                        </div>
                     </div>
                     
                     <div class="glass-card">
                         <h4 class="text-white font-medium">音程間隔練習法</h4>
-                        <p class="text-white-70">増四度/減五度（±42.1¢）が最も困難で、完全四度（±13.7¢）が最も得意な音程間隔です。困難な音程間隔の集中練習が全体向上の鍵となります。</p>
+                        <p class="text-white-70" id="interval-practice-method">増四度/減五度（±42.1¢）が最も困難で、完全四度（±13.7¢）が最も得意な音程間隔です。困難な音程間隔の集中練習が全体向上の鍵となります。</p>
                     </div>
                 </div>
                 
