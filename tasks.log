@@ -1562,3 +1562,25 @@ Phase 5: analyzeRelativePitchPatterns - 音程間隔別習熟度と相対音感�
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-16 11:47:55] コミット: Phase 2-5表示修正: 詳細分析セクション表示機能追加
+
+Phase 2-5のセクションが表示されない問題を修正:
+
+🔧 修正内容:
+- showPhase2to5Sections()関数を新規追加
+- showResultsAnalysis関数でPhase 2-5表示処理呼び出し
+- 各Phaseセクションのdisplay制御を実装
+
+📋 対象セクション:
+- Phase 2: セッション別パフォーマンス分析 (session-performance)
+- Phase 3: 音程別弱点ランキング (note-weaknesses)
+- Phase 4: 時系列パフォーマンス分析 (time-series-analysis)
+- Phase 5: 相対音感パターン分析 (relative-pitch-patterns)
+
+✅ 期待される結果:
+- 詳細分析レポートで全Phase 1-5セクションが表示される
+- 実データに基づく具体的な分析結果がユーザーに提供される
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
