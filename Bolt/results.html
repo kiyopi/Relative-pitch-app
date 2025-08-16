@@ -2312,6 +2312,7 @@
                 return generate12ToneModeAnalysis(gradeResult, avgError, excellenceRate);
             } else {
                 return generateProModeAnalysis(gradeResult, avgError, excellenceRate);
+            }
         }
         
         // 8セッション（基本モード）の分析
@@ -2399,55 +2400,6 @@
             return analysisComponents.join("。") + "。";
         }
         
-        // 既存のコード（削除対象）
-        function generateDetailedAnalysisOLD(gradeResult, mode) {
-            const analysisComponents = [];
-            
-            // 1. 平均誤差の分析
-            if (avgError <= 10) {
-                analysisComponents.push("平均誤差±" + avgError.toFixed(1) + "¢は極めて優秀で、プロフェッショナルレベルの精度です");
-            } else if (avgError <= 20) {
-                analysisComponents.push("平均誤差±" + avgError.toFixed(1) + "¢は安定した良好な成績で、音程感覚が定着しています");
-            } else if (avgError <= 30) {
-                analysisComponents.push("平均誤差±" + avgError.toFixed(1) + "¢は標準的な成績ですが、さらなる精度向上の余地があります");
-            } else {
-                analysisComponents.push("平均誤差±" + avgError.toFixed(1) + "¢は改善が必要で、基本的な音程感覚の定着に集中しましょう");
-            }
-            
-            // 2. ピンポイント分析による具体的問題特定
-            if (extremeErrors && extremeErrors.maxError && extremeErrors.maxError.error > 0) {
-                const maxErrInfo = extremeErrors.maxError;
-                const maxErrSign = maxErrInfo.rawError > 0 ? '+' : '';
-                analysisComponents.push(`最大誤差${maxErrSign}${maxErrInfo.rawError.toFixed(1)}¢はセッション${maxErrInfo.session}の${maxErrInfo.note}音で発生しており、この音程の集中練習が効果的です`);
-            }
-            
-            // 3. 最高精度の成功体験特定
-            if (extremeErrors && extremeErrors.minError && extremeErrors.minError.error < 10) {
-                const minErrInfo = extremeErrors.minError;
-                const minErrSign = minErrInfo.rawError > 0 ? '+' : '';
-                analysisComponents.push(`最高精度${minErrSign}${minErrInfo.rawError.toFixed(1)}¢をセッション${minErrInfo.session}の${minErrInfo.note}音で達成しており、この精度の再現性向上が鍵となります`);
-            }
-            
-            // 4. Excellence Rate分析
-            if (excellenceRate >= 80) {
-                analysisComponents.push("Excellence Rate " + excellenceRate.toFixed(1) + "%は優秀で、±20¢以内の高精度な発声が安定しています");
-            } else if (excellenceRate >= 60) {
-                analysisComponents.push("Excellence Rate " + excellenceRate.toFixed(1) + "%は良好ですが、より多くの音程で高精度を目指しましょう");
-            } else {
-                analysisComponents.push("Excellence Rate " + excellenceRate.toFixed(1) + "%は改善が必要で、基本的な音程の安定化が重要です");
-            }
-            
-            // モード別の特化分析
-            if (mode === 8) {
-                analysisComponents.push("ランダム基音モードでは自然な音階（ドレミファソラシ）の定着度が重要です");
-            } else if (mode === 12) {
-                analysisComponents.push("連続チャレンジモードでは半音を含む12音への適応力が試されています");
-            } else if (mode === 24) {
-                analysisComponents.push("12音階モードでは完璧な12音律システムの習得が求められます");
-            }
-            
-            return analysisComponents.join("。") + "。";
-        }
         
         // 練習指導メッセージ生成（簡略化版）
         function generatePracticeGuidance(gradeResult, mode) {
