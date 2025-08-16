@@ -2301,16 +2301,106 @@
             const avgError = Math.abs(metrics.raw.avgError || 0);
             const excellenceRate = metrics.raw.excellenceRate || 0;
             
-            // Phase 1: ピンポイント分析を有効化
+            // セッション数に応じたモード判定
+            const sessionCount = mode.actualSessions || mockSessionsData.length;
+            console.log('🎯 [DEBUG] Session count for analysis:', sessionCount);
+            
+            // モード別のPhase分析を実行
+            if (sessionCount <= 8) {
+                return generateBasicModeAnalysis(gradeResult, avgError, excellenceRate);
+            } else if (sessionCount <= 12) {
+                return generate12ToneModeAnalysis(gradeResult, avgError, excellenceRate);
+            } else {
+                return generateProModeAnalysis(gradeResult, avgError, excellenceRate);
+        }
+        
+        // 8セッション（基本モード）の分析
+        function generateBasicModeAnalysis(gradeResult, avgError, excellenceRate) {
             const extremeErrors = findExtremeErrors(mockSessionsData);
+            const analysisComponents = [];
             
-            // Phase 2以降は段階的に追加予定
-            // const sessionPerf = analyzeSessionPerformance(mockSessionsData);
-            // const noteWeaknesses = analyzeNoteWeaknesses(mockSessionsData);
-            // const timeSeriesAnalysis = analyzeTimeSeriesPerformance(mockSessionsData);
-            // const relativePitchPatterns = analyzeRelativePitchPatterns(mockSessionsData);
+            // 基本音程感覚の評価
+            if (avgError <= 15) {
+                analysisComponents.push(`基本音階の平均誤差±${avgError.toFixed(1)}¢は優秀で、ドレミファソラシドの音程感覚が良好に定着しています`);
+            } else if (avgError <= 25) {
+                analysisComponents.push(`基本音階の平均誤差±${avgError.toFixed(1)}¢は良好で、自然音階の理解が進んでいます`);
+            } else {
+                analysisComponents.push(`基本音階の平均誤差±${avgError.toFixed(1)}¢は改善の余地があり、基本的な音程練習の継続が必要です`);
+            }
             
-            // 基本的な分析のみ（簡略化版）
+            // ピンポイント分析（基本モード）
+            if (extremeErrors && extremeErrors.maxError && extremeErrors.maxError.error > 20) {
+                const maxErr = extremeErrors.maxError;
+                analysisComponents.push(`最大誤差±${maxErr.error.toFixed(1)}¢は${maxErr.note}音で発生。基音から${maxErr.note}音への音程関係を重点的に練習してください`);
+            }
+            
+            analysisComponents.push("ランダム基音モードでは自然音階（ドレミファソラシ）の安定した習得が目標です");
+            
+            return analysisComponents.join("。") + "。";
+        }
+        
+        // 12セッション（12音特化モード）の分析
+        function generate12ToneModeAnalysis(gradeResult, avgError, excellenceRate) {
+            const analysisComponents = [];
+            
+            // 12音対応力の評価
+            if (avgError <= 15) {
+                analysisComponents.push(`12音システムの平均誤差±${avgError.toFixed(1)}¢は優秀で、半音階への適応力が高いレベルです`);
+            } else if (avgError <= 25) {
+                analysisComponents.push(`12音システムの平均誤差±${avgError.toFixed(1)}¢は良好で、クロマチック音程の理解が進展しています`);
+            } else {
+                analysisComponents.push(`12音システムの平均誤差±${avgError.toFixed(1)}¢は改善可能で、半音階練習の継続が効果的です`);
+            }
+            
+            // 12音特化のピンポイント分析
+            const extremeErrors = findExtremeErrors(mockSessionsData);
+            if (extremeErrors && extremeErrors.maxError) {
+                const maxErr = extremeErrors.maxError;
+                const isSharpFlat = maxErr.note.includes('#') || maxErr.note.includes('♭');
+                if (isSharpFlat) {
+                    analysisComponents.push(`最大誤差±${maxErr.error.toFixed(1)}¢は${maxErr.note}音（半音）で発生。#♭音程の精度向上が12音習得の鍵となります`);
+                } else {
+                    analysisComponents.push(`最大誤差±${maxErr.error.toFixed(1)}¢は${maxErr.note}音で発生。基本音から半音階への展開練習が有効です`);
+                }
+            }
+            
+            // 12音システム理解度の評価
+            const toneData = analyzeTonePerformance(mockSessionsData);
+            const testedTones = Object.values(toneData).filter(tone => tone.sessions > 0).length;
+            const coverage = (testedTones / 12 * 100).toFixed(0);
+            
+            analysisComponents.push(`12音カバレッジ${coverage}%: 半音を含む全12音への対応力向上が相対音感の完成度を決定します`);
+            
+            return analysisComponents.join("。") + "。";
+        }
+        
+        // 24セッション（プロモード）の分析
+        function generateProModeAnalysis(gradeResult, avgError, excellenceRate) {
+            const analysisComponents = [];
+            
+            // プロレベルの評価
+            if (avgError <= 10) {
+                analysisComponents.push(`プロレベルの平均誤差±${avgError.toFixed(1)}¢は卓越しており、完璧な12音律システムを習得しています`);
+            } else if (avgError <= 15) {
+                analysisComponents.push(`プロレベルの平均誤差±${avgError.toFixed(1)}¢は優秀で、高度な音程精度を実現しています`);
+            } else {
+                analysisComponents.push(`プロレベル基準の平均誤差±${avgError.toFixed(1)}¢は更なる精密性が求められます`);
+            }
+            
+            // 上級者向けの詳細分析
+            const extremeErrors = findExtremeErrors(mockSessionsData);
+            if (extremeErrors && extremeErrors.maxError) {
+                const maxErr = extremeErrors.maxError;
+                analysisComponents.push(`最大誤差±${maxErr.error.toFixed(1)}¢の${maxErr.note}音の完全習得により、プロフェッショナルレベルの完成度に到達します`);
+            }
+            
+            analysisComponents.push("12音階モードでは演奏・指導レベルの完璧な12音律システム習得が目標です");
+            
+            return analysisComponents.join("。") + "。";
+        }
+        
+        // 既存のコード（削除対象）
+        function generateDetailedAnalysisOLD(gradeResult, mode) {
             const analysisComponents = [];
             
             // 1. 平均誤差の分析
