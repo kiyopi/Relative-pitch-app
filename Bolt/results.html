@@ -2033,6 +2033,41 @@
             
             // Phase 1: 練習指導の表示
             showPracticeGuidance(gradeResult, modeInfo);
+            
+            // Phase 2-5: 詳細分析セクションの表示
+            showPhase2to5Sections();
+        }
+        
+        // Phase 2-5セクションの表示
+        function showPhase2to5Sections() {
+            // Phase 2: セッション別パフォーマンス分析
+            const sessionPerformanceEl = document.getElementById('session-performance');
+            if (sessionPerformanceEl) {
+                sessionPerformanceEl.style.display = 'block';
+            }
+            
+            // Phase 3: 音程別弱点ランキング
+            const noteWeaknessesEl = document.getElementById('note-weaknesses');
+            if (noteWeaknessesEl) {
+                noteWeaknessesEl.style.display = 'block';
+            }
+            
+            // Phase 4: 時系列パフォーマンス分析
+            const timeSeriesEl = document.getElementById('time-series-analysis');
+            if (timeSeriesEl) {
+                timeSeriesEl.style.display = 'block';
+            }
+            
+            // Phase 5: 相対音感パターン分析
+            const relativePitchEl = document.getElementById('relative-pitch-patterns');
+            if (relativePitchEl) {
+                relativePitchEl.style.display = 'block';
+            }
+            
+            // アイコンを再初期化
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
         }
         
         // Phase 1: ピンポイント分析の表示関数（HTML生成回避版）
