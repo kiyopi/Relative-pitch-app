@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>8va相対音感トレーニング - 総合評価（無料版）</title>
+    <link rel="stylesheet" href="styles/system.css?v=4">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <style>
+        /* 背景グラデーションアニメーション - iOS対応版 */
+        body {
+            position: relative;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            -webkit-overflow-scrolling: touch;
+            background: #0f172a; /* フォールバック */
+        }
+        
+        /* 疑似要素で背景アニメーション */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            -webkit-animation: gradientShift 15s ease infinite;
+            z-index: -1;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            will-change: background-position;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @-webkit-keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* フローティングアニメーション */
+        .page-header-icon {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* SNSシェアセクション・shimmerアニメーション等は system.css に移動済み */
+        
+        .share-card h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        
+        .share-card p {
+            color: white;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+        
+        /* rank-sectionスタイル（新横一列レイアウト） */
+        .rank-section {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .rank-mode {
+            margin-bottom: 24px;
+        }
+        
+        .rank-section .mode-title {
+            font-size: 1.6rem !important;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+        }
+        
+        .rank-content-row {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+        }
+        
+        .rank-icon {
+            flex-shrink: 0;
+        }
+        
+        .rank-stats-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+        
+        .rank-stat-item {
+            text-align: center;
+            min-width: 80px;
+        }
+        
+        .stat-value-rank {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 4px;
+            transition: transform 0.2s ease;
+            line-height: 1;
+        }
+        
+        .stat-value-rank.grade-value {
+            font-size: 2.0rem;
+            color: #ffffff; /* グレードは白色 */
+        }
+        
+        .stat-value-rank.avg-error {
+            color: #fbbf24; /* 平均誤差もグレードと同じ黄色 */
+        }
+        
+        .stat-label-rank {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.1;
+            margin: 0;
+            white-space: nowrap;
+        }
+        
+        .rank-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .rank-circle-icon {
+            width: 64px;
+            height: 64px;
+        }
+        
+        @media (max-width: 768px) {
+            .rank-content-row {
+                gap: 20px;
+            }
+            
+            .rank-stats-row {
+                gap: 20px;
+            }
+            
+            .rank-circle {
+                width: 90px;
+                height: 90px;
+            }
+            
+            .rank-circle-icon {
+                width: 54px !important;
+                height: 54px !important;
+            }
+            
+            .stat-value-rank {
+                font-size: 1.5rem;
+            }
+            
+            .stat-value-rank.grade-value {
+                font-size: 2rem;
+            }
+        }
+        
+        .share-buttons {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .share-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            position: relative;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .share-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+        
+        .share-btn svg {
+            width: 24px;
+            height: 24px;
+            z-index: 1;
+        }
+        
+        .share-btn.twitter:hover {
+            box-shadow: 0 8px 25px rgba(29, 161, 242, 0.4), 0 0 30px rgba(29, 161, 242, 0.3);
+        }
+        
+        .share-btn.line:hover {
+            box-shadow: 0 8px 25px rgba(0, 195, 0, 0.4), 0 0 30px rgba(0, 195, 0, 0.3);
+        }
+        
+        .share-btn.facebook:hover {
+            box-shadow: 0 8px 25px rgba(24, 119, 242, 0.4), 0 0 30px rgba(24, 119, 242, 0.3);
+        }
+        
+        .share-btn.copy:hover {
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4), 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+        
+        @media (max-width: 640px) {
+            .share-btn {
+                width: 48px;
+                height: 48px;
+            }
+            
+            .share-btn svg {
+                width: 20px;
+                height: 20px;
+            }
+        }
+        
+        /* フリーミアム制限表示 */
+        .limitation-badge {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        
+        /* premium-cta スタイルは system.css に移動済み */
+        
+        .feature-preview {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin: 1rem 0;
+            color: #cbd5e1;
+        }
+        
+        .comparison-table {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .comparison-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .comparison-row:last-child {
+            border-bottom: none;
+        }
+        
+        .check-icon {
+            color: #10b981;
+        }
+        
+        .x-icon {
+            color: #ef4444;
+        }
+        
+        /* feature-highlight スタイルは system.css に移動済み */
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-item.available {
+            color: #cbd5e1;
+        }
+        
+        .feature-item.locked {
+            color: #94a3b8;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen p-6">
+        <div class="container">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="flex justify-center mb-6">
+                    <div class="page-header-icon page-header-icon-purple">
+                        <i data-lucide="file-chart-column-increasing" class="icon-2xl text-white" data-stroke-width="2"></i>
+                    </div>
+                </div>
+                <h1 class="text-4xl font-bold text-white mb-4">総合評価 - 無料版</h1>
+                <p class="text-green-200 text-xl mb-6">12セッション完了 - あなたの音感レベルを分析しました</p>
+                <div class="limitation-badge" style="display: inline-block; margin-top: 1rem;">
+                    🔒 無料版：基本評価・7日間データのみ表示
+                </div>
+            </div>
+            <!-- SNSシェアセクション -->
+            <div class="share-section" id="share-section">
+            <div class="share-card">
+                <!-- rank-section -->
+                <section class="rank-section">
+                    <!-- モード名 -->
+                    <div class="rank-mode">
+                        <h3 class="mode-title" id="main-mode-title">連続チャレンジモード</h3>
+                    </div>
+                    
+                    <!-- グレードアイコンと統計情報を横一列に -->
+                    <div class="rank-content-row">
+                        <!-- グレードアイコン -->
+                        <div class="rank-icon">
+                            <div class="rank-circle" style="background: linear-gradient(135deg, #fbbf24, #d97706);">
+                                <i data-lucide="crown" class="rank-circle-icon" style="color: white;"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- 統計情報 -->
+                        <div class="rank-stats-row">
+                            <div class="rank-stat-item">
+                                <div class="stat-value-rank grade-value" id="dynamic-grade">B</div>
+                                <div class="stat-label-rank">総合グレード</div>
+                            </div>
+                            <div class="rank-stat-item">
+                                <div class="stat-value-rank avg-error" style="color: #fbbf24;">±42¢</div>
+                                <div class="stat-label-rank">平均誤差（セント）</div>
+                            </div>
+                            <div class="rank-stat-item">
+                                <div class="stat-value-rank max-error">+58¢</div>
+                                <div class="stat-label-rank">最大誤差（セント）</div>
+                            </div>
+                            <div class="rank-stat-item">
+                                <div class="stat-value-rank session-count">12</div>
+                                <div class="stat-label-rank">セッション数</div>
+                            </div>
+                        </div>
+                        
+                        <!-- ランク取得メッセージ -->
+                        <div class="rank-achievement-message" style="margin-top: 0px; margin-bottom: 0px; text-align: center;">
+                            <p id="share-message" style="color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; margin: 0;">
+                                B級ランク取得！グッドプレイヤー！
+                            </p>
+                        </div>
+                    </div>
+                </section>
+                
+                <h3 style="margin-top: 0px; margin-bottom: 24px;">みんなに成果をシェアしよう！</h3>
+                <div class="share-buttons">
+                    <a href="#" class="share-btn twitter" onclick="shareToTwitter(event)" title="Xでシェア">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="share-btn line" onclick="shareToLine(event)" title="LINEで送る">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.348 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="share-btn facebook" onclick="shareToFacebook(event)" title="Facebookでシェア">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                    </a>
+                    <button class="share-btn copy" onclick="copyShareText(event)" title="リンクをコピー">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="limitation-badge" style="margin-top: 1.5rem;">
+                    🔒 無料版：基本情報のみシェア可能
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Charts -->
+        <div class="glass-card mb-8" style="max-width: 100vw; overflow-x: hidden;">
+            <div class="block md:grid md:grid-cols-2 gap-4 md:gap-8">
+                <!-- Error Trend Chart -->
+                <div class="mb-8 md:mb-0">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-white">誤差推移</h3>
+                        <div class="limitation-badge text-xs px-2 py-1" style="margin: 0;">
+                            🔒 7日間のみ
+                        </div>
+                    </div>
+                    <div class="relative bg-white/5 rounded-lg p-0 md:p-4" id="error-trend-container" style="height: 280px;">
+                        <canvas id="error-trend-chart"></canvas>
+                    </div>
+                    <div class="text-xs text-white-60 text-center mt-2" style="min-height: 80px; height: auto;">
+                        過去7日間の平均誤差推移。改善傾向が確認できます。<br>
+                        <span class="text-yellow-300">全期間データと詳細分析はプレミアム版で</span>
+                    </div>
+                </div>
+                
+                <!-- Accuracy Chart -->
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-white">評価分布</h3>
+                        <div class="limitation-badge text-xs px-2 py-1" style="margin: 0;">
+                            🔒 基本表示のみ
+                        </div>
+                    </div>
+                    <div class="bg-white/5 rounded-lg" style="height: 200px;">
+                        <canvas id="accuracy-chart" width="400" height="200"></canvas>
+                    </div>
+                    <div class="text-xs text-white-60 text-center mt-2">
+                        12セッションの評価内訳<br>
+                        <span class="text-yellow-300">詳細分析はプレミアム版で</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sessions Overview -->
+        <div class="glass-card mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-white">セッション別成績</h3>
+                <div class="limitation-badge text-xs px-2 py-1" style="margin: 0;">
+                    🔒 最新のみ詳細表示
+                </div>
+            </div>
+            <p class="text-white-70 text-sm mb-4">
+                <span class="lg:hidden">最新セッションの詳細のみ表示可能</span>
+                <span class="hidden lg:inline">最新セッション（セッション12）の詳細分析のみ表示可能</span>
+            </p>
+            <div class="grid grid-cols-12 gap-3" id="sessions-grid">
+                <!-- Sessions will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Detailed Session Analysis (Latest Only) -->
+        <div class="glass-card mb-8" id="detailed-analysis-section">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-white text-center flex-1">
+                    <div>詳細分析</div>
+                    <div class="text-lg mt-1">セッション12（最新）</div>
+                </h3>
+            </div>
+            <div class="mb-4 text-center" id="session-info">
+                <p class="text-white-70">基音: C# | 平均誤差: ±20.1セント</p>
+            </div>
+            <div class="space-y-2" id="note-results">
+                <!-- 8音の詳細結果 -->
+                <div class="bg-white/5 rounded-lg p-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-white">音程1: ド</span>
+                        <span class="text-green-300">+5セント</span>
+                    </div>
+                </div>
+                <div class="bg-white/5 rounded-lg p-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-white">音程2: レ</span>
+                        <span class="text-yellow-300">+15セント</span>
+                    </div>
+                </div>
+                <div class="bg-white/5 rounded-lg p-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-white">音程3: ミ</span>
+                        <span class="text-red-300">+35セント</span>
+                    </div>
+                </div>
+                <div class="bg-white/5 rounded-lg p-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-white">音程4: ファ</span>
+                        <span class="text-green-300">-8セント</span>
+                    </div>
+                </div>
+                <div class="bg-white/5 rounded-lg p-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-white">音程5: ソ</span>
+                        <span class="text-yellow-300">+22セント</span>
+                    </div>
+                </div>
+                <div class="bg-white/5 rounded-lg p-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-white">音程6: ラ</span>
+                        <span class="text-green-300">+12セント</span>
+                    </div>
+                </div>
+                <div class="bg-white/5 rounded-lg p-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-white">音程7: シ</span>
+                        <span class="text-red-300">+42セント</span>
+                    </div>
+                </div>
+                <div class="bg-white/5 rounded-lg p-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-white">音程8: ド（オクターブ）</span>
+                        <span class="text-yellow-300">+18セント</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 p-4 rounded-xl border-2 border-dashed border-yellow-400/30 bg-yellow-400/5">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="lock" class="icon text-yellow-300"></i>
+                        <div>
+                            <div class="text-white font-medium">他のセッションの詳細分析を見るには</div>
+                            <div class="text-white-70 text-sm">全12セッションの詳細分析が可能</div>
+                        </div>
+                    </div>
+                    <a href="results-freemium-premium.html" class="btn" style="background: linear-gradient(135deg, #ffd700, #ffb347); color: #333; text-decoration: none; padding: 0.5rem 1rem;">
+                        💎プレミアム版へ
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Analysis Preview -->
+        <div class="glass-card mb-8">
+            <div class="text-center">
+                <div class="mx-auto w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mb-6">
+                    <i data-lucide="lock" class="w-8 h-8 text-purple-300"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-4">
+                    詳細分析＋トレーニング記録
+                </h3>
+                <div class="bg-white/5 rounded-lg p-4 mb-6 relative overflow-hidden">
+                    <!-- Blur overlay to simulate premium content -->
+                    <div class="filter blur-sm text-white-70">
+                        <p class="mb-3">
+                            あなたの F# 基音が他より18¢低い傾向にあります。<br>
+                            過去3ヶ月の記録から、週2回のF#基音練習で改善可能と分析。
+                        </p>
+                        <div class="text-sm space-y-2">
+                            <div>• 12音別詳細分析</div>
+                            <div>• AI練習プラン作成</div>
+                            <div>• 成長予測レポート</div>
+                            <div>• 全期間データアクセス</div>
+                        </div>
+                    </div>
+                    <!-- Lock overlay -->
+                    <div class="absolute inset-0 flex items-center justify-center bg-black/20">
+                        <div class="text-center">
+                            <i data-lucide="crown" class="w-8 h-8 text-yellow-400 mx-auto mb-2"></i>
+                            <div class="text-yellow-300 font-medium text-sm">プレミアム版でアンロック</div>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-sm text-white-60 mb-6">
+                    12音別分析・具体的練習指導・全期間記録はプレミアム版でご利用いただけます
+                </p>
+                <a href="results-freemium-premium.html" class="btn premium-cta inline-block">
+                    <i data-lucide="sparkles" class="w-4 h-4 mr-2"></i>
+                    詳細分析を見る（¥980/月）
+                </a>
+            </div>
+        </div>
+
+        <!-- プレミアム機能比較 -->
+        <div class="glass-card mb-8">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 2rem;">
+                <i data-lucide="scale" style="width: 24px; height: 24px; color: white;"></i>
+                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">
+                    無料版 vs プレミアム版
+                </h3>
+            </div>
+            
+            <!-- 機能比較テーブル -->
+            <div style="background: rgba(255, 255, 255, 0.02); border-radius: 12px; overflow: hidden;">
+                <!-- ヘッダー -->
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; background: rgba(255, 255, 255, 0.05);">
+                    <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1);">
+                        <h4 style="color: white; font-weight: 600; margin: 0;">機能</h4>
+                    </div>
+                    <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <i data-lucide="user" style="width: 18px; height: 18px; color: white;"></i>
+                            <h4 style="color: white; font-weight: 600; margin: 0;">無料版</h4>
+                        </div>
+                    </div>
+                    <div style="padding: 1rem; text-align: center;">
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <i data-lucide="crown" style="width: 18px; height: 18px; color: white;"></i>
+                            <h4 style="color: white; font-weight: 600; margin: 0;">プレミアム版</h4>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 機能項目 -->
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                    <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1);">
+                        <span style="color: white;">総合グレード・基本統計</span>
+                    </div>
+                    <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+                        <i data-lucide="circle-check-big" style="width: 20px; height: 20px; color: white;"></i>
+                    </div>
+                    <div style="padding: 1rem; text-align: center;">
+                        <i data-lucide="circle-check-big" style="width: 20px; height: 20px; color: white;"></i>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                    <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1);">
+                        <span style="color: white;">誤差推移・評価分布グラフ</span>
+                    </div>
+                    <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+                        <span style="color: white; font-size: 0.875rem;">7日間のみ</span>
+                    </div>
+                    <div style="padding: 1rem; text-align: center;">
+                        <span style="color: white; font-size: 0.875rem;">全期間</span>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                    <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1);">
+                        <span style="color: white;">セッション成績表示</span>
+                    </div>
+                    <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+                        <span style="color: white; font-size: 0.875rem;">最新のみ</span>
+                    </div>
+                    <div style="padding: 1rem; text-align: center;">
+                        <i data-lucide="circle-check-big" style="width: 20px; height: 20px; color: white;"></i>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                    <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1);">
+                        <span style="color: white;">SNSシェア機能</span>
+                    </div>
+                    <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+                        <span style="color: white; font-size: 0.875rem;">基本情報のみ</span>
+                    </div>
+                    <div style="padding: 1rem; text-align: center;">
+                        <span style="color: white; font-size: 0.875rem;">詳細分析付き</span>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                    <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1);">
+                        <span style="color: white;">12音別詳細分析</span>
+                    </div>
+                    <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+                        <i data-lucide="minus" style="width: 20px; height: 20px; color: white;"></i>
+                    </div>
+                    <div style="padding: 1rem; text-align: center;">
+                        <i data-lucide="circle-check-big" style="width: 20px; height: 20px; color: white;"></i>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                    <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1);">
+                        <span style="color: white;">AI練習プラン・成長予測</span>
+                    </div>
+                    <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+                        <i data-lucide="minus" style="width: 20px; height: 20px; color: white;"></i>
+                    </div>
+                    <div style="padding: 1rem; text-align: center;">
+                        <i data-lucide="circle-check-big" style="width: 20px; height: 20px; color: white;"></i>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                    <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1);">
+                        <span style="color: white;">トレーニング記録</span>
+                    </div>
+                    <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+                        <span style="color: white; font-size: 0.875rem;">7日間のみ</span>
+                    </div>
+                    <div style="padding: 1rem; text-align: center;">
+                        <span style="color: white; font-size: 0.875rem;">全期間</span>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr;">
+                    <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1);">
+                        <span style="color: white;">データ出力・検索機能</span>
+                    </div>
+                    <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+                        <i data-lucide="minus" style="width: 20px; height: 20px; color: white;"></i>
+                    </div>
+                    <div style="padding: 1rem; text-align: center;">
+                        <i data-lucide="circle-check-big" style="width: 20px; height: 20px; color: white;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- プレミアムCTA -->
+        <div style="text-align: center; margin: 2rem 0;">
+            <a href="results-freemium-premium.html" class="premium-cta" style="display: inline-block; padding: 1rem 2rem; background: linear-gradient(135deg, #ffd700, #ffb347); color: #333; font-weight: 600; text-decoration: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); transition: all 0.3s ease;">
+                <i data-lucide="crown" style="width: 20px; height: 20px; margin-right: 0.5rem;"></i>
+                詳細分析＋トレーニング記録を見る（¥980/月）
+            </a>
+        </div>
+
+        <!-- 次のステップセクション -->
+        <div class="glass-card mb-8">
+            <div class="text-center mb-6">
+                <div class="mx-auto w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mb-4">
+                    <i data-lucide="target" class="w-8 h-8 text-blue-300"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">
+                    💡 次のステップ
+                </h3>
+                <p class="text-green-300 font-medium">
+                    連続チャレンジモードでB級達成おめでとうございます！
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- 現在の成果 -->
+                <div class="bg-white/5 rounded-lg p-4">
+                    <h4 class="text-white font-medium mb-3 flex items-center">
+                        <i data-lucide="check-circle" class="w-4 h-4 mr-2 text-green-300"></i>
+                        現在の成果
+                    </h4>
+                    <div class="text-sm text-white-70 space-y-1">
+                        <div>• 半音を含む12音への対応力向上</div>
+                        <div>• 平均誤差±20.1セントを達成</div>
+                        <div>• 連続練習習慣の確立</div>
+                    </div>
+                </div>
+                
+                <!-- 次の目標 -->
+                <div class="bg-white/5 rounded-lg p-4">
+                    <h4 class="text-white font-medium mb-3 flex items-center">
+                        <i data-lucide="arrow-up-right" class="w-4 h-4 mr-2 text-blue-300"></i>
+                        次の目標
+                    </h4>
+                    <div class="text-sm text-white-70 space-y-1">
+                        <div>• A級（±15¢以下）を目指す</div>
+                        <div>• 週3回・15分の集中練習継続</div>
+                        <div>• 12音階モードでプロレベル挑戦</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 練習推奨 -->
+            <div class="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg p-4 mb-4">
+                <h4 class="text-white font-medium mb-2 flex items-center">
+                    <i data-lucide="clock" class="w-4 h-4 mr-2 text-yellow-300"></i>
+                    効果的な練習スケジュール
+                </h4>
+                <div class="text-sm text-white-70">
+                    <div class="mb-2">📅 <strong>頻度:</strong> 週3回、1回15分</div>
+                    <div class="mb-2">🎯 <strong>重点:</strong> 苦手な音程（ミ・シの±35¢超）を集中練習</div>
+                    <div>⏰ <strong>時間帯:</strong> 集中力の高い午前中がおすすめ</div>
+                </div>
+            </div>
+            
+            <!-- プレミアム案内 -->
+            <div class="text-center p-3 bg-yellow-400/5 rounded-lg border border-yellow-400/20">
+                <p class="text-sm text-yellow-300 mb-2">
+                    🔍 より具体的な改善点と個別練習プランは
+                </p>
+                <a href="results-freemium-premium.html" class="text-yellow-400 font-medium hover:text-yellow-300 transition-colors">
+                    詳細分析レポート（プレミアム版）
+                </a>
+                <span class="text-yellow-300"> でご確認いただけます</span>
+            </div>
+        </div>
+
+        <!-- アクションボタン -->
+        <div class="glass-card mb-8" style="padding: 1.5rem; text-align: center;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <button style="background: rgba(59, 130, 246, 0.3); border: 1px solid rgba(59, 130, 246, 0.5); color: white; padding: 0.75rem; border-radius: 8px; cursor: pointer;">
+                    📊 記録を見る
+                </button>
+                <button style="background: rgba(16, 185, 129, 0.3); border: 1px solid rgba(16, 185, 129, 0.5); color: white; padding: 0.75rem; border-radius: 8px; cursor: pointer;">
+                    🏠 ホームに戻る
+                </button>
+            </div>
+            <button style="background: rgba(251, 191, 36, 0.3); border: 1px solid rgba(251, 191, 36, 0.5); color: white; padding: 0.75rem; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 1rem;">
+                🎵 再チャレンジ
+            </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results.js is loaded but with freemium limitations -->
+    <script>
+        // Mock data and basic functionality for freemium version
+        const mockSessionsData = [
+            { session: 1, baseNote: 'A', averageCentError: 18.5 },
+            { session: 2, baseNote: 'F#', averageCentError: 24.2 },
+            { session: 3, baseNote: 'D', averageCentError: 16.8 },
+            { session: 4, baseNote: 'Bb', averageCentError: 32.1 },
+            { session: 5, baseNote: 'G', averageCentError: 14.6 },
+            { session: 6, baseNote: 'E', averageCentError: 28.7 },
+            { session: 7, baseNote: 'C', averageCentError: 19.3 },
+            { session: 8, baseNote: 'F', averageCentError: 22.5 },
+            { session: 9, baseNote: 'D#', averageCentError: 35.8 },
+            { session: 10, baseNote: 'B', averageCentError: 12.4 },
+            { session: 11, baseNote: 'G#', averageCentError: 26.9 },
+            { session: 12, baseNote: 'C#', averageCentError: 20.1 }
+        ];
+    </script>
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 [FREEMIUM] Initializing freemium basic results page');
+            
+            try {
+                // セッショングリッドの初期化
+                initializeSessionsGrid();
+                console.log('✅ Sessions grid initialized');
+                
+                // グラフの初期化
+                initializeCharts();
+                console.log('✅ Charts initialized');
+                
+                // フリーミアム版の制限を適用
+                applyFreemiumLimitations();
+                console.log('✅ Freemium limitations applied');
+                
+                // アイコンの初期化
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                    console.log('✅ Lucide icons initialized');
+                } else {
+                    console.warn('⚠️ Lucide library not loaded');
+                }
+                
+                console.log('🎉 [FREEMIUM] All features initialized successfully');
+            } catch (error) {
+                console.error('❌ [FREEMIUM] Initialization error:', error);
+            }
+        });
+        
+        function initializeSessionsGrid() {
+            const grid = document.getElementById('sessions-grid');
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+            mockSessionsData.forEach((session, index) => {
+                const sessionElement = document.createElement('div');
+                const isLatest = session.session === 12;
+                const isLocked = !isLatest; // 最新セッション以外はロック
+                
+                sessionElement.className = `aspect-square rounded-lg cursor-pointer transition-all flex flex-col items-center justify-center text-center relative ${
+                    isLocked ? 'opacity-50' : 'hover:scale-105 active:scale-95'
+                }`;
+                
+                // セッションの背景色
+                const bgColor = session.averageCentError < 20 ? 'rgba(34, 197, 94, 0.2)' :
+                               session.averageCentError < 30 ? 'rgba(96, 165, 250, 0.2)' :
+                               session.averageCentError < 40 ? 'rgba(251, 191, 36, 0.2)' :
+                               'rgba(239, 68, 68, 0.2)';
+                
+                sessionElement.style.background = bgColor;
+                sessionElement.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+                
+                // セッション番号
+                const sessionNumber = document.createElement('div');
+                sessionNumber.className = 'text-white font-bold text-sm';
+                sessionNumber.textContent = `S${session.session}`;
+                sessionElement.appendChild(sessionNumber);
+                
+                // 誤差表示
+                const errorDisplay = document.createElement('div');
+                errorDisplay.className = 'text-xs text-white-70';
+                errorDisplay.textContent = `±${session.averageCentError.toFixed(0)}¢`;
+                sessionElement.appendChild(errorDisplay);
+                
+                // ロックアイコン
+                if (isLocked) {
+                    const lockIcon = document.createElement('i');
+                    lockIcon.setAttribute('data-lucide', 'lock');
+                    lockIcon.className = 'absolute top-1 right-1';
+                    lockIcon.style.width = '12px';
+                    lockIcon.style.height = '12px';
+                    lockIcon.style.color = 'rgba(255, 255, 255, 0.5)';
+                    sessionElement.appendChild(lockIcon);
+                }
+                
+                // 最新バッジ
+                if (isLatest) {
+                    sessionElement.style.boxShadow = '0 0 0 2px rgba(255, 215, 0, 0.5)';
+                    const latestBadge = document.createElement('div');
+                    latestBadge.className = 'absolute -top-2 -right-2 bg-yellow-500 text-black text-xs px-1 rounded';
+                    latestBadge.textContent = '最新';
+                    latestBadge.style.fontSize = '0.6rem';
+                    sessionElement.appendChild(latestBadge);
+                }
+                
+                // クリックイベントハンドラー
+                sessionElement.addEventListener('click', () => {
+                    if (isLocked) {
+                        showPremiumAlert();
+                    } else {
+                        // 最新セッション（S12）の詳細分析エリアを表示
+                        showSessionDetails(session);
+                    }
+                });
+                
+                grid.appendChild(sessionElement);
+            });
+            
+            // アイコンの再初期化
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        function showPremiumAlert() {
+            // モーダル風アラートの作成
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.style.zIndex = '9999';
+            
+            const modalContent = document.createElement('div');
+            modalContent.className = 'bg-gray-800 rounded-xl p-6 max-w-md mx-4 border border-gray-600';
+            modalContent.style.background = 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1))';
+            modalContent.style.backdropFilter = 'blur(10px)';
+            modalContent.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+            
+            modalContent.innerHTML = `
+                <div class="text-center">
+                    <div class="mx-auto w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mb-4">
+                        <i data-lucide="lock" class="w-8 h-8 text-black"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">プレミアム版でアンロック</h3>
+                    <p class="text-gray-300 mb-6">
+                        過去のセッション詳細を確認するには<br>
+                        プレミアム版にアップグレードしてください
+                    </p>
+                    <div class="space-y-3">
+                        <button onclick="window.open('results-freemium-premium.html', '_blank')" 
+                                class="w-full btn" 
+                                style="background: linear-gradient(135deg, #ffd700, #ffb347); color: #333;">
+                            💎 プレミアム版を見る
+                        </button>
+                        <button onclick="this.closest('.fixed').remove()" 
+                                class="w-full btn btn-secondary">
+                            閉じる
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // アイコンの初期化
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            
+            // モーダル外クリックで閉じる
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+        
+        function showSessionDetails(session) {
+            // 最新セッション（S12）の詳細分析エリアを表示
+            const detailsSection = document.getElementById('detailed-analysis-section');
+            if (detailsSection) {
+                detailsSection.scrollIntoView({ behavior: 'smooth' });
+                
+                // 詳細分析エリアのハイライト効果
+                detailsSection.style.transition = 'all 0.3s ease';
+                detailsSection.style.transform = 'scale(1.02)';
+                detailsSection.style.boxShadow = '0 0 20px rgba(59, 130, 246, 0.3)';
+                
+                setTimeout(() => {
+                    detailsSection.style.transform = 'scale(1)';
+                    detailsSection.style.boxShadow = 'none';
+                }, 600);
+            }
+        }
+        
+        function initializeCharts() {
+            // 誤差推移グラフ
+            const errorTrendCtx = document.getElementById('error-trend-chart');
+            if (errorTrendCtx && typeof Chart !== 'undefined') {
+                new Chart(errorTrendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['7日前', '6日前', '5日前', '4日前', '3日前', '2日前', '今日'],
+                        datasets: [{
+                            label: '平均誤差 (セント)',
+                            data: [35, 32, 28, 30, 25, 22, 18],
+                            borderColor: '#60a5fa',
+                            backgroundColor: 'rgba(96, 165, 250, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                borderColor: '#60a5fa',
+                                borderWidth: 1
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: 'rgba(255, 255, 255, 0.7)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: 'rgba(255, 255, 255, 0.7)'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 評価分布グラフ
+            const accuracyCtx = document.getElementById('accuracy-chart');
+            if (accuracyCtx && typeof Chart !== 'undefined') {
+                new Chart(accuracyCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Perfect (±10¢)', 'Great (±20¢)', 'Good (±30¢)', 'Fair (±40¢)', 'Needs Work (>40¢)'],
+                        datasets: [{
+                            data: [2, 3, 4, 2, 1],
+                            backgroundColor: [
+                                'rgba(34, 197, 94, 0.8)',
+                                'rgba(96, 165, 250, 0.8)',
+                                'rgba(251, 191, 36, 0.8)',
+                                'rgba(249, 115, 22, 0.8)',
+                                'rgba(239, 68, 68, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgba(34, 197, 94, 1)',
+                                'rgba(96, 165, 250, 1)',
+                                'rgba(251, 191, 36, 1)',
+                                'rgba(249, 115, 22, 1)',
+                                'rgba(239, 68, 68, 1)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    color: 'rgba(255, 255, 255, 0.7)',
+                                    padding: 10,
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleColor: '#fff',
+                                bodyColor: '#fff'
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        function applyFreemiumLimitations() {
+            // 7日間制限の視覚的表示を強化
+            const chartContainers = document.querySelectorAll('[id*="chart"]');
+            chartContainers.forEach(container => {
+                if (container && !container.classList.contains('chart-container-limited')) {
+                    container.classList.add('chart-container-limited');
+                }
+            });
+            
+            // セッション制限の表示を強化
+            const sessionItems = document.querySelectorAll('.session-item');
+            sessionItems.forEach(item => {
+                // すべてのセッションにロック状態を適用（最新以外）
+                if (!item.classList.contains('active')) {
+                    item.classList.add('locked');
+                }
+            });
+            
+            // プレミアム制限メッセージの動的追加
+            addLimitationReminders();
+        }
+        
+        function addLimitationReminders() {
+            // グレード表示エリアに制限メッセージを追加
+            const gradeSection = document.querySelector('.grade-badge');
+            if (gradeSection && gradeSection.parentElement) {
+                const existingLimitation = gradeSection.parentElement.querySelector('.premium-limitation-note');
+                if (!existingLimitation) {
+                    const limitationNote = document.createElement('div');
+                    limitationNote.className = 'premium-limitation-note text-xs text-yellow-300 text-center mt-2';
+                    limitationNote.innerHTML = '💎 詳細グレード分析はプレミアム版で';
+                    gradeSection.parentElement.appendChild(limitationNote);
+                }
+            }
+            
+            // セッション数制限の明示
+            const sessionsHeaders = document.querySelectorAll('h3');
+            sessionsHeaders.forEach(header => {
+                if (header.textContent && header.textContent.includes('セッション別成績')) {
+                    header.style.opacity = '0.8';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
