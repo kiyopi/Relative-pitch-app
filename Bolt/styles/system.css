@@ -925,3 +925,346 @@ body {
     font-size: 0.875rem;
     opacity: 0.7;
 }
+
+/* ==========================================================================
+   Premium Analysis Page Styles
+   ========================================================================== */
+
+/* Premium Badge */
+.premium-badge {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #1f2937;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.premium-badge-container {
+    text-align: center;
+    margin: 1rem 0;
+}
+
+/* Tab Navigation */
+.tab-navigation {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.tab-button {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.tab-button.active {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(29, 78, 216, 0.2));
+    border-color: rgba(59, 130, 246, 0.5);
+    color: #ffffff;
+}
+
+.tab-content {
+    display: none;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Analysis Card */
+.analysis-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 100%;
+    margin: 0 auto;
+    margin-bottom: 2rem;
+}
+
+.card-title {
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+/* 12音分析グリッド */
+.tone-analysis-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    margin: 1rem 0;
+}
+
+.tone-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tone-card.weak {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.tone-card.strong {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+/* 練習推奨スタイル */
+.practice-recommendation {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(29, 78, 216, 0.1));
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+}
+
+.priority-high {
+    border-left: 4px solid #ef4444;
+    padding-left: 1rem;
+}
+
+.priority-medium {
+    border-left: 4px solid #f59e0b;
+    padding-left: 1rem;
+}
+
+.priority-low {
+    border-left: 4px solid #10b981;
+    padding-left: 1rem;
+}
+
+/* 成長予測 */
+.growth-projection {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.1));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+}
+
+/* エクスポート機能 */
+.export-section {
+    text-align: center;
+    padding: 2rem 0;
+    margin-top: 2rem;
+}
+
+.export-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.export-btn {
+    min-width: 120px;
+}
+
+/* ナビゲーション */
+.navigation-section {
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.navigation-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Debug Navigation Styles */
+.debug-nav {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    z-index: 1000;
+    min-width: 200px;
+}
+
+.debug-nav h4 {
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    text-align: center;
+}
+
+.nav-grid {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.nav-btn.current {
+    background: rgba(59, 130, 246, 0.3);
+    color: white;
+    border: 1px solid rgba(59, 130, 246, 0.5);
+}
+
+/* Page Header System Enhancement */
+.page-header {
+    text-align: center;
+    padding: 60px 0 40px;
+}
+
+.page-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.page-subtitle {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.5rem;
+}
+
+.page-description {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+/* Hero Section */
+.hero-section {
+    margin-bottom: 3rem;
+}
+
+.tab-section {
+    margin-bottom: 2rem;
+}
+
+/* Text color utilities for analysis content */
+.text-slate-300 { color: #cbd5e1; }
+.text-slate-400 { color: #94a3b8; }
+.text-amber-400 { color: #fbbf24; }
+.text-amber-500 { color: #f59e0b; }
+.text-emerald-400 { color: #10b981; }
+.text-red-400 { color: #f87171; }
+.text-blue-400 { color: #60a5fa; }
+
+/* Font weight utilities */
+.font-semibold { font-weight: 600; }
+
+/* Spacing utilities */
+.space-y-4 > * + * { margin-top: 1rem; }
+.space-y-1 > * + * { margin-top: 0.25rem; }
+.space-y-2 > * + * { margin-top: 0.5rem; }
+
+/* Background utilities */
+.bg-black { background-color: #000000; }
+.bg-opacity-30 { background-color: rgba(0, 0, 0, 0.3); }
+.bg-blue-500 { background-color: #3b82f6; }
+.bg-opacity-10 { background-color: rgba(59, 130, 246, 0.1); }
+.border { border-width: 1px; }
+.border-blue-500 { border-color: #3b82f6; }
+.border-opacity-20 { border-color: rgba(59, 130, 246, 0.2); }
+
+/* Layout utilities */
+.inline-flex { display: inline-flex; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.list-disc { list-style-type: disc; }
+
+/* ==========================================================================
+   Alert System (from bolt-new-design/styles.css)
+   ========================================================================== */
+.info-alert, .success-alert {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.info-alert {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.success-alert {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.info-alert p, .success-alert p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Responsive grid utilities */
+@media (min-width: 768px) {
+    .md\\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .md\\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
