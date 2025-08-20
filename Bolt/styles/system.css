@@ -165,6 +165,8 @@ body {
 .text-blue-300 { color: #93c5fd; }
 .text-yellow-300 { color: #fde047; }
 .text-red-300 { color: #fca5a5; }
+.text-gray-300 { color: #9ca3af; }
+.text-orange-300 { color: #fdba74; }
 
 /* 明るい文字色（ボタン用） */
 .text-yellow-200 { color: #fef08a; }
@@ -1287,6 +1289,124 @@ body {
   margin: 0;
   line-height: 1.5;
 }
+
+/* ==========================================================================
+   Grade Icons (S~E級総合評価アイコン)
+   ========================================================================== */
+.grade-s {
+  stroke: #fbbf24 !important;
+  fill: none !important;
+  background: transparent !important;
+}
+
+.grade-a {
+  stroke: #d1d5db !important;
+  fill: none !important;
+  background: transparent !important;
+}
+
+.grade-b {
+  stroke: #fdba74 !important;
+  fill: none !important;
+  background: transparent !important;
+}
+
+.grade-c {
+  stroke: #6ee7b7 !important;
+  fill: none !important;
+  background: transparent !important;
+}
+
+.grade-d {
+  stroke: #7dd3fc !important;
+  fill: none !important;
+  background: transparent !important;
+}
+
+.grade-e {
+  stroke: #fca5a5 !important;
+  fill: none !important;
+  background: transparent !important;
+}
+
+/* ==========================================================================
+   Rank Icon System (S-E Grade Circles)
+   ========================================================================== */
+.rank-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rank-circle {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rank-circle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+/* S-E Grade Rank Circle Classes */
+.rank-s {
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+}
+
+.rank-a {
+  background: linear-gradient(135deg, #9ca3af, #6b7280);
+}
+
+.rank-b {
+  background: linear-gradient(135deg, #fdba74, #ea580c);
+}
+
+.rank-c {
+  background: linear-gradient(135deg, #6ee7b7, #059669);
+}
+
+.rank-d {
+  background: linear-gradient(135deg, #7dd3fc, #0369a1);
+}
+
+.rank-e {
+  background: linear-gradient(135deg, #fca5a5, #dc2626);
+}
+
+/* Size variations */
+.rank-sm { width: 40px; height: 40px; }
+.rank-md { width: 60px; height: 60px; }
+.rank-lg { width: 80px; height: 80px; }
+
+/* Icon sizes for rank circles - standard 48px for all rank icons */
+.rank-circle.rank-md i[data-lucide] { width: 48px !important; height: 48px !important; }
+.rank-circle i[data-lucide] { width: 48px !important; height: 48px !important; }
+
+/* Additional selectors for Lucide icons in rank circles */
+.rank-circle i.lucide { width: 48px !important; height: 48px !important; }
+
+/* All rank circle icons default to 48px */
+.rank-circle[class*="rank-"] i { 
+  width: 48px !important; 
+  height: 48px !important; 
+}
+
+/* Rank circle icons inherit text-white class styling */
+.rank-circle i {
+  /* Icons use text-white class for proper Lucide styling */
+}
+
+/* Rank circle background classes for S-E grade evaluation */
+.rank-circle-s { background: linear-gradient(135deg, #fbbf24, #d97706); }
+.rank-circle-a { background: linear-gradient(135deg, #9ca3af, #6b7280); }
+.rank-circle-b { background: linear-gradient(135deg, #fdba74, #ea580c); }
+.rank-circle-c { background: linear-gradient(135deg, #6ee7b7, #059669); }
+.rank-circle-d { background: linear-gradient(135deg, #7dd3fc, #0369a1); }
+.rank-circle-e { background: linear-gradient(135deg, #fca5a5, #dc2626); }
 
 /* Responsive grid utilities */
 @media (min-width: 768px) {
