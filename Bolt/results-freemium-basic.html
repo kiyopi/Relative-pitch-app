@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>8va相対音感トレーニング - 総合評価（無料版）</title>
+    <title>8va相対音感トレーニング - 総合評価</title>
     <link rel="stylesheet" href="styles/system.css?v=4">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,7 +35,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
             -webkit-animation: gradientShift 15s ease infinite;
@@ -262,14 +262,14 @@
         
         /* フリーミアム制限表示 */
         .limitation-badge {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #fca5a5;
-            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            padding: 0.25rem 0.5rem;
             border-radius: 8px;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             text-align: center;
-            margin: 1rem 0;
+            margin: 0.5rem 0;
         }
         
         /* premium-cta スタイルは system.css に移動済み */
@@ -334,17 +334,14 @@
     <div class="min-h-screen p-6">
         <div class="container">
             <!-- Header -->
-            <div class="text-center mb-8">
+            <div class="text-center mb-8 relative">
                 <div class="flex justify-center mb-6">
                     <div class="page-header-icon page-header-icon-purple">
                         <i data-lucide="file-chart-column-increasing" class="icon-2xl text-white" data-stroke-width="2"></i>
                     </div>
                 </div>
-                <h1 class="text-4xl font-bold text-white mb-4">総合評価 - 無料版</h1>
+                <h1 class="text-4xl font-bold text-white mb-4">総合評価</h1>
                 <p class="text-green-200 text-xl mb-6">12セッション完了 - あなたの相対音感能力を分析</p>
-                <div class="limitation-badge" style="display: inline-block; margin-top: 1rem;">
-                    🔒 無料版：基本評価・7日間データのみ表示
-                </div>
             </div>
             <!-- SNSシェアセクション -->
             <div class="share-section" id="share-section">
@@ -419,9 +416,6 @@
                     </button>
                 </div>
                 
-                <div class="limitation-badge" style="margin-top: 1.5rem;">
-                    🔒 無料版：基本情報のみシェア可能
-                </div>
             </div>
         </div>
 
@@ -432,9 +426,6 @@
                 <div class="mb-8 md:mb-0">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-xl font-bold text-white">誤差推移</h3>
-                        <div class="limitation-badge text-xs px-2 py-1" style="margin: 0;">
-                            🔒 7日間のみ
-                        </div>
                     </div>
                     <div class="relative bg-white/5 rounded-lg p-0 md:p-4" id="error-trend-container" style="height: 280px;">
                         <canvas id="error-trend-chart"></canvas>
@@ -449,8 +440,9 @@
                 <div>
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-xl font-bold text-white">評価分布</h3>
-                        <div class="limitation-badge text-xs px-2 py-1" style="margin: 0;">
-                            🔒 基本表示のみ
+                        <div style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.75rem; color: rgba(255,255,255,0.6); padding: 0.25rem 0.5rem; background: rgba(255,255,255,0.1); border-radius: 6px;">
+                            <i data-lucide="lock" style="width: 12px; height: 12px;"></i>
+                            <span>基本表示</span>
                         </div>
                     </div>
                     <div class="bg-white/5 rounded-lg" style="height: 200px;">
@@ -468,8 +460,9 @@
         <div class="glass-card mb-8">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-bold text-white">セッション別成績</h3>
-                <div class="limitation-badge text-xs px-2 py-1" style="margin: 0;">
-                    🔒 最新のみ詳細表示
+                <div style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.75rem; color: rgba(255,255,255,0.6); padding: 0.25rem 0.5rem; background: rgba(255,255,255,0.1); border-radius: 6px;">
+                    <i data-lucide="lock" style="width: 12px; height: 12px;"></i>
+                    <span>最新のみ表示</span>
                 </div>
             </div>
             <p class="text-white-70 text-sm mb-4">
@@ -546,58 +539,83 @@
             <div class="mt-6 p-4 rounded-xl border-2 border-dashed border-yellow-400/30 bg-yellow-400/5">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-3">
-                        <i data-lucide="lock" class="icon text-yellow-300"></i>
+                        <i data-lucide="lock" style="width: 16px; height: 16px; color: rgba(255, 255, 255, 0.6);"></i>
                         <div>
                             <div class="text-white font-medium">他のセッションの詳細分析を見るには</div>
                             <div class="text-white-70 text-sm">全12セッションの詳細分析が可能</div>
                         </div>
                     </div>
                     <a href="results-premium-analysis.html" class="btn" style="background: linear-gradient(135deg, #ffd700, #ffb347); color: #333; text-decoration: none; padding: 0.5rem 1rem;">
-                        💎プレミアム版へ
+                        プレミアム版へ
                     </a>
                 </div>
             </div>
         </div>
 
-        <!-- Detailed Analysis Preview -->
+
+
+        <!-- 次のステップセクション -->
         <div class="glass-card mb-8">
-            <div class="text-center">
-                <div class="mx-auto w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mb-6">
-                    <i data-lucide="lock" class="w-8 h-8 text-purple-300"></i>
-                </div>
-                <h3 class="text-xl font-bold text-white mb-4">
-                    詳細分析＋トレーニング記録
-                </h3>
-                <div class="bg-white/5 rounded-lg p-4 mb-6 relative overflow-hidden">
-                    <!-- Blur overlay to simulate premium content -->
-                    <div class="filter blur-sm text-white-70">
-                        <p class="mb-3">
-                            あなたの F# 基音が他より18¢低い傾向にあります。<br>
-                            過去3ヶ月の記録から、週2回のF#基音練習で改善可能と分析。
-                        </p>
-                        <div class="text-sm space-y-2">
-                            <div>• 12音別詳細分析</div>
-                            <div>• AI練習プラン作成</div>
-                            <div>• 成長予測レポート</div>
-                            <div>• 全期間データアクセス</div>
-                        </div>
-                    </div>
-                    <!-- Lock overlay -->
-                    <div class="absolute inset-0 flex items-center justify-center bg-black/20">
-                        <div class="text-center">
-                            <i data-lucide="crown" class="w-8 h-8 text-yellow-400 mx-auto mb-2"></i>
-                            <div class="text-yellow-300 font-medium text-sm">プレミアム版でアンロック</div>
-                        </div>
-                    </div>
-                </div>
-                <p class="text-sm text-white-60 mb-6">
-                    12音別分析・具体的練習指導・全期間記録はプレミアム版でご利用いただけます
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-white mb-3">
+                    💡 次のステップ
+                </h2>
+                <p class="text-green-300 font-semibold text-lg">
+                    B級達成おめでとうございます！
                 </p>
-                <a href="results-premium-analysis.html" class="btn premium-cta inline-block">
-                    <i data-lucide="sparkles" class="w-4 h-4 mr-2"></i>
-                    詳細分析を見る（¥980/月）
-                </a>
+                <p class="text-white-70 mt-2">
+                    相対音感の基礎が身につきました。さらなる上達を目指しましょう！
+                </p>
             </div>
+            
+            <div class="next-steps-grid grid gap-8" style="grid-template-columns: repeat(1, 1fr);">
+                <style>
+                    @media (min-width: 768px) {
+                        .next-steps-grid {
+                            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+                        }
+                    }
+                </style>
+                <!-- 現在の成果 -->
+                <div class="glass-card">
+                    <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+                        <i data-lucide="check-circle" class="w-5 h-5 text-green-300 mr-3"></i>
+                        現在の成果
+                    </h3>
+                    <div class="space-y-2 text-left">
+                        <div class="text-white-70">• 各基音での相対音感能力向上</div>
+                        <div class="text-white-70">• 平均誤差±20.1セントを達成</div>
+                        <div class="text-white-70">• 相対音感練習習慣の確立</div>
+                    </div>
+                </div>
+                
+                <!-- 次の目標 -->
+                <div class="glass-card">
+                    <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+                        <i data-lucide="arrow-up-right" class="w-5 h-5 text-blue-300 mr-3"></i>
+                        次の目標
+                    </h3>
+                    <div class="space-y-2 text-left">
+                        <div class="text-white-70">• A級（±15¢以下）を目指す</div>
+                        <div class="text-white-70">• 週3回・15分の集中練習継続</div>
+                        <div class="text-white-70">• どんな基音でも安定した相対音感を目指す</div>
+                    </div>
+                </div>
+                
+                <!-- 効果的な練習スケジュール -->
+                <div class="glass-card">
+                    <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+                        <i data-lucide="clock" class="w-5 h-5 text-yellow-300 mr-3"></i>
+                        効果的な練習スケジュール
+                    </h3>
+                    <div class="space-y-2 text-left">
+                        <div class="text-white-70">• 週3回、1回15分の継続練習</div>
+                        <div class="text-white-70">• シャープ系基音での集中練習</div>
+                        <div class="text-white-70">• 集中力の高い午前中がおすすめ</div>
+                    </div>
+                </div>
+            </div>
+            
         </div>
 
         <!-- プレミアム機能比較 -->
@@ -648,7 +666,7 @@
                         <span style="color: white;">誤差推移・評価分布グラフ</span>
                     </div>
                     <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
-                        <span style="color: white; font-size: 0.875rem;">7日間のみ</span>
+                        <span style="color: white; font-size: 0.875rem;">基本表示</span>
                     </div>
                     <div style="padding: 1rem; text-align: center;">
                         <span style="color: white; font-size: 0.875rem;">全期間</span>
@@ -708,7 +726,7 @@
                         <span style="color: white;">トレーニング記録</span>
                     </div>
                     <div style="padding: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
-                        <span style="color: white; font-size: 0.875rem;">7日間のみ</span>
+                        <span style="color: white; font-size: 0.875rem;">基本記録</span>
                     </div>
                     <div style="padding: 1rem; text-align: center;">
                         <span style="color: white; font-size: 0.875rem;">全期間</span>
@@ -729,97 +747,23 @@
             </div>
         </div>
 
-        <!-- プレミアムCTA -->
-        <div style="text-align: center; margin: 2rem 0;">
-            <a href="results-premium-analysis.html" class="premium-cta" style="display: inline-block; padding: 1rem 2rem; background: linear-gradient(135deg, #ffd700, #ffb347); color: #333; font-weight: 600; text-decoration: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); transition: all 0.3s ease;">
-                <i data-lucide="crown" style="width: 20px; height: 20px; margin-right: 0.5rem;"></i>
-                詳細分析＋トレーニング記録を見る（¥980/月）
-            </a>
-        </div>
-
-        <!-- 次のステップセクション -->
-        <div class="glass-card mb-8">
-            <div class="text-center mb-6">
-                <div class="mx-auto w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mb-4">
-                    <i data-lucide="target" class="w-8 h-8 text-blue-300"></i>
-                </div>
-                <h3 class="text-xl font-bold text-white mb-2">
-                    💡 次のステップ
-                </h3>
-                <p class="text-green-300 font-medium">
-                    相対音感チャレンジでB級達成おめでとうございます！
-                </p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <!-- 現在の成果 -->
-                <div class="bg-white/5 rounded-lg p-4">
-                    <h4 class="text-white font-medium mb-3 flex items-center">
-                        <i data-lucide="check-circle" class="w-4 h-4 mr-2 text-green-300"></i>
-                        現在の成果
-                    </h4>
-                    <div class="text-sm text-white-70 space-y-1">
-                        <div>• 各基音での相対音感能力向上</div>
-                        <div>• 平均誤差±20.1セントを達成</div>
-                        <div>• 相対音感練習習慣の確立</div>
-                    </div>
-                </div>
-                
-                <!-- 次の目標 -->
-                <div class="bg-white/5 rounded-lg p-4">
-                    <h4 class="text-white font-medium mb-3 flex items-center">
-                        <i data-lucide="arrow-up-right" class="w-4 h-4 mr-2 text-blue-300"></i>
-                        次の目標
-                    </h4>
-                    <div class="text-sm text-white-70 space-y-1">
-                        <div>• A級（±15¢以下）を目指す</div>
-                        <div>• 週3回・15分の集中練習継続</div>
-                        <div>• どんな基音でも安定した相対音感を目指す</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 練習推奨 -->
-            <div class="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg p-4 mb-4">
-                <h4 class="text-white font-medium mb-2 flex items-center">
-                    <i data-lucide="clock" class="w-4 h-4 mr-2 text-yellow-300"></i>
-                    効果的な練習スケジュール
-                </h4>
-                <div class="text-sm text-white-70">
-                    <div class="mb-2">📅 <strong>頻度:</strong> 週3回、1回15分</div>
-                    <div class="mb-2">🎯 <strong>重点:</strong> 苦手な基音（シャープ系基音など）での相対音感練習</div>
-                    <div>⏰ <strong>時間帯:</strong> 集中力の高い午前中がおすすめ</div>
-                </div>
-            </div>
-            
-            <!-- プレミアム案内 -->
-            <div class="text-center p-3 bg-yellow-400/5 rounded-lg border border-yellow-400/20">
-                <p class="text-sm text-yellow-300 mb-2">
-                    🔍 より具体的な改善点と個別練習プランは
-                </p>
-                <a href="results-premium-analysis.html" class="text-yellow-400 font-medium hover:text-yellow-300 transition-colors">
-                    詳細分析レポート（プレミアム版）
+        <!-- フッターナビゲーション -->
+        <footer class="footer-navigation">
+            <div class="nav-buttons">
+                <a href="records.html" class="btn btn-secondary">
+                    <i data-lucide="bar-chart-3" class="icon-sm"></i>
+                    <span>記録を見る</span>
                 </a>
-                <span class="text-yellow-300"> でご確認いただけます</span>
+                <a href="index.html" class="btn btn-secondary">
+                    <i data-lucide="home" class="icon-sm"></i>
+                    <span>ホームに戻る</span>
+                </a>
+                <a href="training.html" class="btn btn-primary">
+                    <i data-lucide="refresh-cw"></i>
+                    再チャレンジ
+                </a>
             </div>
-        </div>
-
-        <!-- アクションボタン -->
-        <div class="glass-card mb-8" style="padding: 1.5rem; text-align: center;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <button style="background: rgba(59, 130, 246, 0.3); border: 1px solid rgba(59, 130, 246, 0.5); color: white; padding: 0.75rem; border-radius: 8px; cursor: pointer;">
-                    📊 記録を見る
-                </button>
-                <button style="background: rgba(16, 185, 129, 0.3); border: 1px solid rgba(16, 185, 129, 0.5); color: white; padding: 0.75rem; border-radius: 8px; cursor: pointer;">
-                    🏠 ホームに戻る
-                </button>
-            </div>
-            <button style="background: rgba(251, 191, 36, 0.3); border: 1px solid rgba(251, 191, 36, 0.5); color: white; padding: 0.75rem; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 1rem;">
-                🎵 再チャレンジ
-            </button>
-            </div>
-        </div>
-    </div>
+        </footer>
 
     <!-- Results.js is loaded but with freemium limitations -->
     <script>
@@ -906,15 +850,17 @@
                 errorDisplay.textContent = `±${session.averageCentError.toFixed(0)}¢`;
                 sessionElement.appendChild(errorDisplay);
                 
-                // ロックアイコン
+                // 制限されたセッションにはロックアイコンと薄い表示
                 if (isLocked) {
                     const lockIcon = document.createElement('i');
                     lockIcon.setAttribute('data-lucide', 'lock');
                     lockIcon.className = 'absolute top-1 right-1';
-                    lockIcon.style.width = '12px';
-                    lockIcon.style.height = '12px';
-                    lockIcon.style.color = 'rgba(255, 255, 255, 0.5)';
+                    lockIcon.style.width = '10px';
+                    lockIcon.style.height = '10px';
+                    lockIcon.style.color = 'rgba(255, 255, 255, 0.6)';
                     sessionElement.appendChild(lockIcon);
+                    sessionElement.style.opacity = '0.6';
+                    sessionElement.style.pointerEvents = 'none';
                 }
                 
                 // 最新バッジ
@@ -961,9 +907,9 @@
             modalContent.innerHTML = `
                 <div class="text-center">
                     <div class="mx-auto w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mb-4">
-                        <i data-lucide="lock" class="w-8 h-8 text-black"></i>
+                        <i data-lucide="star" style="width: 16px; height: 16px; color: rgba(0,0,0,0.7);"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-3">プレミアム版でアンロック</h3>
+                    <h3 class="text-lg font-medium text-white mb-3">詳細分析</h3>
                     <p class="text-gray-300 mb-6">
                         過去のセッション詳細を確認するには<br>
                         プレミアム版にアップグレードしてください
