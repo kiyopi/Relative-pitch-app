@@ -9,15 +9,75 @@
     <link rel="stylesheet" href="styles/system.css">
     
     <!-- アイコンライブラリ -->
-    <script src="assets/icons/lucide-icons.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
     <style>
+        /* UIカタログ背景アニメーション - system.cssの色を使用 */
+        body {
+            position: relative;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            -webkit-overflow-scrolling: touch;
+            background: #0f172a; /* フォールバック */
+        }
+        
+        /* 疑似要素で背景アニメーション */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            -webkit-animation: gradientShift 15s ease infinite;
+            z-index: -1;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            will-change: background-position;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @-webkit-keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* フローティングアニメーション */
+        .page-header-icon {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
         .catalog-section {
-            margin-bottom: 3rem;
+            margin: 3rem 0;
             padding: 2rem;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 1rem;
             border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* スムーススクロール */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* ページ内リンクのオフセット調整 */
+        .catalog-section {
+            scroll-margin-top: 2rem;
         }
         
         .component-grid {
@@ -64,6 +124,406 @@
             color: white;
             font-weight: bold;
         }
+        
+        /* === 新規追加：統一スタイルシステム === */
+        
+        /* セッション管理コンポーネント */
+        .session-box {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .session-box:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .session-box.selected {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.6), 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .session-number {
+            font-size: 0.875rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 0.25rem;
+        }
+        
+        .session-icon {
+            margin-bottom: 0.25rem;
+        }
+        
+        .session-error {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        /* 評価レベル別の背景色 */
+        .session-excellent {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(245, 158, 11, 0.2));
+            border-color: rgba(251, 191, 36, 0.4);
+        }
+        
+        .session-good {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(16, 185, 129, 0.2));
+            border-color: rgba(34, 197, 94, 0.4);
+        }
+        
+        .session-pass {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.2));
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+        
+        .session-practice {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.2));
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+        
+        /* 詳細分析の音階結果スタイル */
+        .note-result-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .note-result-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* プレミアム機能コンポーネント */
+        .premium-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ffd700, #ffb347);
+            color: #333;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+        
+        /* 分析・統計表示コンポーネント */
+        .rank-section {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .rank-mode {
+            margin-bottom: 24px;
+        }
+        
+        .mode-title {
+            font-size: 1.6rem !important;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+        }
+        
+        .rank-content-row {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+        }
+        
+        .rank-stats-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+        
+        .rank-stat-item {
+            text-align: center;
+            min-width: 80px;
+        }
+        
+        .stat-value-rank {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 4px;
+            transition: transform 0.2s ease;
+            line-height: 1;
+        }
+        
+        .stat-label-rank {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.1;
+            margin: 0;
+            white-space: nowrap;
+        }
+        
+        .rank-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .performance-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .performance-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .performance-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        /* パフォーマンスアイコン統一クラスシステム */
+        .performance-icon {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* サイズバリエーション */
+        .performance-icon-sm { width: 32px; height: 32px; border-radius: 8px; }
+        .performance-icon-md { width: 40px; height: 40px; border-radius: 10px; }
+        .performance-icon-lg { width: 48px; height: 48px; border-radius: 12px; }
+        .performance-icon-xl { width: 56px; height: 56px; border-radius: 14px; }
+        
+        /* カラーバリエーション */
+        .performance-icon-excellent {
+            background: rgba(252, 211, 77, 0.8);
+            border: 1px solid rgba(252, 211, 77, 0.5);
+        }
+        
+        .performance-icon-good {
+            background: rgba(34, 197, 94, 0.8);
+            border: 1px solid rgba(34, 197, 94, 0.5);
+        }
+        
+        .performance-icon-pass {
+            background: rgba(59, 130, 246, 0.8);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+        }
+        
+        .performance-icon-practice {
+            background: rgba(239, 68, 68, 0.8);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+        }
+        
+        .performance-icon-neutral {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .performance-icon-premium {
+            background: linear-gradient(135deg, rgba(252, 211, 77, 0.8), rgba(251, 146, 60, 0.8));
+            border: 1px solid rgba(252, 211, 77, 0.6);
+        }
+        
+        /* 旧クラスとの互換性 */
+        .best-session .performance-icon {
+            background: rgba(252, 211, 77, 0.8);
+            border: 1px solid rgba(252, 211, 77, 0.5);
+        }
+        
+        .worst-session .performance-icon {
+            background: rgba(239, 68, 68, 0.7);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+        }
+        
+        .consistency-item .performance-icon {
+            background: rgba(59, 130, 246, 0.7);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+        }
+        
+        .session-highlight {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .session-score {
+            color: #fbbf24;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+        
+        .best-session .session-score {
+            color: #fcd34d;
+        }
+        
+        .worst-session .session-score {
+            color: #ef4444;
+        }
+        
+        /* セクションヘッダー */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .section-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.875rem;
+            margin: 0;
+        }
+        
+        /* ナビゲーションシステム */
+        .footer-navigation {
+            margin-top: 3rem;
+            padding: 2rem 0;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        /* チャート・グラフエリア */
+        .chart-container {
+            margin-bottom: 2rem;
+        }
+        
+        /* ブレッドクラム */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+        
+        /* レスポンシブ対応 */
+        @media (max-width: 768px) {
+            .rank-content-row {
+                gap: 20px;
+            }
+            
+            .rank-stats-row {
+                gap: 20px;
+            }
+            
+            .rank-circle {
+                width: 90px;
+                height: 90px;
+            }
+            
+            .stat-value-rank {
+                font-size: 1.5rem;
+            }
+            
+            .performance-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .performance-icon {
+                align-self: center;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .session-box {
+                min-height: 60px;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .premium-badge {
+                top: 10px;
+                right: 10px;
+                padding: 0.375rem 0.75rem;
+                font-size: 0.75rem;
+            }
+            
+            .breadcrumb {
+                flex-wrap: wrap;
+                gap: 0.25rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -80,8 +540,48 @@
                 <p class="text-purple-200 text-xl">8va相対音感トレーニングアプリのデザインシステム</p>
             </header>
 
+            <!-- 目次 -->
+            <section class="catalog-section" id="table-of-contents">
+                <h2 class="text-2xl font-bold text-white mb-4">📚 目次</h2>
+                <p class="text-white-70 mb-6">UIカタログの各セクションに素早くアクセス</p>
+                
+                <div class="component-grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-3">🎯 基本コンポーネント</h3>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="#page-header-icons" class="text-blue-300 hover:text-blue-200 transition-colors">ページヘッダーアイコン</a></li>
+                            <li><a href="#evaluation-icons" class="text-blue-300 hover:text-blue-200 transition-colors">評価アイコンシステム</a></li>
+                            <li><a href="#icon-usage" class="text-blue-300 hover:text-blue-200 transition-colors">アイコン使用方法</a></li>
+                            <li><a href="#icon-sizes" class="text-blue-300 hover:text-blue-200 transition-colors">アイコンサイズ</a></li>
+                            <li><a href="#buttons" class="text-blue-300 hover:text-blue-200 transition-colors">ボタンとガラスエフェクト</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-3">🎨 デザインシステム</h3>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="#color-palette" class="text-blue-300 hover:text-blue-200 transition-colors">カラーパレット</a></li>
+                            <li><a href="#typography" class="text-blue-300 hover:text-blue-200 transition-colors">タイポグラフィ</a></li>
+                            <li><a href="#premium-freemium" class="text-blue-300 hover:text-blue-200 transition-colors">プレミアム機能システム</a></li>
+                            <li><a href="#interactive" class="text-blue-300 hover:text-blue-200 transition-colors">インタラクティブ要素</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-3">📊 専門コンポーネント</h3>
+                        <ul class="space-y-2 text-sm">
+                            <li><a href="#session-management" class="text-blue-300 hover:text-blue-200 transition-colors">セッション管理</a></li>
+                            <li><a href="#analytics" class="text-blue-300 hover:text-blue-200 transition-colors">分析・統計表示</a></li>
+                            <li><a href="#performance-icons" class="text-blue-300 hover:text-blue-200 transition-colors">パフォーマンスアイコン</a></li>
+                            <li><a href="#navigation" class="text-blue-300 hover:text-blue-200 transition-colors">ナビゲーション</a></li>
+                            <li><a href="#base-template" class="text-blue-300 hover:text-blue-200 transition-colors">ベーステンプレート</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
             <!-- 1. ページヘッダーアイコン -->
-            <section class="catalog-section">
+            <section class="catalog-section" id="page-header-icons">
                 <h2 class="text-2xl font-bold text-white mb-4">🎯 ページヘッダーアイコン</h2>
                 <p class="text-white-70 mb-6">各ページトップの統一されたヘッダーアイコン（96px × 96px）</p>
                 
@@ -128,7 +628,7 @@
             </section>
 
             <!-- 2. 評価アイコンシステム -->
-            <section class="catalog-section">
+            <section class="catalog-section" id="evaluation-icons">
                 <h2 class="text-2xl font-bold text-white mb-4">⭐ 評価アイコンシステム</h2>
                 <p class="text-white-70 mb-6">S級総合評価と音感精度4段階評価アイコン（stroke-width: 1.5）</p>
                 
@@ -196,7 +696,59 @@
             </section>
 
             <!-- 3. アイコンサイズ -->
-            <section class="catalog-section">
+            <section class="catalog-section" id="icon-usage">
+                <h2 class="text-2xl font-bold text-white mb-4">🎨 アイコン使用方法</h2>
+                <p class="text-white-70 mb-6">Lucideアイコンの正しい色指定とベストプラクティス</p>
+
+                <div class="component-grid">
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">✅ 正しいクラス指定</h3>
+                        <div class="flex items-center gap-4 mb-4">
+                            <i data-lucide="home" class="text-white" style="width: 24px; height: 24px;"></i>
+                            <i data-lucide="trophy" class="text-yellow-300" style="width: 24px; height: 24px;"></i>
+                            <i data-lucide="star" class="text-green-300" style="width: 24px; height: 24px;"></i>
+                            <i data-lucide="thumbs-up" class="text-blue-300" style="width: 24px; height: 24px;"></i>
+                            <i data-lucide="triangle-alert" class="text-red-300" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <div class="code-sample">&lt;!-- Tailwindクラスで色を統一指定 --&gt;
+&lt;i data-lucide="home" class="text-white"&gt;&lt;/i&gt;
+&lt;i data-lucide="trophy" class="text-yellow-300"&gt;&lt;/i&gt;
+&lt;i data-lucide="star" class="text-green-300"&gt;&lt;/i&gt;
+&lt;i data-lucide="thumbs-up" class="text-blue-300"&gt;&lt;/i&gt;
+&lt;i data-lucide="triangle-alert" class="text-red-300"&gt;&lt;/i&gt;</div>
+                    </div>
+
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">❌ 間違った指定方法</h3>
+                        <div class="code-sample">&lt;!-- colorプロパティは効果なし（Lucideは線画アイコン） --&gt;
+&lt;i data-lucide="home" style="color: white;"&gt;&lt;/i&gt;
+&lt;i data-lucide="trophy" style="color: #fcd34d;"&gt;&lt;/i&gt;
+
+&lt;!-- 冗長なstroke指定（クラスで統一推奨） --&gt;
+&lt;i data-lucide="home" style="stroke: white; fill: none;"&gt;&lt;/i&gt;</div>
+                    </div>
+
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">🎯 統一色クラス一覧</h3>
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <div class="text-white text-sm">text-white - 基本白</div>
+                            <div class="text-yellow-300 text-sm">text-yellow-300 - Excellent</div>
+                            <div class="text-green-300 text-sm">text-green-300 - Good</div>
+                            <div class="text-blue-300 text-sm">text-blue-300 - Pass</div>
+                            <div class="text-red-300 text-sm">text-red-300 - Practice</div>
+                            <div class="text-white-60 text-sm">text-white-60 - 60%透明度</div>
+                        </div>
+                        <div class="code-sample">&lt;!-- アイコン色指定のベストプラクティス --&gt;
+&lt;i data-lucide="crown" class="text-yellow-300"&gt;&lt;/i&gt;
+&lt;i data-lucide="home" class="text-white"&gt;&lt;/i&gt;
+&lt;i data-lucide="settings" class="text-white-60"&gt;&lt;/i&gt;</div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- アイコンサイズ -->
+            <section class="catalog-section" id="icon-sizes">
                 <h2 class="text-2xl font-bold text-white mb-4">📐 アイコンサイズ</h2>
                 <p class="text-white-70 mb-6">統一されたアイコンサイズシステム</p>
                 
@@ -252,7 +804,7 @@
             </section>
 
             <!-- 4. ボタンとガラスエフェクト -->
-            <section class="catalog-section">
+            <section class="catalog-section" id="buttons">
                 <h2 class="text-2xl font-bold text-white mb-4">🔘 ボタンとガラスエフェクト</h2>
                 <p class="text-white-70 mb-6">グラスモーフィズム効果を活用したボタンシステム</p>
                 
@@ -261,18 +813,18 @@
                         <h3 class="text-white font-medium mb-4">プライマリボタン</h3>
                         <div class="space-y-3">
                             <button class="btn btn-primary">
-                                <i data-lucide="play" class="icon-sm mr-2"></i>
+                                <i data-lucide="play"></i>
                                 トレーニング開始
                             </button>
                             <button class="btn btn-secondary">
-                                <i data-lucide="settings" class="icon-sm mr-2"></i>
+                                <i data-lucide="settings"></i>
                                 設定
                             </button>
                         </div>
                         
                         <div class="code-sample mt-4">
 &lt;button class="btn btn-primary"&gt;
-  &lt;i data-lucide="play" class="icon-sm mr-2"&gt;&lt;/i&gt;
+  &lt;i data-lucide="play"&gt;&lt;/i&gt;
   トレーニング開始
 &lt;/button&gt;</div>
                     </div>
@@ -381,56 +933,87 @@
                 </div>
             </section>
 
-            <!-- 7. グラデーションアイコン -->
-            <section class="catalog-section">
-                <h2 class="text-2xl font-bold text-white mb-4">🌈 グラデーションアイコン</h2>
-                <p class="text-white-70 mb-6">SVGグラデーション効果を適用したLucideアイコン</p>
+            <!-- 7. プレミアム機能・フリーミアム表示システム -->
+            <section class="catalog-section" id="premium-freemium">
+                <h2 class="text-2xl font-bold text-white mb-4">👑 プレミアム機能・フリーミアム表示システム</h2>
+                <p class="text-white-70 mb-6">プレミアム機能、制限表示、アップグレードCTAの統合UI要素</p>
                 
-                <div class="component-grid grid-cols-2 md:grid-cols-3">
-                    <div class="component-item text-center">
-                        <div class="mb-4" id="gold-crown-demo"></div>
-                        <h3 class="text-white font-medium">Gold Crown</h3>
-                        <p class="text-white-60 text-sm">S級専用ゴールドグラデーション</p>
+                <div class="component-grid grid-cols-1 md:grid-cols-2">
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">制限バッジ（控えめ）</h3>
+                        <div class="space-y-3">
+                            <div class="inline-flex items-center bg-orange-900/30 px-2 py-1 rounded text-xs border border-orange-800/50 gap-1" style="color: #fed7aa;">
+                                <i data-lucide="lock" class="icon-xs"></i>
+                                無料版：基本評価・7日間データのみ
+                            </div>
+                            <div class="inline-flex items-center bg-orange-900/30 px-2 py-1 rounded text-xs border border-orange-800/50 gap-1" style="color: #fed7aa;">
+                                <i data-lucide="lock" class="icon-xs"></i>
+                                詳細分析はプレミアム版
+                            </div>
+                        </div>
+                        
+                        <div class="code-sample mt-4">
+&lt;div class="inline-flex items-center bg-orange-900/30 px-2 py-1 rounded text-xs border border-orange-800/50 gap-1" style="color: #fed7aa;"&gt;
+  &lt;i data-lucide="lock" class="icon-xs"&gt;&lt;/i&gt;
+  無料版：基本評価・7日間データのみ
+&lt;/div&gt;</div>
                     </div>
                     
-                    <div class="component-item text-center">
-                        <div class="mb-4" id="royal-trophy-demo"></div>
-                        <h3 class="text-white font-medium">Royal Trophy</h3>
-                        <p class="text-white-60 text-sm">紫ロイヤルグラデーション</p>
-                    </div>
-                    
-                    <div class="component-item text-center">
-                        <div class="mb-4" id="success-star-demo"></div>
-                        <h3 class="text-white font-medium">Success Star</h3>
-                        <p class="text-white-60 text-sm">緑成功グラデーション</p>
-                    </div>
-                    
-                    <div class="component-item text-center">
-                        <div class="mb-4" id="warning-alert-demo"></div>
-                        <h3 class="text-white font-medium">Warning Alert</h3>
-                        <p class="text-white-60 text-sm">オレンジ警告グラデーション</p>
-                    </div>
-                    
-                    <div class="component-item text-center">
-                        <div class="mb-4" id="rainbow-palette-demo"></div>
-                        <h3 class="text-white font-medium">Rainbow Palette</h3>
-                        <p class="text-white-60 text-sm">レインボーグラデーション</p>
-                    </div>
-                    
-                    <div class="component-item text-center">
-                        <div class="mb-4" id="error-frown-demo"></div>
-                        <h3 class="text-white font-medium">Error Frown</h3>
-                        <p class="text-white-60 text-sm">赤エラーグラデーション</p>
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">プレミアムバッジ</h3>
+                        <div class="premium-badge" style="position: relative; top: 0; right: 0; width: max-content; margin: 0 auto;">
+                            <i data-lucide="crown"></i>
+                            プレミアム版
+                        </div>
+                        
+                        <div class="code-sample mt-4">
+&lt;div class="premium-badge"&gt;
+  &lt;i data-lucide="crown"&gt;&lt;/i&gt;
+  プレミアム版
+&lt;/div&gt;</div>
                     </div>
                 </div>
                 
-                <div class="code-sample">
-// JavaScript でグラデーションアイコンを生成
-const goldCrown = gradientIcon('crown', 'gold', 'icon-4xl', 64, 2);
-const royalTrophy = gradientIcon('trophy', 'royal', 'icon-4xl', 64, 2);
-
-// HTML に挿入
-document.getElementById('demo').innerHTML = goldCrown;</div>
+                <!-- プレミアムバッジ -->
+                <h3 class="text-xl font-medium text-white mb-4 mt-8">🏆 プレミアムバッジ</h3>
+                <div class="component-grid grid-cols-1 md:grid-cols-2">
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">右上固定バッジ</h4>
+                        <div class="relative bg-gray-800 rounded-lg p-8 mb-4" style="min-height: 120px;">
+                            <div class="premium-badge">
+                                <i data-lucide="crown" style="width: 16px; height: 16px;"></i>
+                                <span>PREMIUM</span>
+                            </div>
+                            <p class="text-white-60 text-center mt-8">ページコンテンツエリア</p>
+                        </div>
+                        
+                        <div class="code-sample">
+&lt;div class="premium-badge"&gt;
+  &lt;i data-lucide="crown"&gt;&lt;/i&gt;
+  &lt;span&gt;PREMIUM&lt;/span&gt;
+&lt;/div&gt;</div>
+                    </div>
+                    
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">バッジバリエーション</h4>
+                        <div class="space-y-3">
+                            <div class="badge-demo" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.875rem; background: linear-gradient(135deg, #ffd700, #ffb347); color: #333; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);">
+                                <i data-lucide="crown"></i>
+                                <span>PREMIUM</span>
+                            </div>
+                            
+                            <div class="badge-demo" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.875rem; background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
+                                <i data-lucide="star"></i>
+                                <span>PRO</span>
+                            </div>
+                            
+                            <div class="badge-demo" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.875rem; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);">
+                                <i data-lucide="zap"></i>
+                                <span>UNLIMITED</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <!-- 8. インタラクティブコンポーネント -->
@@ -457,19 +1040,19 @@ document.getElementById('demo').innerHTML = goldCrown;</div>
                         <div class="grid grid-cols-3 gap-2">
                             <button class="glass-card-sm p-3 text-center hover:bg-white/10 transition-colors">
                                 <div class="text-yellow-300 mb-1">
-                                    <i data-lucide="trophy" class="icon-sm"></i>
+                                    <i data-lucide="trophy" class="text-yellow-300"></i>
                                 </div>
                                 <div class="text-xs text-white">S1</div>
                             </button>
                             <button class="glass-card-sm p-3 text-center hover:bg-white/10 transition-colors">
                                 <div class="text-green-300 mb-1">
-                                    <i data-lucide="star" class="icon-sm"></i>
+                                    <i data-lucide="star"></i>
                                 </div>
                                 <div class="text-xs text-white">S2</div>
                             </button>
                             <button class="glass-card-sm p-3 text-center hover:bg-white/10 transition-colors">
                                 <div class="text-blue-300 mb-1">
-                                    <i data-lucide="thumbs-up" class="icon-sm"></i>
+                                    <i data-lucide="thumbs-up"></i>
                                 </div>
                                 <div class="text-xs text-white">S3</div>
                             </button>
@@ -478,14 +1061,742 @@ document.getElementById('demo').innerHTML = goldCrown;</div>
                 </div>
             </section>
 
+            <!-- 9. セッション管理コンポーネント -->
+            <section class="catalog-section">
+                <h2 class="text-2xl font-bold text-white mb-4">🎯 セッション管理コンポーネント</h2>
+                <p class="text-white-70 mb-6">12セッション表示と詳細分析用UI要素</p>
+                
+                <!-- セッションボックス -->
+                <h3 class="text-xl font-medium text-white mb-4">📦 セッションボックス</h3>
+                <div class="component-grid grid-cols-1 md:grid-cols-2">
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">評価レベル別セッションボックス</h4>
+                        <div class="grid grid-cols-4 gap-3 mb-4">
+                            <!-- Excellent -->
+                            <div class="session-box session-excellent">
+                                <div class="session-number">1</div>
+                                <div class="session-icon">
+                                    <i data-lucide="trophy" class="text-white" style="width: 16px; height: 16px;"></i>
+                                </div>
+                                <div class="session-error">±12.4¢</div>
+                            </div>
+                            
+                            <!-- Good -->
+                            <div class="session-box session-good">
+                                <div class="session-number">2</div>
+                                <div class="session-icon">
+                                    <i data-lucide="star" style="width: 16px; height: 16px; color: white;"></i>
+                                </div>
+                                <div class="session-error">±18.8¢</div>
+                            </div>
+                            
+                            <!-- Pass -->
+                            <div class="session-box session-pass">
+                                <div class="session-number">3</div>
+                                <div class="session-icon">
+                                    <i data-lucide="thumbs-up" style="width: 16px; height: 16px; color: white;"></i>
+                                </div>
+                                <div class="session-error">±28.9¢</div>
+                            </div>
+                            
+                            <!-- Practice -->
+                            <div class="session-box session-practice">
+                                <div class="session-number">4</div>
+                                <div class="session-icon">
+                                    <i data-lucide="alert-triangle" style="width: 16px; height: 16px; color: white;"></i>
+                                </div>
+                                <div class="session-error">±42.2¢</div>
+                            </div>
+                        </div>
+                        
+                        <div class="code-sample">
+&lt;div class="session-box session-excellent"&gt;
+  &lt;div class="session-number"&gt;1&lt;/div&gt;
+  &lt;div class="session-icon"&gt;
+    &lt;i data-lucide="trophy"&gt;&lt;/i&gt;
+  &lt;/div&gt;
+  &lt;div class="session-error"&gt;±12.4¢&lt;/div&gt;
+&lt;/div&gt;</div>
+                    </div>
+                    
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">12セッショングリッド</h4>
+                        <div class="grid grid-cols-12 gap-2">
+                            <div class="session-box session-excellent"><div class="text-xs text-white">1</div></div>
+                            <div class="session-box session-good"><div class="text-xs text-white">2</div></div>
+                            <div class="session-box session-pass"><div class="text-xs text-white">3</div></div>
+                            <div class="session-box session-practice"><div class="text-xs text-white">4</div></div>
+                            <div class="session-box session-excellent"><div class="text-xs text-white">5</div></div>
+                            <div class="session-box session-good"><div class="text-xs text-white">6</div></div>
+                            <div class="session-box session-pass"><div class="text-xs text-white">7</div></div>
+                            <div class="session-box session-practice"><div class="text-xs text-white">8</div></div>
+                            <div class="session-box session-excellent"><div class="text-xs text-white">9</div></div>
+                            <div class="session-box session-good"><div class="text-xs text-white">10</div></div>
+                            <div class="session-box session-pass"><div class="text-xs text-white">11</div></div>
+                            <div class="session-box session-practice"><div class="text-xs text-white">12</div></div>
+                        </div>
+                        
+                        <div class="code-sample mt-4">
+&lt;div class="grid grid-cols-12 gap-2"&gt;
+  &lt;div class="session-box session-excellent"&gt;1&lt;/div&gt;
+  &lt;div class="session-box session-good"&gt;2&lt;/div&gt;
+  &lt;!-- ... --&gt;
+&lt;/div&gt;</div>
+                    </div>
+                </div>
+                
+                <!-- セッション詳細分析 -->
+                <h3 class="text-xl font-medium text-white mb-4 mt-8">🔍 セッション詳細分析</h3>
+                <div class="component-grid grid-cols-1">
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">音程別結果表示</h4>
+                        <div class="space-y-2">
+                            <div class="note-result-item">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-4">
+                                        <div class="text-lg font-bold text-white">ド</div>
+                                        <div>
+                                            <div class="text-sm text-white-60">目標 262Hz</div>
+                                            <div class="text-sm text-white-60">実音 265Hz</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="font-bold text-xl text-red-300">+12¢</div>
+                                        <i data-lucide="star" class="text-green-300" style="width: 24px; height: 24px;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="note-result-item">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-4">
+                                        <div class="text-lg font-bold text-white">レ</div>
+                                        <div>
+                                            <div class="text-sm text-white-60">目標 294Hz</div>
+                                            <div class="text-sm text-white-60">実音 289Hz</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="font-bold text-xl text-blue-300">-18¢</div>
+                                        <i data-lucide="thumbs-up" class="text-blue-300" style="width: 24px; height: 24px;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="code-sample mt-4">
+&lt;div class="note-result-item"&gt;
+  &lt;div class="flex items-center justify-between"&gt;
+    &lt;div class="flex items-center gap-4"&gt;
+      &lt;div class="text-lg font-bold text-white"&gt;ド&lt;/div&gt;
+      &lt;div&gt;
+        &lt;div class="text-sm text-white-60"&gt;目標 262Hz&lt;/div&gt;
+        &lt;div class="text-sm text-white-60"&gt;実音 265Hz&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="flex items-center gap-3"&gt;
+      &lt;div class="font-bold text-xl text-red-300"&gt;+12¢&lt;/div&gt;
+      &lt;i data-lucide="star" class="text-green-300"&gt;&lt;/i&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 10. 分析・統計表示コンポーネント -->
+            <section class="catalog-section" id="analytics">
+                <h2 class="text-2xl font-bold text-white mb-4">📊 分析・統計表示コンポーネント</h2>
+                <p class="text-white-70 mb-6">相対音感データの分析と可視化UI要素</p>
+                
+                <!-- フリーミアム・プレミアム表示 -->
+                <h3 class="text-xl font-medium text-white mb-4">👑 プレミアム機能・フリーミアム表示システム</h3>
+                <div class="component-grid grid-cols-1 md:grid-cols-2">
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">バッジバリエーション</h4>
+                        <div class="space-y-3">
+                            <div class="bg-gradient-to-r from-amber-400 to-yellow-500 text-amber-900 px-3 py-1 rounded-full text-sm font-semibold flex items-center w-max">
+                                <i data-lucide="crown" class="icon-xs mr-1" style="stroke: currentColor; fill: none;"></i>
+                                プレミアム版
+                            </div>
+                            
+                            <div class="bg-blue-600/20 text-blue-300 px-3 py-1 rounded-full text-sm font-medium flex items-center w-max">
+                                <i data-lucide="zap" class="icon-xs mr-1" style="stroke: currentColor; fill: none;"></i>
+                                詳細分析はプレミアム版
+                            </div>
+                            
+                            <div class="bg-white/10 text-white-60 px-3 py-1 rounded-full text-sm font-medium flex items-center w-max">
+                                <i data-lucide="info" class="icon-xs mr-1" style="stroke: currentColor; fill: none;"></i>
+                                制限バッジ（控えめ）
+                            </div>
+                        </div>
+                        
+                        <div class="code-sample mt-4">
+&lt;div class="premium-badge"&gt;
+  &lt;i data-lucide="crown"&gt;&lt;/i&gt;
+  プレミアム版
+&lt;/div&gt;</div>
+                    </div>
+                    
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">機能比較表</h4>
+                        <div class="glass-card">
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between py-2 border-b border-white/10">
+                                    <span class="text-white-70">基本トレーニング</span>
+                                    <div class="flex gap-4">
+                                        <i data-lucide="check" class="text-green-300" style="width: 16px; height: 16px;"></i>
+                                        <i data-lucide="check" class="text-green-300" style="width: 16px; height: 16px;"></i>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between py-2 border-b border-white/10">
+                                    <span class="text-white-70">詳細分析</span>
+                                    <div class="flex gap-4">
+                                        <i data-lucide="x" class="text-red-300" style="width: 16px; height: 16px;"></i>
+                                        <i data-lucide="check" class="text-green-300" style="width: 16px; height: 16px;"></i>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between py-2">
+                                    <span class="text-white-70">長期データ保存</span>
+                                    <div class="flex gap-4">
+                                        <i data-lucide="x" class="text-red-300" style="width: 16px; height: 16px;"></i>
+                                        <i data-lucide="check" class="text-green-300" style="width: 16px; height: 16px;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- プレミアム限定要素 -->
+                <h3 class="text-xl font-medium text-white mb-4 mt-8">✨ プレミアム限定要素</h3>
+                <div class="component-grid grid-cols-1">
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">限定機能マーカー</h4>
+                        <div class="space-y-4">
+                            <!-- プレミアム限定セクション -->
+                            <div class="glass-card" style="position: relative; border: 1px solid rgba(255, 215, 0, 0.3);">
+                                <div style="position: absolute; top: -8px; right: 16px; background: linear-gradient(135deg, #ffd700, #ffb347); color: #333; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; z-index: 1; display: flex; align-items: center; gap: 4px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.2); width: max-content;">
+                                    <i data-lucide="crown" style="width: 12px; height: 12px;"></i>
+                                    <span>PREMIUM</span>
+                                </div>
+                                <h5 class="text-white font-medium mb-2">全96音程ヒートマップ分析</h5>
+                                <p class="text-white-70 text-sm">プレミアム版でのみ利用可能な詳細分析機能</p>
+                            </div>
+                            
+                            <!-- 無料版制限表示 -->
+                            <div class="glass-card" style="position: relative; opacity: 0.6; background: rgba(255, 255, 255, 0.03); margin-top: 1.5rem;">
+                                <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.7); border-radius: 1rem;">
+                                    <div class="text-center">
+                                        <i data-lucide="lock" class="text-yellow-300 mb-2" style="width: 32px; height: 32px; display: block; margin: 0 auto;"></i>
+                                        <p class="text-white font-medium">プレミアム限定機能</p>
+                                        <p class="text-white-70 text-sm">アップグレードして利用開始</p>
+                                    </div>
+                                </div>
+                                <div style="filter: blur(2px);">
+                                    <h5 class="text-white font-medium mb-2">長期進捗トラッキング</h5>
+                                    <p class="text-white-70 text-sm">6ヶ月間の詳細な相対音感向上データ</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="code-sample mt-4">
+&lt;!-- プレミアム限定セクション --&gt;
+&lt;div class="glass-card premium-only"&gt;
+  &lt;div class="premium-marker"&gt;
+    &lt;i data-lucide="crown"&gt;&lt;/i&gt;
+    PREMIUM
+  &lt;/div&gt;
+  &lt;h5&gt;全96音程ヒートマップ分析&lt;/h5&gt;
+&lt;/div&gt;
+
+&lt;!-- 無料版制限表示 --&gt;
+&lt;div class="glass-card locked-feature"&gt;
+  &lt;div class="lock-overlay"&gt;
+    &lt;i data-lucide="lock"&gt;&lt;/i&gt;
+    &lt;p&gt;プレミアム限定機能&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 11. 分析・統計表示コンポーネント -->
+            <section class="catalog-section" id="analytics">
+                <h2 class="text-2xl font-bold text-white mb-4">📊 分析・統計表示コンポーネント</h2>
+                <p class="text-white-70 mb-6">相対音感データの分析と可視化UI要素</p>
+                
+                <!-- 統計表示カード -->
+                <h3 class="text-xl font-medium text-white mb-4">📈 統計表示カード</h3>
+                <div class="component-grid grid-cols-1 md:grid-cols-2">
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">ランク表示セクション</h4>
+                        <div class="glass-card">
+                            <div class="rank-section" style="text-align: center; margin-bottom: 0; padding-bottom: 0; border-bottom: none;">
+                                <div class="rank-mode">
+                                    <h3 class="mode-title" style="font-size: 1.2rem; font-weight: 700; color: white; margin: 0;">連続チャレンジモード</h3>
+                                </div>
+                                
+                                <div class="rank-content-row" style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+                                    <div class="rank-icon">
+                                        <div class="rank-circle" style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #fbbf24, #d97706);">
+                                            <i data-lucide="crown" style="width: 36px; height: 36px; color: white;"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="rank-stats-row" style="display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap;">
+                                        <div class="rank-stat-item" style="text-align: center;">
+                                            <div class="stat-value-rank grade-value" style="font-size: 1.5rem; font-weight: 700; color: #ffffff; margin-bottom: 4px;">B</div>
+                                            <div class="stat-label-rank" style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7);">総合グレード</div>
+                                        </div>
+                                        <div class="rank-stat-item" style="text-align: center;">
+                                            <div class="stat-value-rank avg-error" style="font-size: 1.25rem; font-weight: 700; color: #fbbf24; margin-bottom: 4px;">±20.1¢</div>
+                                            <div class="stat-label-rank" style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7);">平均誤差</div>
+                                        </div>
+                                        <div class="rank-stat-item" style="text-align: center;">
+                                            <div class="stat-value-rank" style="font-size: 1.25rem; font-weight: 700; color: #ffffff; margin-bottom: 4px;">12</div>
+                                            <div class="stat-label-rank" style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.7);">セッション数</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="code-sample mt-4">
+&lt;div class="rank-section"&gt;
+  &lt;div class="rank-mode"&gt;
+    &lt;h3 class="mode-title"&gt;連続チャレンジモード&lt;/h3&gt;
+  &lt;/div&gt;
+  &lt;div class="rank-content-row"&gt;
+    &lt;div class="rank-icon"&gt;
+      &lt;div class="rank-circle"&gt;
+        &lt;i data-lucide="crown"&gt;&lt;/i&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="rank-stats-row"&gt;
+      &lt;div class="rank-stat-item"&gt;
+        &lt;div class="stat-value-rank grade-value"&gt;B&lt;/div&gt;
+        &lt;div class="stat-label-rank"&gt;総合グレード&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+                    </div>
+                    
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">パフォーマンス表示</h4>
+                        <div class="performance-grid" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div class="performance-item best-session" style="background: rgba(252, 211, 77, 0.1); border: 1px solid rgba(252, 211, 77, 0.3); border-radius: 12px; padding: 1rem; display: flex; align-items: flex-start; gap: 1rem;">
+                                <div class="performance-icon" style="flex-shrink: 0; width: 40px; height: 40px; background: rgba(252, 211, 77, 0.8); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <i data-lucide="trophy" class="text-white" style="width: 20px; height: 20px;"></i>
+                                </div>
+                                <div class="performance-content" style="flex: 1;">
+                                    <h4 style="color: white; font-size: 1rem; font-weight: 600; margin: 0 0 0.25rem 0;">最良セッション</h4>
+                                    <div class="session-highlight" style="background: rgba(252, 211, 77, 0.2); color: #fcd34d; font-weight: 600; font-size: 0.75rem; padding: 0.125rem 0.5rem; border-radius: 12px; display: inline-block; margin-bottom: 0.25rem;">セッション10（基音B）</div>
+                                    <div class="session-score" style="color: #fcd34d; font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem;">±12.4¢</div>
+                                    <p style="color: rgba(255, 255, 255, 0.8); font-size: 0.75rem; line-height: 1.3; margin: 0;">この基音での相対音程認識が最も安定</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="code-sample mt-4">
+&lt;div class="performance-grid"&gt;
+  &lt;div class="performance-item best-session"&gt;
+    &lt;div class="performance-icon"&gt;
+      &lt;i data-lucide="trophy"&gt;&lt;/i&gt;
+    &lt;/div&gt;
+    &lt;div class="performance-content"&gt;
+      &lt;h4&gt;最良セッション&lt;/h4&gt;
+      &lt;div class="session-highlight"&gt;セッション10（基音B）&lt;/div&gt;
+      &lt;div class="session-score"&gt;±12.4¢&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+                    </div>
+                </div>
+                
+                <!-- セクションヘッダー -->
+                <h3 class="text-xl font-medium text-white mb-4 mt-8">🎯 セクションヘッダー</h3>
+                <div class="component-grid grid-cols-1">
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">統一セクションヘッダー</h4>
+                        <div class="section-header" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                            <div class="section-icon" style="width: 40px; height: 40px; background: rgba(255, 255, 255, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="bar-chart-3" style="width: 20px; height: 20px; color: white;"></i>
+                            </div>
+                            <div>
+                                <h3 class="section-title" style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">セッション別パフォーマンス</h3>
+                                <p class="section-subtitle" style="color: rgba(255, 255, 255, 0.7); font-size: 0.875rem; margin: 0;">最良・最悪セッションの特定</p>
+                            </div>
+                        </div>
+                        
+                        <div class="code-sample">
+&lt;div class="section-header"&gt;
+  &lt;div class="section-icon"&gt;
+    &lt;i data-lucide="bar-chart-3"&gt;&lt;/i&gt;
+  &lt;/div&gt;
+  &lt;div&gt;
+    &lt;h3 class="section-title"&gt;セッション別パフォーマンス&lt;/h3&gt;
+    &lt;p class="section-subtitle"&gt;最良・最悪セッションの特定&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+                    </div>
+                </div>
+                
+                <!-- チャート・グラフエリア -->
+                <h3 class="text-xl font-medium text-white mb-4 mt-8">🎯 パフォーマンスアイコン統一システム</h3>
+                
+                <div class="component-grid">
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">サイズバリエーション</h4>
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="performance-icon performance-icon-sm performance-icon-excellent">
+                                <i data-lucide="trophy" class="text-white" style="width: 14px; height: 14px;"></i>
+                            </div>
+                            <div class="performance-icon performance-icon-md performance-icon-excellent">
+                                <i data-lucide="trophy" class="text-white" style="width: 18px; height: 18px;"></i>
+                            </div>
+                            <div class="performance-icon performance-icon-lg performance-icon-excellent">
+                                <i data-lucide="trophy" class="text-white" style="width: 20px; height: 20px;"></i>
+                            </div>
+                            <div class="performance-icon performance-icon-xl performance-icon-excellent">
+                                <i data-lucide="trophy" class="text-white" style="width: 24px; height: 24px;"></i>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2 text-center text-xs text-white-60">
+                            <span>32px (sm)</span>
+                            <span>40px (md)</span>
+                            <span>48px (lg)</span>
+                            <span>56px (xl)</span>
+                        </div>
+                    </div>
+
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">評価別カラーバリエーション</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="performance-icon performance-icon-md performance-icon-excellent">
+                                    <i data-lucide="trophy" class="text-white" style="width: 18px; height: 18px;"></i>
+                                </div>
+                                <div>
+                                    <div class="text-yellow-300 font-medium text-sm">Excellent</div>
+                                    <div class="text-white-60 text-xs">performance-icon-excellent</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-3">
+                                <div class="performance-icon performance-icon-md performance-icon-good">
+                                    <i data-lucide="star" class="text-white" style="width: 18px; height: 18px;"></i>
+                                </div>
+                                <div>
+                                    <div class="text-green-300 font-medium text-sm">Good</div>
+                                    <div class="text-white-60 text-xs">performance-icon-good</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-3">
+                                <div class="performance-icon performance-icon-md performance-icon-pass">
+                                    <i data-lucide="thumbs-up" class="text-white" style="width: 18px; height: 18px;"></i>
+                                </div>
+                                <div>
+                                    <div class="text-blue-300 font-medium text-sm">Pass</div>
+                                    <div class="text-white-60 text-xs">performance-icon-pass</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-3">
+                                <div class="performance-icon performance-icon-md performance-icon-practice">
+                                    <i data-lucide="triangle-alert" class="text-white" style="width: 18px; height: 18px;"></i>
+                                </div>
+                                <div>
+                                    <div class="text-red-300 font-medium text-sm">Practice</div>
+                                    <div class="text-white-60 text-xs">performance-icon-practice</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">特別バリエーション</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="performance-icon performance-icon-md performance-icon-neutral">
+                                    <i data-lucide="circle" class="text-white-60" style="width: 18px; height: 18px;"></i>
+                                </div>
+                                <div>
+                                    <div class="text-white-60 font-medium text-sm">Neutral</div>
+                                    <div class="text-white-60 text-xs">performance-icon-neutral</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-3">
+                                <div class="performance-icon performance-icon-md performance-icon-premium">
+                                    <i data-lucide="crown" class="text-white" style="width: 18px; height: 18px;"></i>
+                                </div>
+                                <div>
+                                    <div class="text-yellow-300 font-medium text-sm">Premium</div>
+                                    <div class="text-white-60 text-xs">performance-icon-premium</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">使用例：クラス指定のみで完成</h4>
+                        <div class="code-sample">&lt;!-- サイズ + カラーをクラス指定で統一 --&gt;
+&lt;div class="performance-icon performance-icon-md performance-icon-excellent"&gt;
+  &lt;i data-lucide="trophy" class="text-white"&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+&lt;!-- 他の評価レベル --&gt;
+&lt;div class="performance-icon performance-icon-lg performance-icon-good"&gt;
+  &lt;i data-lucide="star" class="text-white"&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+&lt;!-- プレミアム版（グラデーション背景） --&gt;
+&lt;div class="performance-icon performance-icon-xl performance-icon-premium"&gt;
+  &lt;i data-lucide="crown" class="text-white"&gt;&lt;/i&gt;
+&lt;/div&gt;</div>
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-medium text-white mb-4 mt-8">📊 チャート・グラフエリア</h3>
+                <div class="component-grid grid-cols-1 md:grid-cols-2">
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">チャートコンテナ</h4>
+                        <div class="chart-container" style="margin-bottom: 1.5rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.5rem; min-height: 200px; display: flex; align-items: center; justify-content: center;">
+                            <div class="text-center">
+                                <i data-lucide="bar-chart-3" class="text-white-60 mb-2" style="width: 40px; height: 40px; margin: 0 auto;"></i>
+                                <p class="text-white-60 text-sm">Chart.js チャートエリア</p>
+                                <p class="text-white-60 text-xs">相対音感ヒートマップ表示</p>
+                            </div>
+                        </div>
+                        
+                        <div class="code-sample">
+&lt;div class="chart-container"&gt;
+  &lt;canvas id="errorTrendChart"&gt;&lt;/canvas&gt;
+&lt;/div&gt;</div>
+                    </div>
+                    
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">ヒートマップ表示</h4>
+                        <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1rem;">
+                            <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px;">
+                                <div style="aspect-ratio: 1; background: #22c55e; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white;">+5</div>
+                                <div style="aspect-ratio: 1; background: #84cc16; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white;">+8</div>
+                                <div style="aspect-ratio: 1; background: #eab308; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white;">+15</div>
+                                <div style="aspect-ratio: 1; background: #f59e0b; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white;">+25</div>
+                                <div style="aspect-ratio: 1; background: #f97316; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white;">+35</div>
+                                <div style="aspect-ratio: 1; background: #ef4444; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white;">+45</div>
+                            </div>
+                            <div class="mt-2 text-center">
+                                <p class="text-white-60 text-xs">音程精度ヒートマップ（セント誤差）</p>
+                            </div>
+                        </div>
+                        
+                        <div class="code-sample mt-4">
+&lt;div class="heatmap-grid"&gt;
+  &lt;div class="heatmap-cell excellent"&gt;+5¢&lt;/div&gt;
+  &lt;div class="heatmap-cell good"&gt;+8¢&lt;/div&gt;
+  &lt;div class="heatmap-cell pass"&gt;+15¢&lt;/div&gt;
+&lt;/div&gt;</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 12. ナビゲーションシステム -->
+            <section class="catalog-section">
+                <h2 class="text-2xl font-bold text-white mb-4">🧭 ナビゲーションシステム</h2>
+                <p class="text-white-70 mb-6">アプリ内ナビゲーションとページ遷移UI要素</p>
+                
+                <!-- フッターナビゲーション -->
+                <h3 class="text-xl font-medium text-white mb-4">⬇️ フッターナビゲーション</h3>
+                <div class="component-grid grid-cols-1">
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">中央配置ボタングループ</h4>
+                        <div class="footer-navigation" style="margin-top: 2rem; padding: 2rem 0;">
+                            <div class="nav-buttons" style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                                <a href="#" class="btn btn-primary">
+                                    <i data-lucide="bar-chart-3"></i>
+                                    詳細分析を見る
+                                </a>
+                                <a href="#" class="btn btn-secondary">
+                                    <i data-lucide="home"></i>
+                                    ホームに戻る
+                                </a>
+                                <a href="#" class="btn btn-primary">
+                                    <i data-lucide="refresh-cw"></i>
+                                    再チャレンジ
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="code-sample">
+&lt;footer class="footer-navigation"&gt;
+  &lt;div class="nav-buttons"&gt;
+    &lt;a href="#" class="btn btn-primary"&gt;
+      &lt;i data-lucide="bar-chart-3"&gt;&lt;/i&gt;
+      詳細分析を見る
+    &lt;/a&gt;
+    &lt;a href="#" class="btn btn-secondary"&gt;
+      &lt;i data-lucide="home"&gt;&lt;/i&gt;
+      ホームに戻る
+    &lt;/a&gt;
+  &lt;/div&gt;
+&lt;/footer&gt;</div>
+                    </div>
+                </div>
+                
+                <!-- 前後ナビゲーション -->
+                <h3 class="text-xl font-medium text-white mb-4 mt-8">⬅️➡️ 前後ナビゲーション</h3>
+                <div class="component-grid grid-cols-1 md:grid-cols-2">
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">詳細分析ヘッダー</h4>
+                        <div class="section-header mb-6">
+                            <div class="flex items-center justify-between w-full">
+                                <button class="glass-card-sm hover:bg-white/10 transition-colors cursor-pointer flex-shrink-0" style="padding: 0.5rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                                        <path d="m15 18-6-6 6-6"/>
+                                    </svg>
+                                </button>
+                                <div class="text-center flex-1 px-2">
+                                    <h3 class="section-title" style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">詳細分析</h3>
+                                    <p class="section-subtitle" style="color: rgba(255, 255, 255, 0.7); font-size: 0.875rem; margin: 0;">セッション<span>1</span></p>
+                                </div>
+                                <button class="glass-card-sm hover:bg-white/10 transition-colors cursor-pointer flex-shrink-0" style="padding: 0.5rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                                        <path d="m9 18 6-6-6-6"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="code-sample">
+&lt;div class="section-header"&gt;
+  &lt;div class="flex items-center justify-between w-full"&gt;
+    &lt;button id="prev-session-btn" class="glass-card-sm"&gt;
+      &lt;svg&gt;&lt;path d="m15 18-6-6 6-6"/&gt;&lt;/svg&gt;
+    &lt;/button&gt;
+    &lt;div class="text-center flex-1 px-2"&gt;
+      &lt;h3 class="section-title"&gt;詳細分析&lt;/h3&gt;
+      &lt;p class="section-subtitle"&gt;セッション1&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;button id="next-session-btn" class="glass-card-sm"&gt;
+      &lt;svg&gt;&lt;path d="m9 18 6-6-6-6"/&gt;&lt;/svg&gt;
+    &lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+                    </div>
+                    
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">ページ内リンク</h4>
+                        <div class="space-y-3">
+                            <a href="#" class="block text-white hover:text-blue-300 transition-colors p-2 rounded-lg hover:bg-white/5">
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+                                    <span>総合評価ページへ</span>
+                                </div>
+                            </a>
+                            
+                            <a href="#" class="block text-white hover:text-green-300 transition-colors p-2 rounded-lg hover:bg-white/5">
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="external-link" style="width: 16px; height: 16px;"></i>
+                                    <span>詳細分析ページへ</span>
+                                </div>
+                            </a>
+                            
+                            <a href="#" class="block text-white hover:text-purple-300 transition-colors p-2 rounded-lg hover:bg-white/5">
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="repeat" style="width: 16px; height: 16px;"></i>
+                                    <span>再トレーニング</span>
+                                </div>
+                            </a>
+                        </div>
+                        
+                        <div class="code-sample mt-4">
+&lt;a href="#" class="nav-link"&gt;
+  &lt;div class="flex items-center gap-3"&gt;
+    &lt;i data-lucide="arrow-right"&gt;&lt;/i&gt;
+    &lt;span&gt;総合評価ページへ&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/a&gt;</div>
+                    </div>
+                </div>
+                
+                <!-- ブレッドクラム -->
+                <h3 class="text-xl font-medium text-white mb-4 mt-8">🍞 ブレッドクラム</h3>
+                <div class="component-grid grid-cols-1">
+                    <div class="component-item">
+                        <h4 class="text-white font-medium mb-4">ページ階層ナビゲーション</h4>
+                        <div class="breadcrumb" style="display: flex; align-items: center; gap: 0.5rem; padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; margin-bottom: 1rem;">
+                            <a href="#" class="text-blue-300 hover:text-blue-200 transition-colors text-sm">ホーム</a>
+                            <i data-lucide="chevron-right" class="text-white-60" style="width: 14px; height: 14px;"></i>
+                            <a href="#" class="text-blue-300 hover:text-blue-200 transition-colors text-sm">トレーニング</a>
+                            <i data-lucide="chevron-right" class="text-white-60" style="width: 14px; height: 14px;"></i>
+                            <span class="text-white-70 text-sm">総合評価</span>
+                        </div>
+                        
+                        <div class="code-sample">
+&lt;div class="breadcrumb"&gt;
+  &lt;a href="#"&gt;ホーム&lt;/a&gt;
+  &lt;i data-lucide="chevron-right"&gt;&lt;/i&gt;
+  &lt;a href="#"&gt;トレーニング&lt;/a&gt;
+  &lt;i data-lucide="chevron-right"&gt;&lt;/i&gt;
+  &lt;span&gt;総合評価&lt;/span&gt;
+&lt;/div&gt;</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ベーステンプレート使用説明 -->
+            <section class="catalog-section" id="base-template">
+                <h2 class="text-2xl font-bold text-white mb-4">🏗️ ベーステンプレート</h2>
+                <p class="text-white-70 mb-6">全ページで使用する統一ベーステンプレート</p>
+                
+                <div class="component-grid">
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">📄 base-template.html</h3>
+                        <div class="mb-4 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+                            <div class="text-blue-300 font-medium mb-2">✨ 統一ベーステンプレート</div>
+                            <p class="text-white-70 text-sm mb-3">全ページの基盤となるHTMLテンプレート。ヘッダー、フッター、アニメーション、Lucideアイコン初期化を含む。</p>
+                            <div class="text-white-60 text-xs">
+                                📍 パス: <code class="text-blue-300">Bolt/base-template.html</code>
+                            </div>
+                        </div>
+                        
+                        <h4 class="text-white font-medium mb-2">含まれる機能</h4>
+                        <ul class="text-white-70 text-sm space-y-2 mb-4">
+                            <li>• 統一グラデーション背景アニメーション</li>
+                            <li>• レスポンシブメタタグ（PWA対応）</li>
+                            <li>• Lucideアイコン自動初期化</li>
+                            <li>• system.css統一スタイル</li>
+                            <li>• フッターナビゲーション</li>
+                            <li>• デバッグナビゲーション</li>
+                        </ul>
+                        
+                        <div class="code-sample">&lt;!-- 新しいページ作成時はこのテンプレートをコピー --&gt;
+&lt;!-- 1. base-template.htmlをコピー --&gt;
+&lt;!-- 2. タイトルとmainコンテンツエリアを編集 --&gt;
+&lt;!-- 3. 必要に応じてページ固有のスタイルを追加 --&gt;
+
+&lt;main class="main-content"&gt;
+    &lt;!-- ここに各ページ固有のコンテンツが入る --&gt;
+&lt;/main&gt;</div>
+                    </div>
+                </div>
+            </section>
+
             <!-- フッター -->
             <footer class="text-center mt-12 pt-8 border-t border-white/10">
                 <p class="text-white-60">8va相対音感トレーニングアプリ UIカタログ</p>
-                <p class="text-white-60 text-sm mt-2">デザインシステム v1.1.0</p>
+                <p class="text-white-60 text-sm mt-2">デザインシステム v2.0.0 - 統一UIコンポーネント完全版</p>
+                <div class="mt-4 text-center">
+                    <p class="text-white-60 text-xs">🎯 セッション管理 | 👑 プレミアム機能 | 📊 分析・統計 | 🧭 ナビゲーション</p>
+                </div>
                 
                 <div class="flex justify-center mt-4 space-x-4">
-                    <button onclick="window.location.href='index.html'" class="btn btn-secondary">
-                        <i data-lucide="home" class="icon-sm mr-2"></i>
+                    <button onclick="window.location.href='index.html'" class="btn btn-primary">
+                        <i data-lucide="home"></i>
                         ホームに戻る
                     </button>
                 </div>
@@ -498,38 +1809,17 @@ document.getElementById('demo').innerHTML = goldCrown;</div>
         // Lucideアイコンの初期化
         document.addEventListener('DOMContentLoaded', function() {
             console.log('📄 [UI-CATALOG] DOM Content Loaded - starting icon initialization');
-            if (typeof initializeLucideIcons === 'function') {
-                initializeLucideIcons();
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+                console.log('✅ [UI-CATALOG] Lucide icons initialized successfully');
             } else {
-                console.error('❌ [UI-CATALOG] initializeLucideIcons function not found');
+                console.error('❌ [UI-CATALOG] Lucide library not loaded');
             }
             
-            // グラデーションアイコンのデモ生成
+            // コンポーネントの初期化
             setTimeout(() => {
-                if (typeof gradientIcon === 'function') {
-                    document.getElementById('gold-crown-demo').innerHTML = 
-                        gradientIcon('crown', 'gold', 'icon-4xl', 64, 1.5);
-                    
-                    document.getElementById('royal-trophy-demo').innerHTML = 
-                        gradientIcon('trophy', 'royal', 'icon-4xl', 64, 1.5);
-                    
-                    document.getElementById('success-star-demo').innerHTML = 
-                        gradientIcon('star', 'success', 'icon-4xl', 64, 1.5);
-                    
-                    document.getElementById('warning-alert-demo').innerHTML = 
-                        gradientIcon('triangle-alert', 'warning', 'icon-4xl', 64, 1.5);
-                    
-                    document.getElementById('rainbow-palette-demo').innerHTML = 
-                        gradientIcon('palette', 'rainbow', 'icon-4xl', 64, 1.5);
-                    
-                    document.getElementById('error-frown-demo').innerHTML = 
-                        gradientIcon('frown', 'error', 'icon-4xl', 64, 1.5);
-                    
-                    console.log('✨ [UI-CATALOG] Gradient icon demos generated');
-                } else {
-                    console.warn('❌ [UI-CATALOG] gradientIcon function not available');
-                }
-            }, 1500);
+                console.log('✨ [UI-CATALOG] Components initialized');
+            }, 500);
         });
     </script>
 </body>

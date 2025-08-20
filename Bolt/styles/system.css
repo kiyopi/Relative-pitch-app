@@ -251,6 +251,15 @@ body {
   cursor: pointer;
   border: none;
   font-size: 1rem;
+  gap: 0.5rem; /* アイコンとテキストの間隔を統一 */
+}
+
+/* ボタン内のアイコンスタイル */
+.btn i[data-lucide],
+.btn svg {
+  width: 1rem !important;   /* 16px 固定 */
+  height: 1rem !important;  /* 16px 固定 */
+  flex-shrink: 0;           /* アイコンが縮まないように */
 }
 
 .btn-primary {
@@ -718,6 +727,22 @@ body {
 .feature-highlight:hover {
     background: rgba(251, 191, 36, 0.15);
     border-color: rgba(251, 191, 36, 0.3);
+}
+
+/* ==========================================================================
+   Footer Navigation System
+   ========================================================================== */
+/* フッターナビゲーション中央配置 */
+.footer-navigation {
+    margin-top: 3rem;
+    padding: 2rem 0;
+}
+
+.nav-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
 /* Premium CTA Button */
