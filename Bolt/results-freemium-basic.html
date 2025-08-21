@@ -328,6 +328,77 @@
             color: #94a3b8;
             opacity: 0.8;
         }
+        
+        /* Session Grid Styles */
+        .session-grid-item {
+            aspect-ratio: 1;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .session-active {
+            opacity: 1;
+        }
+        
+        .session-active:hover {
+            transform: scale(1.05);
+        }
+        
+        .session-active:active {
+            transform: scale(0.95);
+        }
+        
+        
+        .session-excellent {
+            background: rgba(251, 191, 36, 0.2);  /* 黄色 - Trophy */
+        }
+        
+        .session-good {
+            background: rgba(34, 197, 94, 0.2);   /* 緑色 - Star */
+        }
+        
+        .session-pass {
+            background: rgba(96, 165, 250, 0.2);  /* 青色 - Thumbs-up */
+        }
+        
+        .session-practice {
+            background: rgba(239, 68, 68, 0.2);   /* 赤色 - Triangle-alert */
+        }
+        
+        .session-number {
+            color: white;
+            font-weight: bold;
+            font-size: 0.875rem;
+        }
+        
+        .session-evaluation-icon {
+            width: 24px;
+            height: 24px;
+            margin-top: 0.25rem;
+        }
+        
+        .session-selected {
+            filter: brightness(1.8);
+        }
+        
+        /* ホバー時のエフェクト */
+        .session-grid-item {
+            transition: all 0.2s ease;
+        }
+        
+        .session-active:not(.session-selected):hover {
+            transform: scale(1.05);
+            filter: brightness(1.15);
+        }
+        
     </style>
 </head>
 <body>
@@ -456,98 +527,628 @@
             </div>
         </div>
 
-        <!-- Sessions Overview -->
         <div class="glass-card mb-8">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-white">セッション別成績</h3>
-                <div style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.75rem; color: rgba(255,255,255,0.6); padding: 0.25rem 0.5rem; background: rgba(255,255,255,0.1); border-radius: 6px;">
-                    <i data-lucide="lock" style="width: 12px; height: 12px;"></i>
-                    <span>最新のみ表示</span>
-                </div>
+                <h3 class="text-2xl font-bold text-white mb-6">セッション別成績</h3>
+                <p class="text-white-70 text-sm mb-4">
+                    <span class="lg:hidden">セッションをタップして詳細分析を表示</span>
+                    <span class="hidden lg:inline">セッションをクリックして詳細分析を表示</span>
+                </p>
+                <div class="grid grid-cols-12 gap-3" id="sessions-grid"><div class="aspect-square rounded-lg cursor-pointer transition-all hover-scale active:scale-95 flex flex-col items-center justify-center text-center relative scale-105" style="box-shadow: rgba(255, 255, 255, 0.6) 0px 0px 0px 2px, rgba(0, 0, 0, 0.1) 0px 4px 6px; position: relative;">
+                    <div class="absolute inset-0 rounded-lg" style="
+                        opacity: 1;
+                        background: linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(29, 78, 216, 0.8));
+                        backdrop-filter: blur(8px);
+                        -webkit-backdrop-filter: blur(8px);
+                        -moz-backdrop-filter: blur(8px);
+                        border: 1px solid rgba(255, 255, 255, 0.4);
+                        border-radius: 12px;
+                        will-change: transform, opacity;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        -webkit-perspective: 1000px;
+                        perspective: 1000px;
+                    "></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full" style="
+                        opacity: 1;
+                        will-change: transform;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        pointer-events: none;
+                    ">
+                        <div class="text-blue-200 font-bold text-sm mb-1" style="
+                            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+                            filter: brightness(1.2);
+                            -webkit-font-smoothing: antialiased;
+                            -moz-osx-font-smoothing: grayscale;
+                        ">1</div>
+                        <div class="mb-1" style="
+                            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)) brightness(1.2);
+                            -webkit-backface-visibility: hidden;
+                            backface-visibility: hidden;
+                        "><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="thumbs-up" class="lucide lucide-thumbs-up text-blue-200" style="width: 24px; height: 24px;"><path d="M7 10v12"></path><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"></path></svg></div>
+                    </div>
+                </div><div class="aspect-square rounded-lg cursor-pointer transition-all hover-scale active:scale-95 flex flex-col items-center justify-center text-center relative " style="box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px; position: relative; transform: scale(1);">
+                    <div class="absolute inset-0 rounded-lg" style="opacity: 0.7; background: linear-gradient(135deg, rgba(59, 130, 246, 0.45), rgba(29, 78, 216, 0.65)); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 12px; will-change: transform, opacity; transform: translateZ(0px); backface-visibility: hidden; perspective: 1000px;"></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full" style="
+                        opacity: 1;
+                        will-change: transform;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        pointer-events: none;
+                    ">
+                        <div class="text-blue-200 font-bold text-sm mb-1" style="
+                            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+                            filter: brightness(1.2);
+                            -webkit-font-smoothing: antialiased;
+                            -moz-osx-font-smoothing: grayscale;
+                        ">2</div>
+                        <div class="mb-1" style="
+                            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)) brightness(1.2);
+                            -webkit-backface-visibility: hidden;
+                            backface-visibility: hidden;
+                        "><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="thumbs-up" class="lucide lucide-thumbs-up text-blue-200" style="width: 24px; height: 24px;"><path d="M7 10v12"></path><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"></path></svg></div>
+                    </div>
+                </div><div class="aspect-square rounded-lg cursor-pointer transition-all hover-scale active:scale-95 flex flex-col items-center justify-center text-center relative " style="box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px; position: relative;">
+                    <div class="absolute inset-0 rounded-lg" style="
+                        opacity: 0.7;
+                        background: linear-gradient(135deg, rgba(74, 222, 128, 0.45), rgba(34, 197, 94, 0.65));
+                        backdrop-filter: blur(8px);
+                        -webkit-backdrop-filter: blur(8px);
+                        -moz-backdrop-filter: blur(8px);
+                        border: 1px solid rgba(255, 255, 255, 0.3);
+                        border-radius: 12px;
+                        will-change: transform, opacity;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        -webkit-perspective: 1000px;
+                        perspective: 1000px;
+                    "></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full" style="
+                        opacity: 1;
+                        will-change: transform;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        pointer-events: none;
+                    ">
+                        <div class="text-green-200 font-bold text-sm mb-1" style="
+                            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+                            filter: brightness(1.2);
+                            -webkit-font-smoothing: antialiased;
+                            -moz-osx-font-smoothing: grayscale;
+                        ">3</div>
+                        <div class="mb-1" style="
+                            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)) brightness(1.2);
+                            -webkit-backface-visibility: hidden;
+                            backface-visibility: hidden;
+                        "><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" class="lucide lucide-star text-green-200" style="width: 24px; height: 24px;"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg></div>
+                    </div>
+                </div><div class="aspect-square rounded-lg cursor-pointer transition-all hover-scale active:scale-95 flex flex-col items-center justify-center text-center relative " style="box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px; position: relative;">
+                    <div class="absolute inset-0 rounded-lg" style="
+                        opacity: 0.7;
+                        background: linear-gradient(135deg, rgba(74, 222, 128, 0.45), rgba(34, 197, 94, 0.65));
+                        backdrop-filter: blur(8px);
+                        -webkit-backdrop-filter: blur(8px);
+                        -moz-backdrop-filter: blur(8px);
+                        border: 1px solid rgba(255, 255, 255, 0.3);
+                        border-radius: 12px;
+                        will-change: transform, opacity;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        -webkit-perspective: 1000px;
+                        perspective: 1000px;
+                    "></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full" style="
+                        opacity: 1;
+                        will-change: transform;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        pointer-events: none;
+                    ">
+                        <div class="text-green-200 font-bold text-sm mb-1" style="
+                            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+                            filter: brightness(1.2);
+                            -webkit-font-smoothing: antialiased;
+                            -moz-osx-font-smoothing: grayscale;
+                        ">4</div>
+                        <div class="mb-1" style="
+                            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)) brightness(1.2);
+                            -webkit-backface-visibility: hidden;
+                            backface-visibility: hidden;
+                        "><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" class="lucide lucide-star text-green-200" style="width: 24px; height: 24px;"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg></div>
+                    </div>
+                </div><div class="aspect-square rounded-lg cursor-pointer transition-all hover-scale active:scale-95 flex flex-col items-center justify-center text-center relative " style="box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px; position: relative; transform: scale(1);">
+                    <div class="absolute inset-0 rounded-lg" style="opacity: 0.7; background: linear-gradient(135deg, rgba(239, 68, 68, 0.45), rgba(220, 38, 38, 0.65)); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 12px; will-change: transform, opacity; transform: translateZ(0px); backface-visibility: hidden; perspective: 1000px;"></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full" style="
+                        opacity: 1;
+                        will-change: transform;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        pointer-events: none;
+                    ">
+                        <div class="text-red-200 font-bold text-sm mb-1" style="
+                            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+                            filter: brightness(1.2);
+                            -webkit-font-smoothing: antialiased;
+                            -moz-osx-font-smoothing: grayscale;
+                        ">5</div>
+                        <div class="mb-1" style="
+                            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)) brightness(1.2);
+                            -webkit-backface-visibility: hidden;
+                            backface-visibility: hidden;
+                        "><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="triangle-alert" class="lucide lucide-triangle-alert text-red-200" style="width: 24px; height: 24px;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg></div>
+                    </div>
+                </div><div class="aspect-square rounded-lg cursor-pointer transition-all hover-scale active:scale-95 flex flex-col items-center justify-center text-center relative " style="box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px; position: relative;">
+                    <div class="absolute inset-0 rounded-lg" style="
+                        opacity: 0.7;
+                        background: linear-gradient(135deg, rgba(59, 130, 246, 0.45), rgba(29, 78, 216, 0.65));
+                        backdrop-filter: blur(8px);
+                        -webkit-backdrop-filter: blur(8px);
+                        -moz-backdrop-filter: blur(8px);
+                        border: 1px solid rgba(255, 255, 255, 0.3);
+                        border-radius: 12px;
+                        will-change: transform, opacity;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        -webkit-perspective: 1000px;
+                        perspective: 1000px;
+                    "></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full" style="
+                        opacity: 1;
+                        will-change: transform;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        pointer-events: none;
+                    ">
+                        <div class="text-blue-200 font-bold text-sm mb-1" style="
+                            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+                            filter: brightness(1.2);
+                            -webkit-font-smoothing: antialiased;
+                            -moz-osx-font-smoothing: grayscale;
+                        ">6</div>
+                        <div class="mb-1" style="
+                            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)) brightness(1.2);
+                            -webkit-backface-visibility: hidden;
+                            backface-visibility: hidden;
+                        "><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="thumbs-up" class="lucide lucide-thumbs-up text-blue-200" style="width: 24px; height: 24px;"><path d="M7 10v12"></path><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"></path></svg></div>
+                    </div>
+                </div><div class="aspect-square rounded-lg cursor-pointer transition-all hover-scale active:scale-95 flex flex-col items-center justify-center text-center relative " style="box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px; position: relative;">
+                    <div class="absolute inset-0 rounded-lg" style="
+                        opacity: 0.7;
+                        background: linear-gradient(135deg, rgba(74, 222, 128, 0.45), rgba(34, 197, 94, 0.65));
+                        backdrop-filter: blur(8px);
+                        -webkit-backdrop-filter: blur(8px);
+                        -moz-backdrop-filter: blur(8px);
+                        border: 1px solid rgba(255, 255, 255, 0.3);
+                        border-radius: 12px;
+                        will-change: transform, opacity;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        -webkit-perspective: 1000px;
+                        perspective: 1000px;
+                    "></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full" style="
+                        opacity: 1;
+                        will-change: transform;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        pointer-events: none;
+                    ">
+                        <div class="text-green-200 font-bold text-sm mb-1" style="
+                            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+                            filter: brightness(1.2);
+                            -webkit-font-smoothing: antialiased;
+                            -moz-osx-font-smoothing: grayscale;
+                        ">7</div>
+                        <div class="mb-1" style="
+                            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)) brightness(1.2);
+                            -webkit-backface-visibility: hidden;
+                            backface-visibility: hidden;
+                        "><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" class="lucide lucide-star text-green-200" style="width: 24px; height: 24px;"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a .53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg></div>
+                    </div>
+                </div><div class="aspect-square rounded-lg cursor-pointer transition-all hover-scale active:scale-95 flex flex-col items-center justify-center text-center relative " style="box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px; position: relative;">
+                    <div class="absolute inset-0 rounded-lg" style="
+                        opacity: 0.7;
+                        background: linear-gradient(135deg, rgba(59, 130, 246, 0.45), rgba(29, 78, 216, 0.65));
+                        backdrop-filter: blur(8px);
+                        -webkit-backdrop-filter: blur(8px);
+                        -moz-backdrop-filter: blur(8px);
+                        border: 1px solid rgba(255, 255, 255, 0.3);
+                        border-radius: 12px;
+                        will-change: transform, opacity;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        -webkit-perspective: 1000px;
+                        perspective: 1000px;
+                    "></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full" style="
+                        opacity: 1;
+                        will-change: transform;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        pointer-events: none;
+                    ">
+                        <div class="text-blue-200 font-bold text-sm mb-1" style="
+                            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+                            filter: brightness(1.2);
+                            -webkit-font-smoothing: antialiased;
+                            -moz-osx-font-smoothing: grayscale;
+                        ">8</div>
+                        <div class="mb-1" style="
+                            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)) brightness(1.2);
+                            -webkit-backface-visibility: hidden;
+                            backface-visibility: hidden;
+                        "><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="thumbs-up" class="lucide lucide-thumbs-up text-blue-200" style="width: 24px; height: 24px;"><path d="M7 10v12"></path><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"></path></svg></div>
+                    </div>
+                </div><div class="aspect-square rounded-lg cursor-pointer transition-all hover-scale active:scale-95 flex flex-col items-center justify-center text-center relative " style="box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px; position: relative;">
+                    <div class="absolute inset-0 rounded-lg" style="
+                        opacity: 0.7;
+                        background: linear-gradient(135deg, rgba(59, 130, 246, 0.45), rgba(29, 78, 216, 0.65));
+                        backdrop-filter: blur(8px);
+                        -webkit-backdrop-filter: blur(8px);
+                        -moz-backdrop-filter: blur(8px);
+                        border: 1px solid rgba(255, 255, 255, 0.3);
+                        border-radius: 12px;
+                        will-change: transform, opacity;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        -webkit-perspective: 1000px;
+                        perspective: 1000px;
+                    "></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full" style="
+                        opacity: 1;
+                        will-change: transform;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        pointer-events: none;
+                    ">
+                        <div class="text-blue-200 font-bold text-sm mb-1" style="
+                            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+                            filter: brightness(1.2);
+                            -webkit-font-smoothing: antialiased;
+                            -moz-osx-font-smoothing: grayscale;
+                        ">9</div>
+                        <div class="mb-1" style="
+                            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)) brightness(1.2);
+                            -webkit-backface-visibility: hidden;
+                            backface-visibility: hidden;
+                        "><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="thumbs-up" class="lucide lucide-thumbs-up text-blue-200" style="width: 24px; height: 24px;"><path d="M7 10v12"></path><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"></path></svg></div>
+                    </div>
+                </div><div class="aspect-square rounded-lg cursor-pointer transition-all hover-scale active:scale-95 flex flex-col items-center justify-center text-center relative " style="box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px; position: relative;">
+                    <div class="absolute inset-0 rounded-lg" style="
+                        opacity: 0.7;
+                        background: linear-gradient(135deg, rgba(239, 68, 68, 0.45), rgba(220, 38, 38, 0.65));
+                        backdrop-filter: blur(8px);
+                        -webkit-backdrop-filter: blur(8px);
+                        -moz-backdrop-filter: blur(8px);
+                        border: 1px solid rgba(255, 255, 255, 0.3);
+                        border-radius: 12px;
+                        will-change: transform, opacity;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        -webkit-perspective: 1000px;
+                        perspective: 1000px;
+                    "></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full" style="
+                        opacity: 1;
+                        will-change: transform;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        pointer-events: none;
+                    ">
+                        <div class="text-red-200 font-bold text-sm mb-1" style="
+                            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+                            filter: brightness(1.2);
+                            -webkit-font-smoothing: antialiased;
+                            -moz-osx-font-smoothing: grayscale;
+                        ">10</div>
+                        <div class="mb-1" style="
+                            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)) brightness(1.2);
+                            -webkit-backface-visibility: hidden;
+                            backface-visibility: hidden;
+                        "><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="triangle-alert" class="lucide lucide-triangle-alert text-red-200" style="width: 24px; height: 24px;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg></div>
+                    </div>
+                </div><div class="aspect-square rounded-lg cursor-pointer transition-all hover-scale active:scale-95 flex flex-col items-center justify-center text-center relative " style="box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px; position: relative;">
+                    <div class="absolute inset-0 rounded-lg" style="
+                        opacity: 0.7;
+                        background: linear-gradient(135deg, rgba(74, 222, 128, 0.45), rgba(34, 197, 94, 0.65));
+                        backdrop-filter: blur(8px);
+                        -webkit-backdrop-filter: blur(8px);
+                        -moz-backdrop-filter: blur(8px);
+                        border: 1px solid rgba(255, 255, 255, 0.3);
+                        border-radius: 12px;
+                        will-change: transform, opacity;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        -webkit-perspective: 1000px;
+                        perspective: 1000px;
+                    "></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full" style="
+                        opacity: 1;
+                        will-change: transform;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        pointer-events: none;
+                    ">
+                        <div class="text-green-200 font-bold text-sm mb-1" style="
+                            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+                            filter: brightness(1.2);
+                            -webkit-font-smoothing: antialiased;
+                            -moz-osx-font-smoothing: grayscale;
+                        ">11</div>
+                        <div class="mb-1" style="
+                            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)) brightness(1.2);
+                            -webkit-backface-visibility: hidden;
+                            backface-visibility: hidden;
+                        "><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" class="lucide lucide-star text-green-200" style="width: 24px; height: 24px;"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg></div>
+                    </div>
+                </div><div class="aspect-square rounded-lg cursor-pointer transition-all hover-scale active:scale-95 flex flex-col items-center justify-center text-center relative " style="box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px; position: relative;">
+                    <div class="absolute inset-0 rounded-lg" style="
+                        opacity: 0.7;
+                        background: linear-gradient(135deg, rgba(239, 68, 68, 0.45), rgba(220, 38, 38, 0.65));
+                        backdrop-filter: blur(8px);
+                        -webkit-backdrop-filter: blur(8px);
+                        -moz-backdrop-filter: blur(8px);
+                        border: 1px solid rgba(255, 255, 255, 0.3);
+                        border-radius: 12px;
+                        will-change: transform, opacity;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        -webkit-perspective: 1000px;
+                        perspective: 1000px;
+                    "></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center h-full" style="
+                        opacity: 1;
+                        will-change: transform;
+                        -webkit-transform: translateZ(0);
+                        transform: translateZ(0);
+                        -webkit-backface-visibility: hidden;
+                        backface-visibility: hidden;
+                        pointer-events: none;
+                    ">
+                        <div class="text-red-200 font-bold text-sm mb-1" style="
+                            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+                            filter: brightness(1.2);
+                            -webkit-font-smoothing: antialiased;
+                            -moz-osx-font-smoothing: grayscale;
+                        ">12</div>
+                        <div class="mb-1" style="
+                            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)) brightness(1.2);
+                            -webkit-backface-visibility: hidden;
+                            backface-visibility: hidden;
+                        "><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="triangle-alert" class="lucide lucide-triangle-alert text-red-200" style="width: 24px; height: 24px;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg></div>
+                    </div>
+                </div></div>
             </div>
-            <p class="text-white-70 text-sm mb-4">
-                <span class="lg:hidden">最新セッションの詳細のみ表示可能</span>
-                <span class="hidden lg:inline">最新セッション（セッション12）の詳細分析のみ表示可能</span>
-            </p>
-            <div class="grid grid-cols-12 gap-3" id="sessions-grid">
-                <!-- Sessions will be populated by JavaScript -->
-            </div>
-        </div>
         
-        <!-- Detailed Session Analysis (Latest Only) -->
+        <!-- 詳細分析 -->
         <div class="glass-card mb-8" id="detailed-analysis-section">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-bold text-white text-center flex-1">
-                    <div>詳細分析</div>
-                    <div class="text-lg mt-1">セッション12（最新）</div>
-                </h3>
-            </div>
+                <div class="flex items-center justify-between mb-6">
+                    <button id="prev-session-btn" class="glass-card-sm hover:bg-white/10 transition-colors cursor-pointer flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                            <path d="m15 18-6-6 6-6"></path>
+                        </svg>
+                    </button>
+                    <h3 class="text-xl font-bold text-white text-center flex-1 px-2">
+                        <div>詳細分析</div>
+                        <div class="text-lg mt-1">セッション<span id="selected-session">1</span></div>
+                    </h3>
+                    <button id="next-session-btn" class="glass-card-sm hover:bg-white/10 transition-colors cursor-pointer flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </button>
+                </div>
             <div class="mb-4 text-center" id="session-info">
-                <p class="text-white-70">基音: C# | 平均誤差: ±20.1セント</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; align-items: end; min-height: 80px;">
+                    <div style="display: flex; flex-direction: column; justify-content: flex-end; text-align: center; height: 100%;">
+                        <div class="text-2xl md:text-4xl font-bold text-white">C4</div>
+                        <p class="text-xs md:text-base text-green-200">基音</p>
+                    </div>
+                    <div style="display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center; height: 100%;">
+                        <div class="mb-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="thumbs-up" class="lucide lucide-thumbs-up text-blue-300" style="width: 80px; height: 80px;"><path d="M7 10v12"></path><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"></path></svg></div>
+                        <p class="text-base md:text-lg font-bold text-blue-300">Pass</p>
+                    </div>
+                    <div style="display: flex; flex-direction: column; justify-content: flex-end; text-align: center; height: 100%;">
+                        <div class="text-2xl md:text-4xl font-bold text-white">+25.1</div>
+                        <p class="text-xs md:text-base text-green-200">セッション平均誤差</p>
+                    </div>
+                </div>
             </div>
             <div class="space-y-2" id="note-results">
                 <!-- 8音の詳細結果 -->
-                <div class="bg-white/5 rounded-lg p-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-white">音程1: ド</span>
-                        <span class="text-green-300">+5セント</span>
-                    </div>
-                </div>
-                <div class="bg-white/5 rounded-lg p-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-white">音程2: レ</span>
-                        <span class="text-yellow-300">+15セント</span>
-                    </div>
-                </div>
-                <div class="bg-white/5 rounded-lg p-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-white">音程3: ミ</span>
-                        <span class="text-red-300">+35セント</span>
-                    </div>
-                </div>
-                <div class="bg-white/5 rounded-lg p-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-white">音程4: ファ</span>
-                        <span class="text-green-300">-8セント</span>
-                    </div>
-                </div>
-                <div class="bg-white/5 rounded-lg p-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-white">音程5: ソ</span>
-                        <span class="text-yellow-300">+22セント</span>
-                    </div>
-                </div>
-                <div class="bg-white/5 rounded-lg p-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-white">音程6: ラ</span>
-                        <span class="text-green-300">+12セント</span>
-                    </div>
-                </div>
-                <div class="bg-white/5 rounded-lg p-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-white">音程7: シ</span>
-                        <span class="text-red-300">+42セント</span>
-                    </div>
-                </div>
-                <div class="bg-white/5 rounded-lg p-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-white">音程8: ド（オクターブ）</span>
-                        <span class="text-yellow-300">+18セント</span>
-                    </div>
-                </div>
-            </div>
-            <div class="mt-6 p-4 rounded-xl border-2 border-dashed border-yellow-400/30 bg-yellow-400/5">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <i data-lucide="lock" style="width: 16px; height: 16px; color: rgba(255, 255, 255, 0.6);"></i>
-                        <div>
-                            <div class="text-white font-medium">他のセッションの詳細分析を見るには</div>
-                            <div class="text-white-70 text-sm">全12セッションの詳細分析が可能</div>
+                <div class="glass-card-sm hover:bg-white/10 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div>
+                                <div class="text-lg font-bold text-white">ド</div>
+                            </div>
+                            <div>
+                                <div class="text-base text-white-60 font-medium">目標 277Hz</div>
+                                <div class="text-base text-white-60 font-medium">実音 280Hz</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="font-bold text-2xl text-red-300">+5¢</div>
+                            <div class="flex items-center justify-center" style="min-width: 36px;">
+                                <i data-lucide="trophy" class="text-yellow-300" style="width: 28px; height: 28px;"></i>
+                            </div>
                         </div>
                     </div>
-                    <a href="results-premium-analysis.html" class="btn" style="background: linear-gradient(135deg, #ffd700, #ffb347); color: #333; text-decoration: none; padding: 0.5rem 1rem;">
-                        プレミアム版へ
-                    </a>
+                </div>
+                <div class="glass-card-sm hover:bg-white/10 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div>
+                                <div class="text-lg font-bold text-white">レ</div>
+                            </div>
+                            <div>
+                                <div class="text-base text-white-60 font-medium">目標 311Hz</div>
+                                <div class="text-base text-white-60 font-medium">実音 308Hz</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="font-bold text-2xl text-blue-300">+15¢</div>
+                            <div class="flex items-center justify-center" style="min-width: 36px;">
+                                <i data-lucide="star" class="text-green-300" style="width: 28px; height: 28px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card-sm hover:bg-white/10 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div>
+                                <div class="text-lg font-bold text-white">ミ</div>
+                            </div>
+                            <div>
+                                <div class="text-base text-white-60 font-medium">目標 349Hz</div>
+                                <div class="text-base text-white-60 font-medium">実音 354Hz</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="font-bold text-2xl text-red-300">+35¢</div>
+                            <div class="flex items-center justify-center" style="min-width: 36px;">
+                                <i data-lucide="triangle-alert" class="text-red-300" style="width: 28px; height: 28px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card-sm hover:bg-white/10 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div>
+                                <div class="text-lg font-bold text-white">ファ</div>
+                            </div>
+                            <div>
+                                <div class="text-base text-white-60 font-medium">目標 370Hz</div>
+                                <div class="text-base text-white-60 font-medium">実音 366Hz</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="font-bold text-2xl text-blue-300">-8¢</div>
+                            <div class="flex items-center justify-center" style="min-width: 36px;">
+                                <i data-lucide="trophy" class="text-yellow-300" style="width: 28px; height: 28px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card-sm hover:bg-white/10 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div>
+                                <div class="text-lg font-bold text-white">ソ</div>
+                            </div>
+                            <div>
+                                <div class="text-base text-white-60 font-medium">目標 415Hz</div>
+                                <div class="text-base text-white-60 font-medium">実音 420Hz</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="font-bold text-2xl text-red-300">+22¢</div>
+                            <div class="flex items-center justify-center" style="min-width: 36px;">
+                                <i data-lucide="star" class="text-green-300" style="width: 28px; height: 28px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card-sm hover:bg-white/10 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div>
+                                <div class="text-lg font-bold text-white">ラ</div>
+                            </div>
+                            <div>
+                                <div class="text-base text-white-60 font-medium">目標 466Hz</div>
+                                <div class="text-base text-white-60 font-medium">実音 461Hz</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="font-bold text-2xl text-blue-300">+12¢</div>
+                            <div class="flex items-center justify-center" style="min-width: 36px;">
+                                <i data-lucide="trophy" class="text-yellow-300" style="width: 28px; height: 28px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card-sm hover:bg-white/10 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div>
+                                <div class="text-lg font-bold text-white">シ</div>
+                            </div>
+                            <div>
+                                <div class="text-base text-white-60 font-medium">目標 523Hz</div>
+                                <div class="text-base text-white-60 font-medium">実音 529Hz</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="font-bold text-2xl text-red-300">+42¢</div>
+                            <div class="flex items-center justify-center" style="min-width: 36px;">
+                                <i data-lucide="triangle-alert" class="text-red-300" style="width: 28px; height: 28px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card-sm hover:bg-white/10 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div>
+                                <div class="text-lg font-bold text-white">ド'</div>
+                            </div>
+                            <div>
+                                <div class="text-base text-white-60 font-medium">目標 554Hz</div>
+                                <div class="text-base text-white-60 font-medium">実音 560Hz</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="font-bold text-2xl text-red-300">+18¢</div>
+                            <div class="flex items-center justify-center" style="min-width: 36px;">
+                                <i data-lucide="star" class="text-green-300" style="width: 28px; height: 28px;"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -771,10 +1372,10 @@
         const mockSessionsData = [
             { session: 1, baseNote: 'A', averageCentError: 18.5 },
             { session: 2, baseNote: 'F#', averageCentError: 24.2 },
-            { session: 3, baseNote: 'D', averageCentError: 16.8 },
+            { session: 3, baseNote: 'D', averageCentError: 45.8 },  // 赤色（Practice）
             { session: 4, baseNote: 'Bb', averageCentError: 32.1 },
             { session: 5, baseNote: 'G', averageCentError: 14.6 },
-            { session: 6, baseNote: 'E', averageCentError: 28.7 },
+            { session: 6, baseNote: 'E', averageCentError: 41.7 },  // 赤色（Practice）
             { session: 7, baseNote: 'C', averageCentError: 19.3 },
             { session: 8, baseNote: 'F', averageCentError: 22.5 },
             { session: 9, baseNote: 'D#', averageCentError: 35.8 },
@@ -782,6 +1383,195 @@
             { session: 11, baseNote: 'G#', averageCentError: 26.9 },
             { session: 12, baseNote: 'C#', averageCentError: 20.1 }
         ];
+        
+        // 12セッション分の詳細データ（各セッションで8音）
+        const sessionDetailedData = {
+            1: { // A (440Hz)
+                baseHz: 440,
+                notes: [
+                    { name: 'ド', targetHz: 523, actualHz: 530, error: 23 },
+                    { name: 'レ', targetHz: 587, actualHz: 592, error: 15 },
+                    { name: 'ミ', targetHz: 659, actualHz: 665, error: 16 },
+                    { name: 'ファ', targetHz: 698, actualHz: 705, error: 17 },
+                    { name: 'ソ', targetHz: 784, actualHz: 795, error: 24 },
+                    { name: 'ラ', targetHz: 880, actualHz: 885, error: 10 },
+                    { name: 'シ', targetHz: 988, actualHz: 975, error: -23 },
+                    { name: 'ド\'', targetHz: 1047, actualHz: 1060, error: 21 }
+                ]
+            },
+            2: { // F# (370Hz)
+                baseHz: 370,
+                notes: [
+                    { name: 'ド', targetHz: 440, actualHz: 448, error: 31 },
+                    { name: 'レ', targetHz: 494, actualHz: 500, error: 21 },
+                    { name: 'ミ', targetHz: 554, actualHz: 565, error: 34 },
+                    { name: 'ファ', targetHz: 587, actualHz: 595, error: 24 },
+                    { name: 'ソ', targetHz: 659, actualHz: 670, error: 29 },
+                    { name: 'ラ', targetHz: 740, actualHz: 745, error: 12 },
+                    { name: 'シ', targetHz: 831, actualHz: 820, error: -23 },
+                    { name: 'ド\'', targetHz: 880, actualHz: 890, error: 20 }
+                ]
+            },
+            3: { // D (294Hz) - Practiceレベル
+                baseHz: 294,
+                notes: [
+                    { name: 'ド', targetHz: 349, actualHz: 365, error: 62 },
+                    { name: 'レ', targetHz: 392, actualHz: 410, error: 78 },
+                    { name: 'ミ', targetHz: 440, actualHz: 455, error: 58 },
+                    { name: 'ファ', targetHz: 466, actualHz: 480, error: 51 },
+                    { name: 'ソ', targetHz: 523, actualHz: 510, error: -43 },
+                    { name: 'ラ', targetHz: 587, actualHz: 570, error: -50 },
+                    { name: 'シ', targetHz: 659, actualHz: 640, error: -50 },
+                    { name: 'ド\'', targetHz: 698, actualHz: 715, error: 42 }
+                ]
+            },
+            4: { // Bb (466Hz)
+                baseHz: 466,
+                notes: [
+                    { name: 'ド', targetHz: 554, actualHz: 570, error: 49 },
+                    { name: 'レ', targetHz: 622, actualHz: 635, error: 36 },
+                    { name: 'ミ', targetHz: 698, actualHz: 710, error: 30 },
+                    { name: 'ファ', targetHz: 740, actualHz: 755, error: 35 },
+                    { name: 'ソ', targetHz: 831, actualHz: 845, error: 29 },
+                    { name: 'ラ', targetHz: 932, actualHz: 920, error: -22 },
+                    { name: 'シ', targetHz: 1047, actualHz: 1030, error: -28 },
+                    { name: 'ド\'', targetHz: 1109, actualHz: 1125, error: 25 }
+                ]
+            },
+            5: { // G (392Hz) - Excellentレベル
+                baseHz: 392,
+                notes: [
+                    { name: 'ド', targetHz: 466, actualHz: 469, error: 11 },
+                    { name: 'レ', targetHz: 523, actualHz: 527, error: 13 },
+                    { name: 'ミ', targetHz: 587, actualHz: 592, error: 15 },
+                    { name: 'ファ', targetHz: 622, actualHz: 628, error: 17 },
+                    { name: 'ソ', targetHz: 698, actualHz: 703, error: 12 },
+                    { name: 'ラ', targetHz: 784, actualHz: 789, error: 11 },
+                    { name: 'シ', targetHz: 880, actualHz: 875, error: -10 },
+                    { name: 'ド\'', targetHz: 932, actualHz: 940, error: 15 }
+                ]
+            },
+            6: { // E (330Hz) - Practiceレベル
+                baseHz: 330,
+                notes: [
+                    { name: 'ド', targetHz: 392, actualHz: 408, error: 65 },
+                    { name: 'レ', targetHz: 440, actualHz: 455, error: 58 },
+                    { name: 'ミ', targetHz: 494, actualHz: 475, error: -67 },
+                    { name: 'ファ', targetHz: 523, actualHz: 540, error: 56 },
+                    { name: 'ソ', targetHz: 587, actualHz: 570, error: -50 },
+                    { name: 'ラ', targetHz: 659, actualHz: 640, error: -50 },
+                    { name: 'シ', targetHz: 740, actualHz: 720, error: -47 },
+                    { name: 'ド\'', targetHz: 784, actualHz: 800, error: 35 }
+                ]
+            },
+            7: { // C (262Hz)
+                baseHz: 262,
+                notes: [
+                    { name: 'ド', targetHz: 262, actualHz: 267, error: 33 },
+                    { name: 'レ', targetHz: 294, actualHz: 298, error: 24 },
+                    { name: 'ミ', targetHz: 330, actualHz: 335, error: 26 },
+                    { name: 'ファ', targetHz: 349, actualHz: 354, error: 25 },
+                    { name: 'ソ', targetHz: 392, actualHz: 397, error: 22 },
+                    { name: 'ラ', targetHz: 440, actualHz: 435, error: -20 },
+                    { name: 'シ', targetHz: 494, actualHz: 489, error: -18 },
+                    { name: 'ド\'', targetHz: 523, actualHz: 530, error: 23 }
+                ]
+            },
+            8: { // F (349Hz)
+                baseHz: 349,
+                notes: [
+                    { name: 'ド', targetHz: 415, actualHz: 422, error: 29 },
+                    { name: 'レ', targetHz: 466, actualHz: 472, error: 22 },
+                    { name: 'ミ', targetHz: 523, actualHz: 530, error: 23 },
+                    { name: 'ファ', targetHz: 554, actualHz: 560, error: 19 },
+                    { name: 'ソ', targetHz: 622, actualHz: 630, error: 22 },
+                    { name: 'ラ', targetHz: 698, actualHz: 705, error: 17 },
+                    { name: 'シ', targetHz: 784, actualHz: 775, error: -20 },
+                    { name: 'ド\'', targetHz: 831, actualHz: 840, error: 19 }
+                ]
+            },
+            9: { // D# (311Hz)
+                baseHz: 311,
+                notes: [
+                    { name: 'ド', targetHz: 370, actualHz: 382, error: 55 },
+                    { name: 'レ', targetHz: 415, actualHz: 428, error: 53 },
+                    { name: 'ミ', targetHz: 466, actualHz: 478, error: 44 },
+                    { name: 'ファ', targetHz: 494, actualHz: 505, error: 38 },
+                    { name: 'ソ', targetHz: 554, actualHz: 565, error: 34 },
+                    { name: 'ラ', targetHz: 622, actualHz: 610, error: -33 },
+                    { name: 'シ', targetHz: 698, actualHz: 685, error: -32 },
+                    { name: 'ド\'', targetHz: 740, actualHz: 755, error: 35 }
+                ]
+            },
+            10: { // B (494Hz) - Excellentレベル
+                baseHz: 494,
+                notes: [
+                    { name: 'ド', targetHz: 587, actualHz: 590, error: 9 },
+                    { name: 'レ', targetHz: 659, actualHz: 664, error: 13 },
+                    { name: 'ミ', targetHz: 740, actualHz: 745, error: 12 },
+                    { name: 'ファ', targetHz: 784, actualHz: 790, error: 13 },
+                    { name: 'ソ', targetHz: 880, actualHz: 885, error: 10 },
+                    { name: 'ラ', targetHz: 988, actualHz: 995, error: 12 },
+                    { name: 'シ', targetHz: 1109, actualHz: 1100, error: -14 },
+                    { name: 'ド\'', targetHz: 1175, actualHz: 1185, error: 15 }
+                ]
+            },
+            11: { // G# (415Hz)
+                baseHz: 415,
+                notes: [
+                    { name: 'ド', targetHz: 494, actualHz: 503, error: 31 },
+                    { name: 'レ', targetHz: 554, actualHz: 563, error: 28 },
+                    { name: 'ミ', targetHz: 622, actualHz: 632, error: 28 },
+                    { name: 'ファ', targetHz: 659, actualHz: 668, error: 24 },
+                    { name: 'ソ', targetHz: 740, actualHz: 750, error: 23 },
+                    { name: 'ラ', targetHz: 831, actualHz: 820, error: -23 },
+                    { name: 'シ', targetHz: 932, actualHz: 920, error: -22 },
+                    { name: 'ド\'', targetHz: 988, actualHz: 1000, error: 21 }
+                ]
+            },
+            12: { // C# (277Hz)
+                baseHz: 277,
+                notes: [
+                    { name: 'ド', targetHz: 330, actualHz: 335, error: 26 },
+                    { name: 'レ', targetHz: 370, actualHz: 375, error: 23 },
+                    { name: 'ミ', targetHz: 415, actualHz: 420, error: 21 },
+                    { name: 'ファ', targetHz: 440, actualHz: 446, error: 24 },
+                    { name: 'ソ', targetHz: 494, actualHz: 500, error: 21 },
+                    { name: 'ラ', targetHz: 554, actualHz: 548, error: -19 },
+                    { name: 'シ', targetHz: 622, actualHz: 615, error: -19 },
+                    { name: 'ド\'', targetHz: 659, actualHz: 665, error: 16 }
+                ]
+            }
+        };
+    </script>
+    <script>
+        // 左右矢印ボタンの機能
+        function initializeNavigationButtons() {
+            const prevBtn = document.getElementById('prev-session-btn');
+            const nextBtn = document.getElementById('next-session-btn');
+            
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => {
+                    if (currentSessionNumber > 1) {
+                        const prevSession = mockSessionsData.find(s => s.session === currentSessionNumber - 1);
+                        if (prevSession) {
+                            showSessionDetails(prevSession);
+                        }
+                    }
+                });
+            }
+            
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    if (currentSessionNumber < 12) {
+                        const nextSession = mockSessionsData.find(s => s.session === currentSessionNumber + 1);
+                        if (nextSession) {
+                            showSessionDetails(nextSession);
+                        }
+                    }
+                });
+            }
+        }
     </script>
     <script>
         // Initialize page
@@ -800,6 +1590,16 @@
                 // フリーミアム版の制限を適用
                 applyFreemiumLimitations();
                 console.log('✅ Freemium limitations applied');
+                
+                // ナビゲーションボタンの初期化
+                initializeNavigationButtons();
+                console.log('✅ Navigation buttons initialized');
+                
+                // 初期表示（セッション1）
+                const firstSession = mockSessionsData.find(s => s.session === 1);
+                if (firstSession) {
+                    showSessionDetails(firstSession);
+                }
                 
                 // アイコンの初期化
                 if (typeof lucide !== 'undefined') {
@@ -822,65 +1622,42 @@
             grid.innerHTML = '';
             mockSessionsData.forEach((session, index) => {
                 const sessionElement = document.createElement('div');
-                const isLatest = session.session === 12;
-                const isLocked = !isLatest; // 最新セッション以外はロック
-                
-                sessionElement.className = `aspect-square rounded-lg cursor-pointer transition-all flex flex-col items-center justify-center text-center relative ${
-                    isLocked ? 'opacity-50' : 'hover:scale-105 active:scale-95'
-                }`;
-                
-                // セッションの背景色
-                const bgColor = session.averageCentError < 20 ? 'rgba(34, 197, 94, 0.2)' :
-                               session.averageCentError < 30 ? 'rgba(96, 165, 250, 0.2)' :
-                               session.averageCentError < 40 ? 'rgba(251, 191, 36, 0.2)' :
-                               'rgba(239, 68, 68, 0.2)';
-                
-                sessionElement.style.background = bgColor;
-                sessionElement.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+                // 基本クラス構造（全てアクティブ）
+                sessionElement.className = `session-grid-item ${
+                    session.averageCentError < 20 ? 'session-excellent' :
+                    session.averageCentError < 30 ? 'session-good' :
+                    session.averageCentError < 40 ? 'session-pass' :
+                    'session-practice'
+                } session-active`;
                 
                 // セッション番号
                 const sessionNumber = document.createElement('div');
-                sessionNumber.className = 'text-white font-bold text-sm';
+                sessionNumber.className = 'session-number';
                 sessionNumber.textContent = `S${session.session}`;
                 sessionElement.appendChild(sessionNumber);
                 
-                // 誤差表示
-                const errorDisplay = document.createElement('div');
-                errorDisplay.className = 'text-xs text-white-70';
-                errorDisplay.textContent = `±${session.averageCentError.toFixed(0)}¢`;
-                sessionElement.appendChild(errorDisplay);
-                
-                // 制限されたセッションにはロックアイコンと薄い表示
-                if (isLocked) {
-                    const lockIcon = document.createElement('i');
-                    lockIcon.setAttribute('data-lucide', 'lock');
-                    lockIcon.className = 'absolute top-1 right-1';
-                    lockIcon.style.width = '10px';
-                    lockIcon.style.height = '10px';
-                    lockIcon.style.color = 'rgba(255, 255, 255, 0.6)';
-                    sessionElement.appendChild(lockIcon);
-                    sessionElement.style.opacity = '0.6';
-                    sessionElement.style.pointerEvents = 'none';
+                // 音感精度評価アイコン
+                const evaluationIcon = document.createElement('i');
+                if (session.averageCentError < 20) {
+                    evaluationIcon.setAttribute('data-lucide', 'trophy');
+                    evaluationIcon.className = 'session-evaluation-icon text-yellow-300';
+                } else if (session.averageCentError < 30) {
+                    evaluationIcon.setAttribute('data-lucide', 'star');
+                    evaluationIcon.className = 'session-evaluation-icon text-green-300';
+                } else if (session.averageCentError < 40) {
+                    evaluationIcon.setAttribute('data-lucide', 'thumbs-up');
+                    evaluationIcon.className = 'session-evaluation-icon text-blue-300';
+                } else {
+                    evaluationIcon.setAttribute('data-lucide', 'triangle-alert');
+                    evaluationIcon.className = 'session-evaluation-icon text-red-300';
                 }
+                sessionElement.appendChild(evaluationIcon);
                 
-                // 最新バッジ
-                if (isLatest) {
-                    sessionElement.style.boxShadow = '0 0 0 2px rgba(255, 215, 0, 0.5)';
-                    const latestBadge = document.createElement('div');
-                    latestBadge.className = 'absolute -top-2 -right-2 bg-yellow-500 text-black text-xs px-1 rounded';
-                    latestBadge.textContent = '最新';
-                    latestBadge.style.fontSize = '0.6rem';
-                    sessionElement.appendChild(latestBadge);
-                }
                 
-                // クリックイベントハンドラー
+                
+                // クリックイベントハンドラー（全てのセッションで詳細表示）
                 sessionElement.addEventListener('click', () => {
-                    if (isLocked) {
-                        showPremiumAlert();
-                    } else {
-                        // 最新セッション（S12）の詳細分析エリアを表示
-                        showSessionDetails(session);
-                    }
+                    showSessionDetails(session);
                 });
                 
                 grid.appendChild(sessionElement);
@@ -944,21 +1721,147 @@
             });
         }
         
+        // 現在選択中のセッション番号
+        let currentSessionNumber = 1;
+        
         function showSessionDetails(session) {
-            // 最新セッション（S12）の詳細分析エリアを表示
-            const detailsSection = document.getElementById('detailed-analysis-section');
-            if (detailsSection) {
-                detailsSection.scrollIntoView({ behavior: 'smooth' });
+            // 選択されたセッションの詳細を表示（スクロールなし）
+            currentSessionNumber = session.session;
+            
+            // セッション番号を更新
+            const selectedSessionElement = document.getElementById('selected-session');
+            if (selectedSessionElement) {
+                selectedSessionElement.textContent = session.session;
+            }
+            
+            // セッション情報を更新
+            updateSessionInfo(session);
+            
+            // 8音の詳細を更新
+            updateNoteResults(session);
+            
+            // セッションボタンの選択状態を更新
+            updateSessionButtonHighlight(session.session);
+        }
+        
+        function updateSessionButtonHighlight(sessionNumber) {
+            // 全てのセッションボタンのハイライトをクリア
+            const allButtons = document.querySelectorAll('.session-grid-item');
+            allButtons.forEach((btn, index) => {
+                if (index + 1 === sessionNumber) {
+                    btn.classList.add('session-selected');
+                } else {
+                    btn.classList.remove('session-selected');
+                }
+            });
+        }
+        
+        function updateSessionInfo(session) {
+            const sessionInfo = document.getElementById('session-info');
+            if (!sessionInfo) return;
+            
+            // 評価アイコンを決定
+            let iconName, iconColor, evalText;
+            if (session.averageCentError < 20) {
+                iconName = 'trophy';
+                iconColor = 'text-yellow-300';
+                evalText = 'Excellent';
+            } else if (session.averageCentError < 30) {
+                iconName = 'star';
+                iconColor = 'text-green-300';
+                evalText = 'Good';
+            } else if (session.averageCentError < 40) {
+                iconName = 'thumbs-up';
+                iconColor = 'text-blue-300';
+                evalText = 'Pass';
+            } else {
+                iconName = 'triangle-alert';
+                iconColor = 'text-red-300';
+                evalText = 'Practice';
+            }
+            
+            sessionInfo.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; align-items: end; min-height: 80px;">
+                    <div style="display: flex; flex-direction: column; justify-content: flex-end; text-align: center; height: 100%;">
+                        <div class="text-2xl md:text-4xl font-bold text-white">${session.baseNote}</div>
+                        <p class="text-xs md:text-base text-green-200">基音</p>
+                    </div>
+                    <div style="display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center; height: 100%;">
+                        <div class="mb-2">
+                            <i data-lucide="${iconName}" class="${iconColor}" style="width: 80px; height: 80px;"></i>
+                        </div>
+                        <p class="text-base md:text-lg font-bold ${iconColor}">${evalText}</p>
+                    </div>
+                    <div style="display: flex; flex-direction: column; justify-content: flex-end; text-align: center; height: 100%;">
+                        <div class="text-2xl md:text-4xl font-bold text-white">${session.averageCentError > 0 ? '+' : ''}${session.averageCentError.toFixed(1)}</div>
+                        <p class="text-xs md:text-base text-green-200">セッション平均誤差</p>
+                    </div>
+                </div>
+            `;
+            
+            // Lucideアイコンを再初期化
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        function updateNoteResults(session) {
+            const noteResults = document.getElementById('note-results');
+            if (!noteResults) return;
+            
+            // セッション番号に対応する詳細データを取得
+            const sessionDetails = sessionDetailedData[session.session];
+            if (!sessionDetails) return;
+            
+            const notes = sessionDetails.notes;
+            
+            noteResults.innerHTML = '';
+            notes.forEach(note => {
+                // 評価アイコンを決定
+                let iconName, iconColor;
+                const absError = Math.abs(note.error);
+                if (absError <= 15) {
+                    iconName = 'trophy';
+                    iconColor = 'text-yellow-300';
+                } else if (absError <= 25) {
+                    iconName = 'star';
+                    iconColor = 'text-green-300';
+                } else if (absError <= 40) {
+                    iconName = 'thumbs-up';
+                    iconColor = 'text-blue-300';
+                } else {
+                    iconName = 'triangle-alert';
+                    iconColor = 'text-red-300';
+                }
                 
-                // 詳細分析エリアのハイライト効果
-                detailsSection.style.transition = 'all 0.3s ease';
-                detailsSection.style.transform = 'scale(1.02)';
-                detailsSection.style.boxShadow = '0 0 20px rgba(59, 130, 246, 0.3)';
+                const errorColor = note.error > 0 ? 'text-red-300' : 'text-blue-300';
                 
-                setTimeout(() => {
-                    detailsSection.style.transform = 'scale(1)';
-                    detailsSection.style.boxShadow = 'none';
-                }, 600);
+                noteResults.innerHTML += `
+                    <div class="glass-card-sm hover:bg-white/10 transition-colors">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div>
+                                    <div class="text-lg font-bold text-white">${note.name}</div>
+                                </div>
+                                <div>
+                                    <div class="text-base text-white-60 font-medium">目標 ${note.targetHz}Hz</div>
+                                    <div class="text-base text-white-60 font-medium">実音 ${note.actualHz}Hz</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="font-bold text-2xl ${errorColor}">${note.error > 0 ? '+' : ''}${note.error}¢</div>
+                                <div class="flex items-center justify-center" style="min-width: 36px;">
+                                    <i data-lucide="${iconName}" class="${iconColor}" style="width: 28px; height: 28px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Lucideアイコンを再初期化
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
             }
         }
         
