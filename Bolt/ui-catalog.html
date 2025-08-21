@@ -616,6 +616,52 @@
                 gap: 0.25rem;
             }
         }
+        
+        /* === 音感精度評価アイコンバッジ用クラス === */
+        .accuracy-badge {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .accuracy-badge-excellent {
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+        
+        .accuracy-badge-good {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        
+        .accuracy-badge-pass {
+            background: rgba(96, 165, 250, 0.2);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+        }
+        
+        .accuracy-badge-practice {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .accuracy-icon {
+            width: 64px;
+            height: 64px;
+        }
+        
+        /* アイコン位置微調整 */
+        .accuracy-icon-thumbsup {
+            transform: translateY(-2px) translateX(2px);
+        }
+        
+        .accuracy-icon-triangle {
+            transform: translateY(-3px);
+        }
     </style>
 </head>
 <body>
@@ -785,6 +831,84 @@
 
 <!-- 音感精度評価 -->
 &lt;i data-lucide="trophy" class="icon-4xl text-yellow-300"&gt;&lt;/i&gt;</div>
+            </section>
+
+            <!-- 音感精度評価アイコンバッジ -->
+            <section class="catalog-section">
+                <h3 class="text-xl font-medium text-white mb-4">🎯 音感精度評価アイコンバッジ</h3>
+                <p class="text-white-70 mb-6">セッション結果ページで使用する円形バッジスタイル（100px × 100px）</p>
+                
+                <div class="component-grid grid-cols-2 md:grid-cols-4">
+                    <!-- Excellent バッジ -->
+                    <div class="component-item text-center">
+                        <div class="mb-4">
+                            <div class="accuracy-badge accuracy-badge-excellent">
+                                <i data-lucide="trophy" class="text-yellow-300 accuracy-icon"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-yellow-300 font-bold">Excellent</h3>
+                        <p class="text-white-60 text-sm">±15セント以内</p>
+                        <p class="text-white-60 text-xs">黄色バッジ</p>
+                    </div>
+                    
+                    <!-- Good バッジ -->
+                    <div class="component-item text-center">
+                        <div class="mb-4">
+                            <div class="accuracy-badge accuracy-badge-good">
+                                <i data-lucide="star" class="text-green-300 accuracy-icon"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-green-300 font-bold">Good</h3>
+                        <p class="text-white-60 text-sm">15～25セント</p>
+                        <p class="text-white-60 text-xs">緑色バッジ</p>
+                    </div>
+                    
+                    <!-- Pass バッジ -->
+                    <div class="component-item text-center">
+                        <div class="mb-4">
+                            <div class="accuracy-badge accuracy-badge-pass">
+                                <i data-lucide="thumbs-up" class="text-blue-300 accuracy-icon accuracy-icon-thumbsup"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-blue-300 font-bold">Pass</h3>
+                        <p class="text-white-60 text-sm">25～40セント</p>
+                        <p class="text-white-60 text-xs">青色バッジ</p>
+                    </div>
+                    
+                    <!-- Practice バッジ -->
+                    <div class="component-item text-center">
+                        <div class="mb-4">
+                            <div class="accuracy-badge accuracy-badge-practice">
+                                <i data-lucide="triangle-alert" class="text-red-300 accuracy-icon accuracy-icon-triangle"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-red-300 font-bold">Practice</h3>
+                        <p class="text-white-60 text-sm">40セント以上</p>
+                        <p class="text-white-60 text-xs">赤色バッジ</p>
+                    </div>
+                </div>
+                
+                <div class="code-sample">
+&lt;!-- クラスを使った簡潔な記述 --&gt;
+&lt;!-- Excellent --&gt;
+&lt;div class="accuracy-badge accuracy-badge-excellent"&gt;
+  &lt;i data-lucide="trophy" class="text-yellow-300 accuracy-icon"&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+&lt;!-- Good --&gt;
+&lt;div class="accuracy-badge accuracy-badge-good"&gt;
+  &lt;i data-lucide="star" class="text-green-300 accuracy-icon"&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+&lt;!-- Pass (位置調整あり) --&gt;
+&lt;div class="accuracy-badge accuracy-badge-pass"&gt;
+  &lt;i data-lucide="thumbs-up" class="text-blue-300 accuracy-icon accuracy-icon-thumbsup"&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+&lt;!-- Practice (位置調整あり) --&gt;
+&lt;div class="accuracy-badge accuracy-badge-practice"&gt;
+  &lt;i data-lucide="triangle-alert" class="text-red-300 accuracy-icon accuracy-icon-triangle"&gt;&lt;/i&gt;
+&lt;/div&gt;</div>
             </section>
 
             <!-- S-E級ランクアイコン -->
