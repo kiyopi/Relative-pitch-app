@@ -1408,6 +1408,126 @@ body {
 .rank-circle-d { background: linear-gradient(135deg, #7dd3fc, #0369a1); }
 .rank-circle-e { background: linear-gradient(135deg, #fca5a5, #dc2626); }
 
+/* Stats display components */
+.stat-description {
+    font-size: 0.875rem;
+    opacity: 0.8;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.stat-value-rank {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.session-count {
+    color: #60a5fa; /* blue-400 */
+}
+
+/* 分析・統計表示コンポーネント */
+.rank-section {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rank-mode {
+    margin-bottom: 24px;
+}
+
+.mode-title {
+    font-size: 1.6rem !important;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+}
+
+.rank-content-row {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+}
+
+.rank-stats-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+}
+
+.rank-stat-item {
+    text-align: center;
+    min-width: 80px;
+}
+
+.stat-label-rank {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.1;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.rank-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.rank-circle-icon {
+    width: 64px;
+    height: 64px;
+    color: white;
+}
+
+/* 統計値の色クラス */
+.stat-value-avg-error {
+    color: #fbbf24; /* 平均誤差: 黄色 */
+}
+
+.stat-value-max-error {
+    color: #ffffff; /* 最大誤差: 白 */
+}
+
+.stat-value-session-count {
+    color: #ffffff; /* セッション数: 白 */
+}
+
+.stat-value-grade {
+    color: #ffffff; /* グレード: 白 */
+}
+
+/* Rank section responsive */
+@media (max-width: 768px) {
+    .rank-content-row {
+        gap: 20px;
+    }
+    
+    .rank-stats-row {
+        gap: 20px;
+    }
+    
+    .rank-circle {
+        width: 90px;
+        height: 90px;
+    }
+    
+    .stat-value-rank {
+        font-size: 1.5rem;
+    }
+}
+
 /* Responsive grid utilities */
 @media (min-width: 768px) {
     .md\\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }

@@ -44,6 +44,21 @@
             100% { background-position: 0% 50%; }
         }
         
+        /* 評価グラフアニメーション */
+        @keyframes slideIn {
+            from {
+                width: 0;
+            }
+            to {
+                width: var(--bar-width);
+            }
+        }
+        
+        .evaluation-bar {
+            animation: slideIn 0.8s ease-out forwards;
+            animation-delay: var(--delay);
+        }
+        
         /* 8セッション専用グリッド */
         .sessions-grid-8 {
             display: grid;
@@ -161,8 +176,8 @@
             <!-- ヘッダーセクション -->
             <div class="text-center mb-8">
                 <div class="flex justify-center mb-6">
-                    <div class="w-24 h-24 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
-                        <i data-lucide="check-circle" class="icon-2xl text-white"></i>
+                    <div class="page-header-icon page-header-icon-purple animate-float">
+                        <i data-lucide="file-chart-column-increasing" class="icon-2xl text-white" data-stroke-width="2"></i>
                     </div>
                 </div>
                 <h1 class="text-4xl font-bold text-white mb-4">総合評価</h1>
@@ -171,60 +186,98 @@
 
             <!-- 総合評価セクション -->
             <div class="glass-card mb-8">
-                <h2 class="text-2xl font-bold text-white mb-6 text-center">総合成績</h2>
-                
-                <!-- 統計表示 -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="text-center">
-                        <div class="stat-label">総合スコア</div>
-                        <div class="stat-value-rank session-count">8</div>
-                        <div class="stat-description">セッション完了</div>
+                <section class="rank-section">
+                    <!-- モード名 -->
+                    <div class="rank-mode">
+                        <h3 class="mode-title" id="main-mode-title">ランダム基音モード</h3>
                     </div>
                     
-                    <div class="text-center">
-                        <div class="stat-label">総合評価</div>
-                        <div class="stat-value text-green-300">B+</div>
-                        <div class="stat-description">良好な相対音感</div>
+                    <!-- グレードアイコンと統計情報を横一列に -->
+                    <div class="rank-content-row">
+                        <!-- グレードアイコン -->
+                        <div class="rank-icon">
+                            <div class="rank-circle rank-md rank-circle-b">
+                                <i data-lucide="circle-star" class="text-white" style="width: 64px; height: 64px;"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- 統計情報 -->
+                        <div class="rank-stats-row">
+                            <div class="rank-stat-item">
+                                <div class="stat-value-rank grade-value" id="dynamic-grade">B</div>
+                                <div class="stat-label-rank">総合グレード</div>
+                            </div>
+                            <div class="rank-stat-item">
+                                <div class="stat-value-rank stat-value-avg-error avg-error">±18.2¢</div>
+                                <div class="stat-label-rank">平均誤差（セント）</div>
+                            </div>
+                            <div class="rank-stat-item">
+                                <div class="stat-value-rank max-error">+25.8¢</div>
+                                <div class="stat-label-rank">最大誤差（セント）</div>
+                            </div>
+                            <div class="rank-stat-item">
+                                <div class="stat-value-rank stat-value-session-count session-count">8</div>
+                                <div class="stat-label-rank">セッション数</div>
+                            </div>
+                        </div>
+                        
+                        <!-- ランク取得メッセージ -->
+                        <div class="rank-achievement-message" style="margin-top: 0px; margin-bottom: 0px; text-align: center;">
+                            <p id="share-message" style="color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; margin: 0;">
+                                B級ランク取得！グッドプレイヤー！
+                            </p>
+                        </div>
                     </div>
-                    
-                    <div class="text-center">
-                        <div class="stat-label">平均精度</div>
-                        <div class="stat-value text-blue-300">±18.2¢</div>
-                        <div class="stat-description">セント差</div>
-                    </div>
-                </div>
+                </section>
                 
                 <!-- 評価内訳 -->
                 <div class="mb-6">
-                    <h3 class="text-lg font-medium text-white mb-4 text-center">8セッションの評価内訳</h3>
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <i data-lucide="trophy" class="text-yellow-300" style="width: 20px; height: 20px;"></i>
-                                <span class="text-white">Excellent (±15¢以内)</span>
+                    <h3 class="text-lg font-medium text-white mb-4 text-center">8セッション64音の評価内訳</h3>
+                    
+                    <!-- 評価グラフ -->
+                    <div class="mb-6" id="evaluation-chart" style="display: flex; flex-direction: column; gap: 0.75rem; padding: 0 1rem;">
+                        <!-- Excellent -->
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <i data-lucide="trophy" class="text-yellow-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+                            <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="flex: 1; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden;">
+                                    <div class="evaluation-bar" style="--bar-width: 25%; --delay: 0.1s; width: 0; height: 100%; background: #fbbf24; border-radius: 3px;"></div>
+                                </div>
+                                <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">16</span>
                             </div>
-                            <span class="text-white font-bold">2回</span>
                         </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <i data-lucide="star" class="text-green-300" style="width: 20px; height: 20px;"></i>
-                                <span class="text-white">Good (15-25¢)</span>
+                        
+                        <!-- Good -->
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <i data-lucide="star" class="text-green-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+                            <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="flex: 1; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden;">
+                                    <div class="evaluation-bar" style="--bar-width: 37.5%; --delay: 0.2s; width: 0; height: 100%; background: #22c55e; border-radius: 3px;"></div>
+                                </div>
+                                <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">24</span>
                             </div>
-                            <span class="text-white font-bold">3回</span>
                         </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <i data-lucide="thumbs-up" class="text-blue-300" style="width: 20px; height: 20px;"></i>
-                                <span class="text-white">Pass (25-40¢)</span>
+                        
+                        <!-- Pass -->
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <i data-lucide="thumbs-up" class="text-blue-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+                            <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="flex: 1; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden;">
+                                    <div class="evaluation-bar" style="--bar-width: 25%; --delay: 0.3s; width: 0; height: 100%; background: #3b82f6; border-radius: 3px;"></div>
+                                </div>
+                                <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">16</span>
                             </div>
-                            <span class="text-white font-bold">2回</span>
                         </div>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <i data-lucide="triangle-alert" class="text-red-300" style="width: 20px; height: 20px;"></i>
-                                <span class="text-white">Practice (40¢以上)</span>
+                        
+                        <!-- Practice -->
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <i data-lucide="triangle-alert" class="text-red-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+                            <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="flex: 1; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden;">
+                                    <div class="evaluation-bar" style="--bar-width: 12.5%; --delay: 0.4s; width: 0; height: 100%; background: #ef4444; border-radius: 3px;"></div>
+                                </div>
+                                <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">8</span>
                             </div>
-                            <span class="text-white font-bold">1回</span>
                         </div>
                     </div>
                 </div>
@@ -298,16 +351,72 @@
     </div>
 
     <script>
-        // 8セッション用モックデータ
+        // 8セッション用モックデータ（音別結果付き）
         const sessionsData = [
-            { session: 1, baseNote: 'C4', avgError: 12.3, rank: 'excellent', icon: 'trophy', color: 'yellow' },
-            { session: 2, baseNote: 'D4', avgError: 18.7, rank: 'good', icon: 'star', color: 'green' },
-            { session: 3, baseNote: 'E4', avgError: 32.1, rank: 'pass', icon: 'thumbs-up', color: 'blue' },
-            { session: 4, baseNote: 'F4', avgError: 14.9, rank: 'excellent', icon: 'trophy', color: 'yellow' },
-            { session: 5, baseNote: 'G4', avgError: 22.4, rank: 'good', icon: 'star', color: 'green' },
-            { session: 6, baseNote: 'A4', avgError: 28.8, rank: 'pass', icon: 'thumbs-up', color: 'blue' },
-            { session: 7, baseNote: 'B4', avgError: 20.1, rank: 'good', icon: 'star', color: 'green' },
-            { session: 8, baseNote: 'C5', avgError: 45.2, rank: 'practice', icon: 'triangle-alert', color: 'red' }
+            { session: 1, baseNote: 'C4', avgError: 12.3, rank: 'excellent', icon: 'trophy', color: 'yellow',
+              noteResults: [
+                { note: 'ド', error: +8.2, status: 'excellent' }, { note: 'レ', error: +15.1, status: 'excellent' },
+                { note: 'ミ', error: -12.4, status: 'excellent' }, { note: 'ファ', error: +9.8, status: 'excellent' },
+                { note: 'ソ', error: +14.2, status: 'excellent' }, { note: 'ラ', error: -8.7, status: 'excellent' },
+                { note: 'シ', error: +11.5, status: 'excellent' }, { note: 'ド', error: +13.8, status: 'excellent' }
+              ]
+            },
+            { session: 2, baseNote: 'D4', avgError: 18.7, rank: 'good', icon: 'star', color: 'green',
+              noteResults: [
+                { note: 'ド', error: +22.1, status: 'good' }, { note: 'レ', error: +16.3, status: 'good' },
+                { note: 'ミ', error: -19.8, status: 'good' }, { note: 'ファ', error: +15.2, status: 'good' },
+                { note: 'ソ', error: +21.4, status: 'good' }, { note: 'ラ', error: -17.6, status: 'good' },
+                { note: 'シ', error: +18.9, status: 'good' }, { note: 'ド', error: +12.4, status: 'excellent' }
+              ]
+            },
+            { session: 3, baseNote: 'E4', avgError: 32.1, rank: 'pass', icon: 'thumbs-up', color: 'blue',
+              noteResults: [
+                { note: 'ド', error: +35.2, status: 'pass' }, { note: 'レ', error: +28.7, status: 'pass' },
+                { note: 'ミ', error: -31.4, status: 'pass' }, { note: 'ファ', error: +39.1, status: 'pass' },
+                { note: 'ソ', error: +25.8, status: 'pass' }, { note: 'ラ', error: -34.6, status: 'pass' },
+                { note: 'シ', error: +33.2, status: 'pass' }, { note: 'ド', error: +29.8, status: 'pass' }
+              ]
+            },
+            { session: 4, baseNote: 'F4', avgError: 14.9, rank: 'excellent', icon: 'trophy', color: 'yellow',
+              noteResults: [
+                { note: 'ド', error: +12.8, status: 'excellent' }, { note: 'レ', error: +17.2, status: 'good' },
+                { note: 'ミ', error: -11.4, status: 'excellent' }, { note: 'ファ', error: +13.7, status: 'excellent' },
+                { note: 'ソ', error: +16.9, status: 'good' }, { note: 'ラ', error: -14.1, status: 'excellent' },
+                { note: 'シ', error: +15.3, status: 'excellent' }, { note: 'ド', error: +18.8, status: 'good' }
+              ]
+            },
+            { session: 5, baseNote: 'G4', avgError: 22.4, rank: 'good', icon: 'star', color: 'green',
+              noteResults: [
+                { note: 'ド', error: +24.1, status: 'good' }, { note: 'レ', error: +19.8, status: 'good' },
+                { note: 'ミ', error: -25.7, status: 'pass' }, { note: 'ファ', error: +21.4, status: 'good' },
+                { note: 'ソ', error: +18.9, status: 'good' }, { note: 'ラ', error: -23.2, status: 'good' },
+                { note: 'シ', error: +26.8, status: 'pass' }, { note: 'ド', error: +20.5, status: 'good' }
+              ]
+            },
+            { session: 6, baseNote: 'A4', avgError: 28.8, rank: 'pass', icon: 'thumbs-up', color: 'blue',
+              noteResults: [
+                { note: 'ド', error: +31.2, status: 'pass' }, { note: 'レ', error: +26.4, status: 'pass' },
+                { note: 'ミ', error: -29.8, status: 'pass' }, { note: 'ファ', error: +33.1, status: 'pass' },
+                { note: 'ソ', error: +24.7, status: 'good' }, { note: 'ラ', error: -32.5, status: 'pass' },
+                { note: 'シ', error: +35.9, status: 'pass' }, { note: 'ド', error: +27.6, status: 'pass' }
+              ]
+            },
+            { session: 7, baseNote: 'B4', avgError: 20.1, rank: 'good', icon: 'star', color: 'green',
+              noteResults: [
+                { note: 'ド', error: +18.7, status: 'good' }, { note: 'レ', error: +22.3, status: 'good' },
+                { note: 'ミ', error: -17.9, status: 'good' }, { note: 'ファ', error: +24.1, status: 'good' },
+                { note: 'ソ', error: +19.5, status: 'good' }, { note: 'ラ', error: -21.8, status: 'good' },
+                { note: 'シ', error: +16.4, status: 'good' }, { note: 'ド', error: +23.7, status: 'good' }
+              ]
+            },
+            { session: 8, baseNote: 'C5', avgError: 45.2, rank: 'practice', icon: 'triangle-alert', color: 'red',
+              noteResults: [
+                { note: 'ド', error: +42.3, status: 'practice' }, { note: 'レ', error: +48.7, status: 'practice' },
+                { note: 'ミ', error: -43.1, status: 'practice' }, { note: 'ファ', error: +52.4, status: 'practice' },
+                { note: 'ソ', error: +39.8, status: 'pass' }, { note: 'ラ', error: -46.9, status: 'practice' },
+                { note: 'シ', error: +44.6, status: 'practice' }, { note: 'ド', error: +41.8, status: 'practice' }
+              ]
+            }
         ];
         
         let selectedSession = 1;
@@ -331,6 +440,9 @@
                 
                 grid.appendChild(box);
             });
+            
+            // Lucideアイコンを初期化
+            lucide.createIcons();
         }
         
         // セッション選択
@@ -348,19 +460,55 @@
             document.getElementById('session-base-note').textContent = session.baseNote;
             document.getElementById('session-average-error').textContent = `${session.avgError > 0 ? '+' : ''}${session.avgError}¢`;
             
-            // ランクアイコンと色の更新
-            const iconElement = document.querySelector('#session-rank-icon i');
+            // ランクアイコンと色の更新（完全な要素再生成）
+            const iconContainer = document.getElementById('session-rank-icon');
             const textElement = document.getElementById('session-rank-text');
             
-            iconElement.setAttribute('data-lucide', session.icon);
-            iconElement.className = `text-${session.color}-300`;
-            iconElement.style = 'width: 80px; height: 80px;';
+            // アイコン要素を完全に再生成
+            iconContainer.innerHTML = `<i data-lucide="${session.icon}" class="text-${session.color}-300" style="width: 80px; height: 80px;"></i>`;
             
             textElement.textContent = session.rank.charAt(0).toUpperCase() + session.rank.slice(1);
             textElement.className = `text-base md:text-lg font-bold text-${session.color}-300`;
             
-            // 音別結果は簡略化（実装時に拡張）
-            document.getElementById('note-results').innerHTML = '<p class="text-white-70 text-center">詳細分析データを読み込み中...</p>';
+            // 音別結果を表示
+            const noteResultsHtml = session.noteResults.map(noteResult => {
+                const statusColors = {
+                    'excellent': 'text-yellow-300',
+                    'good': 'text-green-300',
+                    'pass': 'text-blue-300', 
+                    'practice': 'text-red-300'
+                };
+                const statusIcons = {
+                    'excellent': 'trophy',
+                    'good': 'star',
+                    'pass': 'thumbs-up',
+                    'practice': 'triangle-alert'
+                };
+                const errorText = `${noteResult.error > 0 ? '+' : ''}${noteResult.error}¢`;
+                const colorClass = noteResult.error > 0 ? 'text-red-300' : 'text-blue-300';
+                
+                return `
+                    <div class="glass-card-sm hover:bg-white/10 transition-colors">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div>
+                                    <div class="text-lg font-bold text-white">${noteResult.note}</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="font-bold text-2xl ${colorClass}">
+                                    ${errorText}
+                                </div>
+                                <div class="flex items-center justify-center" style="min-width: 36px;">
+                                    <i data-lucide="${statusIcons[noteResult.status]}" class="${statusColors[noteResult.status]}" style="width: 28px; height: 28px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('note-results').innerHTML = noteResultsHtml;
             
             // Lucideアイコンを再初期化
             lucide.createIcons();
@@ -375,11 +523,108 @@
             if (selectedSession < 8) selectSession(selectedSession + 1);
         };
         
+        // 数値アニメーション関数
+        function animateCountUp(element, targetValue, duration = 1000, isDecimal = false) {
+            const startTime = performance.now();
+            const startValue = 0;
+            
+            function updateValue(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // イージング関数（ease-out-cubic）
+                const easedProgress = 1 - Math.pow(1 - progress, 3);
+                const currentValue = startValue + (targetValue - startValue) * easedProgress;
+                
+                if (isDecimal) {
+                    element.textContent = (targetValue >= 0 ? '+' : '') + currentValue.toFixed(1) + '¢';
+                } else {
+                    element.textContent = Math.floor(currentValue);
+                }
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateValue);
+                }
+            }
+            
+            requestAnimationFrame(updateValue);
+        }
+        
+        function animateGradeDisplay(element, finalGrade, totalDuration = 2000) {
+            const grades = ['S', 'A', 'B', 'C', 'D', 'E'];
+            const finalIndex = grades.indexOf(finalGrade);
+            
+            if (finalIndex === -1) {
+                element.textContent = finalGrade;
+                return;
+            }
+            
+            // 全グレード表示にかける時間を計算（総時間の70%）
+            const gradeDisplayTime = totalDuration * 0.7;
+            const intervalTime = gradeDisplayTime / grades.length;
+            let currentIndex = -1;
+            
+            const gradeInterval = setInterval(() => {
+                currentIndex++;
+                if (currentIndex < grades.length) {
+                    element.textContent = grades[currentIndex];
+                } else {
+                    clearInterval(gradeInterval);
+                    // 残り時間で目的のグレードに戻る
+                    const remainingTime = totalDuration - gradeDisplayTime;
+                    setTimeout(() => {
+                        element.textContent = finalGrade;
+                    }, remainingTime / 2);
+                }
+            }, intervalTime);
+        }
+        
+        function animateStatistics() {
+            setTimeout(() => {
+                // 全ての数値を初期化
+                const avgErrorElement = document.querySelector('.avg-error');
+                const maxErrorElement = document.querySelector('.max-error');
+                const sessionCountElement = document.querySelector('.session-count');
+                const gradeElement = document.getElementById('dynamic-grade');
+                
+                if (avgErrorElement) avgErrorElement.textContent = '±0.0¢';
+                if (maxErrorElement) maxErrorElement.textContent = '+0¢';
+                if (sessionCountElement) sessionCountElement.textContent = '0';
+                if (gradeElement) gradeElement.textContent = 'S';
+                
+                const animationDuration = 1500;
+                
+                setTimeout(() => {
+                    // Grade animation - 全グレード表示
+                    if (gradeElement) {
+                        animateGradeDisplay(gradeElement, 'B', animationDuration);
+                    }
+                    // Average error animation
+                    if (avgErrorElement) {
+                        animateCountUp({
+                            set textContent(val) { avgErrorElement.textContent = val; }
+                        }, 18.2, animationDuration, true);
+                    }
+                    // Max error animation
+                    if (maxErrorElement) {
+                        animateCountUp({
+                            set textContent(val) { maxErrorElement.textContent = val; }
+                        }, 25.8, animationDuration, true);
+                    }
+                    // Session count animation - 白色のまま
+                    if (sessionCountElement) {
+                        animateCountUp(sessionCountElement, 8, animationDuration, false);
+                    }
+                }, 300);
+            }, 500);
+        }
+        
         // 初期化
         document.addEventListener('DOMContentLoaded', () => {
             generateSessionsGrid();
             updateDetailedAnalysis();
             lucide.createIcons();
+            animateStatistics();
         });
     </script>
 </body>
