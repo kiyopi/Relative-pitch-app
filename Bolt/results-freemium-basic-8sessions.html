@@ -324,7 +324,7 @@
                             <p class="text-base md:text-lg font-bold text-blue-300" id="session-rank-text">Pass</p>
                         </div>
                         <div style="display: flex; flex-direction: column; justify-content: flex-end; text-align: center; height: 100%;">
-                            <div class="text-2xl md:text-4xl font-bold text-white" id="session-average-error">+25.1¢</div>
+                            <div class="text-2xl md:text-4xl font-bold text-white" id="session-average-error">±12.3¢</div>
                             <p class="text-xs md:text-base text-green-200">セッション平均誤差</p>
                         </div>
                     </div>
@@ -355,66 +355,98 @@
         const sessionsData = [
             { session: 1, baseNote: 'C4', avgError: 12.3, rank: 'excellent', icon: 'trophy', color: 'yellow',
               noteResults: [
-                { note: 'ド', error: +8.2, status: 'excellent' }, { note: 'レ', error: +15.1, status: 'excellent' },
-                { note: 'ミ', error: -12.4, status: 'excellent' }, { note: 'ファ', error: +9.8, status: 'excellent' },
-                { note: 'ソ', error: +14.2, status: 'excellent' }, { note: 'ラ', error: -8.7, status: 'excellent' },
-                { note: 'シ', error: +11.5, status: 'excellent' }, { note: 'ド', error: +13.8, status: 'excellent' }
+                { note: 'ド', error: +8.2, status: 'excellent', targetHz: 262, actualHz: 264 }, 
+                { note: 'レ', error: +15.1, status: 'excellent', targetHz: 294, actualHz: 297 },
+                { note: 'ミ', error: -12.4, status: 'excellent', targetHz: 330, actualHz: 327 }, 
+                { note: 'ファ', error: +9.8, status: 'excellent', targetHz: 349, actualHz: 351 },
+                { note: 'ソ', error: +14.2, status: 'excellent', targetHz: 392, actualHz: 395 }, 
+                { note: 'ラ', error: -8.7, status: 'excellent', targetHz: 440, actualHz: 437 },
+                { note: 'シ', error: +11.5, status: 'excellent', targetHz: 494, actualHz: 497 }, 
+                { note: 'ド', error: +13.8, status: 'excellent', targetHz: 523, actualHz: 527 }
               ]
             },
             { session: 2, baseNote: 'D4', avgError: 18.7, rank: 'good', icon: 'star', color: 'green',
               noteResults: [
-                { note: 'ド', error: +22.1, status: 'good' }, { note: 'レ', error: +16.3, status: 'good' },
-                { note: 'ミ', error: -19.8, status: 'good' }, { note: 'ファ', error: +15.2, status: 'good' },
-                { note: 'ソ', error: +21.4, status: 'good' }, { note: 'ラ', error: -17.6, status: 'good' },
-                { note: 'シ', error: +18.9, status: 'good' }, { note: 'ド', error: +12.4, status: 'excellent' }
+                { note: 'ド', error: +22.1, status: 'good', targetHz: 294, actualHz: 298 }, 
+                { note: 'レ', error: +16.3, status: 'good', targetHz: 330, actualHz: 333 },
+                { note: 'ミ', error: -19.8, status: 'good', targetHz: 370, actualHz: 366 }, 
+                { note: 'ファ', error: +15.2, status: 'good', targetHz: 392, actualHz: 394 },
+                { note: 'ソ', error: +21.4, status: 'good', targetHz: 440, actualHz: 445 }, 
+                { note: 'ラ', error: -17.6, status: 'good', targetHz: 494, actualHz: 489 },
+                { note: 'シ', error: +18.9, status: 'good', targetHz: 554, actualHz: 560 }, 
+                { note: 'ド', error: +12.4, status: 'excellent', targetHz: 587, actualHz: 590 }
               ]
             },
             { session: 3, baseNote: 'E4', avgError: 32.1, rank: 'pass', icon: 'thumbs-up', color: 'blue',
               noteResults: [
-                { note: 'ド', error: +35.2, status: 'pass' }, { note: 'レ', error: +28.7, status: 'pass' },
-                { note: 'ミ', error: -31.4, status: 'pass' }, { note: 'ファ', error: +39.1, status: 'pass' },
-                { note: 'ソ', error: +25.8, status: 'pass' }, { note: 'ラ', error: -34.6, status: 'pass' },
-                { note: 'シ', error: +33.2, status: 'pass' }, { note: 'ド', error: +29.8, status: 'pass' }
+                { note: 'ド', error: +35.2, status: 'pass', targetHz: 330, actualHz: 337 }, 
+                { note: 'レ', error: +28.7, status: 'pass', targetHz: 370, actualHz: 375 },
+                { note: 'ミ', error: -31.4, status: 'pass', targetHz: 415, actualHz: 408 }, 
+                { note: 'ファ', error: +39.1, status: 'pass', targetHz: 440, actualHz: 448 },
+                { note: 'ソ', error: +25.8, status: 'pass', targetHz: 494, actualHz: 500 }, 
+                { note: 'ラ', error: -34.6, status: 'pass', targetHz: 554, actualHz: 543 },
+                { note: 'シ', error: +33.2, status: 'pass', targetHz: 622, actualHz: 634 }, 
+                { note: 'ド', error: +29.8, status: 'pass', targetHz: 659, actualHz: 671 }
               ]
             },
             { session: 4, baseNote: 'F4', avgError: 14.9, rank: 'excellent', icon: 'trophy', color: 'yellow',
               noteResults: [
-                { note: 'ド', error: +12.8, status: 'excellent' }, { note: 'レ', error: +17.2, status: 'good' },
-                { note: 'ミ', error: -11.4, status: 'excellent' }, { note: 'ファ', error: +13.7, status: 'excellent' },
-                { note: 'ソ', error: +16.9, status: 'good' }, { note: 'ラ', error: -14.1, status: 'excellent' },
-                { note: 'シ', error: +15.3, status: 'excellent' }, { note: 'ド', error: +18.8, status: 'good' }
+                { note: 'ド', error: +12.8, status: 'excellent', targetHz: 349, actualHz: 352 }, 
+                { note: 'レ', error: +17.2, status: 'good', targetHz: 392, actualHz: 396 },
+                { note: 'ミ', error: -11.4, status: 'excellent', targetHz: 440, actualHz: 437 }, 
+                { note: 'ファ', error: +13.7, status: 'excellent', targetHz: 466, actualHz: 469 },
+                { note: 'ソ', error: +16.9, status: 'good', targetHz: 523, actualHz: 528 }, 
+                { note: 'ラ', error: -14.1, status: 'excellent', targetHz: 587, actualHz: 582 },
+                { note: 'シ', error: +15.3, status: 'excellent', targetHz: 659, actualHz: 664 }, 
+                { note: 'ド', error: +18.8, status: 'good', targetHz: 698, actualHz: 705 }
               ]
             },
             { session: 5, baseNote: 'G4', avgError: 22.4, rank: 'good', icon: 'star', color: 'green',
               noteResults: [
-                { note: 'ド', error: +24.1, status: 'good' }, { note: 'レ', error: +19.8, status: 'good' },
-                { note: 'ミ', error: -25.7, status: 'pass' }, { note: 'ファ', error: +21.4, status: 'good' },
-                { note: 'ソ', error: +18.9, status: 'good' }, { note: 'ラ', error: -23.2, status: 'good' },
-                { note: 'シ', error: +26.8, status: 'pass' }, { note: 'ド', error: +20.5, status: 'good' }
+                { note: 'ド', error: +24.1, status: 'good', targetHz: 392, actualHz: 398 }, 
+                { note: 'レ', error: +19.8, status: 'good', targetHz: 440, actualHz: 445 },
+                { note: 'ミ', error: -25.7, status: 'pass', targetHz: 494, actualHz: 486 }, 
+                { note: 'ファ', error: +21.4, status: 'good', targetHz: 523, actualHz: 529 },
+                { note: 'ソ', error: +18.9, status: 'good', targetHz: 587, actualHz: 593 }, 
+                { note: 'ラ', error: -23.2, status: 'good', targetHz: 659, actualHz: 649 },
+                { note: 'シ', error: +26.8, status: 'pass', targetHz: 740, actualHz: 752 }, 
+                { note: 'ド', error: +20.5, status: 'good', targetHz: 784, actualHz: 794 }
               ]
             },
             { session: 6, baseNote: 'A4', avgError: 28.8, rank: 'pass', icon: 'thumbs-up', color: 'blue',
               noteResults: [
-                { note: 'ド', error: +31.2, status: 'pass' }, { note: 'レ', error: +26.4, status: 'pass' },
-                { note: 'ミ', error: -29.8, status: 'pass' }, { note: 'ファ', error: +33.1, status: 'pass' },
-                { note: 'ソ', error: +24.7, status: 'good' }, { note: 'ラ', error: -32.5, status: 'pass' },
-                { note: 'シ', error: +35.9, status: 'pass' }, { note: 'ド', error: +27.6, status: 'pass' }
+                { note: 'ド', error: +31.2, status: 'pass', targetHz: 440, actualHz: 449 }, 
+                { note: 'レ', error: +26.4, status: 'pass', targetHz: 494, actualHz: 501 },
+                { note: 'ミ', error: -29.8, status: 'pass', targetHz: 554, actualHz: 544 }, 
+                { note: 'ファ', error: +33.1, status: 'pass', targetHz: 587, actualHz: 599 },
+                { note: 'ソ', error: +24.7, status: 'good', targetHz: 659, actualHz: 669 }, 
+                { note: 'ラ', error: -32.5, status: 'pass', targetHz: 740, actualHz: 723 },
+                { note: 'シ', error: +35.9, status: 'pass', targetHz: 831, actualHz: 849 }, 
+                { note: 'ド', error: +27.6, status: 'pass', targetHz: 880, actualHz: 896 }
               ]
             },
             { session: 7, baseNote: 'B4', avgError: 20.1, rank: 'good', icon: 'star', color: 'green',
               noteResults: [
-                { note: 'ド', error: +18.7, status: 'good' }, { note: 'レ', error: +22.3, status: 'good' },
-                { note: 'ミ', error: -17.9, status: 'good' }, { note: 'ファ', error: +24.1, status: 'good' },
-                { note: 'ソ', error: +19.5, status: 'good' }, { note: 'ラ', error: -21.8, status: 'good' },
-                { note: 'シ', error: +16.4, status: 'good' }, { note: 'ド', error: +23.7, status: 'good' }
+                { note: 'ド', error: +18.7, status: 'good', targetHz: 494, actualHz: 500 }, 
+                { note: 'レ', error: +22.3, status: 'good', targetHz: 554, actualHz: 562 },
+                { note: 'ミ', error: -17.9, status: 'good', targetHz: 622, actualHz: 615 }, 
+                { note: 'ファ', error: +24.1, status: 'good', targetHz: 659, actualHz: 669 },
+                { note: 'ソ', error: +19.5, status: 'good', targetHz: 740, actualHz: 749 }, 
+                { note: 'ラ', error: -21.8, status: 'good', targetHz: 831, actualHz: 816 },
+                { note: 'シ', error: +16.4, status: 'good', targetHz: 932, actualHz: 942 }, 
+                { note: 'ド', error: +23.7, status: 'good', targetHz: 988, actualHz: 1003 }
               ]
             },
             { session: 8, baseNote: 'C5', avgError: 45.2, rank: 'practice', icon: 'triangle-alert', color: 'red',
               noteResults: [
-                { note: 'ド', error: +42.3, status: 'practice' }, { note: 'レ', error: +48.7, status: 'practice' },
-                { note: 'ミ', error: -43.1, status: 'practice' }, { note: 'ファ', error: +52.4, status: 'practice' },
-                { note: 'ソ', error: +39.8, status: 'pass' }, { note: 'ラ', error: -46.9, status: 'practice' },
-                { note: 'シ', error: +44.6, status: 'practice' }, { note: 'ド', error: +41.8, status: 'practice' }
+                { note: 'ド', error: +42.3, status: 'practice', targetHz: 523, actualHz: 535 }, 
+                { note: 'レ', error: +48.7, status: 'practice', targetHz: 587, actualHz: 604 },
+                { note: 'ミ', error: -43.1, status: 'practice', targetHz: 659, actualHz: 642 }, 
+                { note: 'ファ', error: +52.4, status: 'practice', targetHz: 698, actualHz: 719 },
+                { note: 'ソ', error: +39.8, status: 'pass', targetHz: 784, actualHz: 800 }, 
+                { note: 'ラ', error: -46.9, status: 'practice', targetHz: 880, actualHz: 855 },
+                { note: 'シ', error: +44.6, status: 'practice', targetHz: 988, actualHz: 1014 }, 
+                { note: 'ド', error: +41.8, status: 'practice', targetHz: 1047, actualHz: 1069 }
               ]
             }
         ];
@@ -458,7 +490,7 @@
             
             document.getElementById('selected-session').textContent = selectedSession;
             document.getElementById('session-base-note').textContent = session.baseNote;
-            document.getElementById('session-average-error').textContent = `${session.avgError > 0 ? '+' : ''}${session.avgError}¢`;
+            document.getElementById('session-average-error').textContent = `±${session.avgError}¢`;
             
             // ランクアイコンと色の更新（完全な要素再生成）
             const iconContainer = document.getElementById('session-rank-icon');
@@ -488,19 +520,21 @@
                 const colorClass = noteResult.error > 0 ? 'text-red-300' : 'text-blue-300';
                 
                 return `
-                    <div class="glass-card-sm hover:bg-white/10 transition-colors">
+                    <div class="note-result-item">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-4">
+                                <div class="text-lg font-bold text-white">${noteResult.note}</div>
                                 <div>
-                                    <div class="text-lg font-bold text-white">${noteResult.note}</div>
+                                    <div class="text-sm text-white-60">目標 ${noteResult.targetHz}Hz</div>
+                                    <div class="text-sm text-white-60">実音 ${noteResult.actualHz}Hz</div>
                                 </div>
                             </div>
                             <div class="flex items-center gap-3">
-                                <div class="font-bold text-2xl ${colorClass}">
+                                <div class="font-bold text-xl ${colorClass}">
                                     ${errorText}
                                 </div>
                                 <div class="flex items-center justify-center" style="min-width: 36px;">
-                                    <i data-lucide="${statusIcons[noteResult.status]}" class="${statusColors[noteResult.status]}" style="width: 28px; height: 28px;"></i>
+                                    <i data-lucide="${statusIcons[noteResult.status]}" class="${statusColors[noteResult.status]}" style="width: 24px; height: 24px;"></i>
                                 </div>
                             </div>
                         </div>
@@ -537,7 +571,7 @@
                 const currentValue = startValue + (targetValue - startValue) * easedProgress;
                 
                 if (isDecimal) {
-                    element.textContent = (targetValue >= 0 ? '+' : '') + currentValue.toFixed(1) + '¢';
+                    element.textContent = (targetValue >= 0 ? '±' : '') + currentValue.toFixed(1) + '¢';
                 } else {
                     element.textContent = Math.floor(currentValue);
                 }
