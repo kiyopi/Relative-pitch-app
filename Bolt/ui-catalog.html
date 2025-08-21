@@ -172,6 +172,98 @@
             color: rgba(255, 255, 255, 0.9);
         }
         
+        /* === フリーミアム実装版セッショングリッドスタイル === */
+        .session-grid-item {
+            aspect-ratio: 1;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .session-active {
+            opacity: 1;
+        }
+        
+        .session-active:hover {
+            transform: scale(1.05);
+        }
+        
+        .session-active:active {
+            transform: scale(0.95);
+        }
+        
+        .session-excellent {
+            background: rgba(251, 191, 36, 0.2);  /* 黄色 - Trophy */
+        }
+        
+        .session-good {
+            background: rgba(34, 197, 94, 0.2);   /* 緑色 - Star */
+        }
+        
+        .session-pass {
+            background: rgba(96, 165, 250, 0.2);  /* 青色 - Thumbs-up */
+        }
+        
+        .session-practice {
+            background: rgba(239, 68, 68, 0.2);   /* 赤色 - Triangle-alert */
+        }
+        
+        .session-grid-item .session-number {
+            color: white;
+            font-weight: bold;
+            font-size: 0.875rem;
+        }
+        
+        .session-evaluation-icon {
+            width: 24px;
+            height: 24px;
+            margin-top: 0.25rem;
+        }
+        
+        /* UIカタログ用 - 実装版と同じサイズ・マージン */
+        .session-grid-demo {
+            display: grid !important;
+            grid-template-columns: repeat(12, 1fr) !important; /* 実装版と同じ12列 */
+            gap: 0.75rem !important; /* gap-3と同じ */
+        }
+        
+        /* 実装版と同じアスペクト比を維持 */
+        .session-grid-demo .session-grid-item {
+            aspect-ratio: 1;
+            width: auto; /* 可変幅 */
+            height: auto; /* 可変高さ */
+            min-height: unset;
+            max-width: unset;
+        }
+        
+        /* 実装版と同じアイコンサイズ */
+        .session-grid-demo .session-evaluation-icon {
+            width: 24px;
+            height: 24px;
+            margin-top: 0.25rem;
+        }
+        
+        /* 実装版と同じフォントサイズ */
+        .session-grid-demo .session-number {
+            font-size: 0.875rem;
+        }
+        
+        .session-selected {
+            filter: brightness(1.8);
+        }
+        
+        .session-active:not(.session-selected):hover {
+            transform: scale(1.05);
+            filter: brightness(1.15);
+        }
+        
         /* 評価レベル別の背景色 */
         .session-excellent {
             background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(245, 158, 11, 0.2));
@@ -1245,27 +1337,82 @@
                     </div>
                     
                     <div class="component-item">
-                        <h4 class="text-white font-medium mb-4">12セッショングリッド</h4>
-                        <div class="grid grid-cols-12 gap-2">
-                            <div class="session-box session-excellent"><div class="text-xs text-white">1</div></div>
-                            <div class="session-box session-good"><div class="text-xs text-white">2</div></div>
-                            <div class="session-box session-pass"><div class="text-xs text-white">3</div></div>
-                            <div class="session-box session-practice"><div class="text-xs text-white">4</div></div>
-                            <div class="session-box session-excellent"><div class="text-xs text-white">5</div></div>
-                            <div class="session-box session-good"><div class="text-xs text-white">6</div></div>
-                            <div class="session-box session-pass"><div class="text-xs text-white">7</div></div>
-                            <div class="session-box session-practice"><div class="text-xs text-white">8</div></div>
-                            <div class="session-box session-excellent"><div class="text-xs text-white">9</div></div>
-                            <div class="session-box session-good"><div class="text-xs text-white">10</div></div>
-                            <div class="session-box session-pass"><div class="text-xs text-white">11</div></div>
-                            <div class="session-box session-practice"><div class="text-xs text-white">12</div></div>
+                        <h4 class="text-white font-medium mb-4">12セッショングリッド（実装版サイズ）</h4>
+                        <div class="session-grid-demo">
+                            <!-- Excellent (< 20 cents) -->
+                            <div class="session-grid-item session-excellent session-active">
+                                <div class="session-number">S1</div>
+                                <i data-lucide="trophy" class="session-evaluation-icon text-yellow-300"></i>
+                            </div>
+                            <!-- Good (20-30 cents) -->
+                            <div class="session-grid-item session-good session-active">
+                                <div class="session-number">S2</div>
+                                <i data-lucide="star" class="session-evaluation-icon text-green-300"></i>
+                            </div>
+                            <!-- Practice (> 40 cents) -->
+                            <div class="session-grid-item session-practice session-active">
+                                <div class="session-number">S3</div>
+                                <i data-lucide="triangle-alert" class="session-evaluation-icon text-red-300"></i>
+                            </div>
+                            <!-- Pass (30-40 cents) -->
+                            <div class="session-grid-item session-pass session-active">
+                                <div class="session-number">S4</div>
+                                <i data-lucide="thumbs-up" class="session-evaluation-icon text-blue-300"></i>
+                            </div>
+                            <!-- Excellent -->
+                            <div class="session-grid-item session-excellent session-active">
+                                <div class="session-number">S5</div>
+                                <i data-lucide="trophy" class="session-evaluation-icon text-yellow-300"></i>
+                            </div>
+                            <!-- Practice -->
+                            <div class="session-grid-item session-practice session-active">
+                                <div class="session-number">S6</div>
+                                <i data-lucide="triangle-alert" class="session-evaluation-icon text-red-300"></i>
+                            </div>
+                            <!-- Good -->
+                            <div class="session-grid-item session-good session-active">
+                                <div class="session-number">S7</div>
+                                <i data-lucide="star" class="session-evaluation-icon text-green-300"></i>
+                            </div>
+                            <!-- Good -->
+                            <div class="session-grid-item session-good session-active">
+                                <div class="session-number">S8</div>
+                                <i data-lucide="star" class="session-evaluation-icon text-green-300"></i>
+                            </div>
+                            <!-- Pass -->
+                            <div class="session-grid-item session-pass session-active">
+                                <div class="session-number">S9</div>
+                                <i data-lucide="thumbs-up" class="session-evaluation-icon text-blue-300"></i>
+                            </div>
+                            <!-- Excellent -->
+                            <div class="session-grid-item session-excellent session-active">
+                                <div class="session-number">S10</div>
+                                <i data-lucide="trophy" class="session-evaluation-icon text-yellow-300"></i>
+                            </div>
+                            <!-- Good -->
+                            <div class="session-grid-item session-good session-active">
+                                <div class="session-number">S11</div>
+                                <i data-lucide="star" class="session-evaluation-icon text-green-300"></i>
+                            </div>
+                            <!-- Selected state example -->
+                            <div class="session-grid-item session-good session-active session-selected">
+                                <div class="session-number">S12</div>
+                                <i data-lucide="star" class="session-evaluation-icon text-green-300"></i>
+                            </div>
                         </div>
                         
                         <div class="code-sample mt-4">
-&lt;div class="grid grid-cols-12 gap-2"&gt;
-  &lt;div class="session-box session-excellent"&gt;1&lt;/div&gt;
-  &lt;div class="session-box session-good"&gt;2&lt;/div&gt;
-  &lt;!-- ... --&gt;
+&lt;!-- 実装版と同じ12列グリッド（gap-3） --&gt;
+&lt;div class="grid grid-cols-12 gap-3" id="sessions-grid"&gt;
+  &lt;div class="session-grid-item session-excellent session-active"&gt;
+    &lt;div class="session-number"&gt;S1&lt;/div&gt;
+    &lt;i data-lucide="trophy" class="session-evaluation-icon text-yellow-300"&gt;&lt;/i&gt;
+  &lt;/div&gt;
+  &lt;div class="session-grid-item session-good session-active session-selected"&gt;
+    &lt;div class="session-number"&gt;S12&lt;/div&gt;
+    &lt;i data-lucide="star" class="session-evaluation-icon text-green-300"&gt;&lt;/i&gt;
+  &lt;/div&gt;
+  &lt;!-- ... 12個のセッション --&gt;
 &lt;/div&gt;</div>
                     </div>
                 </div>
