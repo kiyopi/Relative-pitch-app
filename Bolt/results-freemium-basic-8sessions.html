@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>8va相対音感トレーニング - 総合評価</title>
+    
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="styles/system.css">
+    
+    <!-- アイコンライブラリ -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <style>
+        /* 背景アニメーション - UIカタログベース */
+        body {
+            position: relative;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            -webkit-overflow-scrolling: touch;
+            background: #0f172a;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            z-index: -1;
+            transform: translateZ(0);
+            will-change: background-position;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* 8セッション専用グリッド */
+        .sessions-grid-8 {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 0.75rem;
+        }
+        
+        @media (max-width: 768px) {
+            .sessions-grid-8 {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 0.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .sessions-grid-8 {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 0.5rem;
+            }
+        }
+        
+        /* セッションボックス - UIカタログベース（改良版） */
+        .session-box {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .session-box:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .session-box.selected {
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+        }
+        
+        /* レスポンシブ セッション番号 */
+        .session-number {
+            font-weight: bold;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* 8個表示時のサイズ（デスクトップ） */
+        .sessions-grid-8 .session-number {
+            font-size: 1rem;
+        }
+        
+        .sessions-grid-8 .session-icon i {
+            width: 24px;
+            height: 24px;
+        }
+        
+        /* 4x2表示時のサイズ（タブレット・モバイル） */
+        @media (max-width: 768px) {
+            .sessions-grid-8 .session-number {
+                font-size: 0.875rem;
+            }
+            
+            .sessions-grid-8 .session-icon i {
+                width: 20px;
+                height: 20px;
+            }
+        }
+        
+        /* 12個表示時の対応（将来用） */
+        .sessions-grid-12 .session-number {
+            font-size: 0.875rem;
+        }
+        
+        .sessions-grid-12 .session-icon i {
+            width: 20px;
+            height: 20px;
+        }
+        
+        /* 評価レベル別色 - UIカタログから */
+        .session-excellent {
+            background: rgba(251, 191, 36, 0.2);
+            border-color: rgba(251, 191, 36, 0.3);
+        }
+        
+        .session-good {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+        
+        .session-pass {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+        
+        .session-practice {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen p-6">
+        <div class="container">
+            <!-- ヘッダーセクション -->
+            <div class="text-center mb-8">
+                <div class="flex justify-center mb-6">
+                    <div class="w-24 h-24 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
+                        <i data-lucide="check-circle" class="icon-2xl text-white"></i>
+                    </div>
+                </div>
+                <h1 class="text-4xl font-bold text-white mb-4">総合評価</h1>
+                <p class="text-green-200 text-xl mb-6">8セッション完了 - あなたの相対音感能力を分析</p>
+            </div>
+
+            <!-- 総合評価セクション -->
+            <div class="glass-card mb-8">
+                <h2 class="text-2xl font-bold text-white mb-6 text-center">総合成績</h2>
+                
+                <!-- 統計表示 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="text-center">
+                        <div class="stat-label">総合スコア</div>
+                        <div class="stat-value-rank session-count">8</div>
+                        <div class="stat-description">セッション完了</div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="stat-label">総合評価</div>
+                        <div class="stat-value text-green-300">B+</div>
+                        <div class="stat-description">良好な相対音感</div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="stat-label">平均精度</div>
+                        <div class="stat-value text-blue-300">±18.2¢</div>
+                        <div class="stat-description">セント差</div>
+                    </div>
+                </div>
+                
+                <!-- 評価内訳 -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-medium text-white mb-4 text-center">8セッションの評価内訳</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="trophy" class="text-yellow-300" style="width: 20px; height: 20px;"></i>
+                                <span class="text-white">Excellent (±15¢以内)</span>
+                            </div>
+                            <span class="text-white font-bold">2回</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="star" class="text-green-300" style="width: 20px; height: 20px;"></i>
+                                <span class="text-white">Good (15-25¢)</span>
+                            </div>
+                            <span class="text-white font-bold">3回</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="thumbs-up" class="text-blue-300" style="width: 20px; height: 20px;"></i>
+                                <span class="text-white">Pass (25-40¢)</span>
+                            </div>
+                            <span class="text-white font-bold">2回</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="triangle-alert" class="text-red-300" style="width: 20px; height: 20px;"></i>
+                                <span class="text-white">Practice (40¢以上)</span>
+                            </div>
+                            <span class="text-white font-bold">1回</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- セッション別成績 -->
+            <div class="glass-card mb-8">
+                <h3 class="text-2xl font-bold text-white mb-6">セッション別成績</h3>
+                <p class="text-white-70 text-sm mb-4">
+                    <span class="lg:hidden">セッションをタップして詳細分析を表示</span>
+                    <span class="hidden lg:inline">セッションをクリックして詳細分析を表示</span>
+                </p>
+                <div class="sessions-grid-8" id="sessions-grid">
+                    <!-- JavaScriptで8セッション分のHTMLを生成 -->
+                </div>
+            </div>
+            
+            <!-- 詳細分析 -->
+            <div class="glass-card mb-8" id="detailed-analysis-section">
+                <div class="flex items-center justify-between mb-6">
+                    <button id="prev-session-btn" class="glass-card-sm hover:bg-white/10 transition-colors cursor-pointer flex-shrink-0">
+                        <i data-lucide="chevron-left" class="text-white" style="width: 24px; height: 24px;"></i>
+                    </button>
+                    <h3 class="text-xl font-bold text-white text-center flex-1 px-2">
+                        <div>詳細分析</div>
+                        <div class="text-lg mt-1">セッション<span id="selected-session">1</span></div>
+                    </h3>
+                    <button id="next-session-btn" class="glass-card-sm hover:bg-white/10 transition-colors cursor-pointer flex-shrink-0">
+                        <i data-lucide="chevron-right" class="text-white" style="width: 24px; height: 24px;"></i>
+                    </button>
+                </div>
+                
+                <!-- セッション詳細情報 -->
+                <div class="mb-4 text-center" id="session-info">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; align-items: end; min-height: 80px;">
+                        <div style="display: flex; flex-direction: column; justify-content: flex-end; text-align: center; height: 100%;">
+                            <div class="text-2xl md:text-4xl font-bold text-white" id="session-base-note">C4</div>
+                            <p class="text-xs md:text-base text-green-200">基音</p>
+                        </div>
+                        <div style="display: flex; flex-direction: column; justify-content: flex-end; align-items: center; text-align: center; height: 100%;">
+                            <div class="mb-2" id="session-rank-icon">
+                                <i data-lucide="thumbs-up" class="text-blue-300" style="width: 80px; height: 80px;"></i>
+                            </div>
+                            <p class="text-base md:text-lg font-bold text-blue-300" id="session-rank-text">Pass</p>
+                        </div>
+                        <div style="display: flex; flex-direction: column; justify-content: flex-end; text-align: center; height: 100%;">
+                            <div class="text-2xl md:text-4xl font-bold text-white" id="session-average-error">+25.1¢</div>
+                            <p class="text-xs md:text-base text-green-200">セッション平均誤差</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 音別詳細結果 -->
+                <div class="space-y-2" id="note-results">
+                    <!-- JavaScriptで生成 -->
+                </div>
+            </div>
+            
+            <!-- アクションボタン -->
+            <section class="final-actions">
+                <a href="training.html" class="btn btn-primary btn-large">
+                    <i data-lucide="arrow-right" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                    <span>続行</span>
+                </a>
+                <a href="index.html" class="btn btn-secondary btn-large">
+                    <i data-lucide="home" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                    <span>ホームに戻る</span>
+                </a>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // 8セッション用モックデータ
+        const sessionsData = [
+            { session: 1, baseNote: 'C4', avgError: 12.3, rank: 'excellent', icon: 'trophy', color: 'yellow' },
+            { session: 2, baseNote: 'D4', avgError: 18.7, rank: 'good', icon: 'star', color: 'green' },
+            { session: 3, baseNote: 'E4', avgError: 32.1, rank: 'pass', icon: 'thumbs-up', color: 'blue' },
+            { session: 4, baseNote: 'F4', avgError: 14.9, rank: 'excellent', icon: 'trophy', color: 'yellow' },
+            { session: 5, baseNote: 'G4', avgError: 22.4, rank: 'good', icon: 'star', color: 'green' },
+            { session: 6, baseNote: 'A4', avgError: 28.8, rank: 'pass', icon: 'thumbs-up', color: 'blue' },
+            { session: 7, baseNote: 'B4', avgError: 20.1, rank: 'good', icon: 'star', color: 'green' },
+            { session: 8, baseNote: 'C5', avgError: 45.2, rank: 'practice', icon: 'triangle-alert', color: 'red' }
+        ];
+        
+        let selectedSession = 1;
+        
+        // セッショングリッド生成（最小HTML）
+        function generateSessionsGrid() {
+            const grid = document.getElementById('sessions-grid');
+            grid.innerHTML = '';
+            
+            sessionsData.forEach((session, index) => {
+                const box = document.createElement('div');
+                box.className = `session-box session-${session.rank} ${selectedSession === session.session ? 'selected' : ''}`;
+                box.onclick = () => selectSession(session.session);
+                
+                box.innerHTML = `
+                    <div class="session-number">${session.session}</div>
+                    <div class="session-icon">
+                        <i data-lucide="${session.icon}" class="text-${session.color}-300"></i>
+                    </div>
+                `;
+                
+                grid.appendChild(box);
+            });
+        }
+        
+        // セッション選択
+        function selectSession(sessionNum) {
+            selectedSession = sessionNum;
+            generateSessionsGrid();
+            updateDetailedAnalysis();
+        }
+        
+        // 詳細分析更新
+        function updateDetailedAnalysis() {
+            const session = sessionsData[selectedSession - 1];
+            
+            document.getElementById('selected-session').textContent = selectedSession;
+            document.getElementById('session-base-note').textContent = session.baseNote;
+            document.getElementById('session-average-error').textContent = `${session.avgError > 0 ? '+' : ''}${session.avgError}¢`;
+            
+            // ランクアイコンと色の更新
+            const iconElement = document.querySelector('#session-rank-icon i');
+            const textElement = document.getElementById('session-rank-text');
+            
+            iconElement.setAttribute('data-lucide', session.icon);
+            iconElement.className = `text-${session.color}-300`;
+            iconElement.style = 'width: 80px; height: 80px;';
+            
+            textElement.textContent = session.rank.charAt(0).toUpperCase() + session.rank.slice(1);
+            textElement.className = `text-base md:text-lg font-bold text-${session.color}-300`;
+            
+            // 音別結果は簡略化（実装時に拡張）
+            document.getElementById('note-results').innerHTML = '<p class="text-white-70 text-center">詳細分析データを読み込み中...</p>';
+            
+            // Lucideアイコンを再初期化
+            lucide.createIcons();
+        }
+        
+        // ナビゲーション
+        document.getElementById('prev-session-btn').onclick = () => {
+            if (selectedSession > 1) selectSession(selectedSession - 1);
+        };
+        
+        document.getElementById('next-session-btn').onclick = () => {
+            if (selectedSession < 8) selectSession(selectedSession + 1);
+        };
+        
+        // 初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            generateSessionsGrid();
+            updateDetailedAnalysis();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
