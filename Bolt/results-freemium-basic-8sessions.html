@@ -18,6 +18,58 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
     
     <style>
+        /* アイコン付き見出しクラス - UIカタログから統一 */
+        .heading-sm {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.125rem; /* text-lg */
+            line-height: 1.75rem;
+            font-weight: 500; /* font-medium */
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .heading-sm i {
+            width: 20px;
+            height: 20px;
+            color: white;
+        }
+
+        .heading-md {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem; /* text-xl */
+            line-height: 1.75rem;
+            font-weight: 600; /* font-semibold */
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .heading-md i {
+            width: 24px;
+            height: 24px;
+            color: white;
+        }
+
+        .heading-lg {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem; /* text-2xl */
+            line-height: 2rem;
+            font-weight: 700; /* font-bold */
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .heading-lg i {
+            width: 28px;
+            height: 28px;
+            color: white;
+        }
+
         /* 背景アニメーション - UIカタログベース */
         body {
             position: relative;
@@ -206,6 +258,62 @@
                 height: 20px;
             }
         }
+
+        /* Glass Card 拡張ホバーエフェクト */
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.12) !important;
+            border-color: rgba(255, 255, 255, 0.25) !important;
+            transform: translateY(-4px) !important;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+        }
+
+        /* Share Card 反射エフェクト */
+        .share-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .share-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 11s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { 
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+                opacity: 1;
+            }
+            9.1% { 
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+                opacity: 1;
+            }
+            9.2% { 
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+                opacity: 0;
+            }
+            99.9% { 
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+                opacity: 0;
+            }
+            100% { 
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+                opacity: 1;
+            }
+        }
         
         /* 12個表示時の対応（将来用） */
         .sessions-grid-12 .session-number {
@@ -254,7 +362,7 @@
             </div>
 
             <!-- 総合評価セクション -->
-            <div class="glass-card mb-8">
+            <div class="share-card mb-8">
                 <section class="rank-section">
                     <!-- モード名 -->
                     <div class="rank-mode">
@@ -299,7 +407,10 @@
                     </div>
                 </section>
                 
-                <h3 class="text-xl font-medium text-white mb-4 text-center" style="margin-top: 0px; margin-bottom: 24px;">みんなに成果をシェアしよう！</h3>
+                <h3 class="heading-md" style="margin-top: 0px; justify-content: center;">
+                    <i data-lucide="share-2" class="text-blue-400"></i>
+                    みんなに成果をシェアしよう！
+                </h3>
                 <div class="share-buttons">
                     <a href="#" class="share-btn twitter" onclick="shareToTwitter(event)" title="Xでシェア">
                         <svg viewBox="0 0 24 24" fill="currentColor">
@@ -377,8 +488,8 @@
                     
                     <!-- 誤差推移グラフ（元の位置に残す・非表示） -->
                     <div class="mt-8" style="display: none;">
-                        <h4 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                            <i data-lucide="trending-up" class="text-white" style="width: 20px; height: 20px;"></i>
+                        <h4 class="heading-sm">
+                            <i data-lucide="trending-up"></i>
                             誤差推移
                         </h4>
                         <div class="bg-white/5 rounded-lg p-4" id="error-trend-container" style="height: 280px; position: relative; overflow-x: auto; overflow-y: hidden;">
@@ -395,15 +506,15 @@
             
             <!-- グラフ表示セクション -->
             <div class="glass-card mb-8">
-                <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                    <i data-lucide="bar-chart-3" class="text-white" style="width: 28px; height: 28px;"></i>
+                <h3 class="heading-lg">
+                    <i data-lucide="bar-chart-3"></i>
                     成績分析グラフ
                 </h3>
                 
                 <!-- 評価内訳グラフ -->
                 <div class="mb-8">
-                    <h4 class="text-lg font-medium text-white mb-4 flex items-center gap-2">
-                        <i data-lucide="pie-chart" class="text-white" style="width: 20px; height: 20px;"></i>
+                    <h4 class="heading-sm">
+                        <i data-lucide="pie-chart"></i>
                         評価内訳（64音）
                     </h4>
                     
@@ -415,8 +526,8 @@
                 
                 <!-- 誤差推移グラフ -->
                 <div>
-                    <h4 class="text-lg font-medium text-white mb-4 flex items-center gap-2">
-                        <i data-lucide="trending-up" class="text-white" style="width: 20px; height: 20px;"></i>
+                    <h4 class="heading-sm">
+                        <i data-lucide="trending-up"></i>
                         誤差推移
                     </h4>
                     
@@ -483,8 +594,8 @@
             <!-- 次のステップセクション -->
             <div class="glass-card mb-8">
                 <div class="text-center mb-8">
-                    <h2 class="text-2xl font-bold text-white mb-6 flex items-center justify-center gap-3">
-                        <i data-lucide="lightbulb" class="text-yellow-300" style="width: 28px; height: 28px;"></i>
+                    <h2 class="heading-lg" style="justify-content: center;">
+                        <i data-lucide="lightbulb" class="text-yellow-300"></i>
                         次のステップ
                     </h2>
                     <p class="text-green-300 font-semibold text-lg mb-3">
