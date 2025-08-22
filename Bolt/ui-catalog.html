@@ -91,6 +91,7 @@
             background: rgba(255, 255, 255, 0.03);
             border-radius: 0.75rem;
             border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 2rem;
         }
         
         .code-sample {
@@ -1266,6 +1267,90 @@
                             <p class="text-white-60 text-sm">キャプションテキスト</p>
                             <p class="text-white-60 text-sm">text-white-60 text-sm</p>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- アイコン付き見出しスタイル -->
+                <div class="component-item mt-8">
+                    <h3 class="text-xl font-medium text-white mb-4">アイコン付き見出し</h3>
+                    <p class="text-white-60 text-sm mb-6">アイコンと見出しのバランスの良い組み合わせパターン</p>
+                    
+                    <div class="space-y-6">
+                        <!-- パターン1: 小見出し用（gap-2） -->
+                        <div>
+                            <h4 class="text-lg font-medium text-white mb-2 flex items-center" style="gap: 0.5rem;">
+                                <i data-lucide="pie-chart" class="text-white" style="width: 20px; height: 20px;"></i>
+                                <span>評価内訳（64音）</span>
+                            </h4>
+                            <p class="text-white-60 text-xs">gap-2（0.5rem）: 小見出し・サブタイトル用</p>
+                        </div>
+                        
+                        <!-- パターン2: 中見出し用（gap-3） -->
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2 flex items-center" style="gap: 0.75rem;">
+                                <i data-lucide="trending-up" class="text-white" style="width: 24px; height: 24px;"></i>
+                                <span>誤差推移グラフ</span>
+                            </h3>
+                            <p class="text-white-60 text-xs">gap-3（0.75rem）: 中見出し・セクションタイトル用</p>
+                        </div>
+                        
+                        <!-- パターン3: 大見出し用（gap-3） -->
+                        <div>
+                            <h2 class="text-2xl font-bold text-white mb-2 flex items-center" style="gap: 0.75rem;">
+                                <i data-lucide="bar-chart-3" class="text-white" style="width: 28px; height: 28px;"></i>
+                                <span>成績分析グラフ</span>
+                            </h2>
+                            <p class="text-white-60 text-xs">gap-3（0.75rem）: 大見出し・メインタイトル用</p>
+                        </div>
+                        
+                        <!-- カラーバリエーション -->
+                        <div class="mt-6">
+                            <p class="text-white-70 text-sm mb-3">カラーバリエーション:</p>
+                            <div class="space-y-3">
+                                <h4 class="text-lg font-medium text-white flex items-center" style="gap: 0.5rem;">
+                                    <i data-lucide="trophy" class="text-yellow-300" style="width: 20px; height: 20px;"></i>
+                                    <span>優秀成績</span>
+                                </h4>
+                                <h4 class="text-lg font-medium text-white flex items-center" style="gap: 0.5rem;">
+                                    <i data-lucide="check-circle" class="text-green-300" style="width: 20px; height: 20px;"></i>
+                                    <span>達成項目</span>
+                                </h4>
+                                <h4 class="text-lg font-medium text-white flex items-center" style="gap: 0.5rem;">
+                                    <i data-lucide="info" class="text-blue-300" style="width: 20px; height: 20px;"></i>
+                                    <span>情報・ヒント</span>
+                                </h4>
+                                <h4 class="text-lg font-medium text-white flex items-center" style="gap: 0.5rem;">
+                                    <i data-lucide="alert-triangle" class="text-red-300" style="width: 20px; height: 20px;"></i>
+                                    <span>注意事項</span>
+                                </h4>
+                            </div>
+                        </div>
+                        
+                        <!-- 使用ガイドライン -->
+                        <div class="bg-white/5 rounded-lg p-4 mt-6">
+                            <h5 class="text-white font-medium mb-2">💡 使用ガイドライン</h5>
+                            <ul class="text-white-60 text-sm space-y-1">
+                                <li>アイコンサイズ: 見出しサイズに合わせて調整（16px〜28px）</li>
+                                <li>gap設定: 小見出しはgap-2、中・大見出しはgap-3を推奨</li>
+                                <li>flex items-center: 垂直方向の中央揃えを必ず設定</li>
+                                <li>span要素: テキスト部分を<span>で囲むと管理しやすい</li>
+                                <li>カラー: アイコンの意味に応じて適切な色を選択</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- コードサンプル -->
+                        <div class="code-sample mt-4">
+&lt;!-- 小見出し用 --&gt;
+&lt;h4 class="text-lg font-medium text-white flex items-center" style="gap: 0.5rem;"&gt;
+    &lt;i data-lucide="pie-chart" class="text-white" style="width: 20px; height: 20px;"&gt;&lt;/i&gt;
+    &lt;span&gt;評価内訳（64音）&lt;/span&gt;
+&lt;/h4&gt;
+
+&lt;!-- 中・大見出し用 --&gt;
+&lt;h3 class="text-xl font-bold text-white flex items-center" style="gap: 0.75rem;"&gt;
+    &lt;i data-lucide="trending-up" class="text-white" style="width: 24px; height: 24px;"&gt;&lt;/i&gt;
+    &lt;span&gt;誤差推移グラフ&lt;/span&gt;
+&lt;/h3&gt;</div>
                     </div>
                 </div>
             </section>

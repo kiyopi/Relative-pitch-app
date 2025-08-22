@@ -13,6 +13,10 @@
     <!-- アイコンライブラリ -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    
     <style>
         /* 背景アニメーション - UIカタログベース */
         body {
@@ -230,11 +234,11 @@
                     </div>
                 </section>
                 
-                <!-- 評価内訳 -->
-                <div class="mb-6">
+                <!-- 評価内訳（元の位置に残す） -->
+                <div class="mb-6" style="display: none;">
                     <h3 class="text-lg font-medium text-white mb-4 text-center">8セッション64音の評価内訳</h3>
                     
-                    <!-- 評価グラフ -->
+                    <!-- 評価グラフ（移動用に元のまま残す） -->
                     <div class="mb-6" id="evaluation-chart" style="display: flex; flex-direction: column; gap: 0.75rem; padding: 0 1rem;">
                         <!-- Excellent -->
                         <div style="display: flex; align-items: center; gap: 0.75rem;">
@@ -279,6 +283,56 @@
                                 <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">8</span>
                             </div>
                         </div>
+                    </div>
+                    
+                    <!-- 誤差推移グラフ（元の位置に残す・非表示） -->
+                    <div class="mt-8" style="display: none;">
+                        <h4 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                            <i data-lucide="trending-up" class="text-white" style="width: 20px; height: 20px;"></i>
+                            誤差推移
+                        </h4>
+                        <div class="bg-white/5 rounded-lg p-4" id="error-trend-container" style="height: 280px; position: relative; overflow-x: auto; overflow-y: hidden;">
+                            <div id="chart-wrapper" style="min-width: 100%; height: 100%;">
+                                <canvas id="error-trend-chart" style="height: 100%;"></canvas>
+                            </div>
+                        </div>
+                        <div class="text-xs text-white-60 text-center mt-3" id="chart-description" style="min-height: 60px;">
+                            <!-- グラフの説明はJavaScriptで動的に設定 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- グラフ表示セクション -->
+            <div class="glass-card mb-8">
+                <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                    <i data-lucide="bar-chart-3" class="text-white" style="width: 28px; height: 28px;"></i>
+                    成績分析グラフ
+                </h3>
+                
+                <!-- 評価内訳グラフ -->
+                <div class="mb-8">
+                    <h4 class="text-lg font-medium text-white mb-4 flex items-center gap-2">
+                        <i data-lucide="pie-chart" class="text-white" style="width: 20px; height: 20px;"></i>
+                        評価内訳（64音）
+                    </h4>
+                    
+                    <!-- 評価グラフをここに移動 -->
+                    <div id="evaluation-chart-container" class="bg-white/5 rounded-lg p-4">
+                        <!-- JavaScriptで移動 -->
+                    </div>
+                </div>
+                
+                <!-- 誤差推移グラフ -->
+                <div>
+                    <h4 class="text-lg font-medium text-white mb-4 flex items-center gap-2">
+                        <i data-lucide="trending-up" class="text-white" style="width: 20px; height: 20px;"></i>
+                        誤差推移
+                    </h4>
+                    
+                    <!-- 誤差推移グラフをここに移動 -->
+                    <div id="error-trend-section">
+                        <!-- JavaScriptで移動 -->
                     </div>
                 </div>
             </div>
@@ -777,7 +831,7 @@
         };
         
         // 数値アニメーション関数
-        function animateCountUp(element, targetValue, duration = 1000, isDecimal = false) {
+        function animateCountUp(element, targetValue, duration = 1000, isDecimal = false, isMaxError = false) {
             const startTime = performance.now();
             const startValue = 0;
             
@@ -790,7 +844,13 @@
                 const currentValue = startValue + (targetValue - startValue) * easedProgress;
                 
                 if (isDecimal) {
-                    element.textContent = (targetValue >= 0 ? '±' : '') + currentValue.toFixed(1) + '¢';
+                    if (isMaxError) {
+                        // 最大誤差は実際の符号を表示
+                        element.textContent = (targetValue >= 0 ? '+' : '') + currentValue.toFixed(1) + '¢';
+                    } else {
+                        // 平均誤差は±を表示
+                        element.textContent = (targetValue >= 0 ? '±' : '') + currentValue.toFixed(1) + '¢';
+                    }
                 } else {
                     element.textContent = Math.floor(currentValue);
                 }
@@ -862,7 +922,7 @@
                     if (maxErrorElement) {
                         animateCountUp({
                             set textContent(val) { maxErrorElement.textContent = val; }
-                        }, 25.8, animationDuration, true);
+                        }, 25.8, animationDuration, true, true);
                     }
                     // Session count animation - 白色のまま
                     if (sessionCountElement) {
@@ -872,12 +932,490 @@
             }, 500);
         }
         
+        // モックデータ（8セッション分）
+        const mockSessionData = [
+            { rootNote: 'C', avgError: 22.3, notes: [
+                { note: 'ド', error: -15.2 },
+                { note: 'レ', error: 28.5 },
+                { note: 'ミ', error: -12.8 },
+                { note: 'ファ', error: 35.2 },
+                { note: 'ソ', error: -18.9 },
+                { note: 'ラ', error: 22.4 },
+                { note: 'シ', error: -31.5 },
+                { note: 'ド\'', error: 13.9 }
+            ]},
+            { rootNote: 'G', avgError: 18.7, notes: [
+                { note: 'ド', error: 12.5 },
+                { note: 'レ', error: -25.3 },
+                { note: 'ミ', error: 9.8 },
+                { note: 'ファ', error: -28.6 },
+                { note: 'ソ', error: 14.2 },
+                { note: 'ラ', error: -19.8 },
+                { note: 'シ', error: 26.3 },
+                { note: 'ド\'', error: -13.1 }
+            ]},
+            { rootNote: 'D', avgError: 15.2, notes: [
+                { note: 'ド', error: -10.2 },
+                { note: 'レ', error: 18.5 },
+                { note: 'ミ', error: -8.3 },
+                { note: 'ファ', error: 22.1 },
+                { note: 'ソ', error: -11.5 },
+                { note: 'ラ', error: 15.8 },
+                { note: 'シ', error: -20.2 },
+                { note: 'ド\'', error: 15.0 }
+            ]},
+            { rootNote: 'A', avgError: 19.8, notes: [
+                { note: 'ド', error: 14.3 },
+                { note: 'レ', error: -26.2 },
+                { note: 'ミ', error: 11.5 },
+                { note: 'ファ', error: -30.8 },
+                { note: 'ソ', error: 16.9 },
+                { note: 'ラ', error: -20.5 },
+                { note: 'シ', error: 28.1 },
+                { note: 'ド\'', error: -10.1 }
+            ]},
+            { rootNote: 'E', avgError: 16.5, notes: [
+                { note: 'ド', error: -11.8 },
+                { note: 'レ', error: 20.3 },
+                { note: 'ミ', error: -9.2 },
+                { note: 'ファ', error: 24.5 },
+                { note: 'ソ', error: -13.6 },
+                { note: 'ラ', error: 17.2 },
+                { note: 'シ', error: -22.8 },
+                { note: 'ド\'', error: 12.6 }
+            ]},
+            { rootNote: 'B', avgError: 21.2, notes: [
+                { note: 'ド', error: 16.5 },
+                { note: 'レ', error: -29.8 },
+                { note: 'ミ', error: 13.2 },
+                { note: 'ファ', error: -32.5 },
+                { note: 'ソ', error: 18.3 },
+                { note: 'ラ', error: -23.1 },
+                { note: 'シ', error: 30.2 },
+                { note: 'ド\'', error: -6.0 }
+            ]},
+            { rootNote: 'F', avgError: 14.3, notes: [
+                { note: 'ド', error: -9.5 },
+                { note: 'レ', error: 17.2 },
+                { note: 'ミ', error: -7.8 },
+                { note: 'ファ', error: 20.5 },
+                { note: 'ソ', error: -10.8 },
+                { note: 'ラ', error: 14.6 },
+                { note: 'シ', error: -18.9 },
+                { note: 'ド\'', error: 15.1 }
+            ]},
+            { rootNote: 'C#', avgError: 17.9, notes: [
+                { note: 'ド', error: 13.2 },
+                { note: 'レ', error: -23.5 },
+                { note: 'ミ', error: 10.5 },
+                { note: 'ファ', error: -26.8 },
+                { note: 'ソ', error: 15.2 },
+                { note: 'ラ', error: -18.6 },
+                { note: 'シ', error: 24.5 },
+                { note: 'ド\'', error: -11.0 }
+            ]}
+        ];
+        
+        // Chart.js関連の変数とフラグ
+        let errorTrendChartAnimated = false;
+        let errorTrendObserver = null;
+        
+        // 誤差推移チャートの初期化
+        function initializeErrorTrendChart() {
+            const canvas = document.getElementById('error-trend-chart');
+            if (!canvas) {
+                console.error('Error trend chart canvas not found');
+                return;
+            }
+            
+            // Canvas のサイズをコンテナに合わせて設定
+            const container = document.getElementById('error-trend-container');
+            const wrapper = document.getElementById('chart-wrapper');
+            const isMobile = window.innerWidth < 768;
+            
+            if (container && wrapper) {
+                const rect = container.getBoundingClientRect();
+                if (isMobile) {
+                    // モバイル: 横幅を広げて横スクロール可能に
+                    const minWidth = Math.max(800, rect.width); // 最小800px
+                    wrapper.style.width = minWidth + 'px';
+                    canvas.width = minWidth - 32;
+                    canvas.height = rect.height - 32;
+                } else {
+                    // PC: コンテナに合わせる
+                    canvas.width = rect.width - 32;
+                    canvas.height = rect.height - 32;
+                }
+            }
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error('Failed to get 2D context from canvas');
+                return;
+            }
+            
+            console.log('🎯 Initializing error trend chart, animated:', errorTrendChartAnimated);
+            
+            // レスポンシブ設定: デバイス判定（isMobileの再定義）
+            const isMobileChart = window.innerWidth < 768;
+            
+            // グラフの説明を動的に設定
+            const descriptionElement = document.getElementById('chart-description');
+            if (descriptionElement) {
+                if (isMobileChart) {
+                    descriptionElement.innerHTML = `
+                        <div class="font-semibold text-white-70">【グラフの見方】</div>
+                        <div class="mt-1">縦軸: セッション番号（S1～S8） / 横軸: 平均誤差（セント）</div>
+                        <div>0に近いほど正確な音程です</div>
+                    `;
+                } else {
+                    descriptionElement.innerHTML = `
+                        <div class="font-semibold text-white-70">【グラフの見方】</div>
+                        <div class="mt-1">横軸: セッション別8音 / 縦軸: 誤差（セント）</div>
+                        <div>0に近いほど正確な音程です・横スクロールで全体を表示</div>
+                    `;
+                }
+            }
+            
+            // 既存のチャートインスタンスを破棄
+            if (window.errorTrendChartInstance) {
+                window.errorTrendChartInstance.destroy();
+            }
+            
+            if (isMobileChart) {
+                initializeMobileBarChart(ctx, canvas);
+            } else {
+                initializePCLineChart(ctx, canvas);
+            }
+        }
+        
+        // PC版: Line Chart実装（8セッション用）
+        function initializePCLineChart(ctx, canvas) {
+            const noteNames = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド\''];
+            const labels = [];
+            const allData = [];
+            const colors = [];
+            
+            // 8セッション分のデータを構築
+            mockSessionData.forEach((session, sessionIndex) => {
+                session.notes.forEach((noteResult, noteIndex) => {
+                    labels.push(`S${sessionIndex + 1}-${noteNames[noteIndex]}`);
+                    allData.push(noteResult.error);
+                    
+                    // 誤差レベルに応じた色分け
+                    const absError = Math.abs(noteResult.error);
+                    if (absError <= 10) colors.push('rgba(34, 197, 94, 0.8)');      // Green (excellent)
+                    else if (absError <= 20) colors.push('rgba(251, 191, 36, 0.8)'); // Yellow (good)  
+                    else if (absError <= 35) colors.push('rgba(59, 130, 246, 0.8)');  // Blue (pass)
+                    else colors.push('rgba(239, 68, 68, 0.8)');                     // Red (practice)
+                });
+            });
+            
+            const dataset = {
+                label: '誤差（セント）',
+                data: allData,
+                borderColor: 'rgba(255, 255, 255, 0.8)',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                pointBackgroundColor: colors,
+                pointBorderColor: colors,
+                pointRadius: 3,
+                pointHoverRadius: 5,
+                borderWidth: 1.5,  // 線を細く
+                tension: 0.3,
+                fill: false
+            };
+            
+            window.errorTrendChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [dataset]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: errorTrendChartAnimated ? false : {
+                        duration: 800,
+                        onComplete: () => {
+                            console.log('✅ Error trend chart animation completed (PC Line)');
+                            errorTrendChartAnimated = true;
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    const sign = value >= 0 ? '+' : '';
+                                    return `誤差: ${sign}${value.toFixed(1)}¢`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: function(context) {
+                                    // セッションの境界で線を濃く
+                                    if (context.index % 8 === 0 && context.index !== 0) {
+                                        return 'rgba(255, 255, 255, 0.3)';
+                                    }
+                                    return 'rgba(255, 255, 255, 0.05)';
+                                },
+                                lineWidth: function(context) {
+                                    if (context.index % 8 === 0 && context.index !== 0) {
+                                        return 1.5;
+                                    }
+                                    return 0.5;
+                                }
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.6)',
+                                font: { size: 9 },
+                                maxRotation: 45,
+                                autoSkip: false,
+                                callback: function(value, index) {
+                                    // セッションの最初と中間のみラベル表示
+                                    const label = this.getLabelForValue(value);
+                                    if (index % 8 === 0) {
+                                        return label.split('-')[0]; // S1, S2などを表示
+                                    } else if (index % 8 === 4) {
+                                        return label.split('-')[1]; // 中間の音名
+                                    }
+                                    return '';
+                                }
+                            }
+                        },
+                        y: {
+                            min: -40,
+                            max: 40,
+                            grid: {
+                                color: function(context) {
+                                    if (context.tick && context.tick.value === 0) {
+                                        return 'rgba(255, 255, 255, 0.4)';
+                                    }
+                                    return 'rgba(255, 255, 255, 0.1)';
+                                },
+                                lineWidth: function(context) {
+                                    if (context.tick && context.tick.value === 0) {
+                                        return 2;
+                                    }
+                                    return 1;
+                                },
+                                drawOnChartArea: true,
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.6)',
+                                font: { size: 10 },
+                                stepSize: 20,
+                                callback: function(value) {
+                                    if (value === 0) return '0';
+                                    return value > 0 ? `+${value}¢` : `${value}¢`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // モバイル版: 横向きバーチャート実装（8セッション用）
+        function initializeMobileBarChart(ctx, canvas) {
+            const labels = mockSessionData.map((session, index) => `セッション${index + 1}`);
+            const data = mockSessionData.map(session => session.avgError);
+            const backgroundColors = [];
+            
+            // セッション平均誤差に応じた色分け
+            data.forEach(avgError => {
+                const absError = Math.abs(avgError);
+                let barColor;
+                if (absError <= 10) barColor = 'rgba(34, 197, 94, 0.8)';      // Green
+                else if (absError <= 20) barColor = 'rgba(251, 191, 36, 0.8)'; // Yellow
+                else if (absError <= 35) barColor = 'rgba(59, 130, 246, 0.8)';  // Blue
+                else barColor = 'rgba(239, 68, 68, 0.8)';                     // Red
+                
+                backgroundColors.push(barColor);
+            });
+            
+            window.errorTrendChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '平均誤差',
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderColor: backgroundColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: errorTrendChartAnimated ? false : {
+                        duration: 1000,
+                        onComplete: () => {
+                            console.log('✅ Error trend chart animation completed (Mobile Bar)');
+                            errorTrendChartAnimated = true;
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.x;
+                                    const sign = value >= 0 ? '+' : '';
+                                    return `平均誤差: ${sign}${value.toFixed(1)}¢`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: function(context) {
+                                    if (context.tick && context.tick.value === 0) {
+                                        return 'rgba(255, 255, 255, 0.4)';
+                                    }
+                                    return 'rgba(255, 255, 255, 0.1)';
+                                },
+                                lineWidth: function(context) {
+                                    if (context.tick && context.tick.value === 0) {
+                                        return 2;
+                                    }
+                                    return 1;
+                                }
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.6)',
+                                font: { size: 10 },
+                                callback: function(value) {
+                                    return value >= 0 ? `+${value}¢` : `${value}¢`;
+                                }
+                            }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.6)',
+                                font: { size: 10 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // グラフセクションの表示監視
+        function observeErrorTrendChart() {
+            const errorTrendContainer = document.getElementById('error-trend-container');
+            
+            if (!errorTrendContainer) {
+                console.log('⚠️ Error trend container not found, initializing immediately');
+                initializeErrorTrendChart();
+                return;
+            }
+            
+            console.log('📊 Setting up error trend chart observer...');
+            
+            // 既存のオブザーバーをクリーンアップ
+            if (errorTrendObserver) {
+                errorTrendObserver.disconnect();
+                errorTrendObserver = null;
+            }
+            
+            // まだアニメーション済みでない場合のみオブザーバーを設定
+            if (!errorTrendChartAnimated) {
+                errorTrendObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        console.log('👁️ Intersection observer triggered:', entry.isIntersecting);
+                        if (entry.isIntersecting && !errorTrendChartAnimated) {
+                            console.log('🎯 Error trend chart visible, initializing...');
+                            initializeErrorTrendChart();
+                            errorTrendObserver.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.1,
+                    rootMargin: '50px'
+                });
+                
+                errorTrendObserver.observe(errorTrendContainer);
+                
+                // フォールバック: 3秒後にまだ初期化されていなければ強制初期化
+                setTimeout(() => {
+                    if (!errorTrendChartAnimated) {
+                        console.log('⏰ Timeout fallback: forcing chart initialization');
+                        initializeErrorTrendChart();
+                    }
+                }, 3000);
+            }
+        }
+        
+        // グラフ要素を新しいセクションに移動
+        function moveGraphsToNewSection() {
+            // 評価グラフを移動
+            const evaluationChart = document.getElementById('evaluation-chart');
+            const evaluationContainer = document.getElementById('evaluation-chart-container');
+            if (evaluationChart && evaluationContainer) {
+                evaluationContainer.appendChild(evaluationChart);
+            }
+            
+            // 誤差推移グラフセクションを移動
+            const errorTrendContainer = document.getElementById('error-trend-container');
+            const errorTrendSection = document.getElementById('error-trend-section');
+            const chartDescription = document.getElementById('chart-description');
+            
+            if (errorTrendContainer && errorTrendSection) {
+                errorTrendSection.appendChild(errorTrendContainer);
+                if (chartDescription) {
+                    errorTrendSection.appendChild(chartDescription);
+                }
+            }
+        }
+        
         // 初期化
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 DOM loaded, starting initialization...');
+            
             generateSessionsGrid();
             updateDetailedAnalysis();
             lucide.createIcons();
             animateStatistics();
+            
+            // グラフを新しいセクションに移動
+            moveGraphsToNewSection();
+            
+            // Chart.js の利用可能性をチェック
+            function checkChartJS() {
+                if (typeof Chart !== 'undefined') {
+                    console.log('✅ Chart.js is available');
+                    // グラフセクションの表示監視を開始
+                    observeErrorTrendChart();
+                    
+                    // Canvas要素の存在確認
+                    const canvas = document.getElementById('error-trend-chart');
+                    console.log('Canvas element:', canvas);
+                    
+                    // 即座にグラフを初期化（デバッグ用）
+                    setTimeout(() => {
+                        console.log('🔧 Forcing chart initialization for debugging...');
+                        initializeErrorTrendChart();
+                    }, 500);
+                } else {
+                    console.error('❌ Chart.js is not available, retrying...');
+                    setTimeout(checkChartJS, 100);
+                }
+            }
+            
+            checkChartJS();
+            
+            // コンテナ要素の存在確認
+            const container = document.getElementById('error-trend-container');
+            console.log('Container element:', container);
         });
     </script>
 </body>
