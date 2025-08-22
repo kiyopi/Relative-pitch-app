@@ -659,6 +659,87 @@
         .accuracy-icon-triangle {
             transform: translateY(-3px);
         }
+
+        /* シェアボタンスタイル（UIカタログ表示用） */
+        .share-buttons {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .share-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .share-btn svg {
+            width: 24px;
+            height: 24px;
+            z-index: 1;
+        }
+        
+        .share-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 255, 255, 0.2);
+        }
+        
+        .share-btn.twitter:hover {
+            box-shadow: 0 8px 25px rgba(29, 161, 242, 0.4), 0 0 30px rgba(29, 161, 242, 0.3);
+        }
+        
+        .share-btn.line:hover {
+            box-shadow: 0 8px 25px rgba(0, 195, 0, 0.4), 0 0 30px rgba(0, 195, 0, 0.3);
+        }
+        
+        .share-btn.facebook:hover {
+            box-shadow: 0 8px 25px rgba(24, 119, 242, 0.4), 0 0 30px rgba(24, 119, 242, 0.3);
+        }
+        
+        .share-btn.copy:hover {
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4), 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+        
+        /* コピー成功アニメーション */
+        .share-btn.copy.copied {
+            background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+            transform: translateY(-3px) scale(1.1);
+        }
+        
+        .share-btn.copy.copied svg {
+            display: none;
+        }
+        
+        .share-btn.copy.copied::after {
+            content: "✓";
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 640px) {
+            .share-btn {
+                width: 48px;
+                height: 48px;
+            }
+            
+            .share-btn svg {
+                width: 20px;
+                height: 20px;
+            }
+        }
     </style>
 </head>
 <body>
