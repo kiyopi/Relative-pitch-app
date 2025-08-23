@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UIカタログ - 8va相対音感トレーニングアプリ</title>
+    
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="styles/system.css">
+    
+    <!-- アイコンライブラリ -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="js/lucide-init.js"></script>
+    
+    <style>
+        .catalog-section {
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .component-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .component-item {
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .code-sample {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            color: #e2e8f0;
+            margin-top: 1rem;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        
+        .color-swatch {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 0.5rem;
+            display: inline-block;
+            margin: 0.25rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .gradient-demo {
+            height: 6rem;
+            border-radius: 0.75rem;
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen p-6">
+        <div class="container max-w-7xl mx-auto">
+            <!-- ヘッダー -->
+            <header class="text-center mb-12">
+                <div class="flex justify-center mb-6">
+                    <div class="page-header-icon page-header-icon-purple">
+                        <i data-lucide="palette" class="icon-2xl text-white" data-stroke-width="2"></i>
+                    </div>
+                </div>
+                <h1 class="text-4xl font-bold text-white mb-4">UIカタログ</h1>
+                <p class="text-purple-200 text-xl">8va相対音感トレーニングアプリのデザインシステム</p>
+            </header>
+
+            <!-- 1. ページヘッダーアイコン -->
+            <section class="catalog-section">
+                <h2 class="text-2xl font-bold text-white mb-4">🎯 ページヘッダーアイコン</h2>
+                <p class="text-white-70 mb-6">各ページトップの統一されたヘッダーアイコン（96px × 96px）</p>
+                
+                <div class="component-grid grid-cols-2 md:grid-cols-4">
+                    <div class="component-item text-center">
+                        <div class="page-header-icon page-header-icon-purple">
+                            <i data-lucide="file-chart-column-increasing" class="icon-2xl text-white" data-stroke-width="2"></i>
+                        </div>
+                        <h3 class="text-white font-medium">紫グラデーション</h3>
+                        <p class="text-white-60 text-sm">総合評価ページ</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="page-header-icon page-header-icon-blue">
+                            <i data-lucide="mic" class="icon-2xl text-white" data-stroke-width="2"></i>
+                        </div>
+                        <h3 class="text-white font-medium">青グラデーション</h3>
+                        <p class="text-white-60 text-sm">マイクテストページ</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="page-header-icon page-header-icon-green">
+                            <i data-lucide="target" class="icon-2xl text-white" data-stroke-width="2"></i>
+                        </div>
+                        <h3 class="text-white font-medium">緑グラデーション</h3>
+                        <p class="text-white-60 text-sm">トレーニングページ</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="page-header-icon page-header-icon-orange">
+                            <i data-lucide="activity" class="icon-2xl text-white" data-stroke-width="2"></i>
+                        </div>
+                        <h3 class="text-white font-medium">オレンジグラデーション</h3>
+                        <p class="text-white-60 text-sm">記録ページ</p>
+                    </div>
+                </div>
+                
+                <div class="code-sample">
+&lt;div class="page-header-icon page-header-icon-purple"&gt;
+  &lt;i data-lucide="file-chart-column-increasing" 
+     class="icon-2xl text-white" 
+     data-stroke-width="2"&gt;&lt;/i&gt;
+&lt;/div&gt;</div>
+            </section>
+
+            <!-- 2. 評価アイコンシステム -->
+            <section class="catalog-section">
+                <h2 class="text-2xl font-bold text-white mb-4">⭐ 評価アイコンシステム</h2>
+                <p class="text-white-70 mb-6">S級総合評価と音感精度4段階評価アイコン（stroke-width: 1.5）</p>
+                
+                <!-- S級総合評価アイコン -->
+                <h3 class="text-xl font-medium text-white mb-4">👑 S級総合評価アイコン</h3>
+                <div class="component-grid grid-cols-1 md:grid-cols-1 max-w-md mx-auto mb-8">
+                    <div class="component-item text-center">
+                        <div class="mb-4">
+                            <i data-lucide="crown" class="text-yellow-300" style="width: 80px; height: 80px; transform: scale(1.5);"></i>
+                        </div>
+                        <h3 class="text-yellow-300 font-bold text-xl">S級</h3>
+                        <p class="text-white-60 text-sm">総合評価最高ランク</p>
+                        <p class="text-white-60 text-xs">crown（王冠）</p>
+                    </div>
+                </div>
+                
+                <!-- 音感精度評価アイコン -->
+                <h3 class="text-xl font-medium text-white mb-4">🎵 音感精度評価アイコン</h3>
+                
+                <div class="component-grid grid-cols-2 md:grid-cols-4">
+                    <div class="component-item text-center">
+                        <div class="mb-4">
+                            <i data-lucide="trophy" class="icon-4xl text-yellow-300"></i>
+                        </div>
+                        <h3 class="text-yellow-300 font-bold">Excellent</h3>
+                        <p class="text-white-60 text-sm">±15セント以内</p>
+                        <p class="text-white-60 text-xs">trophy</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="mb-4">
+                            <i data-lucide="star" class="icon-4xl text-green-300"></i>
+                        </div>
+                        <h3 class="text-green-300 font-bold">Good</h3>
+                        <p class="text-white-60 text-sm">15～25セント</p>
+                        <p class="text-white-60 text-xs">star</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="mb-4">
+                            <i data-lucide="thumbs-up" class="icon-4xl text-blue-300"></i>
+                        </div>
+                        <h3 class="text-blue-300 font-bold">Pass</h3>
+                        <p class="text-white-60 text-sm">25～40セント</p>
+                        <p class="text-white-60 text-xs">thumbs-up</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="mb-4">
+                            <i data-lucide="triangle-alert" class="icon-4xl text-red-300"></i>
+                        </div>
+                        <h3 class="text-red-300 font-bold">Practice</h3>
+                        <p class="text-white-60 text-sm">40セント以上</p>
+                        <p class="text-white-60 text-xs">triangle-alert</p>
+                    </div>
+                </div>
+                
+                <div class="code-sample">
+<!-- S級総合評価 -->
+&lt;i data-lucide="crown" class="icon-4xl text-yellow-300" 
+   style="transform: scale(1.5);"&gt;&lt;/i&gt;
+
+<!-- 音感精度評価 -->
+&lt;i data-lucide="trophy" class="icon-4xl text-yellow-300"&gt;&lt;/i&gt;</div>
+            </section>
+
+            <!-- 3. アイコンサイズ -->
+            <section class="catalog-section">
+                <h2 class="text-2xl font-bold text-white mb-4">📐 アイコンサイズ</h2>
+                <p class="text-white-70 mb-6">統一されたアイコンサイズシステム</p>
+                
+                <div class="component-grid grid-cols-2 md:grid-cols-4">
+                    <div class="component-item text-center">
+                        <i data-lucide="home" class="icon-xs text-white mb-2"></i>
+                        <h3 class="text-white font-medium">icon-xs</h3>
+                        <p class="text-white-60 text-sm">12px</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <i data-lucide="home" class="icon-sm text-white mb-2"></i>
+                        <h3 class="text-white font-medium">icon-sm</h3>
+                        <p class="text-white-60 text-sm">16px</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <i data-lucide="home" class="icon-md text-white mb-2"></i>
+                        <h3 class="text-white font-medium">icon-md</h3>
+                        <p class="text-white-60 text-sm">24px</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <i data-lucide="home" class="icon-lg text-white mb-2"></i>
+                        <h3 class="text-white font-medium">icon-lg</h3>
+                        <p class="text-white-60 text-sm">32px</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <i data-lucide="home" class="icon-xl text-white mb-2"></i>
+                        <h3 class="text-white font-medium">icon-xl</h3>
+                        <p class="text-white-60 text-sm">40px</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <i data-lucide="home" class="icon-2xl text-white mb-2"></i>
+                        <h3 class="text-white font-medium">icon-2xl</h3>
+                        <p class="text-white-60 text-sm">48px</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <i data-lucide="home" class="icon-3xl text-white mb-2"></i>
+                        <h3 class="text-white font-medium">icon-3xl</h3>
+                        <p class="text-white-60 text-sm">64px</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <i data-lucide="home" class="icon-4xl text-white mb-2"></i>
+                        <h3 class="text-white font-medium">icon-4xl</h3>
+                        <p class="text-white-60 text-sm">80px</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. ボタンとガラスエフェクト -->
+            <section class="catalog-section">
+                <h2 class="text-2xl font-bold text-white mb-4">🔘 ボタンとガラスエフェクト</h2>
+                <p class="text-white-70 mb-6">グラスモーフィズム効果を活用したボタンシステム</p>
+                
+                <div class="component-grid grid-cols-1 md:grid-cols-2">
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">プライマリボタン</h3>
+                        <div class="space-y-3">
+                            <button class="btn btn-primary">
+                                <i data-lucide="play" class="icon-sm mr-2"></i>
+                                トレーニング開始
+                            </button>
+                            <button class="btn btn-secondary">
+                                <i data-lucide="settings" class="icon-sm mr-2"></i>
+                                設定
+                            </button>
+                        </div>
+                        
+                        <div class="code-sample mt-4">
+&lt;button class="btn btn-primary"&gt;
+  &lt;i data-lucide="play" class="icon-sm mr-2"&gt;&lt;/i&gt;
+  トレーニング開始
+&lt;/button&gt;</div>
+                    </div>
+                    
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">ガラスカード</h3>
+                        <div class="glass-card mb-4">
+                            <h4 class="text-white font-medium mb-2">ガラスカード</h4>
+                            <p class="text-white-70 text-sm">背景にぼかし効果と透明度を適用したカード</p>
+                        </div>
+                        
+                        <div class="code-sample">
+&lt;div class="glass-card"&gt;
+  &lt;h4 class="text-white font-medium"&gt;ガラスカード&lt;/h4&gt;
+  &lt;p class="text-white-70"&gt;コンテンツ&lt;/p&gt;
+&lt;/div&gt;</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. カラーパレット -->
+            <section class="catalog-section">
+                <h2 class="text-2xl font-bold text-white mb-4">🎨 カラーパレットとグラデーション</h2>
+                <p class="text-white-70 mb-6">アプリケーション全体で使用されるカラーシステム</p>
+                
+                <div class="component-grid grid-cols-1 md:grid-cols-2">
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">評価カラー</h3>
+                        <div class="grid grid-cols-4 gap-2">
+                            <div class="text-center">
+                                <div class="color-swatch" style="background: #fcd34d;"></div>
+                                <p class="text-xs text-white-60">Yellow<br>Excellent</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="color-swatch" style="background: #6ee7b7;"></div>
+                                <p class="text-xs text-white-60">Green<br>Good</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="color-swatch" style="background: #7dd3fc;"></div>
+                                <p class="text-xs text-white-60">Blue<br>Pass</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="color-swatch" style="background: #fca5a5;"></div>
+                                <p class="text-xs text-white-60">Red<br>Practice</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">グラデーション</h3>
+                        <div class="space-y-2">
+                            <div class="gradient-demo" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);">
+                                紫グラデーション
+                            </div>
+                            <div class="gradient-demo" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+                                青グラデーション
+                            </div>
+                            <div class="gradient-demo" style="background: linear-gradient(135deg, #10b981, #059669);">
+                                緑グラデーション
+                            </div>
+                            <div class="gradient-demo" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                                オレンジグラデーション
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. タイポグラフィ -->
+            <section class="catalog-section">
+                <h2 class="text-2xl font-bold text-white mb-4">📝 タイポグラフィ</h2>
+                <p class="text-white-70 mb-6">統一されたテキストスタイル</p>
+                
+                <div class="component-item">
+                    <div class="space-y-4">
+                        <div>
+                            <h1 class="text-4xl font-bold text-white">メインタイトル</h1>
+                            <p class="text-white-60 text-sm">text-4xl font-bold text-white</p>
+                        </div>
+                        
+                        <div>
+                            <h2 class="text-2xl font-bold text-white">セクションタイトル</h2>
+                            <p class="text-white-60 text-sm">text-2xl font-bold text-white</p>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-medium text-white">サブタイトル</h3>
+                            <p class="text-white-60 text-sm">text-xl font-medium text-white</p>
+                        </div>
+                        
+                        <div>
+                            <p class="text-white">本文テキスト</p>
+                            <p class="text-white-60 text-sm">text-white</p>
+                        </div>
+                        
+                        <div>
+                            <p class="text-white-70">サブテキスト</p>
+                            <p class="text-white-60 text-sm">text-white-70</p>
+                        </div>
+                        
+                        <div>
+                            <p class="text-white-60 text-sm">キャプションテキスト</p>
+                            <p class="text-white-60 text-sm">text-white-60 text-sm</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. グラデーションアイコン -->
+            <section class="catalog-section">
+                <h2 class="text-2xl font-bold text-white mb-4">🌈 グラデーションアイコン</h2>
+                <p class="text-white-70 mb-6">SVGグラデーション効果を適用したLucideアイコン</p>
+                
+                <div class="component-grid grid-cols-2 md:grid-cols-3">
+                    <div class="component-item text-center">
+                        <div class="mb-4" id="gold-crown-demo"></div>
+                        <h3 class="text-white font-medium">Gold Crown</h3>
+                        <p class="text-white-60 text-sm">S級専用ゴールドグラデーション</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="mb-4" id="royal-trophy-demo"></div>
+                        <h3 class="text-white font-medium">Royal Trophy</h3>
+                        <p class="text-white-60 text-sm">紫ロイヤルグラデーション</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="mb-4" id="success-star-demo"></div>
+                        <h3 class="text-white font-medium">Success Star</h3>
+                        <p class="text-white-60 text-sm">緑成功グラデーション</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="mb-4" id="warning-alert-demo"></div>
+                        <h3 class="text-white font-medium">Warning Alert</h3>
+                        <p class="text-white-60 text-sm">オレンジ警告グラデーション</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="mb-4" id="rainbow-palette-demo"></div>
+                        <h3 class="text-white font-medium">Rainbow Palette</h3>
+                        <p class="text-white-60 text-sm">レインボーグラデーション</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="mb-4" id="error-frown-demo"></div>
+                        <h3 class="text-white font-medium">Error Frown</h3>
+                        <p class="text-white-60 text-sm">赤エラーグラデーション</p>
+                    </div>
+                </div>
+                
+                <div class="code-sample">
+// JavaScript でグラデーションアイコンを生成
+const goldCrown = gradientIcon('crown', 'gold', 'icon-4xl', 64, 2);
+const royalTrophy = gradientIcon('trophy', 'royal', 'icon-4xl', 64, 2);
+
+// HTML に挿入
+document.getElementById('demo').innerHTML = goldCrown;</div>
+            </section>
+
+            <!-- 8. インタラクティブコンポーネント -->
+            <section class="catalog-section">
+                <h2 class="text-2xl font-bold text-white mb-4">⚡ インタラクティブコンポーネント</h2>
+                <p class="text-white-70 mb-6">ユーザーインタラクションを伴うUI要素</p>
+                
+                <div class="component-grid grid-cols-1 md:grid-cols-2">
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">プログレスバー</h3>
+                        <div class="progress-bar mb-2">
+                            <div class="progress-fill" style="width: 75%;"></div>
+                        </div>
+                        <p class="text-white-60 text-sm">75%完了</p>
+                        
+                        <div class="code-sample mt-4">
+&lt;div class="progress-bar"&gt;
+  &lt;div class="progress-fill" style="width: 75%;"&gt;&lt;/div&gt;
+&lt;/div&gt;</div>
+                    </div>
+                    
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">セッション選択ボタン</h3>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button class="glass-card-sm p-3 text-center hover:bg-white/10 transition-colors">
+                                <div class="text-yellow-300 mb-1">
+                                    <i data-lucide="trophy" class="icon-sm"></i>
+                                </div>
+                                <div class="text-xs text-white">S1</div>
+                            </button>
+                            <button class="glass-card-sm p-3 text-center hover:bg-white/10 transition-colors">
+                                <div class="text-green-300 mb-1">
+                                    <i data-lucide="star" class="icon-sm"></i>
+                                </div>
+                                <div class="text-xs text-white">S2</div>
+                            </button>
+                            <button class="glass-card-sm p-3 text-center hover:bg-white/10 transition-colors">
+                                <div class="text-blue-300 mb-1">
+                                    <i data-lucide="thumbs-up" class="icon-sm"></i>
+                                </div>
+                                <div class="text-xs text-white">S3</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- フッター -->
+            <footer class="text-center mt-12 pt-8 border-t border-white/10">
+                <p class="text-white-60">8va相対音感トレーニングアプリ UIカタログ</p>
+                <p class="text-white-60 text-sm mt-2">デザインシステム v1.1.0</p>
+                
+                <div class="flex justify-center mt-4 space-x-4">
+                    <button onclick="window.location.href='index.html'" class="btn btn-secondary">
+                        <i data-lucide="home" class="icon-sm mr-2"></i>
+                        ホームに戻る
+                    </button>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Lucideアイコンの初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 [UI-CATALOG] DOM Content Loaded - starting icon initialization');
+            if (typeof initializeLucideIcons === 'function') {
+                initializeLucideIcons();
+            } else {
+                console.error('❌ [UI-CATALOG] initializeLucideIcons function not found');
+            }
+            
+            // グラデーションアイコンのデモ生成
+            setTimeout(() => {
+                if (typeof gradientIcon === 'function') {
+                    document.getElementById('gold-crown-demo').innerHTML = 
+                        gradientIcon('crown', 'gold', 'icon-4xl', 64, 1.5);
+                    
+                    document.getElementById('royal-trophy-demo').innerHTML = 
+                        gradientIcon('trophy', 'royal', 'icon-4xl', 64, 1.5);
+                    
+                    document.getElementById('success-star-demo').innerHTML = 
+                        gradientIcon('star', 'success', 'icon-4xl', 64, 1.5);
+                    
+                    document.getElementById('warning-alert-demo').innerHTML = 
+                        gradientIcon('triangle-alert', 'warning', 'icon-4xl', 64, 1.5);
+                    
+                    document.getElementById('rainbow-palette-demo').innerHTML = 
+                        gradientIcon('palette', 'rainbow', 'icon-4xl', 64, 1.5);
+                    
+                    document.getElementById('error-frown-demo').innerHTML = 
+                        gradientIcon('frown', 'error', 'icon-4xl', 64, 1.5);
+                    
+                    console.log('✨ [UI-CATALOG] Gradient icon demos generated');
+                } else {
+                    console.warn('❌ [UI-CATALOG] gradientIcon function not available');
+                }
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

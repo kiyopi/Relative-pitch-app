@@ -22,20 +22,22 @@
 
 ### **Phase A: 緊急修正項目（基本的な不整合解消）**
 
-#### A.1 アイコンとグレード表示の不整合修正
-**現在の問題:**
-- B級なのに`crown`（王冠）アイコン表示
-- B級なのにゴールドの背景色
-- 仕様書との完全不一致
+#### A.1 アイコンとグレード表示の不整合修正 ✅ **完了済み**
+**修正済み内容:**
+- S級～E級アイコンを仕様書準拠に更新
+- 新しいアイコンマッピング適用
+- CSS クラスシステム実装
 
-**改善内容:**
+**新しいアイコン定義:**
 ```javascript
-// 正しいB級表示への修正
+// 現在の正しいS-E級表示
 const gradeDisplay = {
-  grade: 'B',
-  icon: 'star',           // crown → star
-  color: '#3b82f6',       // gold → blue
-  message: '実用レベル！合唱や弾き語りに最適です'
+  'S': { icon: 'crown', color: 'gold', message: 'プロレベル！レコーディング品質の精度です' },
+  'A': { icon: 'medal', color: 'gray', message: '素晴らしい！楽器アンサンブルに対応できます' },
+  'B': { icon: 'circle-star', color: 'orange', message: '実用レベル！合唱や弾き語りに最適です' },
+  'C': { icon: 'smile', color: 'green', message: '基礎習得！カラオケや趣味演奏を楽しめます' },
+  'D': { icon: 'meh', color: 'blue', message: '練習中！基礎をしっかり身につけましょう' },
+  'E': { icon: 'frown', color: 'red', message: '基礎から！一歩ずつ確実に向上していきます' }
 };
 ```
 

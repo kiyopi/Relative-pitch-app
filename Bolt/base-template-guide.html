@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ベーステンプレートガイド</title>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            position: relative;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            -webkit-overflow-scrolling: touch;
+            background: #0f172a; /* フォールバック */
+            color: white;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            padding: 2rem;
+        }
+        
+        /* 疑似要素で背景アニメーション */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            z-index: -1;
+            will-change: background-position;
+        }
+        
+        @keyframes gradientShift {
+            0% { 
+                background-position: 0% 50%;
+            }
+            50% { 
+                background-position: 100% 50%;
+            }
+            100% { 
+                background-position: 0% 50%;
+            }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .section-desc {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-list {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-list li {
+            margin-bottom: 0.5rem;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #60a5fa;
+        }
+
+        .code-sample {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            color: #e2e8f0;
+            margin: 1rem 0;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .demo-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 1rem 0;
+        }
+
+        .demo-card:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-4px);
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+
+        .highlight-box {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .highlight-title {
+            color: #60a5fa;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+        }
+
+        .path-info {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center; margin-bottom: 2rem; font-size: 2rem;">🏗️ ベーステンプレートガイド</h1>
+        
+        <!-- 概要 -->
+        <div class="section">
+            <h2 class="section-title">📄 base-template.html</h2>
+            <div class="highlight-box">
+                <div class="highlight-title">✨ 統一ベーステンプレート</div>
+                <p class="highlight-text">全ページの基盤となるHTMLテンプレート。ヘッダー、フッター、アニメーション、Lucideアイコン初期化を含む。</p>
+                <div class="path-info">📍 パス: Bolt/base-template.html</div>
+            </div>
+            
+            <h3 style="color: white; font-weight: 600; margin: 1.5rem 0 1rem;">含まれる機能</h3>
+            <ul class="feature-list">
+                <li>統一グラデーション背景アニメーション</li>
+                <li>レスポンシブメタタグ（PWA対応）</li>
+                <li>Lucideアイコン自動初期化</li>
+                <li>system.css統一スタイル</li>
+                <li>フッターナビゲーション</li>
+                <li>デバッグナビゲーション</li>
+            </ul>
+            
+            <div class="code-sample"><!-- 新しいページ作成時はこのテンプレートをコピー -->
+<!-- 1. base-template.htmlをコピー -->
+<!-- 2. タイトルとmainコンテンツエリアを編集 -->
+<!-- 3. 必要に応じてページ固有のスタイルを追加 -->
+
+&lt;main class="main-content"&gt;
+    &lt;!-- ここに各ページ固有のコンテンツが入る --&gt;
+&lt;/main&gt;</div>
+        </div>
+
+        <!-- Glass Card ホバーエフェクト -->
+        <div class="section">
+            <h2 class="section-title">🎨 Glass Card ホバーエフェクト</h2>
+            <p class="section-desc">ベーステンプレートに含まれるGlass Cardコンポーネントのデモ</p>
+            
+            <div class="demo-card">
+                <h4 style="color: white; font-weight: 600; margin-bottom: 0.5rem;">ホバーエフェクト デモ</h4>
+                <p style="color: rgba(255, 255, 255, 0.7); font-size: 0.875rem;">このカードにマウスホバーするとホバーエフェクトが確認できます</p>
+                <p style="color: rgba(255, 255, 255, 0.6); font-size: 0.75rem; margin-top: 0.5rem;">transform: translateY(-4px) + 背景色変化 + ボーダー強化</p>
+            </div>
+
+            <h3 style="color: white; font-weight: 600; margin: 1.5rem 0 1rem;">Glass Card CSS</h3>
+            <div class="code-sample">/* system.css基本スタイル + 拡張ホバーエフェクト */
+.glass-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 2rem;
+}
+
+.glass-card:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-4px);
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}</div>
+
+            <h3 style="color: white; font-weight: 600; margin: 1.5rem 0 1rem;">💡 使用方法</h3>
+            <div class="code-sample">&lt;div class="glass-card mb-8"&gt;
+    &lt;h3&gt;カードタイトル&lt;/h3&gt;
+    &lt;p&gt;カードコンテンツ&lt;/p&gt;
+&lt;/div&gt;</div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+                console.log('✅ Lucide icons initialized');
+            }
+        });
+    </script>
+</body>
+</html>

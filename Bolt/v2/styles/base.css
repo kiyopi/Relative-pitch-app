@@ -172,3 +172,141 @@
     border-radius: 0.5rem;
     margin-top: 1.5rem;
 }
+
+/* ページヘッダーアイコンアニメーション */
+.page-header-icon {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+/* フッターコンポーネント専用クラス */
+.footer-base {
+    text-align: center;
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-content {
+    margin-bottom: 1.5rem;
+}
+
+.footer-description {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.footer-description-lg {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.125rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.footer-description-sub {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    font-size: 0.875rem;
+}
+
+.footer-nav-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+    .footer-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .footer-nav-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.footer-stat-item {
+    text-align: center;
+}
+
+.footer-stat-icon {
+    width: 24px;
+    height: 24px;
+    margin: 0 auto 0.5rem;
+    display: block;
+}
+
+.footer-stat-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.footer-stat-value {
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.footer-nav-item {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-nav-icon {
+    width: 32px;
+    height: 32px;
+    margin: 0 auto 0.75rem;
+    display: block;
+}
+
+.footer-nav-title {
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.footer-nav-desc {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.footer-copyright {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.footer-tagline {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.875rem;
+    font-style: italic;
+}
+
+/* アイコン使用方法ガイドライン */
+/* 一般的なアイコン: text-white クラス使用 */
+/* 音感精度評価アイコン: text-yellow-300(Excellent), text-green-300(Good), text-blue-300(Pass), text-red-300(Practice) */
+/* 総合評価グレードアイコン: text-yellow-300(S), text-gray-300(A), text-orange-300(B), text-green-300(C), text-blue-300(D), text-red-300(E) */

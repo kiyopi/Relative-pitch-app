@@ -114,6 +114,74 @@
             animation: slideIn 0.8s ease-out forwards;
             animation-delay: var(--delay);
         }
+
+        /* フッターコンポーネント専用クラス */
+        .footer-base {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.875rem;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+        }
+
+        @media (min-width: 768px) {
+            .footer-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .footer-stat-item {
+            text-align: center;
+        }
+
+        .footer-stat-icon {
+            width: 24px;
+            height: 24px;
+            margin: 0 auto 0.5rem auto;
+            display: block;
+        }
+
+        .footer-stat-label {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.25rem;
+        }
+
+        .footer-stat-value {
+            color: white;
+            font-weight: 500;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1.5rem;
+        }
+
+        .footer-copyright {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.875rem;
+        }
+
+        .footer-tagline {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
         
         /* シェアボタンスタイル */
         .share-buttons {
@@ -813,14 +881,48 @@
             <!-- アクションボタン -->
             <section class="final-actions">
                 <a href="training.html" class="btn btn-primary btn-large">
-                    <i data-lucide="arrow-right" style="width: 16px; height: 16px; margin-right: 8px;"></i>
-                    <span>続行</span>
+                    <i data-lucide="play" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                    <span>新しいトレーニング開始</span>
                 </a>
                 <a href="index.html" class="btn btn-secondary btn-large">
                     <i data-lucide="home" style="width: 16px; height: 16px; margin-right: 8px;"></i>
                     <span>ホームに戻る</span>
                 </a>
             </section>
+            
+            <!-- フッター -->
+            <footer class="footer-base">
+                <div class="footer-content">
+                    <h3 class="heading-md" style="justify-content: center; margin-bottom: 1rem;">
+                        <i data-lucide="music" class="text-blue-400"></i>
+                        8va 相対音感トレーニング
+                    </h3>
+                    <p class="footer-description">8セッション完了！相対音感の基礎が身につきました。</p>
+                </div>
+                
+                <div class="footer-grid">
+                    <div class="footer-stat-item">
+                        <i data-lucide="trophy" class="footer-stat-icon text-yellow-300"></i>
+                        <p class="footer-stat-label">達成したグレード</p>
+                        <p class="footer-stat-value">B級 (実用レベル)</p>
+                    </div>
+                    <div class="footer-stat-item">
+                        <i data-lucide="target" class="footer-stat-icon text-green-300"></i>
+                        <p class="footer-stat-label">総合精度</p>
+                        <p class="footer-stat-value">±18.7¢</p>
+                    </div>
+                    <div class="footer-stat-item">
+                        <i data-lucide="calendar" class="footer-stat-icon text-blue-400"></i>
+                        <p class="footer-stat-label">完了セッション</p>
+                        <p class="footer-stat-value">8セッション (64音)</p>
+                    </div>
+                </div>
+                
+                <div class="footer-bottom">
+                    <p class="footer-copyright">© 2024 8va相対音感トレーニングアプリ</p>
+                    <p class="footer-tagline">あなたの音楽レベル向上をサポートします</p>
+                </div>
+            </footer>
         </div>
     </div>
 

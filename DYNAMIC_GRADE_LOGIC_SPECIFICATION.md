@@ -320,12 +320,12 @@ function calculateDynamicGrade(sessionData) {
 // グレード説明の生成
 function getGradeDescription(grade) {
   const descriptions = {
-    'S': 'プロレベル！レコーディング品質の精度です',
-    'A': '素晴らしい！楽器アンサンブルに対応できます', 
-    'B': '実用レベル！合唱や弾き語りに最適です',
-    'C': '基礎習得！カラオケや趣味演奏を楽しめます',
-    'D': '練習中！基礎をしっかり身につけましょう',
-    'E': '基礎から！一歩ずつ確実に向上していきます'
+    'S': { message: 'プロレベル！レコーディング品質の精度です', icon: 'crown', color: 'gold' },
+    'A': { message: '素晴らしい！楽器アンサンブルに対応できます', icon: 'medal', color: 'gray' },
+    'B': { message: '実用レベル！合唱や弾き語りに最適です', icon: 'circle-star', color: 'orange' },
+    'C': { message: '基礎習得！カラオケや趣味演奏を楽しめます', icon: 'smile', color: 'green' },
+    'D': { message: '練習中！基礎をしっかり身につけましょう', icon: 'meh', color: 'blue' },
+    'E': { message: '基礎から！一歩ずつ確実に向上していきます', icon: 'frown', color: 'red' }
   };
   
   return descriptions[grade] || descriptions['E'];

@@ -35,7 +35,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
             -webkit-animation: gradientShift 15s ease infinite;
@@ -86,18 +86,7 @@
             z-index: 10;
         }
         
-        /* フッターナビゲーション中央配置 */
-        .footer-navigation {
-            margin-top: 3rem;
-            padding: 2rem 0;
-        }
-        
-        .nav-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
+        /* フッターナビゲーションスタイルは system.css に統一 */
         
         /* rank-sectionスタイル（新横一列レイアウト） */
         .rank-section {
@@ -650,16 +639,16 @@
             <footer class="footer-navigation">
                 <div class="nav-buttons">
                     <a href="results-premium-analysis.html" class="btn btn-primary">
-                        <i data-lucide="bar-chart-3" style="width: 16px; height: 16px;"></i>
+                        <i data-lucide="bar-chart-3" class="icon-sm"></i>
                         <span>詳細分析を見る</span>
                     </a>
                     <a href="index.html" class="btn btn-secondary">
-                        <i data-lucide="home" style="width: 16px; height: 16px;"></i>
+                        <i data-lucide="home" class="icon-sm"></i>
                         <span>ホームに戻る</span>
                     </a>
-                    <a href="training.html" class="btn btn-accent">
-                        <i data-lucide="target" style="width: 16px; height: 16px;"></i>
-                        <span>再チャレンジ</span>
+                    <a href="training.html" class="btn btn-primary">
+                        <i data-lucide="refresh-cw"></i>
+                        再チャレンジ
                     </a>
                 </div>
             </footer>

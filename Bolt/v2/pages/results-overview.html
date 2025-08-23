@@ -7,6 +7,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>総合評価 - 8va相対音感トレーニング</title>
     <link rel="stylesheet" href="../styles/system.css">
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/results.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -58,119 +60,7 @@
             100% { background-position: 0% 50%; }
         }
         
-        /* ページ固有スタイル（UIカタログ準拠） */
-        
-        /* 機能比較テーブル */
-        .comparison-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .comparison-table {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 2rem;
-        }
-        
-        .comparison-header-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .comparison-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        
-        .comparison-row-last {
-            border-bottom: none;
-        }
-        
-        .comparison-cell {
-            padding: 1rem;
-        }
-        
-        .comparison-feature-header {
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .comparison-plan-header {
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-        }
-        
-        .comparison-feature {
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-        
-        .comparison-value {
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .comparison-value:last-child {
-            border-right: none;
-        }
-        
-        .plan-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-        
-        .plan-header h4 {
-            color: white;
-            font-weight: 600;
-            margin: 0;
-        }
-        
-        .comparison-header h4 {
-            color: white;
-            font-weight: 600;
-            margin: 0;
-        }
-        
-        /* プレミアムCTA */
-        .premium-cta {
-            text-align: center;
-        }
-        
-        .btn-premium {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        
-        .btn-premium:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
-        }
-        
-        .premium-cta-note {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.75rem;
-            margin-top: 0.5rem;
-        }
+        /* ページ固有スタイル（外部CSSファイルに移動） */
     </style>
 </head>
 <body>
@@ -179,7 +69,9 @@
         <header class="page-header">
             <div class="page-header-content">
                 <div class="page-header-icon-wrapper">
-                    <i data-lucide="file-chart-column-increasing" class="page-header-icon" style="width: 40px; height: 40px;"></i>
+                    <div class="page-header-icon page-header-icon-purple">
+                        <i data-lucide="file-chart-column-increasing" class="icon-2xl text-white" data-stroke-width="2"></i>
+                    </div>
                 </div>
                 <h1 class="page-title">総合評価</h1>
                 <p class="page-subtitle">8セッション (64音) の総合評価</p>
@@ -371,7 +263,36 @@
 
         <!-- フッター -->
         <footer class="footer-base">
-            <!-- UIカタログ準拠のフッター -->
+            <div class="footer-content">
+                <h3 class="heading-lg" style="justify-content: center;">
+                    <i data-lucide="award" class="text-yellow-400"></i>
+                    8セッション完了！お疲れ様でした
+                </h3>
+                <p class="footer-description">素晴らしい進歩です。継続的な練習で更なる向上を目指しましょう。</p>
+            </div>
+            
+            <div class="footer-grid">
+                <div class="footer-stat-item">
+                    <i data-lucide="target" class="footer-stat-icon text-green-400"></i>
+                    <p class="footer-stat-label">総合グレード</p>
+                    <p class="footer-stat-value">B級</p>
+                </div>
+                <div class="footer-stat-item">
+                    <i data-lucide="activity" class="footer-stat-icon text-orange-400"></i>
+                    <p class="footer-stat-label">平均誤差</p>
+                    <p class="footer-stat-value">±18.7¢</p>
+                </div>
+                <div class="footer-stat-item">
+                    <i data-lucide="calendar" class="footer-stat-icon text-blue-400"></i>
+                    <p class="footer-stat-label">完了セッション</p>
+                    <p class="footer-stat-value">8セッション (64音)</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p class="footer-copyright">© 2024 8va相対音感トレーニングアプリ</p>
+                <p class="footer-tagline">あなたの音楽レベル向上をサポートします</p>
+            </div>
         </footer>
     </div>
 

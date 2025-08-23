@@ -41,7 +41,8 @@
     </div>
 
     <!-- Load the icon script -->
-    <script src="assets/icons/lucide-icons.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="js/lucide-init.js"></script>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -63,10 +64,10 @@
             }
             
             // Try to initialize icons
-            if (typeof initializeLucideIcons === 'function') {
-                console.log('🚀 Starting icon initialization...');
-                initializeLucideIcons();
-                debugDiv.innerHTML += `<p>Icon initialization: ✅ Executed</p>`;
+            if (typeof ensureLucideIcons === 'function') {
+                console.log('🚀 Starting secure icon initialization...');
+                ensureLucideIcons();
+                debugDiv.innerHTML += `<p>Icon initialization: ✅ Executed with retry logic</p>`;
             } else {
                 debugDiv.innerHTML += `<p>Icon initialization: ❌ Function not available</p>`;
             }
