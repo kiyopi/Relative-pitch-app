@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>総合評価 - 8va相対音感トレーニング</title>
+    <link rel="stylesheet" href="../styles/system.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    
+    <style>
+        /* 背景グラデーションアニメーション */
+        body {
+            position: relative;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            -webkit-overflow-scrolling: touch;
+            background: #0f172a;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            -webkit-animation: gradientShift 15s ease infinite;
+            z-index: -1;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            will-change: background-position;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @-webkit-keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* ページ固有スタイル（UIカタログ準拠） */
+        
+        /* 機能比較テーブル */
+        .comparison-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .comparison-table {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .comparison-header-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .comparison-row-last {
+            border-bottom: none;
+        }
+        
+        .comparison-cell {
+            padding: 1rem;
+        }
+        
+        .comparison-feature-header {
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .comparison-plan-header {
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        
+        .comparison-feature {
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .comparison-value {
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .comparison-value:last-child {
+            border-right: none;
+        }
+        
+        .plan-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .plan-header h4 {
+            color: white;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .comparison-header h4 {
+            color: white;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        /* プレミアムCTA */
+        .premium-cta {
+            text-align: center;
+        }
+        
+        .btn-premium {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        .premium-cta-note {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ヘッダー -->
+        <header class="page-header">
+            <div class="page-header-content">
+                <div class="page-header-icon-wrapper">
+                    <i data-lucide="file-chart-column-increasing" class="page-header-icon" style="width: 40px; height: 40px;"></i>
+                </div>
+                <h1 class="page-title">総合評価</h1>
+                <p class="page-subtitle">8セッション (64音) の総合評価</p>
+            </div>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <!-- 総合グレードセクション -->
+            <section class="glass-card mb-6">
+                <div id="grade-section">
+                    <!-- JavaScriptで動的生成 -->
+                </div>
+            </section>
+
+            <!-- セッショングリッド -->
+            <section class="glass-card mb-6">
+                <h2 class="heading-md mb-4">
+                    <i data-lucide="grid-3x3" style="width: 24px; height: 24px;"></i>
+                    セッション一覧
+                </h2>
+                <div id="session-grid-container">
+                    <!-- JavaScriptで動的生成 -->
+                </div>
+            </section>
+
+            <!-- 誤差推移グラフ -->
+            <section class="glass-card mb-6">
+                <h2 class="heading-md mb-4">
+                    <i data-lucide="trending-up" style="width: 24px; height: 24px;"></i>
+                    誤差推移
+                </h2>
+                <div class="chart-container">
+                    <canvas id="error-trend-chart"></canvas>
+                </div>
+            </section>
+
+            <!-- 詳細分析セクション -->
+            <section class="glass-card mb-6">
+                <h2 class="heading-md mb-4">
+                    <i data-lucide="bar-chart-3" style="width: 24px; height: 24px;"></i>
+                    詳細分析
+                </h2>
+                <div id="detail-analysis-container">
+                    <!-- JavaScriptで動的生成 -->
+                </div>
+            </section>
+
+            <!-- 次のステップ -->
+            <section class="glass-card mb-6">
+                <h2 class="heading-md mb-4">
+                    <i data-lucide="compass" style="width: 24px; height: 24px;"></i>
+                    次のステップ
+                </h2>
+                <div class="next-steps-grid">
+                    <!-- UIカタログ準拠のコンポーネント -->
+                </div>
+            </section>
+
+            <!-- 無料版 vs プレミアム版比較 -->
+            <section class="glass-card mb-8">
+                <div class="comparison-header">
+                    <i data-lucide="scale" style="width: 24px; height: 24px;"></i>
+                    <h2 class="heading-md">無料版 vs プレミアム版</h2>
+                </div>
+                
+                <!-- 機能比較テーブル -->
+                <div class="comparison-table">
+                    <!-- ヘッダー -->
+                    <div class="comparison-header-row">
+                        <div class="comparison-cell comparison-feature-header">
+                            <h4>機能</h4>
+                        </div>
+                        <div class="comparison-cell comparison-plan-header">
+                            <div class="plan-header">
+                                <i data-lucide="user" style="width: 18px; height: 18px;"></i>
+                                <h4>無料版</h4>
+                            </div>
+                        </div>
+                        <div class="comparison-cell comparison-plan-header">
+                            <div class="plan-header">
+                                <i data-lucide="crown" style="width: 18px; height: 18px;"></i>
+                                <h4>プレミアム版</h4>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ランダムモード -->
+                    <div class="comparison-row">
+                        <div class="comparison-cell comparison-feature">
+                            <span>ランダム基音モード</span>
+                        </div>
+                        <div class="comparison-cell comparison-value">
+                            <i data-lucide="circle-check-big" style="width: 20px; height: 20px;" class="text-green-400"></i>
+                        </div>
+                        <div class="comparison-cell comparison-value">
+                            <i data-lucide="circle-check-big" style="width: 20px; height: 20px;" class="text-green-400"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- 連続チャレンジモード -->
+                    <div class="comparison-row">
+                        <div class="comparison-cell comparison-feature">
+                            <span>連続チャレンジモード</span>
+                        </div>
+                        <div class="comparison-cell comparison-value">
+                            <i data-lucide="minus" style="width: 20px; height: 20px;" class="text-gray-500"></i>
+                        </div>
+                        <div class="comparison-cell comparison-value">
+                            <i data-lucide="circle-check-big" style="width: 20px; height: 20px;" class="text-green-400"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- 詳細分析レポート -->
+                    <div class="comparison-row">
+                        <div class="comparison-cell comparison-feature">
+                            <span>詳細分析レポート</span>
+                        </div>
+                        <div class="comparison-cell comparison-value">
+                            <span class="text-gray-400 text-sm">基本表示</span>
+                        </div>
+                        <div class="comparison-cell comparison-value">
+                            <span class="text-white text-sm">AI分析付き</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 12音階マスターモード -->
+                    <div class="comparison-row">
+                        <div class="comparison-cell comparison-feature">
+                            <span>12音階マスターモード</span>
+                        </div>
+                        <div class="comparison-cell comparison-value">
+                            <i data-lucide="minus" style="width: 20px; height: 20px;" class="text-gray-500"></i>
+                        </div>
+                        <div class="comparison-cell comparison-value">
+                            <i data-lucide="circle-check-big" style="width: 20px; height: 20px;" class="text-green-400"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- 弱点特定・改善提案 -->
+                    <div class="comparison-row">
+                        <div class="comparison-cell comparison-feature">
+                            <span>弱点特定・改善提案</span>
+                        </div>
+                        <div class="comparison-cell comparison-value">
+                            <i data-lucide="minus" style="width: 20px; height: 20px;" class="text-gray-500"></i>
+                        </div>
+                        <div class="comparison-cell comparison-value">
+                            <i data-lucide="circle-check-big" style="width: 20px; height: 20px;" class="text-green-400"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- データエクスポート -->
+                    <div class="comparison-row comparison-row-last">
+                        <div class="comparison-cell comparison-feature">
+                            <span>データエクスポート</span>
+                        </div>
+                        <div class="comparison-cell comparison-value">
+                            <i data-lucide="minus" style="width: 20px; height: 20px;" class="text-gray-500"></i>
+                        </div>
+                        <div class="comparison-cell comparison-value">
+                            <i data-lucide="circle-check-big" style="width: 20px; height: 20px;" class="text-green-400"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- プレミアム版CTA -->
+                <div class="premium-cta">
+                    <button class="btn btn-premium">
+                        <i data-lucide="star" style="width: 16px; height: 16px;"></i>
+                        7日間無料でお試し
+                    </button>
+                    <p class="premium-cta-note">月額480円 • いつでもキャンセル可能</p>
+                </div>
+            </section>
+
+            <!-- アクションボタン -->
+            <section class="action-buttons mb-6">
+                <a href="training.html" class="btn btn-primary btn-large">
+                    <i data-lucide="play" style="width: 16px; height: 16px;"></i>
+                    新しいトレーニング開始
+                </a>
+                <a href="index.html" class="btn btn-secondary btn-large">
+                    <i data-lucide="home" style="width: 16px; height: 16px;"></i>
+                    ホームに戻る
+                </a>
+            </section>
+        </main>
+
+        <!-- フッター -->
+        <footer class="footer-base">
+            <!-- UIカタログ準拠のフッター -->
+        </footer>
+    </div>
+
+    <!-- JavaScript モジュール -->
+    <script type="module">
+        // モジュールインポート（将来的に外部ファイル化）
+        
+        // Lucideアイコン初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+        });
+        
+        // ページ初期化
+        class ResultsOverviewPage {
+            constructor() {
+                this.sessionData = [];
+                this.currentSessionIndex = 0;
+            }
+            
+            async init() {
+                // TODO: データ取得
+                // TODO: コンポーネント初期化
+                // TODO: イベントリスナー設定
+                console.log('Results Overview Page initialized');
+            }
+        }
+        
+        // ページ読み込み時に初期化
+        const page = new ResultsOverviewPage();
+        page.init();
+    </script>
+</body>
+</html>
