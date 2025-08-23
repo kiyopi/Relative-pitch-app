@@ -861,19 +861,18 @@
                     <div class="component-item">
                         <h3 class="text-white font-medium mb-3">🎨 デザインシステム</h3>
                         <ul class="space-y-2 text-sm">
-                            <li><a href="#color-palette" class="text-blue-300 hover:text-blue-200 transition-colors">カラーパレット</a></li>
+                            <li><a href="#color-palette" class="text-blue-300 hover:text-blue-200 transition-colors">カラーパレットとグラデーション</a></li>
                             <li><a href="#typography" class="text-blue-300 hover:text-blue-200 transition-colors">タイポグラフィ</a></li>
-                            <li><a href="#interactive" class="text-blue-300 hover:text-blue-200 transition-colors">インタラクティブ要素</a></li>
+                            <li><a href="#interactive" class="text-blue-300 hover:text-blue-200 transition-colors">インタラクティブコンポーネント</a></li>
                         </ul>
                     </div>
                     
                     <div class="component-item">
                         <h3 class="text-white font-medium mb-3">📊 専門コンポーネント</h3>
                         <ul class="space-y-2 text-sm">
-                            <li><a href="#session-management" class="text-blue-300 hover:text-blue-200 transition-colors">セッション管理</a></li>
-                            <li><a href="#analytics" class="text-blue-300 hover:text-blue-200 transition-colors">分析・統計表示</a></li>
-                            <li><a href="#performance-icons" class="text-blue-300 hover:text-blue-200 transition-colors">パフォーマンスアイコン</a></li>
-                            <li><a href="#navigation" class="text-blue-300 hover:text-blue-200 transition-colors">ナビゲーション</a></li>
+                            <li><a href="#session-management" class="text-blue-300 hover:text-blue-200 transition-colors">セッション管理コンポーネント</a></li>
+                            <li><a href="#analytics" class="text-blue-300 hover:text-blue-200 transition-colors">分析・統計表示コンポーネント</a></li>
+                            <li><a href="#navigation" class="text-blue-300 hover:text-blue-200 transition-colors">ナビゲーションシステム</a></li>
                             <li><a href="#base-template" class="text-blue-300 hover:text-blue-200 transition-colors">ベーステンプレート</a></li>
                         </ul>
                     </div>
@@ -1349,7 +1348,7 @@
             </section>
 
             <!-- 5. カラーパレット -->
-            <section class="catalog-section">
+            <section class="catalog-section" id="color-palette">
                 <h2 class="text-2xl font-bold text-white mb-4">🎨 カラーパレットとグラデーション</h2>
                 <p class="text-white-70 mb-6">アプリケーション全体で使用されるカラーシステム</p>
                 
@@ -1397,7 +1396,7 @@
             </section>
 
             <!-- 6. タイポグラフィ -->
-            <section class="catalog-section">
+            <section class="catalog-section" id="typography">
                 <h2 class="text-2xl font-bold text-white mb-4">📝 タイポグラフィ</h2>
                 <p class="text-white-70 mb-6">統一されたテキストスタイル</p>
                 
@@ -1551,7 +1550,7 @@
             </section>
 
             <!-- 8. インタラクティブコンポーネント -->
-            <section class="catalog-section">
+            <section class="catalog-section" id="interactive">
                 <h2 class="text-2xl font-bold text-white mb-4">⚡ インタラクティブコンポーネント</h2>
                 <p class="text-white-70 mb-6">ユーザーインタラクションを伴うUI要素</p>
                 
@@ -1596,7 +1595,7 @@
             </section>
 
             <!-- 9. セッション管理コンポーネント -->
-            <section class="catalog-section">
+            <section class="catalog-section" id="session-management">
                 <h2 class="text-2xl font-bold text-white mb-4">🎯 セッション管理コンポーネント</h2>
                 <p class="text-white-70 mb-6">12セッション表示と詳細分析用UI要素</p>
                 
@@ -2057,7 +2056,7 @@
             </section>
 
             <!-- 12. ナビゲーションシステム -->
-            <section class="catalog-section">
+            <section class="catalog-section" id="navigation">
                 <h2 class="text-2xl font-bold text-white mb-4">🧭 ナビゲーションシステム</h2>
                 <p class="text-white-70 mb-6">アプリ内ナビゲーションとページ遷移UI要素</p>
                 
@@ -2140,63 +2139,6 @@
 &lt;/div&gt;</div>
                     </div>
                     
-                    <div class="component-item">
-                        <h4 class="text-white font-medium mb-4">ページ内リンク</h4>
-                        <div class="space-y-3">
-                            <a href="#" class="block text-white hover:text-blue-300 transition-colors p-2 rounded-lg hover:bg-white/5">
-                                <div class="flex items-center gap-3">
-                                    <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
-                                    <span>総合評価ページへ</span>
-                                </div>
-                            </a>
-                            
-                            <a href="#" class="block text-white hover:text-green-300 transition-colors p-2 rounded-lg hover:bg-white/5">
-                                <div class="flex items-center gap-3">
-                                    <i data-lucide="external-link" style="width: 16px; height: 16px;"></i>
-                                    <span>詳細分析ページへ</span>
-                                </div>
-                            </a>
-                            
-                            <a href="#" class="block text-white hover:text-purple-300 transition-colors p-2 rounded-lg hover:bg-white/5">
-                                <div class="flex items-center gap-3">
-                                    <i data-lucide="repeat" style="width: 16px; height: 16px;"></i>
-                                    <span>再トレーニング</span>
-                                </div>
-                            </a>
-                        </div>
-                        
-                        <div class="code-sample mt-4">
-&lt;a href="#" class="nav-link"&gt;
-  &lt;div class="flex items-center gap-3"&gt;
-    &lt;i data-lucide="arrow-right"&gt;&lt;/i&gt;
-    &lt;span&gt;総合評価ページへ&lt;/span&gt;
-  &lt;/div&gt;
-&lt;/a&gt;</div>
-                    </div>
-                </div>
-                
-                <!-- ブレッドクラム -->
-                <h3 class="text-xl font-medium text-white mb-4 mt-8">🍞 ブレッドクラム</h3>
-                <div class="component-grid grid-cols-1">
-                    <div class="component-item">
-                        <h4 class="text-white font-medium mb-4">ページ階層ナビゲーション</h4>
-                        <div class="breadcrumb" style="display: flex; align-items: center; gap: 0.5rem; padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 12px; margin-bottom: 1rem;">
-                            <a href="#" class="text-blue-300 hover:text-blue-200 transition-colors text-sm">ホーム</a>
-                            <i data-lucide="chevron-right" class="text-white-60" style="width: 14px; height: 14px;"></i>
-                            <a href="#" class="text-blue-300 hover:text-blue-200 transition-colors text-sm">トレーニング</a>
-                            <i data-lucide="chevron-right" class="text-white-60" style="width: 14px; height: 14px;"></i>
-                            <span class="text-white-70 text-sm">総合評価</span>
-                        </div>
-                        
-                        <div class="code-sample">
-&lt;div class="breadcrumb"&gt;
-  &lt;a href="#"&gt;ホーム&lt;/a&gt;
-  &lt;i data-lucide="chevron-right"&gt;&lt;/i&gt;
-  &lt;a href="#"&gt;トレーニング&lt;/a&gt;
-  &lt;i data-lucide="chevron-right"&gt;&lt;/i&gt;
-  &lt;span&gt;総合評価&lt;/span&gt;
-&lt;/div&gt;</div>
-                    </div>
                 </div>
 
                 <h3 class="text-xl font-medium text-white mb-4 mt-8">📱 シェア機能</h3>
@@ -2407,12 +2349,12 @@ function copyShareText(event) {
                         
                         <h4 class="text-white font-medium mb-2">含まれる機能</h4>
                         <ul class="text-white-70 text-sm space-y-2 mb-4">
-                            <li>• 統一グラデーション背景アニメーション</li>
-                            <li>• レスポンシブメタタグ（PWA対応）</li>
-                            <li>• Lucideアイコン自動初期化</li>
-                            <li>• system.css統一スタイル</li>
-                            <li>• フッターナビゲーション</li>
-                            <li>• デバッグナビゲーション</li>
+                            <li>統一グラデーション背景アニメーション</li>
+                            <li>レスポンシブメタタグ（PWA対応）</li>
+                            <li>Lucideアイコン自動初期化</li>
+                            <li>system.css統一スタイル</li>
+                            <li>フッターナビゲーション</li>
+                            <li>デバッグナビゲーション</li>
                         </ul>
                         
                         <div class="code-sample">&lt;!-- 新しいページ作成時はこのテンプレートをコピー --&gt;
