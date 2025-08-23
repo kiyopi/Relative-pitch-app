@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>統合評価ページ UIコンポーネント</title>
+    <link rel="stylesheet" href="../styles/system.css">
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/results.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
+            min-height: 100vh;
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+        .demo-section {
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+        .component-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <div class="page-header-content">
+                <div class="page-header-icon-wrapper">
+                    <i data-lucide="layout-grid" style="width: 40px; height: 40px;"></i>
+                </div>
+                <h1 class="page-title">統合評価ページ UIコンポーネント</h1>
+                <p class="page-subtitle">results-overview.html 専用コンポーネント集</p>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- 0. ページヘッダーアイコン -->
+            <section class="catalog-section" id="page-header-icons">
+                <h2 class="text-2xl font-bold text-white mb-4">🎯 ページヘッダーアイコン</h2>
+                <p class="text-white-70 mb-6">各ページトップの統一されたヘッダーアイコン（96px × 96px）</p>
+                
+                <div class="component-grid grid-cols-2 md:grid-cols-4">
+                    <div class="component-item text-center">
+                        <div class="page-header-icon page-header-icon-purple">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="file-chart-column-increasing" class="lucide lucide-file-chart-column-increasing icon-2xl text-white" data-stroke-width="2"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M8 18v-2"></path><path d="M12 18v-4"></path><path d="M16 18v-6"></path></svg>
+                        </div>
+                        <h3 class="text-white font-medium">紫グラデーション</h3>
+                        <p class="text-white-60 text-sm">総合評価ページ</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="page-header-icon page-header-icon-blue">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="mic" class="lucide lucide-mic icon-2xl text-white" data-stroke-width="2"><path d="M12 19v3"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><rect x="9" y="2" width="6" height="13" rx="3"></rect></svg>
+                        </div>
+                        <h3 class="text-white font-medium">青グラデーション</h3>
+                        <p class="text-white-60 text-sm">マイクテストページ</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="page-header-icon page-header-icon-green">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="target" class="lucide lucide-target icon-2xl text-white" data-stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                        </div>
+                        <h3 class="text-white font-medium">緑グラデーション</h3>
+                        <p class="text-white-60 text-sm">トレーニングページ</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="page-header-icon page-header-icon-orange">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="activity" class="lucide lucide-activity icon-2xl text-white" data-stroke-width="2"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path></svg>
+                        </div>
+                        <h3 class="text-white font-medium">オレンジグラデーション</h3>
+                        <p class="text-white-60 text-sm">記録ページ</p>
+                    </div>
+                </div>
+                
+                <div class="code-sample">
+                    <h4 class="text-lg font-medium text-white mb-3">使用例</h4>
+                    <pre class="bg-gray-900 text-gray-300 p-3 rounded text-sm"><code>&lt;div class="page-header-icon page-header-icon-purple"&gt;
+  &lt;i data-lucide="file-chart-column-increasing" 
+     class="icon-2xl text-white" 
+     data-stroke-width="2"&gt;&lt;/i&gt;
+&lt;/div&gt;</code></pre>
+                </div>
+            </section>
+
+            <!-- 1. 総合評価グレードアイコン（S〜E級） -->
+            <section class="catalog-section">
+                <h3 class="text-xl font-medium text-white mb-4">👑 総合評価グレードアイコン（S〜E級）</h3>
+                
+                <div class="component-grid grid-cols-2 md:grid-cols-6">
+                    <div class="component-item text-center">
+                        <div class="mb-4" style="display: flex; justify-content: center;">
+                            <div class="rank-circle rank-md rank-circle-s">
+                                <i data-lucide="crown" class="text-white" style="width: 64px; height: 64px;"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-yellow-300 font-bold">S級</h3>
+                        <p class="text-white-60 text-sm">プロレベル</p>
+                        <p class="text-white-60 text-xs">crown</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="mb-4" style="display: flex; justify-content: center;">
+                            <div class="rank-circle rank-md rank-circle-a">
+                                <i data-lucide="medal" class="text-white" style="width: 64px; height: 64px;"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-gray-300 font-bold">A級</h3>
+                        <p class="text-white-60 text-sm">楽器アンサンブル</p>
+                        <p class="text-white-60 text-xs">medal</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="mb-4" style="display: flex; justify-content: center;">
+                            <div class="rank-circle rank-md rank-circle-b">
+                                <i data-lucide="circle-star" class="text-white" style="width: 64px; height: 64px;"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-orange-300 font-bold">B級</h3>
+                        <p class="text-white-60 text-sm">合唱・弾き語り</p>
+                        <p class="text-white-60 text-xs">circle-star</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="mb-4" style="display: flex; justify-content: center;">
+                            <div class="rank-circle rank-md rank-circle-c">
+                                <i data-lucide="smile" class="text-white" style="width: 64px; height: 64px;"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-green-300 font-bold">C級</h3>
+                        <p class="text-white-60 text-sm">カラオケ・趣味</p>
+                        <p class="text-white-60 text-xs">smile</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="mb-4" style="display: flex; justify-content: center;">
+                            <div class="rank-circle rank-md rank-circle-d">
+                                <i data-lucide="meh" class="text-white" style="width: 64px; height: 64px;"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-blue-300 font-bold">D級</h3>
+                        <p class="text-white-60 text-sm">練習中</p>
+                        <p class="text-white-60 text-xs">meh</p>
+                    </div>
+                    
+                    <div class="component-item text-center">
+                        <div class="mb-4" style="display: flex; justify-content: center;">
+                            <div class="rank-circle rank-md rank-circle-e">
+                                <i data-lucide="frown" class="text-white" style="width: 64px; height: 64px;"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-red-300 font-bold">E級</h3>
+                        <p class="text-white-60 text-sm">基礎から</p>
+                        <p class="text-white-60 text-xs">frown</p>
+                    </div>
+                </div>
+                
+                <div class="code-sample">
+                    <h4 class="text-lg font-medium text-white mb-3">使用例</h4>
+                    <pre class="bg-gray-900 text-gray-300 p-3 rounded text-sm"><code>&lt;div class="rank-circle rank-md rank-circle-s"&gt;
+    &lt;i data-lucide="crown" style="width: 64px; height: 64px;"&gt;&lt;/i&gt;
+&lt;/div&gt;</code></pre>
+                </div>
+            </section>
+
+            <!-- 2. セッショングリッド -->
+            <section class="demo-section">
+                <h2 class="component-title">
+                    <i data-lucide="grid-3x3" style="width: 24px; height: 24px;"></i>
+                    セッショングリッド - 8セッション表示
+                </h2>
+                <div class="glass-card mb-6">
+                    <h3 class="heading-md mb-4">
+                        <i data-lucide="grid-3x3" style="width: 24px; height: 24px;"></i>
+                        セッション一覧
+                    </h3>
+                    <div class="session-grid session-grid-8">
+                        <div class="session-box session-excellent selected">
+                            <div class="session-number">1</div>
+                            <div class="session-icon">
+                                <i data-lucide="trophy" style="width: 20px; height: 20px;"></i>
+                            </div>
+                        </div>
+                        <div class="session-box session-good">
+                            <div class="session-number">2</div>
+                            <div class="session-icon">
+                                <i data-lucide="star" style="width: 20px; height: 20px;"></i>
+                            </div>
+                        </div>
+                        <div class="session-box session-pass">
+                            <div class="session-number">3</div>
+                            <div class="session-icon">
+                                <i data-lucide="thumbs-up" style="width: 20px; height: 20px;"></i>
+                            </div>
+                        </div>
+                        <div class="session-box session-practice">
+                            <div class="session-number">4</div>
+                            <div class="session-icon">
+                                <i data-lucide="triangle-alert" style="width: 20px; height: 20px;"></i>
+                            </div>
+                        </div>
+                        <div class="session-box session-excellent">
+                            <div class="session-number">5</div>
+                            <div class="session-icon">
+                                <i data-lucide="trophy" style="width: 20px; height: 20px;"></i>
+                            </div>
+                        </div>
+                        <div class="session-box session-good">
+                            <div class="session-number">6</div>
+                            <div class="session-icon">
+                                <i data-lucide="star" style="width: 20px; height: 20px;"></i>
+                            </div>
+                        </div>
+                        <div class="session-box session-pass">
+                            <div class="session-number">7</div>
+                            <div class="session-icon">
+                                <i data-lucide="thumbs-up" style="width: 20px; height: 20px;"></i>
+                            </div>
+                        </div>
+                        <div class="session-box session-excellent">
+                            <div class="session-number">8</div>
+                            <div class="session-icon">
+                                <i data-lucide="trophy" style="width: 20px; height: 20px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. 誤差推移グラフ -->
+            <section class="demo-section">
+                <h2 class="component-title">
+                    <i data-lucide="trending-up" style="width: 24px; height: 24px;"></i>
+                    誤差推移グラフ
+                </h2>
+                <div class="glass-card mb-6">
+                    <h3 class="heading-md mb-4">
+                        <i data-lucide="trending-up" style="width: 24px; height: 24px;"></i>
+                        誤差推移
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="demo-chart" width="400" height="200" style="background: rgba(255,255,255,0.1); border-radius: 8px;">
+                            <!-- Chart.js グラフエリア -->
+                        </canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. 詳細分析セクション -->
+            <section class="demo-section">
+                <h2 class="component-title">
+                    <i data-lucide="bar-chart-3" style="width: 24px; height: 24px;"></i>
+                    詳細分析セクション
+                </h2>
+                <div class="glass-card mb-6">
+                    <h3 class="heading-md mb-4">
+                        <i data-lucide="bar-chart-3" style="width: 24px; height: 24px;"></i>
+                        詳細分析
+                    </h3>
+                    <div class="analysis-navigation">
+                        <button class="btn btn-secondary">
+                            <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
+                        </button>
+                        <span class="analysis-title">セッション 1 の詳細</span>
+                        <button class="btn btn-secondary">
+                            <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
+                        </button>
+                    </div>
+                    <div class="detailed-results-list">
+                        <div class="result-row">
+                            <div class="note-info">
+                                <i data-lucide="music" style="width: 24px; height: 24px;"></i>
+                                <span class="note-interval">C4</span>
+                            </div>
+                            <div class="note-details">
+                                <span class="target-freq">目標周波数</span>
+                                <span class="target-value">261.6</span>
+                            </div>
+                            <div class="note-details">
+                                <span class="actual-freq">実音周波数</span>
+                                <span class="actual-value">268.1</span>
+                            </div>
+                            <div class="error-display">
+                                <span class="error-value">+8.2¢</span>
+                                <i data-lucide="star" style="width: 16px; height: 16px;" class="text-yellow-400"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="result-row">
+                            <div class="note-info">
+                                <i data-lucide="music" style="width: 24px; height: 24px;"></i>
+                                <span class="note-interval">D</span>
+                            </div>
+                            <div class="note-details">
+                                <span class="target-freq">目標周波数</span>
+                                <span class="target-value">293.7</span>
+                            </div>
+                            <div class="note-details">
+                                <span class="actual-freq">実音周波数</span>
+                                <span class="actual-value">310.1</span>
+                            </div>
+                            <div class="error-display">
+                                <span class="error-value">+15.1¢</span>
+                                <i data-lucide="star" style="width: 16px; height: 16px;" class="text-green-400"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="result-row">
+                            <div class="note-info">
+                                <i data-lucide="music" style="width: 24px; height: 24px;"></i>
+                                <span class="note-interval">E</span>
+                            </div>
+                            <div class="note-details">
+                                <span class="target-freq">目標周波数</span>
+                                <span class="target-value">329.6</span>
+                            </div>
+                            <div class="note-details">
+                                <span class="actual-freq">実音周波数</span>
+                                <span class="actual-value">318.8</span>
+                            </div>
+                            <div class="error-display">
+                                <span class="error-value">-8.4¢</span>
+                                <i data-lucide="star" style="width: 16px; height: 16px;" class="text-yellow-400"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="result-row">
+                            <div class="note-info">
+                                <i data-lucide="music" style="width: 24px; height: 24px;"></i>
+                                <span class="note-interval">F#</span>
+                            </div>
+                            <div class="note-details">
+                                <span class="target-freq">目標周波数</span>
+                                <span class="target-value">370.0</span>
+                            </div>
+                            <div class="note-details">
+                                <span class="actual-freq">実音周波数</span>
+                                <span class="actual-value">389.1</span>
+                            </div>
+                            <div class="error-display">
+                                <span class="error-value">+8.8¢</span>
+                                <i data-lucide="star" style="width: 16px; height: 16px;" class="text-yellow-400"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="result-row">
+                            <div class="note-info">
+                                <i data-lucide="music" style="width: 24px; height: 24px;"></i>
+                                <span class="note-interval">G</span>
+                            </div>
+                            <div class="note-details">
+                                <span class="target-freq">目標周波数</span>
+                                <span class="target-value">392.0</span>
+                            </div>
+                            <div class="note-details">
+                                <span class="actual-freq">実音周波数</span>
+                                <span class="actual-value">+24.5¢</span>
+                            </div>
+                            <div class="error-display">
+                                <span class="error-value">+24.5¢</span>
+                                <i data-lucide="star" style="width: 16px; height: 16px;" class="text-green-400"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="result-row">
+                            <div class="note-info">
+                                <i data-lucide="music" style="width: 24px; height: 24px;"></i>
+                                <span class="note-interval">A</span>
+                            </div>
+                            <div class="note-details">
+                                <span class="target-freq">目標周波数</span>
+                                <span class="target-value">440.0</span>
+                            </div>
+                            <div class="note-details">
+                                <span class="actual-freq">実音周波数</span>
+                                <span class="actual-value">-6.7¢</span>
+                            </div>
+                            <div class="error-display">
+                                <span class="error-value">-6.7¢</span>
+                                <i data-lucide="star" style="width: 16px; height: 16px;" class="text-yellow-400"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="result-row">
+                            <div class="note-info">
+                                <i data-lucide="music" style="width: 24px; height: 24px;"></i>
+                                <span class="note-interval">B</span>
+                            </div>
+                            <div class="note-details">
+                                <span class="target-freq">目標周波数</span>
+                                <span class="target-value">493.9</span>
+                            </div>
+                            <div class="note-details">
+                                <span class="actual-freq">実音周波数</span>
+                                <span class="actual-value">+12.9¢</span>
+                            </div>
+                            <div class="error-display">
+                                <span class="error-value">+12.9¢</span>
+                                <i data-lucide="star" style="width: 16px; height: 16px;" class="text-yellow-400"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="result-row">
+                            <div class="note-info">
+                                <i data-lucide="music" style="width: 24px; height: 24px;"></i>
+                                <span class="note-interval">C5</span>
+                            </div>
+                            <div class="note-details">
+                                <span class="target-freq">目標周波数</span>
+                                <span class="target-value">523.3</span>
+                            </div>
+                            <div class="note-details">
+                                <span class="actual-freq">実音周波数</span>
+                                <span class="actual-value">+14.8¢</span>
+                            </div>
+                            <div class="error-display">
+                                <span class="error-value">+14.8¢</span>
+                                <i data-lucide="star" style="width: 16px; height: 16px;" class="text-green-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. 次のステップ -->
+            <section class="demo-section">
+                <h2 class="component-title">
+                    <i data-lucide="compass" style="width: 24px; height: 24px;"></i>
+                    次のステップ
+                </h2>
+                <div class="glass-card mb-6">
+                    <h3 class="heading-md mb-4">
+                        <i data-lucide="compass" style="width: 24px; height: 24px;"></i>
+                        次のステップ
+                    </h3>
+                    <div class="next-steps-grid">
+                        <div class="step-card">
+                            <div class="step-icon">
+                                <i data-lucide="target" style="width: 32px; height: 32px;"></i>
+                            </div>
+                            <h4 class="step-title">連続チャレンジ</h4>
+                            <p class="step-description">より高度な連続モードに挑戦しましょう</p>
+                        </div>
+                        <div class="step-card">
+                            <div class="step-icon">
+                                <i data-lucide="music" style="width: 32px; height: 32px;"></i>
+                            </div>
+                            <h4 class="step-title">12音階マスター</h4>
+                            <p class="step-description">全ての音程を完璧にマスター</p>
+                        </div>
+                        <div class="step-card">
+                            <div class="step-icon">
+                                <i data-lucide="settings" style="width: 32px; height: 32px;"></i>
+                            </div>
+                            <h4 class="step-title">カスタム練習</h4>
+                            <p class="step-description">弱点を重点的に克服</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. 無料版vs有料版比較 -->
+            <section class="demo-section">
+                <h2 class="component-title">
+                    <i data-lucide="scale" style="width: 24px; height: 24px;"></i>
+                    機能比較テーブル
+                </h2>
+                <div class="glass-card mb-8">
+                    <div class="comparison-header">
+                        <i data-lucide="scale" style="width: 24px; height: 24px;"></i>
+                        <h3 class="heading-md">無料版 vs プレミアム版</h3>
+                    </div>
+                    
+                    <div class="comparison-table">
+                        <!-- ヘッダー -->
+                        <div class="comparison-header-row">
+                            <div class="comparison-cell comparison-feature-header">
+                                <h4>機能</h4>
+                            </div>
+                            <div class="comparison-cell comparison-plan-header">
+                                <div class="plan-header">
+                                    <i data-lucide="user" style="width: 18px; height: 18px;"></i>
+                                    <h4>無料版</h4>
+                                </div>
+                            </div>
+                            <div class="comparison-cell comparison-plan-header">
+                                <div class="plan-header">
+                                    <i data-lucide="crown" style="width: 18px; height: 18px;"></i>
+                                    <h4>プレミアム版</h4>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 機能行 -->
+                        <div class="comparison-row">
+                            <div class="comparison-cell comparison-feature">
+                                <span>ランダム基音モード</span>
+                            </div>
+                            <div class="comparison-cell comparison-value">
+                                <i data-lucide="circle-check-big" style="width: 20px; height: 20px;" class="text-green-400"></i>
+                            </div>
+                            <div class="comparison-cell comparison-value">
+                                <i data-lucide="circle-check-big" style="width: 20px; height: 20px;" class="text-green-400"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-row comparison-row-last">
+                            <div class="comparison-cell comparison-feature">
+                                <span>連続チャレンジモード</span>
+                            </div>
+                            <div class="comparison-cell comparison-value">
+                                <i data-lucide="minus" style="width: 20px; height: 20px;" class="text-gray-500"></i>
+                            </div>
+                            <div class="comparison-cell comparison-value">
+                                <i data-lucide="circle-check-big" style="width: 20px; height: 20px;" class="text-green-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- プレミアム版CTA -->
+                    <div class="premium-cta">
+                        <button class="btn btn-premium">
+                            <i data-lucide="star" style="width: 16px; height: 16px;"></i>
+                            7日間無料でお試し
+                        </button>
+                        <p class="premium-cta-note">月額480円 • いつでもキャンセル可能</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. アクションボタン -->
+            <section class="demo-section">
+                <h2 class="component-title">
+                    <i data-lucide="mouse-pointer-click" style="width: 24px; height: 24px;"></i>
+                    アクションボタン
+                </h2>
+                <div class="action-buttons mb-6">
+                    <a href="#" class="btn btn-primary btn-large">
+                        <i data-lucide="play" style="width: 16px; height: 16px;"></i>
+                        新しいトレーニング開始
+                    </a>
+                    <a href="#" class="btn btn-secondary btn-large">
+                        <i data-lucide="home" style="width: 16px; height: 16px;"></i>
+                        ホームに戻る
+                    </a>
+                </div>
+            </section>
+
+            <!-- 8. 詳細分析ナビゲーション -->
+            <section class="demo-section">
+                <h2 class="component-title">
+                    <i data-lucide="navigation" style="width: 24px; height: 24px;"></i>
+                    詳細分析ナビゲーション
+                </h2>
+                <div class="analysis-navigation">
+                    <button class="btn btn-secondary" data-direction="prev">
+                        <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
+                    </button>
+                    <span class="analysis-title">セッション 1 の詳細</span>
+                    <button class="btn btn-secondary" data-direction="next">
+                        <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 9. 音程結果アイテム -->
+            <section class="demo-section">
+                <h2 class="component-title">
+                    <i data-lucide="music" style="width: 24px; height: 24px;"></i>
+                    音程結果アイテム
+                </h2>
+                <div class="note-results-grid">
+                    <div class="note-result-item">
+                        <div class="note-result-header">
+                            <i data-lucide="music" style="width: 24px; height: 24px;"></i>
+                            <span class="note-name">C4 → F4 (完全4度)</span>
+                        </div>
+                        <div class="note-result-stats">
+                            <div class="note-error excellent">±8.2¢</div>
+                            <div class="note-frequencies">
+                                <span class="freq-target">目標: 349.2Hz</span>
+                                <span class="freq-actual">実音: 347.8Hz</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="note-result-item">
+                        <div class="note-result-header">
+                            <i data-lucide="music" style="width: 24px; height: 24px;"></i>
+                            <span class="note-name">G4 → D5 (完全5度)</span>
+                        </div>
+                        <div class="note-result-stats">
+                            <div class="note-error good">±15.7¢</div>
+                            <div class="note-frequencies">
+                                <span class="freq-target">目標: 587.3Hz</span>
+                                <span class="freq-actual">583.1Hz</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 10. ステップカード -->
+            <section class="demo-section">
+                <h2 class="component-title">
+                    <i data-lucide="layers" style="width: 24px; height: 24px;"></i>
+                    ステップカード
+                </h2>
+                <div class="next-steps-grid">
+                    <div class="step-card">
+                        <div class="step-icon">
+                            <i data-lucide="target" style="width: 32px; height: 32px;"></i>
+                        </div>
+                        <h4 class="step-title">連続チャレンジ</h4>
+                        <p class="step-description">より高度な連続モードに挑戦しましょう</p>
+                        <button class="step-button">
+                            <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+                            開始
+                        </button>
+                    </div>
+                    
+                    <div class="step-card">
+                        <div class="step-icon">
+                            <i data-lucide="music" style="width: 32px; height: 32px;"></i>
+                        </div>
+                        <h4 class="step-title">12音階マスター</h4>
+                        <p class="step-description">全ての音程を完璧にマスター</p>
+                        <button class="step-button">
+                            <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+                            開始
+                        </button>
+                    </div>
+                    
+                    <div class="step-card">
+                        <div class="step-icon">
+                            <i data-lucide="settings" style="width: 32px; height: 32px;"></i>
+                        </div>
+                        <h4 class="step-title">カスタム練習</h4>
+                        <p class="step-description">弱点を重点的に克服</p>
+                        <button class="step-button">
+                            <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+                            開始
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer-base">
+            <p>&copy; 2024 8va相対音感トレーニング</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+        });
+    </script>
+</body>
+</html>

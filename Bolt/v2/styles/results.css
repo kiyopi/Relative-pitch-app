@@ -1,0 +1,378 @@
+/* results.css - 統合評価ページ専用スタイル */
+
+/* 機能比較テーブル */
+.comparison-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.comparison-table {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.comparison-header-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.comparison-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.comparison-row-last {
+    border-bottom: none;
+}
+
+.comparison-cell {
+    padding: 1rem;
+}
+
+.comparison-feature-header {
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.comparison-plan-header {
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.comparison-feature {
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.comparison-value {
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.comparison-value:last-child {
+    border-right: none;
+}
+
+.plan-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.plan-header h4 {
+    color: white;
+    font-weight: 600;
+    margin: 0;
+}
+
+.comparison-header h4 {
+    color: white;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* プレミアムCTA */
+.premium-cta {
+    text-align: center;
+}
+
+.btn-premium {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+}
+
+.premium-cta-note {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+/* 総合グレード表示 */
+.grade-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+}
+
+.grade-icon-container {
+    margin-bottom: 1.5rem;
+}
+
+.grade-text {
+    margin-bottom: 2rem;
+}
+
+.grade-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.grade-description {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.125rem;
+}
+
+.grade-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+@media (min-width: 768px) {
+    .grade-stats {
+        flex-direction: row;
+        gap: 3rem;
+    }
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+}
+
+.stat-value-avg-error {
+    color: #22c55e;
+}
+
+.stat-value-session-count {
+    color: #3b82f6;
+}
+
+/* 詳細分析ナビゲーション */
+.analysis-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.analysis-title {
+    font-weight: 600;
+    color: white;
+    font-size: 1.125rem;
+}
+
+/* 音程結果グリッド */
+.note-results-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .note-results-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.note-result-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.note-name {
+    font-weight: 600;
+    color: white;
+}
+
+.note-result-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.note-error {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.note-error.excellent {
+    color: #fbbf24;
+}
+
+.note-error.good {
+    color: #22c55e;
+}
+
+.note-frequencies {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+}
+
+.freq-target, .freq-actual {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* セッショングリッド追加スタイル */
+.session-grid-8 {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 0.75rem;
+}
+
+@media (max-width: 767px) {
+    .session-grid-8 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.session-box {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.75rem;
+    padding: 0.5rem;
+}
+
+.session-box.selected {
+    filter: brightness(1.8);
+    transform: scale(1.05);
+}
+
+.session-number {
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+    text-align: center;
+}
+
+.session-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.session-excellent {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+}
+
+.session-good {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.session-pass {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.session-practice {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+/* 詳細分析結果リスト */
+.detailed-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.result-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    align-items: center;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    gap: 1rem;
+}
+
+.note-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.note-interval {
+    font-weight: 600;
+    color: white;
+}
+
+.note-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.target-freq, .actual-freq {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0.25rem;
+}
+
+.target-value, .actual-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+}
+
+.error-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.error-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+}
+
+.text-yellow-400 {
+    color: #fbbf24;
+}
+
