@@ -1,5 +1,51 @@
 /* base.css - 基本共通スタイル */
 
+/* ===== 基本レイアウト（system.cssから移行） ===== */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 var(--space-4);
+  }
+}
+
+/* ===== ガラスカード（system.cssから移行） ===== */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-3xl);
+  padding: var(--space-8);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  background: var(--glass-hover);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.glass-card-sm {
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .glass-card {
+    padding: var(--space-6);
+  }
+  
+  .glass-card-sm {
+    padding: var(--space-3);
+  }
+}
+
 /* メインコンテンツ */
 .main-content {
     padding: 0 1rem;

@@ -42,55 +42,6 @@
         </header>
 
         <main class="main-content">
-            <!-- 0. ページヘッダーアイコン -->
-            <section class="catalog-section" id="page-header-icons">
-                <h2 class="text-2xl font-bold text-white mb-4">🎯 ページヘッダーアイコン</h2>
-                <p class="text-white-70 mb-6">各ページトップの統一されたヘッダーアイコン（96px × 96px）</p>
-                
-                <div class="component-grid grid-cols-2 md:grid-cols-4">
-                    <div class="component-item text-center">
-                        <div class="page-header-icon page-header-icon-purple">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="file-chart-column-increasing" class="lucide lucide-file-chart-column-increasing icon-2xl text-white" data-stroke-width="2"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M8 18v-2"></path><path d="M12 18v-4"></path><path d="M16 18v-6"></path></svg>
-                        </div>
-                        <h3 class="text-white font-medium">紫グラデーション</h3>
-                        <p class="text-white-60 text-sm">総合評価ページ</p>
-                    </div>
-                    
-                    <div class="component-item text-center">
-                        <div class="page-header-icon page-header-icon-blue">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="mic" class="lucide lucide-mic icon-2xl text-white" data-stroke-width="2"><path d="M12 19v3"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><rect x="9" y="2" width="6" height="13" rx="3"></rect></svg>
-                        </div>
-                        <h3 class="text-white font-medium">青グラデーション</h3>
-                        <p class="text-white-60 text-sm">マイクテストページ</p>
-                    </div>
-                    
-                    <div class="component-item text-center">
-                        <div class="page-header-icon page-header-icon-green">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="target" class="lucide lucide-target icon-2xl text-white" data-stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
-                        </div>
-                        <h3 class="text-white font-medium">緑グラデーション</h3>
-                        <p class="text-white-60 text-sm">トレーニングページ</p>
-                    </div>
-                    
-                    <div class="component-item text-center">
-                        <div class="page-header-icon page-header-icon-orange">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="activity" class="lucide lucide-activity icon-2xl text-white" data-stroke-width="2"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path></svg>
-                        </div>
-                        <h3 class="text-white font-medium">オレンジグラデーション</h3>
-                        <p class="text-white-60 text-sm">記録ページ</p>
-                    </div>
-                </div>
-                
-                <div class="code-sample">
-                    <h4 class="text-lg font-medium text-white mb-3">使用例</h4>
-                    <pre class="bg-gray-900 text-gray-300 p-3 rounded text-sm"><code>&lt;div class="page-header-icon page-header-icon-purple"&gt;
-  &lt;i data-lucide="file-chart-column-increasing" 
-     class="icon-2xl text-white" 
-     data-stroke-width="2"&gt;&lt;/i&gt;
-&lt;/div&gt;</code></pre>
-                </div>
-            </section>
-
             <!-- 1. 総合評価グレードアイコン（S〜E級） -->
             <section class="catalog-section">
                 <h3 class="text-xl font-medium text-white mb-4">👑 総合評価グレードアイコン（S〜E級）</h3>
@@ -170,6 +121,7 @@
 &lt;/div&gt;</code></pre>
                 </div>
             </section>
+
 
             <!-- 2. セッショングリッド -->
             <section class="demo-section">
@@ -665,6 +617,44 @@
                 lucide.createIcons();
             }
         });
+        
+        // シェア機能デモ
+        function getShareText() {
+            return '🎵 8va相対音感トレーニングで【B級】獲得！\n平均誤差: ±18.2セント\n8セッション完走！';
+        }
+        
+        function shareToTwitter(event) {
+            event.preventDefault();
+            const text = encodeURIComponent(getShareText());
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+        }
+        
+        function shareToLine(event) {
+            event.preventDefault();
+            const text = encodeURIComponent(getShareText() + '\n' + window.location.href);
+            window.open(`https://social-plugins.line.me/lineit/share?text=${text}`, '_blank');
+        }
+        
+        function shareToFacebook(event) {
+            event.preventDefault();
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+        }
+        
+        function copyShareText(event) {
+            event.preventDefault();
+            const text = getShareText() + '\n' + window.location.href;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.currentTarget;
+                btn.classList.add('copied');
+                setTimeout(() => btn.classList.remove('copied'), 2000);
+            }).catch(err => {
+                console.error('コピーに失敗しました:', err);
+                alert('クリップボードへのコピーに失敗しました');
+            });
+        }
     </script>
 </body>
 </html>

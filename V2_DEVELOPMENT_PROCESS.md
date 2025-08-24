@@ -66,9 +66,27 @@ Grep [関連キーワード] /path/to/styles/
 - `ui-components-results.html` - results専用コンポーネント
 
 ### **CSS分割**
-- `system.css` - 全ページ共通スタイル（既存）
-- `base.css` - v2共通コンポーネント
-- `results.css` - results専用スタイル
+- ~~`system.css` - 全ページ共通スタイル（廃止）~~
+- `base.css` - v2共通コンポーネント（全ページ読み込み）
+- `results.css` - results専用スタイル（results系ページのみ読み込み）
+
+### **🚨 CSS読み込みルール（絶対遵守）**
+- **❌ 禁止**: `system.css`の読み込み（v2環境では使用禁止）
+- **✅ 必須**: 各ページで適切なCSSファイルのみ読み込み
+
+#### **ページ別CSS読み込みパターン**
+```html
+<!-- トップページ（index.html） -->
+<link rel="stylesheet" href="../styles/base.css">
+
+<!-- 統合評価ページ（results-overview.html） -->
+<link rel="stylesheet" href="../styles/base.css">
+<link rel="stylesheet" href="../styles/results.css">
+
+<!-- UIカタログ（results系） -->
+<link rel="stylesheet" href="../styles/base.css">
+<link rel="stylesheet" href="../styles/results.css">
+```
 
 ### **ページファイル**
 - `index.html` - トップページ
@@ -84,12 +102,22 @@ Grep [関連キーワード] /path/to/styles/
 - ❌ 既存クラス検索なしでスタイル追加
 - ❌ 要求を曖昧なまま作業開始
 - ❌ 重複コンポーネント作成
+- ❌ **system.cssの読み込み（v2環境では絶対禁止）**
 
 ### **必須確認ポイント**
 ```
-新しいスタイル作成前 → 「system.cssに既存しませんか？」
+新しいスタイル作成前 → 「base.css/results.cssに既存しませんか？」
 ボタン作成前 → 「ui-catalogのボタンセクションを確認しましたか？」
 レイアウト変更前 → 「他ページで同じパターンはありませんか？」
+CSS読み込み前 → 「system.cssを使用していませんか？（v2では禁止）」
+```
+
+### **⚡ CSS読み込み確認フロー**
+```
+1. HTML編集時 → link要素確認
+2. system.css発見 → 即座に適切なファイルに変更
+3. 不足スタイル → system.cssから該当ファイルにコピー
+4. 動作確認 → エラーがあれば追加移行
 ```
 
 ---
