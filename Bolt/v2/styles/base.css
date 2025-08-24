@@ -76,12 +76,21 @@
 }
 
 /* カラークラス（system.cssから移行） */
+/* 300番台 - アイコン・強調用 */
 .text-yellow-300 { color: #fde047; }
 .text-green-300 { color: #86efac; }
 .text-blue-300 { color: #93c5fd; }
 .text-red-300 { color: #fca5a5; }
 .text-gray-300 { color: #9ca3af; }
 .text-orange-300 { color: #fdba74; }
+.text-purple-300 { color: #c4b5fd; }
+
+/* 200番台 - ラベル・サブテキスト用 */
+.text-yellow-200 { color: #fef08a; }
+.text-green-200 { color: #bbf7d0; }
+.text-blue-200 { color: #bae6fd; }
+.text-red-200 { color: #fecaca; }
+.text-purple-200 { color: #ddd6fe; }
 
 /* レイアウトクラス（system.cssから移行） */
 .flex { display: flex; }
