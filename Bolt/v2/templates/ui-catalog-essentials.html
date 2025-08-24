@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UIカタログ エッセンシャル - 8va相対音感トレーニングアプリ</title>
+    
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="ui-catalog.css">
+    
+    <!-- アイコンライブラリ -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <div class="ui-catalog min-h-screen p-6">
+        <div class="container max-w-7xl mx-auto">
+            <!-- ヘッダー -->
+            <header class="text-center mb-8">
+                <div class="flex justify-center mb-6">
+                    <div class="page-header-icon page-header-icon-yellow">
+                        <i data-lucide="star" class="icon-2xl text-white" data-stroke-width="2"></i>
+                    </div>
+                </div>
+                <h1 class="text-4xl font-bold text-white mb-4">UIカタログ エッセンシャル</h1>
+                <p class="text-yellow-200 text-xl">必須基本スタイル・コアコンポーネント</p>
+            </header>
+
+            <!-- カタログナビゲーション -->
+            <nav class="catalog-nav">
+                <h2 class="text-xl font-bold text-white mb-2">🧭 UIカタログナビゲーション</h2>
+                <p class="text-white-70 text-sm">v2環境のデザインシステムを体系的に閲覧</p>
+                
+                <div class="catalog-nav-grid">
+                    <a href="ui-catalog-index.html" class="catalog-nav-item">
+                        <i data-lucide="grid-3x3" class="catalog-nav-icon text-blue-300"></i>
+                        <div class="catalog-nav-info">
+                            <h3>インデックス</h3>
+                            <p>総合ナビゲーション</p>
+                        </div>
+                    </a>
+                    
+                    <a href="ui-catalog-essentials.html" class="catalog-nav-item current">
+                        <i data-lucide="star" class="catalog-nav-icon text-yellow-300"></i>
+                        <div class="catalog-nav-info">
+                            <h3>エッセンシャル</h3>
+                            <p>必須基本スタイル</p>
+                        </div>
+                    </a>
+                    
+                    <a href="ui-catalog-components.html" class="catalog-nav-item">
+                        <i data-lucide="package" class="catalog-nav-icon text-green-300"></i>
+                        <div class="catalog-nav-info">
+                            <h3>コンポーネント</h3>
+                            <p>汎用UI要素</p>
+                        </div>
+                    </a>
+                    
+                    <a href="ui-catalog-results.html" class="catalog-nav-item">
+                        <i data-lucide="bar-chart-3" class="catalog-nav-icon text-purple-300"></i>
+                        <div class="catalog-nav-info">
+                            <h3>結果表示</h3>
+                            <p>専用コンポーネント</p>
+                        </div>
+                    </a>
+                    
+                    <a href="ui-catalog-advanced.html" class="catalog-nav-item">
+                        <i data-lucide="zap" class="catalog-nav-icon text-orange-300"></i>
+                        <div class="catalog-nav-info">
+                            <h3>アドバンス</h3>
+                            <p>高度エフェクト</p>
+                        </div>
+                    </a>
+                </div>
+            </nav>
+
+            <!-- メインコンテンツエリア -->
+            <main id="catalog-content">
+                
+                <!-- アイコンサイズシステム -->
+                <section id="icon-sizes" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">📏 アイコンサイズ</h2>
+                    <p class="text-white-70 mb-6">統一されたアイコンサイズシステム</p>
+                    
+                    <div class="component-grid grid-cols-2 md:grid-cols-4">
+                        <div class="component-item text-center">
+                            <i data-lucide="home" class="icon-xs text-white mb-2"></i>
+                            <h3 class="text-white font-medium">icon-xs</h3>
+                            <p class="text-white-60 text-sm">12px</p>
+                        </div>
+                        
+                        <div class="component-item text-center">
+                            <i data-lucide="home" class="icon-sm text-white mb-2"></i>
+                            <h3 class="text-white font-medium">icon-sm</h3>
+                            <p class="text-white-60 text-sm">16px</p>
+                        </div>
+                        
+                        <div class="component-item text-center">
+                            <i data-lucide="home" class="icon-md text-white mb-2"></i>
+                            <h3 class="text-white font-medium">icon-md</h3>
+                            <p class="text-white-60 text-sm">24px</p>
+                        </div>
+                        
+                        <div class="component-item text-center">
+                            <i data-lucide="home" class="icon-lg text-white mb-2"></i>
+                            <h3 class="text-white font-medium">icon-lg</h3>
+                            <p class="text-white-60 text-sm">32px</p>
+                        </div>
+                        
+                        <div class="component-item text-center">
+                            <i data-lucide="home" class="icon-xl text-white mb-2"></i>
+                            <h3 class="text-white font-medium">icon-xl</h3>
+                            <p class="text-white-60 text-sm">40px</p>
+                        </div>
+                        
+                        <div class="component-item text-center">
+                            <i data-lucide="home" class="icon-2xl text-white mb-2"></i>
+                            <h3 class="text-white font-medium">icon-2xl</h3>
+                            <p class="text-white-60 text-sm">48px</p>
+                        </div>
+                        
+                        <div class="component-item text-center">
+                            <i data-lucide="home" class="icon-3xl text-white mb-2"></i>
+                            <h3 class="text-white font-medium">icon-3xl</h3>
+                            <p class="text-white-60 text-sm">64px</p>
+                        </div>
+                        
+                        <div class="component-item text-center">
+                            <i data-lucide="home" class="icon-4xl text-white mb-2"></i>
+                            <h3 class="text-white font-medium">icon-4xl</h3>
+                            <p class="text-white-60 text-sm">80px</p>
+                        </div>
+                    </div>
+                    
+                    <!-- アイコン使用方法詳細 -->
+                    <div class="component-item mt-8">
+                        <h3 class="text-white font-medium mb-4">🎨 アイコン使用方法</h3>
+                        
+                        <h4 class="text-white-70 font-medium mb-2">一般的なアイコン</h4>
+                        <div class="flex items-center gap-4 mb-4">
+                            <i data-lucide="home" class="text-white" style="width: 24px; height: 24px;"></i>
+                            <i data-lucide="settings" class="text-white" style="width: 24px; height: 24px;"></i>
+                            <i data-lucide="mic" class="text-white" style="width: 24px; height: 24px;"></i>
+                            <i data-lucide="play" class="text-white" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        
+                        <h4 class="text-white-70 font-medium mb-2">音感精度評価アイコン</h4>
+                        <div class="flex items-center gap-4 mb-4">
+                            <i data-lucide="trophy" class="text-yellow-300" style="width: 24px; height: 24px;"></i>
+                            <i data-lucide="star" class="text-green-300" style="width: 24px; height: 24px;"></i>
+                            <i data-lucide="thumbs-up" class="text-blue-300" style="width: 24px; height: 24px;"></i>
+                            <i data-lucide="triangle-alert" class="text-red-300" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        
+                        <h4 class="text-white-70 font-medium mb-2">総合評価グレードアイコン（S-E級）</h4>
+                        <div class="flex items-center gap-4 mb-4">
+                            <i data-lucide="crown" class="text-yellow-300" style="width: 24px; height: 24px;"></i>
+                            <i data-lucide="medal" class="text-gray-300" style="width: 24px; height: 24px;"></i>
+                            <i data-lucide="circle-star" class="text-orange-300" style="width: 24px; height: 24px;"></i>
+                            <i data-lucide="smile" class="text-green-300" style="width: 24px; height: 24px;"></i>
+                            <i data-lucide="meh" class="text-blue-300" style="width: 24px; height: 24px;"></i>
+                            <i data-lucide="frown" class="text-red-300" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        
+                        <div class="code-sample">&lt;!-- 一般的なアイコン --&gt;
+&lt;i data-lucide="home" class="text-white"&gt;&lt;/i&gt;
+&lt;i data-lucide="settings" class="text-white"&gt;&lt;/i&gt;
+
+&lt;!-- 音感精度評価アイコン --&gt;
+&lt;i data-lucide="trophy" class="text-yellow-300"&gt;&lt;/i&gt;
+&lt;i data-lucide="star" class="text-green-300"&gt;&lt;/i&gt;
+&lt;i data-lucide="thumbs-up" class="text-blue-300"&gt;&lt;/i&gt;
+&lt;i data-lucide="triangle-alert" class="text-red-300"&gt;&lt;/i&gt;
+
+&lt;!-- 総合評価グレードアイコン（S-E級） --&gt;
+&lt;i data-lucide="crown" class="text-yellow-300"&gt;&lt;/i&gt; &lt;!-- S級 --&gt;
+&lt;i data-lucide="medal" class="text-gray-300"&gt;&lt;/i&gt; &lt;!-- A級 --&gt;
+&lt;i data-lucide="circle-star" class="text-orange-300"&gt;&lt;/i&gt; &lt;!-- B級 --&gt;
+&lt;i data-lucide="smile" class="text-green-300"&gt;&lt;/i&gt; &lt;!-- C級 --&gt;
+&lt;i data-lucide="meh" class="text-blue-300"&gt;&lt;/i&gt; &lt;!-- D級 --&gt;
+&lt;i data-lucide="frown" class="text-red-300"&gt;&lt;/i&gt; &lt;!-- E級 --&gt;</div>
+                    </div>
+                    
+                    <!-- 間違った指定方法 -->
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">❌ 間違った指定方法</h3>
+                        <div class="code-sample">&lt;!-- colorプロパティは効果なし（Lucideは線画アイコン） --&gt;
+&lt;i data-lucide="home" style="color: white;"&gt;&lt;/i&gt;
+&lt;i data-lucide="trophy" style="color: #fcd34d;"&gt;&lt;/i&gt;
+
+&lt;!-- 冗長なstroke指定（クラスで統一推奨） --&gt;
+&lt;i data-lucide="home" style="stroke: white; fill: none;"&gt;&lt;/i&gt;</div>
+                    </div>
+
+                    <!-- 統一色クラス一覧 -->
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">🎯 統一色クラス一覧</h3>
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <div class="text-white text-sm">text-white - 基本白</div>
+                            <div class="text-yellow-300 text-sm">text-yellow-300 - Excellent</div>
+                            <div class="text-green-300 text-sm">text-green-300 - Good</div>
+                            <div class="text-blue-300 text-sm">text-blue-300 - Pass</div>
+                            <div class="text-red-300 text-sm">text-red-300 - Practice</div>
+                            <div class="text-white-60 text-sm">text-white-60 - 60%透明度</div>
+                        </div>
+                        <div class="code-sample">&lt;!-- アイコン色指定のベストプラクティス --&gt;
+&lt;i data-lucide="crown" class="text-yellow-300"&gt;&lt;/i&gt;
+&lt;i data-lucide="home" class="text-white"&gt;&lt;/i&gt;
+&lt;i data-lucide="settings" class="text-white-60"&gt;&lt;/i&gt;</div>
+                    </div>
+                </section>
+
+                <!-- ボタンとガラスエフェクト -->
+                <section id="buttons" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">🔘 ボタンとガラスエフェクト</h2>
+                    <p class="text-white-70 mb-6">グラスモーフィズム効果を活用したボタンシステム</p>
+                    
+                    <div class="component-grid grid-cols-1 md:grid-cols-2">
+                        <div class="component-item">
+                            <h3 class="text-white font-medium mb-4">ボタンスタイル</h3>
+                            <div class="space-y-3">
+                                <a href="index.html" class="btn btn-outline">
+                                    <i data-lucide="home"></i>
+                                    <span>ホームに戻る</span>
+                                </a>
+                                <a href="#" class="btn btn-success">
+                                    <i data-lucide="share"></i>
+                                    <span>結果を共有</span>
+                                </a>
+                                <a href="#" class="btn btn-primary">
+                                    <i data-lucide="play"></i>
+                                    <span>トレーニング開始</span>
+                                </a>
+                                <a href="training.html" class="btn btn-primary btn-large">
+                                    <i data-lucide="rotate-ccw"></i>
+                                    <span>もう一度挑戦</span>
+                                </a>
+                            </div>
+                            
+                            <div class="code-sample mt-4">
+&lt;a href="index.html" class="btn btn-outline"&gt;
+  &lt;i data-lucide="home"&gt;&lt;/i&gt;
+  &lt;span&gt;ホームに戻る&lt;/span&gt;
+&lt;/a&gt;
+
+&lt;a href="#" class="btn btn-success"&gt;
+  &lt;i data-lucide="share"&gt;&lt;/i&gt;
+  &lt;span&gt;結果を共有&lt;/span&gt;
+&lt;/a&gt;
+
+&lt;a href="#" class="btn btn-primary"&gt;
+  &lt;i data-lucide="play"&gt;&lt;/i&gt;
+  &lt;span&gt;トレーニング開始&lt;/span&gt;
+&lt;/a&gt;
+
+&lt;a href="training.html" class="btn btn-primary btn-large"&gt;
+  &lt;i data-lucide="rotate-ccw"&gt;&lt;/i&gt;
+  &lt;span&gt;もう一度挑戦&lt;/span&gt;
+&lt;/a&gt;</div>
+                        </div>
+                        
+                        <div class="component-item">
+                            <h3 class="text-white font-medium mb-4">ガラスカード</h3>
+                            <div class="glass-card mb-4">
+                                <h4 class="text-white font-medium mb-2">ガラスカード</h4>
+                                <p class="text-white-70 text-sm">背景にぼかし効果と透明度を適用したカード</p>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;div class="glass-card"&gt;
+  &lt;h4 class="text-white font-medium"&gt;ガラスカード&lt;/h4&gt;
+  &lt;p class="text-white-70"&gt;コンテンツ&lt;/p&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- カラーパレットとグラデーション -->
+                <section id="color-palette" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">🎨 カラーパレットとグラデーション</h2>
+                    <p class="text-white-70 mb-6">統一されたカラーシステム</p>
+                    
+                    <div class="component-grid grid-cols-1 md:grid-cols-2">
+                        <div class="component-item">
+                            <h3 class="text-white font-medium mb-4">評価カラー</h3>
+                            <div class="grid grid-cols-4 gap-2">
+                                <div class="text-center">
+                                    <div class="color-swatch" style="background: #fcd34d;"></div>
+                                    <p class="text-xs text-white-60">Yellow<br>Excellent</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="color-swatch" style="background: #6ee7b7;"></div>
+                                    <p class="text-xs text-white-60">Green<br>Good</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="color-swatch" style="background: #7dd3fc;"></div>
+                                    <p class="text-xs text-white-60">Blue<br>Pass</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="color-swatch" style="background: #fca5a5;"></div>
+                                    <p class="text-xs text-white-60">Red<br>Practice</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="component-item">
+                            <h3 class="text-white font-medium mb-4">グラデーション</h3>
+                            <div class="space-y-2">
+                                <div class="gradient-demo" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);">
+                                    紫グラデーション
+                                </div>
+                                <div class="gradient-demo" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+                                    青グラデーション
+                                </div>
+                                <div class="gradient-demo" style="background: linear-gradient(135deg, #10b981, #059669);">
+                                    緑グラデーション
+                                </div>
+                                <div class="gradient-demo" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                                    オレンジグラデーション
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                            <!-- 6. タイポグラフィ -->
+            <section class="catalog-section" id="typography">
+                <h2 class="text-2xl font-bold text-white mb-4">📝 タイポグラフィ</h2>
+                <p class="text-white-70 mb-6">統一されたテキストスタイル</p>
+                
+                <div class="component-item">
+                    <div class="space-y-4">
+                        <div>
+                            <h1 class="text-4xl font-bold text-white">メインタイトル</h1>
+                            <p class="text-white-60 text-sm">text-4xl font-bold text-white</p>
+                        </div>
+                        
+                        <div>
+                            <h2 class="text-2xl font-bold text-white">セクションタイトル</h2>
+                            <p class="text-white-60 text-sm">text-2xl font-bold text-white</p>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-medium text-white">サブタイトル</h3>
+                            <p class="text-white-60 text-sm">text-xl font-medium text-white</p>
+                        </div>
+                        
+                        <div>
+                            <p class="text-white">本文テキスト</p>
+                            <p class="text-white-60 text-sm">text-white</p>
+                        </div>
+                        
+                        <div>
+                            <p class="text-white-70">サブテキスト</p>
+                            <p class="text-white-60 text-sm">text-white-70</p>
+                        </div>
+                        
+                        <div>
+                            <p class="text-white-60 text-sm">キャプションテキスト</p>
+                            <p class="text-white-60 text-sm">text-white-60 text-sm</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- アイコン付き見出しスタイル -->
+                <div class="component-item mt-8">
+                    <h3 class="text-xl font-medium text-white mb-4">📋 アイコン付き見出し</h3>
+                    <p class="text-white-60 text-sm mb-6">統一されたアイコン見出しクラスシステム</p>
+                    
+                    <div class="space-y-6">
+                        <!-- 小見出し -->
+                        <div>
+                            <h4 class="heading-sm">
+                                <i data-lucide="pie-chart"></i>
+                                評価内訳（64音）
+                            </h4>
+                            <p class="text-white-60 text-xs">heading-sm - 小見出し・サブタイトル用</p>
+                        </div>
+                        
+                        <!-- 中見出し -->
+                        <div>
+                            <h3 class="heading-md">
+                                <i data-lucide="trending-up"></i>
+                                誤差推移グラフ
+                            </h3>
+                            <p class="text-white-60 text-xs">heading-md - 中見出し・セクションタイトル用</p>
+                        </div>
+                        
+                        <!-- 大見出し -->
+                        <div>
+                            <h2 class="heading-lg">
+                                <i data-lucide="bar-chart-3"></i>
+                                成績分析グラフ
+                            </h2>
+                            <p class="text-white-60 text-xs">heading-lg - 大見出し・メインタイトル用</p>
+                        </div>
+                        
+                        <!-- 使用ガイドライン -->
+                        <div class="mt-6 bg-white/5 rounded-lg p-4">
+                            <h4 class="text-white font-medium mb-3">💡 使用ガイドライン</h4>
+                            <ul class="text-white-70 text-sm space-y-2">
+                                <li>• <code class="text-blue-300">heading-sm</code>: サブセクション、項目見出し</li>
+                                <li>• <code class="text-blue-300">heading-md</code>: セクションタイトル、機能見出し</li>
+                                <li>• <code class="text-blue-300">heading-lg</code>: メインタイトル、ページ見出し</li>
+                                <li>• アイコンは自動的に適切なサイズになります</li>
+                                <li>• アイコン色は <code class="text-yellow-300">text-{color}</code> で変更可能</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- コードサンプル -->
+                        <div class="code-sample mt-4">&lt;!-- 基本使用例 --&gt;
+&lt;h4 class="heading-sm"&gt;
+  &lt;i data-lucide="pie-chart"&gt;&lt;/i&gt;
+  評価内訳（64音）
+&lt;/h4&gt;
+
+&lt;h3 class="heading-md"&gt;
+  &lt;i data-lucide="trending-up"&gt;&lt;/i&gt;
+  誤差推移グラフ
+&lt;/h3&gt;
+
+&lt;h2 class="heading-lg"&gt;
+  &lt;i data-lucide="bar-chart-3"&gt;&lt;/i&gt;
+  成績分析グラフ
+&lt;/h2&gt;
+
+&lt;!-- アイコン色変更例 --&gt;
+&lt;h3 class="heading-md"&gt;
+  &lt;i data-lucide="lightbulb" class="text-yellow-300"&gt;&lt;/i&gt;
+  次のステップ
+&lt;/h3&gt;</div>
+                            <div class="space-y-3">
+                                <h4 class="text-lg font-medium text-white flex items-center" style="gap: 0.5rem;">
+                                    <i data-lucide="trophy" class="text-yellow-300" style="width: 20px; height: 20px;"></i>
+                                    <span>優秀成績</span>
+                                </h4>
+                                <h4 class="text-lg font-medium text-white flex items-center" style="gap: 0.5rem;">
+                                    <i data-lucide="check-circle" class="text-green-300" style="width: 20px; height: 20px;"></i>
+                                    <span>達成項目</span>
+                                </h4>
+                                <h4 class="text-lg font-medium text-white flex items-center" style="gap: 0.5rem;">
+                                    <i data-lucide="info" class="text-blue-300" style="width: 20px; height: 20px;"></i>
+                                    <span>情報・ヒント</span>
+                                </h4>
+                                <h4 class="text-lg font-medium text-white flex items-center" style="gap: 0.5rem;">
+                                    <i data-lucide="alert-triangle" class="text-red-300" style="width: 20px; height: 20px;"></i>
+                                    <span>注意事項</span>
+                                </h4>
+                            </div>
+                        </div>
+                        
+                        <!-- 使用ガイドライン -->
+                        <div class="bg-white/5 rounded-lg p-4 mt-6">
+                            <h5 class="text-white font-medium mb-2">💡 使用ガイドライン</h5>
+                            <ul class="text-white-60 text-sm space-y-1">
+                                <li>アイコンサイズ: 見出しサイズに合わせて調整（16px〜28px）</li>
+                                <li>gap設定: 小見出しはgap-2、中・大見出しはgap-3を推奨</li>
+                                <li>flex items-center: 垂直方向の中央揃えを必ず設定</li>
+                                <li>span要素: テキスト部分を<span>で囲むと管理しやすい</li>
+                                <li>カラー: アイコンの意味に応じて適切な色を選択</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- コードサンプル -->
+                        <div class="code-sample mt-4">
+&lt;!-- 小見出し用 --&gt;
+&lt;h4 class="text-lg font-medium text-white flex items-center" style="gap: 0.5rem;"&gt;
+    &lt;i data-lucide="pie-chart" class="text-white" style="width: 20px; height: 20px;"&gt;&lt;/i&gt;
+    &lt;span&gt;評価内訳（64音）&lt;/span&gt;
+&lt;/h4&gt;
+
+&lt;!-- 中・大見出し用 --&gt;
+&lt;h3 class="text-xl font-bold text-white flex items-center" style="gap: 0.75rem;"&gt;
+    &lt;i data-lucide="trending-up" class="text-white" style="width: 24px; height: 24px;"&gt;&lt;/i&gt;
+    &lt;span&gt;誤差推移グラフ&lt;/span&gt;
+&lt;/h3&gt;</div>
+                    </div>
+            </section>
+
+            </main>
+
+            <!-- フッター -->
+            <footer class="catalog-section">
+                <div class="text-center">
+                    <h3 class="text-lg font-medium text-white mb-4">🏗️ v2環境アーキテクチャ</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <h4 class="text-blue-300 font-medium mb-2">CSS変数システム</h4>
+                            <p class="text-white-70">スペーシング・カラー・境界線の統一管理</p>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <h4 class="text-green-300 font-medium mb-2">コンポーネントベース</h4>
+                            <p class="text-white-70">再利用可能なUIパーツ設計</p>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <h4 class="text-purple-300 font-medium mb-2">クリーンアーキテクチャ</h4>
+                            <p class="text-white-70">system.css依存完全除去</p>
+                        </div>
+                    </div>
+                    <p class="text-white-60 text-sm mt-4">© 2024 8va相対音感トレーニングアプリ v2</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="ui-catalog.js"></script>
+</body>
+</html>

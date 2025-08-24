@@ -46,6 +46,117 @@
   --bg-accent: #581c87;
 }
 
+/* ===== Tailwindクラス（system.cssから移行） ===== */
+.text-xl { 
+  font-size: 1.25rem; 
+  line-height: 1.75rem; 
+}
+
+.text-2xl { 
+  font-size: 1.5rem; 
+  line-height: 2rem; 
+}
+
+.text-4xl { 
+  font-size: 2.25rem; 
+  line-height: 2.5rem; 
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+  .text-4xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+  
+  .text-2xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+}
+
+/* カラークラス（system.cssから移行） */
+.text-yellow-300 { color: #fde047; }
+.text-green-300 { color: #86efac; }
+.text-blue-300 { color: #93c5fd; }
+.text-red-300 { color: #fca5a5; }
+.text-gray-300 { color: #9ca3af; }
+.text-orange-300 { color: #fdba74; }
+
+/* レイアウトクラス（system.cssから移行） */
+.flex { display: flex; }
+.items-center { align-items: center; }
+.gap-4 { gap: var(--space-4); }
+
+/* スペーシング */
+.space-y-3 > * + * {
+  margin-top: var(--space-3);
+}
+
+/* ボタンスタイル（bolt-new-designから移行） */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-height: 48px;
+}
+
+.btn-large {
+  padding: 16px 32px;
+  font-size: 1.1rem;
+  min-height: 56px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: #ffffff;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.4);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #ffffff;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(34, 197, 94, 0.4);
+}
+
+.btn-outline {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-outline:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
 /* ===== 基本レイアウト（system.cssから移行） ===== */
 .container {
   max-width: 1200px;
@@ -80,6 +191,14 @@
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
   padding: var(--space-4);
+}
+
+.glass-card-lg {
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-3xl);
+  padding: var(--space-10);
 }
 
 @media (max-width: 768px) {
@@ -245,6 +364,48 @@
     color: rgba(255, 255, 255, 0.7);
     font-size: 0.875rem;
     margin-bottom: 1rem;
+}
+
+
+/* ===== アイコンサイズシステム ===== */
+.icon-xs {
+  width: 12px;
+  height: 12px;
+}
+
+.icon-sm {
+  width: 16px;
+  height: 16px;
+}
+
+.icon-md {
+  width: 24px;
+  height: 24px;
+}
+
+.icon-lg {
+  width: 32px;
+  height: 32px;
+}
+
+.icon-xl {
+  width: 40px;
+  height: 40px;
+}
+
+.icon-2xl {
+  width: 48px;
+  height: 48px;
+}
+
+.icon-3xl {
+  width: 64px;
+  height: 64px;
+}
+
+.icon-4xl {
+  width: 80px;
+  height: 80px;
 }
 
 .step-button {

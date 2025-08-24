@@ -279,6 +279,59 @@
     text-align: center;
 }
 
+/* === コードサンプル表示改善 === */
+
+.ui-catalog .code-sample {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 1.5rem;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: #e5e7eb;
+    white-space: pre-line;
+    overflow-x: auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* === UIカタログ専用グリッドレイアウト === */
+
+.ui-catalog .grid { display: grid; }
+.ui-catalog .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+.ui-catalog .gap-2 { gap: var(--space-2); }
+.ui-catalog .text-center { text-align: center; }
+.ui-catalog .text-xs { font-size: 0.75rem; line-height: 1rem; }
+
+
+/* UIカタログ専用ボタン調整 */
+.ui-catalog .btn {
+  width: auto;
+  min-height: 40px;
+  padding: 10px 20px;
+}
+
+.ui-catalog .btn-large {
+  min-height: 48px;
+  padding: 12px 24px;
+}
+
+/* ボタンコンテナ - カタログ表示用（縦並びで見やすく） */
+.ui-catalog .space-y-3 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+  .ui-catalog .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+  }
+}
+
+
 /* === レスポンシブ調整 === */
 
 @media (max-width: 768px) {
