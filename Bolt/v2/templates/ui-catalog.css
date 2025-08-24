@@ -1,0 +1,321 @@
+/* ui-catalog.css - UIカタログ専用スタイル */
+/* 🚨 注意: 親セクションに干渉しないよう名前空間を使用 */
+
+/* === UIカタログ専用スタイル（.ui-catalog 名前空間内でのみ適用） === */
+
+/* カタログセクション */
+.ui-catalog .catalog-section {
+    margin: var(--space-12) 0;
+    padding: var(--space-8);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-2xl);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    scroll-margin-top: 2rem;
+}
+
+/* UIカタログ表示用コンポーネント（CSS変数活用） */
+.ui-catalog .color-swatch {
+    width: 4rem;
+    height: 4rem;
+    border-radius: var(--radius-lg);
+    display: inline-block;
+    margin: var(--space-1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.ui-catalog .gradient-demo {
+    height: 6rem;
+    border-radius: var(--radius-xl);
+    margin: var(--space-2) 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-white);
+    font-weight: bold;
+}
+
+/* カタログナビゲーション */
+.ui-catalog .catalog-nav {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-6);
+    margin-bottom: var(--space-8);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.ui-catalog .catalog-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+}
+
+.ui-catalog .catalog-nav-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    text-decoration: none;
+    color: var(--text-white);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.ui-catalog .catalog-nav-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.ui-catalog .catalog-nav-item.current {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.ui-catalog .catalog-nav-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.ui-catalog .catalog-nav-info h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: var(--space-1);
+}
+
+.ui-catalog .catalog-nav-info p {
+    font-size: 0.875rem;
+    color: var(--text-white-70);
+    margin: 0;
+}
+
+/* === コードサンプル表示システム === */
+
+.ui-catalog .code-example {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    margin: var(--space-4) 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ui-catalog .code-example-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ui-catalog .code-example-title {
+    color: var(--text-white);
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.ui-catalog .code-example-actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.ui-catalog .code-copy-btn {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: var(--radius-md);
+    padding: var(--space-1) var(--space-3);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.ui-catalog .code-copy-btn:hover {
+    background: rgba(59, 130, 246, 0.3);
+}
+
+.ui-catalog .code-copy-btn.copied {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.ui-catalog .code-preview {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    margin-bottom: var(--space-4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ui-catalog .code-source {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #e5e7eb;
+    overflow-x: auto;
+    position: relative;
+}
+
+.ui-catalog .code-source pre {
+    margin: 0;
+    white-space: pre;
+    word-wrap: normal;
+}
+
+/* シンタックスハイライト風の色付け */
+.ui-catalog .code-source .tag {
+    color: #7dd3fc;
+}
+
+.ui-catalog .code-source .attr {
+    color: #fbbf24;
+}
+
+.ui-catalog .code-source .string {
+    color: #86efac;
+}
+
+.ui-catalog .code-source .comment {
+    color: #9ca3af;
+    font-style: italic;
+}
+
+/* === UIカタログ専用エフェクト === */
+
+/* Glass Card デモ用拡張ホバーエフェクト - カタログ内のみ */
+.ui-catalog .glass-card:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    transform: translateY(-4px) !important;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Share Card デモ用反射エフェクト - カタログ内のみ */
+.ui-catalog .share-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.ui-catalog .share-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: rotate(45deg);
+    animation: shimmer 11s infinite;
+}
+
+@keyframes shimmer {
+    0% { 
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 1;
+    }
+    9.1% { 
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+        opacity: 1;
+    }
+    9.2% { 
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+        opacity: 0;
+    }
+    99.9% { 
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 0;
+    }
+    100% { 
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 1;
+    }
+}
+
+/* クイックアクセスアイテム */
+.ui-catalog .quick-access-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-xl);
+    text-decoration: none;
+    color: var(--text-white);
+    transition: all 0.3s ease;
+    min-height: 80px;
+}
+
+.ui-catalog .quick-access-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.ui-catalog .quick-access-item span {
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* === レスポンシブ調整 === */
+
+@media (max-width: 768px) {
+    .ui-catalog .catalog-section {
+        padding: var(--space-6);
+        margin: var(--space-8) 0;
+    }
+    
+    .ui-catalog .catalog-nav {
+        padding: var(--space-4);
+    }
+    
+    .ui-catalog .catalog-nav-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-2);
+    }
+    
+    .ui-catalog .code-example {
+        padding: var(--space-4);
+    }
+    
+    .ui-catalog .code-preview {
+        padding: var(--space-4);
+    }
+    
+    .ui-catalog .code-source {
+        font-size: 0.75rem;
+        padding: var(--space-3);
+    }
+    
+    .ui-catalog .code-example-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2);
+    }
+    
+    .ui-catalog .code-example-actions {
+        align-self: flex-end;
+    }
+}

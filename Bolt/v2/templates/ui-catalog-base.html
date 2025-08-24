@@ -133,65 +133,35 @@
                 <p class="text-purple-200 text-xl">8va相対音感トレーニングアプリのデザインシステム</p>
             </header>
 
-            <!-- プロジェクト基本情報 -->
+            <!-- v2環境概要 -->
             <section class="catalog-section" id="project-info">
-                <h2 class="text-2xl font-bold text-white mb-4">📋 プロジェクト基本情報</h2>
-                <p class="text-white-70 mb-6">8va相対音感トレーニングアプリ v2環境のデザインシステム概要</p>
+                <h2 class="text-2xl font-bold text-white mb-4">📋 v2環境概要</h2>
+                <p class="text-white-70 mb-4">CSS変数システムとクリーンアーキテクチャによるコンポーネントベース設計</p>
                 
-                <div class="component-grid grid-cols-1 md:grid-cols-2">
-                    <div class="component-item">
-                        <h3 class="text-white font-medium mb-3">🎯 技術構成</h3>
-                        <ul class="space-y-2 text-sm text-white-80">
-                            <li>• <strong>フレームワーク:</strong> Vanilla TypeScript + Vite</li>
-                            <li>• <strong>CSS設計:</strong> CSS変数 + コンポーネントベース</li>
-                            <li>• <strong>アイコン:</strong> Lucide Icons</li>
-                            <li>• <strong>フォント:</strong> Inter + システムフォント</li>
-                            <li>• <strong>音声処理:</strong> Web Audio API + Pitchy</li>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div class="bg-white/5 rounded-lg p-3">
+                        <h4 class="text-blue-300 font-medium mb-2">📁 base.css</h4>
+                        <ul class="text-white-70 space-y-1">
+                            <li>• CSS変数システム</li>
+                            <li>• 基本レイアウト</li>
+                            <li>• 共通コンポーネント</li>
                         </ul>
                     </div>
-                    
-                    <div class="component-item">
-                        <h3 class="text-white font-medium mb-3">🎨 デザイン原則</h3>
-                        <ul class="space-y-2 text-sm text-white-80">
-                            <li>• <strong>Glass Morphism:</strong> 透明度とぼかしエフェクト</li>
-                            <li>• <strong>グラデーション:</strong> 動的背景アニメーション</li>
-                            <li>• <strong>統一色システム:</strong> 評価レベル別カラー</li>
-                            <li>• <strong>レスポンシブ:</strong> モバイルファースト設計</li>
-                            <li>• <strong>アクセシビリティ:</strong> 高コントラストと読みやすさ</li>
+                    <div class="bg-white/5 rounded-lg p-3">
+                        <h4 class="text-green-300 font-medium mb-2">📊 results.css</h4>
+                        <ul class="text-white-70 space-y-1">
+                            <li>• 結果表示専用</li>
+                            <li>• ランクシステム</li>
+                            <li>• シェア機能</li>
                         </ul>
                     </div>
-                </div>
-
-                <div class="component-item mt-4">
-                    <h3 class="text-white font-medium mb-3">📁 CSS構造</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                        <div class="bg-white/5 rounded-lg p-3">
-                            <h4 class="text-blue-300 font-medium mb-2">base.css</h4>
-                            <ul class="text-white-70 space-y-1">
-                                <li>• CSS変数システム</li>
-                                <li>• 基本レイアウト</li>
-                                <li>• 共通コンポーネント</li>
-                                <li>• アニメーション</li>
-                            </ul>
-                        </div>
-                        <div class="bg-white/5 rounded-lg p-3">
-                            <h4 class="text-green-300 font-medium mb-2">results.css</h4>
-                            <ul class="text-white-70 space-y-1">
-                                <li>• 結果表示専用</li>
-                                <li>• ランクシステム</li>
-                                <li>• グラフ・チャート</li>
-                                <li>• シェア機能</li>
-                            </ul>
-                        </div>
-                        <div class="bg-white/5 rounded-lg p-3">
-                            <h4 class="text-yellow-300 font-medium mb-2">廃止済み</h4>
-                            <ul class="text-white-70 space-y-1">
-                                <li>• ~~system.css~~</li>
-                                <li>• v2では使用禁止</li>
-                                <li>• 依存完全除去</li>
-                                <li>• クリーンアーキテクチャ</li>
-                            </ul>
-                        </div>
+                    <div class="bg-white/5 rounded-lg p-3">
+                        <h4 class="text-red-300 font-medium mb-2">❌ 廃止済み</h4>
+                        <ul class="text-white-70 space-y-1">
+                            <li>• system.css</li>
+                            <li>• v2では使用禁止</li>
+                            <li>• 完全分離済み</li>
+                        </ul>
                     </div>
                 </div>
             </section>

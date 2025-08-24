@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{CATALOG_TITLE}} - 8va相対音感トレーニングアプリ</title>
+    
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="ui-catalog.css">
+    
+    <!-- アイコンライブラリ -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <div class="ui-catalog min-h-screen p-6">
+        <div class="container max-w-7xl mx-auto">
+            <!-- ヘッダー -->
+            <header class="text-center mb-8">
+                <div class="flex justify-center mb-6">
+                    <div class="page-header-icon page-header-icon-purple">
+                        <i data-lucide="{{HEADER_ICON}}" class="icon-2xl text-white" data-stroke-width="2"></i>
+                    </div>
+                </div>
+                <h1 class="text-4xl font-bold text-white mb-4">{{CATALOG_TITLE}}</h1>
+                <p class="text-purple-200 text-xl">{{CATALOG_DESCRIPTION}}</p>
+            </header>
+
+            <!-- カタログナビゲーション -->
+            <nav class="catalog-nav">
+                <h2 class="text-xl font-bold text-white mb-2">🧭 UIカタログナビゲーション</h2>
+                <p class="text-white-70 text-sm">v2環境のデザインシステムを体系的に閲覧</p>
+                
+                <div class="catalog-nav-grid">
+                    <a href="ui-catalog-index.html" class="catalog-nav-item">
+                        <i data-lucide="grid-3x3" class="catalog-nav-icon text-blue-300"></i>
+                        <div class="catalog-nav-info">
+                            <h3>インデックス</h3>
+                            <p>総合ナビゲーション</p>
+                        </div>
+                    </a>
+                    
+                    <a href="ui-catalog-essentials.html" class="catalog-nav-item">
+                        <i data-lucide="star" class="catalog-nav-icon text-yellow-300"></i>
+                        <div class="catalog-nav-info">
+                            <h3>エッセンシャル</h3>
+                            <p>必須基本スタイル</p>
+                        </div>
+                    </a>
+                    
+                    <a href="ui-catalog-components.html" class="catalog-nav-item">
+                        <i data-lucide="package" class="catalog-nav-icon text-green-300"></i>
+                        <div class="catalog-nav-info">
+                            <h3>コンポーネント</h3>
+                            <p>汎用UI要素</p>
+                        </div>
+                    </a>
+                    
+                    <a href="ui-catalog-results.html" class="catalog-nav-item">
+                        <i data-lucide="bar-chart-3" class="catalog-nav-icon text-purple-300"></i>
+                        <div class="catalog-nav-info">
+                            <h3>結果表示</h3>
+                            <p>専用コンポーネント</p>
+                        </div>
+                    </a>
+                    
+                    <a href="ui-catalog-advanced.html" class="catalog-nav-item">
+                        <i data-lucide="zap" class="catalog-nav-icon text-orange-300"></i>
+                        <div class="catalog-nav-info">
+                            <h3>アドバンス</h3>
+                            <p>高度エフェクト</p>
+                        </div>
+                    </a>
+                </div>
+            </nav>
+
+            <!-- メインコンテンツエリア（各カタログで置換） -->
+            <main id="catalog-content">
+                {{CATALOG_CONTENT}}
+            </main>
+
+            <!-- フッター -->
+            <footer class="catalog-section">
+                <div class="text-center">
+                    <h3 class="text-lg font-medium text-white mb-4">🏗️ v2環境アーキテクチャ</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <h4 class="text-blue-300 font-medium mb-2">CSS変数システム</h4>
+                            <p class="text-white-70">スペーシング・カラー・境界線の統一管理</p>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <h4 class="text-green-300 font-medium mb-2">コンポーネントベース</h4>
+                            <p class="text-white-70">再利用可能なUIパーツ設計</p>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <h4 class="text-purple-300 font-medium mb-2">クリーンアーキテクチャ</h4>
+                            <p class="text-white-70">system.css依存完全除去</p>
+                        </div>
+                    </div>
+                    <p class="text-white-60 text-sm mt-4">© 2024 8va相対音感トレーニングアプリ v2</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="ui-catalog.js"></script>
+</body>
+</html>
