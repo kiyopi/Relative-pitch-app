@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UIカタログ コンポーネント - 8va相対音感トレーニングアプリ</title>
+    
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="ui-catalog.css">
+    
+    <!-- アイコンライブラリ -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <div class="ui-catalog min-h-screen p-6">
+        <div class="container max-w-7xl mx-auto">
+            <!-- ヘッダー -->
+            <header class="text-center mb-8">
+                <div class="flex justify-center mb-6">
+                    <div class="page-header-icon page-header-icon-green">
+                        <i data-lucide="package" class="icon-2xl text-white" data-stroke-width="2"></i>
+                    </div>
+                </div>
+                <h1 class="text-4xl font-bold text-white mb-4">UIカタログ コンポーネント</h1>
+                <p class="text-green-200 text-xl">汎用UI要素・インタラクティブコンポーネント</p>
+            </header>
+
+            <!-- カタログナビゲーション -->
+            <nav class="catalog-nav">
+                <h2 class="text-xl font-bold text-white mb-2">🧭 UIカタログナビゲーション</h2>
+                <p class="text-white-70 text-sm">v2環境のデザインシステムを体系的に閲覧</p>
+                
+                <div class="catalog-nav-grid">
+                    <a href="ui-catalog-index.html" class="catalog-nav-item">
+                        <i data-lucide="grid-3x3" class="catalog-nav-icon text-blue-300"></i>
+                        <div class="catalog-nav-info">
+                            <h3>インデックス</h3>
+                            <p>総合ナビゲーション</p>
+                        </div>
+                    </a>
+                    
+                    <a href="ui-catalog-essentials.html" class="catalog-nav-item">
+                        <i data-lucide="star" class="catalog-nav-icon text-yellow-300"></i>
+                        <div class="catalog-nav-info">
+                            <h3>エッセンシャル</h3>
+                            <p>必須基本スタイル</p>
+                        </div>
+                    </a>
+                    
+                    <a href="ui-catalog-components.html" class="catalog-nav-item current">
+                        <i data-lucide="package" class="catalog-nav-icon text-green-300"></i>
+                        <div class="catalog-nav-info">
+                            <h3>コンポーネント</h3>
+                            <p>汎用UI要素</p>
+                        </div>
+                    </a>
+                    
+                    <a href="ui-catalog-results.html" class="catalog-nav-item">
+                        <i data-lucide="bar-chart-3" class="catalog-nav-icon text-purple-300"></i>
+                        <div class="catalog-nav-info">
+                            <h3>結果表示</h3>
+                            <p>専用コンポーネント</p>
+                        </div>
+                    </a>
+                    
+                    <a href="ui-catalog-advanced.html" class="catalog-nav-item">
+                        <i data-lucide="zap" class="catalog-nav-icon text-orange-300"></i>
+                        <div class="catalog-nav-info">
+                            <h3>アドバンス</h3>
+                            <p>高度エフェクト</p>
+                        </div>
+                    </a>
+                </div>
+            </nav>
+
+            <!-- メインコンテンツエリア -->
+            <main id="catalog-content">
+                
+                <!-- カードコンポーネント -->
+                <section id="cards" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">💳 カードコンポーネント</h2>
+                    <p class="text-white-70 mb-6">Glass morphismを活用したカードシステム</p>
+                    
+                    <div class="component-grid grid-cols-1 md:grid-cols-2">
+                        <div class="component-item">
+                            <h3 class="text-white font-medium mb-4">基本カード</h3>
+                            <div class="glass-card mb-4">
+                                <h4 class="text-white font-medium mb-2">ガラスカード</h4>
+                                <p class="text-white-70 text-sm">背景にぼかし効果と透明度を適用したカード</p>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;div class="glass-card"&gt;
+    &lt;h4 class="text-white font-medium"&gt;ガラスカード&lt;/h4&gt;
+    &lt;p class="text-white-70"&gt;コンテンツ&lt;/p&gt;
+&lt;/div&gt;</div>
+                        </div>
+                        
+                        <div class="component-item">
+                            <h3 class="text-white font-medium mb-4">サイズバリエーション</h3>
+                            <div class="space-y-3">
+                                <div class="glass-card-sm">
+                                    <p class="text-white text-sm">Small カード</p>
+                                </div>
+                                <div class="glass-card">
+                                    <p class="text-white text-sm">通常カード</p>
+                                </div>
+                                <div class="glass-card-lg">
+                                    <p class="text-white text-sm">Large カード</p>
+                                </div>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;div class="glass-card-sm"&gt;Small&lt;/div&gt;
+&lt;div class="glass-card"&gt;通常&lt;/div&gt;
+&lt;div class="glass-card-lg"&gt;Large&lt;/div&gt;</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- プログレスバー -->
+                <section id="progress" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">📊 プログレスバー</h2>
+                    <p class="text-white-70 mb-6">進行状況表示用プログレスバー</p>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <h3 class="text-white font-medium mb-4">基本プログレスバー</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <p class="text-white-70 text-sm mb-2">25%完了</p>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 25%;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-white-70 text-sm mb-2">60%完了</p>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 60%;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-white-70 text-sm mb-2">100%完了</p>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;div class="progress-bar"&gt;
+    &lt;div class="progress-fill" style="width: 75%;"&gt;&lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                        
+                        <div class="component-item">
+                            <h3 class="text-white font-medium mb-4">進行バーセクション（セッション完了時）</h3>
+                            <div class="glass-card">
+                                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                    <div style="flex: 1;">
+                                        <div style="background: rgba(255, 255, 255, 0.1); border-radius: 9999px; height: 12px; overflow: hidden; margin-bottom: 0.5rem;">
+                                            <div style="height: 100%; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-radius: 9999px; transition: width 0.5s ease; width: 25%;"></div>
+                                        </div>
+                                        <div style="text-align: center; color: rgba(255, 255, 255, 0.8); font-size: 0.875rem;">セッション 2 / 8</div>
+                                    </div>
+                                    <a href="#" class="btn btn-primary" style="white-space: nowrap; align-self: center;">
+                                        <i data-lucide="arrow-right" class="icon-sm"></i>
+                                        <span>次の基音へ</span>
+                                    </a>
+                                </div>
+                                
+                                <!-- PC表示用（768px以上） -->
+                                <style>
+                                @media (min-width: 768px) {
+                                    .glass-card > div:first-child {
+                                        flex-direction: row !important;
+                                        align-items: center !important;
+                                        gap: 1.5rem !important;
+                                    }
+                                    
+                                    .glass-card > div:first-child > div:first-child + a {
+                                        align-self: auto !important;
+                                    }
+                                    
+                                    .glass-card > div:first-child > div:first-child div:last-child {
+                                        text-align: left !important;
+                                    }
+                                }
+                                </style>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;!-- セッション完了時（ボタンあり） --&gt;
+&lt;div class="glass-card"&gt;
+    &lt;div class="progress-layout"&gt;
+        &lt;div style="flex: 1;"&gt;
+            &lt;div class="progress-container"&gt;
+                &lt;div class="progress-bar-fill" style="width: 25%;"&gt;&lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class="progress-text"&gt;セッション 2 / 8&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;a href="#" class="btn btn-primary"&gt;次の基音へ&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                        
+                        <div class="component-item">
+                            <h3 class="text-white font-medium mb-4">進行バーセクション（セッション中）</h3>
+                            <div class="glass-card">
+                                <div style="flex: 1;">
+                                    <div style="background: rgba(255, 255, 255, 0.1); border-radius: 9999px; height: 12px; overflow: hidden; margin-bottom: 0.5rem;">
+                                        <div style="height: 100%; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-radius: 9999px; transition: width 0.5s ease; width: 62.5%;"></div>
+                                    </div>
+                                    <div style="text-align: center; color: rgba(255, 255, 255, 0.8); font-size: 0.875rem;">セッション 5 / 8（進行中）</div>
+                                </div>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;!-- セッション中（ボタンなし） --&gt;
+&lt;div class="glass-card"&gt;
+    &lt;div style="flex: 1;"&gt;
+        &lt;div class="progress-container"&gt;
+            &lt;div class="progress-bar-fill" style="width: 62.5%;"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="progress-text"&gt;セッション 5 / 8（進行中）&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- ナビゲーション -->
+                <section id="navigation" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">🧭 ナビゲーション</h2>
+                    <p class="text-white-70 mb-6">フッターナビゲーションシステム</p>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <h3 class="text-white font-medium mb-4">フッターナビ</h3>
+                            <div class="footer-nav-grid">
+                                <div class="footer-nav-item">
+                                    <i data-lucide="play-circle" class="footer-nav-icon text-green-400"></i>
+                                    <h3 class="footer-nav-title">トレーニング</h3>
+                                    <p class="footer-nav-desc">音感を鍛える</p>
+                                </div>
+                                <div class="footer-nav-item">
+                                    <i data-lucide="bar-chart-3" class="footer-nav-icon text-blue-400"></i>
+                                    <h3 class="footer-nav-title">結果分析</h3>
+                                    <p class="footer-nav-desc">成績を確認</p>
+                                </div>
+                                <div class="footer-nav-item">
+                                    <i data-lucide="settings" class="footer-nav-icon text-purple-400"></i>
+                                    <h3 class="footer-nav-title">設定</h3>
+                                    <p class="footer-nav-desc">アプリ設定</p>
+                                </div>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;div class="footer-nav-grid"&gt;
+    &lt;div class="footer-nav-item"&gt;
+        &lt;i data-lucide="play-circle" class="footer-nav-icon text-green-400"&gt;&lt;/i&gt;
+        &lt;h3 class="footer-nav-title"&gt;トレーニング&lt;/h3&gt;
+        &lt;p class="footer-nav-desc"&gt;音感を鍛える&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+
+            <!-- フッター -->
+            <footer class="catalog-section">
+                <div class="text-center">
+                    <h3 class="text-lg font-medium text-white mb-4">🏗️ v2環境アーキテクチャ</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <h4 class="text-blue-300 font-medium mb-2">CSS変数システム</h4>
+                            <p class="text-white-70">スペーシング・カラー・境界線の統一管理</p>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <h4 class="text-green-300 font-medium mb-2">コンポーネントベース</h4>
+                            <p class="text-white-70">再利用可能なUIパーツ設計</p>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <h4 class="text-purple-300 font-medium mb-2">クリーンアーキテクチャ</h4>
+                            <p class="text-white-70">system.css依存完全除去</p>
+                        </div>
+                    </div>
+                    <p class="text-white-60 text-sm mt-4">© 2024 8va相対音感トレーニングアプリ v2</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="ui-catalog.js"></script>
+</body>
+</html>
