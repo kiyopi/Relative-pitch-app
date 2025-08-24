@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Lucide Test</title>
+    <style>
+        .help-button {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .help-button svg {
+            width: 16px !important;
+            height: 16px !important;
+            color: white !important;
+            stroke: white !important;
+        }
+        body {
+            background: #0f172a;
+            padding: 50px;
+        }
+        .test-white { color: white; }
+    </style>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <h1 style="color: white;">Lucide Test</h1>
+    
+    <p style="color: white;">Test 1: Basic icon</p>
+    <i data-lucide="help-circle" class="test-white"></i>
+    
+    <p style="color: white;">Test 2: Sized icon</p>
+    <i data-lucide="help-circle" class="test-white" style="width: 32px; height: 32px;"></i>
+    
+    <p style="color: white;">Test 3: Help button</p>
+    <button class="help-button">
+        <i data-lucide="help-circle" class="test-white"></i>
+    </button>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded');
+            if (typeof lucide !== 'undefined') {
+                console.log('Lucide available');
+                lucide.createIcons();
+                console.log('Icons created');
+            } else {
+                console.error('Lucide not available');
+            }
+        });
+    </script>
+</body>
+</html>

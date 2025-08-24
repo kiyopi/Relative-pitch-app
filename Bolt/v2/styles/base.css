@@ -136,7 +136,11 @@
 
 /* レイアウトクラス（system.cssから移行） */
 .flex { display: flex; }
+.flex-col { flex-direction: column; }
 .items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.gap-3 { gap: var(--space-3); }
 .gap-4 { gap: var(--space-4); }
 
 /* スペーシング */
