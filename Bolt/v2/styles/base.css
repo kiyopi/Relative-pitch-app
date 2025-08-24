@@ -76,6 +76,13 @@
 }
 
 /* カラークラス（system.cssから移行） */
+/* 基本テキスト色 */
+.text-white { color: #ffffff; }
+.text-white-90 { color: rgba(255, 255, 255, 0.9); }
+.text-white-80 { color: rgba(255, 255, 255, 0.8); }
+.text-white-70 { color: rgba(255, 255, 255, 0.7); }
+.text-white-60 { color: rgba(255, 255, 255, 0.6); }
+
 /* 300番台 - アイコン・強調用 */
 .text-yellow-300 { color: #fde047; }
 .text-green-300 { color: #86efac; }
@@ -91,6 +98,41 @@
 .text-blue-200 { color: #bae6fd; }
 .text-red-200 { color: #fecaca; }
 .text-purple-200 { color: #ddd6fe; }
+
+/* レスポンシブフォントクラス（session-result.htmlから移行） */
+.score-base-note {
+  font-size: 1.75rem; /* 28px モバイル */
+  line-height: 1.2;
+  font-weight: bold;
+}
+
+.score-error {
+  font-size: 1.75rem; /* 28px モバイル */
+  line-height: 1.2;
+  font-weight: bold;
+}
+
+/* タブレット (481px-767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+  .score-base-note {
+    font-size: 2.5rem; /* 40px */
+  }
+  
+  .score-error {
+    font-size: 2.5rem; /* 40px */
+  }
+}
+
+/* PC (768px以上) */
+@media (min-width: 768px) {
+  .score-base-note {
+    font-size: 2.5rem; /* 40px */
+  }
+  
+  .score-error {
+    font-size: 2.5rem; /* 40px */
+  }
+}
 
 /* レイアウトクラス（system.cssから移行） */
 .flex { display: flex; }
@@ -673,6 +715,61 @@ html {
     color: rgba(255, 255, 255, 0.8);
     font-size: 0.875rem;
     font-style: italic;
+}
+
+/* ヘルプボタン */
+.help-button {
+    position: absolute;
+    bottom: -12px;
+    right: -12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+/* ヘルプアイコンボタン - 総合グレード・詳細説明用 */
+.help-icon-btn {
+    position: absolute;
+    bottom: -12px;
+    right: -12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.help-icon-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.help-icon-btn i[data-lucide] {
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+    max-width: 20px !important;
+    max-height: 20px !important;
+}
+
+
+.help-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 /* アイコン使用方法ガイドライン */
