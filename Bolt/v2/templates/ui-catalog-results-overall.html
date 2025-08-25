@@ -7,6 +7,7 @@
     
     <!-- スタイルシート -->
     <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/results.css">
     <link rel="stylesheet" href="ui-catalog.css">
     
     <!-- フォント -->
@@ -28,7 +29,7 @@
                     </div>
                 </div>
                 <h1 class="text-4xl font-bold text-white mb-4">UIカタログ 総合評価</h1>
-                <p class="text-orange-200 text-xl">8セッション総合結果表示コンポーネント</p>
+                <p class="text-orange-200 text-xl">複数セッション総合結果表示コンポーネント</p>
             </header>
 
             <!-- カタログナビゲーション -->
@@ -73,7 +74,7 @@
                         <i data-lucide="bar-chart-3" class="catalog-nav-icon text-orange-300"></i>
                         <div class="catalog-nav-info">
                             <h3>総合評価</h3>
-                            <p>8セッション総合結果</p>
+                            <p>複数セッション総合結果</p>
                         </div>
                     </a>
                     
@@ -90,10 +91,445 @@
             <!-- メインコンテンツエリア -->
             <main id="catalog-content">
                 
-                <!-- TODO: 総合評価コンポーネント -->
-                <section class="catalog-section">
-                    <h2 class="text-2xl font-bold text-white mb-4">🚧 開発予定</h2>
-                    <p class="text-white-70 mb-6">総合評価コンポーネントを準備中です。</p>
+                <!-- セッショングリッドシステム -->
+                <section id="session-grids" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">📊 セッショングリッドシステム</h2>
+                    <p class="text-white-70 mb-6">複数セッションを表示するグリッドレイアウト（8/12/24対応）</p>
+                    
+                    <!-- 8セッショングリッド -->
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">8セッショングリッド</h3>
+                        <div class="sessions-grid-8">
+                            <div class="session-box session-excellent">
+                                <div class="session-number">1</div>
+                                <div class="session-icon">
+                                    <i data-lucide="trophy" class="text-yellow-300"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-good">
+                                <div class="session-number">2</div>
+                                <div class="session-icon">
+                                    <i data-lucide="star" class="text-green-300"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-pass">
+                                <div class="session-number">3</div>
+                                <div class="session-icon">
+                                    <i data-lucide="thumbs-up" class="text-blue-300"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-practice">
+                                <div class="session-number">4</div>
+                                <div class="session-icon">
+                                    <i data-lucide="triangle-alert" class="text-red-300"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-excellent">
+                                <div class="session-number">5</div>
+                                <div class="session-icon">
+                                    <i data-lucide="trophy" class="text-yellow-300"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-good">
+                                <div class="session-number">6</div>
+                                <div class="session-icon">
+                                    <i data-lucide="star" class="text-green-300"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-pass">
+                                <div class="session-number">7</div>
+                                <div class="session-icon">
+                                    <i data-lucide="thumbs-up" class="text-blue-300"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-excellent">
+                                <div class="session-number">8</div>
+                                <div class="session-icon">
+                                    <i data-lucide="trophy" class="text-yellow-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="code-sample">
+&lt;!-- 8セッショングリッド --&gt;
+&lt;div class="sessions-grid-8"&gt;
+    &lt;div class="session-box session-excellent"&gt;
+        &lt;div class="session-number"&gt;1&lt;/div&gt;
+        &lt;div class="session-icon"&gt;
+            &lt;i data-lucide="trophy" class="text-yellow-300" style="width: 16px; height: 16px;"&gt;&lt;/i&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;!-- 他のセッション... --&gt;
+&lt;/div&gt;</div>
+                    </div>
+                    
+                    <!-- 12セッショングリッド -->
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">12セッショングリッド</h3>
+                        <div class="sessions-grid-12">
+                            <div class="session-box session-excellent">
+                                <div class="session-number">1</div>
+                                <div class="session-icon">
+                                    <i data-lucide="trophy" class="text-yellow-300" style="width: 14px; height: 14px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-good">
+                                <div class="session-number">2</div>
+                                <div class="session-icon">
+                                    <i data-lucide="star" class="text-green-300" style="width: 14px; height: 14px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-pass">
+                                <div class="session-number">3</div>
+                                <div class="session-icon">
+                                    <i data-lucide="thumbs-up" class="text-blue-300" style="width: 14px; height: 14px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-practice">
+                                <div class="session-number">4</div>
+                                <div class="session-icon">
+                                    <i data-lucide="triangle-alert" class="text-red-300" style="width: 14px; height: 14px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-excellent">
+                                <div class="session-number">5</div>
+                                <div class="session-icon">
+                                    <i data-lucide="trophy" class="text-yellow-300" style="width: 14px; height: 14px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-good">
+                                <div class="session-number">6</div>
+                                <div class="session-icon">
+                                    <i data-lucide="star" class="text-green-300" style="width: 14px; height: 14px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-pass">
+                                <div class="session-number">7</div>
+                                <div class="session-icon">
+                                    <i data-lucide="thumbs-up" class="text-blue-300" style="width: 14px; height: 14px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-practice">
+                                <div class="session-number">8</div>
+                                <div class="session-icon">
+                                    <i data-lucide="triangle-alert" class="text-red-300" style="width: 14px; height: 14px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-excellent">
+                                <div class="session-number">9</div>
+                                <div class="session-icon">
+                                    <i data-lucide="trophy" class="text-yellow-300" style="width: 14px; height: 14px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-good">
+                                <div class="session-number">10</div>
+                                <div class="session-icon">
+                                    <i data-lucide="star" class="text-green-300" style="width: 14px; height: 14px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-pass">
+                                <div class="session-number">11</div>
+                                <div class="session-icon">
+                                    <i data-lucide="thumbs-up" class="text-blue-300" style="width: 14px; height: 14px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-excellent selected">
+                                <div class="session-number">12</div>
+                                <div class="session-icon">
+                                    <i data-lucide="trophy" class="text-yellow-300" style="width: 14px; height: 14px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="code-sample">
+&lt;!-- 12セッショングリッド --&gt;
+&lt;div class="sessions-grid-12"&gt;
+    &lt;div class="session-box session-excellent"&gt;
+        &lt;div class="session-number"&gt;1&lt;/div&gt;
+        &lt;div class="session-icon"&gt;
+            &lt;i data-lucide="trophy" class="text-yellow-300" style="width: 14px; height: 14px;"&gt;&lt;/i&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;!-- 12個のセッション... --&gt;
+&lt;/div&gt;</div>
+                    </div>
+                    
+                    <!-- 24セッショングリッド -->
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">24セッショングリッド</h3>
+                        <div class="sessions-grid-24">
+                            <div class="session-box session-excellent">
+                                <div class="session-number">1</div>
+                                <div class="session-icon">
+                                    <i data-lucide="trophy" class="text-yellow-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-good">
+                                <div class="session-number">2</div>
+                                <div class="session-icon">
+                                    <i data-lucide="star" class="text-green-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-pass">
+                                <div class="session-number">3</div>
+                                <div class="session-icon">
+                                    <i data-lucide="thumbs-up" class="text-blue-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-practice">
+                                <div class="session-number">4</div>
+                                <div class="session-icon">
+                                    <i data-lucide="triangle-alert" class="text-red-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-excellent">
+                                <div class="session-number">5</div>
+                                <div class="session-icon">
+                                    <i data-lucide="trophy" class="text-yellow-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-good">
+                                <div class="session-number">6</div>
+                                <div class="session-icon">
+                                    <i data-lucide="star" class="text-green-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-pass">
+                                <div class="session-number">7</div>
+                                <div class="session-icon">
+                                    <i data-lucide="thumbs-up" class="text-blue-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-practice">
+                                <div class="session-number">8</div>
+                                <div class="session-icon">
+                                    <i data-lucide="triangle-alert" class="text-red-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-excellent">
+                                <div class="session-number">9</div>
+                                <div class="session-icon">
+                                    <i data-lucide="trophy" class="text-yellow-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-good">
+                                <div class="session-number">10</div>
+                                <div class="session-icon">
+                                    <i data-lucide="star" class="text-green-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-pass">
+                                <div class="session-number">11</div>
+                                <div class="session-icon">
+                                    <i data-lucide="thumbs-up" class="text-blue-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-practice">
+                                <div class="session-number">12</div>
+                                <div class="session-icon">
+                                    <i data-lucide="triangle-alert" class="text-red-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-excellent">
+                                <div class="session-number">13</div>
+                                <div class="session-icon">
+                                    <i data-lucide="trophy" class="text-yellow-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-good">
+                                <div class="session-number">14</div>
+                                <div class="session-icon">
+                                    <i data-lucide="star" class="text-green-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-pass">
+                                <div class="session-number">15</div>
+                                <div class="session-icon">
+                                    <i data-lucide="thumbs-up" class="text-blue-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-practice">
+                                <div class="session-number">16</div>
+                                <div class="session-icon">
+                                    <i data-lucide="triangle-alert" class="text-red-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-excellent">
+                                <div class="session-number">17</div>
+                                <div class="session-icon">
+                                    <i data-lucide="trophy" class="text-yellow-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-good">
+                                <div class="session-number">18</div>
+                                <div class="session-icon">
+                                    <i data-lucide="star" class="text-green-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-pass">
+                                <div class="session-number">19</div>
+                                <div class="session-icon">
+                                    <i data-lucide="thumbs-up" class="text-blue-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-practice">
+                                <div class="session-number">20</div>
+                                <div class="session-icon">
+                                    <i data-lucide="triangle-alert" class="text-red-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-excellent">
+                                <div class="session-number">21</div>
+                                <div class="session-icon">
+                                    <i data-lucide="trophy" class="text-yellow-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-good">
+                                <div class="session-number">22</div>
+                                <div class="session-icon">
+                                    <i data-lucide="star" class="text-green-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-pass">
+                                <div class="session-number">23</div>
+                                <div class="session-icon">
+                                    <i data-lucide="thumbs-up" class="text-blue-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                            <div class="session-box session-excellent selected">
+                                <div class="session-number">24</div>
+                                <div class="session-icon">
+                                    <i data-lucide="trophy" class="text-yellow-300" style="width: 12px; height: 12px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="code-sample">
+&lt;!-- 24セッショングリッド --&gt;
+&lt;div class="sessions-grid-24"&gt;
+    &lt;div class="session-box session-excellent"&gt;
+        &lt;div class="session-number"&gt;1&lt;/div&gt;
+        &lt;div class="session-icon"&gt;
+            &lt;i data-lucide="trophy" class="text-yellow-300" style="width: 12px; height: 12px;"&gt;&lt;/i&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;!-- 24個のセッション... --&gt;
+&lt;/div&gt;</div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+                <!-- 統計カード -->
+                <section id="stat-cards" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">📈 統計カードシステム</h2>
+                    <p class="text-white-70 mb-6">総合評価の統計情報表示カード</p>
+                    
+                    <div class="component-grid grid-cols-1 md:grid-cols-3">
+                        <!-- グレードカード -->
+                        <div class="component-item">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i data-lucide="award" class="text-yellow-300"></i>
+                                </div>
+                                <div class="stat-label">総合グレード</div>
+                                <div class="stat-value stat-value-grade">Excellent</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 平均誤差カード -->
+                        <div class="component-item">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i data-lucide="target" class="text-green-300"></i>
+                                </div>
+                                <div class="stat-label">平均誤差</div>
+                                <div class="stat-value">±12.5¢</div>
+                            </div>
+                        </div>
+                        
+                        <!-- セッション数カード -->
+                        <div class="component-item">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i data-lucide="hash" class="text-blue-300"></i>
+                                </div>
+                                <div class="stat-label">完了セッション</div>
+                                <div class="stat-value">8 / 8</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="code-sample">
+&lt;!-- 統計カード --&gt;
+&lt;div class="stat-card"&gt;
+    &lt;div class="stat-icon"&gt;
+        &lt;i data-lucide="award" class="text-yellow-300"&gt;&lt;/i&gt;
+    &lt;/div&gt;
+    &lt;div class="stat-label"&gt;総合グレード&lt;/div&gt;
+    &lt;div class="stat-value stat-value-grade"&gt;Excellent&lt;/div&gt;
+&lt;/div&gt;</div>
+                    
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+                <!-- 共有カード -->
+                <section id="share-cards" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">🎉 共有カードシステム</h2>
+                    <p class="text-white-70 mb-6">結果共有用のカードとSNSボタン</p>
+                    
+                    <div class="component-item">
+                        <div class="share-card">
+                            <div class="rank-achievement-message">
+                                <h3 class="text-2xl font-bold text-yellow-300 mb-2">🏆 Excellent達成！</h3>
+                                <p class="text-white">素晴らしい音感精度です！</p>
+                            </div>
+                            
+                            <div class="share-buttons">
+                                <button class="share-btn share-btn-twitter">
+                                    <i data-lucide="twitter"></i>
+                                    <span>Twitter</span>
+                                </button>
+                                <button class="share-btn share-btn-line">
+                                    <i data-lucide="message-circle"></i>
+                                    <span>LINE</span>
+                                </button>
+                                <button class="share-btn share-btn-facebook">
+                                    <i data-lucide="facebook"></i>
+                                    <span>Facebook</span>
+                                </button>
+                                <button class="share-btn share-btn-copy">
+                                    <i data-lucide="copy"></i>
+                                    <span>コピー</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="code-sample">
+&lt;!-- 共有カード --&gt;
+&lt;div class="share-card"&gt;
+    &lt;div class="rank-achievement-message"&gt;
+        &lt;h3 class="text-2xl font-bold text-yellow-300 mb-2"&gt;🏆 Excellent達成！&lt;/h3&gt;
+        &lt;p class="text-white"&gt;素晴らしい音感精度です！&lt;/p&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="share-buttons"&gt;
+        &lt;button class="share-btn share-btn-twitter"&gt;
+            &lt;i data-lucide="twitter"&gt;&lt;/i&gt;
+            &lt;span&gt;Twitter&lt;/span&gt;
+        &lt;/button&gt;
+        &lt;!-- 他のSNSボタン... --&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
                 </section>
 
             </main>
@@ -102,18 +538,25 @@
             <footer class="catalog-section">
                 <div class="text-center">
                     <h3 class="text-lg font-medium text-white mb-4">📊 総合評価コンポーネント</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <h4 class="text-orange-300 font-medium mb-2">セッショングリッド</h4>
+                            <p class="text-white-70">8/12/24セッション対応</p>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <h4 class="text-green-300 font-medium mb-2">統計カード</h4>
+                            <p class="text-white-70">グレード・誤差・セッション数</p>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <h4 class="text-blue-300 font-medium mb-2">共有機能</h4>
+                            <p class="text-white-70">SNS共有ボタン・メッセージ</p>
+                        </div>
+                    </div>
                     <p class="text-white-60 text-sm mt-4">© 2024 8va相対音感トレーニングアプリ v2</p>
                 </div>
             </footer>
         </div>
     </div>
-
-    <!-- CSS追加 -->
-    <style>
-        .page-header-icon-orange {
-            background: linear-gradient(135deg, #f97316, #ea580c);
-        }
-    </style>
 
     <!-- JavaScript -->
     <script src="ui-catalog.js"></script>
