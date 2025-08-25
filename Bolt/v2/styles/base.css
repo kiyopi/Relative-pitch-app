@@ -99,37 +99,19 @@
 .text-red-200 { color: #fecaca; }
 .text-purple-200 { color: #ddd6fe; }
 
-/* レスポンシブフォントクラス（session-result.htmlから移行） */
-.score-base-note {
+/* === レスポンシブフォントクラス === */
+/* セッション評価スコア表示 - 基音・平均誤差の大型表示 */
+.score-base-note,
+.score-average {
   font-size: 1.75rem; /* 28px モバイル */
   line-height: 1.2;
   font-weight: bold;
 }
 
-.score-error {
-  font-size: 1.75rem; /* 28px モバイル */
-  line-height: 1.2;
-  font-weight: bold;
-}
-
-/* タブレット (481px-767px) */
-@media (min-width: 481px) and (max-width: 767px) {
-  .score-base-note {
-    font-size: 2.5rem; /* 40px */
-  }
-  
-  .score-error {
-    font-size: 2.5rem; /* 40px */
-  }
-}
-
-/* PC (768px以上) */
-@media (min-width: 768px) {
-  .score-base-note {
-    font-size: 2.5rem; /* 40px */
-  }
-  
-  .score-error {
+/* タブレット・PC (481px以上) */
+@media (min-width: 481px) {
+  .score-base-note,
+  .score-average {
     font-size: 2.5rem; /* 40px */
   }
 }
@@ -601,12 +583,49 @@
   color: var(--text-white-60);
 }
 
-/* カラーバリエーション（コンパクト版） */
-.text-main-title-color { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #93c5fd; }
-.text-section-title-color { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #fca5a5; }
-.text-sub-title-color { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #86efac; }
-.text-body-color { font-size: 1rem; line-height: 1.5rem; color: #fde047; }
-.text-caption-color { font-size: 0.875rem; line-height: 1.25rem; color: #fdba74; }
+/* === タイポグラフィ カラーバリエーション === */
+
+/* text-main-title バリエーション (2.25rem, 700) */
+.text-main-title-yellow { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #fde047; }
+.text-main-title-green { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #86efac; }
+.text-main-title-blue { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #93c5fd; }
+.text-main-title-red { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #fca5a5; }
+.text-main-title-purple { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #c4b5fd; }
+
+/* text-section-title バリエーション (1.5rem, 700) */
+.text-section-title-yellow { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #fde047; }
+.text-section-title-green { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #86efac; }
+.text-section-title-blue { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #93c5fd; }
+.text-section-title-red { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #fca5a5; }
+.text-section-title-purple { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #c4b5fd; }
+
+/* text-sub-title バリエーション (1.25rem, 500) */
+.text-sub-title-yellow { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #fde047; }
+.text-sub-title-green { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #86efac; }
+.text-sub-title-blue { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #93c5fd; }
+.text-sub-title-red { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #fca5a5; }
+.text-sub-title-purple { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #c4b5fd; }
+
+/* text-body バリエーション (1rem, 400) */
+.text-body-yellow { font-size: 1rem; line-height: 1.5rem; color: #fde047; }
+.text-body-green { font-size: 1rem; line-height: 1.5rem; color: #86efac; }
+.text-body-blue { font-size: 1rem; line-height: 1.5rem; color: #93c5fd; }
+.text-body-red { font-size: 1rem; line-height: 1.5rem; color: #fca5a5; }
+.text-body-purple { font-size: 1rem; line-height: 1.5rem; color: #c4b5fd; }
+
+/* text-sub-text バリエーション (1rem, 400, 200番台の色) */
+.text-sub-text-yellow { font-size: 1rem; line-height: 1.5rem; color: #fef08a; }
+.text-sub-text-green { font-size: 1rem; line-height: 1.5rem; color: #bbf7d0; }
+.text-sub-text-blue { font-size: 1rem; line-height: 1.5rem; color: #bae6fd; }
+.text-sub-text-red { font-size: 1rem; line-height: 1.5rem; color: #fecaca; }
+.text-sub-text-purple { font-size: 1rem; line-height: 1.5rem; color: #ddd6fe; }
+
+/* text-caption バリエーション (0.875rem, 400, 200番台の色) */
+.text-caption-yellow { font-size: 0.875rem; line-height: 1.25rem; color: #fef08a; }
+.text-caption-green { font-size: 0.875rem; line-height: 1.25rem; color: #bbf7d0; }
+.text-caption-blue { font-size: 0.875rem; line-height: 1.25rem; color: #bae6fd; }
+.text-caption-red { font-size: 0.875rem; line-height: 1.25rem; color: #fecaca; }
+.text-caption-purple { font-size: 0.875rem; line-height: 1.25rem; color: #ddd6fe; }
 
 
 /* モバイル対応 */
@@ -897,3 +916,49 @@ html {
 .text-golden-yellow { color: #ffa500; } /* S級アイコン用黄色寄りオレンジ */
 
 /* 総合評価グレードアイコン: text-amber-500(S), text-gray-300(A), text-orange-300(B), text-green-300(C), text-blue-300(D), text-red-300(E) */
+
+/* === 音感精度評価アイコンバッジ === */
+.accuracy-badge {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    position: relative;
+}
+
+.accuracy-badge-excellent {
+    background: rgba(251, 191, 36, 0.2);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.accuracy-badge-good {
+    background: rgba(34, 197, 94, 0.2);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.accuracy-badge-pass {
+    background: rgba(96, 165, 250, 0.2);
+    border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.accuracy-badge-practice {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.accuracy-icon {
+    width: 64px;
+    height: 64px;
+}
+
+/* アイコン位置微調整 */
+.accuracy-icon-thumbsup {
+    transform: translateY(-2px) translateX(2px);
+}
+
+.accuracy-icon-triangle {
+    transform: translateY(-3px);
+}

@@ -90,6 +90,80 @@
             <!-- メインコンテンツエリア -->
             <main id="catalog-content">
                 
+                <!-- 音感精度評価アイコンバッジ -->
+                <section id="accuracy-evaluation-icons" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">🎯 音感精度評価アイコンバッジ</h2>
+                    <p class="text-white-70 mb-6">セッション結果ページで使用する円形バッジスタイル（100px × 100px）</p>
+                    
+                    <div class="component-grid grid-cols-2 md:grid-cols-4">
+                        <!-- Excellent バッジ -->
+                        <div class="component-item text-center">
+                            <div class="mb-4">
+                                <div class="accuracy-badge accuracy-badge-excellent">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="trophy" class="lucide lucide-trophy text-yellow-300 accuracy-icon"><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978"></path><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978"></path><path d="M18 9h1.5a1 1 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"></path><path d="M6 9H4.5a1 1 0 0 1 0-5H6"></path></svg>
+                                </div>
+                            </div>
+                            <h3 class="text-yellow-300 font-bold">Excellent</h3>
+                            <p class="text-caption">±15セント以内</p>
+                            <p class="text-caption">黄色バッジ</p>
+                        </div>
+                        
+                        <!-- Good バッジ -->
+                        <div class="component-item text-center">
+                            <div class="mb-4">
+                                <div class="accuracy-badge accuracy-badge-good">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" class="lucide lucide-star text-green-300 accuracy-icon"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
+                                </div>
+                            </div>
+                            <h3 class="text-green-300 font-bold">Good</h3>
+                            <p class="text-caption">15～25セント</p>
+                            <p class="text-caption">緑色バッジ</p>
+                        </div>
+                        
+                        <!-- Pass バッジ -->
+                        <div class="component-item text-center">
+                            <div class="mb-4">
+                                <div class="accuracy-badge accuracy-badge-pass">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="thumbs-up" class="lucide lucide-thumbs-up text-blue-300 accuracy-icon accuracy-icon-thumbsup"><path d="M7 10v12"></path><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"></path></svg>
+                                </div>
+                            </div>
+                            <h3 class="text-blue-300 font-bold">Pass</h3>
+                            <p class="text-caption">25～40セント</p>
+                            <p class="text-caption">青色バッジ</p>
+                        </div>
+                        
+                        <!-- Practice バッジ -->
+                        <div class="component-item text-center">
+                            <div class="mb-4">
+                                <div class="accuracy-badge accuracy-badge-practice">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="triangle-alert" class="lucide lucide-triangle-alert text-red-300 accuracy-icon accuracy-icon-triangle"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+                                </div>
+                            </div>
+                            <h3 class="text-red-300 font-bold">Practice</h3>
+                            <p class="text-caption">40セント以上</p>
+                            <p class="text-caption">赤色バッジ</p>
+                        </div>
+                    </div>
+                    
+                    <div class="code-sample">
+&lt;!-- 音感精度評価アイコンバッジ使用例 --&gt;
+&lt;div class="accuracy-badge accuracy-badge-excellent"&gt;
+    &lt;i data-lucide="trophy" class="text-yellow-300 accuracy-icon"&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+&lt;div class="accuracy-badge accuracy-badge-good"&gt;
+    &lt;i data-lucide="star" class="text-green-300 accuracy-icon"&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+&lt;div class="accuracy-badge accuracy-badge-pass"&gt;
+    &lt;i data-lucide="thumbs-up" class="text-blue-300 accuracy-icon accuracy-icon-thumbsup"&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+&lt;div class="accuracy-badge accuracy-badge-practice"&gt;
+    &lt;i data-lucide="triangle-alert" class="text-red-300 accuracy-icon accuracy-icon-triangle"&gt;&lt;/i&gt;
+&lt;/div&gt;</div>
+                </section>
+
                 <!-- セッション概要表示 -->
                 <section id="session-overview" class="catalog-section">
                     <h2 class="text-2xl font-bold text-white mb-4">📊 セッション概要表示</h2>
@@ -107,25 +181,25 @@
                                         <!-- 基音表示（左） -->
                                         <div style="grid-area: left; justify-self: center; display: flex; flex-direction: column; align-items: center; text-align: center;">
                                             <div class="score-base-note text-white">C4</div>
-                                            <p class="text-sm text-green-200">基音</p>
+                                            <p class="text-body-green">基音</p>
                                         </div>
                                         
                                         <!-- トロフィーアイコン（中央） -->
                                         <div style="grid-area: center; display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: flex-end;">
-                                            <div style="position: relative; width: 100px; height: 100px; background: rgba(251, 191, 36, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 1px solid rgba(251, 191, 36, 0.3);">
-                                                <i data-lucide="trophy" class="text-yellow-300" style="width: 64px; height: 64px;"></i>
+                                            <div class="accuracy-badge accuracy-badge-excellent" style="position: relative;">
+                                                <i data-lucide="trophy" class="text-yellow-300 accuracy-icon"></i>
                                                 <!-- ヘルプボタン -->
                                                 <button class="help-icon-btn" style="color: white;">
                                                     <i data-lucide="help-circle" style="width: 20px !important; height: 20px !important; min-width: 20px !important; min-height: 20px !important; max-width: 20px !important; max-height: 20px !important; font-size: 20px !important;"></i>
                                                 </button>
                                             </div>
-                                            <p class="text-lg text-white font-medium mt-4">素晴らしい精度！</p>
+                                            <p class="text-sub-title mt-4">素晴らしい精度！</p>
                                         </div>
                                         
                                         <!-- 平均誤差（右） -->
                                         <div style="grid-area: right; justify-self: center; display: flex; flex-direction: column; align-items: center; text-align: center;">
-                                            <div class="score-error text-white">±12.1¢</div>
-                                            <p class="text-sm text-green-200">セッション平均誤差</p>
+                                            <div class="score-average text-white">±12.1¢</div>
+                                            <p class="text-body-green">セッション平均誤差</p>
                                         </div>
                                     </div>
                                 </div>
@@ -137,21 +211,21 @@
     &lt;div class="score-grid-pc"&gt;
         &lt;div class="base-note-section"&gt;
             &lt;div class="score-base-note text-white"&gt;C4&lt;/div&gt;
-            &lt;p class="text-sm text-green-200"&gt;基音&lt;/p&gt;
+            &lt;p class="text-body-green"&gt;基音&lt;/p&gt;
         &lt;/div&gt;
         &lt;div class="trophy-section"&gt;
-            &lt;div class="trophy-container"&gt;
-                &lt;i data-lucide="trophy" class="text-yellow-300"&gt;&lt;/i&gt;
+            &lt;div class="accuracy-badge accuracy-badge-excellent" style="position: relative;"&gt;
+                &lt;i data-lucide="trophy" class="text-yellow-300 accuracy-icon"&gt;&lt;/i&gt;
                 &lt;!-- ヘルプアイコンボタン --&gt;
                 &lt;button class="help-icon-btn" style="color: white;"&gt;
-                    &lt;i data-lucide="help-circle" style="width: 20px !important; height: 20px !important; min-width: 20px !important; min-height: 20px !important; max-width: 20px !important; max-height: 20px !important; font-size: 20px !important;"&gt;&lt;/i&gt;
+                    &lt;i data-lucide="help-circle" style="width: 20px !important; height: 20px !important;"&gt;&lt;/i&gt;
                 &lt;/button&gt;
             &lt;/div&gt;
-            &lt;p class="text-lg text-white font-medium"&gt;素晴らしい精度！&lt;/p&gt;
+            &lt;p class="text-sub-title mt-4"&gt;素晴らしい精度！&lt;/p&gt;
         &lt;/div&gt;
         &lt;div class="error-section"&gt;
-            &lt;div class="score-error text-white"&gt;±12.1¢&lt;/div&gt;
-            &lt;p class="text-sm text-green-200"&gt;セッション平均誤差&lt;/p&gt;
+            &lt;div class="score-average text-white"&gt;±12.1¢&lt;/div&gt;
+            &lt;p class="text-body-green"&gt;セッション平均誤差&lt;/p&gt;
         &lt;/div&gt;
     &lt;/div&gt;
 &lt;/div&gt;</div>
@@ -249,19 +323,19 @@
                             
                             <div class="space-y-2">
                                 <!-- Excellent例 -->
-                                <div class="glass-card-sm hover:bg-white/10 transition-colors">
+                                <div class="note-result-item">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-4">
                                             <div>
-                                                <div class="text-lg font-bold text-white">ファ</div>
+                                                <div class="text-sub-title">ファ</div>
                                             </div>
                                             <div>
-                                                <div class="text-base text-white-60 font-medium">目標 349Hz</div>
-                                                <div class="text-base text-white-60 font-medium">実音 348Hz</div>
+                                                <div class="text-body">目標 349Hz</div>
+                                                <div class="text-body">実音 348Hz</div>
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-3">
-                                            <div class="font-bold text-xl text-blue-300">-6¢</div>
+                                            <div class="text-section-title-red">-6¢</div>
                                             <div class="flex items-center justify-center" style="width: 48px; height: 48px;">
                                                 <i data-lucide="trophy" class="text-yellow-300" style="width: 28px; height: 28px;"></i>
                                             </div>
@@ -270,19 +344,19 @@
                                 </div>
                                 
                                 <!-- Good例 -->
-                                <div class="glass-card-sm hover:bg-white/10 transition-colors">
+                                <div class="note-result-item">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-4">
                                             <div>
-                                                <div class="text-lg font-bold text-white">ラ</div>
+                                                <div class="text-sub-title">ラ</div>
                                             </div>
                                             <div>
-                                                <div class="text-base text-white-60 font-medium">目標 440Hz</div>
-                                                <div class="text-base text-white-60 font-medium">実音 445Hz</div>
+                                                <div class="text-body">目標 440Hz</div>
+                                                <div class="text-body">実音 445Hz</div>
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-3">
-                                            <div class="font-bold text-xl text-red-300">+20¢</div>
+                                            <div class="text-section-title-green">+20¢</div>
                                             <div class="flex items-center justify-center" style="width: 48px; height: 48px;">
                                                 <i data-lucide="star" class="text-green-300" style="width: 28px; height: 28px;"></i>
                                             </div>
@@ -291,19 +365,19 @@
                                 </div>
                                 
                                 <!-- Pass例 -->
-                                <div class="glass-card-sm hover:bg-white/10 transition-colors">
+                                <div class="note-result-item">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-4">
                                             <div>
-                                                <div class="text-lg font-bold text-white">ミ</div>
+                                                <div class="text-sub-title">ミ</div>
                                             </div>
                                             <div>
-                                                <div class="text-base text-white-60 font-medium">目標 330Hz</div>
-                                                <div class="text-base text-white-60 font-medium">実音 336Hz</div>
+                                                <div class="text-body">目標 330Hz</div>
+                                                <div class="text-body">実音 336Hz</div>
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-3">
-                                            <div class="font-bold text-xl text-red-300">+32¢</div>
+                                            <div class="text-section-title-green">+32¢</div>
                                             <div class="flex items-center justify-center" style="width: 48px; height: 48px;">
                                                 <i data-lucide="thumbs-up" class="text-blue-300" style="width: 28px; height: 28px; transform: translateY(-2px) translateX(2px);"></i>
                                             </div>
@@ -314,17 +388,17 @@
                             
                             <div class="code-sample">
 &lt;!-- 音別結果アイテム --&gt;
-&lt;div class="glass-card-sm hover:bg-white/10 transition-colors"&gt;
+&lt;div class="note-result-item"&gt;
     &lt;div class="flex items-center justify-between"&gt;
         &lt;div class="flex items-center gap-4"&gt;
-            &lt;div class="text-lg font-bold text-white"&gt;ファ&lt;/div&gt;
+            &lt;div class="text-sub-title"&gt;ファ&lt;/div&gt;
             &lt;div&gt;
-                &lt;div class="text-base text-white-60"&gt;目標 349Hz&lt;/div&gt;
-                &lt;div class="text-base text-white-60"&gt;実音 348Hz&lt;/div&gt;
+                &lt;div class="text-body"&gt;目標 349Hz&lt;/div&gt;
+                &lt;div class="text-body"&gt;実音 348Hz&lt;/div&gt;
             &lt;/div&gt;
         &lt;/div&gt;
         &lt;div class="flex items-center gap-3"&gt;
-            &lt;div class="font-bold text-xl text-blue-300"&gt;-6¢&lt;/div&gt;
+            &lt;div class="text-sub-title text-blue-300"&gt;-6¢&lt;/div&gt;
             &lt;div class="accuracy-icon-container"&gt;
                 &lt;i data-lucide="trophy" class="text-yellow-300"&gt;&lt;/i&gt;
             &lt;/div&gt;
