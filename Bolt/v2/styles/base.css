@@ -229,6 +229,19 @@
 .glass-card:hover {
   background: var(--glass-hover);
   border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-4px);
+}
+
+.glass-card-sm:hover {
+  background: var(--glass-hover);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-4px);
+}
+
+.glass-card-lg:hover {
+  background: var(--glass-hover);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-4px);
 }
 
 .glass-card-sm {
@@ -237,6 +250,7 @@
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
   padding: var(--space-4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card-lg {
@@ -245,6 +259,7 @@
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-3xl);
   padding: var(--space-10);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media (max-width: 768px) {

@@ -192,16 +192,6 @@
 
 /* === UIカタログ専用エフェクト === */
 
-/* Glass Card デモ用拡張ホバーエフェクト - カタログ内のみ */
-.ui-catalog .glass-card:hover {
-    background: rgba(255, 255, 255, 0.12) !important;
-    border-color: rgba(255, 255, 255, 0.25) !important;
-    transform: translateY(-4px) !important;
-    box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
-}
-
 /* Share Card デモ用反射エフェクト - カタログ内のみ */
 .ui-catalog .share-card {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
@@ -299,9 +289,153 @@
 
 .ui-catalog .grid { display: grid; }
 .ui-catalog .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+.ui-catalog .grid-cols-5 { grid-template-columns: repeat(5, 1fr); }
 .ui-catalog .gap-2 { gap: var(--space-2); }
 .ui-catalog .text-center { text-align: center; }
 .ui-catalog .text-xs { font-size: 0.75rem; line-height: 1rem; }
+
+/* === カラーパレット専用スタイル === */
+
+/* Primary Color Swatches */
+.ui-catalog .color-primary-50 { background: var(--primary-50); }
+.ui-catalog .color-primary-100 { background: var(--primary-100); }
+.ui-catalog .color-primary-200 { background: var(--primary-200); }
+.ui-catalog .color-primary-300 { background: var(--primary-300); }
+.ui-catalog .color-primary-400 { background: var(--primary-400); }
+.ui-catalog .color-primary-500 { background: var(--primary-500); }
+.ui-catalog .color-primary-600 { background: var(--primary-600); }
+.ui-catalog .color-primary-700 { background: var(--primary-700); }
+.ui-catalog .color-primary-800 { background: var(--primary-800); }
+.ui-catalog .color-primary-900 { background: var(--primary-900); }
+
+/* Secondary Color Swatches */
+.ui-catalog .color-secondary-50 { background: var(--secondary-50); }
+.ui-catalog .color-secondary-100 { background: var(--secondary-100); }
+.ui-catalog .color-secondary-200 { background: var(--secondary-200); }
+.ui-catalog .color-secondary-300 { background: var(--secondary-300); }
+.ui-catalog .color-secondary-400 { background: var(--secondary-400); }
+.ui-catalog .color-secondary-500 { background: var(--secondary-500); }
+.ui-catalog .color-secondary-600 { background: var(--secondary-600); }
+.ui-catalog .color-secondary-700 { background: var(--secondary-700); }
+.ui-catalog .color-secondary-800 { background: var(--secondary-800); }
+.ui-catalog .color-secondary-900 { background: var(--secondary-900); }
+
+/* Accent Color Swatches */
+.ui-catalog .color-accent-50 { background: var(--accent-50); }
+.ui-catalog .color-accent-100 { background: var(--accent-100); }
+.ui-catalog .color-accent-200 { background: var(--accent-200); }
+.ui-catalog .color-accent-300 { background: var(--accent-300); }
+.ui-catalog .color-accent-400 { background: var(--accent-400); }
+.ui-catalog .color-accent-500 { background: var(--accent-500); }
+.ui-catalog .color-accent-600 { background: var(--accent-600); }
+.ui-catalog .color-accent-700 { background: var(--accent-700); }
+.ui-catalog .color-accent-800 { background: var(--accent-800); }
+.ui-catalog .color-accent-900 { background: var(--accent-900); }
+
+/* カラーパレット項目ラベル */
+.ui-catalog .color-label {
+    font-size: 0.75rem;
+    color: var(--text-white-70);
+    margin-top: var(--space-1);
+    text-align: center;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+/* === グラデーション専用スタイル === */
+
+/* Linear Gradients */
+.ui-catalog .gradient-primary {
+    background: linear-gradient(135deg, #fb923c, #f97316);
+}
+
+.ui-catalog .gradient-success {
+    background: linear-gradient(135deg, var(--success-400), var(--success-500));
+}
+
+.ui-catalog .gradient-warning {
+    background: linear-gradient(135deg, var(--warning-400), var(--accent-400));
+}
+
+.ui-catalog .gradient-error {
+    background: linear-gradient(135deg, var(--error-400), var(--error-600));
+}
+
+.ui-catalog .gradient-blue {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.ui-catalog .gradient-purple {
+    background: linear-gradient(135deg, var(--primary-400), var(--secondary-400));
+}
+
+/* Radial Gradients */
+.ui-catalog .gradient-radial-primary {
+    background: radial-gradient(circle, var(--primary-400), var(--primary-600));
+}
+
+.ui-catalog .gradient-radial-secondary {
+    background: radial-gradient(circle, var(--secondary-400), var(--secondary-600));
+}
+
+.ui-catalog .gradient-radial-accent {
+    background: radial-gradient(circle, var(--accent-400), var(--accent-600));
+}
+
+/* Conic Gradients */
+.ui-catalog .gradient-conic-rainbow {
+    background: conic-gradient(
+        from 0deg,
+        #ff0000, #ff8000, #ffff00, #80ff00,
+        #00ff00, #00ff80, #00ffff, #0080ff,
+        #0000ff, #8000ff, #ff00ff, #ff0080,
+        #ff0000
+    );
+}
+
+.ui-catalog .gradient-conic-primary {
+    background: conic-gradient(
+        from 0deg,
+        var(--primary-400),
+        var(--primary-600),
+        var(--primary-800),
+        var(--primary-400)
+    );
+}
+
+/* Animated Gradients */
+.ui-catalog .gradient-animated {
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    animation: gradient-shift 3s ease infinite;
+}
+
+/* Grade Color Gradients (system.cssから参照) */
+.ui-catalog .gradient-grade-s {
+    background: linear-gradient(135deg, #ffd700, #ffb347);
+    color: #333;
+}
+
+.ui-catalog .gradient-grade-a {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.ui-catalog .gradient-grade-b {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.ui-catalog .gradient-grade-c {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.ui-catalog .gradient-grade-d {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+/* グラデーション項目のテキスト表示調整 */
+.ui-catalog .gradient-demo .gradient-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
 
 
 /* UIカタログ専用ボタン調整 */
@@ -331,6 +465,20 @@
   }
 }
 
+
+/* === ページトップに戻るボタン === */
+.ui-catalog .back-to-top {
+    color: #60a5fa;
+    text-decoration: none;
+    font-size: 0.875rem;
+    display: inline-block;
+    text-align: center;
+    margin: var(--space-4) auto;
+}
+
+.ui-catalog .back-to-top:hover {
+    color: #93c5fd;
+}
 
 /* === レスポンシブ調整 === */
 
