@@ -872,6 +872,7 @@ html {
 .color-basic-purple { background: #8b5cf6; }
 
 /* === 評価カラークラス === */
+.color-eval-gold { background: #fbbf24; }
 .color-eval-excellent { background: #fcd34d; }
 .color-eval-good { background: #6ee7b7; }
 .color-eval-pass { background: #7dd3fc; }
@@ -884,4 +885,7 @@ html {
 .gradient-catalog-green { background: linear-gradient(135deg, #10b981, #059669); }
 .gradient-catalog-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
 .gradient-catalog-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
-/* 総合評価グレードアイコン: text-yellow-300(S), text-gray-300(A), text-orange-300(B), text-green-300(C), text-blue-300(D), text-red-300(E) */
+/* === ゴールド系独自色クラス === */
+.text-golden-yellow { color: #ffa500; } /* S級アイコン用黄色寄りオレンジ */
+
+/* 総合評価グレードアイコン: text-amber-500(S), text-gray-300(A), text-orange-300(B), text-green-300(C), text-blue-300(D), text-red-300(E) */
