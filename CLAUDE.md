@@ -206,4 +206,146 @@ results.css (結果表示専用)
 
 ---
 
+## 🎯 プログレスバー統一システム（クイックリファレンス）
+
+### 基本構造
+```html
+<!-- 外枠 -->
+<div class="progress-bar [modifier]">
+    <!-- 内側（色付きバー） -->
+    <div class="progress-fill-[type] [color-class]" style="width: X%;"></div>
+</div>
+```
+
+### モディファイアクラス
+- `.progress-bar.flex` - フレックスレイアウト内で使用（評価分布バー等）
+- `.progress-bar.with-margin` - 下マージン付き（進行バーセクション等）
+
+### 内側バーの種類
+- `.progress-fill` - グラデーション用（基本フィル）
+- `.progress-fill-custom` - カスタム色用（評価分布バー等）
+
+### 色クラス一覧
+
+#### グラデーション（進行バー用）
+- `.gradient-catalog-blue` - 青グラデーション（セッション進行バー）
+- `.gradient-catalog-green` - 緑グラデーション（基本プログレスバー）
+- `.gradient-catalog-purple` / `.gradient-catalog-orange` / `.gradient-catalog-red`
+
+#### 評価カラー（評価分布バー用）
+- `.color-eval-gold` - 金色（Excellent）
+- `.color-eval-good` - 緑色（Good）  
+- `.color-eval-pass` - 青色（Pass）
+- `.color-eval-practice` - 赤色（Practice）
+
+### 実装パターン
+
+#### 進行バーセクション
+```html
+<!-- セッション完了時・セッション中 -->
+<div class="progress-bar with-margin">
+    <div class="progress-fill gradient-catalog-blue" style="width: 25%;"></div>
+</div>
+<div>セッション 2 / 8</div>
+```
+
+#### 基本プログレスバー
+```html
+<div class="progress-bar">
+    <div class="progress-fill gradient-catalog-green" style="width: 75%;"></div>
+</div>
+```
+
+#### 評価分布バー
+```html
+<div style="display: flex; align-items: center; gap: 0.75rem;">
+    <i data-lucide="trophy" class="text-yellow-300"></i>
+    <div class="progress-bar flex">
+        <div class="progress-fill-custom color-eval-gold" style="width: 37.5%;"></div>
+    </div>
+    <span>3</span>
+</div>
+```
+
+### 重要な原則
+- **インラインスタイルは `width` のみ**（幅の指定以外禁止）
+- **高さは10px統一**（すべてのプログレスバー）
+- **アニメーションは `transition: width 0.5s ease`**（軽量化）
+- **色はCSSクラスで管理**（グラデーション・評価カラー）
+
+## 🚨 インライン排除の作業手順（最重要）
+
+### 絶対に守る優先順位
+1. **📍 STEP 1: インラインスタイル確認**（最優先！）
+   - HTMLファイル内のすべての `style=` を探す
+   - 排除可能なインラインを特定
+
+2. **🔍 STEP 2: 既存クラス検索**
+   - 対応するCSSクラスが存在するか確認
+   - base.cssのユーティリティクラスを優先使用
+
+3. **✏️ STEP 3: クラス置き換え**
+   - インラインスタイルをCSSクラスに変更
+   - 動的値（width等）のみインライン許可
+
+4. **✅ STEP 4: 動作確認**
+   - レイアウト崩れがないか確認
+
+### 既存ユーティリティクラス一覧
+
+#### レイアウトクラス
+```css
+.flex                /* display: flex */
+.flex-col            /* flex-direction: column */
+.items-center        /* align-items: center */
+.justify-center      /* justify-content: center */
+.justify-between     /* justify-content: space-between */
+.gap-3               /* gap: 0.75rem (12px) */
+.gap-4               /* gap: 1rem (16px) */
+```
+
+#### 見出しクラス
+```css
+.heading-sm          /* 小見出し: flex + icon 20px */
+.heading-md          /* 中見出し: flex + icon 24px */  
+.heading-lg          /* 大見出し: flex + icon 28px */
+```
+
+#### 許可されるインライン（例外）
+- **Lucideアイコンサイズ**: `style="width: 20px; height: 20px;"`
+- **プログレスバー幅**: `style="width: 37.5%;"`
+- **動的計算値**: 座標、サイズ等
+- **レイアウト固定値**: `flex-shrink: 0;` `min-width: 20px;` `text-align: right;`
+
+### 評価分布バーの標準レイアウト
+
+#### 完全版（見出し + 評価バー）
+```html
+<div class="glass-card">
+    <!-- 見出し -->
+    <h4 class="heading-md">
+        <i data-lucide="bar-chart-3" class="text-blue-300"></i>
+        <span>評価分布</span>
+    </h4>
+    
+    <!-- 評価バー項目 -->
+    <div class="flex items-center gap-3">
+        <i data-lucide="trophy" class="text-yellow-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+        <div class="progress-bar flex">
+            <div class="progress-fill-custom color-eval-gold" style="width: 37.5%;"></div>
+        </div>
+        <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">3</span>
+    </div>
+</div>
+```
+
+### 🔄 作業忘却防止チェックリスト
+毎回作業前に以下を確認：
+- [ ] インラインスタイル `style=` を最初に探したか？
+- [ ] 既存のユーティリティクラス（flex、gap-3等）を確認したか？
+- [ ] `.heading-md` 等の見出しクラスに重複クラスを付けていないか？
+- [ ] 動的値以外のインラインを排除できたか？
+
+---
+
 **このファイルは開発進行に応じて更新されます**
