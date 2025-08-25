@@ -293,45 +293,84 @@
                     <h2 class="text-2xl font-bold text-white mb-4">🎨 カラーパレットとグラデーション</h2>
                     <p class="text-white-70 mb-6">統一されたカラーシステム</p>
                     
-                    <div class="component-grid grid-cols-1 md:grid-cols-2">
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <h3 class="text-white font-medium mb-4">基本カラーパレット</h3>
+                            <div class="grid grid-cols-5 gap-2 mb-6">
+                                <div class="text-center">
+                                    <div class="color-swatch color-basic-blue"></div>
+                                    <p class="text-xs text-white-60">Blue<br>#3b82f6</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="color-swatch color-basic-green"></div>
+                                    <p class="text-xs text-white-60">Green<br>#10b981</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="color-swatch color-basic-orange"></div>
+                                    <p class="text-xs text-white-60">Orange<br>#f59e0b</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="color-swatch color-basic-red"></div>
+                                    <p class="text-xs text-white-60">Red<br>#ef4444</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="color-swatch color-basic-purple"></div>
+                                    <p class="text-xs text-white-60">Purple<br>#8b5cf6</p>
+                                </div>
+                            </div>
+                            <div class="code-sample">&lt;!-- 基本カラー使用例 --&gt;
+&lt;div class="color-swatch color-basic-blue"&gt;&lt;/div&gt;</div>
+                        </div>
+                        
                         <div class="component-item">
                             <h3 class="text-white font-medium mb-4">評価カラー</h3>
-                            <div class="grid grid-cols-4 gap-2">
+                            <div class="grid grid-cols-5 gap-2">
                                 <div class="text-center">
-                                    <div class="color-swatch" style="background: #fcd34d;"></div>
+                                    <div class="color-swatch color-eval-excellent"></div>
                                     <p class="text-xs text-white-60">Yellow<br>Excellent</p>
                                 </div>
                                 <div class="text-center">
-                                    <div class="color-swatch" style="background: #6ee7b7;"></div>
+                                    <div class="color-swatch color-eval-good"></div>
                                     <p class="text-xs text-white-60">Green<br>Good</p>
                                 </div>
                                 <div class="text-center">
-                                    <div class="color-swatch" style="background: #7dd3fc;"></div>
+                                    <div class="color-swatch color-eval-pass"></div>
                                     <p class="text-xs text-white-60">Blue<br>Pass</p>
                                 </div>
                                 <div class="text-center">
-                                    <div class="color-swatch" style="background: #fca5a5;"></div>
+                                    <div class="color-swatch color-eval-warning"></div>
+                                    <p class="text-xs text-white-60">Orange<br>Warning</p>
+                                </div>
+                                <div class="text-center">
+                                    <div class="color-swatch color-eval-practice"></div>
                                     <p class="text-xs text-white-60">Red<br>Practice</p>
                                 </div>
                             </div>
+                            <div class="code-sample">&lt;!-- 評価カラー使用例 --&gt;
+&lt;div class="color-swatch color-eval-excellent"&gt;&lt;/div&gt;</div>
                         </div>
                         
                         <div class="component-item">
                             <h3 class="text-white font-medium mb-4">グラデーション</h3>
                             <div class="space-y-2">
-                                <div class="gradient-demo" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);">
+                                <div class="gradient-demo gradient-catalog-purple">
                                     紫グラデーション
                                 </div>
-                                <div class="gradient-demo" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+                                <div class="gradient-demo gradient-catalog-blue">
                                     青グラデーション
                                 </div>
-                                <div class="gradient-demo" style="background: linear-gradient(135deg, #10b981, #059669);">
+                                <div class="gradient-demo gradient-catalog-green">
                                     緑グラデーション
                                 </div>
-                                <div class="gradient-demo" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                                <div class="gradient-demo gradient-catalog-orange">
                                     オレンジグラデーション
                                 </div>
+                                <div class="gradient-demo gradient-catalog-red">
+                                    レッドグラデーション
+                                </div>
                             </div>
+                            <div class="code-sample">&lt;!-- グラデーション使用例 --&gt;
+&lt;div class="gradient-demo gradient-catalog-purple"&gt;紫グラデーション&lt;/div&gt;</div>
                         </div>
                     </div>
                 </section>
@@ -344,35 +383,83 @@
                 <div class="component-item">
                     <div class="space-y-4">
                         <div>
-                            <h1 class="text-4xl font-bold text-white">メインタイトル</h1>
-                            <p class="text-white-60 text-sm">text-4xl font-bold text-white</p>
+                            <h1 class="text-main-title">メインタイトル</h1>
+                            <p class="text-white-60 text-sm">text-main-title</p>
                         </div>
                         
                         <div>
-                            <h2 class="text-2xl font-bold text-white">セクションタイトル</h2>
-                            <p class="text-white-60 text-sm">text-2xl font-bold text-white</p>
+                            <h2 class="text-section-title">セクションタイトル</h2>
+                            <p class="text-white-60 text-sm">text-section-title</p>
                         </div>
                         
                         <div>
-                            <h3 class="text-xl font-medium text-white">サブタイトル</h3>
-                            <p class="text-white-60 text-sm">text-xl font-medium text-white</p>
+                            <h3 class="text-sub-title">サブタイトル</h3>
+                            <p class="text-white-60 text-sm">text-sub-title</p>
                         </div>
                         
                         <div>
-                            <p class="text-white">本文テキスト</p>
-                            <p class="text-white-60 text-sm">text-white</p>
+                            <p class="text-body">本文テキスト</p>
+                            <p class="text-white-60 text-sm">text-body</p>
                         </div>
                         
                         <div>
-                            <p class="text-white-70">サブテキスト</p>
-                            <p class="text-white-60 text-sm">text-white-70</p>
+                            <p class="text-sub-text">サブテキスト</p>
+                            <p class="text-white-60 text-sm">text-sub-text</p>
                         </div>
                         
                         <div>
-                            <p class="text-white-60 text-sm">キャプションテキスト</p>
-                            <p class="text-white-60 text-sm">text-white-60 text-sm</p>
+                            <p class="text-caption">キャプションテキスト</p>
+                            <p class="text-white-60 text-sm">text-caption</p>
                         </div>
                     </div>
+                    
+                    <!-- カラーバリエーション -->
+                    <div class="component-item mt-8">
+                        <h4 class="text-white font-medium mb-4">🎨 カラーバリエーション（各レベル1つずつ）</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <h1 class="text-main-title-color">メインタイトル（カラー）</h1>
+                                <p class="text-white-60 text-sm">text-main-title-color</p>
+                            </div>
+                            
+                            <div>
+                                <h2 class="text-section-title-color">セクションタイトル（カラー）</h2>
+                                <p class="text-white-60 text-sm">text-section-title-color</p>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-sub-title-color">サブタイトル（カラー）</h3>
+                                <p class="text-white-60 text-sm">text-sub-title-color</p>
+                            </div>
+                            
+                            <div>
+                                <p class="text-body-color">本文テキスト（カラー）</p>
+                                <p class="text-white-60 text-sm">text-body-color</p>
+                            </div>
+                            
+                            <div>
+                                <p class="text-caption-color">キャプションテキスト（カラー）</p>
+                                <p class="text-white-60 text-sm">text-caption-color</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 使用例 -->
+                    <div class="code-sample">
+&lt;!-- 基本タイポグラフィ（白色） --&gt;
+&lt;h1 class="text-main-title"&gt;メインタイトル&lt;/h1&gt;
+&lt;h2 class="text-section-title"&gt;セクションタイトル&lt;/h2&gt;
+&lt;h3 class="text-sub-title"&gt;サブタイトル&lt;/h3&gt;
+&lt;p class="text-body"&gt;本文テキスト&lt;/p&gt;
+&lt;p class="text-sub-text"&gt;サブテキスト&lt;/p&gt;
+&lt;span class="text-caption"&gt;キャプションテキスト&lt;/span&gt;
+
+&lt;!-- カラーバリエーション（各レベル1つずつ） --&gt;
+&lt;h1 class="text-main-title-color"&gt;カラーメインタイトル&lt;/h1&gt;
+&lt;h2 class="text-section-title-color"&gt;カラーセクションタイトル&lt;/h2&gt;
+&lt;h3 class="text-sub-title-color"&gt;カラーサブタイトル&lt;/h3&gt;
+&lt;p class="text-body-color"&gt;カラー本文テキスト&lt;/p&gt;
+&lt;span class="text-caption-color"&gt;カラーキャプション&lt;/span&gt;</div>
                 </div>
                 
                 <!-- 文字色クラス一覧 -->

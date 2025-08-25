@@ -144,8 +144,17 @@
 .gap-4 { gap: var(--space-4); }
 
 /* スペーシング */
+.space-y-1 > * + * {
+  margin-top: var(--space-1);
+}
+.space-y-2 > * + * {
+  margin-top: var(--space-2);
+}
 .space-y-3 > * + * {
   margin-top: var(--space-3);
+}
+.space-y-4 > * + * {
+  margin-top: var(--space-4);
 }
 
 /* ボタンスタイル（bolt-new-designから移行） */
@@ -507,6 +516,19 @@
     margin-bottom: 2rem;
 }
 
+/* 音別結果アイテム */
+.note-result-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.note-result-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
 .component-grid {
     display: grid;
     gap: 1.5rem;
@@ -536,6 +558,68 @@
     padding: 1rem;
     border-radius: 0.5rem;
     margin-top: 1.5rem;
+}
+
+/* ===== タイポグラフィクラス ===== */
+/* 基本タイポグラフィ（白色） */
+.text-main-title {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+  font-weight: 700;
+  color: var(--text-white);
+}
+
+.text-section-title {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+  color: var(--text-white);
+}
+
+.text-sub-title {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 500;
+  color: var(--text-white);
+}
+
+.text-body {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  color: var(--text-white);
+}
+
+.text-sub-text {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  color: var(--text-white-70);
+}
+
+.text-caption {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--text-white-60);
+}
+
+/* カラーバリエーション（コンパクト版） */
+.text-main-title-color { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #93c5fd; }
+.text-section-title-color { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #fca5a5; }
+.text-sub-title-color { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #86efac; }
+.text-body-color { font-size: 1rem; line-height: 1.5rem; color: #fde047; }
+.text-caption-color { font-size: 0.875rem; line-height: 1.25rem; color: #fdba74; }
+
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+  .text-main-title {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+  
+  .text-section-title {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
 }
 
 /* ===== アニメーション（UIカタログから移行） ===== */
@@ -779,4 +863,25 @@ html {
 /* アイコン使用方法ガイドライン */
 /* 一般的なアイコン: text-white クラス使用 */
 /* 音感精度評価アイコン: text-yellow-300(Excellent), text-green-300(Good), text-blue-300(Pass), text-red-300(Practice) */
+
+/* === 基本カラークラス === */
+.color-basic-blue { background: #3b82f6; }
+.color-basic-green { background: #10b981; }
+.color-basic-orange { background: #f59e0b; }
+.color-basic-red { background: #ef4444; }
+.color-basic-purple { background: #8b5cf6; }
+
+/* === 評価カラークラス === */
+.color-eval-excellent { background: #fcd34d; }
+.color-eval-good { background: #6ee7b7; }
+.color-eval-pass { background: #7dd3fc; }
+.color-eval-warning { background: #fdba74; }
+.color-eval-practice { background: #fca5a5; }
+
+/* === グラデーションクラス === */
+.gradient-catalog-purple { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
+.gradient-catalog-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+.gradient-catalog-green { background: linear-gradient(135deg, #10b981, #059669); }
+.gradient-catalog-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.gradient-catalog-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
 /* 総合評価グレードアイコン: text-yellow-300(S), text-gray-300(A), text-orange-300(B), text-green-300(C), text-blue-300(D), text-red-300(E) */
