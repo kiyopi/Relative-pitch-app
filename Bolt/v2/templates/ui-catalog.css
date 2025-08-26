@@ -450,11 +450,18 @@
   padding: 12px 24px;
 }
 
-/* ボタンコンテナ - カタログ表示用（縦並びで見やすく） */
+/* ボタンコンテナ - カタログ表示用 */
 .ui-catalog .space-y-3 {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+}
+
+/* ボタン横並び用 */
+.ui-catalog .button-row {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
 }
 
 /* モバイル対応 */
@@ -479,6 +486,13 @@
 .ui-catalog .back-to-top:hover {
     color: #93c5fd;
 }
+
+/* === UIカタログ専用マージンユーティリティ === */
+
+.ui-catalog .mb-2 { margin-bottom: 0.5rem; }
+.ui-catalog .mb-4 { margin-bottom: 1rem; }
+.ui-catalog .mb-6 { margin-bottom: 1.5rem; }
+.ui-catalog .mb-8 { margin-bottom: 2rem; }
 
 /* === レスポンシブ調整 === */
 

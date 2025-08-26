@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 UIカタログ エフェクト</title>
+    
+    <!-- favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
+    
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="ui-catalog.css">
+    
+    <!-- フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- アイコンライブラリ -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <div class="ui-catalog min-h-screen p-6">
+        <div class="container max-w-7xl mx-auto">
+            <!-- ヘッダー -->
+            <header class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-white mb-4">UIカタログ エフェクト</h1>
+                <p class="text-purple-200 text-xl">アニメーション・視覚効果・インタラクション</p>
+            </header>
+
+            <!-- カタログナビゲーション：JavaScript自動生成 -->
+            <nav id="catalog-nav" style="text-align: center; margin: 2rem 0;">
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;" id="catalog-nav-links">
+                    <!-- JavaScriptで自動生成されます -->
+                </div>
+            </nav>
+
+            <!-- メインコンテンツエリア -->
+            <main id="catalog-content">
+                
+                <!-- ホバーエフェクト -->
+                <section id="hover-effects" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">✨ ホバーエフェクト</h2>
+                    <p class="text-white-70 mb-6">インタラクティブなホバーアニメーション</p>
+                    
+                    <h3 class="text-white font-medium mb-4">カードホバー</h3>
+                    
+                    <div class="component-grid grid-cols-1 md:grid-cols-2">
+                        <div class="component-item">
+                            <div class="glass-card">
+                                <h4 class="text-white font-medium mb-2">浮遊エフェクト</h4>
+                                <p class="text-white-70 text-sm">ホバーで浮き上がる</p>
+                            </div>
+                            <p class="text-caption mt-2">glass-card クラス標準</p>
+                        </div>
+                        
+                        <div class="component-item">
+                            <div class="button-row">
+                                <div style="text-align: center;">
+                                    <button class="btn btn-primary">
+                                        <i data-lucide="sparkles"></i>
+                                        <span>プライマリボタン</span>
+                                    </button>
+                                    <p class="text-caption mt-2">フローティングエフェクト</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <button class="btn btn-outline">
+                                        <i data-lucide="arrow-right"></i>
+                                        <span>アウトラインボタン</span>
+                                    </button>
+                                    <p class="text-caption mt-2">フローティングエフェクト</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-white font-medium mb-4">エフェクト実装例</h3>
+                    
+                    <div class="code-sample">
+/* ホバーエフェクト実装 */
+.glass-card:hover,
+.btn:hover {
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* グラスモーフィズム */
+.glass-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}</div>
+                    
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+                <!-- フローティングアニメーション -->
+                <section id="floating-animation" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">🎈 フローティングアニメーション</h2>
+                    <p class="text-white-70 mb-6">ゆらゆらと浮遊する動き</p>
+                    
+                    <h3 class="text-white font-medium mb-4">ページヘッダーアイコン</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item text-center">
+                            <div class="page-header-icon gradient-catalog-purple">
+                                <i data-lucide="sparkles" class="icon-2xl text-white"></i>
+                            </div>
+                            <p class="text-caption mt-2">6秒周期で上下10pxの浮遊効果（ease-in-out・無限ループ）</p>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-white font-medium mb-4">エフェクト実装例</h3>
+                    
+                    <div class="code-sample">
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.page-header-icon {
+    animation: float 6s ease-in-out infinite;
+}</div>
+                    
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+                <!-- グラデーション背景 -->
+                <section id="gradient-background" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">🌈 グラデーション背景</h2>
+                    <p class="text-white-70 mb-6">動的な背景グラデーションアニメーション</p>
+                    
+                    <h3 class="text-white font-medium mb-4">背景アニメーション</h3>
+                    
+                    <div class="component-item">
+                        <div style="height: 200px; border-radius: 16px; background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%); background-size: 400% 400%; animation: gradientShift 5s ease infinite;">
+                            <div class="flex items-center justify-center h-full">
+                                <p class="text-white font-medium">15秒周期のグラデーションシフト</p>
+                            </div>
+                        </div>
+                        
+                        <h3 class="text-white font-medium mb-4">エフェクト実装例</h3>
+                        
+                        <div class="code-sample">
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+body::before {
+    background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+}</div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+
+
+            </main>
+
+            <!-- フッター -->
+            <footer class="catalog-section">
+                <div class="text-center">
+                    <h3 class="text-lg font-medium text-white mb-4">✨ エフェクトシステム</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <h4 class="text-purple-300 font-medium mb-2">アニメーション</h4>
+                            <p class="text-white-70">フローティング・グラデーションシフト</p>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <h4 class="text-blue-300 font-medium mb-2">トランジション</h4>
+                            <p class="text-white-70">スムーズな状態変化</p>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <h4 class="text-green-300 font-medium mb-2">視覚効果</h4>
+                            <p class="text-white-70">グラスモーフィズム・影効果</p>
+                        </div>
+                    </div>
+                    <p class="text-white-60 text-sm mt-4">© 2024 8va相対音感トレーニングアプリ v2</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="ui-catalog.js"></script>
+</body>
+</html>
