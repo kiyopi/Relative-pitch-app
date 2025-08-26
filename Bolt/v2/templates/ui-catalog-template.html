@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{CATALOG_TITLE}} - 8va相対音感トレーニングアプリ</title>
+    <title>🎨 {{CATALOG_TITLE}}</title>
     
     <!-- favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
@@ -29,51 +29,10 @@
                 <p class="text-purple-200 text-xl">{{CATALOG_DESCRIPTION}}</p>
             </header>
 
-            <!-- カタログナビゲーション -->
-            <nav class="catalog-nav">
-                <h2 class="text-xl font-bold text-white mb-2">🧭 UIカタログナビゲーション</h2>
-                <p class="text-white-70 text-sm">v2環境のデザインシステムを体系的に閲覧</p>
-                
-                <div class="catalog-nav-grid">
-                    <a href="ui-catalog-index.html" class="catalog-nav-item">
-                        <i data-lucide="grid-3x3" class="catalog-nav-icon text-blue-300"></i>
-                        <div class="catalog-nav-info">
-                            <h3>インデックス</h3>
-                            <p>総合ナビゲーション</p>
-                        </div>
-                    </a>
-                    
-                    <a href="ui-catalog-essentials.html" class="catalog-nav-item">
-                        <i data-lucide="star" class="catalog-nav-icon text-yellow-300"></i>
-                        <div class="catalog-nav-info">
-                            <h3>エッセンシャル</h3>
-                            <p>必須基本スタイル</p>
-                        </div>
-                    </a>
-                    
-                    <a href="ui-catalog-components.html" class="catalog-nav-item">
-                        <i data-lucide="package" class="catalog-nav-icon text-green-300"></i>
-                        <div class="catalog-nav-info">
-                            <h3>コンポーネント</h3>
-                            <p>汎用UI要素</p>
-                        </div>
-                    </a>
-                    
-                    <a href="ui-catalog-results.html" class="catalog-nav-item">
-                        <i data-lucide="bar-chart-3" class="catalog-nav-icon text-purple-300"></i>
-                        <div class="catalog-nav-info">
-                            <h3>結果表示</h3>
-                            <p>専用コンポーネント</p>
-                        </div>
-                    </a>
-                    
-                    <a href="ui-catalog-advanced.html" class="catalog-nav-item">
-                        <i data-lucide="zap" class="catalog-nav-icon text-orange-300"></i>
-                        <div class="catalog-nav-info">
-                            <h3>アドバンス</h3>
-                            <p>高度エフェクト</p>
-                        </div>
-                    </a>
+            <!-- カタログナビゲーション：JavaScript自動生成 -->
+            <nav id="catalog-nav" style="text-align: center; margin: 2rem 0;">
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;" id="catalog-nav-links">
+                    <!-- JavaScriptで自動生成されます -->
                 </div>
             </nav>
 
@@ -82,25 +41,61 @@
                 {{CATALOG_CONTENT}}
             </main>
 
+            <!-- 🔧 component-itemテンプレートパーツ（開発時参照用） -->
+            <!-- 
+                📝 使用方法:
+                1. セクション全体をコピー
+                2. {{変数名}}を実際の値に置換
+                3. 見出し(h3)はcomponent-itemの「外」に配置
+                4. デモコンテンツはcomponent-itemの「中」に配置
+                
+                🚨 重要: 見出しをcomponent-item内に入れない（構造が分かりにくくなる）
+            -->
+            <template id="component-item-template">
+                <!-- ✅ 正しい構造: 見出しをcomponent-itemの外に配置 -->
+                <section id="{{SECTION_ID}}" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">{{SECTION_TITLE}}</h2>
+                    <p class="text-white-70 mb-6">{{SECTION_DESCRIPTION}}</p>
+                    
+                    <!-- 個別コンポーネント -->
+                    <h3 class="text-white font-medium mb-4">{{COMPONENT_NAME}}</h3>
+                    
+                    <div class="component-item">
+                        <!-- ここにコンポーネントデモを配置 -->
+                        {{COMPONENT_DEMO}}
+                        
+                        <!-- コードサンプル（必要に応じて） -->
+                        <div class="code-sample">
+{{COMPONENT_CODE}}
+                        </div>
+                    </div>
+                    
+                    <!-- 複数のコンポーネントバリエーション -->
+                    <h3 class="text-white font-medium mb-4">{{VARIANT_NAME}}</h3>
+                    
+                    <div class="component-item">
+                        {{VARIANT_DEMO}}
+                    </div>
+                    
+                    <!-- ページトップに戻るボタン -->
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+                
+                <!-- ❌ 間違った構造（使用禁止） -->
+                <div class="component-item-wrong-example" style="display: none;">
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">間違い：見出しがcomponent-item内にある</h3>
+                        <!-- この構造は使用禁止 -->
+                    </div>
+                </div>
+            </template>
+
             <!-- フッター -->
             <footer class="catalog-section">
                 <div class="text-center">
-                    <h3 class="text-lg font-medium text-white mb-4">🏗️ v2環境アーキテクチャ</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                        <div class="bg-white/5 rounded-lg p-3">
-                            <h4 class="text-blue-300 font-medium mb-2">CSS変数システム</h4>
-                            <p class="text-white-70">スペーシング・カラー・境界線の統一管理</p>
-                        </div>
-                        <div class="bg-white/5 rounded-lg p-3">
-                            <h4 class="text-green-300 font-medium mb-2">コンポーネントベース</h4>
-                            <p class="text-white-70">再利用可能なUIパーツ設計</p>
-                        </div>
-                        <div class="bg-white/5 rounded-lg p-3">
-                            <h4 class="text-purple-300 font-medium mb-2">クリーンアーキテクチャ</h4>
-                            <p class="text-white-70">system.css依存完全除去</p>
-                        </div>
-                    </div>
-                    <p class="text-white-60 text-sm mt-4">© 2024 8va相対音感トレーニングアプリ v2</p>
+                    <p class="text-white-60 text-sm">© 2024 8va相対音感トレーニングアプリ v2</p>
                 </div>
             </footer>
         </div>

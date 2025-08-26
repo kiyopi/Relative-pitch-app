@@ -1,5 +1,57 @@
 // ui-catalog.js - UIカタログ専用JavaScript
 
+// カタログナビゲーション自動生成
+class CatalogNavigation {
+    constructor() {
+        this.catalogPages = [
+            { file: 'ui-catalog-index.html', name: 'インデックス', color: '#60a5fa' },
+            { file: 'ui-catalog-essentials.html', name: 'エッセンシャル', color: '#fbbf24' },
+            { file: 'ui-catalog-components.html', name: 'コンポーネント', color: '#34d399' },
+            { file: 'ui-catalog-results-session.html', name: 'セッション評価', color: '#a78bfa' },
+            { file: 'ui-catalog-results-overall.html', name: '総合評価', color: '#fb923c' },
+            { file: 'ui-catalog-results-analysis.html', name: '詳細分析', color: '#ef4444' },
+            { file: 'ui-catalog-effects.html', name: 'エフェクト', color: '#8b5cf6' }
+        ];
+        this.init();
+    }
+    
+    init() {
+        const navContainer = document.getElementById('catalog-nav-links');
+        if (!navContainer) return;
+        
+        const currentPage = window.location.pathname.split('/').pop();
+        
+        this.catalogPages.forEach(page => {
+            const link = document.createElement('a');
+            link.href = page.file;
+            link.textContent = page.name;
+            link.style.cssText = `
+                color: ${page.color}; 
+                text-decoration: none; 
+                padding: 0.5rem 1rem; 
+                border-radius: 0.5rem; 
+                background: ${page.color}1a; 
+                border: 1px solid ${page.color}33; 
+                font-size: 0.875rem; 
+                transition: all 0.3s ease;
+                ${currentPage === page.file ? 'font-weight: bold; box-shadow: 0 0 0 2px ' + page.color + '66;' : ''}
+            `;
+            
+            link.addEventListener('mouseenter', () => {
+                link.style.background = page.color + '26';
+                link.style.transform = 'translateY(-1px)';
+            });
+            
+            link.addEventListener('mouseleave', () => {
+                link.style.background = page.color + '1a';
+                link.style.transform = 'translateY(0)';
+            });
+            
+            navContainer.appendChild(link);
+        });
+    }
+}
+
 // コードサンプル管理システム
 class CodeExampleManager {
     constructor() {
@@ -121,6 +173,9 @@ class UICatalogManager {
     init() {
         document.addEventListener('DOMContentLoaded', () => {
             console.log('📄 [UI-CATALOG] DOM Content Loaded - starting initialization');
+            
+            // ナビゲーション初期化
+            this.catalogNav = new CatalogNavigation();
             
             // アイコン初期化
             this.initializeIcons();

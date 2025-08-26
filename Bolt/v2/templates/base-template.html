@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>8va相対音感トレーニング - ページタイトル</title>
-    <link rel="stylesheet" href="../styles/system.css?v=4">
+    <link rel="stylesheet" href="../styles/base.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -17,77 +17,6 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     
-    <style>
-        /* 背景グラデーションアニメーション - iOS対応版 */
-        body {
-            position: relative;
-            min-height: 100vh;
-            min-height: -webkit-fill-available;
-            -webkit-overflow-scrolling: touch;
-            background: #0f172a; /* フォールバック */
-        }
-        
-        /* 疑似要素で背景アニメーション */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-            -webkit-animation: gradientShift 15s ease infinite;
-            z-index: -1;
-            transform: translateZ(0);
-            -webkit-transform: translateZ(0);
-            -webkit-backface-visibility: hidden;
-            will-change: background-position;
-        }
-        
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        @-webkit-keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        /* フローティングアニメーション */
-        .page-header-icon {
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        /* PREMIUMバッジ位置調整 */
-        .premium-badge {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #ffd700, #ffb347);
-            color: #333;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.875rem;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            z-index: 10;
-        }
-        
-        /* フッターナビゲーションスタイルは system.css に統一 */
-    </style>
 </head>
 <body>
     <!-- Debug Navigation -->
@@ -134,14 +63,14 @@
             </div>
             
             <!-- Header -->
-            <div class="text-center mb-8">
-                <div class="flex justify-center mb-6">
+            <div class="text-center" style="margin-bottom: 2rem;">
+                <div class="flex justify-center" style="margin-bottom: 1.5rem;">
                     <div class="page-header-icon page-header-icon-purple">
                         <i data-lucide="trophy" class="icon-2xl text-white" data-stroke-width="2"></i>
                     </div>
                 </div>
-                <h1 class="text-4xl font-bold text-white mb-4">ページタイトル</h1>
-                <p class="text-green-200 text-xl mb-6">メインサブタイトル</p>
+                <h1 class="text-4xl font-bold text-white" style="margin-bottom: 1rem;">ページタイトル</h1>
+                <p class="text-green-200 text-xl" style="margin-bottom: 1.5rem;">メインサブタイトル</p>
                 <p class="text-blue-200">ページの説明文がここに入ります</p>
             </div>
 

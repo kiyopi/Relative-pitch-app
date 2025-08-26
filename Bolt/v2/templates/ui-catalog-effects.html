@@ -165,6 +165,72 @@ body::before {
                     </div>
                 </section>
 
+                <!-- iPhone対応背景エフェクト -->
+                <section id="ios-background-effects" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">📱 iPhone対応背景エフェクト</h2>
+                    <p class="text-white-70 mb-6">iOS Safari用に最適化された背景アニメーション</p>
+                    
+                    <h3 class="text-white font-medium mb-4">iOS対応実装</h3>
+                    
+                    <div class="component-item">
+                        <div class="glass-card">
+                            <h4 class="text-white font-medium mb-3">特別な対応項目</h4>
+                            <ul class="text-white-70 text-sm space-y-2">
+                                <li>• <code>min-height: -webkit-fill-available</code> - iOS Safari対応</li>
+                                <li>• <code>-webkit-overflow-scrolling: touch</code> - スムーズスクロール</li>
+                                <li>• <code>-webkit-animation</code> - Webkitプレフィックス付きアニメーション</li>
+                                <li>• <code>transform: translateZ(0)</code> - ハードウェアアクセラレーション</li>
+                                <li>• <code>-webkit-backface-visibility: hidden</code> - ちらつき防止</li>
+                                <li>• <code>will-change: background-position</code> - パフォーマンス最適化</li>
+                            </ul>
+                        </div>
+                        
+                        <h3 class="text-white font-medium mb-4">エフェクト実装例（iPhone最適化版）</h3>
+                        
+                        <div class="code-sample">
+/* 背景グラデーションアニメーション - iOS対応版 */
+body {
+    position: relative;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    -webkit-overflow-scrolling: touch;
+    background: #0f172a; /* フォールバック */
+}
+
+/* 疑似要素で背景アニメーション */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+    -webkit-animation: gradientShift 15s ease infinite;
+    z-index: -1;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    will-change: background-position;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@-webkit-keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}</div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
 
 
             </main>
@@ -172,22 +238,7 @@ body::before {
             <!-- フッター -->
             <footer class="catalog-section">
                 <div class="text-center">
-                    <h3 class="text-lg font-medium text-white mb-4">✨ エフェクトシステム</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                        <div class="bg-white/5 rounded-lg p-3">
-                            <h4 class="text-purple-300 font-medium mb-2">アニメーション</h4>
-                            <p class="text-white-70">フローティング・グラデーションシフト</p>
-                        </div>
-                        <div class="bg-white/5 rounded-lg p-3">
-                            <h4 class="text-blue-300 font-medium mb-2">トランジション</h4>
-                            <p class="text-white-70">スムーズな状態変化</p>
-                        </div>
-                        <div class="bg-white/5 rounded-lg p-3">
-                            <h4 class="text-green-300 font-medium mb-2">視覚効果</h4>
-                            <p class="text-white-70">グラスモーフィズム・影効果</p>
-                        </div>
-                    </div>
-                    <p class="text-white-60 text-sm mt-4">© 2024 8va相対音感トレーニングアプリ v2</p>
+                    <p class="text-white-60 text-sm">© 2024 8va相対音感トレーニングアプリ v2</p>
                 </div>
             </footer>
         </div>
