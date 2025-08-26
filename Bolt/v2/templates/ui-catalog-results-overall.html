@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UIカタログ 総合評価 - 8va相対音感トレーニングアプリ</title>
+    <title>🎨 UIカタログ 総合評価</title>
+    
+    <!-- favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
     
     <!-- スタイルシート -->
     <link rel="stylesheet" href="../styles/base.css">
@@ -23,68 +26,14 @@
         <div class="container max-w-7xl mx-auto">
             <!-- ヘッダー -->
             <header class="text-center mb-8">
-                <div class="flex justify-center mb-6">
-                    <div class="page-header-icon page-header-icon-orange">
-                        <i data-lucide="bar-chart-3" class="icon-2xl text-white" data-stroke-width="2"></i>
-                    </div>
-                </div>
                 <h1 class="text-4xl font-bold text-white mb-4">UIカタログ 総合評価</h1>
                 <p class="text-orange-200 text-xl">複数セッション総合結果表示コンポーネント</p>
             </header>
 
-            <!-- カタログナビゲーション -->
-            <nav class="catalog-nav">
-                <h2 class="text-xl font-bold text-white mb-2">🧭 UIカタログナビゲーション</h2>
-                <p class="text-white-70 text-sm">v2環境のデザインシステムを体系的に閲覧</p>
-                
-                <div class="catalog-nav-grid">
-                    <a href="ui-catalog-index.html" class="catalog-nav-item">
-                        <i data-lucide="grid-3x3" class="catalog-nav-icon text-blue-300"></i>
-                        <div class="catalog-nav-info">
-                            <h3>インデックス</h3>
-                            <p>総合ナビゲーション</p>
-                        </div>
-                    </a>
-                    
-                    <a href="ui-catalog-essentials.html" class="catalog-nav-item">
-                        <i data-lucide="star" class="catalog-nav-icon text-yellow-300"></i>
-                        <div class="catalog-nav-info">
-                            <h3>エッセンシャル</h3>
-                            <p>必須基本スタイル</p>
-                        </div>
-                    </a>
-                    
-                    <a href="ui-catalog-components.html" class="catalog-nav-item">
-                        <i data-lucide="package" class="catalog-nav-icon text-green-300"></i>
-                        <div class="catalog-nav-info">
-                            <h3>コンポーネント</h3>
-                            <p>汎用UI要素</p>
-                        </div>
-                    </a>
-                    
-                    <a href="ui-catalog-results-session.html" class="catalog-nav-item">
-                        <i data-lucide="circle-check-big" class="catalog-nav-icon text-purple-300"></i>
-                        <div class="catalog-nav-info">
-                            <h3>セッション評価</h3>
-                            <p>単体セッション結果</p>
-                        </div>
-                    </a>
-                    
-                    <a href="ui-catalog-results-overall.html" class="catalog-nav-item current">
-                        <i data-lucide="bar-chart-3" class="catalog-nav-icon text-orange-300"></i>
-                        <div class="catalog-nav-info">
-                            <h3>総合評価</h3>
-                            <p>複数セッション総合結果</p>
-                        </div>
-                    </a>
-                    
-                    <a href="ui-catalog-advanced.html" class="catalog-nav-item">
-                        <i data-lucide="zap" class="catalog-nav-icon text-red-300"></i>
-                        <div class="catalog-nav-info">
-                            <h3>アドバンス</h3>
-                            <p>高度エフェクト</p>
-                        </div>
-                    </a>
+            <!-- カタログナビゲーション：JavaScript自動生成 -->
+            <nav id="catalog-nav" style="text-align: center; margin: 2rem 0;">
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;" id="catalog-nav-links">
+                    <!-- JavaScriptで自動生成されます -->
                 </div>
             </nav>
 
@@ -181,8 +130,9 @@
                     <p class="text-white-70 mb-6">複数セッションを表示するグリッドレイアウト（8/12/24対応）</p>
                     
                     <!-- 8セッショングリッド -->
+                    <h3 class="text-white font-medium mb-4">8セッショングリッド</h3>
+                    
                     <div class="component-item">
-                        <h3 class="text-white font-medium mb-4">8セッショングリッド</h3>
                         <div class="sessions-grid-8">
                             <div class="session-box session-excellent">
                                 <div class="session-number">1</div>
@@ -248,8 +198,9 @@
                     </div>
                     
                     <!-- 12セッショングリッド -->
+                    <h3 class="text-white font-medium mb-4">12セッショングリッド</h3>
+                    
                     <div class="component-item">
-                        <h3 class="text-white font-medium mb-4">12セッショングリッド</h3>
                         <div class="sessions-grid-12">
                             <div class="session-box session-excellent">
                                 <div class="session-number">1</div>
@@ -339,8 +290,9 @@
                     </div>
                     
                     <!-- 24セッショングリッド -->
+                    <h3 class="text-white font-medium mb-4">24セッショングリッド</h3>
+                    
                     <div class="component-item">
-                        <h3 class="text-white font-medium mb-4">24セッショングリッド</h3>
                         <div class="sessions-grid-24">
                             <div class="session-box session-excellent">
                                 <div class="session-number">1</div>
@@ -512,8 +464,9 @@
                     <p class="text-white-70 mb-6">ランク表示セクション・統計情報の表示カード</p>
                     
                     <!-- ランク表示セクション (ui-catalog-results.htmlから移植) -->
+                    <h4 class="text-white font-medium mb-4">ランク表示セクション</h4>
+                    
                     <div class="component-item">
-                        <h4 class="text-white font-medium mb-4">ランク表示セクション</h4>
                         <div class="glass-card">
                             <div class="rank-mode">
                                 <h3 class="mode-title">ランダム基音モード</h3>
@@ -667,6 +620,51 @@
         &lt;/button&gt;
     &lt;/div&gt;
 &lt;/div&gt;</div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+                <!-- ⬅️➡️ 前後ナビゲーション -->
+                <section id="prev-next-navigation" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">⬅️➡️ 前後ナビゲーション</h2>
+                    <p class="text-white-70 mb-6">セッション間移動とページ遷移ナビゲーション</p>
+                    
+                    <h3 class="text-white font-medium mb-4">詳細分析ヘッダー</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <div class="section-header" style="margin-bottom: 1rem;">
+                                <div class="flex items-center justify-between w-full">
+                                    <button class="glass-card-sm">
+                                        <i data-lucide="chevron-left" class="text-white" style="width: 24px; height: 24px;"></i>
+                                    </button>
+                                    <div class="text-center flex-1 px-2">
+                                        <h3 class="text-sub-title">詳細分析 - セッション<span>1</span></h3>
+                                    </div>
+                                    <button class="glass-card-sm">
+                                        <i data-lucide="chevron-right" class="text-white" style="width: 24px; height: 24px;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;div class="section-header"&gt;
+  &lt;div class="flex items-center justify-between w-full"&gt;
+    &lt;button id="prev-session-btn" class="glass-card-sm"&gt;
+      &lt;i data-lucide="chevron-left" class="text-white" style="width: 24px; height: 24px;"&gt;&lt;/i&gt;
+    &lt;/button&gt;
+    &lt;div class="text-center flex-1 px-2"&gt;
+      &lt;h3 class="text-sub-title"&gt;詳細分析 - セッション1&lt;/h3&gt;
+    &lt;/div&gt;
+    &lt;button id="next-session-btn" class="glass-card-sm"&gt;
+      &lt;i data-lucide="chevron-right" class="text-white" style="width: 24px; height: 24px;"&gt;&lt;/i&gt;
+    &lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
                     </div>
                     
                     <div style="text-align: center; margin: 1rem 0;">

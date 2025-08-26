@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UIカタログ コンポーネント - 8va相対音感トレーニングアプリ</title>
+    <title>🎨 UIカタログ コンポーネント</title>
     
     <!-- favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
@@ -29,59 +29,10 @@
                 <p class="text-green-200 text-xl">汎用UI要素・インタラクティブコンポーネント</p>
             </header>
 
-            <!-- カタログナビゲーション -->
-            <nav class="catalog-nav">
-                <h2 class="text-xl font-bold text-white mb-2">🧭 UIカタログナビゲーション</h2>
-                <p class="text-white-70 text-sm">v2環境のデザインシステムを体系的に閲覧</p>
-                
-                <div class="catalog-nav-grid">
-                    <a href="ui-catalog-index.html" class="catalog-nav-item">
-                        <i data-lucide="grid-3x3" class="catalog-nav-icon text-blue-300"></i>
-                        <div class="catalog-nav-info">
-                            <h3>インデックス</h3>
-                            <p>総合ナビゲーション</p>
-                        </div>
-                    </a>
-                    
-                    <a href="ui-catalog-essentials.html" class="catalog-nav-item">
-                        <i data-lucide="star" class="catalog-nav-icon text-yellow-300"></i>
-                        <div class="catalog-nav-info">
-                            <h3>エッセンシャル</h3>
-                            <p>必須基本スタイル</p>
-                        </div>
-                    </a>
-                    
-                    <a href="ui-catalog-components.html" class="catalog-nav-item current">
-                        <i data-lucide="package" class="catalog-nav-icon text-green-300"></i>
-                        <div class="catalog-nav-info">
-                            <h3>コンポーネント</h3>
-                            <p>汎用UI要素</p>
-                        </div>
-                    </a>
-                    
-                    <a href="ui-catalog-results-session.html" class="catalog-nav-item">
-                        <i data-lucide="circle-check-big" class="catalog-nav-icon text-purple-300"></i>
-                        <div class="catalog-nav-info">
-                            <h3>セッション評価</h3>
-                            <p>単体セッション結果</p>
-                        </div>
-                    </a>
-                    
-                    <a href="ui-catalog-results-overall.html" class="catalog-nav-item">
-                        <i data-lucide="bar-chart-3" class="catalog-nav-icon text-orange-300"></i>
-                        <div class="catalog-nav-info">
-                            <h3>総合評価</h3>
-                            <p>8セッション総合結果</p>
-                        </div>
-                    </a>
-                    
-                    <a href="ui-catalog-advanced.html" class="catalog-nav-item">
-                        <i data-lucide="zap" class="catalog-nav-icon text-red-300"></i>
-                        <div class="catalog-nav-info">
-                            <h3>アドバンス</h3>
-                            <p>高度エフェクト</p>
-                        </div>
-                    </a>
+            <!-- カタログナビゲーション：JavaScript自動生成 -->
+            <nav id="catalog-nav" style="text-align: center; margin: 2rem 0;">
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;" id="catalog-nav-links">
+                    <!-- JavaScriptで自動生成されます -->
                 </div>
             </nav>
 
@@ -144,9 +95,10 @@
                     <h2 class="text-2xl font-bold text-white mb-4">💳 カードコンポーネント</h2>
                     <p class="text-white-70 mb-6">Glass morphismを活用したカードシステム</p>
                     
+                    <h3 class="text-white font-medium mb-4">基本カード</h3>
+                    
                     <div class="component-grid grid-cols-1 md:grid-cols-2">
                         <div class="component-item">
-                            <h3 class="text-white font-medium mb-4">基本カード</h3>
                             <div class="glass-card mb-4">
                                 <h4 class="text-white font-medium mb-2">ガラスカード</h4>
                                 <p class="text-white-70 text-sm">背景にぼかし効果と透明度を適用したカード</p>
@@ -158,9 +110,12 @@
     &lt;p class="text-white-70"&gt;コンテンツ&lt;/p&gt;
 &lt;/div&gt;</div>
                         </div>
+                    </div>
                         
+                    <h3 class="text-white font-medium mb-4">サイズバリエーション</h3>
+                    
+                    <div class="component-grid grid-cols-1 md:grid-cols-2">
                         <div class="component-item">
-                            <h3 class="text-white font-medium mb-4">サイズバリエーション</h3>
                             <div class="space-y-3">
                                 <div class="glass-card-sm">
                                     <p class="text-white text-sm">Small カード</p>
@@ -190,9 +145,10 @@
                     <h2 class="text-2xl font-bold text-white mb-4">📊 プログレスバー</h2>
                     <p class="text-white-70 mb-6">進行状況表示用プログレスバー</p>
                     
+                    <h3 class="text-white font-medium mb-4">基本プログレスバー</h3>
+                    
                     <div class="component-grid grid-cols-1">
                         <div class="component-item">
-                            <h3 class="text-white font-medium mb-4">基本プログレスバー</h3>
                             <div class="space-y-4">
                                 <div>
                                     <p class="text-white-70 text-sm mb-2">25%完了</p>
@@ -220,9 +176,12 @@
     &lt;div class="progress-fill gradient-catalog-green" style="width: 75%;"&gt;&lt;/div&gt;
 &lt;/div&gt;</div>
                         </div>
+                    </div>
                         
+                    <h3 class="text-white font-medium mb-4">進行バーセクション（セッション完了時）</h3>
+                    
+                    <div class="component-grid grid-cols-1">
                         <div class="component-item">
-                            <h3 class="text-white font-medium mb-4">進行バーセクション（セッション完了時）</h3>
                             <div class="glass-card">
                                 <div style="display: flex; flex-direction: column; gap: 1rem;">
                                     <div style="flex: 1;">
@@ -267,9 +226,12 @@
     &lt;a href="#" class="btn btn-primary"&gt;次の基音へ&lt;/a&gt;
 &lt;/div&gt;</div>
                         </div>
+                    </div>
                         
+                    <h3 class="text-white font-medium mb-4">進行バーセクション（セッション中）</h3>
+                    
+                    <div class="component-grid grid-cols-1">
                         <div class="component-item">
-                            <h3 class="text-white font-medium mb-4">進行バーセクション（セッション中）</h3>
                             <div class="glass-card">
                                 <div style="flex: 1;">
                                     <div class="progress-bar with-margin">
@@ -300,9 +262,10 @@
                     <h2 class="text-2xl font-bold text-white mb-4">🧭 ナビゲーション</h2>
                     <p class="text-white-70 mb-6">フッターナビゲーションシステム</p>
                     
+                    <h3 class="text-white font-medium mb-4">フッターナビ</h3>
+                    
                     <div class="component-grid grid-cols-1">
                         <div class="component-item">
-                            <h3 class="text-white font-medium mb-4">フッターナビ</h3>
                             <div class="footer-nav-grid">
                                 <div class="footer-nav-item">
                                     <i data-lucide="play-circle" class="footer-nav-icon text-green-400"></i>
