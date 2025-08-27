@@ -44,13 +44,44 @@
                     <h2 class="text-2xl font-bold text-white mb-4">✨ ホバーエフェクト</h2>
                     <p class="text-white-70 mb-6">インタラクティブなホバーアニメーション</p>
                     
-                    <h3 class="text-white font-medium mb-4">カードホバー</h3>
+                    <h3 class="text-white font-medium mb-4">汎用ホバーエフェクト</h3>
+                    
+                    <div class="component-grid grid-cols-1 md:grid-cols-3">
+                        <!-- hover-pop -->
+                        <div class="component-item">
+                            <div class="glass-card hover-pop">
+                                <h4 class="text-white font-medium mb-2">Pop エフェクト</h4>
+                                <p class="text-white-70 text-sm">浮上 + 拡大 + 影グロー</p>
+                            </div>
+                            <p class="text-caption mt-2">hover-pop クラス</p>
+                        </div>
+                        
+                        <!-- hover-lift -->
+                        <div class="component-item">
+                            <div class="glass-card hover-lift">
+                                <h4 class="text-white font-medium mb-2">Lift エフェクト</h4>
+                                <p class="text-white-70 text-sm">高く浮上 + 深い影</p>
+                            </div>
+                            <p class="text-caption mt-2">hover-lift クラス</p>
+                        </div>
+                        
+                        <!-- hover-glow -->
+                        <div class="component-item">
+                            <div class="glass-card hover-glow">
+                                <h4 class="text-white font-medium mb-2">Glow エフェクト</h4>
+                                <p class="text-white-70 text-sm">グロー + ボーダー強調</p>
+                            </div>
+                            <p class="text-caption mt-2">hover-glow クラス</p>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-white font-medium mb-4">従来のカードホバー</h3>
                     
                     <div class="component-grid grid-cols-1 md:grid-cols-2">
                         <div class="component-item">
                             <div class="glass-card">
                                 <h4 class="text-white font-medium mb-2">浮遊エフェクト</h4>
-                                <p class="text-white-70 text-sm">ホバーで浮き上がる</p>
+                                <p class="text-white-70 text-sm">ホバーで浮き上がる（影なし）</p>
                             </div>
                             <p class="text-caption mt-2">glass-card クラス標準</p>
                         </div>
@@ -75,22 +106,69 @@
                         </div>
                     </div>
                     
+                    <h3 class="text-white font-medium mb-4">実際の使用例</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <!-- 音別結果アイテムの例 -->
+                            <div class="note-result-item hover-pop">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-4">
+                                        <div class="text-sub-title">ドレミファ</div>
+                                        <div>
+                                            <div class="text-body">目標 440Hz</div>
+                                            <div class="text-body">実音 445Hz</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="text-pitch-deviation-plus">+20¢</div>
+                                        <div class="flex items-center justify-center" style="width: 48px; height: 48px;">
+                                            <i data-lucide="star" class="text-green-300" style="width: 28px; height: 28px;"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-caption mt-2">音別結果アイテム（note-result-item + hover-pop）</p>
+                        </div>
+                    </div>
+                    
                     <h3 class="text-white font-medium mb-4">エフェクト実装例</h3>
                     
                     <div class="code-sample">
-/* ホバーエフェクト実装 */
-.glass-card:hover,
-.btn:hover {
-  transform: translateY(-2px);
-  transition: all 0.3s ease;
+/* === 汎用ホバーエフェクトクラス === */
+.hover-pop {
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-/* グラスモーフィズム */
-.glass-card {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-}</div>
+.hover-pop:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+.hover-lift {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+.hover-glow {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.hover-glow:hover {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* 使用例 */
+&lt;div class="glass-card hover-pop"&gt;...&lt;/div&gt;
+&lt;div class="note-result-item hover-pop"&gt;...&lt;/div&gt;</div>
                     
                     <div style="text-align: center; margin: 1rem 0;">
                         <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
@@ -159,6 +237,79 @@ body::before {
     animation: gradientShift 15s ease infinite;
 }</div>
                     </div>
+                    
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+                <!-- 反射エフェクト -->
+                <section id="reflection-effects" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">✨ 反射エフェクト</h2>
+                    <p class="text-white-70 mb-6">カード上を流れるシマーエフェクト</p>
+                    
+                    <h3 class="text-white font-medium mb-4">Share Card（反射エフェクト付き）</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <div class="glass-card share-card">
+                                <h4 class="text-white font-medium mb-2">反射エフェクト</h4>
+                                <p class="text-white-70 text-sm">11秒間隔で美しい反射がカード上を流れます</p>
+                                <p class="text-white-60 text-xs mt-2">diagonal shimmer effect + グラデーション背景</p>
+                            </div>
+                            <p class="text-caption mt-2">share-card クラス（glass-cardと組み合わせ）</p>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-white font-medium mb-4">エフェクト実装例</h3>
+                    
+                    <div class="code-sample">
+/* Share Card CSS（反射エフェクト付き） */
+.share-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.share-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: rotate(45deg);
+    animation: shimmer 11s infinite;
+}
+
+@keyframes shimmer {
+    0% { 
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 1;
+    }
+    9.1% { 
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+        opacity: 1;
+    }
+    9.2% { 
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+        opacity: 0;
+    }
+    99.9% { 
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 0;
+    }
+    100% { 
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 1;
+    }
+}
+
+/* 使用例 */
+&lt;div class="glass-card share-card"&gt;
+    &lt;h4&gt;反射エフェクト&lt;/h4&gt;
+    &lt;p&gt;美しい反射がカード上を流れます&lt;/p&gt;
+&lt;/div&gt;</div>
                     
                     <div style="text-align: center; margin: 1rem 0;">
                         <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>

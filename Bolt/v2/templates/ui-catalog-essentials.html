@@ -101,28 +101,28 @@
                         
                         <h4 class="text-white-70 font-medium mb-2">一般的なアイコン</h4>
                         <div class="flex items-center gap-4 mb-4">
-                            <i data-lucide="home" class="text-white" style="width: 24px; height: 24px;"></i>
-                            <i data-lucide="settings" class="text-white" style="width: 24px; height: 24px;"></i>
-                            <i data-lucide="mic" class="text-white" style="width: 24px; height: 24px;"></i>
-                            <i data-lucide="play" class="text-white" style="width: 24px; height: 24px;"></i>
+                            <i data-lucide="home" class="text-white icon-md"></i>
+                            <i data-lucide="settings" class="text-white icon-md"></i>
+                            <i data-lucide="mic" class="text-white icon-md"></i>
+                            <i data-lucide="play" class="text-white icon-md"></i>
                         </div>
                         
                         <h4 class="text-white-70 font-medium mb-2">音感精度評価アイコン</h4>
                         <div class="flex items-center gap-4 mb-4">
-                            <i data-lucide="trophy" class="text-yellow-300" style="width: 24px; height: 24px;"></i>
-                            <i data-lucide="star" class="text-green-300" style="width: 24px; height: 24px;"></i>
-                            <i data-lucide="thumbs-up" class="text-blue-300" style="width: 24px; height: 24px;"></i>
-                            <i data-lucide="triangle-alert" class="text-red-300" style="width: 24px; height: 24px;"></i>
+                            <i data-lucide="trophy" class="text-yellow-300 icon-md"></i>
+                            <i data-lucide="star" class="text-green-300 icon-md"></i>
+                            <i data-lucide="thumbs-up" class="text-blue-300 icon-md"></i>
+                            <i data-lucide="triangle-alert" class="text-red-300 icon-md"></i>
                         </div>
                         
                         <h4 class="text-white-70 font-medium mb-2">総合評価グレードアイコン（S-E級）</h4>
                         <div class="flex items-center gap-4 mb-4">
-                            <i data-lucide="crown" class="text-golden-yellow" style="width: 24px; height: 24px;"></i>
-                            <i data-lucide="medal" class="text-gray-300" style="width: 24px; height: 24px;"></i>
-                            <i data-lucide="circle-star" class="text-orange-300" style="width: 24px; height: 24px;"></i>
-                            <i data-lucide="smile" class="text-green-300" style="width: 24px; height: 24px;"></i>
-                            <i data-lucide="meh" class="text-blue-300" style="width: 24px; height: 24px;"></i>
-                            <i data-lucide="frown" class="text-red-300" style="width: 24px; height: 24px;"></i>
+                            <i data-lucide="crown" class="text-golden-yellow icon-md"></i>
+                            <i data-lucide="medal" class="text-gray-300 icon-md"></i>
+                            <i data-lucide="circle-star" class="text-orange-300 icon-md"></i>
+                            <i data-lucide="smile" class="text-green-300 icon-md"></i>
+                            <i data-lucide="meh" class="text-blue-300 icon-md"></i>
+                            <i data-lucide="frown" class="text-red-300 icon-md"></i>
                         </div>
                         
                         <div class="code-sample">&lt;!-- 一般的なアイコン --&gt;
@@ -520,6 +520,15 @@
                             <p class="text-white-60 text-xs">heading-md - &lt;i&gt;アイコン&lt;/i&gt;「評価分布」セット</p>
                         </div>
                         
+                        <!-- 中見出し（上部マージンなし） -->
+                        <div>
+                            <h4 class="heading-md-no-top">
+                                <i data-lucide="bar-chart-3"></i>
+                                評価分布
+                            </h4>
+                            <p class="text-white-60 text-xs">heading-md-no-top - 上部マージンなしバリエーション</p>
+                        </div>
+                        
                         <!-- 大見出し -->
                         <div>
                             <h2 class="heading-lg">
@@ -535,6 +544,7 @@
                             <ul class="text-white-70 text-sm space-y-2">
                                 <li>• <code class="text-blue-300">heading-sm</code>: サブセクション、項目見出し</li>
                                 <li>• <code class="text-blue-300">heading-md</code>: セクションタイトル、機能見出し</li>
+                                <li>• <code class="text-blue-300">heading-md-no-top</code>: 上部マージンなし中見出し</li>
                                 <li>• <code class="text-blue-300">heading-lg</code>: メインタイトル、ページ見出し</li>
                                 <li>• アイコンは自動的に適切なサイズになります</li>
                                 <li>• アイコン色は <code class="text-yellow-300">text-{color}</code> で変更可能</li>
@@ -552,6 +562,11 @@
   &lt;i data-lucide="trending-up"&gt;&lt;/i&gt;
   誤差推移グラフ
 &lt;/h3&gt;
+
+&lt;h4 class="heading-md-no-top"&gt;
+  &lt;i data-lucide="bar-chart-3"&gt;&lt;/i&gt;
+  評価分布
+&lt;/h4&gt;
 
 &lt;h2 class="heading-lg"&gt;
   &lt;i data-lucide="bar-chart-3"&gt;&lt;/i&gt;

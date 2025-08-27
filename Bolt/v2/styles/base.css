@@ -132,6 +132,7 @@ body::before {
 
 /* マージン */
 .m-0 { margin: 0; }
+.mb-0 { margin-bottom: 0; }
 .mb-4 { margin-bottom: 1rem; }
 .mb-6 { margin-bottom: 1.5rem; }
 .mb-8 { margin-bottom: 2rem; }
@@ -235,7 +236,7 @@ body::before {
 /* === bolt-new-design移植: ページヘッダーシステム === */
 .page-header {
   text-align: center;
-  padding: 60px 0 40px;
+  padding: 40px 0 40px;
 }
 
 .page-title {
@@ -246,9 +247,25 @@ body::before {
   text-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
 }
 
+.page-title-no-top {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-white);
+  margin-top: 0;
+  margin-bottom: 16px;
+  text-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+}
+
 .page-subtitle {
   font-size: 1.25rem;
   color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 12px;
+}
+
+.page-subtitle-no-top {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 0;
   margin-bottom: 12px;
 }
 
@@ -258,6 +275,54 @@ body::before {
   max-width: 600px;
   margin: 0 auto;
 }
+
+/* === タイポグラフィ カラーバリエーション === */
+
+/* text-main-title バリエーション (2.25rem, 700) */
+.text-main-title-yellow { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #fde047; }
+.text-main-title-green { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #86efac; }
+.text-main-title-blue { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #93c5fd; }
+.text-main-title-red { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #fca5a5; }
+.text-main-title-purple { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #c4b5fd; }
+
+/* text-section-title バリエーション (1.5rem, 700) */
+.text-section-title-yellow { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #fde047; }
+.text-section-title-green { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #86efac; }
+.text-section-title-blue { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #93c5fd; }
+.text-section-title-red { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #fca5a5; }
+.text-section-title-purple { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #c4b5fd; }
+
+/* 音程偏差表示専用クラス (1.5rem, 700) */
+.text-pitch-deviation-plus { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #3b82f6; } /* 青色 - プラス偏差 */
+.text-pitch-deviation-minus { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #ef4444; } /* 赤色 - マイナス偏差 */
+
+/* text-sub-title バリエーション (1.25rem, 500) */
+.text-sub-title-yellow { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #fde047; }
+.text-sub-title-green { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #86efac; }
+.text-sub-title-blue { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #93c5fd; }
+.text-sub-title-red { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #fca5a5; }
+.text-sub-title-purple { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #c4b5fd; }
+
+/* text-body バリエーション (1rem, 400) */
+.text-body-yellow { font-size: 1rem; line-height: 1.5rem; color: #fde047; }
+.text-body-green { font-size: 1rem; line-height: 1.5rem; color: #86efac; }
+.text-body-blue { font-size: 1rem; line-height: 1.5rem; color: #93c5fd; }
+.text-body-red { font-size: 1rem; line-height: 1.5rem; color: #fca5a5; }
+.text-body-purple { font-size: 1rem; line-height: 1.5rem; color: #c4b5fd; }
+
+/* text-sub-text バリエーション (1rem, 400, 200番台の色) */
+.text-sub-text-yellow { font-size: 1rem; line-height: 1.5rem; color: #fef08a; }
+.text-sub-text-green { font-size: 1rem; line-height: 1.5rem; color: #bbf7d0; }
+.text-sub-text-blue { font-size: 1rem; line-height: 1.5rem; color: #bae6fd; }
+.text-sub-text-red { font-size: 1rem; line-height: 1.5rem; color: #fecaca; }
+.text-sub-text-purple { font-size: 1rem; line-height: 1.5rem; color: #ddd6fe; }
+
+/* text-caption バリエーション (0.875rem, 400, 200番台の色) */
+.text-caption-yellow { font-size: 0.875rem; line-height: 1.25rem; color: #fef08a; }
+.text-caption-green { font-size: 0.875rem; line-height: 1.25rem; color: #bbf7d0; }
+.text-caption-blue { font-size: 0.875rem; line-height: 1.25rem; color: #bae6fd; }
+.text-caption-red { font-size: 0.875rem; line-height: 1.25rem; color: #fecaca; }
+.text-caption-purple { font-size: 0.875rem; line-height: 1.25rem; color: #ddd6fe; }
 
 @media (max-width: 768px) {
   .text-4xl {
@@ -407,6 +472,18 @@ body::before {
   margin-bottom: var(--space-6);
 }
 
+.heading-md-no-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+  color: var(--text-white);
+  margin-top: 0;
+  margin-bottom: var(--space-6);
+}
+
 .heading-md i {
   width: 24px;
   height: 24px;
@@ -492,7 +569,9 @@ body::before {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 14px 24px;
+  padding: 10px 20px;
+  min-height: 36px;
+  min-width: 180px;
   border-radius: 16px;
   font-weight: 600;
   font-size: 0.95rem;
@@ -502,8 +581,11 @@ body::before {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  width: 100%;
-  min-height: 48px;
+}
+
+.btn i {
+  width: 24px;
+  height: 24px;
 }
 
 .btn-large {
@@ -550,18 +632,6 @@ body::before {
   transform: translateY(-2px);
 }
 
-.btn-premium {
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
-  color: #0f172a;
-  border: 1px solid rgba(251, 191, 36, 0.3);
-  box-shadow: 0 4px 20px rgba(251, 191, 36, 0.3);
-}
-
-.btn-premium:hover {
-  background: linear-gradient(135deg, #fcd34d, #fbbf24);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(251, 191, 36, 0.4);
-}
 
 /* --- プログレスバー --- */
 .progress-bar {
@@ -674,11 +744,6 @@ body::before {
   font-size: 0.875rem;
 }
 
-.footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 1.5rem;
-  margin-top: 1.5rem;
-}
 
 .footer-copyright {
   color: rgba(255, 255, 255, 0.6);
@@ -787,21 +852,97 @@ body::before {
 }
 
 /* === bolt-new-design移植: 結果表示レイアウト（v2対応版） === */
-.rank-section {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-8);
-  margin-bottom: var(--space-10);
-  padding-bottom: var(--space-8);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+/* === 音感精度評価アイコンバッジ === */
+.accuracy-badge {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    position: relative;
 }
 
-@media (max-width: 768px) {
-  .rank-section {
-    flex-direction: column;
-    gap: var(--space-5);
-  }
+.accuracy-badge-excellent {
+    background: rgba(251, 191, 36, 0.2);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.accuracy-badge-good {
+    background: rgba(34, 197, 94, 0.2);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.accuracy-badge-pass {
+    background: rgba(96, 165, 250, 0.2);
+    border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.accuracy-badge-practice {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.accuracy-icon {
+    width: 64px;
+    height: 64px;
+}
+
+/* アイコン位置微調整 */
+.accuracy-icon-thumbsup {
+    transform: translateY(-2px) translateX(2px);
+}
+
+.accuracy-icon-triangle {
+    transform: translateY(-3px);
+}
+
+/* === 汎用ホバーエフェクトクラス === */
+.hover-pop {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.hover-pop:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+.hover-lift {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+.hover-glow {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.hover-glow:hover {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* 音別結果アイテム */
+.note-result-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.note-result-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* === bolt-new-design移植: インタラクティブ要素 === */

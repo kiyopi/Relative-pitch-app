@@ -1,6 +1,47 @@
 /* ui-catalog.css - UIカタログ専用スタイル */
 /* 🚨 注意: 親セクションに干渉しないよう名前空間を使用 */
 
+/* === Share Card CSS（反射エフェクト付き） === */
+.share-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.share-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: rotate(45deg);
+    animation: shimmer 11s infinite;
+}
+
+@keyframes shimmer {
+    0% { 
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 1;
+    }
+    9.1% { 
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+        opacity: 1;
+    }
+    9.2% { 
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+        opacity: 0;
+    }
+    99.9% { 
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 0;
+    }
+    100% { 
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 1;
+    }
+}
+
 /* === UIカタログ専用スタイル（.ui-catalog 名前空間内でのみ適用） === */
 
 /* カタログセクション */
@@ -11,6 +52,66 @@
     border-radius: var(--radius-2xl);
     border: 1px solid rgba(255, 255, 255, 0.1);
     scroll-margin-top: 2rem;
+}
+
+/* UIカタログ共通コンポーネント */
+.ui-catalog .component-item {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 2rem;
+}
+
+.ui-catalog .component-grid {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.ui-catalog .grid-cols-1 {
+    grid-template-columns: 1fr;
+}
+
+.ui-catalog .grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.ui-catalog .grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.ui-catalog .grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+@media (min-width: 768px) {
+    .ui-catalog .md\:grid-cols-2 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .ui-catalog .md\:grid-cols-3 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .ui-catalog .md\:grid-cols-4 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .ui-catalog .grid-cols-6 {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+.ui-catalog .code-sample {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 1.5rem;
+    font-family: 'Courier New', monospace;
+    white-space: pre;
+    overflow-x: auto;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 /* UIカタログ表示用コンポーネント（CSS変数活用） */

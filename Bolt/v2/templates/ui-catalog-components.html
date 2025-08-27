@@ -39,6 +39,66 @@
             <!-- メインコンテンツエリア -->
             <main id="catalog-content">
                 
+                <!-- ページヘッダーシステム -->
+                <section id="page-headers" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">📄 ページヘッダー</h2>
+                    <p class="text-white-70 mb-6">統一されたページヘッダーレイアウトシステム</p>
+                    
+                    <h3 class="text-white font-medium mb-4">完全なヘッダー構造</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <div class="page-header" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;">
+                                <div class="page-header-content">
+                                    <div class="page-header-icon-wrapper">
+                                        <div class="page-header-icon gradient-catalog-purple">
+                                            <i data-lucide="file-chart-column-increasing" class="text-white" data-stroke-width="2" style="width: 48px; height: 48px;"></i>
+                                        </div>
+                                    </div>
+                                    <h1 class="page-title-no-top">総合評価</h1>
+                                    <p class="page-subtitle-no-top text-green-200">8セッション (64音) の総合評価</p>
+                                    <p class="page-description text-blue-200">ランダム基音モードの結果</p>
+                                </div>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;div class="page-header"&gt;
+    &lt;div class="page-header-content"&gt;
+        &lt;div class="page-header-icon-wrapper"&gt;
+            &lt;div class="page-header-icon gradient-catalog-purple"&gt;
+                &lt;i data-lucide="file-chart-column-increasing" 
+                   class="text-white" 
+                   data-stroke-width="2" 
+                   style="width: 48px; height: 48px;"&gt;&lt;/i&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;h1 class="page-title-no-top"&gt;総合評価&lt;/h1&gt;
+        &lt;p class="page-subtitle-no-top text-green-200"&gt;8セッション (64音) の総合評価&lt;/p&gt;
+        &lt;p class="page-description text-blue-200"&gt;ランダム基音モードの結果&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-white font-medium mb-4">使用ガイドライン</h3>
+                    <div class="component-item">
+                        <div class="bg-white/5 rounded-lg p-4">
+                            <ul class="text-white-70 text-sm space-y-2">
+                                <li>• <code class="text-blue-300">page-header</code>: ヘッダー全体（padding: 40px 0, text-align: center）</li>
+                                <li>• <code class="text-blue-300">page-header-content</code>: コンテンツ配置（flex column, gap: 0.5rem）</li>
+                                <li>• <code class="text-blue-300">page-header-icon-wrapper</code>: アイコンラッパー（center配置, margin-bottom: 0.5rem）</li>
+                                <li>• <code class="text-blue-300">page-title-no-top</code>: 上部マージンなしタイトル</li>
+                                <li>• <code class="text-blue-300">page-subtitle-no-top</code>: 上部マージンなしサブタイトル + 色クラス組み合わせ可能</li>
+                                <li>• <code class="text-blue-300">page-description</code>: 説明文 + 色クラス組み合わせ可能</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
                 <!-- ページヘッダーアイコン -->
                 <section id="page-header-icons" class="catalog-section">
                     <h2 class="text-2xl font-bold text-white mb-4">🎯 ページヘッダーアイコン</h2>
@@ -47,7 +107,7 @@
                     <div class="component-grid grid-cols-2 md:grid-cols-4">
                         <div class="component-item text-center">
                             <div class="page-header-icon gradient-catalog-purple">
-                                <i data-lucide="file-chart-column-increasing" class="icon-2xl text-white" data-stroke-width="2"></i>
+                                <i data-lucide="file-chart-column-increasing" class="text-white" data-stroke-width="2" style="width: 48px; height: 48px;"></i>
                             </div>
                             <h3 class="text-white font-medium">紫グラデーション</h3>
                             <p class="text-white-60 text-sm">総合評価ページ</p>
@@ -55,7 +115,7 @@
                         
                         <div class="component-item text-center">
                             <div class="page-header-icon gradient-catalog-blue">
-                                <i data-lucide="mic" class="icon-2xl text-white" data-stroke-width="2"></i>
+                                <i data-lucide="mic" class="text-white" data-stroke-width="2" style="width: 48px; height: 48px;"></i>
                             </div>
                             <h3 class="text-white font-medium">青グラデーション</h3>
                             <p class="text-white-60 text-sm">マイクテストページ</p>
@@ -63,7 +123,7 @@
                         
                         <div class="component-item text-center">
                             <div class="page-header-icon gradient-catalog-green">
-                                <i data-lucide="target" class="icon-2xl text-white" data-stroke-width="2"></i>
+                                <i data-lucide="target" class="text-white" data-stroke-width="2" style="width: 48px; height: 48px;"></i>
                             </div>
                             <h3 class="text-white font-medium">緑グラデーション</h3>
                             <p class="text-white-60 text-sm">トレーニングページ</p>
@@ -71,7 +131,7 @@
                         
                         <div class="component-item text-center">
                             <div class="page-header-icon gradient-catalog-orange">
-                                <i data-lucide="activity" class="icon-2xl text-white" data-stroke-width="2"></i>
+                                <i data-lucide="activity" class="text-white" data-stroke-width="2" style="width: 48px; height: 48px;"></i>
                             </div>
                             <h3 class="text-white font-medium">オレンジグラデーション</h3>
                             <p class="text-white-60 text-sm">記録ページ</p>
@@ -81,8 +141,9 @@
                     <div class="code-sample">
 &lt;div class="page-header-icon gradient-catalog-purple"&gt;
   &lt;i data-lucide="file-chart-column-increasing" 
-     class="icon-2xl text-white" 
-     data-stroke-width="2"&gt;&lt;/i&gt;
+     class="text-white" 
+     data-stroke-width="2" 
+     style="width: 48px; height: 48px;"&gt;&lt;/i&gt;
 &lt;/div&gt;</div>
                     
                     <div style="text-align: center; margin: 1rem 0;">
@@ -97,7 +158,7 @@
                     
                     <h3 class="text-white font-medium mb-4">基本カード</h3>
                     
-                    <div class="component-grid grid-cols-1 md:grid-cols-2">
+                    <div class="component-grid grid-cols-1">
                         <div class="component-item">
                             <div class="glass-card mb-4">
                                 <h4 class="text-white font-medium mb-2">ガラスカード</h4>
@@ -114,7 +175,7 @@
                         
                     <h3 class="text-white font-medium mb-4">サイズバリエーション</h3>
                     
-                    <div class="component-grid grid-cols-1 md:grid-cols-2">
+                    <div class="component-grid grid-cols-1">
                         <div class="component-item">
                             <div class="space-y-3">
                                 <div class="glass-card-sm">
@@ -149,31 +210,17 @@
                     
                     <div class="component-grid grid-cols-1">
                         <div class="component-item">
-                            <div class="space-y-4">
-                                <div>
-                                    <p class="text-white-70 text-sm mb-2">25%完了</p>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill gradient-catalog-green" style="width: 25%;"></div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <p class="text-white-70 text-sm mb-2">60%完了</p>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill gradient-catalog-green" style="width: 60%;"></div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <p class="text-white-70 text-sm mb-2">100%完了</p>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill gradient-catalog-green" style="width: 100%;"></div>
-                                    </div>
+                            <div>
+                                <p class="text-white-70 text-sm mb-2">60%完了</p>
+                                <div class="progress-bar">
+                                    <div class="progress-fill gradient-catalog-green" style="width: 60%;"></div>
                                 </div>
                             </div>
                             
                             <div class="code-sample">
 &lt;!-- 基本プログレスバー（緑グラデーション） --&gt;
 &lt;div class="progress-bar"&gt;
-    &lt;div class="progress-fill gradient-catalog-green" style="width: 75%;"&gt;&lt;/div&gt;
+    &lt;div class="progress-fill gradient-catalog-green" style="width: 60%;"&gt;&lt;/div&gt;
 &lt;/div&gt;</div>
                         </div>
                     </div>
@@ -267,18 +314,14 @@
                     <div class="component-grid grid-cols-1">
                         <div class="component-item">
                             <footer class="footer-base">
-                                <div class="footer-bottom">
-                                    <p class="footer-copyright">© 2024 8va相対音感トレーニングアプリ</p>
-                                    <p class="footer-tagline">音楽の新しい扉を開こう</p>
-                                </div>
+                                <p class="footer-copyright">© 2024 8va相対音感トレーニングアプリ</p>
+                                <p class="footer-tagline">音楽の新しい扉を開こう</p>
                             </footer>
                             
                             <div class="code-sample">
 &lt;footer class="footer-base"&gt;
-    &lt;div class="footer-bottom"&gt;
-        &lt;p class="footer-copyright"&gt;© 2024 8va相対音感トレーニングアプリ&lt;/p&gt;
-        &lt;p class="footer-tagline"&gt;音楽の新しい扉を開こう&lt;/p&gt;
-    &lt;/div&gt;
+    &lt;p class="footer-copyright"&gt;© 2024 8va相対音感トレーニングアプリ&lt;/p&gt;
+    &lt;p class="footer-tagline"&gt;音楽の新しい扉を開こう&lt;/p&gt;
 &lt;/footer&gt;</div>
                         </div>
                     </div>

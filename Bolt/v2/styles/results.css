@@ -1,5 +1,159 @@
 /* results.css - 統合評価ページ専用スタイル */
 
+/* Share Card CSS（反射エフェクト付き） */
+.share-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.share-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: rotate(45deg);
+    animation: shimmer 11s infinite;
+}
+
+@keyframes shimmer {
+    0% { 
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 1;
+    }
+    9.1% { 
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+        opacity: 1;
+    }
+    9.2% { 
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+        opacity: 0;
+    }
+    99.9% { 
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 0;
+    }
+    100% { 
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 1;
+    }
+}
+
+/* rank-sectionスタイル（新横一列レイアウト） */
+.rank-section {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rank-mode {
+    margin-bottom: 24px;
+}
+
+.rank-section .mode-title {
+    font-size: 1.6rem !important;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+}
+
+.rank-content-row {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+}
+
+.rank-icon {
+    flex-shrink: 0;
+}
+
+.rank-stats-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+}
+
+.rank-stat-item {
+    text-align: center;
+    min-width: 80px;
+}
+
+.stat-value-rank {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+    transition: transform 0.2s ease;
+    line-height: 1;
+}
+
+.stat-value-rank.grade-value {
+    font-size: 2.0rem;
+    color: #ffffff; /* グレードは白色 */
+}
+
+.stat-value-rank.avg-error {
+    color: #fbbf24; /* 平均誤差もグレードと同じ黄色 */
+}
+
+.stat-label-rank {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.1;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.rank-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.rank-circle-icon {
+    width: 64px;
+    height: 64px;
+}
+
+@media (max-width: 768px) {
+    .rank-content-row {
+        gap: 20px;
+    }
+    
+    .rank-stats-row {
+        gap: 20px;
+    }
+    
+    .rank-circle {
+        width: 90px;
+        height: 90px;
+    }
+    
+    .rank-circle-icon {
+        width: 54px !important;
+        height: 54px !important;
+    }
+    
+    .stat-value-rank {
+        font-size: 1.5rem;
+    }
+    
+    .stat-value-rank.grade-value {
+        font-size: 2rem;
+    }
+}
+
 /* 機能比較テーブル */
 .comparison-header {
     display: flex;
@@ -79,37 +233,6 @@
     color: white;
     font-weight: 600;
     margin: 0;
-}
-
-/* プレミアムCTA */
-.premium-cta {
-    text-align: center;
-}
-
-.btn-premium {
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.btn-premium:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
-}
-
-.premium-cta-note {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 0.75rem;
-    margin-top: 0.5rem;
 }
 
 /* 総合グレード表示 */
@@ -631,6 +754,41 @@
         width: 20px;
         height: 20px;
     }
+}
+
+/* ランク取得メッセージの下マージン調整 */
+.rank-achievement-message {
+    margin-bottom: 0;
+}
+
+/* rank-content-rowの下の横線 */
+.rank-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 32px 0 24px 0;
+}
+
+/* シェアセクション */
+.rank-share-section {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.rank-share-section h3 {
+    margin-bottom: 20px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.rank-share-section .share-buttons {
+    display: flex;
+    gap: 1.2rem;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 /* 総合評価グレードアイコンシステム */
