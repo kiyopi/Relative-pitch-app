@@ -6,6 +6,7 @@ class CatalogNavigation {
         this.catalogPages = [
             { file: 'ui-catalog-index.html', name: 'インデックス', color: '#60a5fa' },
             { file: 'ui-catalog-essentials.html', name: 'エッセンシャル', color: '#fbbf24' },
+            { file: 'ui-catalog-top.html', name: 'トップページ', color: '#10b981' },
             { file: 'ui-catalog-components.html', name: 'コンポーネント', color: '#34d399' },
             { file: 'ui-catalog-results-session.html', name: 'セッション評価', color: '#a78bfa' },
             { file: 'ui-catalog-results-overall.html', name: '総合評価', color: '#fb923c' },

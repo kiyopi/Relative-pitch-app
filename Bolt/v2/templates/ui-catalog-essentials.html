@@ -173,6 +173,54 @@
 &lt;i data-lucide="home" class="text-white"&gt;&lt;/i&gt;
 &lt;i data-lucide="settings" class="text-white-60"&gt;&lt;/i&gt;</div>
                     </div>
+                    
+                    <!-- アイコンリンク・ボタン -->
+                    <h3 class="text-white font-medium mb-4">🔗 アイコンリンク・ボタン</h3>
+                    
+                    <div class="component-item">
+                        <div class="flex items-center gap-4 mb-4">
+                            <a href="#" class="nav-link" title="トレーニング記録">
+                                <i data-lucide="history" class="icon-md"></i>
+                            </a>
+                            <a href="#" class="nav-link" title="総合評価">
+                                <i data-lucide="bar-chart-3" class="icon-md text-blue-300"></i>
+                            </a>
+                            <button class="nav-button" title="設定">
+                                <i data-lucide="settings" class="icon-md"></i>
+                            </button>
+                            <button class="nav-button" title="共有">
+                                <i data-lucide="share" class="icon-md"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="code-sample">&lt;!-- ナビゲーション用アイコンリンク・ボタン --&gt;
+&lt;a href="#" class="nav-link" title="トレーニング記録"&gt;
+    &lt;i data-lucide="history" class="icon-md"&gt;&lt;/i&gt;
+&lt;/a&gt;
+
+&lt;a href="#" class="nav-link" title="総合評価"&gt;
+    &lt;i data-lucide="bar-chart-3" class="icon-md text-blue-300"&gt;&lt;/i&gt;
+&lt;/a&gt;
+
+&lt;button class="nav-button" title="設定"&gt;
+    &lt;i data-lucide="settings" class="icon-md"&gt;&lt;/i&gt;
+&lt;/button&gt;
+
+&lt;button class="nav-button" title="共有"&gt;
+    &lt;i data-lucide="share" class="icon-md"&gt;&lt;/i&gt;
+&lt;/button&gt;</div>
+                        
+                        <div class="mt-4 bg-white/5 rounded-lg p-4">
+                            <h4 class="text-white font-medium mb-3">💡 使用ガイドライン</h4>
+                            <ul class="text-white-70 text-sm space-y-2">
+                                <li>• <code class="text-blue-300">nav-link</code>: リンク用（ページ遷移）</li>
+                                <li>• <code class="text-blue-300">nav-button</code>: ボタン用（JavaScript処理）</li>
+                                <li>• 両方とも透明背景・統一スタイル</li>
+                                <li>• ホバーで白色に変化</li>
+                                <li>• アイコンサイズは <code class="text-yellow-300">icon-md</code> (24px) 推奨</li>
+                            </ul>
+                        </div>
+                    </div>
                     <div style="text-align: center; margin: 1rem 0;">
                         <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
                     </div>

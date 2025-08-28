@@ -1,13 +1,13 @@
 /* ui-catalog.css - UIカタログ専用スタイル */
 /* 🚨 注意: 親セクションに干渉しないよう名前空間を使用 */
 
-/* === Share Card CSS（反射エフェクト付き） === */
-.share-card {
+/* === Share Card CSS（反射エフェクト付き） - 名前空間保護 === */
+.ui-catalog .share-card {
     position: relative;
     overflow: hidden;
 }
 
-.share-card::before {
+.ui-catalog .share-card::before {
     content: '';
     position: absolute;
     top: -50%;
@@ -293,52 +293,6 @@
 
 /* === UIカタログ専用エフェクト === */
 
-/* Share Card デモ用反射エフェクト - カタログ内のみ */
-.ui-catalog .share-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-    backdrop-filter: blur(10px);
-    border-radius: var(--radius-2xl);
-    padding: var(--space-8);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.ui-catalog .share-card::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    transform: rotate(45deg);
-    animation: shimmer 11s infinite;
-}
-
-@keyframes shimmer {
-    0% { 
-        transform: translateX(-100%) translateY(-100%) rotate(45deg);
-        opacity: 1;
-    }
-    9.1% { 
-        transform: translateX(100%) translateY(100%) rotate(45deg);
-        opacity: 1;
-    }
-    9.2% { 
-        transform: translateX(100%) translateY(100%) rotate(45deg);
-        opacity: 0;
-    }
-    99.9% { 
-        transform: translateX(-100%) translateY(-100%) rotate(45deg);
-        opacity: 0;
-    }
-    100% { 
-        transform: translateX(-100%) translateY(-100%) rotate(45deg);
-        opacity: 1;
-    }
-}
 
 /* クイックアクセスアイテム */
 .ui-catalog .quick-access-item {

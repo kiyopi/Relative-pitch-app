@@ -5,99 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>8va相対音感トレーニング - ページタイトル</title>
+    <title>8va相対音感トレーニング - {{PAGE_TITLE}}</title>
+    
+    <!-- スタイルシート -->
     <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/results.css"><!-- 結果表示専用スタイル（開発効率優先・将来分離予定） -->
+    
+    <!-- フォント -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <!-- Lucide Icons -->
+    <!-- アイコンライブラリ -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <!-- Chart.js（必要に応じて） -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script> -->
     
 </head>
 <body>
-    <!-- Debug Navigation -->
-    <nav class="debug-nav">
-        <h4>Debug Nav</h4>
-        <div class="nav-grid">
-            <a href="index.html" class="nav-btn">
-                <i data-lucide="home" style="width: 12px; height: 12px;"></i>
-                <span>ホーム</span>
-            </a>
-            <a href="mic-test.html" class="nav-btn">
-                <i data-lucide="mic" style="width: 12px; height: 12px;"></i>
-                <span>マイクテスト</span>
-            </a>
-            <a href="training.html" class="nav-btn">
-                <i data-lucide="target" style="width: 12px; height: 12px;"></i>
-                <span>トレーニング</span>
-            </a>
-            <a href="session-result.html" class="nav-btn">
-                <i data-lucide="check-circle" style="width: 12px; height: 12px;"></i>
-                <span>セッション結果</span>
-            </a>
-            <a href="results-freemium-basic.html" class="nav-btn">
-                <i data-lucide="trophy" style="width: 12px; height: 12px;"></i>
-                <span>総合結果（無料）</span>
-            </a>
-            <a href="results-premium-overview.html" class="nav-btn current">
-                <i data-lucide="crown" style="width: 12px; height: 12px;"></i>
-                <span>総合評価（有料）</span>
-            </a>
-            <a href="results-premium-analysis.html" class="nav-btn">
-                <i data-lucide="bar-chart-3" style="width: 12px; height: 12px;"></i>
-                <span>詳細分析（有料）</span>
-            </a>
-        </div>
-    </nav>
-
     <div class="min-h-screen p-6">
         <div class="container">
-            <!-- Status Badge -->
-            <div class="premium-badge" style="display: none;">
-                <i data-lucide="crown" style="width: 16px; height: 16px;"></i>
-                <span>PREMIUM</span>
-            </div>
-            
-            <!-- Header -->
-            <div class="text-center" style="margin-bottom: 2rem;">
-                <div class="flex justify-center" style="margin-bottom: 1.5rem;">
-                    <div class="page-header-icon page-header-icon-purple">
-                        <i data-lucide="trophy" class="icon-2xl text-white" data-stroke-width="2"></i>
+            <!-- ヘッダー -->
+            <header class="page-header">
+                <div class="page-header-content">
+                    <div class="page-header-icon-wrapper">
+                        <div class="page-header-icon {{HEADER_GRADIENT_CLASS}}">
+                            <i data-lucide="{{HEADER_ICON}}" class="text-white" data-stroke-width="2" style="width: 48px; height: 48px;"></i>
+                        </div>
                     </div>
+                    <h1 class="page-title-no-top">{{PAGE_TITLE}}</h1>
+                    <p class="page-subtitle-no-top text-green-200">{{PAGE_SUBTITLE}}</p>
+                    <p class="page-description text-blue-200">{{PAGE_DESCRIPTION}}</p>
                 </div>
-                <h1 class="text-4xl font-bold text-white" style="margin-bottom: 1rem;">ページタイトル</h1>
-                <p class="text-green-200 text-xl" style="margin-bottom: 1.5rem;">メインサブタイトル</p>
-                <p class="text-blue-200">ページの説明文がここに入ります</p>
-            </div>
+            </header>
 
-            <!-- メインコンテンツエリア（各ページで異なる） -->
+            <!-- メインコンテンツエリア -->
             <main class="main-content">
-                <!-- ここに各ページ固有のコンテンツが入る -->
+                {{MAIN_CONTENT}}
             </main>
 
-            <!-- フッターナビゲーション -->
-            <footer class="footer-navigation">
-                <div class="nav-buttons">
-                    <a href="index.html" class="btn btn-secondary">
-                        <i data-lucide="home"></i>
-                        ホームに戻る
-                    </a>
-                    <a href="training.html" class="btn btn-primary">
-                        <i data-lucide="refresh-cw"></i>
-                        再チャレンジ
-                    </a>
+            <!-- フッター -->
+            <footer class="footer-base">
+                <div class="footer-bottom">
+                    <p class="footer-copyright">© 2024 8va相対音感トレーニングアプリ</p>
+                    <p class="footer-tagline">音楽の新しい扉を開こう</p>
                 </div>
             </footer>
         </div>
     </div>
 
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <!-- JavaScript -->
     <script>
-        lucide.createIcons();
+        // Lucideアイコンを初期化
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+        
+        // {{CUSTOM_JAVASCRIPT}}
     </script>
 </body>
 </html>
