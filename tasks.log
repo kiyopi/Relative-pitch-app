@@ -990,3 +990,20 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-28 18:20:32] コミット: UIカタログ大幅リファクタリング完了: アーキテクチャ統一とファイル整理
+
+- ui-catalog-essentials.html: コンポーネント統合とクリーン化
+- ui-catalog-index.html: インデックス構造最適化
+- ui-catalog.css/.js: スタイル・機能統合による軽量化
+- ui-catalog-top.html: 新規トップページテンプレート追加
+- base-template.html: v2環境基盤テンプレート改良
+
+ファイル整理:
+- 重複テンプレートファイル削除（base/layouts/results）
+- アーキテクチャドキュメント更新
+- 開発プロセス文書統合
+- 一時的分析ファイル追加
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
