@@ -1527,7 +1527,7 @@ body::before {
 }
 
 .mode-title {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: #ffffff;
   margin-top: 0;
@@ -1584,7 +1584,8 @@ body::before {
 }
 
 .theory-section {
-  padding: 40px 0;
+  padding: 0 0 28px 0;
+  margin-top: 0;
 }
 
 .theory-card {
@@ -1592,7 +1593,7 @@ body::before {
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
-  padding: 32px;
+  padding: 20px;
   display: flex;
   align-items: center;
   gap: 24px;
@@ -1612,10 +1613,15 @@ body::before {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.theory-content {
+  padding-top: 12px;
+}
+
 .theory-content h4 {
   font-size: 1.25rem;
   font-weight: 600;
   color: #ffffff;
+  margin-top: 0;
   margin-bottom: 8px;
 }
 
