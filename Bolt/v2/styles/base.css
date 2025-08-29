@@ -1226,6 +1226,51 @@ body::before {
   50% { transform: translateY(-10px); }
 }
 
+
+/* 進行バーセクション統一システム */
+.progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* セッション完了時：ボタン追加 */
+.progress-section.completed {
+  /* 基本レイアウトは共通 */
+}
+
+.progress-content {
+  flex: 1;
+}
+
+.progress-label {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+}
+
+.progress-action {
+  white-space: nowrap;
+  align-self: center;
+}
+
+/* PC表示（768px以上）でレイアウト変更 */
+@media (min-width: 768px) {
+  .progress-section.completed {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .progress-section.completed .progress-action {
+    align-self: auto;
+  }
+  
+  .progress-section.completed .progress-label {
+    text-align: left;
+  }
+}
+
 /* === bolt-new-design移植: 高度なアニメーション === */
 @keyframes shine {
   0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }

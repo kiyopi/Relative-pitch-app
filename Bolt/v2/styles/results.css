@@ -1,5 +1,149 @@
 /* results.css - 統合評価ページ専用スタイル */
 
+/* ランク説明ポップオーバー - 画面中央配置 */
+.rank-popover {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+}
+
+.rank-popover.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.rank-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 8px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.rank-item:last-child {
+    margin-bottom: 0;
+}
+
+/* ？アイコン - グラススタイル */
+.rank-info-btn {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: all 0.2s ease;
+}
+
+.rank-info-btn:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    transform: scale(1.1);
+}
+
+/* ヘルプボタン位置調整 */
+.help-btn-position {
+    position: absolute;
+    bottom: -12px;
+    right: -12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.help-icon-btn {
+    position: absolute;
+    bottom: -12px;
+    right: -12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: all 0.2s ease;
+}
+
+.help-icon-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+/* ランク名スタイル */
+.rank-name {
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.rank-name-excellent {
+    color: #fcd34d;
+}
+
+.rank-name-good {
+    color: #86efac;
+}
+
+.rank-name-pass {
+    color: #7dd3fc;
+}
+
+.rank-name-practice {
+    color: #fca5a5;
+}
+
+.rank-range {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.75rem;
+}
+
+.popover-title {
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+/* 音別結果アイテム */
+.note-result-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: background 0.2s ease;
+}
+
+.note-result-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* カウントテキスト */
+.count-text {
+    min-width: 20px;
+    text-align: right;
+}
+
 /* Share Card CSS（反射エフェクト付き） */
 .share-card {
     position: relative;
