@@ -128,14 +128,18 @@
 
 /* 音別結果アイテム */
 .note-result-item {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--glass-bg);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
     border-radius: 12px;
     padding: 1rem;
-    transition: background 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .note-result-item:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--glass-hover);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-4px);
 }
 
 /* カウントテキスト */

@@ -46,7 +46,7 @@
             </div>
 
             <!-- セッション概要 -->
-            <div class="glass-card mb-8">
+            <div class="glass-card">
                 <div class="text-center mb-10 pb-8 border-b border-white/10">
                     <div class="flex flex-col gap-6 items-center">
                         <!-- トロフィーアイコン（中央） -->
@@ -164,10 +164,179 @@
             </div>
 
             <!-- 詳細分析 -->
-            <div class="glass-card mb-8">
-                <h3 class="text-xl font-medium text-white mb-6 text-center">詳細分析</h3>
+            <div class="glass-card">
+                <h3 class="heading-md-no-top">
+                    <i data-lucide="microscope" style="width: 24px; height: 24px;"></i>
+                    <span>詳細分析</span>
+                </h3>
                 <div class="space-y-2" id="note-results">
-                    <!-- Note results will be populated by JavaScript -->
+                    <!-- ド -->
+                    <div class="note-result-item">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div>
+                                    <div class="text-sub-title">ド</div>
+                                </div>
+                                <div>
+                                    <div class="text-body">目標 262Hz</div>
+                                    <div class="text-body">実音 260Hz</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="text-pitch-deviation-minus">-8¢</div>
+                                <div class="flex items-center justify-center ">
+                                    <i data-lucide="trophy" class="text-yellow-300" style="width: 28px; height: 28px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- レ -->
+                    <div class="note-result-item">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div>
+                                    <div class="text-sub-title">レ</div>
+                                </div>
+                                <div>
+                                    <div class="text-body">目標 294Hz</div>
+                                    <div class="text-body">実音 298Hz</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="text-pitch-deviation-plus">+15¢</div>
+                                <div class="flex items-center justify-center ">
+                                    <i data-lucide="star" class="text-green-300" style="width: 28px; height: 28px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ミ -->
+                    <div class="note-result-item">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div>
+                                    <div class="text-sub-title">ミ</div>
+                                </div>
+                                <div>
+                                    <div class="text-body">目標 330Hz</div>
+                                    <div class="text-body">実音 335Hz</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="text-pitch-deviation-plus">+25¢</div>
+                                <div class="flex items-center justify-center ">
+                                    <i data-lucide="thumbs-up" class="text-blue-300" style="width: 28px; height: 28px; transform: translateY(-2px) translateX(2px);"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ファ -->
+                    <div class="note-result-item">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div>
+                                    <div class="text-sub-title">ファ</div>
+                                </div>
+                                <div>
+                                    <div class="text-body">目標 349Hz</div>
+                                    <div class="text-body">実音 348Hz</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="text-pitch-deviation-minus">-3¢</div>
+                                <div class="flex items-center justify-center ">
+                                    <i data-lucide="trophy" class="text-yellow-300" style="width: 28px; height: 28px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ソ -->
+                    <div class="note-result-item">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div>
+                                    <div class="text-sub-title">ソ</div>
+                                </div>
+                                <div>
+                                    <div class="text-body">目標 392Hz</div>
+                                    <div class="text-body">実音 395Hz</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="text-pitch-deviation-plus">+12¢</div>
+                                <div class="flex items-center justify-center ">
+                                    <i data-lucide="star" class="text-green-300" style="width: 28px; height: 28px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ラ -->
+                    <div class="note-result-item">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div>
+                                    <div class="text-sub-title">ラ</div>
+                                </div>
+                                <div>
+                                    <div class="text-body">目標 440Hz</div>
+                                    <div class="text-body">実音 450Hz</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="text-pitch-deviation-plus">+38¢</div>
+                                <div class="flex items-center justify-center ">
+                                    <i data-lucide="triangle-alert" class="text-red-300" style="width: 28px; height: 28px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- シ -->
+                    <div class="note-result-item">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div>
+                                    <div class="text-sub-title">シ</div>
+                                </div>
+                                <div>
+                                    <div class="text-body">目標 494Hz</div>
+                                    <div class="text-body">実音 488Hz</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="text-pitch-deviation-minus">-20¢</div>
+                                <div class="flex items-center justify-center ">
+                                    <i data-lucide="thumbs-up" class="text-blue-300" style="width: 28px; height: 28px; transform: translateY(-2px) translateX(2px);"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ド（高音） -->
+                    <div class="note-result-item">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div>
+                                    <div class="text-sub-title">ド</div>
+                                </div>
+                                <div>
+                                    <div class="text-body">目標 523Hz</div>
+                                    <div class="text-body">実音 527Hz</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="text-pitch-deviation-plus">+13¢</div>
+                                <div class="flex items-center justify-center ">
+                                    <i data-lucide="star" class="text-green-300" style="width: 28px; height: 28px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -185,154 +354,7 @@
         </div>
     </div>
 
-    <script>
-        // Mock session data for current session
-        const currentSessionData = {
-            session: 2,
-            baseNote: 'C4',
-            totalSessions: 8,
-            noteResults: [
-                { noteIndex: 0, noteName: 'ド', targetFrequency: 261.63, userFrequency: 265.2, centError: 24, isCorrect: true },
-                { noteIndex: 1, noteName: 'レ', targetFrequency: 293.66, userFrequency: 290.1, centError: -21, isCorrect: true },
-                { noteIndex: 2, noteName: 'ミ', targetFrequency: 329.63, userFrequency: 335.8, centError: 32, isCorrect: true },
-                { noteIndex: 3, noteName: 'ファ', targetFrequency: 349.23, userFrequency: 348.0, centError: -6, isCorrect: true },
-                { noteIndex: 4, noteName: 'ソ', targetFrequency: 392.00, userFrequency: 388.5, centError: -16, isCorrect: true },
-                { noteIndex: 5, noteName: 'ラ', targetFrequency: 440.00, userFrequency: 445.2, centError: 20, isCorrect: true },
-                { noteIndex: 6, noteName: 'シ', targetFrequency: 493.88, userFrequency: 490.0, centError: -14, isCorrect: true },
-                { noteIndex: 7, noteName: 'ド\'', targetFrequency: 523.25, userFrequency: 528.6, centError: 18, isCorrect: true }
-            ]
-        };
-
-        // Helper function to create Lucide icons
-        function lucideIcon(iconName, colorClass = '', sizeClass = 'icon-lg') {
-            return `<i data-lucide="${iconName}" class="${colorClass} ${sizeClass}"></i>`;
-        }
-
-        // Get evaluation level for a note
-        function getEvaluationLevel(centError) {
-            const absError = Math.abs(centError);
-            if (absError <= 15) return { level: 'excellent', color: 'text-yellow-300', label: 'Excellent', icon: lucideIcon('trophy', 'text-yellow-300', 'icon-lg') };
-            if (absError <= 25) return { level: 'good', color: 'text-green-300', label: 'Good', icon: lucideIcon('star', 'text-green-300', 'icon-lg') };
-            if (absError <= 40) return { level: 'pass', color: 'text-blue-300', label: 'Pass', icon: lucideIcon('thumbs-up', 'text-blue-300', 'icon-lg') };
-            return { level: 'practice', color: 'text-red-300', label: 'Practice', icon: lucideIcon('triangle-alert', 'text-red-300', 'icon-lg') };
-        }
-
-        // Display note results
-        function displayNoteResults() {
-            const noteResults = document.getElementById('note-results');
-            noteResults.innerHTML = '';
-
-            currentSessionData.noteResults.forEach((note) => {
-                const evaluation = getEvaluationLevel(note.centError);
-
-                const noteElement = document.createElement('div');
-                noteElement.className = 'glass-card-sm hover:bg-white/10 transition-colors';
-                noteElement.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div>
-                                <div class="text-lg font-bold text-white">${note.noteName}</div>
-                            </div>
-                            <div>
-                                <div class="text-base text-white-60 font-medium">目標 ${note.targetFrequency.toFixed(0)}Hz</div>
-                                <div class="text-base text-white-60 font-medium">実音 ${note.userFrequency.toFixed(0)}Hz</div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <div class="font-bold text-2xl ${note.centError > 0 ? 'text-red-300' : 'text-blue-300'}">
-                                ${note.centError > 0 ? '+' : ''}${note.centError}¢
-                            </div>
-                            <div class="flex items-center justify-center" style="min-width: 36px;">
-                                ${evaluation.icon}
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                noteResults.appendChild(noteElement);
-            });
-        }
-
-        // Update progress bar
-        function updateProgressBar() {
-            const progressPercent = (currentSessionData.session / currentSessionData.totalSessions) * 100;
-            const progressBar = document.querySelector('.progress-bar-fill');
-            if (progressBar) {
-                setTimeout(() => {
-                    progressBar.style.width = `${progressPercent}%`;
-                }, 300);
-            }
-        }
-
-        // Animate average error
-        function animateAverageError() {
-            const element = document.getElementById('average-error');
-            if (!element) return;
-            
-            const targetValue = 12.1;
-            const isPositive = true; // サンプルデータではプラス
-            let currentValue = 0;
-            const increment = targetValue / 60; // 1秒で完了
-            
-            const animation = setInterval(() => {
-                currentValue += increment;
-                if (currentValue >= targetValue) {
-                    currentValue = targetValue;
-                    clearInterval(animation);
-                    
-                    // アニメーション完了時に色変更
-                    setTimeout(() => {
-                        element.classList.remove('text-white');
-                        element.classList.add('text-yellow-300');
-                    }, 200);
-                }
-                element.textContent = (isPositive ? '+' : '-') + currentValue.toFixed(1) + '¢';
-            }, 16); // 60fps
-        }
-
-        // Initialize page
-        function initializePage() {
-            displayNoteResults();
-            updateProgressBar();
-            
-            // Initialize Lucide icons with stroke width 1.5 as default
-            setTimeout(() => {
-                if (typeof lucide !== 'undefined') {
-                    lucide.createIcons({
-                        strokeWidth: 1.5  // デフォルト: 1.5、強調時: 1.75
-                    });
-                }
-            }, 100);
-            
-            // Start average error animation
-            setTimeout(animateAverageError, 500);
-        }
-
-        // ランク説明ポップオーバー制御
-        function toggleRankPopover() {
-            const popover = document.getElementById('rank-popover');
-            popover.classList.toggle('show');
-        }
-        
-        // ポップオーバー外クリックで閉じる
-        document.addEventListener('click', function(event) {
-            const popover = document.getElementById('rank-popover');
-            const button = document.querySelector('.rank-info-btn');
-            
-            if (popover && !popover.contains(event.target) && !button.contains(event.target)) {
-                popover.classList.remove('show');
-            }
-        });
-
-        // Initialize on DOM ready
-        document.addEventListener('DOMContentLoaded', initializePage);
-        window.addEventListener('load', () => {
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons({
-                    strokeWidth: 1.5  // デフォルト: 1.5、強調時: 1.75
-                });
-            }
-        });
-    </script>
+    <!-- Lucide初期化 -->
+    <script src="../js/lucide-init.js"></script>
 </body>
 </html>

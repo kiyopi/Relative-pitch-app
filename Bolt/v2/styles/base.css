@@ -549,6 +549,7 @@ body::before {
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-3xl);
   padding: var(--space-8);
+  margin-bottom: var(--space-6);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -564,6 +565,7 @@ body::before {
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
   padding: var(--space-4);
+  margin-bottom: var(--space-6);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -579,6 +581,7 @@ body::before {
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-3xl);
   padding: var(--space-10);
+  margin-bottom: var(--space-6);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -978,20 +981,6 @@ body::before {
     border-color: rgba(255, 255, 255, 0.3);
 }
 
-/* 音別結果アイテム */
-.note-result-item {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 1rem;
-    margin-bottom: 0.75rem;
-    transition: all 0.3s ease;
-}
-
-.note-result-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.2);
-}
 
 /* === bolt-new-design移植: インタラクティブ要素 === */
 .note-circle {
