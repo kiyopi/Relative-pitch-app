@@ -10,6 +10,7 @@
     
     <!-- スタイルシート -->
     <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/results.css">
     <link rel="stylesheet" href="ui-catalog.css">
     
     <!-- フォント -->
@@ -30,8 +31,8 @@
             </header>
 
             <!-- カタログナビゲーション：JavaScript自動生成 -->
-            <nav id="catalog-nav" style="text-align: center; margin: 2rem 0;">
-                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;" id="catalog-nav-links">
+            <nav id="catalog-nav">
+                <div id="catalog-nav-links">
                     <!-- JavaScriptで自動生成されます -->
                 </div>
             </nav>
@@ -39,6 +40,57 @@
             <!-- メインコンテンツエリア -->
             <main id="catalog-content">
                 
+                <!-- ヘルプアイコンボタン -->
+                <section id="help-icon-button" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">❓ ヘルプアイコンボタン</h2>
+                    <p class="text-white-70 mb-6">精度評価バッジに配置される説明ボタン（30px × 30px）</p>
+                    <p class="text-orange-200 mb-6"><strong>⚠️ 注意:</strong> アイコンサイズは.accuracy-icon（64px）の影響により、インライン指定が必須です</p>
+                    
+                    <div class="component-grid grid-cols-1 md:grid-cols-2">
+                        <!-- 基本ヘルプボタン -->
+                        <div class="component-item text-center">
+                            <div class="mb-4">
+                                <div class="accuracy-badge accuracy-badge-excellent relative" style="margin: 0 auto;">
+                                    <i data-lucide="trophy" class="text-yellow-300 accuracy-icon"></i>
+                                    <button class="help-icon-btn text-white">
+                                        <i data-lucide="help-circle" style="width: 20px !important; height: 20px !important; min-width: 20px !important; min-height: 20px !important; max-width: 20px !important; max-height: 20px !important; font-size: 20px !important;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <h3 class="text-white font-medium">基本ヘルプボタン</h3>
+                            <p class="text-caption">30px円形ボタン</p>
+                            <p class="text-caption">20pxアイコン</p>
+                        </div>
+                        
+                        <!-- 単体ヘルプボタン -->
+                        <div class="component-item text-center">
+                            <div class="mb-4">
+                                <div style="position: relative; width: 100px; height: 100px; margin: 0 auto;">
+                                    <button class="help-icon-btn text-white">
+                                        <i data-lucide="help-circle" style="width: 20px !important; height: 20px !important; min-width: 20px !important; min-height: 20px !important; max-width: 20px !important; max-height: 20px !important; font-size: 20px !important;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <h3 class="text-white font-medium">単体ヘルプボタン</h3>
+                            <p class="text-caption">グラス効果</p>
+                            <p class="text-caption">ホバー拡大</p>
+                        </div>
+                    </div>
+                    
+                    <div class="code-sample">
+&lt;!-- ヘルプアイコンボタン使用例 --&gt;
+&lt;!-- 注意: .accuracy-icon（64px）上書きのためインライン必須 --&gt;
+&lt;div class="accuracy-badge accuracy-badge-excellent relative"&gt;
+    &lt;i data-lucide="trophy" class="text-yellow-300 accuracy-icon"&gt;&lt;/i&gt;
+    &lt;button class="help-icon-btn text-white"&gt;
+        &lt;i data-lucide="help-circle" style="width: 20px !important; height: 20px !important; min-width: 20px !important; min-height: 20px !important; max-width: 20px !important; max-height: 20px !important; font-size: 20px !important;"&gt;&lt;/i&gt;
+    &lt;/button&gt;
+&lt;/div&gt;</div>
+                    <div class="catalog-back-to-top">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
                 <!-- 音感精度評価アイコンバッジ -->
                 <section id="accuracy-evaluation-icons" class="catalog-section">
                     <h2 class="text-2xl font-bold text-white mb-4">🎯 音感精度評価アイコンバッジ</h2>
@@ -111,7 +163,7 @@
 &lt;div class="accuracy-badge accuracy-badge-practice"&gt;
     &lt;i data-lucide="triangle-alert" class="text-red-300 accuracy-icon accuracy-icon-triangle"&gt;&lt;/i&gt;
 &lt;/div&gt;</div>
-                    <div style="text-align: center; margin: 1rem 0;">
+                    <div class="catalog-back-to-top">
                         <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
                     </div>
                 </section>
@@ -131,7 +183,7 @@
                                 <div class="score-section">
                                     <div class="score-grid">
                                         <!-- 基音表示（左） -->
-                                        <div class="base-note-section flex flex-col items-center text-center">
+                                        <div class="base-note-section">
                                             <div class="score-base-note text-white">C4</div>
                                             <p class="text-body-green">基音</p>
                                         </div>
@@ -142,14 +194,15 @@
                                                 <i data-lucide="trophy" class="text-yellow-300 accuracy-icon"></i>
                                                 <!-- ヘルプボタン -->
                                                 <button class="help-icon-btn text-white">
-                                                    <i data-lucide="help-circle" class="icon-md"></i>
+                                                    <i data-lucide="help-circle" style="width: 20px !important; height: 20px !important; min-width: 20px !important; min-height: 20px !important; max-width: 20px !important; max-height: 20px !important; font-size: 20px !important;"></i>
                                                 </button>
                                             </div>
                                             <p class="text-sub-title mt-4">素晴らしい精度！</p>
                                         </div>
                                         
+                                        
                                         <!-- 平均誤差（右） -->
-                                        <div class="error-section flex flex-col items-center text-center">
+                                        <div class="error-section">
                                             <div class="score-average text-white">±12.1¢</div>
                                             <p class="text-body-green">セッション平均誤差</p>
                                         </div>
@@ -166,10 +219,10 @@
             &lt;p class="text-body-green"&gt;基音&lt;/p&gt;
         &lt;/div&gt;
         &lt;div class="trophy-section"&gt;
-            &lt;div class="accuracy-badge accuracy-badge-excellent" style="position: relative;"&gt;
+            &lt;div class="accuracy-badge accuracy-badge-excellent relative"&gt;
                 &lt;i data-lucide="trophy" class="text-yellow-300 accuracy-icon"&gt;&lt;/i&gt;
                 &lt;!-- ヘルプアイコンボタン --&gt;
-                &lt;button class="help-icon-btn" style="color: white;"&gt;
+                &lt;button class="help-icon-btn text-white"&gt;
                     &lt;i data-lucide="help-circle" style="width: 20px !important; height: 20px !important;"&gt;&lt;/i&gt;
                 &lt;/button&gt;
             &lt;/div&gt;
@@ -183,7 +236,7 @@
 &lt;/div&gt;</div>
                         </div>
                     </div>
-                    <div style="text-align: center; margin: 1rem 0;">
+                    <div class="catalog-back-to-top">
                         <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
                     </div>
                 </section>
@@ -263,25 +316,25 @@
     
     &lt;!-- Excellent --&gt;
     &lt;div class="flex items-center gap-3"&gt;
-        &lt;i data-lucide="trophy" class="text-yellow-300" style="width: 20px; height: 20px; flex-shrink: 0;"&gt;&lt;/i&gt;
+        &lt;i data-lucide="trophy" class="text-yellow-300 shrink-0" style="width: 20px; height: 20px;"&gt;&lt;/i&gt;
         &lt;div class="progress-bar flex"&gt;
             &lt;div class="progress-fill-custom color-eval-gold" style="width: 37.5%;"&gt;&lt;/div&gt;
         &lt;/div&gt;
-        &lt;span class="text-sm text-white-60" style="min-width: 20px; text-align: right;"&gt;3&lt;/span&gt;
+        &lt;span class="text-sm text-white-60 count-text-right"&gt;3&lt;/span&gt;
     &lt;/div&gt;
     
     &lt;!-- Good --&gt;
     &lt;div class="flex items-center gap-3"&gt;
-        &lt;i data-lucide="star" class="text-green-300" style="width: 20px; height: 20px; flex-shrink: 0;"&gt;&lt;/i&gt;
+        &lt;i data-lucide="star" class="text-green-300 shrink-0" style="width: 20px; height: 20px;"&gt;&lt;/i&gt;
         &lt;div class="progress-bar flex"&gt;
             &lt;div class="progress-fill-custom color-eval-good" style="width: 25%;"&gt;&lt;/div&gt;
         &lt;/div&gt;
-        &lt;span class="text-sm text-white-60" style="min-width: 20px; text-align: right;"&gt;2&lt;/span&gt;
+        &lt;span class="text-sm text-white-60 count-text-right"&gt;2&lt;/span&gt;
     &lt;/div&gt;
 &lt;/div&gt;</div>
                         </div>
                     </div>
-                    <div style="text-align: center; margin: 1rem 0;">
+                    <div class="catalog-back-to-top">
                         <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
                     </div>
                 </section>
@@ -385,7 +438,7 @@
 &lt;/div&gt;</div>
                         </div>
                     </div>
-                    <div style="text-align: center; margin: 1rem 0;">
+                    <div class="catalog-back-to-top">
                         <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
                     </div>
                 </section>
@@ -452,7 +505,7 @@
 &lt;/div&gt;</div>
                         </div>
                     </div>
-                    <div style="text-align: center; margin: 1rem 0;">
+                    <div class="catalog-back-to-top">
                         <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
                     </div>
                 </section>
@@ -468,17 +521,6 @@
         </div>
     </div>
 
-    <!-- CSS追加 -->
-    <style>
-        @keyframes slideInBar {
-            from { width: 0; }
-            to { width: var(--bar-width); }
-        }
-        
-        .page-header-icon-purple {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-        }
-    </style>
 
     <!-- JavaScript -->
     <script src="ui-catalog.js"></script>

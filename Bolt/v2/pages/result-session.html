@@ -47,67 +47,67 @@
 
             <!-- セッション概要 -->
             <div class="glass-card">
-                <div class="text-center mb-10 pb-8 border-b border-white/10">
-                    <div class="flex flex-col gap-6 items-center">
+                <div class="score-section">
+                    <div class="score-grid">
+                        <!-- 基音表示（左） -->
+                        <div class="base-note-section">
+                            <div class="score-base-note text-white">C4</div>
+                            <p class="text-body-green">基音</p>
+                        </div>
+                        
                         <!-- トロフィーアイコン（中央） -->
-                        <div class="trophy-section flex flex-col items-center text-center justify-end">
-                            <div>
-                                <div class="accuracy-badge accuracy-badge-excellent relative">
-                                    <i data-lucide="trophy" class="text-yellow-300 accuracy-icon"></i>
-                                    <!-- 精度ランク説明アイコン -->
-                                    <button class="rank-info-btn help-btn-position" onclick="toggleRankPopover()">
-                                        <i data-lucide="help-circle" class="text-white icon-xs"></i>
-                                    </button>
+                        <div class="trophy-section">
+                            <div class="accuracy-badge accuracy-badge-excellent relative">
+                                <i data-lucide="trophy" class="text-yellow-300 accuracy-icon"></i>
+                                <!-- 精度ランク説明アイコン -->
+                                <button class="rank-info-btn help-btn-position" onclick="toggleRankPopover()">
+                                    <i data-lucide="help-circle" class="text-white" style="width: 20px !important; height: 20px !important; min-width: 20px !important; min-height: 20px !important; max-width: 20px !important; max-height: 20px !important; font-size: 20px !important;"></i>
+                                </button>
+                                
+                                <!-- 精度ランク説明ポップオーバー -->
+                                <div id="rank-popover" class="rank-popover">
+                                    <h4 class="popover-title">精度ランク</h4>
                                     
-                                    <!-- 精度ランク説明ポップオーバー -->
-                                    <div id="rank-popover" class="rank-popover">
-                                        <h4 class="popover-title">精度ランク</h4>
-                                        
-                                        <div class="rank-item">
-                                            <i data-lucide="trophy" class="text-yellow-300 icon-md shrink-0"></i>
-                                            <div>
-                                                <div class="rank-name rank-name-excellent">Excellent</div>
-                                                <div class="rank-range">±15セント以内</div>
-                                            </div>
+                                    <div class="rank-item">
+                                        <i data-lucide="trophy" class="text-yellow-300 icon-md shrink-0"></i>
+                                        <div>
+                                            <div class="rank-name rank-name-excellent">Excellent</div>
+                                            <div class="rank-range">±15セント以内</div>
                                         </div>
-                                        
-                                        <div class="rank-item">
-                                            <i data-lucide="star" class="text-green-300 icon-md shrink-0"></i>
-                                            <div>
-                                                <div class="rank-name rank-name-good">Good</div>
-                                                <div class="rank-range">15～25セント</div>
-                                            </div>
+                                    </div>
+                                    
+                                    <div class="rank-item">
+                                        <i data-lucide="star" class="text-green-300 icon-md shrink-0"></i>
+                                        <div>
+                                            <div class="rank-name rank-name-good">Good</div>
+                                            <div class="rank-range">15～25セント</div>
                                         </div>
-                                        
-                                        <div class="rank-item">
-                                            <i data-lucide="thumbs-up" class="text-blue-300 icon-md shrink-0"></i>
-                                            <div>
-                                                <div class="rank-name rank-name-pass">Pass</div>
-                                                <div class="rank-range">25～40セント</div>
-                                            </div>
+                                    </div>
+                                    
+                                    <div class="rank-item">
+                                        <i data-lucide="thumbs-up" class="text-blue-300 icon-md shrink-0"></i>
+                                        <div>
+                                            <div class="rank-name rank-name-pass">Pass</div>
+                                            <div class="rank-range">25～40セント</div>
                                         </div>
-                                        
-                                        <div class="rank-item">
-                                            <i data-lucide="triangle-alert" class="text-red-300 icon-md shrink-0"></i>
-                                            <div>
-                                                <div class="rank-name rank-name-practice">Practice</div>
-                                                <div class="rank-range">40セント以上</div>
-                                            </div>
+                                    </div>
+                                    
+                                    <div class="rank-item">
+                                        <i data-lucide="triangle-alert" class="text-red-300 icon-md shrink-0"></i>
+                                        <div>
+                                            <div class="rank-name rank-name-practice">Practice</div>
+                                            <div class="rank-range">40セント以上</div>
                                         </div>
                                     </div>
                                 </div>
-                                <p class="text-lg text-white font-medium mt-4">素晴らしい精度！</p>
                             </div>
+                            <p class="text-lg text-white font-medium mt-4">素晴らしい精度！</p>
                         </div>
-                        <!-- C4 基音（左） -->
-                        <div class="flex flex-col items-center text-center">
-                            <div class="text-3xl font-bold text-white">C4</div>
-                            <p class="text-sm text-green-200">基音</p>
-                        </div>
+                        
                         <!-- 平均誤差（右） -->
-                        <div class="flex flex-col items-center text-center">
-                            <div class="text-3xl font-bold text-white" id="average-error">+0.0¢</div>
-                            <p class="text-sm text-green-200">セッション平均誤差</p>
+                        <div class="error-section">
+                            <div class="score-average text-white" id="average-error">+0.0¢</div>
+                            <p class="text-body-green">セッション平均誤差</p>
                         </div>
                     </div>
                 </div>

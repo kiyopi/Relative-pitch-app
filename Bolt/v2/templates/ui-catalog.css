@@ -1,6 +1,28 @@
 /* ui-catalog.css - UIカタログ専用スタイル */
 /* 🚨 注意: 親セクションに干渉しないよう名前空間を使用 */
 
+/* テスト用：普通の箇所でのヘルプアイコン表示 */
+.ui-catalog .help-icon-test {
+    color: white !important;
+    background: red !important;
+    border: 3px solid yellow !important;
+    border-radius: 50% !important;
+    padding: 8px !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    outline: none !important;
+    text-decoration: none !important;
+}
+
+.ui-catalog .help-icon-test i {
+    width: 24px !important;
+    height: 24px !important;
+}
+
 /* === Share Card CSS（反射エフェクト付き） - 名前空間保護 === */
 .ui-catalog .share-card {
     position: relative;
@@ -340,6 +362,39 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* === カタログ表示制御 === */
+
+.ui-catalog #catalog-nav {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.ui-catalog #catalog-nav-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.ui-catalog .catalog-back-to-top {
+    text-align: center;
+    margin: 1rem 0;
+}
+
+/* インライン置き換え用クラス */
+.ui-catalog .relative {
+    position: relative;
+}
+
+.ui-catalog .shrink-0 {
+    flex-shrink: 0;
+}
+
+.ui-catalog .count-text-right {
+    min-width: 20px;
+    text-align: right;
+}
+
 /* === UIカタログ専用グリッドレイアウト === */
 
 .ui-catalog .grid { display: grid; }
@@ -348,6 +403,15 @@
 .ui-catalog .gap-2 { gap: var(--space-2); }
 .ui-catalog .text-center { text-align: center; }
 .ui-catalog .text-xs { font-size: 0.75rem; line-height: 1rem; }
+
+/* セッション概要3列グリッド */
+.ui-catalog .score-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+    align-items: end;
+    text-align: center;
+}
 
 /* === カラーパレット専用スタイル === */
 
