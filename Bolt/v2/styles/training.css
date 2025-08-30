@@ -1,0 +1,129 @@
+/* ==========================================================================
+   トレーニング関連ページ専用スタイル
+   preparation.html, training.html用
+   ========================================================================== */
+
+/* ==========================================================================
+   マイクテスト・準備ページ
+   ========================================================================== */
+.mic-test-main {
+  max-width: 700px;
+  margin: 0 auto;
+  padding-bottom: 60px;
+}
+
+/* テストセクション */
+.test-section {
+  margin-bottom: 40px;
+  transition: all 0.5s ease;
+}
+
+.test-section.hidden {
+  display: none;
+}
+
+/* セクション説明 */
+.section-description {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  margin-bottom: 24px;
+}
+
+/* アラート系 */
+.info-alert, 
+.success-alert {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.info-alert {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.success-alert {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.info-alert p, 
+.success-alert p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* メーターグループ */
+.meter-group {
+  margin-bottom: 20px;
+}
+
+.meter-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+}
+
+.meter-value {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* プログレスバー（オレンジ） */
+.progress-bar.progress-orange .progress-fill {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+/* 結果カード */
+.result-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.result-card h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 16px;
+}
+
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.result-row:last-child {
+  border-bottom: none;
+}
+
+.result-row span:first-child {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.result-value {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* テストステータス */
+.test-status {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  font-style: italic;
+  margin-top: 16px;
+}

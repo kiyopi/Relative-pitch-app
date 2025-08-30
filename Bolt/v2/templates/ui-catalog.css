@@ -557,17 +557,7 @@
 }
 
 
-/* UIカタログ専用ボタン調整 */
-.ui-catalog .btn {
-  width: auto;
-  min-height: 40px;
-  padding: 10px 20px;
-}
 
-.ui-catalog .btn-large {
-  min-height: 48px;
-  padding: 12px 24px;
-}
 
 /* ボタンコンテナ - カタログ表示用 */
 .ui-catalog .space-y-3 {

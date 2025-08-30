@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>トレーニング前の準備 - 8va相対音感トレーニング</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.344.0/lucide.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/results.css">
+    <link rel="stylesheet" href="../styles/training.css">
+</head>
+<body>
+    <!-- Debug Navigation -->
+    <nav class="debug-nav">
+        <h4>Debug Nav</h4>
+        <div class="nav-grid">
+            <a href="index.html" class="nav-btn">
+                <i data-lucide="home" style="width: 12px; height: 12px;"></i>
+                <span>ホーム</span>
+            </a>
+            <a href="mic-test.html" class="nav-btn current">
+                <i data-lucide="mic" style="width: 12px; height: 12px;"></i>
+                <span>マイクテスト</span>
+            </a>
+            <a href="training.html" class="nav-btn">
+                <i data-lucide="target" style="width: 12px; height: 12px;"></i>
+                <span>トレーニング</span>
+            </a>
+            <a href="session-result.html" class="nav-btn">
+                <i data-lucide="check-circle" style="width: 12px; height: 12px;"></i>
+                <span>セッション結果</span>
+            </a>
+            <a href="final-result.html" class="nav-btn">
+                <i data-lucide="trophy" style="width: 12px; height: 12px;"></i>
+                <span>総合結果</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- ヘッダー -->
+        <header class="page-header">
+            <div class="page-header-icon page-header-icon-blue">
+                <i data-lucide="mic" 
+                   style="width: 48px; height: 48px; color: white; stroke-width: 2;"></i>
+            </div>
+            <h1 class="page-title">トレーニング前の準備</h1>
+            <p class="page-description">ランダム基音モード へのアクセス</p>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main class="mic-test-main">
+            <div class="glass-card">
+                <!-- マイク許可セクション -->
+                <section class="test-section" id="permission-section">
+                    <div class="section-header">
+                        <h3>マイクロフォンの許可</h3>
+                        <p class="section-description">音程検出のためマイクロフォンへのアクセスが必要です</p>
+                    </div>
+                    
+                    <div class="info-alert">
+                        <i data-lucide="shield-check" style="width: 24px; height: 24px; color: #60a5fa;"></i>
+                        <p>音声データは外部に送信されません。ブラウザ内でリアルタイム処理されます。</p>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="request-mic-btn">
+                        <i data-lucide="mic" style="width: 24px; height: 24px;"></i>
+                        <span>マイクを許可</span>
+                    </button>
+                </section>
+
+                <!-- 音声テストセクション -->
+                <section class="test-section hidden" id="audio-test-section">
+                    <div class="section-header">
+                        <h3>音声テスト</h3>
+                        <p class="section-description">マイクが正常に動作しているか確認します</p>
+                    </div>
+                    
+                    <!-- 音量レベル -->
+                    <div class="meter-group">
+                        <div class="meter-label">
+                            <span>音量レベル</span>
+                            <span class="meter-value" id="volume-value">65%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="volume-progress" style="width: 65%"></div>
+                        </div>
+                    </div>
+
+                    <!-- 検出周波数 -->
+                    <div class="meter-group">
+                        <div class="meter-label">
+                            <span>検出周波数</span>
+                            <span class="meter-value" id="frequency-value">261.6 Hz</span>
+                        </div>
+                    </div>
+
+                    <div class="success-alert">
+                        <i data-lucide="volume-2" style="width: 24px; height: 24px; color: #22c55e;"></i>
+                        <p>マイクが正常に動作しています。音域テストに進みましょう。</p>
+                    </div>
+
+                    <button class="btn btn-primary" id="start-range-test-btn">
+                        <span>音域テストを開始</span>
+                        <i data-lucide="arrow-right" style="width: 24px; height: 24px;"></i>
+                    </button>
+                </section>
+
+                <!-- 音域テストセクション -->
+                <section class="test-section hidden" id="range-test-section">
+                    <div class="section-header">
+                        <h3>音域テスト</h3>
+                        <p class="section-description">あなたの快適な音域を測定しています...</p>
+                    </div>
+                    
+                    <div class="meter-group">
+                        <div class="meter-label">
+                            <span>テスト進行</span>
+                            <span class="meter-value" id="range-progress-value">0%</span>
+                        </div>
+                        <div class="progress-bar progress-orange">
+                            <div class="progress-fill" id="range-progress" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <p class="test-status" id="test-status">低音から高音まで段階的にテストしています...</p>
+                </section>
+
+                <!-- 結果表示セクション -->
+                <section class="test-section hidden" id="result-section">
+                    <div class="section-header">
+                        <h3>テスト完了</h3>
+                        <p class="section-description">音域テストが完了しました</p>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h4>あなたの音域</h4>
+                        <div class="result-row">
+                            <span>音域範囲</span>
+                            <span class="result-value">A2 - F5</span>
+                        </div>
+                        <div class="result-row">
+                            <span>オクターブ数</span>
+                            <span class="result-value">2.6オクターブ</span>
+                        </div>
+                    </div>
+
+                    <div class="success-alert">
+                        <i data-lucide="check-circle" style="width: 24px; height: 24px; color: #22c55e;"></i>
+                        <p>最適な基音が自動選択されます。快適にトレーニングできます！</p>
+                    </div>
+
+                    <button class="btn btn-success" id="start-training-btn">
+                        <span>トレーニング開始</span>
+                        <i data-lucide="arrow-right" style="width: 24px; height: 24px;"></i>
+                    </button>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        lucide.createIcons();
+
+        // DOM要素の取得
+        const requestMicBtn = document.getElementById('request-mic-btn');
+        const startRangeTestBtn = document.getElementById('start-range-test-btn');
+        const startTrainingBtn = document.getElementById('start-training-btn');
+        
+        const permissionSection = document.getElementById('permission-section');
+        const audioTestSection = document.getElementById('audio-test-section');
+        const rangeTestSection = document.getElementById('range-test-section');
+        const resultSection = document.getElementById('result-section');
+
+        // セクション表示切り替え
+        function showSection(sectionToShow) {
+            [permissionSection, audioTestSection, rangeTestSection, resultSection].forEach(section => {
+                section.classList.add('hidden');
+            });
+            sectionToShow.classList.remove('hidden');
+        }
+
+        // マイク許可ボタン
+        requestMicBtn.addEventListener('click', async () => {
+            try {
+                requestMicBtn.disabled = true;
+                requestMicBtn.innerHTML = '<i data-lucide="loader" style="width: 24px; height: 24px;"></i><span>許可を待っています...</span>';
+                lucide.createIcons();
+
+                // マイク許可のシミュレーション
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                showSection(audioTestSection);
+                startVolumeSimulation();
+                
+            } catch (error) {
+                console.error('マイク許可エラー:', error);
+                requestMicBtn.disabled = false;
+                requestMicBtn.innerHTML = '<i data-lucide="mic" style="width: 24px; height: 24px;"></i><span>マイクを許可</span>';
+                lucide.createIcons();
+            }
+        });
+
+        // 音域テスト開始ボタン
+        startRangeTestBtn.addEventListener('click', () => {
+            showSection(rangeTestSection);
+            startRangeTest();
+        });
+
+        // トレーニング開始ボタン
+        startTrainingBtn.addEventListener('click', () => {
+            window.location.href = 'training.html';
+        });
+
+        // 音量シミュレーション
+        function startVolumeSimulation() {
+            const volumeProgress = document.getElementById('volume-progress');
+            const volumeValue = document.getElementById('volume-value');
+            const frequencyValue = document.getElementById('frequency-value');
+
+            setInterval(() => {
+                const volume = Math.floor(Math.random() * 30) + 50; // 50-80%
+                const frequency = (Math.random() * 100 + 220).toFixed(1); // 220-320Hz
+
+                volumeProgress.style.width = volume + '%';
+                volumeValue.textContent = volume + '%';
+                frequencyValue.textContent = frequency + ' Hz';
+            }, 800);
+        }
+
+        // 音域テストシミュレーション
+        function startRangeTest() {
+            const rangeProgress = document.getElementById('range-progress');
+            const rangeProgressValue = document.getElementById('range-progress-value');
+            const testStatus = document.getElementById('test-status');
+
+            let progress = 0;
+            const messages = [
+                '低音域をテストしています...',
+                '中音域をテストしています...',
+                '高音域をテストしています...',
+                '音域を分析しています...',
+                '結果を計算しています...'
+            ];
+
+            const interval = setInterval(() => {
+                progress += 20;
+                rangeProgress.style.width = progress + '%';
+                rangeProgressValue.textContent = progress + '%';
+                
+                if (progress <= 100) {
+                    const messageIndex = Math.floor((progress - 1) / 20);
+                    if (messages[messageIndex]) {
+                        testStatus.textContent = messages[messageIndex];
+                    }
+                }
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        showSection(resultSection);
+                    }, 1000);
+                }
+            }, 800);
+        }
+    </script>
+</body>
+</html>

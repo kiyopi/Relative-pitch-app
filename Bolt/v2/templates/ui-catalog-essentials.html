@@ -226,63 +226,159 @@
                     </div>
                 </section>
 
-                <!-- ボタンとガラスエフェクト -->
+                <!-- ボタンスタイル -->
                 <section id="buttons" class="catalog-section">
-                    <h2 class="text-2xl font-bold text-white mb-4">🔘 ボタンとガラスエフェクト</h2>
-                    <p class="text-white-70 mb-6">グラスモーフィズム効果を活用したボタンシステム</p>
+                    <h2 class="text-2xl font-bold text-white mb-4">🔘 ボタンスタイル</h2>
+                    <p class="text-white-70 mb-6">各種アクション用のボタンコンポーネント</p>
                     
-                    <h3 class="text-white font-medium mb-4">ボタンスタイル</h3>
+                    <h3 class="text-white font-medium mb-4">基本ボタン</h3>
                     
-                    <div class="component-grid grid-cols-1 md:grid-cols-2">
+                    <div class="component-grid grid-cols-1">
                         <div class="component-item">
                             <div class="space-y-3">
-                                <a href="index.html" class="btn btn-outline">
+                                <button class="btn btn-outline">
                                     <i data-lucide="home"></i>
                                     <span>ホームに戻る</span>
-                                </a>
-                                <a href="#" class="btn btn-success">
+                                </button>
+                                <button class="btn btn-success">
                                     <i data-lucide="share"></i>
                                     <span>結果を共有</span>
-                                </a>
-                                <a href="#" class="btn btn-primary">
+                                </button>
+                                <button class="btn btn-primary">
                                     <i data-lucide="play"></i>
                                     <span>トレーニング開始</span>
-                                </a>
-                                <a href="training.html" class="btn btn-primary btn-large">
+                                </button>
+                                <button class="btn btn-primary">
                                     <i data-lucide="rotate-ccw"></i>
                                     <span>もう一度挑戦</span>
-                                </a>
+                                </button>
                             </div>
                             
                             <div class="code-sample mt-4">
-&lt;a href="index.html" class="btn btn-outline"&gt;
+&lt;button class="btn btn-outline"&gt;
   &lt;i data-lucide="home"&gt;&lt;/i&gt;
   &lt;span&gt;ホームに戻る&lt;/span&gt;
-&lt;/a&gt;
+&lt;/button&gt;
 
-&lt;a href="#" class="btn btn-success"&gt;
+&lt;button class="btn btn-success"&gt;
   &lt;i data-lucide="share"&gt;&lt;/i&gt;
   &lt;span&gt;結果を共有&lt;/span&gt;
-&lt;/a&gt;
+&lt;/button&gt;
 
-&lt;a href="#" class="btn btn-primary"&gt;
+&lt;button class="btn btn-primary"&gt;
   &lt;i data-lucide="play"&gt;&lt;/i&gt;
   &lt;span&gt;トレーニング開始&lt;/span&gt;
-&lt;/a&gt;
+&lt;/button&gt;
 
-&lt;a href="training.html" class="btn btn-primary btn-large"&gt;
+&lt;button class="btn btn-primary"&gt;
   &lt;i data-lucide="rotate-ccw"&gt;&lt;/i&gt;
   &lt;span&gt;もう一度挑戦&lt;/span&gt;
-&lt;/a&gt;</div>
+&lt;/button&gt;</div>
                         </div>
-                        
+                    </div>
+                    
+                    <!-- ボタン幅バリエーション -->
+                    <h3 class="text-white font-medium mb-4 mt-8">ボタン幅バリエーション</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <div class="space-y-3">
+                                <button class="btn btn-outline">
+                                    <i data-lucide="mouse-pointer"></i>
+                                    <span>デフォルト（auto）</span>
+                                </button>
+                                <button class="btn btn-primary btn-w-full">
+                                    <i data-lucide="maximize"></i>
+                                    <span>フル幅（100%）</span>
+                                </button>
+                                <div class="flex gap-2">
+                                    <button class="btn btn-success md:btn-w-1/2">
+                                        <i data-lucide="columns-2"></i>
+                                        <span>50%幅</span>
+                                    </button>
+                                    <button class="btn btn-primary md:btn-w-1/2">
+                                        <i data-lucide="layout-grid"></i>
+                                        <span>50%幅</span>
+                                    </button>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button class="btn btn-outline md:btn-w-1/3">
+                                        <i data-lucide="columns-3"></i>
+                                        <span>33%幅</span>
+                                    </button>
+                                    <button class="btn btn-primary md:btn-w-1/3">
+                                        <i data-lucide="grid-3x3"></i>
+                                        <span>33%幅</span>
+                                    </button>
+                                    <button class="btn btn-success md:btn-w-1/3">
+                                        <i data-lucide="layout-template"></i>
+                                        <span>33%幅</span>
+                                    </button>
+                                </div>
+                                <div class="flex gap-2 justify-center">
+                                    <button class="btn btn-outline md:btn-w-1/4">
+                                        <i data-lucide="columns-4"></i>
+                                        <span>25%幅</span>
+                                    </button>
+                                    <button class="btn btn-primary md:btn-w-1/4">
+                                        <i data-lucide="square"></i>
+                                        <span>25%幅</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="code-sample mt-4">
+&lt;!-- 幅クラスの使用例 --&gt;
+&lt;button class="btn btn-outline"&gt;デフォルト（auto）&lt;/button&gt;
+&lt;button class="btn btn-primary btn-w-full"&gt;フル幅（100%）&lt;/button&gt;
+
+&lt;!-- 2列レイアウト --&gt;
+&lt;div class="flex gap-2"&gt;
+  &lt;button class="btn btn-success md:btn-w-1/2"&gt;50%幅&lt;/button&gt;
+  &lt;button class="btn btn-primary md:btn-w-1/2"&gt;50%幅&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- 3列レイアウト --&gt;
+&lt;div class="flex gap-2"&gt;
+  &lt;button class="btn btn-outline md:btn-w-1/3"&gt;33%幅&lt;/button&gt;
+  &lt;button class="btn btn-primary md:btn-w-1/3"&gt;33%幅&lt;/button&gt;
+  &lt;button class="btn btn-success md:btn-w-1/3"&gt;33%幅&lt;/button&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+                
+                <!-- ガラスエフェクト -->
+                <section id="glass-effects" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">🔮 ガラスエフェクト</h2>
+                    <p class="text-white-70 mb-6">グラスモーフィズム効果を活用したカードシステム</p>
+                    
+                    <h3 class="text-white font-medium mb-4">ガラスカード</h3>
+                    
+                    <div class="component-grid grid-cols-1 md:grid-cols-2">
                         <div class="component-item">
                             <div class="glass-card mb-4">
-                                <h4 class="text-white font-medium mb-2">ガラスカード</h4>
+                                <h4 class="text-white font-medium mb-2">標準ガラスカード</h4>
                                 <p class="text-white-70 text-sm">背景にぼかし効果と透明度を適用したカード</p>
                                 <p class="text-green-300 text-xs mt-2">💡 デフォルトで下マージン（var(--space-6)）が設定済み</p>
                             </div>
                             
+                            <div class="glass-card-sm mb-4">
+                                <h4 class="text-white font-medium mb-2">小サイズ</h4>
+                                <p class="text-white-70 text-sm">コンパクトなコンテンツ用</p>
+                            </div>
+                            
+                            <div class="glass-card-lg">
+                                <h4 class="text-white font-medium mb-2">大サイズ</h4>
+                                <p class="text-white-70 text-sm">重要なコンテンツや詳細情報用</p>
+                            </div>
+                        </div>
+                        
+                        <div class="component-item">
+                            <h4 class="text-white-70 font-medium mb-2">使用例</h4>
                             <div class="code-sample">
 &lt;!-- 基本ガラスカード（デフォルトで下マージンあり） --&gt;
 &lt;div class="glass-card"&gt;
