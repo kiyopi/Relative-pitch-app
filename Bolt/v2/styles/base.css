@@ -79,6 +79,56 @@ body {
   padding: 1.5rem 1rem 3rem 1rem;
 }
 
+/* デフォルトマージン・パディングリセット */
+p,
+h1, h2, h3, h4, h5, h6,
+ul, ol, li,
+blockquote, pre,
+figure, figcaption,
+dl, dd, dt,
+fieldset, form, label, legend {
+  margin: 0;
+  padding: 0;
+}
+
+/* リストスタイルリセット */
+ul, ol {
+  list-style: none;
+}
+
+/* リンクスタイルリセット */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* メディア要素の隙間防止 */
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* フォーム要素リセット */
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+/* ボタンのカーソル */
+button {
+  cursor: pointer;
+}
+
+/* テーブルリセット */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
 /* 背景グラデーションアニメーション */
 body::before {
   content: '';
@@ -233,6 +283,8 @@ body::before {
   line-height: 2.5rem;
   font-weight: 700;
   color: var(--text-white);
+  margin-top: 0;
+  margin-bottom: 4px;
 }
 
 .text-section-title {
@@ -240,6 +292,8 @@ body::before {
   line-height: 2rem;
   font-weight: 700;
   color: var(--text-white);
+  margin-top: 0;
+  margin-bottom: 4px;
 }
 
 .text-sub-title {
@@ -247,17 +301,23 @@ body::before {
   line-height: 1.75rem;
   font-weight: 500;
   color: var(--text-white);
+  margin-top: 0;
+  margin-bottom: 4px;
 }
 
 .text-body {
   font-size: 1rem;
   line-height: 1.5rem;
   color: var(--text-white);
+  margin-top: 0;
+  margin-bottom: 4px;
 }
 
 .text-sub-text {
   font-size: 1rem;
   line-height: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 4px;
   color: var(--text-white-70);
 }
 
@@ -265,6 +325,7 @@ body::before {
   font-size: 0.875rem;
   line-height: 1.25rem;
   color: var(--text-white-60);
+  margin-bottom: 4px;
 }
 
 /* レスポンシブフォント */
@@ -282,14 +343,6 @@ body::before {
   text-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
 }
 
-.page-title-no-top {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--text-white);
-  margin-top: 0;
-  margin-bottom: 16px;
-  text-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
-}
 
 .page-subtitle {
   font-size: 1.25rem;
@@ -297,12 +350,6 @@ body::before {
   margin-bottom: 12px;
 }
 
-.page-subtitle-no-top {
-  font-size: 1.25rem;
-  color: rgba(255, 255, 255, 0.9);
-  margin-top: 0;
-  margin-bottom: 12px;
-}
 
 .page-description {
   font-size: 1rem;
@@ -314,50 +361,50 @@ body::before {
 /* === タイポグラフィ カラーバリエーション === */
 
 /* text-main-title バリエーション (2.25rem, 700) */
-.text-main-title-yellow { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #fde047; }
-.text-main-title-green { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #86efac; }
-.text-main-title-blue { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #93c5fd; }
-.text-main-title-red { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #fca5a5; }
-.text-main-title-purple { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #c4b5fd; }
+.text-main-title-yellow { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #fde047; margin-top: 0; margin-bottom: 4px; }
+.text-main-title-green { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #86efac; margin-top: 0; margin-bottom: 4px; }
+.text-main-title-blue { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #93c5fd; margin-top: 0; margin-bottom: 4px; }
+.text-main-title-red { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #fca5a5; margin-top: 0; margin-bottom: 4px; }
+.text-main-title-purple { font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; color: #c4b5fd; margin-top: 0; margin-bottom: 4px; }
 
 /* text-section-title バリエーション (1.5rem, 700) */
-.text-section-title-yellow { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #fde047; }
-.text-section-title-green { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #86efac; }
-.text-section-title-blue { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #93c5fd; }
-.text-section-title-red { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #fca5a5; }
-.text-section-title-purple { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #c4b5fd; }
+.text-section-title-yellow { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #fde047; margin-top: 0; margin-bottom: 4px; }
+.text-section-title-green { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #86efac; margin-top: 0; margin-bottom: 4px; }
+.text-section-title-blue { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #93c5fd; margin-top: 0; margin-bottom: 4px; }
+.text-section-title-red { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #fca5a5; margin-top: 0; margin-bottom: 4px; }
+.text-section-title-purple { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #c4b5fd; margin-top: 0; margin-bottom: 4px; }
 
 /* 音程偏差表示専用クラス (1.5rem, 700) */
-.text-pitch-deviation-plus { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: rgba(59, 130, 246, 0.8); } /* 青色80% - プラス偏差 */
-.text-pitch-deviation-minus { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: rgba(239, 68, 68, 0.8); } /* 赤色80% - マイナス偏差 */
+.text-pitch-deviation-plus { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: rgba(59, 130, 246, 0.8); margin-top: 0; margin-bottom: 4px; } /* 青色80% - プラス偏差 */
+.text-pitch-deviation-minus { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: rgba(239, 68, 68, 0.8); margin-top: 0; margin-bottom: 4px; } /* 赤色80% - マイナス偏差 */
 
 /* text-sub-title バリエーション (1.25rem, 500) */
-.text-sub-title-yellow { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #fde047; }
-.text-sub-title-green { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #86efac; }
-.text-sub-title-blue { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #93c5fd; }
-.text-sub-title-red { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #fca5a5; }
-.text-sub-title-purple { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #c4b5fd; }
+.text-sub-title-yellow { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #fde047; margin-top: 0; margin-bottom: 4px; }
+.text-sub-title-green { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #86efac; margin-top: 0; margin-bottom: 4px; }
+.text-sub-title-blue { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #93c5fd; margin-top: 0; margin-bottom: 4px; }
+.text-sub-title-red { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #fca5a5; margin-top: 0; margin-bottom: 4px; }
+.text-sub-title-purple { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #c4b5fd; margin-top: 0; margin-bottom: 4px; }
 
 /* text-body バリエーション (1rem, 400) */
-.text-body-yellow { font-size: 1rem; line-height: 1.5rem; color: #fde047; }
-.text-body-green { font-size: 1rem; line-height: 1.5rem; color: #86efac; }
-.text-body-blue { font-size: 1rem; line-height: 1.5rem; color: #93c5fd; }
-.text-body-red { font-size: 1rem; line-height: 1.5rem; color: #fca5a5; }
-.text-body-purple { font-size: 1rem; line-height: 1.5rem; color: #c4b5fd; }
+.text-body-yellow { font-size: 1rem; line-height: 1.5rem; color: #fde047; margin-top: 0; margin-bottom: 4px; }
+.text-body-green { font-size: 1rem; line-height: 1.5rem; color: #86efac; margin-top: 0; margin-bottom: 4px; }
+.text-body-blue { font-size: 1rem; line-height: 1.5rem; color: #93c5fd; margin-top: 0; margin-bottom: 4px; }
+.text-body-red { font-size: 1rem; line-height: 1.5rem; color: #fca5a5; margin-top: 0; margin-bottom: 4px; }
+.text-body-purple { font-size: 1rem; line-height: 1.5rem; color: #c4b5fd; margin-top: 0; margin-bottom: 4px; }
 
 /* text-sub-text バリエーション (1rem, 400, 200番台の色) */
-.text-sub-text-yellow { font-size: 1rem; line-height: 1.5rem; color: #fef08a; }
-.text-sub-text-green { font-size: 1rem; line-height: 1.5rem; color: #bbf7d0; }
-.text-sub-text-blue { font-size: 1rem; line-height: 1.5rem; color: #bae6fd; }
-.text-sub-text-red { font-size: 1rem; line-height: 1.5rem; color: #fecaca; }
-.text-sub-text-purple { font-size: 1rem; line-height: 1.5rem; color: #ddd6fe; }
+.text-sub-text-yellow { font-size: 1rem; line-height: 1.5rem; color: #fef08a; margin-top: 0; margin-bottom: 4px; }
+.text-sub-text-green { font-size: 1rem; line-height: 1.5rem; color: #bbf7d0; margin-top: 0; margin-bottom: 4px; }
+.text-sub-text-blue { font-size: 1rem; line-height: 1.5rem; color: #bae6fd; margin-top: 0; margin-bottom: 4px; }
+.text-sub-text-red { font-size: 1rem; line-height: 1.5rem; color: #fecaca; margin-top: 0; margin-bottom: 4px; }
+.text-sub-text-purple { font-size: 1rem; line-height: 1.5rem; color: #ddd6fe; margin-top: 0; margin-bottom: 4px; }
 
 /* text-caption バリエーション (0.875rem, 400, 200番台の色) */
-.text-caption-yellow { font-size: 0.875rem; line-height: 1.25rem; color: #fef08a; }
-.text-caption-green { font-size: 0.875rem; line-height: 1.25rem; color: #bbf7d0; }
-.text-caption-blue { font-size: 0.875rem; line-height: 1.25rem; color: #bae6fd; }
-.text-caption-red { font-size: 0.875rem; line-height: 1.25rem; color: #fecaca; }
-.text-caption-purple { font-size: 0.875rem; line-height: 1.25rem; color: #ddd6fe; }
+.text-caption-yellow { font-size: 0.875rem; line-height: 1.25rem; color: #fef08a; margin-top: 0; margin-bottom: 4px; }
+.text-caption-green { font-size: 0.875rem; line-height: 1.25rem; color: #bbf7d0; margin-top: 0; margin-bottom: 4px; }
+.text-caption-blue { font-size: 0.875rem; line-height: 1.25rem; color: #bae6fd; margin-top: 0; margin-bottom: 4px; }
+.text-caption-red { font-size: 0.875rem; line-height: 1.25rem; color: #fecaca; margin-top: 0; margin-bottom: 4px; }
+.text-caption-purple { font-size: 0.875rem; line-height: 1.25rem; color: #ddd6fe; margin-top: 0; margin-bottom: 4px; }
 
 @media (max-width: 768px) {
   .text-4xl {
@@ -501,6 +548,7 @@ body::before {
   line-height: 1.75rem;
   font-weight: 500;
   color: var(--text-white);
+  margin-top: 0;
   margin-bottom: var(--space-4);
 }
 
@@ -510,18 +558,8 @@ body::before {
   color: var(--text-white);
 }
 
-.heading-md {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-  font-weight: 600;
-  color: var(--text-white);
-  margin-bottom: var(--space-6);
-}
 
-.heading-md-no-top {
+.heading-md {
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -532,6 +570,7 @@ body::before {
   margin-top: 0;
   margin-bottom: var(--space-6);
 }
+
 
 .heading-md i {
   width: 24px;
@@ -547,6 +586,7 @@ body::before {
   line-height: 2rem;
   font-weight: 700;
   color: var(--text-white);
+  margin-top: 0;
   margin-bottom: var(--space-6);
 }
 
@@ -1352,6 +1392,106 @@ body::before {
     transform: translate(-50%, -50%) scale(2.5);
     opacity: 0;
   }
+}
+
+/* ==========================================================================
+   ユーティリティクラス（汎用）
+   ========================================================================== */
+
+/* 表示制御 */
+.hidden {
+  display: none !important;
+}
+
+.block {
+  display: block !important;
+}
+
+.inline-block {
+  display: inline-block !important;
+}
+
+.flex {
+  display: flex !important;
+}
+
+.inline-flex {
+  display: inline-flex !important;
+}
+
+/* Flexboxユーティリティ */
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-3 {
+  gap: 0.75rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+/* テキスト配置 */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/* マージン */
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+/* フォントサイズ */
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+/* 透明度 */
+.text-white-60 {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.text-white-80 {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .note-circle.current::before {

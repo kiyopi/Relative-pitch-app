@@ -1058,3 +1058,44 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-29 14:01:33] コミット: JavaScript影響排除とインライン記述禁止の徹底: クリーンなコード構造への移行
+
+- インラインスクリプトを完全削除（result-session.html、index.html）
+- Lucideアイコン初期化を共通モジュール化（lucide-init.js）
+- SessionGrid.js削除（JavaScript再実装のため）
+- glass-cardコンポーネントにデフォルトマージン追加
+- note-result-itemのホバーエフェクト統一
+- CLAUDE.mdにJavaScript実装原則を明文化
+- UIカタログドキュメント更新（デフォルトマージン記載）
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-29 17:28:26] コミット: UIヘルプアイコンシステム統一完了: インライン許可例外とCSS最適化
+
+- ヘルプアイコンボタンを30px×30pxに統一（base.css、results.css）
+- .accuracy-icon（64px）上書き対応でインラインスタイル許可例外実装
+- results-overview.htmlに総合ランクアイコン・グレードアイコンヘルプ追加
+- UIカタログに専用ヘルプアイコンセクション追加（説明・警告付き）
+- セッション概要3列グリッドレスポンシブ対応（.score-grid実装）
+- CSS階層設計統一: base.css構造クラス・results.css 3列グリッド
+- インライン置き換えクラス追加: .shrink-0、.count-text-right
+- カタログ表示制御クラス統合（ui-catalog.css）
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-30 15:41:18] コミット: V2ボタンシステム統一完了: btn-large廃止・デフォルト幅100%化・アイコンサイズ24px統一
+
+- btn-largeクラス廃止、デフォルトボタンサイズ統一（padding: 14px 24px）
+- ボタンのデフォルト幅を100%に変更（bolt-new-design準拠）
+- <a>タグボタンを全て<button>タグに変更
+- ボタンアイコンサイズを24pxに統一
+- progress-actionクラスで幅auto設定（進行バー横並び対応）
+- btn-secondaryをbtn-outlineに変更
+- final-actionsをaction-buttonsに統一
+- preparation.html新規作成とtraining.css追加
+
+🤖 Generated with Claude Code
+
+Co-Authored-By: Claude <noreply@anthropic.com>

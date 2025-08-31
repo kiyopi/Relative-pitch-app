@@ -14,7 +14,7 @@
 
 /* テストセクション */
 .test-section {
-  margin-bottom: 40px;
+  margin-bottom: 0;
   transition: all 0.5s ease;
 }
 
@@ -97,7 +97,7 @@
   margin-bottom: 16px;
 }
 
-.result-row {
+.range-info-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -105,19 +105,57 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.result-row:last-child {
+.range-info-row:last-child {
   border-bottom: none;
 }
 
-.result-row span:first-child {
+.range-info-row span:first-child {
   color: rgba(255, 255, 255, 0.8);
   font-size: 0.9rem;
 }
 
-.result-value {
+.range-info-value {
   color: #ffffff;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
+}
+
+.range-instruction-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.range-test-left i {
+  color: rgba(59, 130, 246, 0.8) !important;
+}
+
+#range-icon.measuring {
+  animation: range-icon-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes range-icon-pulse {
+  0% {
+    transform: scale(1);
+    color: rgba(59, 130, 246, 0.8);
+  }
+  50% {
+    transform: scale(1.2);
+    color: rgba(59, 130, 246, 1);
+  }
+  100% {
+    transform: scale(1);
+    color: rgba(59, 130, 246, 0.8);
+  }
+}
+
+.range-info-container {
+  margin-bottom: 0;
+}
+
+.range-info-container + .flex {
+  margin-top: 24px;
 }
 
 /* テストステータス */
@@ -126,4 +164,488 @@
   color: rgba(255, 255, 255, 0.8);
   font-style: italic;
   margin-top: 16px;
+}
+
+/* ==========================================================================
+   ステップインジケーター
+   ========================================================================== */
+.step-indicator {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  color: rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.step-indicator.active {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-color: #3b82f6;
+  color: white;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+}
+
+.step-indicator.completed {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-color: #10b981;
+  color: white;
+}
+
+.step-connector {
+  flex: 0 0 40px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.step-connector.active {
+  background: linear-gradient(90deg, #10b981, #3b82f6);
+}
+
+
+/* ==========================================================================
+   音声指示セクション
+   ========================================================================== */
+.voice-instruction {
+  position: relative;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 16px;
+  padding: 24px;
+  margin: 24px 0;
+  text-align: center;
+  overflow: hidden;
+  animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 50px rgba(59, 130, 246, 0.8);
+  }
+}
+
+.voice-instruction-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.voice-instruction-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  letter-spacing: 0.05em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.voice-instruction-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  animation: pulse 2s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0;
+  }
+}
+
+/* 波紋エフェクト（追加） */
+.voice-instruction::before,
+.voice-instruction::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  animation: ripple 3s linear infinite;
+}
+
+.voice-instruction::after {
+  animation-delay: 1.5s;
+}
+
+@keyframes ripple {
+  0% {
+    width: 40px;
+    height: 40px;
+    opacity: 0.5;
+  }
+  100% {
+    width: 300px;
+    height: 300px;
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   音域テストセクション
+   ========================================================================== */
+
+/* テスト段階インジケーター */
+.range-test-status {
+  margin-bottom: 32px;
+}
+
+.test-phase-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.phase-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.phase-number {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.phase-item.active {
+  color: #3b82f6;
+}
+
+.phase-item.active .phase-number {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.phase-item.completed {
+  color: #10b981;
+}
+
+.phase-item.completed .phase-number {
+  background: #10b981;
+  border-color: #10b981;
+  color: white;
+}
+
+.phase-connector {
+  width: 40px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 1px;
+}
+
+.phase-connector.active {
+  background: linear-gradient(90deg, #10b981, #3b82f6);
+}
+
+/* 現在テスト中の音表示 */
+.current-test-note {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.test-note-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* 音域テスト専用 - 完全オリジナルクラス */
+
+/* 音域テストレイアウト */
+.range-test-layout {
+  position: relative;
+  margin: 20px auto;
+  width: 160px;
+  height: 160px;
+}
+
+.range-test-left {
+  position: absolute;
+  left: -160px;
+  top: 60%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.range-test-right {
+  position: absolute;
+  right: -170px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.countdown-text {
+  font-size: 4rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1;
+  margin: 0;
+}
+.voice-range-display-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  width: 160px;
+  height: 160px;
+}
+
+/* SVG円形プログレス */
+.voice-stability-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.voice-progress-circle {
+  transition: stroke-dashoffset 0.1s ease;
+}
+
+/* 確定時のアニメーション */
+.voice-stability-svg.completed .voice-progress-circle {
+  stroke: #10b981;
+  animation: voice-completion-pulse 0.5s ease-out;
+}
+
+@keyframes voice-completion-pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* 音程表示バッジ */
+.voice-note-badge {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.voice-note-badge.measuring {
+  animation: voice-badge-pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+}
+
+.voice-note-badge.confirmed {
+  animation: voice-badge-confirm 0.6s ease-out;
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.6);
+}
+
+@keyframes voice-badge-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(245, 158, 11, 0.7);
+  }
+}
+
+@keyframes voice-badge-confirm {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 0 35px rgba(16, 185, 129, 0.8);
+  }
+  100% {
+    transform: scale(1);
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+  }
+}
+
+.voice-note-text {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.voice-freq-text {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+
+.note-name {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.note-frequency {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+.test-instruction {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.test-instruction.measuring {
+  animation: instruction-glow 2s ease-in-out infinite;
+}
+
+@keyframes instruction-glow {
+  0%, 100% {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.2);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    background: rgba(245, 158, 11, 0.25);
+    border-color: rgba(245, 158, 11, 0.4);
+    box-shadow: 0 0 25px rgba(245, 158, 11, 0.6);
+  }
+}
+
+.test-instruction p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* 検出メーター */
+.detection-meters {
+  margin-bottom: 24px;
+}
+
+.detection-meters .meter-group {
+  margin-bottom: 16px;
+}
+
+/* 高さ縮小アニメーション */
+.collapse-out {
+  animation: collapseOut 1.0s cubic-bezier(0, 0, 0.8, 1) forwards;
+  overflow: hidden;
+}
+
+@keyframes collapseOut {
+  0% {
+    max-height: 200px;
+    opacity: 1;
+    margin: 24px 0;
+    padding: 24px;
+  }
+  60% {
+    opacity: 0;
+    padding: 12px 24px;
+  }
+  100% {
+    max-height: 0;
+    opacity: 0;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* 登場アニメーション */
+.fade-in-up {
+  animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
