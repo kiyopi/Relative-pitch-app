@@ -513,22 +513,23 @@
 }
 
 .note-circle.current {
-  background: linear-gradient(135deg, #ff69b4, #ff1493);
+  background: #ff69b4;  /* シンプルな単色 */
   color: #ffffff;
-  transform: scale(1.2);
-  box-shadow: 0 0 20px rgba(255, 105, 180, 0.6);
-  border-color: rgba(255, 255, 255, 0.4);
+  /* transform: scale(1.2); 削除 */
+  /* box-shadow: 0 0 20px rgba(255, 105, 180, 0.6); 削除 */
+  border-color: #ff1493;
 }
 
 .note-circle.completed {
-  background: linear-gradient(135deg, rgba(255, 105, 180, 0.6), rgba(255, 20, 147, 0.4));
+  background: rgba(255, 105, 180, 0.5);  /* シンプルな半透明 */
   color: #ffffff;
-  border-color: rgba(255, 105, 180, 0.4);
-  box-shadow: 0 0 15px rgba(255, 105, 180, 0.4);
-  backdrop-filter: blur(4px);
+  border-color: rgba(255, 105, 180, 0.7);
+  /* box-shadow: 0 0 15px rgba(255, 105, 180, 0.4); 削除 */
+  /* backdrop-filter: blur(4px); 削除 */
 }
 
-/* 波紋エフェクト */
+/* 波紋エフェクト - 無効化 */
+/*
 @keyframes ripple {
   0% {
     transform: translate(-50%, -50%) scale(1);
@@ -567,6 +568,7 @@
   transform-origin: center;
   animation: ripple 1.5s infinite 0.75s;
 }
+*/
 
 
 /* 音域テスト専用 - 完全オリジナルクラス */

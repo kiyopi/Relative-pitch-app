@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>シンプル タイミングテスト</title>
+    <style>
+        body {
+            margin: 20px;
+            background: #0a0e27;
+            color: white;
+            font-family: monospace;
+        }
+        
+        .bar {
+            width: 100%;
+            height: 50px;
+            background: #333;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .fill {
+            height: 100%;
+            width: 0%;
+            background: lime;
+        }
+        
+        .doremi {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .note {
+            width: 50px;
+            height: 50px;
+            background: #333;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .note.on {
+            background: #ff69b4;
+        }
+        
+        button {
+            padding: 10px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>タイミングテスト</h2>
+    
+    <button onclick="test(0)">0ms</button>
+    <button onclick="test(100)">100ms</button>
+    <button onclick="test(200)">200ms</button>
+    <button onclick="test(300)">300ms</button>
+    <button onclick="test(400)">400ms</button>
+    
+    <div class="bar">
+        <div class="fill" id="bar"></div>
+    </div>
+    
+    <div class="doremi" id="doremi">
+        <div class="note">ド</div>
+        <div class="note">レ</div>
+        <div class="note">ミ</div>
+        <div class="note">ファ</div>
+        <div class="note">ソ</div>
+        <div class="note">ラ</div>
+        <div class="note">シ</div>
+        <div class="note">ド</div>
+    </div>
+    
+    <script>
+        function test(ms) {
+            const bar = document.getElementById('bar');
+            const notes = document.querySelectorAll('.note');
+            
+            // リセット
+            bar.style.transition = 'none';
+            bar.style.width = '0%';
+            notes.forEach(n => n.classList.remove('on'));
+            
+            // 開始
+            requestAnimationFrame(() => {
+                bar.style.transition = 'width 2.5s linear';
+                bar.style.width = '100%';
+                
+                setTimeout(() => {
+                    let i = 0;
+                    const timer = setInterval(() => {
+                        if (i > 0) notes[i-1].classList.remove('on');
+                        if (i < notes.length) {
+                            notes[i].classList.add('on');
+                            i++;
+                        } else {
+                            clearInterval(timer);
+                        }
+                    }, 662.5);
+                }, 2500 - ms);
+            });
+        }
+    </script>
+</body>
+</html>

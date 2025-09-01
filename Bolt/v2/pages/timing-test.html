@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>タイミング測定テスト</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0a0e27;
+            color: white;
+            font-family: monospace;
+        }
+        
+        .test-box {
+            width: 100%;
+            height: 100px;
+            background: red;
+            margin: 20px 0;
+        }
+        
+        .progress-test {
+            width: 100%;
+            height: 20px;
+            background: #333;
+            margin: 20px 0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill-test {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00ff00, #00ff00);
+            border-radius: 10px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px 5px;
+            cursor: pointer;
+        }
+        
+        .log {
+            background: #111;
+            padding: 10px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-size: 14px;
+            line-height: 1.5;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .marker {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            background: blue;
+            margin: 0 10px;
+            vertical-align: middle;
+        }
+        
+        .doremi-simple {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .note-simple {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #333;
+            border: 2px solid #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .note-simple.active {
+            background: #ff69b4;
+            border-color: #ff1493;
+            color: white;
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.6);
+        }
+        
+        .note-simple.completed {
+            background: rgba(255, 105, 180, 0.3);
+            border-color: rgba(255, 105, 180, 0.5);
+            color: #ff69b4;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSSトランジション タイミング測定</h1>
+    
+    <div>
+        <button onclick="runTest(0)">補正なし (2500ms)</button>
+        <button onclick="runTest(100)">100ms補正</button>
+        <button onclick="runTest(200)">200ms補正</button>
+        <button onclick="runTest(300)">300ms補正</button>
+        <button onclick="runTest(400)">400ms補正</button>
+    </div>
+    
+    <h3>プログレスバー</h3>
+    <div class="progress-test">
+        <div class="progress-fill-test" id="progress"></div>
+    </div>
+    
+    <h3>色変化ボックス（setTimeout）</h3>
+    <div class="test-box" id="box"></div>
+    
+    <h3>マーカー（視覚的同期確認）</h3>
+    <div>
+        <span class="marker" id="marker1"></span>
+        プログレス完了
+        <span class="marker" id="marker2"></span>
+        setTimeout発火
+    </div>
+    
+    <h3>シンプル ドレミガイド</h3>
+    <div class="doremi-simple" id="doremi-simple">
+        <div class="note-simple" data-note="ド">ド</div>
+        <div class="note-simple" data-note="レ">レ</div>
+        <div class="note-simple" data-note="ミ">ミ</div>
+        <div class="note-simple" data-note="ファ">ファ</div>
+        <div class="note-simple" data-note="ソ">ソ</div>
+        <div class="note-simple" data-note="ラ">ラ</div>
+        <div class="note-simple" data-note="シ">シ</div>
+        <div class="note-simple" data-note="ド">ド</div>
+    </div>
+    
+    <h3>ログ</h3>
+    <div class="log" id="log"></div>
+    
+    <script>
+        let logEl = document.getElementById('log');
+        let startTime;
+        
+        function log(msg) {
+            const time = performance.now() - startTime;
+            logEl.innerHTML += `[${time.toFixed(0)}ms] ${msg}<br>`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+        
+        function runTest(correction) {
+            // リセット
+            logEl.innerHTML = '';
+            const progress = document.getElementById('progress');
+            const box = document.getElementById('box');
+            const marker1 = document.getElementById('marker1');
+            const marker2 = document.getElementById('marker2');
+            const notes = document.querySelectorAll('.note-simple');
+            
+            progress.style.transition = 'none';
+            progress.style.width = '0%';
+            box.style.background = 'red';
+            marker1.style.background = 'blue';
+            marker2.style.background = 'blue';
+            
+            // ドレミガイドリセット
+            notes.forEach(note => {
+                note.classList.remove('active', 'completed');
+            });
+            
+            startTime = performance.now();
+            log(`テスト開始（補正: ${correction}ms）`);
+            
+            // 次のフレームで開始
+            requestAnimationFrame(() => {
+                log('requestAnimationFrame実行');
+                
+                // プログレスバー開始
+                progress.style.transition = 'width 2.5s linear';
+                progress.style.width = '100%';
+                log('プログレスバー アニメーション開始');
+                
+                // transitionendイベント
+                progress.addEventListener('transitionend', function onEnd() {
+                    progress.removeEventListener('transitionend', onEnd);
+                    log('🔵 transitionendイベント発火');
+                    marker1.style.background = 'lime';
+                }, { once: true });
+                
+                // setTimeout（補正あり）でドレミガイド開始
+                setTimeout(() => {
+                    log(`🟢 setTimeout発火（${2500 - correction}ms）`);
+                    box.style.background = 'lime';
+                    marker2.style.background = 'lime';
+                    startDoremiGuide();
+                }, 2500 - correction);
+                
+                // 比較用：理論値での発火
+                setTimeout(() => {
+                    log('⚪ 理論値2500ms到達');
+                }, 2500);
+            });
+        }
+        
+        function startDoremiGuide() {
+            const notes = document.querySelectorAll('.note-simple');
+            let currentIndex = 0;
+            log('ドレミガイド開始');
+            
+            const interval = setInterval(() => {
+                if (currentIndex > 0) {
+                    notes[currentIndex - 1].classList.remove('active');
+                    notes[currentIndex - 1].classList.add('completed');
+                }
+                
+                if (currentIndex < notes.length) {
+                    notes[currentIndex].classList.add('active');
+                    currentIndex++;
+                } else {
+                    clearInterval(interval);
+                    log('ドレミガイド完了');
+                }
+            }, 662.5);
+        }
+        
+        // パフォーマンス測定
+        document.addEventListener('DOMContentLoaded', function() {
+            const info = document.createElement('div');
+            info.style.marginTop = '20px';
+            info.innerHTML = `
+                <strong>デバイス情報:</strong><br>
+                User Agent: ${navigator.userAgent.substring(0, 50)}...<br>
+                画面サイズ: ${window.innerWidth} x ${window.innerHeight}<br>
+            `;
+            document.body.appendChild(info);
+        });
+    </script>
+</body>
+</html>

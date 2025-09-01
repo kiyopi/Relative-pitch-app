@@ -8,11 +8,22 @@
     <!-- フォント最適化 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- クリティカルCSS（インライン） -->
+    <style>
+        /* 初期表示に必要な最小限のスタイル */
+        body { margin: 0; background: #0a0e27; }
+        .container { opacity: 0; transition: opacity 0.3s; }
+        .container.loaded { opacity: 1; }
+    </style>
     
     <!-- スタイルシート -->
     <link rel="stylesheet" href="../styles/base.css">
     <link rel="stylesheet" href="../styles/training.css">
+    
+    <!-- フォント（非ブロッキング） -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"></noscript>
 </head>
 <body>
     <div class="container">
@@ -89,12 +100,18 @@
         </main>
     </div>
 
-    <!-- アイコンライブラリ -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <!-- アイコンライブラリ（非同期読み込み） -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
     
     <!-- TODO: 外部ファイル化 /js/training.js -->
-    <script>
-        lucide.createIcons();
+    <script defer>
+        // DOMContentLoadedで確実に実行
+        document.addEventListener('DOMContentLoaded', function() {
+            // コンテナをフェードイン
+            document.querySelector('.container').classList.add('loaded');
+            
+            // アイコン作成
+            lucide.createIcons();
 
         // 基音再生ボタンの処理
         document.getElementById('play-base-note').addEventListener('click', function() {
@@ -115,10 +132,10 @@
             progressFill.style.width = '100%';
             
             // ドレミガイド開始（タイミング調整版）
-            // 2.5秒 - 補正値でタイミングを合わせる
+            // CSSトランジションの遅延を補正
             setTimeout(() => {
                 startDoremiGuide();
-            }, 2100); // 400ms早めに開始（iPhoneでの検証結果に基づく）
+            }, 2100); // 400ms早めに開始（CSS遅延補正）
         }
 
         function startDoremiGuide() {
@@ -144,7 +161,8 @@
                 }
             }, 662.5); // 5.3秒 ÷ 8音 = 662.5ms
         }
-
+        
+        }); // DOMContentLoaded終了
     </script>
 </body>
 </html>

@@ -1145,3 +1145,11 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-01 15:23:01] コミット: training.html: タイミング補正値を400msに調整
+
+- iPhone Safariでの遅延を考慮
+- 2100ms（400ms補正）に変更
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
