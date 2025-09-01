@@ -18,8 +18,8 @@
     </style>
     
     <!-- スタイルシート -->
-    <link rel="stylesheet" href="../styles/base.css">
-    <link rel="stylesheet" href="../styles/training.css">
+    <link rel="stylesheet" href="../styles/base.css?v=2">
+    <link rel="stylesheet" href="../styles/training.css?v=2">
     
     <!-- フォント（非ブロッキング） -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -50,22 +50,28 @@
                         <p class="text-body">音程を再生してドレミガイドを開始します</p>
                     </div>
                     
-                    <div class="base-note-control">
+                    <div class="base-note-control section-bottom-item">
                         <button class="btn btn-primary" id="play-base-note">
                             <i data-lucide="volume-2" style="width: 24px; height: 24px;"></i>
                             <span>基音スタート</span>
                         </button>
+                        
+                        <!-- プログレス四角（ボタンと横並び） -->
                         <div class="progress-section-inline">
                             <div class="progress-labels">
                                 <span>ドレミガイド開始インターバル</span>
                             </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill gradient-catalog-blue" id="start-progress" style="width: 0%;"></div>
+                            <div class="progress-squares" id="progress-squares">
+                                <div class="progress-square"></div>
+                                <div class="progress-square"></div>
+                                <div class="progress-square"></div>
+                                <div class="progress-square"></div>
+                                <div class="progress-square"></div>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- ドレミガイド -->
+                    <!-- ドレミガイド（同じglass-card内） -->
                     <div class="doremi-guide section-bottom-item">
                         <div class="note-circles">
                             <div class="note-circle" data-note="ド">ド</div>
@@ -100,18 +106,17 @@
         </main>
     </div>
 
-    <!-- アイコンライブラリ（非同期読み込み） -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
-    
     <!-- TODO: 外部ファイル化 /js/training.js -->
-    <script defer>
-        // DOMContentLoadedで確実に実行
-        document.addEventListener('DOMContentLoaded', function() {
+    <script>
+        // Lucideライブラリの確実な読み込み
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/lucide@latest/dist/umd/lucide.js';
+
+        script.onload = function() {
+            lucide.createIcons();
+            
             // コンテナをフェードイン
             document.querySelector('.container').classList.add('loaded');
-            
-            // アイコン作成
-            lucide.createIcons();
 
         // 基音再生ボタンの処理
         document.getElementById('play-base-note').addEventListener('click', function() {
@@ -120,22 +125,25 @@
 
         function startTraining() {
             const button = document.getElementById('play-base-note');
-            const progressFill = document.getElementById('start-progress');
+            const progressSquares = document.querySelectorAll('.progress-square');
             
             // ボタンを無効化
             button.disabled = true;
             button.innerHTML = '<i data-lucide="volume-2" style="width: 24px; height: 24px;"></i><span>再生中...</span>';
             lucide.createIcons(); // アイコンを再作成
             
-            // プログレスバーアニメーション
-            progressFill.style.transition = 'width 2.5s linear';
-            progressFill.style.width = '100%';
-            
-            // ドレミガイド開始（タイミング調整版）
-            // CSSトランジションの遅延を補正
-            setTimeout(() => {
-                startDoremiGuide();
-            }, 2100); // 400ms早めに開始（CSS遅延補正）
+            // プログレス四角を順次消去（2.5秒で5個）
+            const squareInterval = 500; // 0.5秒間隔
+            progressSquares.forEach((square, index) => {
+                setTimeout(() => {
+                    square.classList.add('consumed');
+                    
+                    // 最後の四角が消去されたらドレミガイド開始
+                    if (index === progressSquares.length - 1) {
+                        startDoremiGuide();
+                    }
+                }, squareInterval * index);
+            });
         }
 
         function startDoremiGuide() {
@@ -162,7 +170,8 @@
             }, 662.5); // 5.3秒 ÷ 8音 = 662.5ms
         }
         
-        }); // DOMContentLoaded終了
+        };
+        document.head.appendChild(script);
     </script>
 </body>
 </html>

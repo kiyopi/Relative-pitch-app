@@ -483,8 +483,31 @@
 .note-circles {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
-  gap: 8px;
+  gap: 16px;
   margin-bottom: 0;
+  justify-content: center;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+/* プログレス四角 */
+.progress-squares {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.progress-square {
+  flex: 1;
+  height: 10px;
+  background: #60a5fa;
+  border-radius: 2px;
+}
+
+.progress-square.consumed {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* モバイル時は2行配置（上4下4） */
@@ -504,32 +527,31 @@
   justify-content: center;
   font-weight: 600;
   font-size: 0.875rem;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.8);
   position: relative;
   overflow: visible;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .note-circle.current {
-  background: #ff69b4;  /* シンプルな単色 */
+  background: linear-gradient(135deg, #ff69b4, #ff1493);
   color: #ffffff;
-  /* transform: scale(1.2); 削除 */
-  /* box-shadow: 0 0 20px rgba(255, 105, 180, 0.6); 削除 */
-  border-color: #ff1493;
+  transform: scale(1.2);
+  box-shadow: 0 0 20px rgba(255, 105, 180, 0.6);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .note-circle.completed {
-  background: rgba(255, 105, 180, 0.5);  /* シンプルな半透明 */
+  background: linear-gradient(135deg, rgba(255, 105, 180, 0.6), rgba(255, 20, 147, 0.4));
   color: #ffffff;
-  border-color: rgba(255, 105, 180, 0.7);
-  /* box-shadow: 0 0 15px rgba(255, 105, 180, 0.4); 削除 */
-  /* backdrop-filter: blur(4px); 削除 */
+  border-color: rgba(255, 105, 180, 0.4);
+  box-shadow: 0 0 15px rgba(255, 105, 180, 0.4);
+  backdrop-filter: blur(4px);
 }
 
-/* 波紋エフェクト - 無効化 */
-/*
+/* 波紋エフェクト */
 @keyframes ripple {
   0% {
     transform: translate(-50%, -50%) scale(1);
@@ -568,10 +590,10 @@
   transform-origin: center;
   animation: ripple 1.5s infinite 0.75s;
 }
-*/
 
-
-/* 音域テスト専用 - 完全オリジナルクラス */
+/* ==========================================================================
+   音域テスト専用 - 完全オリジナルクラス
+   ========================================================================== */
 
 /* 音域テストレイアウト */
 .range-test-layout {
