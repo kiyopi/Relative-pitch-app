@@ -1123,3 +1123,16 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-01 15:13:28] コミット: training.html実装: 基音再生とドレミガイド機能追加
+
+- training.html新規作成（preparation.htmlベースの構造）
+- 基音再生ボタンとプログレスバー連動実装
+- ドレミガイド8音順次点灯機能追加
+- 音量確認セクション（静的65%表示）
+- section-bottom-itemクラス追加（マージン重複防止用）
+- preparation.html最適化（未使用変数削除、重複コード関数化）
+- CSS各種マージン調整とスタイル最適化
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -110,22 +110,15 @@
             button.innerHTML = '<i data-lucide="volume-2" style="width: 24px; height: 24px;"></i><span>再生中...</span>';
             lucide.createIcons(); // アイコンを再作成
             
-            // 初期状態を確実に設定
-            progressFill.style.transition = 'none';
-            progressFill.style.width = '0%';
+            // プログレスバーアニメーション
+            progressFill.style.transition = 'width 2.5s linear';
+            progressFill.style.width = '100%';
             
-            // 次のフレームでトランジション開始（MDN推奨パターン）
-            requestAnimationFrame(() => {
-                progressFill.style.transition = 'width 2.5s linear';
-                progressFill.style.width = '100%';
-                
-                // transitionendイベントで正確に同期（ベストプラクティス）
-                const handleTransitionEnd = () => {
-                    progressFill.removeEventListener('transitionend', handleTransitionEnd);
-                    startDoremiGuide();
-                };
-                progressFill.addEventListener('transitionend', handleTransitionEnd);
-            });
+            // ドレミガイド開始（タイミング調整版）
+            // 2.5秒 - 補正値でタイミングを合わせる
+            setTimeout(() => {
+                startDoremiGuide();
+            }, 2300); // 200ms早めに開始（iPhoneでの検証結果に基づく）
         }
 
         function startDoremiGuide() {
