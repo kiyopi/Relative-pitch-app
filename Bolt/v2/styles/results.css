@@ -161,6 +161,14 @@
     transform: translateY(-4px);
 }
 
+/* note-result-item内のテキストスタイル - margin-bottomを0に */
+.note-result-item .text-body,
+.note-result-item .text-pitch-deviation-plus,
+.note-result-item .text-pitch-deviation-minus,
+.note-result-item .text-sub-title {
+    margin-bottom: 0;
+}
+
 /* カウントテキスト */
 .count-text {
     min-width: 20px;
@@ -286,6 +294,7 @@
     align-items: center;
     justify-content: center;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    margin-bottom: 1.5rem;
 }
 
 .rank-circle-icon {
@@ -544,6 +553,10 @@
 }
 
 /* セッション概要3列グリッド（レスポンシブ対応） */
+.score-section {
+    padding-bottom: 1.5rem;
+}
+
 .score-grid {
     display: flex;
     flex-direction: column;
@@ -961,7 +974,7 @@
 /* シェアセクション */
 .rank-share-section {
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 0;
 }
 
 .rank-share-section h3 {
@@ -989,6 +1002,7 @@
     align-items: center;
     justify-content: center;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    margin-bottom: 1.5rem;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 

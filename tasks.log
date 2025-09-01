@@ -1099,3 +1099,16 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with Claude Code
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-08-31 16:30:38] コミット: preparation.html最適化: リセットCSS追加・レイアウト改善・音域テストUI向上
+
+- 包括的なリセットCSS追加（p, h1-h6, ul/ol, フォーム要素等）
+- 全タイポグラフィクラスにmargin-bottom: 4px統一設定
+- test-sectionのmargin-bottom削除で高さ削減
+- ステータス表示のglass-card削除でよりシンプルに
+- voice-note-badgeに測定中/確定エフェクト追加（2秒周期パルス）
+- 音域テストアイコンの色分け（低音:青/高音:赤）実装
+- pタグ/divタグ混在時の余白不統一問題を根本解決
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

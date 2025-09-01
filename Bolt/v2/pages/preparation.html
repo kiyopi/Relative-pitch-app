@@ -426,6 +426,28 @@
             window.location.href = 'training.html';
         });
 
+        // 音域データ表示用の共通関数
+        function displaySavedRangeData(data, displayElement) {
+            const savedRange = document.getElementById('saved-range');
+            const savedOctaves = document.getElementById('saved-octaves');
+            const savedDate = document.getElementById('saved-date');
+            
+            if (savedRange) savedRange.textContent = `${data.lowestNote} - ${data.highestNote}`;
+            if (savedOctaves) savedOctaves.textContent = `${data.octaveCount}オクターブ`;
+            if (savedDate) {
+                const date = new Date(data.testDate);
+                savedDate.textContent = date.toLocaleDateString('ja-JP');
+            }
+            
+            // 表示要素を表示
+            if (displayElement) {
+                setTimeout(() => {
+                    displayElement.classList.remove('hidden');
+                    displayElement.classList.add('fade-in-up');
+                }, 200);
+            }
+        }
+
         // 音量シミュレーション
         function startVolumeSimulation() {
             console.log('音量シミュレーション開始');
@@ -486,23 +508,8 @@
                                     successMessage.textContent = '「ド」の音程を検出できました！音域は設定済みです。';
                                 }
                                 
-                                // 保存データを表示
-                                const savedRange = document.getElementById('saved-range');
-                                const savedOctaves = document.getElementById('saved-octaves');
-                                const savedDate = document.getElementById('saved-date');
-                                
-                                if (savedRange) savedRange.textContent = `${data.lowestNote} - ${data.highestNote}`;
-                                if (savedOctaves) savedOctaves.textContent = `${data.octaveCount}オクターブ`;
-                                if (savedDate) {
-                                    const date = new Date(data.testDate);
-                                    savedDate.textContent = date.toLocaleDateString('ja-JP');
-                                }
-                                
-                                // 保存済み表示を表示
-                                setTimeout(() => {
-                                    rangeSavedDisplay.classList.remove('hidden');
-                                    rangeSavedDisplay.classList.add('fade-in-up');
-                                }, 200);
+                                // 保存データを表示する共通関数を呼び出し
+                                displaySavedRangeData(data, rangeSavedDisplay);
                             } else {
                                 // 音域データがない場合、通常のメッセージとボタンを表示
                                 if (successMessage) {
@@ -557,7 +564,6 @@
             // 安定性検出用
             let stableFrequencies = [];
             let stabilityStartTime = null;
-            let currentDetectedNote = null;
             let detectionInterval = null;
             
             // 音名とHzのマッピング
@@ -873,13 +879,14 @@
                 const highestNote = testResults.highestNote || 'F5';
                 const octaveCount = calculateOctaveRange(lowestNote, highestNote);
                 
-                // 結果表示セクション更新（エラー対策でnullチェック追加）
-                const rangeSpan = document.querySelector('#result-section .result-row:nth-child(1) .result-value');
-                const octaveSpan = document.querySelector('#result-section .result-row:nth-child(2) .result-value');
-                
-                if (rangeSpan && octaveSpan) {
-                    rangeSpan.textContent = `${lowestNote} - ${highestNote}`;
-                    octaveSpan.textContent = `${octaveCount}オクターブ`;
+                // 結果表示セクション更新
+                const rangeInfoRows = document.querySelectorAll('#result-section .range-info-row');
+                if (rangeInfoRows.length >= 2) {
+                    const rangeSpan = rangeInfoRows[0].querySelector('.range-info-value');
+                    const octaveSpan = rangeInfoRows[1].querySelector('.range-info-value');
+                    
+                    if (rangeSpan) rangeSpan.textContent = `${lowestNote} - ${highestNote}`;
+                    if (octaveSpan) octaveSpan.textContent = `${octaveCount}オクターブ`;
                 }
                 
                 // localStorage保存
