@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>トレーニング - 8va相対音感トレーニング</title>
+    
+    <!-- フォント最適化 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/training.css">
+</head>
+<body>
+    <div class="container">
+        <!-- ヘッダー -->
+        <header class="page-header">
+            <div class="page-header-icon gradient-catalog-green">
+                <i data-lucide="target" 
+                   style="width: 48px; height: 48px; color: white; stroke-width: 2;"></i>
+            </div>
+            <h1 class="page-title">ランダム基音モード</h1>
+            <p class="page-description">トレーニング実施中</p>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main class="training-main">
+            <!-- マイク許可セクション -->
+            <div class="glass-card">
+                <section class="test-section" id="permission-section">
+                    <div class="section-header">
+                        <h4 class="text-sub-title heading-sm">
+                            <i data-lucide="music-3" class="text-blue-300"></i>
+                            <span>基音再生とドレミガイド</span>
+                        </h4>
+                        <p class="text-body">音程を再生してドレミガイドを開始します</p>
+                    </div>
+                    
+                    <div class="base-note-control">
+                        <button class="btn btn-primary" id="play-base-note">
+                            <i data-lucide="volume-2" style="width: 24px; height: 24px;"></i>
+                            <span>基音スタート</span>
+                        </button>
+                        <div class="progress-section-inline">
+                            <div class="progress-labels">
+                                <span>ドレミガイド開始インターバル</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill gradient-catalog-blue" id="start-progress" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ドレミガイド -->
+                    <div class="doremi-guide section-bottom-item">
+                        <div class="note-circles">
+                            <div class="note-circle" data-note="ド">ド</div>
+                            <div class="note-circle" data-note="レ">レ</div>
+                            <div class="note-circle" data-note="ミ">ミ</div>
+                            <div class="note-circle" data-note="ファ">ファ</div>
+                            <div class="note-circle" data-note="ソ">ソ</div>
+                            <div class="note-circle" data-note="ラ">ラ</div>
+                            <div class="note-circle" data-note="シ">シ</div>
+                            <div class="note-circle" data-note="ド">ド</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 音量確認セクション -->
+            <section>
+                <div class="glass-card">
+                    <h4 class="text-sub-title">音量確認</h4>
+                    <div class="meter-group">
+                        <div class="meter-label">
+                            <span>音量レベル</span>
+                            <span class="meter-value">65%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill gradient-catalog-green" style="width: 65%;"></div>
+                        </div>
+                    </div>
+                    <p class="text-body text-green-400">適切な音量です</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- アイコンライブラリ -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- TODO: 外部ファイル化 /js/training.js -->
+    <script>
+        lucide.createIcons();
+
+        // 基音再生ボタンの処理
+        document.getElementById('play-base-note').addEventListener('click', function() {
+            startTraining();
+        });
+
+        function startTraining() {
+            const button = document.getElementById('play-base-note');
+            const progressFill = document.getElementById('start-progress');
+            
+            // ボタンを無効化
+            button.disabled = true;
+            button.innerHTML = '<i data-lucide="volume-2" style="width: 24px; height: 24px;"></i><span>再生中...</span>';
+            lucide.createIcons(); // アイコンを再作成
+            
+            // 初期状態を確実に設定
+            progressFill.style.transition = 'none';
+            progressFill.style.width = '0%';
+            
+            // 次のフレームでトランジション開始（MDN推奨パターン）
+            requestAnimationFrame(() => {
+                progressFill.style.transition = 'width 2.5s linear';
+                progressFill.style.width = '100%';
+                
+                // transitionendイベントで正確に同期（ベストプラクティス）
+                const handleTransitionEnd = () => {
+                    progressFill.removeEventListener('transitionend', handleTransitionEnd);
+                    startDoremiGuide();
+                };
+                progressFill.addEventListener('transitionend', handleTransitionEnd);
+            });
+        }
+
+        function startDoremiGuide() {
+            const circles = document.querySelectorAll('.note-circle');
+            let currentIndex = 0;
+            
+            const interval = setInterval(() => {
+                if (currentIndex > 0) {
+                    circles[currentIndex - 1].classList.remove('current');
+                    circles[currentIndex - 1].classList.add('completed');
+                }
+                
+                if (currentIndex < circles.length) {
+                    circles[currentIndex].classList.add('current');
+                    currentIndex++;
+                } else {
+                    clearInterval(interval);
+                    // トレーニング完了後の処理
+                    // TODO: 自動ページ遷移（現在は無効化）
+                    // setTimeout(() => {
+                    //     window.location.href = 'result-session.html';
+                    // }, 1000);
+                }
+            }, 662.5); // 5.3秒 ÷ 8音 = 662.5ms
+        }
+
+    </script>
+</body>
+</html>

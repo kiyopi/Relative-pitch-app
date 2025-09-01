@@ -1112,3 +1112,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-01 12:03:01] コミット: UIスタイル最適化: マージン調整とコード整理
+
+- preparation.html: 未使用変数削除・重複コード解消
+- results.css: score-section、note-result-item内テキストマージン調整
+- base.css: accuracy-badgeにボトムマージン追加
+- result-session.html: フッター追加
+- results-overview.html: 不要なdescription削除
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

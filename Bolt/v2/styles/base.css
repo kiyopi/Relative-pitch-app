@@ -942,6 +942,13 @@ body::before {
   margin-bottom: 1rem;
 }
 
+/* セクション内の最後の項目用
+   セクション内の最後のコンテンツに設定して
+   ボトムマージンが重複しないようにするクラス */
+.section-bottom-item {
+  margin-bottom: 0;
+}
+
 /* アクションボタン群 */
 .action-buttons {
   display: flex;
