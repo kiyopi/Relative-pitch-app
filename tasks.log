@@ -1136,3 +1136,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-01 15:20:02] コミット: training.html: プログレスバーとドレミガイドのタイミング調整
+
+- transitionendイベントからsetTimeout方式に変更
+- タイミングを2300ms（200ms補正）に調整
+- iPhone Safariでの動作確認に基づく最適化
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
