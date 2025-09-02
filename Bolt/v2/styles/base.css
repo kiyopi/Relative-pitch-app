@@ -436,7 +436,7 @@ body::before {
   
   /* === bolt-new-design移植: レスポンシブヘッダー === */
   .page-title {
-    font-size: 2rem;
+    font-size: 1.5rem;
   }
 }
 
