@@ -1304,3 +1304,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-02 19:39:49] コミット: モバイルヘッダー修正: レイアウト・アイコンサイズ調整
+
+- ハンバーガーボタン: 44px×44px、アイコン24px固定
+- モバイル時app-header: 左右マージン0
+- モバイル時header-icon: 非表示
+- ドロップダウンメニュー: 位置・幅調整
+- メニュー内アイテム: パディング・ホバー効果追加
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

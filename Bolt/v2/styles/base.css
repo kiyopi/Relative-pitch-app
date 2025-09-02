@@ -1721,11 +1721,15 @@ body::before {
   gap: 1.25rem;
 }
 
-.header-icon {
+.header-icon-wrapper {
   display: none;
 }
 
 @media (min-width: 768px) {
+  .header-icon-wrapper {
+    display: block;
+  }
+  
   .header-icon {
     width: 56px;
     height: 56px;
