@@ -67,6 +67,8 @@ html {
 }
 
 body {
+  margin: 0;
+  padding: 0;
   position: relative;
   min-height: 100vh;
   min-height: -webkit-fill-available;
@@ -76,7 +78,6 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   font-variation-settings: normal;
-  /* パディングは各ページの.containerで管理 */
 }
 
 /* デフォルトマージン・パディングリセット */

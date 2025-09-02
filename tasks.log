@@ -1251,3 +1251,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-02 17:15:11] コミット: body上書きスタイル削除・実機確認用コミット
+
+- index.html, results-overview.html: body上書きスタイルを削除
+- base.cssのbody設定を使用（根本原因調査のため）
+- 実機でのマージン・パディング動作確認用
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
