@@ -1190,3 +1190,31 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-02 14:16:33] コミット: UI最適化とトレーニングフロー仕様書追加
+
+## 変更内容
+1. ページヘッダーの横並びレイアウト化
+   - アイコンを左配置、タイトルとサブタイトルを近接配置
+   - 全ページのヘッダー構造を統一（4rem × 4rem、内部36px）
+   - UIカタログに新旧ヘッダー構造を文書化
+
+2. preparation.html音域テストUI改善
+   - test-instructionサークルを60px、アイコン40pxに拡大
+   - マイクアイコンとテキストの配置最適化
+
+3. training.htmlトレーニングフロー実装
+   - ランダムモード: セッション評価に自動遷移
+   - 連続・12音モード: 自動進行で総合評価へ
+   - ボタン状態管理（基音スタート→再生中→トレーニング中）
+
+4. results.cssコンテナ幅調整
+   - training.htmlと統一（700px max-width）
+
+5. TRAINING_FLOW_SPECIFICATION.md作成
+   - モード別フロー詳細
+   - 12音モード音域調整機能仕様
+   - 基音データ管理とLocalStorage保存
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

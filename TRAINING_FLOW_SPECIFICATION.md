@@ -11,7 +11,47 @@
 5. モード別の完了処理
 ```
 
-### 1.2 ボタン状態の遷移
+### 1.2 モード別UI表示
+```javascript
+const modeConfig = {
+    random: {
+        name: 'ランダム基音モード',
+        totalSessions: 8,
+        icon: 'shuffle',           // ホームページと統一
+        description: 'トレーニング実施中'
+    },
+    continuous: {
+        name: '連続チャレンジモード',
+        totalSessions: 12,
+        icon: 'zap',              // ホームページと統一
+        description: 'クロマチック12音'
+    },
+    twelve: {
+        name: '12音階モード',
+        totalSessions: 12,
+        icon: 'music',            // ホームページと統一
+        description: '全音域対応'
+    }
+};
+
+// ヘッダー動的更新
+function initializeModeUI() {
+    const config = modeConfig[mode];
+    
+    // ページタイトル・サブタイトル更新
+    document.querySelector('.page-title').textContent = config.name;
+    document.querySelector('.page-subtitle').textContent = config.description;
+    
+    // ヘッダーアイコン更新
+    const headerIcon = document.querySelector('.page-header-icon i');
+    headerIcon.setAttribute('data-lucide', config.icon);
+    lucide.createIcons(); // アイコン再作成
+}
+```
+
+### 1.2 ボタン状態の遷移（モード別）
+
+#### ランダムモード
 ```javascript
 // 初期状態
 <button>🔊 基音スタート</button>
@@ -21,6 +61,18 @@
 
 // トレーニング中（2.5秒～完了まで）
 <button disabled>🧠 トレーニング中</button>
+```
+
+#### 連続・12音モード
+```javascript
+// 初期状態
+<button>🔊 基音スタート</button>
+
+// 基音再生中（0～2.5秒）
+<button disabled>🔊 再生中...</button>
+
+// トレーニング中（2.5秒～完了まで）
+<button onclick="セッション1へ">🔄 初めに戻る</button>
 ```
 
 ## 2. モード別詳細仕様
@@ -97,6 +149,11 @@ function handleTrainingComplete() {
         }
     }
 }
+
+// トレーニング中ボタン: 初めに戻る（確認なし）
+button.onclick = function() {
+    window.location.href = 'training.html?mode=continuous&session=1';
+};
 ```
 
 #### ボタン状態（連続モード特有）
@@ -342,6 +399,23 @@ const overallResult = {
 localStorage.setItem('lastOverallResult', JSON.stringify(overallResult));
 ```
 
+## 6. ユーザー操作の選択肢
+
+### 6.1 トレーニング中の操作
+- **12音・連続モード**: 基音再生ボタンが「初めに戻る」に変化
+- **ランダムモード**: ボタンは「トレーニング中」表示のみ
+- **ホームボタン**: 全モード共通でページ最下部に配置
+
+### 6.2 ボタン配置の設計思想
+- **基音再生ボタン**: モード特有の操作（やり直し・中止）
+- **ホームボタン**: 共通の脱出ルート（モード変更・完全中止）
+- **確認なし**: スムーズな操作でトレーニングを妨げない
+
+### 6.3 ユーザーニーズ対応
+1. **最初からやり直し**: 12音・連続モードの「初めに戻る」
+2. **トレーニング続行不可**: 全モードの「ホームに戻る」
+3. **モード変更**: ホームボタンからモード選択へ
+
 ## 7. 重要な注意事項
 
 ### 7.1 相対音感原則の遵守
@@ -359,19 +433,45 @@ localStorage.setItem('lastOverallResult', JSON.stringify(overallResult));
 - 自動進行中も操作不可
 - 各モードに応じた適切なテキスト表示
 
-## 8. テスト項目
+## 8. UI構成要素
 
-### 8.1 画面遷移テスト
+### 8.1 ボタン配置
+```html
+<!-- メイン操作ボタン（モード別動作） -->
+<button id="play-base-note">基音スタート</button>
+
+<!-- 共通脱出ボタン（最下部） -->
+<footer>
+    <button onclick="window.location.href='index.html'">
+        🏠 ホームに戻る
+    </button>
+</footer>
+```
+
+### 8.2 ボタン状態変化
+```javascript
+// 2.5秒後の状態変化
+if (mode === 'twelve' || mode === 'continuous') {
+    button.innerHTML = '🔄 初めに戻る';
+    button.onclick = () => location.href = `training.html?mode=${mode}&session=1`;
+} else {
+    button.innerHTML = '🧠 トレーニング中';
+}
+```
+
+## 9. テスト項目
+
+### 9.1 画面遷移テスト
 - [ ] ランダムモード: セッション評価への遷移
 - [ ] 連続モード: 自動進行の確認
 - [ ] 12音モード: 音域調整UIの表示
 
-### 8.2 ボタン状態テスト
+### 9.2 ボタン状態テスト
 - [ ] 初期状態の表示
 - [ ] 再生中の状態変化
 - [ ] トレーニング中の表示
 
-### 8.3 データ保存テスト
+### 9.3 データ保存テスト
 - [ ] LocalStorageへの保存
 - [ ] 結果データの整合性
 - [ ] グレード計算の正確性
