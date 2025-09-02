@@ -1269,3 +1269,16 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-02 19:00:46] コミット: CSS重複解消・進行バーUI統一: トレーニング用プログレスバー最適化
+
+- 不要ファイル削除: training-random.html, timing-test.html
+- CSS重複解消: .container, .note-circle, .progress-section重複削除
+- btn-secondary → btn-primary変更（未定義クラス解消）
+- 進行バーUI統一: session-badgeとボタン横並び配置
+- result-session.html構造修正: narrow-main適用で700px制限復旧
+- UIカタログ更新: 新進行バーコンポーネント追加、旧仕様削除
+- CLAUDE.md更新: system.css参照禁止ルール追加
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
