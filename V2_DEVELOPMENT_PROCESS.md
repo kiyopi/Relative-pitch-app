@@ -33,6 +33,7 @@ Grep [関連キーワード] /path/to/styles/
 - **高度なアニメーション**: エフェクト・反射・波紋
 - **レスポンシブグリッド**: 各種レイアウト対応
 - **バッジ・デバッグツール**: 評価表示・開発支援
+- **メインコンテンツ幅システム**: ページタイプ別幅制御
 
 ### **Step 2: 適切配置**
 ```
@@ -189,6 +190,46 @@ CSS読み込み前 → 「system.cssを使用していませんか？（v2では
 - 各作業後にプロセス有効性確認
 - 問題発生時はプロセス改善
 - ドキュメント更新継続
+
+---
+
+## 📐 メインコンテンツ幅システム
+
+### **統一クラス設計**
+```css
+/* ページ幅最大（ホーム・総合評価用） */
+.wide-main {
+  position: relative;
+  z-index: 10;
+  padding: var(--space-6);
+}
+
+/* 700px制限（トレーニング・準備用） */
+.narrow-main {
+  max-width: 700px;
+  margin: 0 auto;
+  padding-bottom: 60px;
+}
+```
+
+### **ページ別適用**
+- **ページ幅最大**: index.html, results-overview.html（情報量多・PC最適）
+- **700px制限**: training.html, preparation.html（シンプル構成・モバイル最適）
+
+### **実装パターン**
+```html
+<!-- ページ幅最大パターン -->
+<main class="wide-main">
+    <div class="container">
+        <!-- コンテンツ -->
+    </div>
+</main>
+
+<!-- 700px制限パターン -->
+<main class="narrow-main">
+    <!-- コンテンツ -->
+</main>
+```
 
 ---
 

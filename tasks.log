@@ -1229,3 +1229,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-02 16:29:25] コミット: index.html: 各モードボタンリンク追加・body構造最適化
+
+- 各始めるボタンに適切なモード別リンク追加（training.html?mode=xxx&session=1）
+- body構造をトレーニングページパターンに変更（コンテンツ幅最適化）
+- app-headerデザインは維持（ホーム専用デザイン）
+- 二重コンテナ構造解消でレイアウト改善
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
