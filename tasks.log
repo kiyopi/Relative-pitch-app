@@ -1315,3 +1315,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-02 19:44:31] コミット: モバイルヘッダーアイコン完全非表示対応
+
+- header-icon-wrapper追加でアイコン要素全体を制御
+- モバイル時: header-icon-wrapper完全非表示
+- PC時(768px以上): 通常表示
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

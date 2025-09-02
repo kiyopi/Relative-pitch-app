@@ -1793,32 +1793,50 @@ body::before {
 /* モバイルメニュー開いた状態 */
 .header-nav.active {
   display: flex;
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  background: rgba(10, 14, 39, 0.98);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: fixed;
+  top: 80px;
+  right: 1rem;
+  background: linear-gradient(135deg, 
+    rgba(30, 41, 82, 0.98),
+    rgba(10, 14, 39, 0.98)
+  );
+  border: 1px solid rgba(59, 130, 246, 0.3);
   border-radius: 12px;
   padding: 1rem;
   flex-direction: column;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
-  z-index: 100;
-  min-width: 180px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(20px);
+  z-index: 1000;
+  min-width: 200px;
   gap: 0.5rem;
 }
 
 .header-nav.active .nav-link,
 .header-nav.active .nav-button {
+  display: flex;
+  align-items: center;
   width: 100%;
   justify-content: flex-start;
   padding: 0.75rem;
   border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  gap: 0.75rem;
+}
+
+.header-nav.active .nav-link i,
+.header-nav.active .nav-button i {
+  width: 20px !important;
+  height: 20px !important;
+  flex-shrink: 0;
 }
 
 .header-nav.active .nav-link:hover,
 .header-nav.active .nav-button:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(59, 130, 246, 0.2);
 }
 
 /* PC表示時 */
@@ -1836,6 +1854,10 @@ body::before {
     flex-direction: row;
     box-shadow: none;
     backdrop-filter: none;
+  }
+  
+  .header-nav .nav-text {
+    display: none;
   }
 }
 
