@@ -1293,3 +1293,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-02 19:21:50] コミット: モバイルヘッダー改善: ハンバーガーメニュー実装
+
+- モバイル用ハンバーガーメニューボタン追加
+- ドロップダウン式ナビゲーションメニュー実装
+- メニュー開閉のトグル機能とアイコン切り替え
+- 外側クリックでメニュー自動閉じる機能
+- レスポンシブ対応: 768px以上で通常表示
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

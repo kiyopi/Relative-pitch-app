@@ -1689,13 +1689,30 @@ body::before {
 .app-header {
   position: relative;
   z-index: 10;
-  padding: 1.5rem;
+  padding: 1.5rem 0;
+}
+
+.app-header .header-brand {
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .app-header {
+    padding: 1.5rem;
+  }
 }
 
 .app-header .container {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .app-header .container {
+    padding: 0 var(--space-6);
+  }
 }
 
 .header-brand {
@@ -1705,17 +1722,23 @@ body::before {
 }
 
 .header-icon {
-  width: 56px;
-  height: 56px;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  border: 2px solid rgba(59, 130, 246, 0.3);
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
-  position: relative;
-  overflow: hidden;
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .header-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
 }
 
 .header-icon::before {
@@ -1735,14 +1758,21 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.menu-toggle i {
+  width: 24px !important;
+  height: 24px !important;
+  stroke-width: 2;
 }
 
 .menu-toggle:hover {
@@ -1760,8 +1790,8 @@ body::before {
 .header-nav.active {
   display: flex;
   position: absolute;
-  top: 100%;
-  right: 1.5rem;
+  top: calc(100% + 8px);
+  right: 0;
   background: rgba(10, 14, 39, 0.98);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
@@ -1770,6 +1800,21 @@ body::before {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
   z-index: 100;
+  min-width: 180px;
+  gap: 0.5rem;
+}
+
+.header-nav.active .nav-link,
+.header-nav.active .nav-button {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+
+.header-nav.active .nav-link:hover,
+.header-nav.active .nav-button:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* PC表示時 */
