@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>トレーニング - 8va相対音感トレーニング</title>
+    
+    <!-- フォント最適化 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- クリティカルCSS（インライン） -->
+    <style>
+        /* 初期表示に必要な最小限のスタイル */
+        body { margin: 0; background: #0a0e27; }
+        .container { opacity: 0; transition: opacity 0.3s; }
+        .container.loaded { opacity: 1; }
+    </style>
+    
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="../styles/base.css?v=2">
+    <link rel="stylesheet" href="../styles/training.css?v=2">
+    
+    <!-- フォント（非ブロッキング） -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"></noscript>
+</head>
+<body>
+    <div class="container">
+        <!-- ヘッダー -->
+        <header class="page-header">
+            <div class="page-header-icon gradient-catalog-green">
+                <i data-lucide="target" 
+                   style="width: 48px; height: 48px; color: white; stroke-width: 2;"></i>
+            </div>
+            <h1 class="page-title">ランダム基音モード</h1>
+            <p class="page-description">トレーニング実施中</p>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main class="training-main">
+            <!-- 進行バーセクション（セッション中） -->
+            <div class="progress-section">
+                <div class="progress-bar with-margin">
+                    <div class="progress-fill gradient-catalog-blue" style="width: 25%;"></div>
+                </div>
+                <div class="progress-label">セッション 2 / 8</div>
+            </div>
+            <!-- マイク許可セクション -->
+            <div class="glass-card">
+                <section class="test-section" id="permission-section">
+                    <div class="section-header">
+                        <h4 class="text-sub-title heading-md">
+                            <i data-lucide="music-3" class="text-blue-300"></i>
+                            <span>基音再生とドレミガイド</span>
+                        </h4>
+                        <p class="text-body">音程を再生してドレミガイドを開始します</p>
+                    </div>
+                    
+                    <div class="base-note-control section-bottom-item">
+                        <button class="btn btn-primary" id="play-base-note">
+                            <i data-lucide="volume-2" style="width: 24px; height: 24px;"></i>
+                            <span>基音スタート</span>
+                        </button>
+                        
+                        <!-- プログレス四角（ボタンと横並び） -->
+                        <div class="progress-section-inline">
+                            <div class="progress-labels">
+                                <span>ドレミガイド開始インターバル</span>
+                            </div>
+                            <div class="progress-squares" id="progress-squares">
+                                <div class="progress-square"></div>
+                                <div class="progress-square"></div>
+                                <div class="progress-square"></div>
+                                <div class="progress-square"></div>
+                                <div class="progress-square"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ドレミガイド（同じglass-card内） -->
+                    <div class="section-header">
+                        <h4 class="text-sub-title heading-sm">ドレミガイド</h4>
+                    </div>
+                    
+                    <div class="doremi-guide section-bottom-item">
+                        <div class="note-circles">
+                            <div class="note-circle" data-note="ド">ド</div>
+                            <div class="note-circle" data-note="レ">レ</div>
+                            <div class="note-circle" data-note="ミ">ミ</div>
+                            <div class="note-circle" data-note="ファ">ファ</div>
+                            <div class="note-circle" data-note="ソ">ソ</div>
+                            <div class="note-circle" data-note="ラ">ラ</div>
+                            <div class="note-circle" data-note="シ">シ</div>
+                            <div class="note-circle" data-note="ド">ド</div>
+                        </div>
+                        <div class="test-status">ガイドに合わせて発声しましょう</div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- マイク認識セクション -->
+            <section>
+                <div class="glass-card">
+                    <div class="flex items-center gap-3">
+                        <div class="test-instruction test-instruction-green" id="mic-badge">
+                            <i data-lucide="mic" style="width: 20px; height: 20px;"></i>
+                        </div>
+                        <div class="progress-bar flex">
+                            <div class="progress-fill gradient-catalog-green" style="width: 65%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- TODO: 外部ファイル化 /js/training.js -->
+    <script>
+        // Lucideライブラリの確実な読み込み
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/lucide@latest/dist/umd/lucide.js';
+
+        script.onload = function() {
+            lucide.createIcons();
+            
+            // コンテナをフェードイン
+            document.querySelector('.container').classList.add('loaded');
+
+        // 基音再生ボタンの処理
+        document.getElementById('play-base-note').addEventListener('click', function() {
+            startTraining();
+        });
+
+        function startTraining() {
+            const button = document.getElementById('play-base-note');
+            const progressSquares = document.querySelectorAll('.progress-square');
+            
+            // ボタンを無効化
+            button.disabled = true;
+            button.innerHTML = '<i data-lucide="volume-2" style="width: 24px; height: 24px;"></i><span>再生中...</span>';
+            lucide.createIcons(); // アイコンを再作成
+            
+            // プログレス四角を順次消去（2.5秒で5個）
+            const squareInterval = 500; // 0.5秒間隔
+            progressSquares.forEach((square, index) => {
+                setTimeout(() => {
+                    square.classList.add('consumed');
+                    
+                    // 最後の四角が消去されたらドレミガイド開始
+                    if (index === progressSquares.length - 1) {
+                        startDoremiGuide();
+                    }
+                }, squareInterval * index);
+            });
+        }
+
+        function startDoremiGuide() {
+            const circles = document.querySelectorAll('.note-circle');
+            const micBadge = document.getElementById('mic-badge');
+            let currentIndex = 0;
+            
+            // マイクバッジを認識中アニメーションに
+            micBadge.classList.add('measuring');
+            
+            const interval = setInterval(() => {
+                if (currentIndex > 0) {
+                    circles[currentIndex - 1].classList.remove('current');
+                    circles[currentIndex - 1].classList.add('completed');
+                }
+                
+                if (currentIndex < circles.length) {
+                    circles[currentIndex].classList.add('current');
+                    currentIndex++;
+                } else {
+                    clearInterval(interval);
+                    // トレーニング完了後の処理
+                    // TODO: 自動ページ遷移（現在は無効化）
+                    // setTimeout(() => {
+                    //     window.location.href = 'result-session.html';
+                    // }, 1000);
+                }
+            }, 662.5); // 5.3秒 ÷ 8音 = 662.5ms
+        }
+        
+        };
+        document.head.appendChild(script);
+    </script>
+</body>
+</html>

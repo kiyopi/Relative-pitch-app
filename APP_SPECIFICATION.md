@@ -485,6 +485,21 @@
 #### なぜ半音階すべてを使うのか
 音楽の世界では12の半音がすべての基礎となります。これらすべてに対して相対音感を持つことで、どんな調性の楽曲でも正確に歌えるようになります。
 
+#### 音域調整機能（12音階モード専用）
+**なぜ必要か**: 12音すべてを使用するため、最低音から最高音まで約2オクターブの範囲が必要となり、個人の音域やコンディションによっては調整が必要です。
+
+**調整画面UI（セッション開始前）**:
+- **音域プレビュー**: 最低音・最高音でのドレミファソラシド試聴
+- **調整ボタン**: 「音域を上げる」「音域を下げる」
+- **視覚的インジケーター**: 5段階のドット表示（とても低い・低い・標準・高い・とても高い）
+- **重要**: 基音の音名は一切表示しない（相対音感原則の遵守）
+
+**動作仕様**:
+- 調整範囲: 標準位置から±2段階（半音単位で±2音）
+- セッション開始後は調整不可（中断防止）
+- 声が出ない場合も継続推奨（音域外は自動的に不正解扱い）
+- 完了後に次回用の音域調整提案を表示
+
 #### 上級モードの3種類
 ユーザーのスキルレベルと練習目的に応じて選択可能です。
 
@@ -833,6 +848,158 @@ display(`現在: ${scaleNames[currentStep]} を歌ってください`);
 - **成功時**: 「共有ありがとうございます！」メッセージ表示
 - **キャンセル時**: 共有画面に留まる
 - **エラー時**: エラーメッセージ表示
+
+---
+
+## 11. 実装用モード別差分表と機能リスト
+
+### 11.1 モード別差分表
+
+| 機能/要素 | ランダム基音（初級） | 連続チャレンジ（中級） | 12音階（上級） |
+|----------|---------------------|----------------------|---------------|
+| **URL** | `/training?mode=random` | `/training?mode=continuous` | `/training?mode=12tone` |
+| **セッション数** | 8回 | 8回（連続） | 12回/24回 |
+| **基音選択** | C3オクターブ8音ランダム | クロマチック12音ランダム | クロマチック12音順次 |
+| **進行バー表示** | セッション X / 8 | セッション X / 8 | セッション X / 12(24) |
+| **セッション間** | 個別評価 → 次へ | 自動進行（評価なし） | 自動進行（評価なし） |
+| **評価タイミング** | 各セッション + 総合 | 総合のみ | 総合のみ |
+| **音域調整** | なし | なし | あり（開始前のみ） |
+| **ドレミ進行** | 上昇のみ | 上昇のみ | 上昇/下降/両方 |
+| **判定基準** | ±50セント | ±50セント | ±30セント |
+
+### 11.2 共通機能リスト（全モード共通）
+
+```javascript
+// すべてのモードで共通の機能
+const commonFeatures = {
+  // UI要素
+  header: true,                    // ページヘッダー
+  baseNoteSection: true,           // 基音再生セクション
+  progressBar: true,               // 進行バー（セッション表示のみ異なる）
+  doremiGuide: true,              // ドレミガイド
+  microphoneIndicator: true,      // マイク認識インジケーター
+  
+  // 機能
+  microphonePermission: true,     // マイク許可
+  pitchDetection: true,           // 音程検出
+  realTimeVisualFeedback: true,  // リアルタイム視覚フィードバック
+  sessionProgress: true,          // セッション進行管理
+  
+  // 制約
+  hideBaseNoteName: true,         // 基音の音名非表示（相対音感原則）
+  noFrequencyDisplay: true,       // 周波数非表示
+  noAbsolutePitchInfo: true      // 絶対音程情報非表示
+};
+```
+
+### 11.3 モード別固有機能リスト
+
+```javascript
+// モード別の固有機能
+const modeSpecificFeatures = {
+  random: {
+    individualSessionResults: true,  // 個別セッション評価
+    sessionTransition: 'manual',     // 手動で次セッションへ
+    baseNotePool: 8,                // 基音候補数
+    evaluationScreen: 'individual'   // 個別評価画面
+  },
+  
+  continuous: {
+    individualSessionResults: false, // 個別評価なし
+    sessionTransition: 'auto',      // 自動進行
+    baseNotePool: 12,               // 基音候補数（半音含む）
+    evaluationScreen: 'summary'     // 総合評価のみ
+  },
+  
+  '12tone': {
+    individualSessionResults: false, // 個別評価なし
+    sessionTransition: 'auto',      // 自動進行
+    baseNotePool: 12,               // 基音候補数（全音階）
+    evaluationScreen: 'summary',    // 総合評価のみ
+    rangeAdjustment: true,          // 音域調整機能
+    directionOptions: ['up', 'down', 'both'], // 進行方向選択
+    stricterAccuracy: true          // より厳密な判定（±30セント）
+  }
+};
+```
+
+### 11.4 実装時のモード判定ロジック
+
+```javascript
+// URLパラメータからモード判定
+const urlParams = new URLSearchParams(window.location.search);
+const mode = urlParams.get('mode') || 'random';
+const sessionNumber = parseInt(urlParams.get('session')) || 1;
+
+// モード設定の取得
+const modeConfig = {
+  random: {
+    maxSessions: 8,
+    title: 'ランダム基音モード',
+    hasIndividualResults: true,
+    baseNoteSelection: 'random_c3_octave'
+  },
+  continuous: {
+    maxSessions: 8,
+    title: '連続チャレンジモード',
+    hasIndividualResults: false,
+    baseNoteSelection: 'random_chromatic'
+  },
+  '12tone': {
+    maxSessions: 12, // または24（サブモードによる）
+    title: '12音階モード',
+    hasIndividualResults: false,
+    baseNoteSelection: 'sequential_chromatic',
+    hasRangeAdjustment: true
+  }
+};
+
+// 現在のモード設定を取得
+const currentMode = modeConfig[mode];
+
+// UIの動的更新
+document.querySelector('.page-title').textContent = currentMode.title;
+document.querySelector('.progress-label').textContent = 
+  `セッション ${sessionNumber} / ${currentMode.maxSessions}`;
+```
+
+### 11.5 音域調整機能の実装（12音階モードのみ）
+
+```javascript
+// 12音階モード専用の音域調整
+if (mode === '12tone' && !sessionStarted) {
+  // 音域調整UIを表示
+  showRangeAdjustmentUI();
+  
+  // 内部管理（音名は表示しない）
+  let rangeShift = 0; // -2 〜 +2
+  
+  // 調整ボタンのイベント
+  document.getElementById('lower-range').addEventListener('click', () => {
+    if (rangeShift > -2) {
+      rangeShift--;
+      updateRangeIndicator(rangeShift);
+    }
+  });
+  
+  document.getElementById('raise-range').addEventListener('click', () => {
+    if (rangeShift < 2) {
+      rangeShift++;
+      updateRangeIndicator(rangeShift);
+    }
+  });
+  
+  // 視覚的表示のみ（音名は隠す）
+  function updateRangeIndicator(shift) {
+    const labels = ['とても低い', '低い', '標準', '高い', 'とても高い'];
+    const dots = document.querySelectorAll('.range-dot');
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === shift + 2);
+    });
+    document.querySelector('.range-label').textContent = labels[shift + 2];
+  }
+}
+```
 
 ---
 

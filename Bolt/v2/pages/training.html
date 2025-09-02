@@ -39,11 +39,18 @@
 
         <!-- メインコンテンツ -->
         <main class="training-main">
+            <!-- 進行バーセクション（セッション中） -->
+            <div class="progress-section">
+                <div class="progress-bar with-margin">
+                    <div class="progress-fill gradient-catalog-blue" style="width: 25%;"></div>
+                </div>
+                <div class="progress-label">セッション 2 / 8</div>
+            </div>
             <!-- マイク許可セクション -->
             <div class="glass-card">
                 <section class="test-section" id="permission-section">
                     <div class="section-header">
-                        <h4 class="text-sub-title heading-sm">
+                        <h4 class="text-sub-title heading-md">
                             <i data-lucide="music-3" class="text-blue-300"></i>
                             <span>基音再生とドレミガイド</span>
                         </h4>
@@ -72,6 +79,10 @@
                     </div>
                     
                     <!-- ドレミガイド（同じglass-card内） -->
+                    <div class="section-header">
+                        <h4 class="text-sub-title heading-sm">ドレミガイド</h4>
+                    </div>
+                    
                     <div class="doremi-guide section-bottom-item">
                         <div class="note-circles">
                             <div class="note-circle" data-note="ド">ド</div>
@@ -83,31 +94,104 @@
                             <div class="note-circle" data-note="シ">シ</div>
                             <div class="note-circle" data-note="ド">ド</div>
                         </div>
+                        <div class="test-status">ガイドに合わせて発声しましょう</div>
+                        
+                        <!-- 12音階モード専用：音域調整（ドレミガイド下） -->
+                        <div class="range-adjustment" id="range-adjustment" style="display: none;">
+                            <!-- トグルヘッダー -->
+                            <div class="range-toggle-header" id="range-toggle-header">
+                                <div>
+                                    <h5 class="heading-sm">
+                                        <i data-lucide="sliders" class="text-blue-300"></i>
+                                        <span>音域調整</span>
+                                    </h5>
+                                    <p class="range-description text-sm text-white-60">あなたの声域に合わせて基音の高さを調整できます</p>
+                                </div>
+                                <button class="btn btn-ghost" id="range-toggle-btn">
+                                    <i data-lucide="chevron-down" style="width: 20px; height: 20px;"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- 調整コントロール（初期は非表示） -->
+                            <div class="range-controls" id="range-controls" style="display: none;">
+                                <div class="flex items-center gap-3">
+                                    <button class="btn btn-secondary" id="range-down">
+                                        <i data-lucide="chevron-down" style="width: 20px; height: 20px;"></i>
+                                        <span>下げる</span>
+                                    </button>
+                                    <div class="range-indicator" id="range-indicator">
+                                        <span class="text-sm">標準</span>
+                                    </div>
+                                    <button class="btn btn-secondary" id="range-up">
+                                        <i data-lucide="chevron-up" style="width: 20px; height: 20px;"></i>
+                                        <span>上げる</span>
+                                    </button>
+                                </div>
+                                
+                                <!-- 音域テストボタン -->
+                                <div class="range-test-buttons">
+                                    <div class="flex items-center gap-3">
+                                        <button class="btn btn-outline" id="test-lowest">
+                                            <i data-lucide="volume-1" style="width: 20px; height: 20px;"></i>
+                                            <span>最低音</span>
+                                        </button>
+                                        <button class="btn btn-outline" id="test-highest">
+                                            <i data-lucide="volume-2" style="width: 20px; height: 20px;"></i>
+                                            <span>最高音</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </div>
 
-            <!-- 音量確認セクション -->
+            <!-- マイク認識セクション -->
             <section>
                 <div class="glass-card">
-                    <h4 class="text-sub-title">音量確認</h4>
-                    <div class="meter-group">
-                        <div class="meter-label">
-                            <span>音量レベル</span>
-                            <span class="meter-value">65%</span>
+                    <div class="flex items-center gap-3">
+                        <div class="test-instruction test-instruction-green" id="mic-badge">
+                            <i data-lucide="mic" style="width: 20px; height: 20px;"></i>
                         </div>
-                        <div class="progress-bar">
+                        <div class="progress-bar flex">
                             <div class="progress-fill gradient-catalog-green" style="width: 65%;"></div>
                         </div>
                     </div>
-                    <p class="text-body text-green-400">適切な音量です</p>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- TODO: 外部ファイル化 /js/training.js -->
+    <!-- モード対応トレーニングスクリプト -->
     <script>
+        // モード設定の初期化
+        const urlParams = new URLSearchParams(window.location.search);
+        const mode = urlParams.get('mode') || 'random';
+        const sessionNum = parseInt(urlParams.get('session')) || 1;
+        
+        // モード別設定
+        const modeConfig = {
+            random: {
+                name: 'ランダム基音モード',
+                totalSessions: 8,
+                icon: 'target',
+                description: 'トレーニング実施中'
+            },
+            continuous: {
+                name: '連続チャレンジモード',
+                totalSessions: 12,
+                icon: 'zap',
+                description: 'クロマチック12音'
+            },
+            twelve: {
+                name: '12音階モード',
+                totalSessions: 12,
+                icon: 'music',
+                description: '全音域対応'
+            }
+        };
+
         // Lucideライブラリの確実な読み込み
         const script = document.createElement('script');
         script.src = 'https://unpkg.com/lucide@latest/dist/umd/lucide.js';
@@ -115,13 +199,108 @@
         script.onload = function() {
             lucide.createIcons();
             
+            // モード別UI初期化
+            initializeModeUI();
+            
             // コンテナをフェードイン
             document.querySelector('.container').classList.add('loaded');
 
-        // 基音再生ボタンの処理
-        document.getElementById('play-base-note').addEventListener('click', function() {
-            startTraining();
-        });
+            // 基音再生ボタンの処理
+            document.getElementById('play-base-note').addEventListener('click', function() {
+                startTraining();
+            });
+        };
+
+        // 音域調整の状態管理
+        let rangeOffset = 0; // -2から+2まで（半音5段階）
+        
+        function initializeModeUI() {
+            const config = modeConfig[mode];
+            
+            // ヘッダー更新
+            const pageTitle = document.querySelector('.page-title');
+            const pageDescription = document.querySelector('.page-description');
+            const headerIcon = document.querySelector('.page-header-icon i');
+            
+            if (pageTitle) pageTitle.textContent = config.name;
+            if (pageDescription) pageDescription.textContent = config.description;
+            if (headerIcon) headerIcon.setAttribute('data-lucide', config.icon);
+            
+            // 進行バー更新
+            const progressFill = document.querySelector('.progress-fill');
+            const progressLabel = document.querySelector('.progress-label');
+            
+            if (progressFill && progressLabel) {
+                const progressPercent = Math.round((sessionNum / config.totalSessions) * 100);
+                progressFill.style.width = progressPercent + '%';
+                progressLabel.textContent = `セッション ${sessionNum} / ${config.totalSessions}`;
+            }
+            
+            // 12音階モードの場合：音域調整を表示
+            if (mode === 'twelve') {
+                const rangeAdjustment = document.getElementById('range-adjustment');
+                if (rangeAdjustment) {
+                    rangeAdjustment.style.display = 'block';
+                    initializeRangeAdjustment();
+                }
+            }
+            
+            // アイコン再作成
+            lucide.createIcons();
+        }
+        
+        function initializeRangeAdjustment() {
+            // トグル機能
+            const toggleHeader = document.getElementById('range-toggle-header');
+            const toggleBtn = document.getElementById('range-toggle-btn');
+            const controls = document.getElementById('range-controls');
+            let isExpanded = false;
+            
+            toggleHeader.addEventListener('click', function() {
+                isExpanded = !isExpanded;
+                controls.style.display = isExpanded ? 'block' : 'none';
+                
+                const chevronIcon = toggleBtn.querySelector('i');
+                chevronIcon.setAttribute('data-lucide', isExpanded ? 'chevron-up' : 'chevron-down');
+                lucide.createIcons();
+            });
+            
+            // 音域調整ボタンのイベントリスナー
+            document.getElementById('range-down').addEventListener('click', function() {
+                if (rangeOffset > -2) {
+                    rangeOffset--;
+                    updateRangeIndicator();
+                }
+            });
+            
+            document.getElementById('range-up').addEventListener('click', function() {
+                if (rangeOffset < 2) {
+                    rangeOffset++;
+                    updateRangeIndicator();
+                }
+            });
+            
+            // 音域テストボタン
+            document.getElementById('test-lowest').addEventListener('click', function() {
+                playRangeTest('lowest');
+            });
+            
+            document.getElementById('test-highest').addEventListener('click', function() {
+                playRangeTest('highest');
+            });
+        }
+        
+        function updateRangeIndicator() {
+            const indicator = document.getElementById('range-indicator').querySelector('span');
+            const rangeLabels = ['低音域', '低め', '標準', '高め', '高音域'];
+            indicator.textContent = rangeLabels[rangeOffset + 2];
+        }
+        
+        function playRangeTest(type) {
+            // 音域テスト再生（実装例）
+            console.log(`${type === 'lowest' ? '最低音' : '最高音'}テスト再生 (offset: ${rangeOffset})`);
+            // TODO: Web Audio APIで実際の音程再生
+        }
 
         function startTraining() {
             const button = document.getElementById('play-base-note');
@@ -148,7 +327,11 @@
 
         function startDoremiGuide() {
             const circles = document.querySelectorAll('.note-circle');
+            const micBadge = document.getElementById('mic-badge');
             let currentIndex = 0;
+            
+            // マイクバッジを認識中アニメーションに
+            micBadge.classList.add('measuring');
             
             const interval = setInterval(() => {
                 if (currentIndex > 0) {
@@ -162,15 +345,28 @@
                 } else {
                     clearInterval(interval);
                     // トレーニング完了後の処理
-                    // TODO: 自動ページ遷移（現在は無効化）
-                    // setTimeout(() => {
-                    //     window.location.href = 'result-session.html';
-                    // }, 1000);
+                    handleTrainingComplete();
                 }
             }, 662.5); // 5.3秒 ÷ 8音 = 662.5ms
         }
+
+        function handleTrainingComplete() {
+            const config = modeConfig[mode];
+            
+            // セッション完了処理
+            setTimeout(() => {
+                // 次のセッションまたは結果ページへ遷移
+                if (sessionNum < config.totalSessions) {
+                    // 次のセッションへ
+                    const nextSession = sessionNum + 1;
+                    window.location.href = `training.html?mode=${mode}&session=${nextSession}`;
+                } else {
+                    // 全セッション完了 - 結果ページへ
+                    window.location.href = `results-overview.html?mode=${mode}`;
+                }
+            }, 1000);
+        }
         
-        };
         document.head.appendChild(script);
     </script>
 </body>
