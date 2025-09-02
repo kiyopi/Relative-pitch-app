@@ -825,8 +825,10 @@ body::before {
 }
 
 .progress-bar.with-margin {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
 }
+
+/* トレーニング用進行バーセクション → training.cssに移行 */
 
 .progress-fill {
   height: 100%;
@@ -1126,38 +1128,7 @@ body::before {
 
 
 /* === bolt-new-design移植: インタラクティブ要素 === */
-.note-circle {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 0.875rem;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.6);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  position: relative;
-  overflow: visible;
-}
-
-.note-circle.current {
-  background: linear-gradient(135deg, #ff69b4, #ff1493);
-  color: var(--text-white);
-  transform: scale(1.2);
-  box-shadow: 0 0 20px rgba(255, 105, 180, 0.6);
-  border-color: rgba(255, 255, 255, 0.4);
-}
-
-.note-circle.completed {
-  background: linear-gradient(135deg, rgba(255, 105, 180, 0.6), rgba(255, 20, 147, 0.4));
-  color: var(--text-white);
-  border-color: rgba(255, 105, 180, 0.4);
-  box-shadow: 0 0 15px rgba(255, 105, 180, 0.4);
-  backdrop-filter: blur(4px);
-}
+/* .note-circle定義はtraining.cssに移行（トレーニング専用のため） */
 
 .volume-meter {
   display: flex;
@@ -1209,8 +1180,10 @@ body::before {
   border: 1px solid rgba(59, 130, 246, 0.3);
   border-radius: 20px;
   color: #93c5fd;
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* === bolt-new-design移植: グリッドレイアウト（削除 - 新定義を使用） === */

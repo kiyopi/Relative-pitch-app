@@ -167,10 +167,18 @@
 4. **CSS重複解消**: 複数CSSファイルの同一クラス定義を統一
 5. **スタイル統一後**: JavaScript実装の修正・更新
 
+### **🚨 CSS調査・修正時の厳格な制約**
+**system.css参照禁止**:
+- ❌ **system.css確認禁止** - 対象外ファイルのため調査・参照しない
+- ❌ **system.css修正禁止** - いかなる場合も変更対象外
+- ✅ **対象ファイル**: base.css、results.css、training.css、ui-catalog.css のみ
+- ✅ **重複調査範囲**: v2フォルダ内の上記CSSファイル間のみ
+
 **注意点**:
 - 静的HTMLとJavaScript生成が混在している場合は事前確認必須
 - CSS競合（base.css vs results.css等）の可能性を常にチェック
 - UIカタログの説明構造を実際のページに混入させない
+- system.cssは基盤ファイルとして触れず、必要な定義はbase.cssに追加
 
 ## 🌿 Git運用方針
 

@@ -12,7 +12,6 @@
     <!-- クリティカルCSS（インライン） -->
     <style>
         /* 初期表示に必要な最小限のスタイル */
-        body { margin: 0; background: #0a0e27; }
         .container { opacity: 0; transition: opacity 0.3s; }
         .container.loaded { opacity: 1; }
     </style>
@@ -45,11 +44,15 @@
         <!-- メインコンテンツ -->
         <main class="narrow-main">
             <!-- 進行バーセクション（セッション中） -->
-            <div class="progress-section">
-                <div class="progress-bar with-margin">
-                    <div class="progress-fill gradient-catalog-blue" style="width: 25%;"></div>
+            <div class="progress-section progress-section-training">
+                <div class="flex items-center gap-4">
+                    <div class="progress-bar with-margin">
+                        <div class="progress-fill gradient-catalog-blue" style="width: 25%;"></div>
+                    </div>
+                    <div class="session-badge">
+                        セッション 1/8
+                    </div>
                 </div>
-                <div class="progress-label">セッション 2 / 8</div>
             </div>
             <!-- マイク許可セクション -->
             <div class="glass-card">
@@ -120,14 +123,14 @@
                             <div class="range-controls" id="range-controls" style="display: none;">
                                 <p class="range-description text-sm text-white-60" style="margin-bottom: 16px;">あなたの声域に合わせて基音の高さを調整できます</p>
                                 <div class="flex items-center gap-3">
-                                    <button class="btn btn-secondary" id="range-down">
+                                    <button class="btn btn-primary" id="range-down">
                                         <i data-lucide="chevron-down" style="width: 20px; height: 20px;"></i>
                                         <span>下げる</span>
                                     </button>
                                     <div class="range-indicator" id="range-indicator">
                                         <span class="text-sm">標準</span>
                                     </div>
-                                    <button class="btn btn-secondary" id="range-up">
+                                    <button class="btn btn-primary" id="range-up">
                                         <i data-lucide="chevron-up" style="width: 20px; height: 20px;"></i>
                                         <span>上げる</span>
                                     </button>

@@ -8,6 +8,7 @@
     <title>8va相対音感トレーニング - セッション評価</title>
     <link rel="stylesheet" href="../styles/base.css">
     <link rel="stylesheet" href="../styles/results.css">
+    <link rel="stylesheet" href="../styles/training.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -16,9 +17,7 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
-    <div class="min-h-screen p-6">
-        <div class="container">
-            <!-- ヘッダー -->
+        <!-- ヘッダー -->
             <header class="page-header">
                 <div class="page-header-content">
                     <div class="page-header-icon-wrapper">
@@ -33,16 +32,18 @@
                 </div>
             </header>
 
+        <!-- メインコンテンツ -->
+        <main class="narrow-main">
             <!-- 進行バー -->
-            <div class="glass-card">
-                <div class="progress-section completed">
-                    <div class="progress-content">
-                        <div class="progress-bar with-margin">
-                            <div class="progress-fill gradient-catalog-blue" style="width: 25%;"></div>
-                        </div>
-                        <div class="progress-label">セッション 2 / 8</div>
+            <div class="progress-section progress-section-training">
+                <div class="flex items-center gap-4">
+                    <div class="progress-bar with-margin">
+                        <div class="progress-fill gradient-catalog-blue" style="width: 25%;"></div>
                     </div>
-                    <button class="btn btn-primary progress-action" onclick="window.location.href='training.html'">
+                    <div class="session-badge">
+                        セッション 1/8
+                    </div>
+                    <button class="btn btn-primary" onclick="window.location.href='training.html'">
                         <i data-lucide="arrow-right" style="width: 24px; height: 24px;"></i>
                         <span>次の基音へ</span>
                     </button>
@@ -357,12 +358,13 @@
             </section>
 
             <!-- フッター -->
-            <footer class="footer-base">
-                <p class="footer-copyright">© 2024 8va相対音感トレーニングアプリ</p>
-                <p class="footer-tagline">音楽の新しい扉を開こう</p>
-            </footer>
-        </div>
-    </div>
+        </main>
+        
+        <!-- フッター -->
+        <footer class="footer-base">
+            <p class="footer-copyright">© 2024 8va相対音感トレーニングアプリ</p>
+            <p class="footer-tagline">音楽の新しい扉を開こう</p>
+        </footer>
 
     <!-- Lucide初期化 -->
     <script src="../js/lucide-init.js"></script>

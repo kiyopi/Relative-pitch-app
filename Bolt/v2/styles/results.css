@@ -1,10 +1,6 @@
 /* results.css - 統合評価ページ専用スタイル */
 
-/* コンテナ幅700px指定 */
-.container {
-    max-width: 700px;
-    margin: 0 auto;
-}
+/* results.cssではコンテナ定義を削除（base.cssの定義を使用） */
 
 /* ランク説明ポップオーバー - 画面中央配置 */
 .rank-popover {

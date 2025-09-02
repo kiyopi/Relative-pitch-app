@@ -1260,3 +1260,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-02 17:24:11] コミット: base.css: bodyのmargin/paddingリセット追加
+
+- bodyにmargin: 0, padding: 0を明示的に追加
+- ユーザーエージェントスタイル（デフォルト8pxマージン等）を完全リセット
+- 全ページでの一貫した幅表示を確保
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

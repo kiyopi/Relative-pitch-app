@@ -610,8 +610,11 @@
 /* ==========================================================================
    プログレス関連（bolt-new-designから移植）
    ========================================================================== */
-.progress-section {
-  margin-bottom: 32px;
+/* .progress-section定義はbase.cssを使用（重複削除） */
+
+/* トレーニング専用進行バーセクション */
+.progress-section-training {
+  margin-bottom: 2rem !important;
 }
 
 .progress-labels {

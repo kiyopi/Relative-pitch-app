@@ -278,71 +278,44 @@
                         </div>
                     </div>
                         
-                    <h3 class="text-white font-medium mb-4">進行バーセクション（セッション完了時）</h3>
+                    <h3 class="text-white font-medium mb-4">トレーニング用進行バーセクション</h3>
                     
                     <div class="component-grid grid-cols-1">
                         <div class="component-item">
-                            <div class="glass-card">
-                                <div class="progress-section completed">
-                                    <div class="progress-content">
-                                        <div class="progress-bar with-margin">
-                                            <div class="progress-fill gradient-catalog-blue" style="width: 25%;"></div>
-                                        </div>
-                                        <div class="progress-label">セッション 2 / 8</div>
+                            <div class="progress-section progress-section-training">
+                                <div class="flex items-center gap-4">
+                                    <div class="progress-bar with-margin">
+                                        <div class="progress-fill gradient-catalog-blue" style="width: 25%;"></div>
                                     </div>
-                                    <a href="#" class="btn btn-primary progress-action">
+                                    <div class="session-badge">
+                                        セッション 1/8
+                                    </div>
+                                    <button class="btn btn-primary">
                                         <i data-lucide="arrow-right" class="icon-sm"></i>
                                         <span>次の基音へ</span>
-                                    </a>
-                                </div>
-                                
-                            </div>
-                            
-                            <div class="code-sample">
-&lt;!-- セッション完了時（ボタンあり、青グラデーション） --&gt;
-&lt;div class="glass-card"&gt;
-    &lt;div class="progress-section completed"&gt;
-        &lt;div class="progress-content"&gt;
-            &lt;div class="progress-bar with-margin"&gt;
-                &lt;div class="progress-fill gradient-catalog-blue" style="width: 25%;"&gt;&lt;/div&gt;
-            &lt;/div&gt;
-            &lt;div class="progress-label"&gt;セッション 2 / 8&lt;/div&gt;
-        &lt;/div&gt;
-        &lt;a href="#" class="btn btn-primary progress-action"&gt;次の基音へ&lt;/a&gt;
-    &lt;/div&gt;
-&lt;/div&gt;</div>
-                        </div>
-                    </div>
-                        
-                    <h3 class="text-white font-medium mb-4">進行バーセクション（セッション中）</h3>
-                    
-                    <div class="component-grid grid-cols-1">
-                        <div class="component-item">
-                            <div class="glass-card">
-                                <div class="progress-section">
-                                    <div class="progress-content">
-                                        <div class="progress-bar with-margin">
-                                            <div class="progress-fill gradient-catalog-blue" style="width: 62.5%;"></div>
-                                        </div>
-                                        <div class="progress-label">セッション 5 / 8（進行中）</div>
-                                    </div>
+                                    </button>
                                 </div>
                             </div>
                             
                             <div class="code-sample">
-&lt;!-- セッション中（ボタンなし、青グラデーション） --&gt;
-&lt;div class="glass-card"&gt;
-    &lt;div class="progress-section"&gt;
-        &lt;div class="progress-content"&gt;
-            &lt;div class="progress-bar with-margin"&gt;
-                &lt;div class="progress-fill gradient-catalog-blue" style="width: 62.5%;"&gt;&lt;/div&gt;
-            &lt;/div&gt;
-            &lt;div class="progress-label"&gt;セッション 5 / 8（進行中）&lt;/div&gt;
+&lt;!-- トレーニング用進行バーセクション --&gt;
+&lt;div class="progress-section progress-section-training"&gt;
+    &lt;div class="flex items-center gap-4"&gt;
+        &lt;div class="progress-bar with-margin"&gt;
+            &lt;div class="progress-fill gradient-catalog-blue" style="width: [動的値]%;"&gt;&lt;/div&gt;
         &lt;/div&gt;
+        &lt;div class="session-badge"&gt;
+            セッション [現在]/[総数]
+        &lt;/div&gt;
+        &lt;button class="btn btn-primary"&gt;
+            &lt;i data-lucide="arrow-right" class="icon-sm"&gt;&lt;/i&gt;
+            &lt;span&gt;次の基音へ&lt;/span&gt;
+        &lt;/button&gt;
     &lt;/div&gt;
 &lt;/div&gt;</div>
                         </div>
                     </div>
+
                     
                     <div style="text-align: center; margin: 1rem 0;">
                         <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
