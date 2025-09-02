@@ -1730,10 +1730,64 @@ body::before {
   animation: shine 3s ease-in-out infinite;
 }
 
-.header-nav {
+/* ハンバーガーメニューボタン */
+.menu-toggle {
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.menu-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* PC用ナビゲーション */
+.header-nav {
+  display: none;
+  align-items: center;
   gap: 1rem;
+}
+
+/* モバイルメニュー開いた状態 */
+.header-nav.active {
+  display: flex;
+  position: absolute;
+  top: 100%;
+  right: 1.5rem;
+  background: rgba(10, 14, 39, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  z-index: 100;
+}
+
+/* PC表示時 */
+@media (min-width: 768px) {
+  .menu-toggle {
+    display: none;
+  }
+  
+  .header-nav {
+    display: flex;
+    position: static;
+    background: transparent;
+    border: none;
+    padding: 0;
+    flex-direction: row;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
 }
 
 .header-brand h1 {

@@ -28,7 +28,13 @@
                         <p class="text-purple-200">あなたの音感を科学的に向上させましょう</p>
                     </div>
                 </div>
-                <nav class="header-nav">
+                <!-- モバイル用ハンバーガーメニュー -->
+                <button class="menu-toggle" id="menu-toggle">
+                    <i data-lucide="menu" class="icon-md"></i>
+                </button>
+                
+                <!-- PC用ナビゲーション -->
+                <nav class="header-nav" id="header-nav">
                     <a href="../templates/records.html" class="nav-link" title="トレーニング記録を見る">
                         <i data-lucide="history" class="icon-md"></i>
                     </a>
@@ -275,5 +281,35 @@
 
     <!-- Lucide初期化 -->
     <script src="../js/lucide-init.js"></script>
+    
+    <!-- メニュー開閉スクリプト -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const headerNav = document.getElementById('header-nav');
+            
+            menuToggle.addEventListener('click', function() {
+                headerNav.classList.toggle('active');
+                // アイコン切り替え
+                const icon = menuToggle.querySelector('i');
+                if (headerNav.classList.contains('active')) {
+                    icon.setAttribute('data-lucide', 'x');
+                } else {
+                    icon.setAttribute('data-lucide', 'menu');
+                }
+                lucide.createIcons();
+            });
+            
+            // 外側クリックで閉じる
+            document.addEventListener('click', function(event) {
+                if (!menuToggle.contains(event.target) && !headerNav.contains(event.target)) {
+                    headerNav.classList.remove('active');
+                    const icon = menuToggle.querySelector('i');
+                    icon.setAttribute('data-lucide', 'menu');
+                    lucide.createIcons();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

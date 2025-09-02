@@ -1282,3 +1282,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-02 19:13:37] コミット: ヘッダーレイアウト最適化: モバイル表示改善
+
+- page-header上部パディング: 40pxに拡大
+- index.htmlヘッダー: モバイル用フォントサイズ調整
+  - h1: 1.5rem + 折り返し禁止（white-space: nowrap）
+  - サブタイトル: 0.875rem
+- レスポンシブ対応: 768px以上で通常サイズ復帰
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
