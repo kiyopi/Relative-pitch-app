@@ -57,7 +57,7 @@
             <!-- マイク許可セクション -->
             <div class="glass-card">
                 <section class="test-section" id="permission-section">
-                    <div class="section-header">
+                    <div class="section-header-training">
                         <h4 class="text-sub-title heading-md">
                             <i data-lucide="music-3" class="text-blue-300"></i>
                             <span>基音再生とドレミガイド</span>
@@ -65,7 +65,7 @@
                         <p class="text-body">基音スタートボタンでトレーニングが開始されます</p>
                     </div>
                     
-                    <div class="base-note-control section-bottom-item">
+                    <div class="base-note-control">
                         <button class="btn btn-primary" id="play-base-note">
                             <i data-lucide="volume-2" style="width: 24px; height: 24px;"></i>
                             <span>基音スタート</span>
@@ -87,11 +87,8 @@
                     </div>
                     
                     <!-- ドレミガイド（同じglass-card内） -->
-                    <div class="section-header">
-                        <h4 class="text-sub-title heading-sm">ドレミガイド</h4>
-                    </div>
-                    
-                    <div class="doremi-guide section-bottom-item">
+                    <h4 class="text-sub-title heading-sm">ドレミガイド</h4>
+                    <div class="doremi-guide">
                         <div class="note-circles">
                             <div class="note-circle" data-note="ド">ド</div>
                             <div class="note-circle" data-note="レ">レ</div>
@@ -105,7 +102,7 @@
                         <div class="test-status">ガイドに合わせて発声しましょう</div>
                         
                         <!-- 12音階モード専用：音域調整（ドレミガイド下） -->
-                        <div class="range-adjustment" id="range-adjustment" style="display: none;">
+                        <div class="range-adjustment" id="range-adjustment">
                             <!-- トグルヘッダー -->
                             <div class="range-toggle-header" id="range-toggle-header">
                                 <div>
@@ -120,7 +117,7 @@
                             </div>
                             
                             <!-- 調整コントロール（初期は非表示） -->
-                            <div class="range-controls" id="range-controls" style="display: none;">
+                            <div class="range-controls" id="range-controls">
                                 <p class="range-description text-sm text-white-60" style="margin-bottom: 16px;">あなたの声域に合わせて基音の高さを調整できます</p>
                                 <div class="flex items-center gap-3">
                                     <button class="btn btn-primary" id="range-down">
@@ -140,12 +137,12 @@
                                 <div class="range-test-buttons">
                                     <div class="flex items-center gap-3">
                                         <button class="btn btn-outline" id="test-lowest">
-                                            <i data-lucide="volume-1" style="width: 20px; height: 20px;"></i>
-                                            <span>最低音を確認</span>
+                                            <i data-lucide="volume-1" class="icon-md"></i>
+                                            <span>最低音<span class="mobile-hide">を確認</span></span>
                                         </button>
                                         <button class="btn btn-outline" id="test-highest">
-                                            <i data-lucide="volume-2" style="width: 20px; height: 20px;"></i>
-                                            <span>最高音を確認</span>
+                                            <i data-lucide="volume-2" class="icon-md"></i>
+                                            <span>最高音<span class="mobile-hide">を確認</span></span>
                                         </button>
                                     </div>
                                 </div>
@@ -170,9 +167,9 @@
             </section>
             
             <!-- ホームボタン -->
-            <section class="text-center" style="padding: 20px 0; margin-top: 40px;">
+            <section class="text-center">
                 <button class="btn btn-outline" onclick="window.location.href='index.html'">
-                    <i data-lucide="home" style="width: 24px; height: 24px;"></i>
+                    <i data-lucide="home"></i>
                     <span>ホームに戻る</span>
                 </button>
             </section>

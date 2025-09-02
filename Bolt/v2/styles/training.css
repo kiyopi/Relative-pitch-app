@@ -18,7 +18,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .base-note-control .btn {
@@ -614,7 +614,46 @@
 
 /* トレーニング専用進行バーセクション */
 .progress-section-training {
-  margin-bottom: 2rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.section-header-training {
+  margin-bottom: 1.5rem;
+}
+
+.section-header-training .heading-md {
+  margin-bottom: 0.5rem;
+}
+
+.range-adjustment {
+  display: none;
+}
+
+.range-controls {
+  display: none;
+}
+
+.range-controls .btn i {
+  flex-shrink: 0;
+}
+
+
+@media (max-width: 768px) {
+  #range-down span,
+  #range-up span {
+    display: none;
+  }
+  
+  .mobile-hide {
+    display: none;
+  }
+  
+  #range-down,
+  #range-up {
+    min-width: 44px;
+    padding: 0.75rem;
+  }
+  
 }
 
 .progress-labels {
@@ -638,7 +677,8 @@
    ========================================================================== */
 .doremi-guide {
   text-align: center;
-  margin-top: 24px;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .note-circles {
@@ -676,6 +716,7 @@
   .note-circles {
     grid-template-columns: repeat(4, 1fr);
     gap: 8px;
+    justify-items: center;
   }
 }
 

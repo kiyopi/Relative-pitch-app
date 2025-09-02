@@ -1335,3 +1335,11 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-02 20:24:35] コミット: ハンバーガーメニューz-index修正: 下のセクションに潜り込む問題解決
+
+- モバイルメニューのz-indexを1000から9999に変更
+- メニューが最前面に表示されるよう修正
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
