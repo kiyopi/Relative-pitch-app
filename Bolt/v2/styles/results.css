@@ -1,5 +1,11 @@
 /* results.css - 統合評価ページ専用スタイル */
 
+/* コンテナ幅700px指定 */
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
 /* ランク説明ポップオーバー - 画面中央配置 */
 .rank-popover {
     position: fixed;

@@ -1175,3 +1175,18 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-02 09:27:52] コミット: training.htmlモード対応実装: URLパラメータ・12音階音域調整・トグルUI完成
+
+- URLパラメータによるモード切り替え機能実装（?mode=random&session=1）
+- 3モード対応（ランダム基音・連続チャレンジ・12音階）
+- 12音階モード専用音域調整機能を追加
+  - トグル式UI（ドレミガイド下配置でファーストルック優先）
+  - 5段階音域調整（低音域→低め→標準→高め→高音域）
+  - 最低音・最高音テストボタン
+  - 説明文追加「あなたの声域に合わせて基音の高さを調整できます」
+- 音域調整UIを独自クラスとして整理（.range-*）
+- APP_SPECIFICATION.mdに実装用差分表と機能リスト追加
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

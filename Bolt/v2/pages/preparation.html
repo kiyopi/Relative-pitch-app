@@ -13,12 +13,17 @@
     <div class="container">
         <!-- ヘッダー -->
         <header class="page-header">
-            <div class="page-header-icon gradient-catalog-blue">
-                <i data-lucide="mic" 
-                   style="width: 48px; height: 48px; color: white; stroke-width: 2;"></i>
+            <div class="page-header-content">
+                <div class="page-header-icon-wrapper">
+                    <div class="page-header-icon gradient-catalog-blue">
+                        <i data-lucide="mic" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;"></i>
+                    </div>
+                </div>
+                <div class="page-header-text">
+                    <h1 class="page-title">トレーニング前の準備</h1>
+                    <p class="page-subtitle text-green-200">ランダム基音モード へのアクセス</p>
+                </div>
             </div>
-            <h1 class="page-title">トレーニング前の準備</h1>
-            <p class="page-description">ランダム基音モード へのアクセス</p>
         </header>
 
 
@@ -181,9 +186,11 @@
                     
                     <!-- テスト指示 -->
                     <div class="text-center mb-6">
-                        <h4 class="text-sub-title mb-4" id="test-instruction-text">できるだけ低い声を出してください</h4>
-                        <div class="test-instruction">
-                            <i data-lucide="mic" style="width: 32px; height: 32px;" class="text-orange-300"></i>
+                        <div class="flex items-center justify-center gap-4 mb-4">
+                            <div class="test-instruction">
+                                <i data-lucide="mic" class="text-orange-300 icon-xl"></i>
+                            </div>
+                            <h4 class="text-sub-title text-left" id="test-instruction-text">できるだけ低い声を出してください</h4>
                         </div>
                     </div>
                     

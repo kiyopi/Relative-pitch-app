@@ -29,12 +29,17 @@
     <div class="container">
         <!-- ヘッダー -->
         <header class="page-header">
-            <div class="page-header-icon gradient-catalog-green">
-                <i data-lucide="target" 
-                   style="width: 48px; height: 48px; color: white; stroke-width: 2;"></i>
+            <div class="page-header-content">
+                <div class="page-header-icon-wrapper">
+                    <div class="page-header-icon gradient-catalog-green">
+                        <i data-lucide="target" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;"></i>
+                    </div>
+                </div>
+                <div class="page-header-text">
+                    <h1 class="page-title">ランダム基音モード</h1>
+                    <p class="page-subtitle text-green-200">トレーニング実施中</p>
+                </div>
             </div>
-            <h1 class="page-title">ランダム基音モード</h1>
-            <p class="page-description">トレーニング実施中</p>
         </header>
 
         <!-- メインコンテンツ -->
@@ -54,7 +59,7 @@
                             <i data-lucide="music-3" class="text-blue-300"></i>
                             <span>基音再生とドレミガイド</span>
                         </h4>
-                        <p class="text-body">音程を再生してドレミガイドを開始します</p>
+                        <p class="text-body">基音スタートボタンでトレーニングが開始されます</p>
                     </div>
                     
                     <div class="base-note-control section-bottom-item">
@@ -219,11 +224,11 @@
             
             // ヘッダー更新
             const pageTitle = document.querySelector('.page-title');
-            const pageDescription = document.querySelector('.page-description');
+            const pageSubtitle = document.querySelector('.page-subtitle');
             const headerIcon = document.querySelector('.page-header-icon i');
             
             if (pageTitle) pageTitle.textContent = config.name;
-            if (pageDescription) pageDescription.textContent = config.description;
+            if (pageSubtitle) pageSubtitle.textContent = config.description;
             if (headerIcon) headerIcon.setAttribute('data-lucide', config.icon);
             
             // 進行バー更新
@@ -311,6 +316,12 @@
             button.innerHTML = '<i data-lucide="volume-2" style="width: 24px; height: 24px;"></i><span>再生中...</span>';
             lucide.createIcons(); // アイコンを再作成
             
+            // ボタン状態更新: トレーニング中表示
+            setTimeout(() => {
+                button.innerHTML = '<i data-lucide="brain" style="width: 24px; height: 24px;"></i><span>トレーニング中</span>';
+                lucide.createIcons();
+            }, 2500);
+            
             // プログレス四角を順次消去（2.5秒で5個）
             const squareInterval = 500; // 0.5秒間隔
             progressSquares.forEach((square, index) => {
@@ -353,18 +364,24 @@
         function handleTrainingComplete() {
             const config = modeConfig[mode];
             
-            // セッション完了処理
-            setTimeout(() => {
-                // 次のセッションまたは結果ページへ遷移
-                if (sessionNum < config.totalSessions) {
-                    // 次のセッションへ
-                    const nextSession = sessionNum + 1;
-                    window.location.href = `training.html?mode=${mode}&session=${nextSession}`;
-                } else {
-                    // 全セッション完了 - 結果ページへ
-                    window.location.href = `results-overview.html?mode=${mode}`;
-                }
-            }, 1000);
+            // ランダムモード: セッション評価に自動遷移
+            if (mode === 'random') {
+                setTimeout(() => {
+                    window.location.href = 'result-session.html';
+                }, 1000);
+            } else {
+                // 連続・12音モード: 自動進行
+                setTimeout(() => {
+                    if (sessionNum < config.totalSessions) {
+                        // 次のセッションへ自動遷移
+                        const nextSession = sessionNum + 1;
+                        window.location.href = `training.html?mode=${mode}&session=${nextSession}`;
+                    } else {
+                        // 全セッション完了 - 総合評価へ
+                        window.location.href = 'results-overview.html';
+                    }
+                }, 2000);
+            }
         }
         
         document.head.appendChild(script);

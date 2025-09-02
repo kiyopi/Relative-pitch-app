@@ -44,20 +44,20 @@
                     <h2 class="text-2xl font-bold text-white mb-4">📄 ページヘッダー</h2>
                     <p class="text-white-70 mb-6">統一されたページヘッダーレイアウトシステム</p>
                     
-                    <h3 class="text-white font-medium mb-4">完全なヘッダー構造</h3>
+                    <h3 class="text-white font-medium mb-4">完全なヘッダー構造（旧版）</h3>
                     
                     <div class="component-grid grid-cols-1">
                         <div class="component-item">
-                            <div class="page-header" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;">
-                                <div class="page-header-content">
-                                    <div class="page-header-icon-wrapper">
-                                        <div class="page-header-icon gradient-catalog-purple">
-                                            <i data-lucide="file-chart-column-increasing" class="text-white" data-stroke-width="2" style="width: 48px; height: 48px;" ></i>
+                            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; text-align: center; padding: 20px 0 40px;">
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                                    <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
+                                        <div style="width: 6rem; height: 6rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                                            <i data-lucide="file-chart-column-increasing" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;" ></i>
                                         </div>
                                     </div>
-                                    <h1 class="page-title">総合評価</h1>
-                                    <p class="page-subtitle text-green-200">8セッション (64音) の総合評価</p>
-                                    <p class="page-description text-blue-200">ランダム基音モードの結果</p>
+                                    <h1 style="font-size: 2.5rem; font-weight: 700; color: white; margin-bottom: 16px;">総合評価</h1>
+                                    <p style="font-size: 1.25rem; color: #86efac; margin-bottom: 12px;">8セッション (64音) の総合評価</p>
+                                    <p style="font-size: 1rem; color: #93c5fd;">ランダム基音モードの結果</p>
                                 </div>
                             </div>
                             
@@ -69,7 +69,7 @@
                 &lt;i data-lucide="file-chart-column-increasing" 
                    class="text-white" 
                    data-stroke-width="2" 
-                   &gt;&lt;/i&gt;
+                   style="width: 48px; height: 48px;"&gt;&lt;/i&gt;
             &lt;/div&gt;
         &lt;/div&gt;
         &lt;h1 class="page-title"&gt;総合評価&lt;/h1&gt;
@@ -80,13 +80,60 @@
                         </div>
                     </div>
                     
+                    <h3 class="text-white font-medium mb-4">新ヘッダー構造（横並び・コンパクト）</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <div class="page-header" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;">
+                                <div class="page-header-content">
+                                    <div class="page-header-icon-wrapper">
+                                        <div class="page-header-icon gradient-catalog-green">
+                                            <i data-lucide="target" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;"></i>
+                                        </div>
+                                    </div>
+                                    <div class="page-header-text">
+                                        <h1 class="page-title">ランダム基音モード</h1>
+                                        <p class="page-subtitle text-green-200">トレーニング実施中</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;div class="page-header"&gt;
+    &lt;div class="page-header-content"&gt;
+        &lt;div class="page-header-icon-wrapper"&gt;
+            &lt;div class="page-header-icon gradient-catalog-green"&gt;
+                &lt;i data-lucide="target" 
+                   class="text-white" 
+                   data-stroke-width="2" 
+                   style="width: 36px; height: 36px;"&gt;&lt;/i&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="page-header-text"&gt;
+            &lt;h1 class="page-title"&gt;ランダム基音モード&lt;/h1&gt;
+            &lt;p class="page-subtitle text-green-200"&gt;トレーニング実施中&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </div>
+                    
                     <h3 class="text-white font-medium mb-4">使用ガイドライン</h3>
                     <div class="component-item">
                         <div class="bg-white/5 rounded-lg p-4">
+                            <h4 class="text-white font-medium mb-2">新ヘッダー構造（推奨）</h4>
+                            <ul class="text-white-70 text-sm space-y-2 mb-4">
+                                <li>• <code class="text-blue-300">page-header</code>: 横並びレイアウト（flex, align-items: center, gap: 1.25rem）</li>
+                                <li>• <code class="text-blue-300">page-header-content</code>: アイコンとテキストの配置（flex, gap: 1rem）</li>
+                                <li>• <code class="text-blue-300">page-header-text</code>: タイトルとサブタイトルグループ（flex column, gap: 0.125rem）</li>
+                                <li>• <code class="text-blue-300">page-header-icon</code>: 4rem × 4rem、内部アイコン36px</li>
+                                <li>• <code class="text-blue-300">page-title</code>: 2.25rem（text-main-titleと同じ）</li>
+                                <li>• <code class="text-blue-300">page-subtitle</code>: 1.125rem、text-green-200クラス必須</li>
+                            </ul>
+                            <h4 class="text-white font-medium mb-2">旧構造（参考）</h4>
                             <ul class="text-white-70 text-sm space-y-2">
-                                <li>• <code class="text-blue-300">page-header</code>: ヘッダー全体（padding: 40px 0, text-align: center）</li>
-                                <li>• <code class="text-blue-300">page-header-content</code>: コンテンツ配置（flex column, gap: 0.5rem）</li>
-                                <li>• <code class="text-blue-300">page-header-icon-wrapper</code>: アイコンラッパー（center配置, margin-bottom: 0.5rem）</li>
+                                <li>• <code class="text-blue-300">page-header</code>: 縦並びレイアウト（text-align: center, padding: 40px 0）</li>
+                                <li>• <code class="text-blue-300">page-header-icon</code>: 6rem × 6rem、内部アイコン48px</li>
                                 <li>• <code class="text-blue-300">page-title</code>: メインタイトル（margin-top: 0がデフォルト）</li>
                                 <li>• <code class="text-blue-300">page-subtitle</code>: サブタイトル + 色クラス組み合わせ可能（margin-top: 0がデフォルト）</li>
                                 <li>• <code class="text-blue-300">page-description</code>: 説明文 + 色クラス組み合わせ可能</li>
@@ -102,12 +149,12 @@
                 <!-- ページヘッダーアイコン -->
                 <section id="page-header-icons" class="catalog-section">
                     <h2 class="text-2xl font-bold text-white mb-4">🎯 ページヘッダーアイコン</h2>
-                    <p class="text-white-70 mb-6">各ページトップの統一されたヘッダーアイコン（96px × 96px）</p>
+                    <p class="text-white-70 mb-6">各ページトップの統一されたヘッダーアイコン（64px × 64px、内部アイコン36px）</p>
                     
-                    <div class="component-grid grid-cols-2 md:grid-cols-4">
+                    <div class="component-grid grid-cols-2 md:grid-cols-4" style="justify-items: center;">
                         <div class="component-item text-center">
                             <div class="page-header-icon gradient-catalog-purple">
-                                <i data-lucide="file-chart-column-increasing" class="text-white" data-stroke-width="2" style="width: 48px; height: 48px;" ></i>
+                                <i data-lucide="file-chart-column-increasing" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;" ></i>
                             </div>
                             <h3 class="text-white font-medium">紫グラデーション</h3>
                             <p class="text-white-60 text-sm">総合評価ページ</p>
@@ -115,7 +162,7 @@
                         
                         <div class="component-item text-center">
                             <div class="page-header-icon gradient-catalog-blue">
-                                <i data-lucide="mic" class="text-white" data-stroke-width="2" style="width: 48px; height: 48px;" ></i>
+                                <i data-lucide="mic" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;" ></i>
                             </div>
                             <h3 class="text-white font-medium">青グラデーション</h3>
                             <p class="text-white-60 text-sm">マイクテストページ</p>
@@ -123,7 +170,7 @@
                         
                         <div class="component-item text-center">
                             <div class="page-header-icon gradient-catalog-green">
-                                <i data-lucide="target" class="text-white" data-stroke-width="2" style="width: 48px; height: 48px;" ></i>
+                                <i data-lucide="target" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;" ></i>
                             </div>
                             <h3 class="text-white font-medium">緑グラデーション</h3>
                             <p class="text-white-60 text-sm">トレーニングページ</p>
@@ -131,7 +178,7 @@
                         
                         <div class="component-item text-center">
                             <div class="page-header-icon gradient-catalog-orange">
-                                <i data-lucide="activity" class="text-white" data-stroke-width="2" style="width: 48px; height: 48px;" ></i>
+                                <i data-lucide="activity" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;" ></i>
                             </div>
                             <h3 class="text-white font-medium">オレンジグラデーション</h3>
                             <p class="text-white-60 text-sm">記録ページ</p>

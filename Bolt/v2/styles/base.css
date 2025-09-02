@@ -331,23 +331,29 @@ body::before {
 /* レスポンシブフォント */
 /* === bolt-new-design移植: ページヘッダーシステム === */
 .page-header {
-  text-align: center;
-  padding: 20px 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0 32px;
+  gap: 1.25rem;
 }
 
 .page-title {
-  font-size: 2.5rem;
+  font-size: 2.25rem;
+  line-height: 2.5rem;
   font-weight: 700;
   color: var(--text-white);
-  margin-bottom: 16px;
+  margin-top: 0;
+  margin-bottom: 0.25rem;
   text-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
 }
 
 
 .page-subtitle {
-  font-size: 1.25rem;
-  color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 12px;
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0;
+  line-height: 1.375rem;
 }
 
 
@@ -835,29 +841,32 @@ body::before {
 
 /* --- ページヘッダーアイコン --- */
 .page-header-icon {
-  width: 6rem;
-  height: 6rem;
+  width: 4rem;
+  height: 4rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin: 0 auto 1.5rem auto;
   animation: float 6s ease-in-out infinite;
 }
 
 .page-header-content {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
+}
+
+.page-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
 }
 
 .page-header-icon-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 0.5rem;
 }
 
 /* --- フッター --- */
