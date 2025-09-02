@@ -1239,3 +1239,15 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-02 16:57:50] コミット: メインコンテンツ幅システム統一・仕様文書化完了
+
+- base.css: 統一クラス追加（.wide-main, .narrow-main）
+- index.html, results-overview.html: .wide-main適用（ページ幅最大）
+- training.html, preparation.html: .narrow-main適用（700px制限）
+- training.css: 個別幅制御スタイル削除（重複回避）
+- V2_DEVELOPMENT_PROCESS.md: メインコンテンツ幅システム仕様追加
+- ui-catalog-components.html: 幅制御コンポーネント・ガイドライン追加
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

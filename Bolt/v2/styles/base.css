@@ -76,7 +76,7 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   font-variation-settings: normal;
-  padding: 1.5rem 1rem 3rem 1rem;
+  /* パディングは各ページの.containerで管理 */
 }
 
 /* デフォルトマージン・パディングリセット */
@@ -873,7 +873,7 @@ body::before {
 .wide-main {
   position: relative;
   z-index: 10;
-  padding: var(--space-6);
+  /* パディングは.containerで管理（二重適用回避） */
 }
 
 /* --- トレーニング・準備ページ用メインコンテンツ（700px制限） --- */
