@@ -405,14 +405,14 @@
                     window.location.href = 'result-session.html';
                 }, 1000);
             } else {
-                // 連続・12音モード: 自動進行
+                // 連続・12音モード: 2回実行してから総合評価へ
                 setTimeout(() => {
-                    if (sessionNum < config.totalSessions) {
-                        // 次のセッションへ自動遷移
+                    if (sessionNum < 2) {
+                        // 2回目まで次のセッションへ
                         const nextSession = sessionNum + 1;
                         window.location.href = `training.html?mode=${mode}&session=${nextSession}`;
                     } else {
-                        // 全セッション完了 - 総合評価へ
+                        // 2回完了 - 総合評価へ
                         window.location.href = 'results-overview.html';
                     }
                 }, 2000);

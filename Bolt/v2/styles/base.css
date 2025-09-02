@@ -882,14 +882,14 @@ body::before {
 /* --- トレーニング・準備ページ用メインコンテンツ（700px制限） --- */
 .narrow-main {
   max-width: 700px;
-  margin: 0 auto 0 auto;
-  padding-bottom: 60px;
+  margin: 0 auto;
 }
 
 /* --- フッター --- */
 .footer-base {
   text-align: center;
   margin-top: 2rem;
+  margin-bottom: 2rem;
   padding-top: 1.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
