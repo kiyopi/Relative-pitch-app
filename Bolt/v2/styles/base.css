@@ -1806,7 +1806,7 @@ body::before {
   flex-direction: column;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(20px);
-  z-index: 1000;
+  z-index: 9999;
   min-width: 200px;
   gap: 0.5rem;
 }

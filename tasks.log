@@ -1324,3 +1324,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-02 20:15:21] コミット: ハンバーガーメニュー表示問題修正
+
+- メニュー位置: fixed配置でヘッダー下80pxに固定
+- 背景改善: グラデーション背景で視認性向上
+- アイコン統一: 20px固定・gap調整で整列
+- z-index強化: 1000で他要素より上位表示
+- PC時テキストラベル非表示
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
