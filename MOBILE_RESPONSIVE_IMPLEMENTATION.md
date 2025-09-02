@@ -99,6 +99,40 @@
 - **レイアウト**: 評価項目のギャップ最適化
 - **進行バー**: プログレスバー配置調整
 
+### 📈 results-overview.html (総合評価ページ)
+
+#### モバイル最適化実装
+```css
+@media (max-width: 768px) {
+  /* シェアテキスト縮小 */
+  .rank-share-section .heading-md span {
+    font-size: 1rem;
+  }
+
+  /* 詳細分析タイトル縦並び */
+  .detail-analysis-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  /* ランク表示レイアウト調整 */
+  .rank-display-grid {
+    grid-template-areas: 
+      "center center"
+      "left right" !important;
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+```
+
+#### 実装内容
+- **ランク表示**: モバイル時に上段ランクバッジ、下段基音・誤差配置
+- **タイトル分割**: 「詳細分析 - セッション1」を縦並び表示
+- **シェアテキスト**: 「みんなに成果をシェア」文字サイズ縮小
+- **JavaScript対応**: 動的生成HTML用クラス追加
+- **インライン削除**: 37個のインラインスタイルをクラス化
+
 ---
 
 ## 🎨 CSS ファイル別モバイル対応
@@ -201,6 +235,70 @@
     width: 90px;
     height: 90px;
   }
+
+  /* 総合評価ページモバイル最適化 */
+  .rank-share-section .heading-md span {
+    font-size: 1rem;
+  }
+
+  .detail-analysis-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .detail-analysis-title .dash-separator {
+    display: none;
+  }
+
+  /* モバイル時のランク表示レイアウト調整 */
+  .rank-display-grid {
+    grid-template-areas: 
+      "center center"
+      "left right" !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1.5rem 2rem !important;
+  }
+}
+
+/* JavaScript動的生成用スタイル（モバイル対応） */
+.score-section {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rank-display-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-areas: 'left center right';
+  align-items: end;
+  gap: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.rank-grid-left, .rank-grid-center, .rank-grid-right {
+  justify-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.accuracy-badge-container {
+  position: relative;
+}
+
+.help-icon-btn-positioned {
+  color: white;
+  right: -16px;
+}
+
+.eval-count-text {
+  min-width: 20px;
+  text-align: right;
 }
 ```
 
@@ -270,6 +368,14 @@
 - [x] **PWAメタタグ設定** (全ページ)
 - [x] **フォントサイズ調整** (base.css)
 - [x] **コンテナパディング統一** (base.css)
+- [x] **ページタイトルサイズ統一** (base.css)
+- [x] **マイク認識セクション統合** (training.html)
+- [x] **総合評価ページモバイル最適化** (results-overview.html)
+- [x] **JavaScript生成用クラス追加** (results.css)
+- [x] **ページヘッダーパディング統一** (base.css)
+- [x] **フッター下部マージン追加** (base.css)
+- [x] **デモ用トレーニング2回実行** (training.html)
+- [x] **ランク表示モバイルレイアウト** (results-overview.html)
 
 ### 🔄 継続対応
 - **動的コンテンツ**: JavaScriptでの動的生成部分

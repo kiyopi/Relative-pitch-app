@@ -403,7 +403,10 @@
 
         // トレーニング開始ボタン
         startTrainingBtn.addEventListener('click', () => {
-            window.location.href = 'training.html';
+            const urlParams = new URLSearchParams(window.location.search);
+            const mode = urlParams.get('mode') || 'random';
+            const session = urlParams.get('session') || '1';
+            window.location.href = `training.html?mode=${mode}&session=${session}`;
         });
 
         // 音域データ表示用の共通関数
