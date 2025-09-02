@@ -1218,3 +1218,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-02 15:38:35] コミット: PCトレーニングUI調整完了・モバイル調整フェーズ開始準備
+
+- training.html: モード別アイコン統一（shuffle/zap/music）、ホームボタン追加、フッター実装
+- training.css: フッター700px制限追加、フォントサイズ調整（1.125rem）
+- ui-catalog-components.html: フッター仕様2パターン対応、使用ガイドライン追加
+- CLAUDE.md: 作業状況更新（PCトレーニングUI完了→モバイル調整フェーズ）
+- TRAINING_FLOW_SPECIFICATION.md: モード別UI仕様、ボタン状態管理、ユーザー操作選択肢追加
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
