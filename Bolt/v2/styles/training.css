@@ -198,7 +198,59 @@
   text-align: center;
   color: rgba(255, 255, 255, 0.8);
   font-style: italic;
-  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+/* マイク認識セクション */
+.mic-recognition-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+/* preparation.html専用: 音声テスト・結果ボタンのモバイル対応 */
+@media (max-width: 768px) {
+  .flex.gap-3.mt-4 {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* 音域テストレイアウトのモバイル対応 */
+  .range-test-layout {
+    position: static;
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin: 20px 0;
+  }
+
+  .range-test-left {
+    position: static;
+    transform: none;
+    order: 1;
+  }
+
+  .voice-range-display-container {
+    position: static;
+    order: 2;
+  }
+
+  .range-test-right {
+    position: static;
+    transform: none;
+    width: auto;
+    height: auto;
+    order: 3;
+  }
+
+  /* 音域テストアイコン縮小 */
+  .phase-item i {
+    width: 16px !important;
+    height: 16px !important;
+  }
 }
 
 /* ==========================================================================
@@ -618,11 +670,11 @@
 }
 
 .section-header-training {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .section-header-training .heading-md {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
 }
 
 .range-adjustment {

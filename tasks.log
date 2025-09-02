@@ -1343,3 +1343,97 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-03 00:37:14] コミット: training.html インラインスタイル削除とモバイル最適化
+
+- インラインスタイル削除
+  - doremi-guideのマージン設定をCSSクラスに移動
+  - range-adjustment/range-controlsの初期非表示をCSSで定義
+  - アイコンサイズをクラスベースに変更
+
+- モバイル最適化
+  - 音域調整ボタン: テキスト非表示でアイコンのみ表示
+  - 音域確認ボタン: 「を確認」を非表示で短縮表示
+  - ドレミガイド: 4列グリッドで中央寄せ
+
+- レイアウト調整
+  - section-header-trainingマージン設定
+  - base-note-controlマージン調整
+  - progress-section-trainingマージン縮小
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-03 01:15:36] コミット: narrow-main下マージン削除: レイアウト最適化
+
+- .narrow-mainのmargin設定を0 auto 0 autoに変更
+- 不要な下マージンを排除してレイアウト改善
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-03 01:30:02] コミット: デモ用トレーニング実装とレイアウト最適化
+
+- 連続・12音モードを2回実行後に総合評価へ遷移するよう変更
+- narrow-mainのpadding-bottom削除でレイアウト最適化
+- footer-baseのmargin-bottom追加でページ下部スペース確保
+- モバイル対応実装ドキュメント追加
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-03 01:36:59] コミット: モバイル版ページタイトルサイズ統一
+
+- .page-titleのモバイル時フォントサイズを2rem→1.5remに調整
+- ホームページのtext-3xlと同じサイズに統一
+- 視覚的一貫性向上
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-03 01:46:04] コミット: 総合評価ページのベース構造統一
+
+- wide-mainを維持（ホームと同じ）
+- 不要な二重containerを削除
+- ページ構造をホームページと統一
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-03 01:50:27] コミット: ページヘッダーのパディング統一
+
+- .page-headerのpaddingを1.5rem 0に変更
+- ホーム以外のページヘッダーマージン統一
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-03 01:55:44] コミット: マイク認識セクションをドレミガイド内に統合
+
+- マイク認識UIをドレミガイド下に移動
+- 独立したglass-cardを削除してUI統合
+- レイアウトの簡素化とスペース効率向上
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-03 02:46:52] コミット: インラインスタイル削除とJavaScript生成用クラス追加
+
+- スコアセクションのインラインスタイルをCSSクラス化
+- ランク表示グリッドとアイテムのクラス追加
+- モバイル対応レイアウト: ランクバッジ上段、基音・誤差下段
+- JavaScript動的生成用スタイルとして明示的にコメント追加
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-03 04:02:06] コミット: ナビゲーションフロー最適化とUI調整
+
+- ホームのランダムモードをpreparation.htmlに遷移するよう変更
+- preparation.htmlのトレーニング開始ボタンでモードパラメータ引き継ぎ
+- training.htmlの文言を「基音スタートボタンでトレーニング開始」に短縮
+- music-2アイコンに変更、サイズ48px、位置調整(-8px)
+- モバイル対応ドキュメント更新
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
