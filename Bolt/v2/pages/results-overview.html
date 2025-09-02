@@ -137,7 +137,7 @@
                             <div class="progress-bar flex">
                                 <div class="progress-fill-custom color-eval-gold" style="width: 37.5%;"></div>
                             </div>
-                            <span class="text-caption" style="min-width: 20px; text-align: right;">3</span>
+                            <span class="text-caption eval-count-text">3</span>
                         </div>
                         
                         <!-- Good -->
@@ -146,7 +146,7 @@
                             <div class="progress-bar flex">
                                 <div class="progress-fill-custom color-eval-good" style="width: 25%;"></div>
                             </div>
-                            <span class="text-caption" style="min-width: 20px; text-align: right;">2</span>
+                            <span class="text-caption" class="eval-count-text">2</span>
                         </div>
                         
                         <!-- Pass -->
@@ -155,7 +155,7 @@
                             <div class="progress-bar flex">
                                 <div class="progress-fill-custom color-eval-pass" style="width: 37.5%;"></div>
                             </div>
-                            <span class="text-caption" style="min-width: 20px; text-align: right;">3</span>
+                            <span class="text-caption eval-count-text">3</span>
                         </div>
                         
                         <!-- Practice -->
@@ -164,7 +164,7 @@
                             <div class="progress-bar flex">
                                 <div class="progress-fill-custom color-eval-practice" style="width: 0%;"></div>
                             </div>
-                            <span class="text-caption" style="min-width: 20px; text-align: right;">0</span>
+                            <span class="text-caption" class="eval-count-text">0</span>
                         </div>
                     </div>
                 </section>
@@ -250,7 +250,11 @@
                                 <i data-lucide="chevron-left" class="text-white icon-md"></i>
                             </button>
                             <div class="text-center flex-1 px-2">
-                                <h3 class="text-sub-title">詳細分析 - セッション<span>1</span></h3>
+                                <h3 class="text-sub-title detail-analysis-title">
+                                    <span>詳細分析</span>
+                                    <span class="dash-separator"> - </span>
+                                    <span>セッション1</span>
+                                </h3>
                             </div>
                             <button class="glass-card-sm">
                                 <i data-lucide="chevron-right" class="text-white icon-md"></i>
@@ -260,21 +264,21 @@
                     
                     <div id="detail-analysis-container">
                         <!-- セッション概要表示 -->
-                        <div class="score-section" style="text-align: center; margin-bottom: 40px; padding-bottom: 32px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div class="score-section">
                             <!-- PC版3列グリッド -->
-                            <div style="display: grid; grid-template-columns: 1fr auto 1fr; grid-template-areas: 'left center right'; align-items: end; gap: 2rem; max-width: 800px; margin: 0 auto;">
+                            <div class="rank-display-grid">
                                 <!-- 基音表示（左） -->
-                                <div style="grid-area: left; justify-self: center; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                <div class="rank-grid-left">
                                     <div class="score-base-note text-white">C4</div>
                                     <p class="text-body-green mb-0">基音</p>
                                 </div>
                                 
                                 <!-- トロフィーアイコン（中央） -->
-                                <div style="grid-area: center; display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: flex-end;">
-                                    <div class="accuracy-badge accuracy-badge-excellent" style="position: relative;">
+                                <div class="rank-grid-center">
+                                    <div class="accuracy-badge accuracy-badge-excellent accuracy-badge-container">
                                         <i data-lucide="trophy" class="text-yellow-300 accuracy-icon"></i>
                                         <!-- ヘルプボタン -->
-                                        <button class="help-icon-btn" style="color: white; right: -16px;">
+                                        <button class="help-icon-btn help-icon-btn-positioned">
                                             <i data-lucide="help-circle" style="width: 20px !important; height: 20px !important; min-width: 20px !important; min-height: 20px !important; max-width: 20px !important; max-height: 20px !important; font-size: 20px !important;"></i>
                                         </button>
                                     </div>
@@ -282,9 +286,9 @@
                                 </div>
                                 
                                 <!-- 平均誤差（右） -->
-                                <div style="grid-area: right; justify-self: center; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                <div class="rank-grid-right">
                                     <div class="score-average text-white">±12.1¢</div>
-                                    <p class="text-body-green mb-0">セッション平均誤差</p>
+                                    <p class="text-body-green mb-0">平均誤差</p>
                                 </div>
                             </div>
                         </div>
