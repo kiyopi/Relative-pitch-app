@@ -47,6 +47,28 @@
   }
 }
 
+/* 表示制御クラス（JavaScript動的制御用） */
+.range-adjustment-hidden {
+  display: none !important;
+}
+
+.range-adjustment-visible {
+  display: block !important;
+}
+
+.range-controls-collapsed {
+  display: none !important;
+}
+
+.range-controls-expanded {
+  display: block !important;
+}
+
+/* レンジ説明テキストの下マージン */
+.range-description {
+  margin-bottom: 1rem;
+}
+
 /* テストセクション */
 .test-section {
   margin-bottom: 0;

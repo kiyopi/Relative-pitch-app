@@ -132,8 +132,8 @@
                             </div>
                             
                             <!-- 調整コントロール（初期は非表示） -->
-                            <div class="range-controls" id="range-controls">
-                                <p class="range-description text-sm text-white-60" style="margin-bottom: 16px;">あなたの声域に合わせて基音の高さを調整できます</p>
+                            <div class="range-controls range-controls-collapsed" id="range-controls">
+                                <p class="range-description text-sm text-white-60">あなたの声域に合わせて基音の高さを調整できます</p>
                                 <div class="flex items-center gap-3">
                                     <button class="btn btn-primary" id="range-down">
                                         <i data-lucide="chevron-down" style="width: 20px; height: 20px;"></i>
@@ -257,7 +257,7 @@
             
             if (progressFill && progressLabel) {
                 const progressPercent = Math.round((sessionNum / config.totalSessions) * 100);
-                progressFill.style.width = progressPercent + '%';
+                progressFill.style.width = progressPercent + '%'; // 動的値のため例外許可
                 progressLabel.textContent = `セッション ${sessionNum} / ${config.totalSessions}`;
             }
             
@@ -265,7 +265,8 @@
             if (mode === 'twelve') {
                 const rangeAdjustment = document.getElementById('range-adjustment');
                 if (rangeAdjustment) {
-                    rangeAdjustment.style.display = 'block';
+                    rangeAdjustment.classList.remove('range-adjustment-hidden');
+                    rangeAdjustment.classList.add('range-adjustment-visible');
                     initializeRangeAdjustment();
                 }
             }
@@ -283,7 +284,14 @@
             
             toggleHeader.addEventListener('click', function() {
                 isExpanded = !isExpanded;
-                controls.style.display = isExpanded ? 'block' : 'none';
+                
+                if (isExpanded) {
+                    controls.classList.remove('range-controls-collapsed');
+                    controls.classList.add('range-controls-expanded');
+                } else {
+                    controls.classList.remove('range-controls-expanded');
+                    controls.classList.add('range-controls-collapsed');
+                }
                 
                 const chevronIcon = toggleBtn.querySelector('i');
                 chevronIcon.setAttribute('data-lucide', isExpanded ? 'chevron-up' : 'chevron-down');
@@ -466,7 +474,7 @@
             
             if (progressFill && progressLabel) {
                 const progressPercent = Math.round((sessionStats.currentSession / config.totalSessions) * 100);
-                progressFill.style.width = progressPercent + '%';
+                progressFill.style.width = progressPercent + '%'; // 動的値のため例外許可
                 progressLabel.textContent = `セッション ${sessionStats.currentSession} / ${config.totalSessions}`;
             }
         }
