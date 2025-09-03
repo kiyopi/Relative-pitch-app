@@ -327,39 +327,175 @@
             // TODO: Web Audio APIで実際の音程再生
         }
 
+        // グローバル変数でセッション管理
+        let trainingSession = null;
+
         function startTraining() {
             const button = document.getElementById('play-base-note');
             const progressSquares = document.querySelectorAll('.progress-square');
             
             // ボタンを無効化
             button.disabled = true;
-            button.innerHTML = '<i data-lucide="volume-2" style="width: 24px; height: 24px;"></i><span>再生中...</span>';
+            button.innerHTML = '<i data-lucide="volume-2" style="width: 24px; height: 24px;"></i><span>初期化中...</span>';
             lucide.createIcons(); // アイコンを再作成
             
-            // ボタン状態更新: モード別表示
-            setTimeout(() => {
-                if (mode === 'twelve') {
-                    // 12音モード: 初めに戻るボタン（確認なし）
-                    button.innerHTML = '<i data-lucide="rotate-ccw" style="width: 24px; height: 24px;"></i><span>初めに戻る</span>';
-                    button.disabled = false;
-                    button.onclick = function() {
-                        window.location.href = 'training.html?mode=twelve&session=1';
-                    };
-                } else if (mode === 'continuous') {
-                    // 連続モード: 初めに戻るボタン（確認なし）
-                    button.innerHTML = '<i data-lucide="rotate-ccw" style="width: 24px; height: 24px;"></i><span>初めに戻る</span>';
-                    button.disabled = false;
-                    button.onclick = function() {
-                        window.location.href = 'training.html?mode=continuous&session=1';
-                    };
-                } else {
-                    // ランダムモード: トレーニング中表示（評価画面へ自動遷移）
-                    button.innerHTML = '<i data-lucide="speech" style="width: 24px; height: 24px;"></i><span>トレーニング中</span>';
-                }
-                lucide.createIcons();
-            }, 2500);
+            // TrainingSession初期化・開始
+            initializeAndStartSession();
             
-            // プログレス四角を順次消去（2.5秒で5個）
+        }
+
+        // TrainingSession初期化・実行
+        async function initializeAndStartSession() {
+            try {
+                // セッション初期化
+                trainingSession = new TrainingSession(mode);
+                
+                // UI更新コールバック設定
+                trainingSession.setUICallbacks({
+                    onSessionStart: handleSessionStart,
+                    onIntervalChange: handleIntervalChange,
+                    onPitchUpdate: handlePitchUpdate,
+                    onSessionComplete: handleSessionComplete,
+                    onError: handleTrainingError
+                });
+                
+                // TrainingSession初期化
+                const initResult = await trainingSession.initializeTraining();
+                
+                if (!initResult.success) {
+                    throw new Error(initResult.error);
+                }
+                
+                // セッション開始
+                await trainingSession.startSession();
+                
+            } catch (error) {
+                handleTrainingError('initialization', error);
+            }
+        }
+
+        // セッション開始ハンドラ
+        function handleSessionStart(sessionInfo) {
+            const button = document.getElementById('play-base-note');
+            button.innerHTML = '<i data-lucide="mic" style="width: 24px; height: 24px;"></i><span>歌ってください</span>';
+            button.disabled = true;
+            lucide.createIcons();
+            
+            console.log('🎯 セッション開始:', sessionInfo);
+        }
+
+        // 音程進行ハンドラ
+        function handleIntervalChange(intervalInfo) {
+            const circles = document.querySelectorAll('.progress-circle');
+            
+            // 前の音程を完了マーク
+            if (intervalInfo.index > 0) {
+                circles[intervalInfo.index - 1]?.classList.remove('current');
+                circles[intervalInfo.index - 1]?.classList.add('completed');
+            }
+            
+            // 現在の音程をハイライト
+            if (intervalInfo.index < circles.length) {
+                circles[intervalInfo.index]?.classList.add('current');
+            }
+            
+            console.log(`🎵 音程変更: ${intervalInfo.interval} (${intervalInfo.targetFreq.toFixed(1)}Hz)`);
+        }
+
+        // リアルタイム音程更新ハンドラ
+        function handlePitchUpdate(updateInfo) {
+            // TODO: ピッチ可視化エリアの更新
+            console.log('🎤 音程検出:', {
+                interval: updateInfo.interval,
+                grade: updateInfo.result.evaluation.grade,
+                centError: updateInfo.result.evaluation.centError,
+                progress: (updateInfo.progress * 100).toFixed(1) + '%'
+            });
+        }
+
+        // セッション完了ハンドラ
+        function handleSessionComplete(completionInfo) {
+            const config = modeConfig[mode];
+            
+            console.log('✅ セッション完了:', completionInfo);
+            
+            // 後続処理（モード別）
+            if (completionInfo.isLastSession) {
+                // 全セッション完了 - 総合評価へ
+                setTimeout(() => {
+                    window.location.href = 'results-overview.html';
+                }, 2000);
+            } else {
+                // セッション評価へ（ランダムモードのみ）
+                if (mode === 'random') {
+                    setTimeout(() => {
+                        window.location.href = 'result-session.html';
+                    }, 1000);
+                } else {
+                    // 次セッション準備
+                    prepareNextSession();
+                }
+            }
+        }
+
+        // 次セッション準備
+        function prepareNextSession() {
+            const hasNext = trainingSession.prepareNextSession();
+            
+            if (hasNext) {
+                const button = document.getElementById('play-base-note');
+                button.innerHTML = '<i data-lucide="play" style="width: 24px; height: 24px;"></i><span>次のセッション</span>';
+                button.disabled = false;
+                button.onclick = function() {
+                    trainingSession.startSession();
+                };
+                lucide.createIcons();
+                
+                // 進行バー更新
+                updateProgressBar();
+            }
+        }
+
+        // 進行バー更新
+        function updateProgressBar() {
+            const sessionStats = trainingSession.getSessionStats();
+            const config = modeConfig[mode];
+            
+            const progressFill = document.querySelector('.progress-fill');
+            const progressLabel = document.querySelector('.progress-label');
+            
+            if (progressFill && progressLabel) {
+                const progressPercent = Math.round((sessionStats.currentSession / config.totalSessions) * 100);
+                progressFill.style.width = progressPercent + '%';
+                progressLabel.textContent = `セッション ${sessionStats.currentSession} / ${config.totalSessions}`;
+            }
+        }
+
+        // エラーハンドラ
+        function handleTrainingError(context, error) {
+            console.error(`[Training UI] ${context}:`, error);
+            
+            const button = document.getElementById('play-base-note');
+            button.innerHTML = '<i data-lucide="alert-circle" style="width: 24px; height: 24px;"></i><span>エラー発生</span>';
+            button.disabled = false;
+            button.onclick = function() {
+                location.reload(); // リロードで再試行
+            };
+            lucide.createIcons();
+            
+            // ユーザー向けエラー表示
+            alert(`エラーが発生しました: ${error.message}\nページをリロードして再試行してください。`);
+        }
+
+        // 旧実装を完全置換
+        function startTrainingOld() {
+            // この関数は削除予定（後方互換のため一時保持）
+            // 新しいstartTraining()が置き換え
+        }
+
+        // 旧実装関数（削除予定）
+        function updateProgressAnimationOld() {
+            // 旧シミュレーション実装 - TrainingSessionで置換済み
             const squareInterval = 500; // 0.5秒間隔
             progressSquares.forEach((square, index) => {
                 setTimeout(() => {
@@ -392,33 +528,15 @@
                     currentIndex++;
                 } else {
                     clearInterval(interval);
-                    // トレーニング完了後の処理
-                    handleTrainingComplete();
+                    // 旧実装：TrainingSessionで置換済み
+                    // handleTrainingComplete();
                 }
             }, 662.5); // 5.3秒 ÷ 8音 = 662.5ms
         }
 
-        function handleTrainingComplete() {
-            const config = modeConfig[mode];
-            
-            // ランダムモード: セッション評価に自動遷移
-            if (mode === 'random') {
-                setTimeout(() => {
-                    window.location.href = 'result-session.html';
-                }, 1000);
-            } else {
-                // 連続・12音モード: 2回実行してから総合評価へ
-                setTimeout(() => {
-                    if (sessionNum < 2) {
-                        // 2回目まで次のセッションへ
-                        const nextSession = sessionNum + 1;
-                        window.location.href = `training.html?mode=${mode}&session=${nextSession}`;
-                    } else {
-                        // 2回完了 - 総合評価へ
-                        window.location.href = 'results-overview.html';
-                    }
-                }, 2000);
-            }
+        // 旧実装（TrainingSessionで置換済み）
+        function handleTrainingCompleteOld() {
+            // この関数は削除予定
         }
         
         document.head.appendChild(script);
