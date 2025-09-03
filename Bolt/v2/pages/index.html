@@ -13,6 +13,10 @@
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- JavaScript モジュール -->
+    <script src="../../js/data-manager.js"></script>
+    <script src="../../js/subscription-manager.js"></script>
 </head>
 <body>
     <div class="container">
@@ -94,7 +98,7 @@
                     <h2 class="text-3xl font-bold text-white mb-8 text-center">トレーニングモードを選択</h2>
                     <div class="modes-grid">
                         <!-- ランダム基音モード -->
-                        <div class="mode-card beginner">
+                        <div class="mode-card beginner" data-mode="random">
                             <div class="card-header">
                                 <div class="mode-icon">
                                     <i data-lucide="shuffle" class="icon-md text-white"></i>
@@ -136,7 +140,7 @@
                         </div>
 
                         <!-- 連続チャレンジモード -->
-                        <div class="mode-card intermediate">
+                        <div class="mode-card intermediate" data-mode="continuous">
                             <div class="card-header">
                                 <div class="mode-icon">
                                     <i data-lucide="zap" class="icon-md text-white"></i>
@@ -178,7 +182,7 @@
                         </div>
 
                         <!-- 12音階モード -->
-                        <div class="mode-card advanced">
+                        <div class="mode-card advanced" data-mode="twelve">
                             <div class="card-header">
                                 <div class="mode-icon">
                                     <i data-lucide="piano" class="icon-md text-white"></i>
