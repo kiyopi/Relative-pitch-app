@@ -1,0 +1,229 @@
+const i = class i {
+  /**
+   * Detect current device and return optimized specifications
+   */
+  static getDeviceSpecs() {
+    if (i.cachedSpecs)
+      return i.cachedSpecs;
+    if (typeof window > "u" || typeof navigator > "u")
+      return i.getDefaultSpecs();
+    const t = navigator.userAgent, e = i.analyzeUserAgent(t);
+    return i.cachedSpecs = e, console.log("📱 [DeviceDetection] Device analysis:", {
+      userAgent: t.substring(0, 100) + "...",
+      deviceType: e.deviceType,
+      isIOS: e.isIOS,
+      sensitivity: e.sensitivity,
+      divisor: e.divisor
+    }), e;
+  }
+  /**
+   * Analyze user agent string and determine device specifications
+   */
+  static analyzeUserAgent(t) {
+    const e = /iPhone/.test(t), o = /iPad/.test(t), a = /Macintosh/.test(t) && "ontouchend" in document, d = /iPad|iPhone|iPod/.test(t), p = /iPad|iPhone|iPod/.test(navigator.platform || ""), r = e || o || a || d || p;
+    let s = "PC";
+    e ? s = "iPhone" : o || a ? s = "iPad" : r && (s = i.detectIOSDeviceType());
+    const n = i.getDeviceOptimizations(s, r);
+    return {
+      deviceType: s,
+      isIOS: r,
+      sensitivity: n.sensitivity,
+      noiseGate: n.noiseGate,
+      divisor: n.divisor,
+      gainCompensation: n.gainCompensation,
+      noiseThreshold: n.noiseThreshold,
+      smoothingFactor: n.smoothingFactor
+    };
+  }
+  /**
+   * Detect iOS device type when specific detection fails
+   */
+  static detectIOSDeviceType() {
+    const t = window.screen.width, e = window.screen.height, o = Math.max(t, e), a = Math.min(t, e);
+    return o >= 768 || o >= 700 && a >= 500 ? "iPad" : "iPhone";
+  }
+  /**
+   * Get device-specific optimization parameters
+   */
+  static getDeviceOptimizations(t, e) {
+    switch (t) {
+      case "iPad":
+        return {
+          sensitivity: 7,
+          // High sensitivity for iPad microphones
+          noiseGate: 0.01,
+          // Low noise gate
+          divisor: 4,
+          // Volume calculation divisor
+          gainCompensation: 1.5,
+          // Gain compensation for low-frequency cut
+          noiseThreshold: 12,
+          // Noise threshold for silence detection
+          smoothingFactor: 0.2
+          // Smoothing factor
+        };
+      case "iPhone":
+        return {
+          sensitivity: 3,
+          // Medium-high sensitivity for iPhone
+          noiseGate: 0.015,
+          // Medium noise gate
+          divisor: 4,
+          // Volume calculation divisor
+          gainCompensation: 1.5,
+          // Gain compensation
+          noiseThreshold: 12,
+          // Noise threshold
+          smoothingFactor: 0.2
+          // Smoothing factor
+        };
+      case "PC":
+      default:
+        return {
+          sensitivity: 1,
+          // Standard sensitivity for PC
+          noiseGate: 0.02,
+          // Higher noise gate for PC microphones
+          divisor: 6,
+          // Different volume calculation for PC
+          gainCompensation: 1,
+          // No additional gain compensation needed
+          noiseThreshold: 15,
+          // Higher noise threshold
+          smoothingFactor: 0.2
+          // Standard smoothing
+        };
+    }
+  }
+  /**
+   * Get default specifications for SSR or fallback
+   */
+  static getDefaultSpecs() {
+    return {
+      deviceType: "PC",
+      isIOS: !1,
+      sensitivity: 1,
+      noiseGate: 0.02,
+      divisor: 6,
+      gainCompensation: 1,
+      noiseThreshold: 15,
+      smoothingFactor: 0.2
+    };
+  }
+  /**
+   * Check if device supports Web Audio API
+   */
+  static supportsWebAudio() {
+    return typeof window < "u" && (typeof window.AudioContext < "u" || typeof window.webkitAudioContext < "u");
+  }
+  /**
+   * Check if device supports MediaDevices API
+   */
+  static supportsMediaDevices() {
+    return typeof navigator < "u" && typeof navigator.mediaDevices < "u" && typeof navigator.mediaDevices.getUserMedia < "u";
+  }
+  /**
+   * Check if device supports MediaRecorder API
+   */
+  static supportsMediaRecorder() {
+    return typeof window < "u" && typeof window.MediaRecorder < "u";
+  }
+  /**
+   * Get comprehensive device capabilities
+   */
+  static getDeviceCapabilities() {
+    return {
+      deviceSpecs: i.getDeviceSpecs(),
+      webAudioSupport: i.supportsWebAudio(),
+      mediaDevicesSupport: i.supportsMediaDevices(),
+      mediaRecorderSupport: i.supportsMediaRecorder(),
+      touchSupport: "ontouchend" in document,
+      userAgent: typeof navigator < "u" ? navigator.userAgent : "Unknown",
+      screenSize: typeof window < "u" ? {
+        width: window.screen.width,
+        height: window.screen.height,
+        pixelRatio: window.devicePixelRatio
+      } : null,
+      language: typeof navigator < "u" ? navigator.language : "Unknown",
+      platform: typeof navigator < "u" && navigator.platform || "Unknown"
+    };
+  }
+  /**
+   * Check if current device is mobile
+   */
+  static isMobile() {
+    return i.getDeviceSpecs().isIOS || /Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test((navigator == null ? void 0 : navigator.userAgent) || "");
+  }
+  /**
+   * Check if current device is tablet
+   */
+  static isTablet() {
+    if (i.getDeviceSpecs().deviceType === "iPad") return !0;
+    const e = (navigator == null ? void 0 : navigator.userAgent) || "";
+    return /Android/i.test(e) && !/Mobile/i.test(e);
+  }
+  /**
+   * Check if current device is desktop
+   */
+  static isDesktop() {
+    return !i.isMobile() && !i.isTablet();
+  }
+  /**
+   * Get recommended audio constraints for current device
+   */
+  static getOptimalAudioConstraints() {
+    const t = i.getDeviceSpecs(), e = {
+      audio: {
+        echoCancellation: !1,
+        noiseSuppression: !1,
+        autoGainControl: !1,
+        sampleRate: 44100,
+        channelCount: 1,
+        sampleSize: 16,
+        // latency: 0.1, // Not supported in MediaTrackConstraints
+        // volume: 1.0, // Not supported in MediaTrackConstraints
+        deviceId: { ideal: "default" }
+      }
+    };
+    return t.isIOS && e.audio && typeof e.audio == "object" && (e.audio = {
+      ...e.audio,
+      // Disable all browser-level processing for iOS
+      googAutoGainControl: !1,
+      googNoiseSuppression: !1,
+      googEchoCancellation: !1,
+      googHighpassFilter: !1,
+      googTypingNoiseDetection: !1,
+      googBeamforming: !1,
+      mozAutoGainControl: !1,
+      mozNoiseSuppression: !1
+    }), e;
+  }
+  /**
+   * Clear cached device specifications (for testing)
+   */
+  static clearCache() {
+    i.cachedSpecs = null;
+  }
+  /**
+   * Get device-specific debugging information
+   */
+  static getDebugInfo() {
+    return {
+      ...i.getDeviceCapabilities(),
+      detectionMethods: {
+        userAgentIPhone: /iPhone/.test((navigator == null ? void 0 : navigator.userAgent) || ""),
+        userAgentIPad: /iPad/.test((navigator == null ? void 0 : navigator.userAgent) || ""),
+        userAgentMacintosh: /Macintosh/.test((navigator == null ? void 0 : navigator.userAgent) || ""),
+        touchSupport: "ontouchend" in document,
+        navigatorPlatform: (navigator == null ? void 0 : navigator.platform) || "Unknown",
+        screenAspectRatio: typeof window < "u" ? (window.screen.width / window.screen.height).toFixed(2) : "Unknown"
+      }
+    };
+  }
+};
+i.cachedSpecs = null;
+let c = i;
+export {
+  c as D
+};
+//# sourceMappingURL=DeviceDetection-DXJ36uZ7.mjs.map
