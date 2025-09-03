@@ -73,7 +73,7 @@
                     </div>
                     
                     <div class="info-alert">
-                        <i data-lucide="shield-check" style="width: 24px; height: 24px; color: #60a5fa;"></i>
+                        <i data-lucide="shield-check" style="width: 48px; height: 48px; color: #60a5fa;"></i>
                         <p>音声データは外部に送信されません。ブラウザ内でリアルタイム処理されます。</p>
                     </div>
                     
@@ -167,65 +167,42 @@
                         <p class="section-description">あなたの快適な音域を測定しています</p>
                     </div>
                     
-                    <!-- 現在のテスト段階表示 -->
-                    <div class="range-test-status">
-                        <div class="test-phase-indicator">
-                            <div class="phase-item active" id="low-range-phase">
-                                <i data-lucide="corner-right-down" style="width: 20px; height: 20px;"></i>
-                                <span>低い声</span>
-                            </div>
-                            <div class="phase-connector"></div>
-                            <div class="phase-item" id="high-range-phase">
-                                <i data-lucide="corner-right-up" style="width: 20px; height: 20px;"></i>
-                                <span>高い声</span>
-                            </div>
-                        </div>
-                    </div>
                     
                     <!-- テスト指示 -->
                     <div class="text-center mb-6">
                         <div class="flex items-center justify-center gap-4 mb-4">
-                            <div class="test-instruction">
-                                <i data-lucide="mic" class="text-orange-300 icon-xl"></i>
+                            <div class="test-instruction" style="flex-shrink: 0;">
+                                <i data-lucide="mic" class="text-orange-300" style="width: 24px; height: 24px;"></i>
                             </div>
-                            <h4 class="text-sub-title text-left" id="test-instruction-text">できるだけ低い声を出してください</h4>
+                            <h4 class="text-sub-title text-left" id="test-instruction-text" style="margin: 0;">音域測定を開始します</h4>
                         </div>
                     </div>
                     
                     <!-- 検出状況 -->
                     <div class="detection-meters">
                         <!-- 音域テスト表示 -->
-                        <div class="range-test-layout">
-                            <!-- 左: アイコン + 測定種別表示 -->
-                            <div class="range-test-left">
-                                <i data-lucide="circle-arrow-down" id="range-icon" style="width: 64px; height: 64px; color: #3b82f6;"></i>
-                                <p class="range-instruction-text" id="range-instruction">低い声</p>
-                            </div>
-                            
+                        <div class="range-test-layout-flex">
                             <!-- 中央: 音程バッジと円形プログレスバー -->
-                            <div class="voice-range-display-container">
-                                <svg class="voice-stability-svg" width="160" height="160" id="stability-ring">
-                                    <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="16"/>
-                                    <circle cx="80" cy="80" r="72" fill="none" stroke="#3b82f6" stroke-width="16" 
-                                            stroke-dasharray="452" stroke-dashoffset="452" 
-                                            transform="rotate(-90 80 80)" class="voice-progress-circle"/>
-                                </svg>
-                                <div class="voice-note-badge">
-                                    <span class="voice-note-text" id="current-note">準備中</span>
-                                    <span class="voice-freq-text" id="current-frequency">- Hz</span>
+                            <div class="range-test-item">
+                                <div class="voice-range-display-container">
+                                    <svg class="voice-stability-svg" width="160" height="160" id="stability-ring">
+                                        <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="16"/>
+                                        <circle cx="80" cy="80" r="72" fill="none" stroke="#3b82f6" stroke-width="16" 
+                                                stroke-dasharray="452" stroke-dashoffset="452" 
+                                                transform="rotate(-90 80 80)" class="voice-progress-circle"/>
+                                    </svg>
+                                    <div class="voice-note-badge">
+                                        <i data-lucide="arrow-down" id="range-icon" style="width: 80px; height: 80px; color: white; display: block;"></i>
+                                        <p class="countdown-text" id="countdown-display" style="display: none;">0</p>
+                                    </div>
                                 </div>
-                            </div>
-                            
-                            <!-- 右: カウントダウン数字 -->
-                            <div class="range-test-right">
-                                <p class="countdown-text" id="countdown-display">3</p>
                             </div>
                         </div>
                         
                         
                     </div>
 
-                    <p class="test-status" id="test-status">低音テストを開始します...</p>
+                    <p class="test-status" id="test-status">測定準備中...</p>
                 </section>
 
                 <!-- 結果表示セクション -->
@@ -526,10 +503,6 @@
         // 音域テスト実装（自由発声+3秒安定維持方式）
         function startRangeTest() {
             // UI要素の取得
-            const lowRangePhase = document.getElementById('low-range-phase');
-            const highRangePhase = document.getElementById('high-range-phase');
-            const currentNote = document.getElementById('current-note');
-            const currentFrequency = document.getElementById('current-frequency');
             const testInstructionText = document.getElementById('test-instruction-text');
             const testStatus = document.getElementById('test-status');
             
@@ -622,22 +595,22 @@
                 stableFrequencies = [];
                 stabilityStartTime = null;
                 
-                // UI更新
-                lowRangePhase.classList.add('active');
-                testInstructionText.textContent = 'できるだけ低い声を出してください';
+                // UI更新  
+                testInstructionText.textContent = '低い音を測定します';
                 testStatus.textContent = '低音域を測定中... 3秒間同じ音程を維持してください';
                 
                 // 指示テキスト更新
-                const rangeInstruction = document.getElementById('range-instruction');
                 const rangeIcon = document.getElementById('range-icon');
+                const countdownDisplay = document.getElementById('countdown-display');
                 const voiceNoteBadge = document.querySelector('.voice-note-badge');
-                if (rangeInstruction) {
-                    rangeInstruction.textContent = '低い声';
-                }
                 if (rangeIcon) {
-                    rangeIcon.setAttribute('data-lucide', 'circle-arrow-down');
-                    rangeIcon.style.color = '#7dd3fc'; // color-eval-pass
+                    rangeIcon.setAttribute('data-lucide', 'arrow-down');
+                    rangeIcon.style.display = 'block';  // 初期状態でアイコン表示
+                    rangeIcon.style.color = 'white';  // 白色
                     lucide.createIcons();
+                }
+                if (countdownDisplay) {
+                    countdownDisplay.style.display = 'none';  // 初期状態で数字非表示
                 }
                 
                 // 測定中エフェクト追加
@@ -672,16 +645,17 @@
                 }
                 
                 // 指示テキスト更新
-                const rangeInstruction = document.getElementById('range-instruction');
                 const rangeIcon = document.getElementById('range-icon');
+                const countdownDisplay = document.getElementById('countdown-display');
                 const voiceNoteBadge = document.querySelector('.voice-note-badge');
-                if (rangeInstruction) {
-                    rangeInstruction.textContent = '高い声';
-                }
                 if (rangeIcon) {
-                    rangeIcon.setAttribute('data-lucide', 'circle-arrow-up');
-                    rangeIcon.style.color = '#fca5a5'; // color-eval-practice
+                    rangeIcon.setAttribute('data-lucide', 'arrow-up');
+                    rangeIcon.style.display = 'block';  // 初期状態でアイコン表示
+                    rangeIcon.style.color = 'white';  // 白色
                     lucide.createIcons();
+                }
+                if (countdownDisplay) {
+                    countdownDisplay.style.display = 'none';  // 初期状態で数字非表示
                 }
                 
                 // 測定中エフェクト追加
@@ -693,18 +667,12 @@
                     voiceNoteBadge.classList.add('measuring');
                 }
                 
-                // UI更新
-                lowRangePhase.classList.remove('active');
-                lowRangePhase.classList.add('completed');
-                document.querySelector('.phase-connector').classList.add('active');
-                highRangePhase.classList.add('active');
+                // UI更新（段階表示削除により不要）
                 
-                testInstructionText.textContent = 'できるだけ高い声を出してください';
+                testInstructionText.textContent = '高い音を測定します';
                 testStatus.textContent = '高音域を測定中... 3秒間同じ音程を維持してください';
                 
-                // リセット表示
-                currentNote.textContent = '準備中';
-                currentFrequency.textContent = '- Hz';
+                // リセット表示（音程表示削除）
                 
                 startContinuousDetection();
             }
@@ -713,7 +681,9 @@
                 const stabilitySvg = document.getElementById('stability-ring');
                 const progressCircle = stabilitySvg ? stabilitySvg.querySelector('.voice-progress-circle') : null;
                 
-                detectionInterval = setInterval(() => {
+                // デバッグ用：2秒待ってから検出開始
+                setTimeout(() => {
+                    detectionInterval = setInterval(() => {
                     // シミュレーション: より安定した周波数検出
                     let targetFreq;
                     if (!window.simulationTargetFreq) {
@@ -728,9 +698,9 @@
                     // 音名取得
                     const closestNote = getClosestNote(detectedHz);
                     
-                    // UI更新
-                    currentNote.textContent = closestNote.note;
-                    currentFrequency.textContent = closestNote.frequency.toFixed(1) + ' Hz';
+                    // UI更新（音程表示削除）
+                    // currentNote.textContent = closestNote.note;
+                    // currentFrequency.textContent = closestNote.frequency.toFixed(1) + ' Hz';
                     
                     // 安定性チェック（±8Hz以内で安定と判定）
                     if (stableFrequencies.length === 0 || Math.abs(detectedHz - stableFrequencies[stableFrequencies.length - 1]) <= 8) {
@@ -745,17 +715,16 @@
                         const stabilityDuration = Date.now() - stabilityStartTime;
                         const stabilityPercent = Math.min(100, (stabilityDuration / 3000) * 100);
                         
-                        // カウントダウン表示更新
+                        // カウントアップ表示（1, 2, 3）
                         const countdownDisplay = document.getElementById('countdown-display');
-                        const remainingTime = Math.ceil(3 - (stabilityDuration / 1000));
-                        if (countdownDisplay) {
-                            if (remainingTime > 0) {
-                                countdownDisplay.textContent = remainingTime;
-                                countdownDisplay.style.display = 'block';
-                            } else {
-                                countdownDisplay.textContent = '0';
-                                countdownDisplay.style.display = 'block';
-                            }
+                        const rangeIcon = document.getElementById('range-icon');
+                        const elapsedTime = Math.floor(stabilityDuration / 1000);
+                        
+                        if (countdownDisplay && rangeIcon) {
+                            // 音声検出中：アイコン非表示、数字表示
+                            rangeIcon.style.display = 'none';
+                            countdownDisplay.style.display = 'block';
+                            countdownDisplay.textContent = Math.min(elapsedTime + 1, 3); // 1, 2, 3でカウントアップ
                         }
                         
                         // 円形プログレスバー更新（SVG stroke-dashoffsetで表現）
@@ -776,6 +745,18 @@
                                 testInstruction.classList.remove('measuring');
                             }
                             const voiceNoteBadge = document.querySelector('.voice-note-badge');
+                            const rangeIcon = document.getElementById('range-icon');
+                            const countdownDisplay = document.getElementById('countdown-display');
+                            
+                            // 設定完了：checkアイコンを表示
+                            if (rangeIcon && countdownDisplay) {
+                                countdownDisplay.style.display = 'none';
+                                rangeIcon.setAttribute('data-lucide', 'check');
+                                rangeIcon.style.color = 'white'; // 白色
+                                rangeIcon.style.display = 'block';
+                                lucide.createIcons();
+                            }
+                            
                             if (voiceNoteBadge) {
                                 voiceNoteBadge.classList.remove('measuring');
                                 voiceNoteBadge.classList.add('confirmed');
@@ -799,14 +780,16 @@
                         }
                         
                     } else {
-                        // 安定性リセット
+                        // 安定性リセット（音が途絶えた）
                         stableFrequencies = [detectedHz];
                         stabilityStartTime = Date.now();
                         
-                        // カウントダウン表示リセット
+                        // 音が途絶えた：数字非表示、アイコン表示
                         const countdownDisplay = document.getElementById('countdown-display');
-                        if (countdownDisplay) {
+                        const rangeIcon = document.getElementById('range-icon');
+                        if (countdownDisplay && rangeIcon) {
                             countdownDisplay.style.display = 'none';
+                            rangeIcon.style.display = 'block';
                         }
                         
                         // 円形プログレスバーリセット（アニメーション付き）
@@ -825,6 +808,7 @@
                         }
                     }
                 }, 100);
+                }, 2000); // デバッグ用：2秒遅延
             }
             
             function recordRangeResult(note, frequency) {
@@ -835,12 +819,32 @@
                     testResults.lowestNote = note.note;
                     testResults.lowestFrequency = frequency;
                     
+                    // 低音設定完了メッセージを表示
+                    const testInstructionText = document.getElementById('test-instruction-text');
+                    const testStatus = document.getElementById('test-status');
+                    if (testInstructionText) {
+                        testInstructionText.textContent = '低い音を設定しました';
+                    }
+                    if (testStatus) {
+                        testStatus.textContent = '待機中...';
+                    }
+                    
                     setTimeout(() => {
                         startHighRangeTest();
-                    }, 2000);
+                    }, 4000);
                 } else {
                     testResults.highestNote = note.note;
                     testResults.highestFrequency = frequency;
+                    
+                    // 高音設定完了メッセージを表示
+                    const testInstructionText = document.getElementById('test-instruction-text');
+                    const testStatus = document.getElementById('test-status');
+                    if (testInstructionText) {
+                        testInstructionText.textContent = '高い音を設定しました';
+                    }
+                    if (testStatus) {
+                        testStatus.textContent = '測定完了';
+                    }
                     
                     setTimeout(() => {
                         finishRangeTest();
@@ -851,9 +855,7 @@
             function finishRangeTest() {
                 console.log('音域テスト完了', testResults);
                 
-                // UI更新
-                highRangePhase.classList.remove('active');
-                highRangePhase.classList.add('completed');
+                // UI更新（段階表示削除により不要）
                 
                 // 結果計算
                 const lowestNote = testResults.lowestNote || 'A2';

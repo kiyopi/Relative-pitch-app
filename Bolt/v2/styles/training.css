@@ -204,7 +204,7 @@
 /* マイク認識セクション */
 .mic-recognition-section {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
 }
 
@@ -246,11 +246,26 @@
     order: 3;
   }
 
-  /* 音域テストアイコン縮小 */
-  .phase-item i {
-    width: 16px !important;
-    height: 16px !important;
+  /* 音域テストレイアウトのモバイル対応 */
+  .range-test-layout-flex {
+    justify-content: center;
+    gap: 0.75rem;
   }
+  
+  .countdown-text {
+    font-size: 2rem;
+  }
+  
+  .range-instruction-text {
+    font-size: 0.875rem;
+  }
+  
+  /* アイコンサイズ調整 */
+  #range-icon {
+    width: 60px !important;
+    height: 60px !important;
+  }
+  
 }
 
 /* ==========================================================================
@@ -269,6 +284,7 @@
   color: rgba(255, 255, 255, 0.4);
   transition: all 0.3s ease;
 }
+
 
 .step-indicator.active {
   background: linear-gradient(135deg, #3b82f6, #1d4ed8);
@@ -289,6 +305,7 @@
   background: rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
 }
+
 
 .step-connector.active {
   background: linear-gradient(90deg, #10b981, #3b82f6);
@@ -408,77 +425,6 @@
    音域テストセクション
    ========================================================================== */
 
-/* テスト段階インジケーター */
-.range-test-status {
-  margin-bottom: 32px;
-}
-
-.test-phase-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.phase-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.phase-number {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.phase-item.active {
-  color: #3b82f6;
-}
-
-.phase-item.active .phase-number {
-  background: #3b82f6;
-  border-color: #3b82f6;
-  color: white;
-}
-
-.phase-item.completed {
-  color: #10b981;
-}
-
-.phase-item.completed .phase-number {
-  background: #10b981;
-  border-color: #10b981;
-  color: white;
-}
-
-.phase-connector {
-  width: 40px;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 1px;
-}
-
-.phase-connector.active {
-  background: linear-gradient(90deg, #10b981, #3b82f6);
-}
 
 /* 現在テスト中の音表示 */
 .current-test-note {
@@ -849,7 +795,22 @@
    音域テスト専用 - 完全オリジナルクラス
    ========================================================================== */
 
-/* 音域テストレイアウト */
+/* 音域テストレイアウト - 単一要素中央配置 */
+.range-test-layout-flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 20px auto;
+}
+
+.range-test-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 旧版レイアウト（互換性のため残す） */
 .range-test-layout {
   position: relative;
   margin: 20px auto;
@@ -859,7 +820,7 @@
 
 .range-test-left {
   position: absolute;
-  left: -160px;
+  left: -120px;
   top: 60%;
   transform: translateY(-50%);
   display: flex;
@@ -870,11 +831,19 @@
 
 .range-test-right {
   position: absolute;
-  right: -170px;
+  right: -100px;
   top: 50%;
   transform: translateY(-50%);
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.countdown-container {
+  min-width: 60px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -883,9 +852,10 @@
 .countdown-text {
   font-size: 4rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.8);
+  color: white;
   line-height: 1;
   margin: 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 .voice-range-display-container {
   position: relative;
@@ -1019,14 +989,21 @@
 
 /* preparation.html用の大きな.test-instruction */
 #range-test-section .test-instruction {
-  width: 60px;
-  height: 60px;
+  width: 48px;
+  height: 48px;
   margin: 0;
 }
 
 #range-test-section .text-sub-title {
   text-align: left !important;
   margin: 0;
+}
+
+/* モバイル版でテキストサイズ調整 */
+@media (max-width: 768px) {
+  #range-test-section .text-sub-title {
+    font-size: 1rem;
+  }
 }
 
 .test-instruction-green {
