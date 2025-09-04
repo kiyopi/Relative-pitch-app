@@ -13,13 +13,15 @@
 - ✅ **完了**: preparation.html音域テスト最終調整（テキスト役割分担、レイアウト統一、iPhone対応）
 - ✅ **完了**: UIレイアウト調整80%完成（モバイル対応、インライン削除、プログレスバー統一）
 - ✅ **完了**: データ設計フェーズ（DATA_MANAGEMENT_SPECIFICATION.md + data-manager.js実装）
-- 🔄 **進行中**: オーディオ機能実装（pitchpro-audio-processing統合、リアルタイム音程検出）
-- 📋 **次期作業**: トレーニング機能JavaScript実装（data-manager連携、評価システム）
+- ✅ **完了**: PitchPro音声処理統合・2秒リセット問題修正・エラーループ防止
+- ✅ **完了**: デバイス検出システム完全修正（iPadOS 13+バグ対策）
+- 🔄 **進行中**: iPhone/iPad実機テスト・本番ページ統合実装準備
+- 📋 **次期作業**: preparation.html/training.html本番実装統合
 
 ### 🌿 **現在のブランチ**
 - **作業ブランチ**: `feature/data-manager-implementation`
-- **実装内容**: データ管理モジュール・pitchpro-audio統合対応
-- **次期フェーズ**: オーディオ機能実装準備完了
+- **実装内容**: データ管理モジュール・pitchpro-audio統合・デバイス最適化完了
+- **次期フェーズ**: 本番ページ統合実装フェーズ
 
 ### ⚠️ **注意すべきこと（最重要）**
 1. **🚨 インライン記述禁止**: HTMLのstyle属性、JavaScriptでのインラインCSS絶対禁止（例外: Lucideアイコンサイズ、プログレスバー幅のみ）
@@ -30,6 +32,9 @@
 
 ### 🎯 **作業のポイント**
 - **データ管理モジュール完了**: `/js/data-manager.js`実装済み（pitchpro-audio統合、課金制御対応）
+- **PitchProオーディオ統合完了**: 2秒リセット問題修正、エラーループ防止、高度デバイス検出実装
+- **iPadOS 13+バグ修正完了**: 仕様書準拠のデバイス判定システム実装（`CRITICAL_DECISIONS_AND_INSIGHTS.md`参照）
+- **テスト環境整備**: `test-ui-integration.html`でUIカタログ準拠の統合テスト環境完成
 - **UIカタログ最優先**: 新しいスタイル作成前に`ui-catalog-essentials.html`で既存コンポーネント確認
 - **ユーティリティクラス活用**: `.flex .items-center .gap-3` `.heading-md` 等で統一
 - **プログレスバー統一**: `.progress-bar` + `.progress-fill-[type]` + 色クラス
@@ -128,65 +133,17 @@
 - `GLOSSARY.md`: プロジェクト用語集（v1.0.0）
 - `CLAUDE.md`: 開発ガイドライン（本ファイル）
 
-## 🚧 進行中作業の参照ファイル（一時的）
+## 🎨 **CSS・UI設計方針**
 
-**注意**: 以下のファイルは現在進行中の作業専用で、作業完了後に削除されます。作業開始前に必ず確認してください。
+### **UIカタログシステム活用**
+- **基本方針**: `ui-catalog-essentials.html`で既存コンポーネント確認後に実装
+- **分離設計**: ui-catalog.css（表示専用）と base.css（実装用）完全分離
+- **統一コンポーネント**: Glass Card・プログレスバー・ボタン等の既存活用
 
-### **必須確認ファイル（*_TEMP.md）**
-- `OVERALL_RESULTS_UI_ANALYSIS_TEMP.md`: 総合評価ページUI分析結果（統一作業用）
-- その他`*_TEMP.md`ファイル: 一時的な作業指示書
-
-### **作業方針ドキュメント**
-- `V2_DEVELOPMENT_PROCESS.md`: v2環境開発プロセス・CSS分離方針
-- `CSS_ARCHITECTURE_LESSONS_LEARNED.md`: CSS設計の教訓・改善方針
-
-### **作業開始前チェックリスト**
-1. 上記の`*_TEMP.md`ファイルの存在確認
-2. 現在進行中の作業内容の把握
-3. 作業方針・制約事項の確認
-4. 既存実装の参照・活用方針の理解
-
-## 🎨 **2024年8月27日 重要更新**: base.css大幅拡張完了
-
-### **base.css統合状況（v2.0.0）**
-- **サイズ**: 749行 → **1,108行** (+359行の大幅拡張)
-- **bolt-new-design統合**: 7カテゴリの機能移植完了
-- **移植元識別**: `/* === bolt-new-design移植: *** === */`でマーク済み
-
-### **新機能カテゴリ**
-1. **ページヘッダーシステム**: `.page-header`, `.page-title` 等
-2. **特化カードシステム**: `.mode-card`, `.base-note-card` 等  
-3. **インタラクティブ要素**: `.note-circle`, `.volume-meter` 等
-4. **バッジシステム**: `.difficulty-badge`, `.session-badge` 等
-5. **グリッドレイアウト**: `.modes-grid`, `.session-grid` 等
-6. **高度なアニメーション**: `@keyframes shine, ripple` 等
-7. **デバッグナビゲーション**: `.debug-nav` 等
-
-### **今後の作業方針**
-- ✅ **base.css**: 機能拡張完了・今後は本格活用フェーズ
-- 🔄 **results-overview.html**: 構造統一完了・スクリプト実装待ち
-- 📋 **次期作業**: results.css最適化とJavaScript機能実装
-
-### **⚠️ JavaScript影響排除フェーズ（重要）**
-**スタイル統一作業時の必須手順**:
-1. **動的生成確認**: `innerHTML = ''`, `appendChild` 等のDOM操作を確認
-2. **JavaScript無効化**: 動的生成処理をコメントアウト
-3. **静的HTML確認**: UIカタログと同じスタイルで静的表示
-4. **CSS重複解消**: 複数CSSファイルの同一クラス定義を統一
-5. **スタイル統一後**: JavaScript実装の修正・更新
-
-### **🚨 CSS調査・修正時の厳格な制約**
-**system.css参照禁止**:
-- ❌ **system.css確認禁止** - 対象外ファイルのため調査・参照しない
-- ❌ **system.css修正禁止** - いかなる場合も変更対象外
-- ✅ **対象ファイル**: base.css、results.css、training.css、ui-catalog.css のみ
-- ✅ **重複調査範囲**: v2フォルダ内の上記CSSファイル間のみ
-
-**注意点**:
-- 静的HTMLとJavaScript生成が混在している場合は事前確認必須
-- CSS競合（base.css vs results.css等）の可能性を常にチェック
-- UIカタログの説明構造を実際のページに混入させない
-- system.cssは基盤ファイルとして触れず、必要な定義はbase.cssに追加
+### **base.css活用状況（v2.0.0）**
+- **サイズ**: 1,108行（7カテゴリの機能統合完了）
+- **主要コンポーネント**: ページヘッダー・特化カード・インタラクティブ要素・バッジ等
+- **活用方針**: 新規CSS作成前に既存クラス確認必須
 
 ## 🌿 Git運用方針
 
@@ -257,6 +214,47 @@ fix/ui-mobile-layout
 refactor/core-typescript-migration
 docs/glossary-update
 ```
+
+---
+
+## 🎵 **2024年9月4日 重要更新**: PitchProオーディオ統合・デバイス検出完全修正
+
+### **🔧 PitchPro音声処理統合完了**
+- **2秒リセット問題修正**: 音量閾値を30% → 1.5%に調整、15フレーム無音検出追加
+- **エラーループ防止**: MicrophoneController・ErrorNotificationSystemの3秒クールダウンタイマー実装
+- **初期安定化短縮**: 10秒 → 2-3秒に改善（5フレーム → 3フレーム調整）
+- **デバイス別最適化**: PC(1.0x)・iPhone(3.0x)・iPad(7.0x)の感度設定実装
+
+### **📱 iPadOS 13+ デバイス判定バグ完全修正**
+- **根本問題**: iPadOS 13+で`navigator.userAgent`が"Macintosh"と偽装報告される
+- **修正手法**: `'ontouchend' in document`による確実な検出実装
+- **仕様書参照**: `CRITICAL_DECISIONS_AND_INSIGHTS.md`の完全対応ロジック適用
+- **複数方式検出**: UserAgent・タッチサポート・Navigator.platform確認によるフォールバック
+
+### **🧪 統合テスト環境完成**
+- **ファイル**: `test-ui-integration.html`
+- **UIカタログ準拠**: base.css・results.css・training.cssを完全活用
+- **詳細ログ**: iPadOS検出・デバイス最適化・音程検出の完全ログ機能
+- **リアルタイム調整**: ノイズレベル・明瞭度・感度のスライダー調整機能
+
+### **📋 実装済み重要機能**
+```javascript
+// iPadOS 13+ 完全検出ロジック
+const isIPhone = /iPhone/.test(userAgent);
+const isIPad = /iPad/.test(userAgent);
+const isIPadOS = /Macintosh/.test(userAgent) && 'ontouchend' in document;
+const hasIOSNavigator = /iPad|iPhone|iPod/.test(userAgent);
+
+// デバイス別最適化設定（TECHNICAL_SPECIFICATIONS.md準拠）
+PC: 感度 1.0x, 音量バー 2.0x
+iPhone: 感度 3.0x, 音量バー 2.0x  
+iPad: 感度 7.0x, 音量バー 2.5x
+```
+
+### **🎯 次期実装フェーズ**
+- iPhone/iPad実機テスト実行
+- preparation.html・training.html本番統合実装
+- results-overview.html動的機能統合
 
 ---
 
