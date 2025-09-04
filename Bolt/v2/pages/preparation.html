@@ -94,7 +94,7 @@
                         <div class="voice-instruction-icon">
                             <i data-lucide="music" style="width: 32px; height: 32px; color: white;"></i>
                         </div>
-                        <p class="voice-instruction-text">「ド」を発声してください</p>
+                        <p class="voice-instruction-text" id="voice-instruction-text">「ド」を発声してください</p>
                         <div class="voice-instruction-pulse"></div>
                     </div>
                     
@@ -642,12 +642,23 @@
         let detectionActive = false;
         let detectedCDoPitches = [];
         
+        // 音量バー表示時間保証のための状態管理
+        let detectionStartTime = null;
+        const MIN_DETECTION_TIME = 3000; // 最低3秒間は音量バー表示を保証
+        const MIN_PITCH_DETECTIONS = 3;   // 最低3回の音程検出を要求
+        
         // リアルタイム音程検出開始
         function startRealAudioDetection() {
             console.log('リアルタイム音程検出開始');
             detectionActive = true;
             detectedCDoPitches = [];
+            detectionStartTime = Date.now(); // 開始時刻記録
             audioProcessor.startDetection();
+            
+            console.log('🕐 音量バー表示保証開始:', {
+                minTime: MIN_DETECTION_TIME + 'ms',
+                minDetections: MIN_PITCH_DETECTIONS
+            });
         }
 
         // リアルタイム音程更新ハンドラー
@@ -702,15 +713,39 @@
                 if (result.frequency >= 150 && result.frequency <= 400 && 
                     result.clarity > 0.15 && result.volume > 0.03) {
                     detectedCDoPitches.push(result.frequency);
+                    
+                    const elapsedTime = Date.now() - detectionStartTime;
+                    const timeConditionMet = elapsedTime >= MIN_DETECTION_TIME;
+                    const countConditionMet = detectedCDoPitches.length >= MIN_PITCH_DETECTIONS;
+                    
                     console.log('✅ C4候補検出！', {
                         frequency: result.frequency,
-                        detectedCount: detectedCDoPitches.length
+                        detectedCount: detectedCDoPitches.length,
+                        elapsedTime: elapsedTime + 'ms',
+                        timeConditionMet: timeConditionMet,
+                        countConditionMet: countConditionMet,
+                        canProceed: timeConditionMet && countConditionMet
                     });
                     
-                    // 1回検出で即成功（最速判定）
-                    if (detectedCDoPitches.length >= 1) {
-                        console.log('🎉 C4検出成功！showDetectionSuccess()呼び出し');
+                    // UI進捗表示を更新
+                    updateDetectionProgress(detectedCDoPitches.length, elapsedTime, timeConditionMet, countConditionMet);
+                    
+                    // 最低表示時間 AND 最低検出回数の両方を満たした場合のみ成功
+                    if (timeConditionMet && countConditionMet) {
+                        console.log('🎉 C4検出成功！時間・回数条件をクリア → showDetectionSuccess()呼び出し');
                         showDetectionSuccess();
+                    } else if (!timeConditionMet) {
+                        console.log('⏳ まだ最低表示時間未達成:', {
+                            required: MIN_DETECTION_TIME + 'ms',
+                            elapsed: elapsedTime + 'ms',
+                            remaining: (MIN_DETECTION_TIME - elapsedTime) + 'ms'
+                        });
+                    } else if (!countConditionMet) {
+                        console.log('🔢 まだ最低検出回数未達成:', {
+                            required: MIN_PITCH_DETECTIONS,
+                            current: detectedCDoPitches.length,
+                            remaining: (MIN_PITCH_DETECTIONS - detectedCDoPitches.length)
+                        });
                     }
                 } else {
                     // 条件未達成の詳細ログ
@@ -777,6 +812,30 @@
             lucide.createIcons();
             
             alert(`オーディオエラー: ${error.message}\nページを更新して再試行してください。`);
+        }
+        
+        // UI進捗表示更新（音程検出プログレス）
+        function updateDetectionProgress(detectionCount, elapsedTime, timeConditionMet, countConditionMet) {
+            const voiceInstructionText = document.getElementById('voice-instruction-text');
+            if (!voiceInstructionText) return;
+            
+            const timeProgress = Math.min(100, (elapsedTime / MIN_DETECTION_TIME) * 100);
+            const countProgress = Math.min(100, (detectionCount / MIN_PITCH_DETECTIONS) * 100);
+            
+            if (timeConditionMet && countConditionMet) {
+                voiceInstructionText.textContent = '✅ 検出完了！まもなく次のステップへ...';
+            } else {
+                const timeRemaining = Math.max(0, Math.ceil((MIN_DETECTION_TIME - elapsedTime) / 1000));
+                const countRemaining = Math.max(0, MIN_PITCH_DETECTIONS - detectionCount);
+                
+                if (!timeConditionMet && !countConditionMet) {
+                    voiceInstructionText.textContent = `「ド」を継続 (${timeRemaining}秒, ${countRemaining}回検出必要)`;
+                } else if (!timeConditionMet) {
+                    voiceInstructionText.textContent = `「ド」を継続 (あと${timeRemaining}秒)`;
+                } else if (!countConditionMet) {
+                    voiceInstructionText.textContent = `「ド」を継続 (あと${countRemaining}回検出必要)`;
+                }
+            }
         }
 
         // 検出成功表示
