@@ -260,14 +260,24 @@
         </main>
     </div>
 
-    <!-- JavaScript モジュール -->
+    <!-- 必要なJavaScript（読み込み順序重要） -->
+    <!-- 1. 基盤システム -->
     <script src="../../../js/data-manager.js"></script>
-    <script src="../../../js/audio-processor.js"></script>
     <script src="../../../js/volume-bar-controller.js"></script>
+    <script src="../../../js/volume-bar-component.js"></script>
     
+    <!-- 2. モジュールシステム -->
+    <script src="../../../js/modules/device-manager.js"></script>
+    <script src="../../../js/modules/voice-range-tester.js"></script>
+    <script src="../../../js/modules/audio-controller.js"></script>
+    
+    <!-- 3. 音声処理ライブラリ -->
+    <script src="../../../js/pitchpro-audio/index.umd.js"></script>
+    
+    <!-- 4. UIライブラリ -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
-    <!-- JavaScript外部ファイル化完了 -->
-    <script src="../../../js/preparation.js"></script>
+    <!-- 5. メインアプリケーション -->
+    <script src="../../../js/preparation-modular.js"></script>
 </body>
 </html>
