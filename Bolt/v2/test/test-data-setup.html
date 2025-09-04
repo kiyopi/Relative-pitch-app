@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>データ連動テスト - 結果表示システム</title>
+    <style>
+        body {
+            font-family: Inter, system-ui, sans-serif;
+            padding: 20px;
+            background: #1a1a2e;
+            color: white;
+        }
+        .test-section {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .btn {
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .btn:hover { background: #45a049; }
+        .status { 
+            padding: 8px; 
+            background: rgba(0,255,0,0.2); 
+            border-radius: 4px; 
+            margin: 5px 0; 
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 データ連動テスト</h1>
+    
+    <div class="test-section">
+        <h3>📊 テストデータ作成</h3>
+        <button class="btn" onclick="createTestSessionData()">セッション評価データ作成</button>
+        <button class="btn" onclick="createTestOverallData()">総合評価データ作成</button>
+        <button class="btn" onclick="clearAllData()">全データクリア</button>
+        <div id="data-status" class="status"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🔗 ページテスト</h3>
+        <button class="btn" onclick="testSessionPage()">セッション評価ページ</button>
+        <button class="btn" onclick="testOverallPage()">総合評価ページ</button>
+        <div id="test-results" class="status"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📈 データ状況確認</h3>
+        <button class="btn" onclick="showDataSummary()">データサマリー表示</button>
+        <pre id="data-summary" style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px;"></pre>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="../../../js/data-manager.js"></script>
+    <script>
+        /**
+         * テスト用セッションデータ作成
+         */
+        function createTestSessionData() {
+            try {
+                console.log('🔧 DataManagerチェック:', typeof DataManager);
+                console.log('📋 DataManagerメソッド:', Object.getOwnPropertyNames(DataManager).filter(name => typeof DataManager[name] === 'function'));
+                
+                const testSessionData = {
+                    sessionId: 'test-session-' + Date.now(),
+                    mode: 'random',
+                    sessionNumber: 1,
+                    baseNote: { note: 'C4', frequency: 261.63 },
+                    detectionResults: [
+                        { targetInterval: 'do', targetFrequency: 261.63, detectedFrequency: 260.1, evaluation: { centError: -8.2, rank: 'excellent' }},
+                        { targetInterval: 're', targetFrequency: 293.66, detectedFrequency: 298.5, evaluation: { centError: +15.3, rank: 'good' }},
+                        { targetInterval: 'mi', targetFrequency: 329.63, detectedFrequency: 335.2, evaluation: { centError: +25.1, rank: 'pass' }},
+                        { targetInterval: 'fa', targetFrequency: 349.23, detectedFrequency: 347.8, evaluation: { centError: -3.1, rank: 'excellent' }},
+                        { targetInterval: 'so', targetFrequency: 392.00, detectedFrequency: 395.4, evaluation: { centError: +12.5, rank: 'good' }},
+                        { targetInterval: 'la', targetFrequency: 440.00, detectedFrequency: 450.2, evaluation: { centError: +38.7, rank: 'practice' }},
+                        { targetInterval: 'ti', targetFrequency: 493.88, detectedFrequency: 487.9, evaluation: { centError: -20.1, rank: 'pass' }},
+                        { targetInterval: 'do', targetFrequency: 523.25, detectedFrequency: 527.3, evaluation: { centError: +13.2, rank: 'good' }}
+                    ],
+                    sessionSummary: {
+                        totalScore: 78.5,
+                        averageCentError: 18.2,
+                        successRate: 0.75,
+                        excellentCount: 2,
+                        goodCount: 3,
+                        passCount: 2,
+                        practiceCount: 1
+                    },
+                    startTime: new Date().toISOString(),
+                    endTime: new Date(Date.now() + 180000).toISOString()
+                };
+                
+                console.log('📝 テストデータ:', testSessionData);
+                
+                if (typeof DataManager !== 'undefined') {
+                    console.log('🔍 saveSessionResultメソッド存在確認:', typeof DataManager.saveSessionResult);
+                    
+                    if (DataManager.saveSessionResult) {
+                        const result = DataManager.saveSessionResult(testSessionData);
+                        console.log('💾 保存結果:', result);
+                        updateStatus('data-status', '✅ セッション評価データを作成しました');
+                    } else {
+                        console.error('❌ DataManager.saveSessionResult メソッドが見つかりません');
+                        console.log('📋 利用可能メソッド:', Object.getOwnPropertyNames(DataManager).filter(name => name.includes('Session') || name.includes('save')));
+                        updateStatus('data-status', '❌ saveSessionResultメソッドなし');
+                    }
+                } else {
+                    console.error('❌ DataManager自体が読み込まれていません');
+                    updateStatus('data-status', '❌ DataManagerが読み込まれていません');
+                }
+            } catch (error) {
+                console.error('❌ セッションデータ作成エラー:', error);
+                updateStatus('data-status', '❌ エラー: ' + error.message);
+            }
+        }
+
+        /**
+         * テスト用総合評価データ作成
+         */
+        function createTestOverallData() {
+            const testOverallData = {
+                mode: 'random',
+                sessionData: ['test-session-1', 'test-session-2', 'test-session-3', 'test-session-4', 'test-session-5', 'test-session-6', 'test-session-7', 'test-session-8'],
+                finalEvaluation: {
+                    dynamicGrade: 'B',
+                    finalScore: 82.3,
+                    excellenceRatio: 0.65,
+                    excellentCount: 20,
+                    goodCount: 25,
+                    passCount: 15,
+                    practiceCount: 4
+                },
+                statistics: {
+                    noteStatistics: {
+                        'ド': { successRate: 0.85, averageError: 12.5 },
+                        'レ': { successRate: 0.80, averageError: 18.3 },
+                        'ミ': { successRate: 0.75, averageError: 22.1 },
+                        'ファ': { successRate: 0.90, averageError: 8.7 },
+                        'ソ': { successRate: 0.78, averageError: 19.4 },
+                        'ラ': { successRate: 0.68, averageError: 28.9 },
+                        'シ': { successRate: 0.82, averageError: 16.2 },
+                        'ド(高)': { successRate: 0.88, averageError: 11.3 }
+                    }
+                },
+                completedAt: new Date().toISOString()
+            };
+            
+            DataManager.saveOverallEvaluation(testOverallData);
+            updateStatus('data-status', '✅ 総合評価データを作成しました');
+        }
+
+        /**
+         * 全データクリア
+         */
+        function clearAllData() {
+            localStorage.clear();
+            updateStatus('data-status', '🗑️ 全データをクリアしました');
+        }
+
+        /**
+         * セッション評価ページテスト
+         */
+        function testSessionPage() {
+            window.open('../pages/result-session.html', '_blank');
+            updateStatus('test-results', '📄 セッション評価ページを開きました');
+        }
+
+        /**
+         * 総合評価ページテスト
+         */
+        function testOverallPage() {
+            window.open('../pages/results-overview.html?mode=random', '_blank');
+            updateStatus('test-results', '📄 総合評価ページを開きました');
+        }
+
+        /**
+         * データサマリー表示
+         */
+        function showDataSummary() {
+            const latestSession = DataManager.getLatestSession();
+            const latestEvaluation = DataManager.getLatestEvaluation('random');
+            const sessionHistory = DataManager.getSessionHistory();
+            
+            const summary = {
+                'セッション履歴数': sessionHistory.length,
+                '最新セッション': latestSession ? `${latestSession.sessionNumber} (スコア: ${Math.round(latestSession.sessionSummary?.totalScore || 0)})` : '無し',
+                '最新総合評価': latestEvaluation ? `${latestEvaluation.finalEvaluation?.dynamicGrade}級 (スコア: ${Math.round(latestEvaluation.finalEvaluation?.finalScore || 0)})` : '無し',
+                'LocalStorageキー': Object.keys(localStorage).filter(key => !key.startsWith('_'))
+            };
+            
+            document.getElementById('data-summary').textContent = JSON.stringify(summary, null, 2);
+        }
+
+        /**
+         * ステータス更新
+         */
+        function updateStatus(elementId, message) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = message;
+                setTimeout(() => element.textContent = '', 5000);
+            }
+        }
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            // DataManager読み込み確認
+            if (typeof DataManager === 'undefined') {
+                updateStatus('data-status', '❌ DataManagerが読み込まれていません');
+                console.error('DataManager読み込み失敗');
+            } else {
+                updateStatus('data-status', '🚀 テスト環境準備完了 - DataManager読み込み済み');
+                console.log('✅ DataManager読み込み成功:', DataManager);
+            }
+        });
+    </script>
+</body>
+</html>

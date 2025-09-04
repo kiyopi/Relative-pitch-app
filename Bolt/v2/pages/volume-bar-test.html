@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎚️ 音量バーコンポーネント テスト</title>
+    
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="../styles/base.css">
+    
+    <!-- フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- ヘッダー -->
+        <header class="page-header">
+            <div class="page-header-content">
+                <div class="page-header-icon-wrapper">
+                    <div class="page-header-icon gradient-catalog-green">
+                        <i data-lucide="volume-2" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;"></i>
+                    </div>
+                </div>
+                <div class="page-header-text">
+                    <h1 class="page-title">音量バーテスト</h1>
+                    <p class="page-subtitle text-green-200">コンポーネント動作確認</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main class="narrow-main">
+            <!-- テスト用コントロール -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="settings" class="text-blue-300"></i>
+                    <span>テストコントロール</span>
+                </h3>
+                
+                <div class="flex gap-4 mt-4">
+                    <button id="test-volume" class="btn btn-primary">
+                        <i data-lucide="volume-2" style="width: 20px; height: 20px;"></i>
+                        音量シミュレート
+                    </button>
+                    <button id="reset-volume" class="btn btn-secondary">
+                        <i data-lucide="volume-x" style="width: 20px; height: 20px;"></i>
+                        リセット
+                    </button>
+                    <button id="start-real-audio" class="btn btn-outline">
+                        <i data-lucide="mic" style="width: 20px; height: 20px;"></i>
+                        実音声テスト
+                    </button>
+                    <button id="direct-test" class="btn btn-secondary">
+                        <i data-lucide="zap" style="width: 20px; height: 20px;"></i>
+                        直接テスト50%
+                    </button>
+                </div>
+            </div>
+
+            <!-- 音量バーコンポーネントテスト -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="bar-chart-3" class="text-green-300"></i>
+                    <span>音量バーコンポーネント</span>
+                </h3>
+                
+                <!-- 音量バー 1: 基本パターン -->
+                <div class="mt-4">
+                    <h5 class="text-sm font-medium mb-2">基本音量バー</h5>
+                    <div class="volume-bar-component" id="volume-bar-1">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="volume-2" class="text-yellow-300" style="width: 20px; height: 20px;"></i>
+                            <div class="progress-bar flex-1">
+                                <div class="progress-fill gradient-catalog-green volume-progress" data-volume="0" style="width: 0%;"></div>
+                            </div>
+                            <span class="text-sm text-white-60 min-w-16 volume-text">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 音量バー 2: 音声認識パターン -->
+                <div class="mt-6">
+                    <h5 class="text-sm font-medium mb-2">音声認識パターン</h5>
+                    <div class="volume-bar-component" id="volume-bar-2">
+                        <div class="mic-recognition-section">
+                            <div class="test-instruction test-instruction-green">
+                                <i data-lucide="mic" style="width: 20px; height: 20px;"></i>
+                            </div>
+                            <div class="progress-bar flex">
+                                <div class="progress-fill gradient-catalog-green volume-progress" data-volume="0" style="width: 0%;"></div>
+                            </div>
+                            <span class="text-sm text-white-60 min-w-16 volume-text">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 音量バー 3: カスタム色パターン -->
+                <div class="mt-6">
+                    <h5 class="text-sm font-medium mb-2">カスタム色パターン</h5>
+                    <div class="volume-bar-component" id="volume-bar-3">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="volume-2" class="text-blue-300" style="width: 20px; height: 20px;"></i>
+                            <div class="progress-bar flex-1">
+                                <div class="progress-fill gradient-catalog-blue volume-progress" data-volume="0" style="width: 0%;"></div>
+                            </div>
+                            <span class="text-sm text-white-60 min-w-16 volume-text">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- デバイス別設定表示 -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="smartphone" class="text-purple-300"></i>
+                    <span>デバイス情報</span>
+                </h3>
+                <div class="mt-4">
+                    <div class="text-sm text-white-80" id="device-info">
+                        デバイス検出中...
+                    </div>
+                    <div class="text-xs text-white-60 mt-2" id="volume-scale-info">
+                        音量スケール設定: 読み込み中...
+                    </div>
+                </div>
+            </div>
+
+            <!-- デバッグログ -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="terminal" class="text-orange-300"></i>
+                    <span>デバッグログ</span>
+                </h3>
+                <div class="mt-4 p-4 bg-black bg-opacity-50 rounded-lg max-h-64 overflow-y-auto font-mono text-sm" id="debug-log">
+                    <div class="text-green-300">[INFO] 音量バーテストページ読み込み完了</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Lucideアイコン -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- PitchPro直接使用 -->
+    <script src="../../../js/pitchpro-audio/index.umd.js"></script>
+    
+    <!-- 音量バーコンポーネント -->
+    <script src="../../../js/volume-bar-component.js"></script>
+
+    <!-- テストスクリプト -->
+    <script>
+        // ログ機能
+        function addLog(message, type = 'INFO') {
+            const log = document.getElementById('debug-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const colorClass = {
+                'INFO': 'text-blue-300',
+                'SUCCESS': 'text-green-300', 
+                'ERROR': 'text-red-300',
+                'WARNING': 'text-yellow-300'
+            }[type] || 'text-gray-300';
+            
+            const entry = document.createElement('div');
+            entry.className = colorClass;
+            entry.textContent = `[${type}] ${timestamp}: ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+            
+            console.log(`[${type}] ${message}`);
+        }
+
+        // VolumeBarComponentは外部ファイルから読み込み済み
+
+        // デバイス検出（test-ui-integrationと同じ形式）
+        function detectDevice() {
+            const userAgent = navigator.userAgent;
+            const isIPhone = /iPhone/.test(userAgent);
+            const isIPad = /iPad/.test(userAgent) || (/Macintosh/.test(userAgent) && 'ontouchend' in document);
+            
+            let deviceType = 'PC';
+            let volumeScale = 4.0; // PC向け感度さらに向上
+            let sensitivityMultiplier = 2.5; // 実機テスト結果
+            
+            if (isIPhone) {
+                deviceType = 'iPhone';
+                volumeScale = 4.5; // 実機テスト結果
+                sensitivityMultiplier = 3.5; // 実機テスト結果
+            } else if (isIPad) {
+                deviceType = 'iPad';
+                volumeScale = 7.0; // 実機テスト結果
+                sensitivityMultiplier = 5.0; // 実機テスト結果
+            }
+            
+            return { deviceType, volumeScale, sensitivityMultiplier };
+        }
+
+        // 変数
+        let volumeBars = {};
+        let pitchProInstance = null;
+        let audioUpdateLoop = null;
+        let isRealAudioActive = false;
+        
+        // スムージング用変数
+        let smoothedVolume = 0;
+        let volumeHistory = [];
+        const SMOOTHING_FACTOR = 0.5; // スムージング強度を調整（反応性重視）
+        const HISTORY_SIZE = 2; // 履歴サイズを最小化（即応性向上）
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lucide初期化
+            lucide.createIcons();
+            
+            // 音量バーコンポーネント初期化（デバッグモード有効）
+            try {
+                volumeBars.bar1 = new VolumeBarComponent('volume-bar-1', { debugMode: true, deviceOptimization: false });
+                volumeBars.bar2 = new VolumeBarComponent('volume-bar-2', { debugMode: true, deviceOptimization: false });
+                volumeBars.bar3 = new VolumeBarComponent('volume-bar-3', { debugMode: true, deviceOptimization: false });
+                addLog('全音量バーコンポーネント初期化完了', 'SUCCESS');
+            } catch (error) {
+                addLog(`音量バー初期化エラー: ${error.message}`, 'ERROR');
+            }
+
+            // デバイス情報表示
+            const device = detectDevice();
+            document.getElementById('device-info').textContent = 
+                `デバイス: ${device.deviceType}`;
+            document.getElementById('volume-scale-info').textContent = 
+                `音量スケール設定: ${device.volumeScale}x`;
+
+            // ボタンイベント
+            document.getElementById('test-volume').addEventListener('click', function() {
+                addLog('音量シミュレーション開始', 'INFO');
+                Object.values(volumeBars).forEach(bar => {
+                    addLog(`バー手動テスト: ${bar.element.id}`, 'INFO');
+                    bar.startAnimationTest();
+                });
+            });
+
+            document.getElementById('reset-volume').addEventListener('click', function() {
+                addLog('全音量バーリセット', 'INFO');
+                Object.values(volumeBars).forEach(bar => bar.reset());
+            });
+
+            document.getElementById('start-real-audio').addEventListener('click', async function() {
+                const button = this;
+                if (isRealAudioActive) {
+                    stopRealAudio();
+                } else {
+                    await startRealAudio();
+                }
+            });
+
+            document.getElementById('direct-test').addEventListener('click', function() {
+                addLog('直接50%音量テスト実行', 'INFO');
+                Object.values(volumeBars).forEach(bar => {
+                    addLog(`直接更新テスト: ${bar.element.id} → 50%`, 'INFO');
+                    bar.updateVolume(50, { immediate: false, forceUpdate: true });
+                });
+            });
+
+            addLog('音量バーテストページ初期化完了', 'SUCCESS');
+        });
+
+        // PitchPro直接使用の実音声テスト機能
+        let audioManager = null; // グローバルに移動
+        
+        async function startRealAudio() {
+            try {
+                addLog('実音声テスト開始 - PitchPro初期化中...', 'INFO');
+                
+                // PitchPro AudioManager初期化
+                if (!window.PitchPro || !window.PitchPro.AudioManager) {
+                    throw new Error('PitchPro library not loaded properly');
+                }
+                
+                audioManager = new window.PitchPro.AudioManager();
+                await audioManager.initialize();
+                
+                // PitchDetector作成
+                pitchProInstance = new window.PitchPro.PitchDetector(audioManager);
+                await pitchProInstance.initialize();
+                
+                // コールバック設定（重要：test-ui-integrationと同じ方式）
+                pitchProInstance.setCallbacks({
+                    onPitchUpdate: (result) => {
+                        if (result && result.volume !== undefined) {
+                            // 音量値を直接グローバル変数に保存
+                            window.lastPitchResult = result;
+                        }
+                    },
+                    onError: (error) => {
+                        addLog(`音程検出エラー: ${error.message}`, 'ERROR');
+                    }
+                });
+                
+                // 検出開始
+                pitchProInstance.startDetection();
+                addLog('PitchPro初期化・検出開始完了', 'SUCCESS');
+                
+                // デバイス検出
+                const device = detectDevice();
+                addLog(`デバイス: ${device.deviceType}, 音量スケール: ${device.volumeScale}x`, 'INFO');
+                
+                // リアルタイム音量更新開始
+                startVolumeUpdate(device);
+                
+                // UI更新
+                isRealAudioActive = true;
+                const button = document.getElementById('start-real-audio');
+                button.innerHTML = '<i data-lucide="mic-off" style="width: 20px; height: 20px;"></i> 停止';
+                button.className = 'btn btn-danger';
+                lucide.createIcons();
+                
+                addLog('実音声テスト開始完了 - マイクに向かって音を出してください', 'SUCCESS');
+                
+            } catch (error) {
+                addLog(`実音声テスト開始エラー: ${error.message}`, 'ERROR');
+                console.error('実音声テスト開始エラー:', error);
+            }
+        }
+        
+        function stopRealAudio() {
+            addLog('実音声テスト停止中...', 'INFO');
+            
+            // 更新ループ停止
+            if (audioUpdateLoop) {
+                clearInterval(audioUpdateLoop);
+                audioUpdateLoop = null;
+            }
+            
+            // PitchPro停止・解放
+            if (pitchProInstance) {
+                pitchProInstance.stopDetection();
+                pitchProInstance.cleanup();
+                pitchProInstance = null;
+            }
+            
+            // スムージング状態リセット
+            smoothedVolume = 0;
+            volumeHistory = [];
+            
+            // 音量バーリセット
+            Object.values(volumeBars).forEach(bar => bar.reset());
+            
+            // UI更新
+            isRealAudioActive = false;
+            const button = document.getElementById('start-real-audio');
+            button.innerHTML = '<i data-lucide="mic" style="width: 20px; height: 20px;"></i> 実音声テスト';
+            button.className = 'btn btn-outline';
+            lucide.createIcons();
+            
+            addLog('実音声テスト停止完了', 'SUCCESS');
+        }
+        
+        function startVolumeUpdate(device) {
+            audioUpdateLoop = setInterval(() => {
+                if (!window.lastPitchResult) return;
+                
+                try {
+                    // コールバックから取得した音量値を使用（test-ui-integrationと完全に同じ）
+                    const result = window.lastPitchResult;
+                    const rawVolume = result.volume || 0;
+                    
+                    // test-ui-integrationと同じ計算式を使用
+                    const deviceSpecs = detectDevice();
+                    const adjustedVolume = rawVolume * device.volumeScale * deviceSpecs.sensitivityMultiplier;
+                    const displayVolume = Math.min(100, Math.max(0, adjustedVolume));
+                    
+                    // スムージング処理を一旦コメントアウト
+                    /*
+                    // 履歴に追加（移動平均用）
+                    volumeHistory.push(volume);
+                    if (volumeHistory.length > HISTORY_SIZE) {
+                        volumeHistory.shift();
+                    }
+                    
+                    // 移動平均計算
+                    const averageVolume = volumeHistory.reduce((sum, v) => sum + v, 0) / volumeHistory.length;
+                    
+                    // スムージング適用（指数移動平均）
+                    smoothedVolume = smoothedVolume + SMOOTHING_FACTOR * (averageVolume - smoothedVolume);
+                    
+                    // 最小変化量制限（細かい振動を抑制）
+                    const minChange = 1.0; // 1.0%以下の変化は無視（高感度維持）
+                    const volumeDifference = Math.abs(smoothedVolume - (volumeBars.bar1?.getCurrentVolume() || 0));
+                    
+                    if (volumeDifference < minChange && smoothedVolume > 0.5) { // 0.5%以上のときのみ制限
+                        return; // 小さな変化はスキップ
+                    }
+                    
+                    // 0-100%に制限
+                    const displayVolume = Math.min(100, Math.max(0, smoothedVolume));
+                    */
+                    
+                    // 音量バー更新
+                    Object.values(volumeBars).forEach(bar => {
+                        bar.updateVolume(displayVolume);
+                    });
+                    
+                    // デバッグ表示（頻繁に表示）
+                    if (Math.random() < 0.1) { // 約10%の確率 = 約0.5秒に1回
+                        addLog(`音量更新: Raw=${rawVolume.toFixed(2)}, Scale=${device.volumeScale.toFixed(1)}x, Sens=${deviceSpecs.sensitivityMultiplier}x, Final=${displayVolume.toFixed(1)}%`, 'INFO');
+                    }
+                    
+                } catch (error) {
+                    addLog(`音量取得エラー: ${error.message}`, 'WARNING');
+                }
+                
+            }, 50); // 20fps更新
+        }
+    </script>
+</body>
+</html>

@@ -21,9 +21,9 @@
     <link rel="stylesheet" href="../styles/training.css?v=2">
     
     <!-- JavaScript モジュール -->
-    <script src="../../js/data-manager.js"></script>
-    <script src="../../js/audio-processor.js"></script>
-    <script src="../../js/training-session.js"></script>
+    <script src="../../../js/data-manager.js"></script>
+    <script src="../../../js/audio-processor.js"></script>
+    <script src="../../../js/training-session.js"></script>
     
     <!-- フォント（非ブロッキング） -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -112,7 +112,7 @@
                                 <i data-lucide="mic" style="width: 20px; height: 20px;"></i>
                             </div>
                             <div class="progress-bar flex">
-                                <div class="progress-fill gradient-catalog-green" style="width: 65%;"></div>
+                                <div class="progress-fill gradient-catalog-green" style="width: 0%;"></div>
                             </div>
                         </div>
                         
@@ -253,12 +253,15 @@
             
             // 進行バー更新
             const progressFill = document.querySelector('.progress-fill');
-            const progressLabel = document.querySelector('.progress-label');
+            const sessionBadge = document.querySelector('.session-badge');
             
-            if (progressFill && progressLabel) {
+            if (progressFill) {
                 const progressPercent = Math.round((sessionNum / config.totalSessions) * 100);
                 progressFill.style.width = progressPercent + '%'; // 動的値のため例外許可
-                progressLabel.textContent = `セッション ${sessionNum} / ${config.totalSessions}`;
+            }
+            
+            if (sessionBadge) {
+                sessionBadge.textContent = `セッション ${sessionNum}/${config.totalSessions}`;
             }
             
             // 12音階モードの場合：音域調整を表示
@@ -339,10 +342,37 @@
         let trainingSession = null;
 
         function startTraining() {
-            const button = document.getElementById('play-base-note');
-            const progressSquares = document.querySelectorAll('.progress-square');
+            
+            // 音域データチェック
+            let voiceRangeData = DataManager.getVoiceRangeData();
+            if (!voiceRangeData) {
+                console.warn('⚠️ 音域データが見つかりません。デバッグ用ダミーデータを設定します。');
+                
+                // デバッグ用ダミーデータ
+                const dummyVoiceRange = {
+                    timestamp: new Date().toISOString(),
+                    results: {
+                        lowestNote: { note: 'G3', frequency: 196.00 },
+                        highestNote: { note: 'G5', frequency: 783.99 },
+                        comfortableRange: {
+                            low: { note: 'C4', frequency: 261.63 },
+                            high: { note: 'C5', frequency: 523.25 },
+                            recommendedRoot: 'C4'
+                        },
+                        octaveRange: 2.0
+                    }
+                };
+                
+                // ダミーデータを保存
+                DataManager.saveVoiceRangeData(dummyVoiceRange.results);
+                voiceRangeData = DataManager.getVoiceRangeData();
+                
+                // アラートを表示するが続行
+                alert('音域データが見つからないため、デバッグ用データで続行します。\n正式には準備ページで音域テストを完了してください。');
+            }
             
             // ボタンを無効化
+            const button = document.getElementById('play-base-note');
             button.disabled = true;
             button.innerHTML = '<i data-lucide="volume-2" style="width: 24px; height: 24px;"></i><span>初期化中...</span>';
             lucide.createIcons(); // アイコンを再作成
@@ -355,6 +385,21 @@
         // TrainingSession初期化・実行
         async function initializeAndStartSession() {
             try {
+                console.log('🚀 TrainingSession初期化開始', { mode });
+                
+                // マイク許可確認
+                console.log('🎤 マイク許可状態確認中...');
+                try {
+                    const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
+                    console.log('🎤 マイク許可状態:', permissionStatus.state);
+                    
+                    if (permissionStatus.state === 'denied') {
+                        throw new Error('マイクへのアクセスが拒否されています。ブラウザの設定を確認してください。');
+                    }
+                } catch (err) {
+                    console.warn('⚠️ permissions API未対応:', err);
+                }
+                
                 // セッション初期化
                 trainingSession = new TrainingSession(mode);
                 
@@ -366,18 +411,24 @@
                     onSessionComplete: handleSessionComplete,
                     onError: handleTrainingError
                 });
+                console.log('📋 UIコールバック設定完了');
                 
                 // TrainingSession初期化
+                console.log('⚙️ TrainingSession.initializeTraining()実行中...');
                 const initResult = await trainingSession.initializeTraining();
+                console.log('⚙️ initializeTraining結果:', initResult);
                 
                 if (!initResult.success) {
                     throw new Error(initResult.error);
                 }
                 
                 // セッション開始
+                console.log('🎬 trainingSession.startSession()実行中...');
                 await trainingSession.startSession();
+                console.log('🎬 startSession()完了');
                 
             } catch (error) {
+                console.error('💥 initializeAndStartSession エラー:', error);
                 handleTrainingError('initialization', error);
             }
         }
@@ -394,7 +445,7 @@
 
         // 音程進行ハンドラ
         function handleIntervalChange(intervalInfo) {
-            const circles = document.querySelectorAll('.progress-circle');
+            const circles = document.querySelectorAll('.note-circle');
             
             // 前の音程を完了マーク
             if (intervalInfo.index > 0) {
@@ -412,13 +463,55 @@
 
         // リアルタイム音程更新ハンドラ
         function handlePitchUpdate(updateInfo) {
-            // TODO: ピッチ可視化エリアの更新
-            console.log('🎤 音程検出:', {
-                interval: updateInfo.interval,
-                grade: updateInfo.result.evaluation.grade,
-                centError: updateInfo.result.evaluation.centError,
-                progress: (updateInfo.progress * 100).toFixed(1) + '%'
+            console.log('🔔 handlePitchUpdate呼び出し:', {
+                updateInfo: updateInfo,
+                resultKeys: Object.keys(updateInfo.result || {}),
+                detectedData: updateInfo.result?.detectedData
             });
+            
+            // 音量バーの更新
+            const volumeBar = document.querySelector('.mic-recognition-section .progress-fill');
+            
+            // updateInfo.result.detectedDataからvolumeを取得
+            let volume = 0;
+            
+            // detectedDataの構造を詳細に確認
+            if (updateInfo.result?.detectedData) {
+                console.log('📦 detectedData構造:', {
+                    keys: Object.keys(updateInfo.result.detectedData),
+                    volume: updateInfo.result.detectedData.volume,
+                    fullData: updateInfo.result.detectedData
+                });
+                
+                if (updateInfo.result.detectedData.volume !== undefined) {
+                    volume = updateInfo.result.detectedData.volume;
+                    console.log('📊 volume取得成功:', volume);
+                }
+            } else {
+                console.log('⚠️ detectedDataが存在しません');
+            }
+            
+            if (volumeBar) {
+                const volumePercent = Math.min(100, volume * 100);
+                volumeBar.style.width = `${volumePercent}%`;
+                console.log(`🎚️ 音量バー更新: ${volumePercent.toFixed(1)}%`);
+                
+                // デバッグ用：音量表示
+                if (!this.lastVolumeLog || Date.now() - this.lastVolumeLog > 1000) {
+                    console.log(`🎚️ 音量: ${volumePercent.toFixed(1)}%`);
+                    this.lastVolumeLog = Date.now();
+                }
+            }
+            
+            // 評価がある場合のみログ出力
+            if (updateInfo.result?.evaluation) {
+                console.log('🎤 音程検出:', {
+                    interval: updateInfo.interval,
+                    grade: updateInfo.result.evaluation.grade,
+                    centError: updateInfo.result.evaluation.centError,
+                    progress: (updateInfo.progress * 100).toFixed(1) + '%'
+                });
+            }
         }
 
         // セッション完了ハンドラ
@@ -470,12 +563,15 @@
             const config = modeConfig[mode];
             
             const progressFill = document.querySelector('.progress-fill');
-            const progressLabel = document.querySelector('.progress-label');
+            const sessionBadge = document.querySelector('.session-badge');
             
-            if (progressFill && progressLabel) {
+            if (progressFill) {
                 const progressPercent = Math.round((sessionStats.currentSession / config.totalSessions) * 100);
                 progressFill.style.width = progressPercent + '%'; // 動的値のため例外許可
-                progressLabel.textContent = `セッション ${sessionStats.currentSession} / ${config.totalSessions}`;
+            }
+            
+            if (sessionBadge) {
+                sessionBadge.textContent = `セッション ${sessionStats.currentSession}/${config.totalSessions}`;
             }
         }
 

@@ -201,7 +201,7 @@ class DataManager {
     
     let filtered = evaluations;
     if (mode) {
-      filtered = evaluations.filter(eval => eval.mode === mode);
+      filtered = evaluations.filter(evalData => evalData.mode === mode);
     }
     
     return filtered
@@ -514,9 +514,15 @@ class DataManager {
    * セッション完了時の統計計算
    */
   static calculateSessionSummary(detectionResults) {
+    console.log('📊 セッション統計計算開始:', {
+      totalResults: detectionResults.length,
+      sampleResult: detectionResults[0]
+    });
+    
     const validResults = detectionResults.filter(result => result !== null);
     
     if (validResults.length === 0) {
+      console.error('❌ 有効な検出結果が0件のため統計計算失敗');
       return null;
     }
 

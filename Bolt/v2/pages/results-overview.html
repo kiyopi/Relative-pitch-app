@@ -22,6 +22,10 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    
+    <!-- JavaScript モジュール -->
+    <script src="../../../js/data-manager.js"></script>
+    <script src="../../../js/results-controller.js"></script>
 </head>
 <body>
     <div class="container">
@@ -131,41 +135,7 @@
                     
                     <!-- 評価分布バー -->
                     <div class="flex flex-col gap-3">
-                        <!-- Excellent -->
-                        <div class="flex items-center gap-3">
-                            <i data-lucide="trophy" class="text-yellow-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
-                            <div class="progress-bar flex">
-                                <div class="progress-fill-custom color-eval-gold" style="width: 37.5%;"></div>
-                            </div>
-                            <span class="text-caption eval-count-text">3</span>
-                        </div>
-                        
-                        <!-- Good -->
-                        <div class="flex items-center gap-3">
-                            <i data-lucide="star" class="text-green-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
-                            <div class="progress-bar flex">
-                                <div class="progress-fill-custom color-eval-good" style="width: 25%;"></div>
-                            </div>
-                            <span class="text-caption" class="eval-count-text">2</span>
-                        </div>
-                        
-                        <!-- Pass -->
-                        <div class="flex items-center gap-3">
-                            <i data-lucide="thumbs-up" class="text-blue-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
-                            <div class="progress-bar flex">
-                                <div class="progress-fill-custom color-eval-pass" style="width: 37.5%;"></div>
-                            </div>
-                            <span class="text-caption eval-count-text">3</span>
-                        </div>
-                        
-                        <!-- Practice -->
-                        <div class="flex items-center gap-3">
-                            <i data-lucide="triangle-alert" class="text-red-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
-                            <div class="progress-bar flex">
-                                <div class="progress-fill-custom color-eval-practice" style="width: 0%;"></div>
-                            </div>
-                            <span class="text-caption" class="eval-count-text">0</span>
-                        </div>
+                        <!-- JavaScriptで動的生成 -->
                     </div>
                 </section>
 
@@ -187,57 +157,7 @@
                         <span>セッション一覧</span>
                     </h2>
                     <div id="session-grid-container">
-                        <!-- 8セッショングリッド（サンプル） -->
-                        <div class="sessions-grid-8">
-                            <div class="session-box session-excellent">
-                                <div class="session-number">1</div>
-                                <div class="session-icon">
-                                    <i data-lucide="trophy" class="text-yellow-300"></i>
-                                </div>
-                            </div>
-                            <div class="session-box session-good">
-                                <div class="session-number">2</div>
-                                <div class="session-icon">
-                                    <i data-lucide="star" class="text-green-300"></i>
-                                </div>
-                            </div>
-                            <div class="session-box session-pass">
-                                <div class="session-number">3</div>
-                                <div class="session-icon">
-                                    <i data-lucide="thumbs-up" class="text-blue-300"></i>
-                                </div>
-                            </div>
-                            <div class="session-box session-practice">
-                                <div class="session-number">4</div>
-                                <div class="session-icon">
-                                    <i data-lucide="triangle-alert" class="text-red-300"></i>
-                                </div>
-                            </div>
-                            <div class="session-box session-excellent">
-                                <div class="session-number">5</div>
-                                <div class="session-icon">
-                                    <i data-lucide="trophy" class="text-yellow-300"></i>
-                                </div>
-                            </div>
-                            <div class="session-box session-good">
-                                <div class="session-number">6</div>
-                                <div class="session-icon">
-                                    <i data-lucide="star" class="text-green-300"></i>
-                                </div>
-                            </div>
-                            <div class="session-box session-pass">
-                                <div class="session-number">7</div>
-                                <div class="session-icon">
-                                    <i data-lucide="thumbs-up" class="text-blue-300"></i>
-                                </div>
-                            </div>
-                            <div class="session-box session-excellent">
-                                <div class="session-number">8</div>
-                                <div class="session-icon">
-                                    <i data-lucide="trophy" class="text-yellow-300"></i>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- JavaScriptで動的生成 -->
                     </div>
                 </section>
 
@@ -294,158 +214,8 @@
                         </div>
                         
                         <!-- 音別詳細結果 -->
-                        <div class="space-y-2">
-                            <!-- ド -->
-                            <div class="note-result-item">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-4">
-                                        <div class="text-sub-title">ド</div>
-                                        <div>
-                                            <div class="text-body">目標 262Hz</div>
-                                            <div class="text-body">実音 260Hz</div>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="text-pitch-deviation-minus">-8¢</div>
-                                        <div class="flex items-center justify-center">
-                                            <i data-lucide="trophy" class="text-yellow-300" style="width: 28px; height: 28px;"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- レ -->
-                            <div class="note-result-item">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-4">
-                                        <div class="text-sub-title">レ</div>
-                                        <div>
-                                            <div class="text-body">目標 294Hz</div>
-                                            <div class="text-body">実音 298Hz</div>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="text-pitch-deviation-plus">+15¢</div>
-                                        <div class="flex items-center justify-center">
-                                            <i data-lucide="star" class="text-green-300" style="width: 28px; height: 28px;"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- ミ -->
-                            <div class="note-result-item">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-4">
-                                        <div class="text-sub-title">ミ</div>
-                                        <div>
-                                            <div class="text-body">目標 330Hz</div>
-                                            <div class="text-body">実音 335Hz</div>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="text-pitch-deviation-plus">+25¢</div>
-                                        <div class="flex items-center justify-center">
-                                            <i data-lucide="thumbs-up" class="text-blue-300" style="width: 28px; height: 28px; transform: translateY(-2px) translateX(2px);"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- ファ -->
-                            <div class="note-result-item">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-4">
-                                        <div class="text-sub-title">ファ</div>
-                                        <div>
-                                            <div class="text-body">目標 349Hz</div>
-                                            <div class="text-body">実音 348Hz</div>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="text-pitch-deviation-minus">-3¢</div>
-                                        <div class="flex items-center justify-center">
-                                            <i data-lucide="trophy" class="text-yellow-300" style="width: 28px; height: 28px;"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- ソ -->
-                            <div class="note-result-item">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-4">
-                                        <div class="text-sub-title">ソ</div>
-                                        <div>
-                                            <div class="text-body">目標 392Hz</div>
-                                            <div class="text-body">実音 395Hz</div>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="text-pitch-deviation-plus">+12¢</div>
-                                        <div class="flex items-center justify-center">
-                                            <i data-lucide="star" class="text-green-300" style="width: 28px; height: 28px;"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- ラ -->
-                            <div class="note-result-item">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-4">
-                                        <div class="text-sub-title">ラ</div>
-                                        <div>
-                                            <div class="text-body">目標 440Hz</div>
-                                            <div class="text-body">実音 450Hz</div>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="text-pitch-deviation-plus">+38¢</div>
-                                        <div class="flex items-center justify-center">
-                                            <i data-lucide="triangle-alert" class="text-red-300" style="width: 28px; height: 28px;"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- シ -->
-                            <div class="note-result-item">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-4">
-                                        <div class="text-sub-title">シ</div>
-                                        <div>
-                                            <div class="text-body">目標 494Hz</div>
-                                            <div class="text-body">実音 488Hz</div>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="text-pitch-deviation-minus">-20¢</div>
-                                        <div class="flex items-center justify-center">
-                                            <i data-lucide="thumbs-up" class="text-blue-300" style="width: 28px; height: 28px; transform: translateY(-2px) translateX(2px);"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- ド（高音） -->
-                            <div class="note-result-item">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-4">
-                                        <div class="text-sub-title">ド</div>
-                                        <div>
-                                            <div class="text-body">目標 523Hz</div>
-                                            <div class="text-body">実音 527Hz</div>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="text-pitch-deviation-plus">+13¢</div>
-                                        <div class="flex items-center justify-center">
-                                            <i data-lucide="star" class="text-green-300" style="width: 28px; height: 28px;"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="space-y-2" id="detail-note-results">
+                            <!-- JavaScriptで動的生成 -->
                         </div>
                         
                         <!-- 追加の分析情報（未定） -->

@@ -102,10 +102,10 @@
                     <div class="meter-group">
                         <div class="meter-label">
                             <span>音量レベル</span>
-                            <span class="meter-value" id="volume-value">65%</span>
+                            <span class="meter-value" id="volume-value">0%</span>
                         </div>
                         <div class="progress-bar">
-                            <div class="progress-fill" id="volume-progress" style="width: 65%"></div>
+                            <div class="progress-fill gradient-catalog-green" id="volume-progress" style="width: 0%"></div>
                         </div>
                     </div>
 
@@ -117,7 +117,7 @@
                         </div>
                     </div>
 
-                    <div class="success-alert hidden" id="detection-success">
+                    <div class="success-alert" id="detection-success">
                         <i data-lucide="check-circle" style="width: 24px; height: 24px; color: #22c55e;"></i>
                         <p id="detection-success-message">「ド」の音程を検出できました！音域テストに進みましょう。</p>
                     </div>
@@ -249,6 +249,11 @@
         </main>
     </div>
 
+    <!-- JavaScript モジュール -->
+    <script src="../../../js/data-manager.js"></script>
+    <script src="../../../js/audio-processor.js"></script>
+    <script src="../../../js/volume-bar-controller.js"></script>
+    
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
     <!-- TODO: 外部ファイル化 /js/preparation.js -->
@@ -256,6 +261,57 @@
     <!-- スタイル実装完了後に外部ファイル化必須 -->
     <script>
         lucide.createIcons();
+
+        // デバイス検出（CRITICAL_DECISIONS_AND_INSIGHTS.md準拠 - iPadOS 13+バグ対策）
+        function detectDeviceWithSpecs() {
+            const userAgent = navigator.userAgent; // toLowerCase削除（大文字小文字区別重要）
+            
+            // iPadOS 13+ 完全対応検出ロジック
+            const isIPhone = /iPhone/.test(userAgent);
+            const isIPad = /iPad/.test(userAgent);
+            const isIPadOS = /Macintosh/.test(userAgent) && 'ontouchend' in document; // iPadOS 13+偽装対策
+            const hasIOSNavigator = /iPad|iPhone|iPod/.test(userAgent);
+            const hasIOSPlatform = /iPad|iPhone|iPod/.test((navigator).platform || '');
+            
+            // 複数方式による総合判定
+            const isIOS = isIPhone || isIPad || isIPadOS || hasIOSNavigator || hasIOSPlatform;
+            
+            let deviceType = 'PC';
+            let sensitivityMultiplier = 2.5; // 実機テスト済み設定
+            let volumeBarScale = 4.0; // 実機テスト済み設定
+            
+            if (isIPhone) {
+                deviceType = 'iPhone';
+                sensitivityMultiplier = 3.5; // 実機テスト済み設定
+                volumeBarScale = 4.5; // 実機テスト済み設定
+            } else if (isIPad || isIPadOS) { // isIPadOS追加が重要
+                deviceType = 'iPad';
+                sensitivityMultiplier = 5.0; // 実機テスト済み設定
+                volumeBarScale = 7.0; // 実機テスト済み設定
+            } else if (isIOS) {
+                deviceType = 'iOS Device';
+                sensitivityMultiplier = 3.5; // フォールバック
+                volumeBarScale = 4.5;
+            }
+            
+            return {
+                deviceType,
+                sensitivityMultiplier,
+                volumeBarScale,
+                isIOS,
+                debugInfo: {
+                    userAgent: userAgent,
+                    detectionMethods: {
+                        isIPhone,
+                        isIPad,
+                        isIPadOS, // iPadOS 13+検出状態
+                        hasIOSNavigator,
+                        hasIOSPlatform,
+                        touchSupport: 'ontouchend' in document
+                    }
+                }
+            };
+        }
 
         // DOM要素の取得
         const requestMicBtn = document.getElementById('request-mic-btn');
@@ -266,6 +322,36 @@
         const audioTestSection = document.getElementById('audio-test-section');
         const rangeTestSection = document.getElementById('range-test-section');
         const resultSection = document.getElementById('result-section');
+
+        // グローバルデバイス設定
+        const deviceSpecs = detectDeviceWithSpecs();
+        console.log(`🔍 デバイス検出結果: ${deviceSpecs.deviceType}`, deviceSpecs);
+        
+        // iPadOS 13+ 検出の詳細ログ
+        if (deviceSpecs.debugInfo.detectionMethods.isIPadOS) {
+            console.log('⚠️ iPadOS 13+ 検出: Macintosh偽装を発見・iPad判定に修正', {
+                userAgent: deviceSpecs.debugInfo.userAgent,
+                touchSupport: deviceSpecs.debugInfo.detectionMethods.touchSupport,
+                macintoshUA: /Macintosh/.test(deviceSpecs.debugInfo.userAgent),
+                iPadUA: /iPad/.test(deviceSpecs.debugInfo.userAgent)
+            });
+        }
+
+        // デバイス設定をlocalStorageに保存（後続ページで使用）
+        try {
+            const deviceSettings = {
+                deviceType: deviceSpecs.deviceType,
+                sensitivityMultiplier: deviceSpecs.sensitivityMultiplier,
+                volumeBarScale: deviceSpecs.volumeBarScale,
+                isIOS: deviceSpecs.isIOS,
+                detectedAt: new Date().toISOString(),
+                userAgent: deviceSpecs.debugInfo.userAgent
+            };
+            localStorage.setItem('deviceSettings', JSON.stringify(deviceSettings));
+            console.log('💾 デバイス設定をlocalStorageに保存完了');
+        } catch (error) {
+            console.warn('⚠️ デバイス設定の保存に失敗:', error);
+        }
 
         // ステップインジケーター更新
         function updateStepStatus(stepNumber, status) {
@@ -299,6 +385,12 @@
         // 初期状態設定
         updateStepStatus(1, 'active');
 
+        // オーディオプロセッサーインスタンス
+        let audioProcessor = null;
+        
+        // VolumeBarControllerインスタンス（新統合システム）
+        let volumeBarController = null;
+
         // マイク許可ボタン
         requestMicBtn.addEventListener('click', async () => {
             try {
@@ -306,21 +398,152 @@
                 requestMicBtn.innerHTML = '<i data-lucide="loader" style="width: 24px; height: 24px;"></i><span>許可を待っています...</span>';
                 lucide.createIcons();
 
-                // マイク許可のシミュレーション
-                await new Promise(resolve => setTimeout(resolve, 1500));
+                // デバイス別最適化AudioProcessor初期化
+                console.log(`🚀 AudioProcessor初期化開始（${deviceSpecs.deviceType}用最適化）...`);
+                audioProcessor = new AudioProcessor();
+                console.log('📦 AudioProcessorインスタンス作成完了');
+                
+                const initResult = await audioProcessor.initialize();
+                console.log('🔍 初期化結果:', initResult);
+                
+                if (!initResult.success) {
+                    console.error('❌ AudioProcessor初期化失敗:', initResult.error);
+                    throw new Error(initResult.error);
+                }
+
+                // デバイス別感度設定適用
+                console.log(`🔧 ${deviceSpecs.deviceType}用感度設定適用: ${deviceSpecs.sensitivityMultiplier}x`);
+                
+                // TODO: AudioProcessorの感度設定メソッドが実装され次第適用
+                // audioProcessor.setSensitivity(deviceSpecs.sensitivityMultiplier);
+                
+                // VolumeBarController初期化（新統合システム）
+                console.log('🎚️ VolumeBarController初期化開始...');
+                try {
+                    volumeBarController = new VolumeBarController({
+                        updateInterval: 50,          // 20fps更新
+                        enableSmoothing: false,      // スムージング無効（推奨）
+                        debugMode: true,             // デバッグモード有効
+                        autoDetectDevice: true       // デバイス自動検出
+                    });
+                    
+                    // 音量バー要素を登録（シンプル登録方式）
+                    volumeBarController.addVolumeBar('volume-bar-1', 'volume-progress');
+                    
+                    // パーセンテージ表示用の要素にクラス追加（VolumeBarController自動検出用）
+                    const volumePercentElement = document.getElementById('volume-value');
+                    if (volumePercentElement) {
+                        volumePercentElement.classList.add('volume-percent');
+                    }
+                    
+                    console.log('✅ VolumeBarController初期化完了', {
+                        deviceType: volumeBarController.getDeviceSpecs().deviceType,
+                        volumeBarScale: volumeBarController.getDeviceSpecs().volumeBarScale,
+                        sensitivityMultiplier: volumeBarController.getDeviceSpecs().sensitivityMultiplier
+                    });
+                } catch (error) {
+                    console.error('❌ VolumeBarController初期化エラー:', error);
+                    // エラー時は既存システムで継続
+                }
+
+                // オーディオコールバック設定（VolumeBarController統合方式）
+                audioProcessor.setCallbacks({
+                    onPitchUpdate: (result) => {
+                        console.log('🎵 onPitchUpdate統合コールバック受信:', {
+                            result: result,
+                            volume: result?.volume,
+                            volumeType: typeof result?.volume,
+                            frequency: result?.frequency,
+                            clarity: result?.clarity,
+                            detectionActive: detectionActive
+                        });
+                        
+                        // 検出停止中は音量バー更新をスキップ（マイクミュート連動）
+                        console.log('🔍 detectionActive状態チェック:', detectionActive);
+                        if (!detectionActive) {
+                            console.log('⏸️ 検出停止中のため音量バー更新をスキップ');
+                            return;
+                        }
+                        console.log('▶️ detectionActive=trueのため処理継続');
+                        
+                        // リアルタイム音程処理
+                        handleRealPitchUpdate(result);
+                        
+                        // VolumeBarController統合システムで音量バー更新
+                        if (result && typeof result.volume === 'number' && volumeBarController) {
+                            // VolumeBarControllerのコールバックを手動呼び出し
+                            volumeBarController.handlePitchUpdate(result);
+                            
+                            // 使用状況ログ（既存システムと並行動作確認用）
+                            if (result.volume > 0.01 && detectionActive && Math.random() < 0.1) {
+                                console.log('🎚️ VolumeBarController統合システム使用中:', {
+                                    rawVolume: result.volume.toFixed(3),
+                                    deviceType: volumeBarController.getDeviceSpecs().deviceType,
+                                    volumeBarScale: volumeBarController.getDeviceSpecs().volumeBarScale
+                                });
+                            }
+                        }
+                        
+                        // 既存システム（フォールバック用、最終的に削除予定）
+                        if (result && typeof result.volume === 'number' && !volumeBarController) {
+                            const rawVolume = result.volume || 0;
+                            
+                            // デバイス別音量バースケール（実機テスト済み設定）
+                            let scale = 4.0; // PC標準（実機テスト済み）
+                            if (deviceSpecs?.deviceType === 'iPhone') {
+                                scale = 4.5; // iPhone: 感度3.5x, 音量バー4.5x
+                            } else if (deviceSpecs?.deviceType === 'iPad') {
+                                scale = 7.0; // iPad: 感度5.0x, 音量バー7.0x  
+                            }
+                            
+                            // 基本音量計算
+                            const adjustedVolume = rawVolume * scale * deviceSpecs.sensitivityMultiplier;
+                            
+                            // 0-100%制限
+                            let volumePercent = Math.min(100, Math.max(0, adjustedVolume));
+                            
+                            const volumeProgress = document.getElementById('volume-progress');
+                            const volumeValue = document.getElementById('volume-value');
+                            
+                            if (volumeProgress) {
+                                volumeProgress.style.width = volumePercent + '%';
+                            }
+                            if (volumeValue) {
+                                volumeValue.textContent = volumePercent.toFixed(0) + '%';
+                            }
+                            
+                            // フォールバックシステム使用ログ
+                            if (rawVolume > 0.01 && detectionActive && Math.random() < 0.1) {
+                                console.log('⚠️ フォールバックシステム使用中:', {
+                                    rawVolume: rawVolume.toFixed(3),
+                                    scale: scale,
+                                    volumePercent: volumePercent.toFixed(1)
+                                });
+                            }
+                        }
+                    },
+                    onVolumeUpdate: (volume) => {
+                        console.log('🔊 onVolumeUpdate（分離方式）受信:', volume);
+                        handleVolumeUpdate(volume, deviceSpecs.volumeBarScale);
+                    },
+                    onError: (context, error) => handleAudioError(context, error),
+                    onStateChange: (state) => console.log('Audio state:', state)
+                });
                 
                 // ステップ1完了、ステップ2へ
                 updateStepStatus(1, 'completed');
                 updateStepStatus(2, 'active');
                 
                 showSection(audioTestSection);
-                startVolumeSimulation();
+                startRealAudioDetection();
                 
             } catch (error) {
                 console.error('マイク許可エラー:', error);
                 requestMicBtn.disabled = false;
-                requestMicBtn.innerHTML = '<i data-lucide="mic" style="width: 24px; height: 24px;"></i><span>マイクを許可</span>';
+                requestMicBtn.innerHTML = '<i data-lucide="alert-circle" style="width: 24px; height: 24px;"></i><span>マイク許可失敗 - 再試行</span>';
                 lucide.createIcons();
+                
+                alert(`マイクの許可に失敗しました: ${error.message}`);
             }
         });
 
@@ -401,12 +624,249 @@
             if (displayElement) {
                 setTimeout(() => {
                     displayElement.classList.remove('hidden');
-                    displayElement.classList.add('fade-in-up');
+                    // displayElement.classList.add('fade-in-up'); // アニメーション無効化
                 }, 200);
             }
         }
 
-        // 音量シミュレーション
+        // 実際のオーディオ検出処理
+        let detectionActive = false;
+        let detectedCDoPitches = [];
+        
+        // リアルタイム音程検出開始
+        function startRealAudioDetection() {
+            console.log('リアルタイム音程検出開始');
+            detectionActive = true;
+            detectedCDoPitches = [];
+            audioProcessor.startDetection();
+        }
+
+        // リアルタイム音程更新ハンドラー
+        function handleRealPitchUpdate(result) {
+            if (!detectionActive) {
+                console.log('⏸️ detectionActive=false のため音程処理をスキップ');
+                return;
+            }
+            
+            // 詳細デバッグログ
+            console.log('🎵 handleRealPitchUpdate呼び出し:', {
+                result: result,
+                resultKeys: result ? Object.keys(result) : 'null',
+                frequency: result?.frequency,
+                volume: result?.volume,
+                clarity: result?.clarity,
+                timestamp: new Date().toLocaleTimeString()
+            });
+            
+            // 音域テスト用のグローバル変数に保存
+            window.lastDetectedFrequency = result.frequency;
+            window.lastDetectedClarity = result.clarity;
+            
+            const volumeProgress = document.getElementById('volume-progress');
+            const volumeValue = document.getElementById('volume-value');
+            const frequencyValue = document.getElementById('frequency-value');
+            
+            // 音量表示更新（統合方式で処理済みのため、この処理は不要）
+            // 統合方式のonPitchUpdateで音量バー更新を実行中
+            
+            // 周波数表示更新
+            if (frequencyValue && result.frequency > 0) {
+                const note = frequencyToNote(result.frequency);
+                frequencyValue.textContent = `${result.frequency.toFixed(1)} Hz (${note})`;
+                
+                // C4音程検出（超大幅緩和：200Hz未満にも対応）
+                const isFreqInRange = result.frequency >= 150 && result.frequency <= 400;
+                const isClarityOK = result.clarity > 0.15;
+                const isVolumeOK = result.volume > 0.03;
+                
+                console.log('🎯 C4検出チェック:', {
+                    frequency: result.frequency,
+                    clarity: result.clarity,
+                    volume: result.volume,
+                    isInRange: isFreqInRange,
+                    clarityOK: isClarityOK,
+                    volumeOK: isVolumeOK,
+                    allConditionsMet: isFreqInRange && isClarityOK && isVolumeOK
+                });
+                
+                // 条件超超緩和：150-400Hz、clarity>0.15、volume>0.03（極小音量・低音域対応）
+                if (result.frequency >= 150 && result.frequency <= 400 && 
+                    result.clarity > 0.15 && result.volume > 0.03) {
+                    detectedCDoPitches.push(result.frequency);
+                    console.log('✅ C4候補検出！', {
+                        frequency: result.frequency,
+                        detectedCount: detectedCDoPitches.length
+                    });
+                    
+                    // 1回検出で即成功（最速判定）
+                    if (detectedCDoPitches.length >= 1) {
+                        console.log('🎉 C4検出成功！showDetectionSuccess()呼び出し');
+                        showDetectionSuccess();
+                    }
+                } else {
+                    // 条件未達成の詳細ログ
+                    if (result.frequency > 0) {
+                        console.log('⚠️ C4検出条件未達成:', {
+                            frequency: result.frequency,
+                            frequencyInRange: result.frequency >= 150 && result.frequency <= 400,
+                            clarityOK: result.clarity > 0.15,
+                            volumeOK: result.volume > 0.03
+                        });
+                    }
+                }
+            }
+        }
+
+        // 音量更新ハンドラー（デバイス別最適化対応）
+        function handleVolumeUpdate(volume, volumeScale = null) {
+            // 詳細デバッグログ
+            console.log('📊 handleVolumeUpdate呼び出し:', {
+                volume: volume,
+                volumeScale: volumeScale,
+                deviceSpecs: deviceSpecs?.volumeBarScale,
+                timestamp: new Date().toLocaleTimeString()
+            });
+            
+            // ボリュームレベルバー更新
+            const volumeProgress = document.getElementById('volume-progress');
+            if (volumeProgress) {
+                // デバイス別音量バースケール適用
+                const scale = volumeScale || deviceSpecs.volumeBarScale;
+                const adjustedVolume = volume * scale;
+                
+                // volume値を0-100%に変換
+                const volumePercent = Math.min(100, Math.max(0, adjustedVolume * 100));
+                volumeProgress.style.width = volumePercent + '%';
+                
+                // 詳細ログ出力
+                console.log('🎚️ 音量バー更新:', {
+                    rawVolume: volume,
+                    scale: scale,
+                    adjustedVolume: adjustedVolume,
+                    volumePercent: volumePercent,
+                    elementFound: !!volumeProgress
+                });
+                
+                // デバッグ用ログ（デバイス最適化情報含む）
+                if (scale !== 1.0) {
+                    console.log(`📊 Volume update [${deviceSpecs.deviceType}]:`, 
+                        `${volume.toFixed(3)} × ${scale}x = ${adjustedVolume.toFixed(3)} → ${volumePercent.toFixed(1)}%`);
+                } else {
+                    console.log('📊 Volume update:', volume, '→', volumePercent + '%');
+                }
+            }
+        }
+
+        // オーディオエラーハンドラー
+        function handleAudioError(context, error) {
+            console.error(`Audio Error [${context}]:`, error);
+            detectionActive = false;
+            
+            const requestMicBtn = document.getElementById('request-mic-btn');
+            requestMicBtn.disabled = false;
+            requestMicBtn.innerHTML = '<i data-lucide="alert-circle" style="width: 24px; height: 24px;"></i><span>エラー - 再試行</span>';
+            lucide.createIcons();
+            
+            alert(`オーディオエラー: ${error.message}\nページを更新して再試行してください。`);
+        }
+
+        // 検出成功表示
+        function showDetectionSuccess() {
+            console.log('🎉 showDetectionSuccess実行開始');
+            
+            detectionActive = false;
+            audioProcessor.stopDetection();
+            console.log('🛑 音程検出停止完了');
+            
+            // VolumeBarController統合システムで音量バーリセット
+            if (volumeBarController) {
+                console.log('🎚️ VolumeBarController.stop()でリセット実行');
+                volumeBarController.stop(); // 統一されたリセット・停止処理
+            } else {
+                console.log('⚠️ VolumeBarControllerが利用不可のため手動リセット実行');
+                // フォールバック: 手動リセット（VolumeBarController初期化失敗時）
+                const volumeProgress = document.getElementById('volume-progress');
+                const volumeValue = document.getElementById('volume-value');
+                if (volumeProgress) {
+                    volumeProgress.style.transition = 'none';
+                    volumeProgress.style.width = '0%';
+                    volumeProgress.style.opacity = '0.3';
+                    setTimeout(() => {
+                        if (volumeProgress) {
+                            volumeProgress.style.transition = 'width 0.5s ease';
+                        }
+                    }, 200);
+                }
+                if (volumeValue) {
+                    volumeValue.textContent = '0%';
+                }
+            }
+            
+            const detectionSuccess = document.getElementById('detection-success');
+            const startRangeBtn = document.getElementById('start-range-test-btn');
+            const rangeSavedDisplay = document.getElementById('range-saved-display');
+            
+            console.log('📋 要素取得確認:', {
+                detectionSuccess: !!detectionSuccess,
+                startRangeBtn: !!startRangeBtn,
+                rangeSavedDisplay: !!rangeSavedDisplay
+            });
+            
+            if (detectionSuccess) {
+                // 音声指示セクションを即座に非表示
+                const voiceInstruction = document.querySelector('.voice-instruction');
+                if (voiceInstruction) {
+                    // 即座に強制非表示（アニメーション問題を完全に回避）
+                    voiceInstruction.style.display = 'none';
+                    voiceInstruction.classList.add('hidden');
+                    voiceInstruction.classList.add('collapse-out');
+                    console.log('✅ voice-instruction セクションを強制非表示');
+                }
+                
+                // アニメーション無効化（音量バー競合回避）
+                // detectionSuccess.classList.remove('hidden'); // 既に表示済み
+                // detectionSuccess.classList.add('fade-in-up'); // アニメーション無効化
+                console.log('✅ detection-success セクション（アニメーション無効化済み）');
+                
+                // 既存の音域データをチェック
+                const voiceRangeData = DataManager.getVoiceRangeData();
+                const successMessage = document.getElementById('detection-success-message');
+                
+                if (voiceRangeData && rangeSavedDisplay) {
+                    // 既存データ表示
+                    if (successMessage) {
+                        successMessage.textContent = '「ド」の音程を検出できました！音域は設定済みです。';
+                    }
+                    displaySavedRangeData(voiceRangeData.results, rangeSavedDisplay);
+                } else {
+                    // 新規音域テストが必要
+                    if (successMessage) {
+                        successMessage.textContent = '「ド」の音程を検出できました！音域テストに進みましょう。';
+                    }
+                    
+                    if (startRangeBtn) {
+                        setTimeout(() => {
+                            startRangeBtn.classList.remove('hidden');
+                            // startRangeBtn.classList.add('fade-in-up'); // アニメーション無効化
+                        }, 500);
+                    }
+                }
+            }
+        }
+
+        // 周波数から音名変換
+        function frequencyToNote(frequency) {
+            const A4_FREQ = 440.0;
+            const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+            
+            const semitones = Math.round(12 * Math.log2(frequency / A4_FREQ));
+            const octave = Math.floor((semitones + 9) / 12) + 4;
+            const noteIndex = (semitones + 9 + 120) % 12; // 負数対応
+            
+            return `${noteNames[noteIndex]}${octave}`;
+        }
+
+        // 音量シミュレーション（削除予定）
         function startVolumeSimulation() {
             console.log('音量シミュレーション開始');
             
@@ -449,9 +909,9 @@
                         console.log('検出成功！メッセージとボタンを表示');
                         
                         if (detectionSuccess && detectionSuccess.classList.contains('hidden')) {
-                            // 成功メッセージとボタンをアニメーション付きで表示
+                            // 成功メッセージとボタンを即座に表示（アニメーション無効化）
                             detectionSuccess.classList.remove('hidden');
-                            detectionSuccess.classList.add('fade-in-up');
+                            // detectionSuccess.classList.add('fade-in-up'); // アニメーション無効化
                             
                             // 音域データをチェック
                             const voiceRangeData = localStorage.getItem('voiceRangeData');
@@ -477,7 +937,7 @@
                                 if (startRangeTestBtn) {
                                     setTimeout(() => {
                                         startRangeTestBtn.classList.remove('hidden');
-                                        startRangeTestBtn.classList.add('fade-in-up');
+                                        // startRangeTestBtn.classList.add('fade-in-up'); // アニメーション無効化
                                     }, 200);
                                 }
                             }
@@ -500,8 +960,26 @@
             }, 800);
         }
 
-        // 音域テスト実装（自由発声+3秒安定維持方式）
+        // 音域テスト実装（実際のオーディオ検出）
         function startRangeTest() {
+            // VolumeBarController統合システムで音量バーリセット
+            if (volumeBarController) {
+                console.log('🎚️ VolumeBarController.stop()でリセット実行（音域テスト開始時）');
+                volumeBarController.stop(); // 統一されたリセット処理
+            } else {
+                console.log('⚠️ VolumeBarControllerが利用不可のため手動リセット実行（音域テスト開始時）');
+                // フォールバック: 手動リセット（VolumeBarController初期化失敗時）
+                const volumeProgress = document.getElementById('volume-progress');
+                const volumeValue = document.getElementById('volume-value');
+                if (volumeProgress) {
+                    volumeProgress.style.width = '0%';
+                    volumeProgress.style.opacity = '0.3';
+                }
+                if (volumeValue) {
+                    volumeValue.textContent = '0%';
+                }
+            }
+            
             // UI要素の取得
             const testInstructionText = document.getElementById('test-instruction-text');
             const testStatus = document.getElementById('test-status');
@@ -681,29 +1159,32 @@
                 const stabilitySvg = document.getElementById('stability-ring');
                 const progressCircle = stabilitySvg ? stabilitySvg.querySelector('.voice-progress-circle') : null;
                 
-                // デバッグ用：2秒待ってから検出開始
-                setTimeout(() => {
-                    detectionInterval = setInterval(() => {
-                    // シミュレーション: より安定した周波数検出
-                    let targetFreq;
-                    if (!window.simulationTargetFreq) {
-                        // 初回のみターゲット周波数設定
-                        window.simulationTargetFreq = currentPhase === 'low' ? 130 + Math.random() * 30 : 350 + Math.random() * 100;
-                    }
-                    targetFreq = window.simulationTargetFreq;
+                // 実際のオーディオ検出開始
+                detectionActive = true;
+                audioProcessor.startDetection();
+                
+                // VolumeBarController再開（音域テスト用）
+                if (volumeBarController) {
+                    console.log('🎚️ VolumeBarController再開（音域テスト継続用）');
+                    // 注意: volumeBarController.start()は再初期化するため、代わりに状態管理を直接更新
+                    volumeBarController.isActive = true;
+                    volumeBarController.startUpdateLoop();
+                }
+                
+                detectionInterval = setInterval(() => {
+                    // 実際の音程検出結果を使用
+                    if (window.lastDetectedFrequency && window.lastDetectedFrequency > 0 && window.lastDetectedClarity > 0.6) {
+                        const detectedHz = window.lastDetectedFrequency;
+                        
+                        // 音名取得
+                        const closestNote = getClosestNote(detectedHz);
                     
-                    // より小さな変動（±3Hz）でシミュレート
-                    const detectedHz = targetFreq + (Math.random() - 0.5) * 6;
+                        // UI更新（音程表示削除）
+                        // currentNote.textContent = closestNote.note;
+                        // currentFrequency.textContent = closestNote.frequency.toFixed(1) + ' Hz';
                     
-                    // 音名取得
-                    const closestNote = getClosestNote(detectedHz);
-                    
-                    // UI更新（音程表示削除）
-                    // currentNote.textContent = closestNote.note;
-                    // currentFrequency.textContent = closestNote.frequency.toFixed(1) + ' Hz';
-                    
-                    // 安定性チェック（±8Hz以内で安定と判定）
-                    if (stableFrequencies.length === 0 || Math.abs(detectedHz - stableFrequencies[stableFrequencies.length - 1]) <= 8) {
+                        // 安定性チェック（±8Hz以内で安定と判定）
+                        if (stableFrequencies.length === 0 || Math.abs(detectedHz - stableFrequencies[stableFrequencies.length - 1]) <= 8) {
                         stableFrequencies.push(detectedHz);
                         
                         // 安定性開始時刻記録
@@ -807,8 +1288,8 @@
                             stabilitySvg.classList.remove('completed');
                         }
                     }
+                    }
                 }, 100);
-                }, 2000); // デバッグ用：2秒遅延
             }
             
             function recordRangeResult(note, frequency) {
@@ -872,18 +1353,22 @@
                     if (octaveSpan) octaveSpan.textContent = `${octaveCount}オクターブ`;
                 }
                 
-                // localStorage保存
-                const voiceRangeData = {
+                // DataManager経由で保存
+                const rangeResults = {
                     lowestNote: lowestNote,
                     highestNote: highestNote,
-                    octaveCount: octaveCount,
-                    testDate: new Date().toISOString(),
+                    comfortableRange: {
+                        min: lowestNote,
+                        max: highestNote,
+                        recommendedRoot: 'C4' // 基本推奨
+                    },
                     lowestFrequency: testResults.lowestFrequency,
-                    highestFrequency: testResults.highestFrequency
+                    highestFrequency: testResults.highestFrequency,
+                    octaveCount: octaveCount
                 };
                 
-                localStorage.setItem('voiceRangeData', JSON.stringify(voiceRangeData));
-                console.log('音域データ保存完了:', voiceRangeData);
+                const savedData = DataManager.saveVoiceRangeData(rangeResults);
+                console.log('音域データ保存完了（DataManager）:', savedData);
                 
                 // ステップ3完了
                 updateStepStatus(3, 'completed');

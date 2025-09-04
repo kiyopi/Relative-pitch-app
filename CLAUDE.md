@@ -15,26 +15,31 @@
 - ✅ **完了**: データ設計フェーズ（DATA_MANAGEMENT_SPECIFICATION.md + data-manager.js実装）
 - ✅ **完了**: PitchPro音声処理統合・2秒リセット問題修正・エラーループ防止
 - ✅ **完了**: デバイス検出システム完全修正（iPadOS 13+バグ対策）
-- 🔄 **進行中**: iPhone/iPad実機テスト・本番ページ統合実装準備
-- 📋 **次期作業**: preparation.html/training.html本番実装統合
+- ✅ **完了**: 安定版マイクロフォンシステム復活（audio-manager-stable.js + microphone-manager-stable.js）
+- ✅ **完了**: VolumeBarController統合音量制御システム実装完了（実機テスト済み設定統合）
+- 🔄 **進行中**: preparation.html/training.html本番実装統合
+- 📋 **次期作業**: トレーニング機能完全統合・リリース準備
 
 ### 🌿 **現在のブランチ**
 - **作業ブランチ**: `feature/data-manager-implementation`
-- **実装内容**: データ管理モジュール・pitchpro-audio統合・デバイス最適化完了
+- **実装内容**: データ管理モジュール・pitchpro-audio統合・デバイス最適化・VolumeBarController完了
 - **次期フェーズ**: 本番ページ統合実装フェーズ
 
 ### ⚠️ **注意すべきこと（最重要）**
 1. **🚨 インライン記述禁止**: HTMLのstyle属性、JavaScriptでのインラインCSS絶対禁止（例外: Lucideアイコンサイズ、プログレスバー幅のみ）
 2. **📋 作業開始前必須チェック**: UIカタログ→base.css→類似実装の順で確認（新規CSS作成前）
 3. **📝 データ管理統合**: `/js/data-manager.js`活用でlocalStorage統一管理
-4. **📝 トレーニングJS**: 開発段階ではページ内記述許可、本番実装時に外部ファイル化
-5. **🌿 Git自動化**: 作業完了時のみコミット・プッシュ実行（修正中は禁止）
+4. **🎚️ 音量バー制御**: `VolumeBarController`統一使用・**必ずコールバック方式**で`result.volume`取得
+5. **📝 トレーニングJS**: 開発段階ではページ内記述許可、本番実装時に外部ファイル化
+6. **🌿 Git自動化**: 作業完了時のみコミット・プッシュ実行（修正中は禁止）
 
 ### 🎯 **作業のポイント**
 - **データ管理モジュール完了**: `/js/data-manager.js`実装済み（pitchpro-audio統合、課金制御対応）
 - **PitchProオーディオ統合完了**: 2秒リセット問題修正、エラーループ防止、高度デバイス検出実装
+- **VolumeBarController統合完了**: 実機テスト済み設定統合・統一音量制御システム実装
 - **iPadOS 13+バグ修正完了**: 仕様書準拠のデバイス判定システム実装（`CRITICAL_DECISIONS_AND_INSIGHTS.md`参照）
 - **テスト環境整備**: `test-ui-integration.html`でUIカタログ準拠の統合テスト環境完成
+- **安定版マイクシステム**: `audio-manager-stable.js` + `microphone-manager-stable.js` + `test-stable-microphone.html`実装完了
 - **UIカタログ最優先**: 新しいスタイル作成前に`ui-catalog-essentials.html`で既存コンポーネント確認
 - **ユーティリティクラス活用**: `.flex .items-center .gap-3` `.heading-md` 等で統一
 - **プログレスバー統一**: `.progress-bar` + `.progress-fill-[type]` + 色クラス
@@ -42,6 +47,7 @@
 - **レスポンシブ対応**: モバイルファースト、PWA対応
 
 ### 🔍 **よく使う実装例**
+
 ```html
 <!-- 見出し + アイコン -->
 <h4 class="heading-md"><i data-lucide="bar-chart-3" class="text-blue-300"></i><span>評価分布</span></h4>
@@ -49,6 +55,24 @@
 <div class="progress-bar"><div class="progress-fill gradient-catalog-green" style="width: 75%;"></div></div>
 <!-- レイアウト -->
 <div class="flex items-center gap-3"><!-- コンテンツ --></div>
+```
+
+### 🎚️ **VolumeBarController実装例**
+
+```javascript
+// シンプル実装
+const controller = await VolumeBarController.createSimple(['volume-bar-1']);
+await controller.start();
+
+// ❌ 間違った音量取得方法（動作しない）
+const volume = pitchProInstance.rawVolume; // 存在しない
+
+// ✅ 正しい音量取得方法（必須）
+pitchDetector.setCallbacks({
+    onPitchUpdate: (result) => {
+        const volume = result.volume; // これを使用
+    }
+});
 ```
 
 ---
@@ -223,7 +247,7 @@ docs/glossary-update
 - **2秒リセット問題修正**: 音量閾値を30% → 1.5%に調整、15フレーム無音検出追加
 - **エラーループ防止**: MicrophoneController・ErrorNotificationSystemの3秒クールダウンタイマー実装
 - **初期安定化短縮**: 10秒 → 2-3秒に改善（5フレーム → 3フレーム調整）
-- **デバイス別最適化**: PC(1.0x)・iPhone(3.0x)・iPad(7.0x)の感度設定実装
+- **デバイス別最適化**: PC(2.5x)・iPhone(3.5x)・iPad(5.0x)の感度設定実装
 
 ### **📱 iPadOS 13+ デバイス判定バグ完全修正**
 - **根本問題**: iPadOS 13+で`navigator.userAgent`が"Macintosh"と偽装報告される
@@ -245,16 +269,22 @@ const isIPad = /iPad/.test(userAgent);
 const isIPadOS = /Macintosh/.test(userAgent) && 'ontouchend' in document;
 const hasIOSNavigator = /iPad|iPhone|iPod/.test(userAgent);
 
-// デバイス別最適化設定（TECHNICAL_SPECIFICATIONS.md準拠）
-PC: 感度 1.0x, 音量バー 2.0x
-iPhone: 感度 3.0x, 音量バー 2.0x  
-iPad: 感度 7.0x, 音量バー 2.5x
+// デバイス別最適化設定（実機テスト済み）
+PC: 感度 2.5x, 音量バー 4.0x
+iPhone: 感度 3.5x, 音量バー 4.5x  
+iPad: 感度 5.0x, 音量バー 7.0x
 ```
 
 ### **🎯 次期実装フェーズ**
 - iPhone/iPad実機テスト実行
 - preparation.html・training.html本番統合実装
 - results-overview.html動的機能統合
+
+### **📋 VolumeBarController統合完了（2025年1月7日追加）**
+- **VolumeBarController実装**: 統一音量制御システム完成（`/js/volume-bar-controller.js`）
+- **音量バー統合仕様書**: 完全なドキュメント作成（`/specifications/VOLUME_BAR_INTEGRATION_SPECIFICATION.md`）
+- **重要な教訓**: PitchProからの音量値取得は必ずコールバック方式`result.volume`を使用
+- **実機テスト済み設定**: PC(4.0x)・iPhone(4.5x)・iPad(7.0x)の音量バー感度設定確定
 
 ---
 
@@ -623,6 +653,49 @@ results.css (結果表示専用)
 
 ### **CSS特化モード確認文**
 「CSS特化モードを了解しました。HTML・JavaScript変更は行わず、CSSのみの調整を実行します。」
+
+---
+
+---
+
+## 🎚️ **2025年1月7日 重要更新**: VolumeBarController統合システム完成
+
+### **🔧 VolumeBarController統合完成**
+- **統一音量制御システム**: 実機テスト済み設定を統合した完全な音量バー制御システム実装完了
+- **実機テスト済み設定統合**: PC(4.0x)・iPhone(4.5x)・iPad(7.0x)の最適設定を統合
+- **音量取得方式統一**: コールバック方式(`result.volume`)での正しい音量値取得を完全実装
+- **仕様書完備**: `VOLUME_BAR_INTEGRATION_SPECIFICATION.md`で詳細実装方法を文書化
+
+### **⚠️ 重要な注意事項（今後の実装者向け）**
+
+**❌ 絶対に使ってはいけない方法:**
+```javascript
+// これらのプロパティは存在しないか更新されない
+const volume = pitchProInstance.rawVolume;
+const volume = pitchProInstance.currentVolume;
+const volume = pitchProInstance.stableVolume;
+```
+
+**✅ 必ず使う正しい方法:**
+```javascript
+pitchDetector.setCallbacks({
+    onPitchUpdate: (result) => {
+        const volume = result.volume; // 必ずこれを使用
+        // VolumeBarControllerで処理
+    }
+});
+```
+
+### **📋 実装済み統合システム**
+- **VolumeBarController**: `/js/volume-bar-controller.js`
+- **実装例**: `/test-volume-controller.html`（シンプル実装例）
+- **統合テスト**: `/test-ui-integration.html`（完全統合テスト）
+- **仕様書**: `/specifications/VOLUME_BAR_INTEGRATION_SPECIFICATION.md`
+
+### **🎯 次期実装フェーズ**
+- preparation.html・training.htmlへのVolumeBarController統合
+- トレーニング機能の完全統合実装
+- リリース準備・最終調整
 
 ---
 

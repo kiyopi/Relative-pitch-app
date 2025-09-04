@@ -73,11 +73,16 @@ class TrainingSession {
       }
 
       // AudioProcessorコールバック設定
+      console.log('🔧 AudioProcessorコールバック設定開始');
       this.audioProcessor.setCallbacks({
-        onPitchUpdate: (result) => this.handlePitchDetection(result),
+        onPitchUpdate: (result) => {
+          console.log('📡 AudioProcessorからのコールバック受信:', result);
+          this.handlePitchDetection(result);
+        },
         onError: (context, error) => this.handleAudioError(context, error),
         onStateChange: (state) => this.handleAudioStateChange(state)
       });
+      console.log('✅ AudioProcessorコールバック設定完了');
 
       // アクセス権限チェック
       const accessCheck = DataManager.checkModeAccess(this.mode);
@@ -174,20 +179,25 @@ class TrainingSession {
    * セッション開始
    */
   async startSession() {
+    console.log('📍 startSession()開始, currentState:', this.currentState);
+    
     if (this.currentState !== 'idle') {
       console.warn('⚠️ セッション重複開始防止');
       return;
     }
 
     try {
+      console.log('📍 ステップ1: 状態をpreparingに変更');
       this.currentState = 'preparing';
       this.startTime = new Date().toISOString();
       this.detectionResults = [];
       this.currentIntervalIndex = 0;
       this.currentInterval = this.intervals[0];
       
+      console.log('📍 ステップ2: ターゲット周波数更新');
       this.updateTargetFrequency();
 
+      console.log('📍 ステップ3: UI通知, コールバック存在:', !!this.uiCallbacks.onSessionStart);
       // UI通知
       if (this.uiCallbacks.onSessionStart) {
         this.uiCallbacks.onSessionStart({
@@ -198,9 +208,12 @@ class TrainingSession {
         });
       }
 
+      console.log('📍 ステップ4: 音程検出開始前, audioProcessor存在:', !!this.audioProcessor);
       // 音程検出開始
+      console.log('🎵 音程検出開始指示');
       this.audioProcessor.startDetection();
       this.currentState = 'active';
+      console.log('✅ 状態をactiveに変更、音程検出待機中');
       
       // 音程進行タイマー開始（ドレミファソラシドを5.3秒で進行）
       this.startIntervalProgression();
@@ -257,6 +270,14 @@ class TrainingSession {
       this.currentTargetFreq,
       this.currentInterval
     );
+
+    console.log('🎤 音程検出結果処理:', {
+      pitchResult: pitchResult,
+      targetFreq: this.currentTargetFreq,
+      interval: this.currentInterval,
+      sessionResult: sessionResult,
+      resultsCount: this.detectionResults.length
+    });
 
     if (sessionResult) {
       this.detectionResults.push(sessionResult);

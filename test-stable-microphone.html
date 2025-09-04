@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安定版マイク制御システムテスト</title>
+    <style>
+        body {
+            font-family: Inter, system-ui, sans-serif;
+            padding: 20px;
+            background: #1a1a2e;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .section {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+        .btn {
+            padding: 12px 24px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            margin: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn:hover { background: #45a049; }
+        .btn:disabled { 
+            background: #666; 
+            cursor: not-allowed; 
+        }
+        .status {
+            padding: 12px;
+            background: rgba(0,255,0,0.2);
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .error {
+            background: rgba(255,0,0,0.2);
+        }
+        .volume-bar {
+            width: 100%;
+            height: 40px;
+            background: #333;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 15px 0;
+            position: relative;
+        }
+        .volume-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A, #FFC107, #FF9800);
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+        .volume-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+        .pitch-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .pitch-item {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .pitch-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .log {
+            background: #0a0a0e;
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-entry {
+            margin: 3px 0;
+            padding: 2px 0;
+        }
+        .log-error { color: #ff6b6b; }
+        .log-success { color: #51cf66; }
+        .log-info { color: #74c0fc; }
+        .log-warn { color: #ffd43b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 安定版マイク制御システムテスト</h1>
+        
+        <div class="section">
+            <h3>📋 システム情報</h3>
+            <div class="pitch-display">
+                <div class="pitch-item">
+                    <div>システム状態</div>
+                    <div class="pitch-value" id="system-status">未初期化</div>
+                </div>
+                <div class="pitch-item">
+                    <div>マイク権限</div>
+                    <div class="pitch-value" id="permission-status">未確認</div>
+                </div>
+                <div class="pitch-item">
+                    <div>デバイス種別</div>
+                    <div class="pitch-value" id="device-type">検出中</div>
+                </div>
+                <div class="pitch-item">
+                    <div>マイク感度</div>
+                    <div class="pitch-value" id="sensitivity-display">--</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>🎛️ マイク制御</h3>
+            <button class="btn" id="init-btn" onclick="initializeMicrophone()">マイク初期化</button>
+            <button class="btn" id="start-btn" onclick="startDetection()" disabled>検出開始</button>
+            <button class="btn" id="stop-btn" onclick="stopDetection()" disabled>検出停止</button>
+            <button class="btn" onclick="testSensitivity()">感度テスト</button>
+            <button class="btn" onclick="cleanupSystem()">クリーンアップ</button>
+        </div>
+
+        <div class="section">
+            <h3>🔊 音量表示</h3>
+            <div class="volume-bar">
+                <div class="volume-fill" id="volume-fill"></div>
+                <div class="volume-text" id="volume-text">0%</div>
+            </div>
+            <div id="volume-info" class="status">音量情報が表示されます</div>
+        </div>
+
+        <div class="section">
+            <h3>🎵 音程検出</h3>
+            <div class="pitch-display">
+                <div class="pitch-item">
+                    <div>周波数</div>
+                    <div class="pitch-value" id="frequency">--</div>
+                </div>
+                <div class="pitch-item">
+                    <div>音名</div>
+                    <div class="pitch-value" id="note">--</div>
+                </div>
+                <div class="pitch-item">
+                    <div>明瞭度</div>
+                    <div class="pitch-value" id="clarity">--</div>
+                </div>
+                <div class="pitch-item">
+                    <div>オクターブ</div>
+                    <div class="pitch-value" id="octave">--</div>
+                </div>
+            </div>
+            <div id="pitch-info" class="status">音程情報が表示されます</div>
+        </div>
+
+        <div class="section">
+            <h3>📝 ログ</h3>
+            <div class="log" id="log"></div>
+        </div>
+    </div>
+
+    <!-- 安定版マイク制御システム読み込み -->
+    <script src="./js/audio-manager-stable.js"></script>
+    <script src="./js/microphone-manager-stable.js"></script>
+    <!-- PitchProライブラリ（基本機能のみ） -->
+    <script src="./js/pitchpro-audio/index.umd.js"></script>
+
+    <script>
+        // グローバル変数
+        let microphoneManager = null;
+        let isSystemReady = false;
+
+        // ログ機能
+        function addLog(message, type = 'info') {
+            const log = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+            
+            // コンソールにも出力
+            const consoleMethod = type === 'error' ? 'error' : type === 'warn' ? 'warn' : 'log';
+            console[consoleMethod](`[${type.toUpperCase()}] ${message}`);
+        }
+
+        // ステータス更新
+        function updateStatus(elementId, text, className = '') {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = text;
+                if (className) {
+                    element.className = className;
+                }
+            }
+        }
+
+        // マイクロフォン初期化
+        async function initializeMicrophone() {
+            try {
+                addLog('マイクロフォン初期化開始...', 'info');
+                updateStatus('system-status', '初期化中');
+                
+                // ボタン状態更新
+                document.getElementById('init-btn').disabled = true;
+                
+                // 必要なクラスの存在確認
+                if (typeof window.audioManagerStable === 'undefined') {
+                    throw new Error('AudioManager (安定版) が見つかりません');
+                }
+                
+                if (typeof window.MicrophoneManager === 'undefined') {
+                    throw new Error('MicrophoneManager が見つかりません');
+                }
+                
+                if (typeof window.PitchPro === 'undefined') {
+                    throw new Error('PitchPro ライブラリが見つかりません');
+                }
+                
+                addLog('必要なライブラリ確認完了', 'success');
+                
+                // MicrophoneManager作成
+                microphoneManager = new window.MicrophoneManager();
+                
+                // コールバック設定
+                microphoneManager.setCallbacks({
+                    onPitchUpdate: (result) => {
+                        updatePitchDisplay(result);
+                    },
+                    onVolumeUpdate: (volumeData) => {
+                        updateVolumeDisplay(volumeData);
+                    },
+                    onError: (error) => {
+                        addLog(`エラー: ${error.message}`, 'error');
+                        updateStatus('system-status', 'エラー');
+                    },
+                    onPermissionChange: (granted) => {
+                        updateStatus('permission-status', granted ? '許可済み' : '拒否');
+                        addLog(`マイク権限: ${granted ? '許可' : '拒否'}`, granted ? 'success' : 'error');
+                    },
+                    onStateChange: (state) => {
+                        updateStatus('system-status', state);
+                        addLog(`状態変更: ${state}`, 'info');
+                    }
+                });
+                
+                // 権限確認
+                const permissionStatus = await microphoneManager.checkPermission();
+                addLog(`マイク権限状態: ${permissionStatus}`, 'info');
+                
+                // 初期化実行
+                const result = await microphoneManager.initialize();
+                
+                // デバイス情報表示
+                const deviceInfo = microphoneManager.getDeviceInfo();
+                if (deviceInfo) {
+                    updateStatus('device-type', deviceInfo.deviceType);
+                    updateStatus('sensitivity-display', `${microphoneManager.getSensitivity().toFixed(1)}x`);
+                    
+                    addLog(`デバイス検出: ${deviceInfo.deviceType}`, 'success');
+                    addLog(`デフォルト感度: ${microphoneManager.getSensitivity()}x`, 'info');
+                }
+                
+                // 初期化成功
+                isSystemReady = true;
+                updateStatus('system-status', '初期化完了');
+                updateStatus('permission-status', '許可済み');
+                
+                // ボタン状態更新
+                document.getElementById('init-btn').disabled = false;
+                document.getElementById('start-btn').disabled = false;
+                
+                addLog('✅ マイクロフォン初期化成功', 'success');
+                
+            } catch (error) {
+                addLog(`❌ 初期化失敗: ${error.message}`, 'error');
+                updateStatus('system-status', '初期化失敗');
+                document.getElementById('init-btn').disabled = false;
+            }
+        }
+
+        // 検出開始
+        function startDetection() {
+            if (!isSystemReady || !microphoneManager) {
+                addLog('システムが初期化されていません', 'error');
+                return;
+            }
+            
+            try {
+                microphoneManager.startDetection();
+                
+                // ボタン状態更新
+                document.getElementById('start-btn').disabled = true;
+                document.getElementById('stop-btn').disabled = false;
+                
+                addLog('🎵 音程検出開始', 'success');
+                
+            } catch (error) {
+                addLog(`検出開始エラー: ${error.message}`, 'error');
+            }
+        }
+
+        // 検出停止
+        function stopDetection() {
+            if (!microphoneManager) return;
+            
+            try {
+                microphoneManager.stopDetection();
+                
+                // ボタン状態更新
+                document.getElementById('start-btn').disabled = false;
+                document.getElementById('stop-btn').disabled = true;
+                
+                // 表示クリア
+                clearDisplays();
+                
+                addLog('🛑 音程検出停止', 'info');
+                
+            } catch (error) {
+                addLog(`検出停止エラー: ${error.message}`, 'error');
+            }
+        }
+
+        // 感度テスト
+        function testSensitivity() {
+            if (!microphoneManager) return;
+            
+            const sensitivities = [1.0, 3.0, 7.0, 10.0];
+            let currentIndex = 0;
+            
+            const testNext = () => {
+                if (currentIndex < sensitivities.length) {
+                    const sensitivity = sensitivities[currentIndex];
+                    microphoneManager.setSensitivity(sensitivity);
+                    updateStatus('sensitivity-display', `${sensitivity.toFixed(1)}x`);
+                    addLog(`感度変更: ${sensitivity}x`, 'info');
+                    
+                    currentIndex++;
+                    setTimeout(testNext, 2000);
+                } else {
+                    addLog('感度テスト完了', 'success');
+                }
+            };
+            
+            testNext();
+        }
+
+        // クリーンアップ
+        function cleanupSystem() {
+            try {
+                if (microphoneManager) {
+                    microphoneManager.forceCleanup();
+                    microphoneManager = null;
+                }
+                
+                isSystemReady = false;
+                
+                // 表示リセット
+                updateStatus('system-status', '未初期化');
+                updateStatus('permission-status', '未確認');
+                updateStatus('device-type', '検出中');
+                updateStatus('sensitivity-display', '--');
+                clearDisplays();
+                
+                // ボタンリセット
+                document.getElementById('init-btn').disabled = false;
+                document.getElementById('start-btn').disabled = true;
+                document.getElementById('stop-btn').disabled = true;
+                
+                addLog('🧹 システムクリーンアップ完了', 'success');
+                
+            } catch (error) {
+                addLog(`クリーンアップエラー: ${error.message}`, 'error');
+            }
+        }
+
+        // 音程表示更新
+        function updatePitchDisplay(result) {
+            if (result) {
+                updateStatus('frequency', result.frequency ? `${result.frequency.toFixed(1)} Hz` : '--');
+                updateStatus('note', result.note || '--');
+                updateStatus('clarity', result.clarity ? `${(result.clarity * 100).toFixed(1)}%` : '--');
+                updateStatus('octave', result.octave || '--');
+                
+                // 詳細情報
+                const pitchInfo = `周波数: ${result.frequency?.toFixed(1) || 0} Hz | 明瞭度: ${(result.clarity * 100)?.toFixed(1) || 0}%`;
+                updateStatus('pitch-info', pitchInfo);
+            }
+        }
+
+        // 音量表示更新
+        function updateVolumeDisplay(volumeData) {
+            if (volumeData) {
+                const volume = Math.round(volumeData.volume);
+                
+                // 音量バー更新
+                document.getElementById('volume-fill').style.width = `${Math.min(100, volume)}%`;
+                document.getElementById('volume-text').textContent = `${volume}%`;
+                
+                // 詳細情報
+                const volumeInfo = `音量: ${volume}% | RMS: ${(volumeData.rms * 100).toFixed(2)}% | 閾値: ${volumeData.threshold} | ${volumeData.deviceType}`;
+                updateStatus('volume-info', volumeInfo);
+            }
+        }
+
+        // 表示クリア
+        function clearDisplays() {
+            updateStatus('frequency', '--');
+            updateStatus('note', '--');
+            updateStatus('clarity', '--');
+            updateStatus('octave', '--');
+            updateStatus('pitch-info', '音程情報が表示されます');
+            
+            document.getElementById('volume-fill').style.width = '0%';
+            document.getElementById('volume-text').textContent = '0%';
+            updateStatus('volume-info', '音量情報が表示されます');
+        }
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            addLog('🚀 安定版マイク制御システムテスト画面読み込み完了', 'success');
+            
+            // システム確認
+            if (typeof window.audioManagerStable === 'undefined') {
+                addLog('⚠️ AudioManager (安定版) が読み込まれていません', 'warn');
+            } else {
+                addLog('✅ AudioManager (安定版) 読み込み確認', 'success');
+            }
+            
+            if (typeof window.MicrophoneManager === 'undefined') {
+                addLog('⚠️ MicrophoneManager が読み込まれていません', 'warn');
+            } else {
+                addLog('✅ MicrophoneManager 読み込み確認', 'success');
+            }
+            
+            if (typeof window.PitchPro === 'undefined') {
+                addLog('⚠️ PitchPro ライブラリが読み込まれていません', 'warn');
+            } else {
+                addLog('✅ PitchPro ライブラリ読み込み確認', 'success');
+                addLog(`利用可能なクラス: ${Object.keys(window.PitchPro).join(', ')}`, 'info');
+            }
+        });
+
+        // ページを離れる時のクリーンアップ
+        window.addEventListener('beforeunload', () => {
+            if (microphoneManager) {
+                microphoneManager.forceCleanup();
+            }
+        });
+    </script>
+</body>
+</html>
