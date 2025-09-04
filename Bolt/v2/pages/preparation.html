@@ -427,13 +427,22 @@
                         autoDetectDevice: true       // デバイス自動検出
                     });
                     
-                    // 音量バー要素を登録（シンプル登録方式）
-                    volumeBarController.addVolumeBar('volume-bar-1', 'volume-progress');
-                    
                     // パーセンテージ表示用の要素にクラス追加（VolumeBarController自動検出用）
                     const volumePercentElement = document.getElementById('volume-value');
                     if (volumePercentElement) {
                         volumePercentElement.classList.add('volume-percent');
+                    }
+                    
+                    // 音量バー要素を登録（親コンテナを登録してprogress-fillと.volume-percentを自動検出）
+                    const volumeProgressElement = document.getElementById('volume-progress');
+                    if (volumeProgressElement) {
+                        const meterGroupContainer = volumeProgressElement.closest('.meter-group');
+                        if (meterGroupContainer) {
+                            volumeBarController.addVolumeBar('volume-bar-1', meterGroupContainer);
+                            console.log('🎚️ 音量バー親コンテナを登録:', meterGroupContainer);
+                        } else {
+                            console.warn('⚠️ meter-group親コンテナが見つかりません');
+                        }
                     }
                     
                     console.log('✅ VolumeBarController初期化完了', {

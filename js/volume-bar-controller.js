@@ -342,17 +342,27 @@ class VolumeBarController {
      * 全音量バー更新
      */
     updateAllVolumeBars(volumePercent) {
+        this.log(`🎚️ 音量バー更新開始: ${volumePercent}%, 登録数: ${this.volumeBars.size}`, 'DEBUG');
+        
         this.volumeBars.forEach((element, id) => {
+            this.log(`🔍 音量バー更新中: ID=${id}, Element=${element?.tagName}`, 'DEBUG');
+            
             // プログレスバー形式の場合
             const progressBar = element.querySelector('.progress-fill, .volume-progress, [data-volume-bar]');
             if (progressBar) {
+                this.log(`✅ プログレスバー発見: ${progressBar.tagName}.${progressBar.className} → ${volumePercent}%`, 'DEBUG');
                 progressBar.style.width = volumePercent + '%';
+            } else {
+                this.log(`❌ プログレスバーが見つかりません: セレクタ=".progress-fill, .volume-progress, [data-volume-bar]"`, 'DEBUG');
             }
             
             // パーセント表示の場合
             const percentText = element.querySelector('.volume-text, .volume-percent, [data-volume-text]');
             if (percentText) {
+                this.log(`✅ パーセント表示発見: ${percentText.tagName}.${percentText.className} → ${volumePercent.toFixed(1)}%`, 'DEBUG');
                 percentText.textContent = volumePercent.toFixed(1) + '%';
+            } else {
+                this.log(`❌ パーセント表示が見つかりません: セレクタ=".volume-text, .volume-percent, [data-volume-text]"`, 'DEBUG');
             }
             
             // VolumeBarComponentインスタンスの場合
@@ -360,6 +370,8 @@ class VolumeBarController {
                 element.updateVolume(volumePercent);
             }
         });
+        
+        this.log(`🎚️ 音量バー更新完了: ${volumePercent}%`, 'DEBUG');
     }
 
     /**
