@@ -998,8 +998,8 @@
 }
 
 .test-instruction {
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  background: rgba(239, 68, 68, 0.1);  /* 赤色背景に変更 */
+  border: 1px solid rgba(239, 68, 68, 0.2);  /* 赤色ボーダーに変更 */
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -1014,6 +1014,8 @@
   width: 48px;
   height: 48px;
   margin: 0;
+  background: rgba(239, 68, 68, 0.15);  /* 赤色背景（やや濃いめ） */
+  border: 1px solid rgba(239, 68, 68, 0.3);  /* 赤色ボーダー（やや濃いめ） */
 }
 
 #range-test-section .text-sub-title {
@@ -1039,14 +1041,14 @@
 
 @keyframes instruction-glow {
   0%, 100% {
-    background: rgba(245, 158, 11, 0.1);
-    border-color: rgba(245, 158, 11, 0.2);
-    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+    background: rgba(239, 68, 68, 0.15);  /* 赤色に変更 */
+    border-color: rgba(239, 68, 68, 0.3);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
   }
   50% {
-    background: rgba(245, 158, 11, 0.25);
-    border-color: rgba(245, 158, 11, 0.4);
-    box-shadow: 0 0 25px rgba(245, 158, 11, 0.6);
+    background: rgba(239, 68, 68, 0.3);  /* 赤色に変更 */
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
   }
 }
 

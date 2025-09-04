@@ -1,8 +1,9 @@
 # 音域テスト機能 - 詳細仕様書
 
-**バージョン**: 1.0.0  
-**作成日**: 2025-08-09  
-**用途**: マイクテストページの音域テスト機能詳細仕様
+**バージョン**: 2.0.0  
+**作成日**: 2025-09-04  
+**更新日**: 2025-09-04  
+**用途**: preparation.htmlページの音域テスト機能詳細仕様（実装準拠版）
 
 ---
 
@@ -12,54 +13,66 @@
 - **ユーザーの快適音域の特定**: 無理なく歌える音域を自動検出
 - **個別最適化**: ユーザーに最適な基音を提案
 - **トレーニング精度向上**: 音域に適した基音でより効果的な練習を実現
-- **デバイス品質判定**: 測定精度に影響するデバイス性能を事前に検出
+- **シンプルなUX**: 基準音なし・自由発声による直感的な測定方式
+
+### ⚠️ 重要な実装仕様（v2.0.0での変更点）
+1. **基準音は使用しない**: ユーザーが自由に発声する方式
+2. **3秒連続安定維持**: ±8Hz以内で3秒間途切れることなく維持が必要
+3. **音程・周波数表示なし**: アイコン・カウントダウン・チェックマークのみ表示
+4. **単回測定**: 低音域・高音域をそれぞれ1回ずつ測定
+5. **リセット機能**: 音声が途切れた場合は即座にリセット・再開
 
 ### 実装場所
-マイクテストページ（`/microphone-test`）の準備プロセス内
+準備ページ（`preparation.html`）の音域テストセクション内
 
 ---
 
 ## 📊 テスト手順
 
-### 1. 低音テスト
+### 1. 低音テスト（自由発声方式）
 ```javascript
 const lowRangeTest = {
-  startNote: 'C3',         // 開始音（130.81Hz）
-  direction: 'descending', // 下降方向
-  stepSize: 1,             // 半音ずつ
-  endCondition: 'userLimit', // ユーザーが歌えなくなるまで
-  testRange: ['C3', 'C2', 'C1'], // テスト範囲
-  instruction: 'このトーンに合わせて「ラ」で歌ってください'
+  testType: 'free_vocalization',    // 自由発声
+  instruction: 'できるだけ低い声を出し３秒間キープしてください',
+  stabilityDuration: 3000,          // 3秒間安定維持
+  stabilityTolerance: 8,            // ±8Hz以内で安定判定
+  resetOnBreak: true,               // 途切れたらリセット
+  minDetectionVolume: 0.01,         // 最小音量閾値
+  clarityThreshold: 0.6             // 明瞭度閾値
 };
 ```
 
 #### 実施フロー
-1. **開始音再生**: C3（130.81Hz）を2秒再生
-2. **発声指示**: 「この音に合わせて歌ってください」
-3. **検出**: ユーザーの発声を3秒間検出
-4. **判定**: 基準音から±50セント以内で「成功」判定
-5. **次の音へ**: B2 → A#2 → A2... と下降
-6. **終了条件**: 連続2回失敗または最低音B1到達
+1. **指示表示**: 「できるだけ低い声を出し３秒間キープしてください」
+2. **待機状態**: 「測定中...」表示
+3. **音声検出**: リアルタイム周波数検出開始
+4. **安定性判定**: ±8Hz以内で3秒間連続維持をチェック
+5. **進捗表示**: 円形プログレスバーと数字カウントアップ（1, 2, 3秒）
+6. **完了判定**: 3秒達成時に「測定完了」表示とチェックマークアイコン
+7. **リセット処理**: 音声が途切れた場合は「リセットされました - 測定中...」
 
-### 2. 高音テスト
+### 2. 高音テスト（自由発声方式）
 ```javascript
 const highRangeTest = {
-  startNote: 'C4',         // 開始音（261.63Hz）
-  direction: 'ascending',  // 上昇方向
-  stepSize: 1,             // 半音ずつ
-  endCondition: 'userLimit', // ユーザーが歌えなくなるまで
-  testRange: ['C4', 'C5', 'C6'], // テスト範囲
-  instruction: 'このトーンに合わせて「ラ」で歌ってください'
+  testType: 'free_vocalization',    // 自由発声
+  instruction: 'できるだけ高い声を出し３秒間キープしてください',
+  stabilityDuration: 3000,          // 3秒間安定維持
+  stabilityTolerance: 8,            // ±8Hz以内で安定判定
+  resetOnBreak: true,               // 途切れたらリセット
+  waitBetweenTests: 3000,           // 低音→高音間の待機時間
+  minDetectionVolume: 0.01,         // 最小音量閾値
+  clarityThreshold: 0.6             // 明瞭度閾値
 };
 ```
 
 #### 実施フロー
-1. **開始音再生**: C4（261.63Hz）を2秒再生
-2. **発声指示**: 「この音に合わせて歌ってください」
-3. **検出**: ユーザーの発声を3秒間検出
-4. **判定**: 基準音から±50セント以内で「成功」判定
-5. **次の音へ**: C#4 → D4 → D#4... と上昇
-6. **終了条件**: 連続2回失敗または最高音C6到達
+1. **指示表示**: 「できるだけ高い声を出し３秒間キープしてください」
+2. **待機状態**: 「測定中...」表示
+3. **音声検出**: リアルタイム周波数検出開始
+4. **安定性判定**: ±8Hz以内で3秒間連続維持をチェック
+5. **進捗表示**: 円形プログレスバーと数字カウントアップ（1, 2, 3秒）
+6. **完了判定**: 3秒達成時に「測定完了」表示とチェックマークアイコン
+7. **結果計算**: 音域データ保存と結果画面への遷移
 
 ---
 
@@ -116,35 +129,54 @@ class BaseNoteRecommender {
 
 ---
 
-## 🎨 UI表示仕様
+## 🎨 UI表示仕様（実装準拠版）
 
 ### テスト進行表示
 ```html
 <div class="voice-range-test">
-  <div class="test-header">
-    <h3>🎵 音域テスト</h3>
-    <div class="progress-indicator">
-      <span class="phase active">低音テスト</span>
-      <span class="phase">高音テスト</span>
-      <span class="phase">結果表示</span>
+  <!-- 上部指示エリア（右上にマイクアイコン配置） -->
+  <div class="test-instruction-header">
+    <h4 class="text-sub-title" id="test-instruction-text">音域を測定します</h4>
+    <div class="test-instruction">
+      <i data-lucide="mic" class="text-green-400" style="width: 24px; height: 24px;"></i>
     </div>
   </div>
   
-  <div class="current-test">
-    <div class="note-display">
-      <div class="note-name">A2</div>
-      <div class="frequency">110.0 Hz</div>
-    </div>
-    <div class="instruction">
-      この音に合わせて「ラ」で歌ってください
-    </div>
-    <div class="detection-feedback">
-      <div class="status detecting">検出中...</div>
-      <div class="pitch-meter"><!-- 音程メーター --></div>
+  <!-- 中央の円形プログレスバーとアイコン -->
+  <div class="voice-range-display-container">
+    <svg class="voice-stability-svg" width="160" height="160" id="stability-ring">
+      <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="16"/>
+      <circle cx="80" cy="80" r="72" fill="none" stroke="#3b82f6" stroke-width="16" 
+              stroke-dasharray="452" stroke-dashoffset="452" 
+              transform="rotate(-90 80 80)" class="voice-progress-circle"/>
+    </svg>
+    <div class="voice-note-badge">
+      <!-- 低音テスト: arrow-down（黄色）、高音テスト: arrow-up（赤色）、完了: check（緑色） -->
+      <i data-lucide="arrow-down" id="range-icon" style="width: 80px; height: 80px; color: white;"></i>
+      <!-- カウントダウン表示（1, 2, 3） -->
+      <p class="countdown-text" id="countdown-display" style="display: none;">0</p>
     </div>
   </div>
+  
+  <!-- 下部ステータスメッセージ -->
+  <p class="test-status" id="test-status">待機中...</p>
 </div>
 ```
+
+### メッセージ仕様
+#### 上部メッセージ（test-instruction-text）
+- 初期状態: `音域を測定します`
+- 低音テスト: `できるだけ低い声を出し３秒間キープしてください`
+- 低音完了: `測定完了`
+- 高音テスト: `できるだけ高い声を出し３秒間キープしてください`
+- 高音完了: `測定完了`
+
+#### 下部メッセージ（test-status）
+- 初期状態: `待機中...`
+- 測定中: `測定中...`
+- リセット時: `リセットされました - 測定中...` （1.5秒後に「測定中...」に戻る）
+- 遷移待機: `次の測定を準備しています...`
+- 最終完了: `音域測定が完了しました！`
 
 ### 結果表示
 ```html
@@ -183,23 +215,31 @@ class BaseNoteRecommender {
 
 ## 🔧 技術実装詳細
 
-### 音程検出パラメータ
+### 音程検出パラメータ（実装準拠版）
 ```javascript
 const rangeTestConfig = {
-  // 検出設定
-  detectionTime: 3000,        // 3秒間検出
-  stabilityThreshold: 0.8,    // 安定度しきい値
-  accuracyThreshold: 50,      // ±50セント許容
+  // 安定性検出設定
+  stabilityDuration: 3000,       // 3秒間安定維持必須
+  stabilityTolerance: 8,         // ±8Hz以内で安定判定
+  detectionInterval: 100,        // 100ms間隔で検出
   
-  // テスト設定
-  playbackTime: 2000,         // 基準音再生時間
-  pauseBetweenNotes: 500,     // 音程間の休憩
-  maxFailures: 2,             // 最大連続失敗回数
+  // 音声検出設定
+  minVolumeAbsolute: 0.01,       // 最小音量閾値
+  clarityThreshold: 0.6,         // 明瞭度閾値
+  resetOnBreak: true,            // 音が途切れたら即座にリセット
   
-  // 音域設定
-  minTestNote: 'B1',          // 最低テスト音（61.74Hz）
-  maxTestNote: 'C6',          // 最高テスト音（1046.50Hz）
-  defaultRange: {             // デフォルト音域（テスト失敗時）
+  // UI更新設定
+  progressUpdateRate: 100,       // 円形プログレス更新間隔（ms）
+  countdownDisplay: true,        // カウントダウン数字表示
+  iconAnimations: true,          // アイコンアニメーション有効
+  
+  // テスト間隔設定
+  waitBetweenTests: 3000,        // 低音→高音テストの待機時間
+  completionDelay: 1000,         // 完了エフェクト表示時間
+  resultTransitionDelay: 2000,   // 結果画面への遷移遅延
+  
+  // デフォルト設定（エラー時）
+  defaultRange: {
     low: 'C3',
     high: 'C5',
     octaves: 2.0

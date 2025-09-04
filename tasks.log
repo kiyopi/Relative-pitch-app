@@ -1594,3 +1594,104 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - preparation.html・training.html本番統合実装準備完了
 - 音量バーコンポーネント統合確認済み
 
+[2025-09-04 22:22:58] コミット: feat: VolumeBarController統合Phase2実装完了 - 音量バーリセット問題修正
+
+- preparation.htmlにVolumeBarController統合システム実装
+- showDetectionSuccess()とstartRangeTest()でVolumeBarController.stop()使用
+- 音声認識完了後の音量バー0復帰問題修正
+- startContinuousDetection()でVolumeBarController再開機能追加
+- フォールバック機能付きでVolumeBarController初期化失敗時も対応
+- VOLUME_BAR_INTEGRATION_SPECIFICATION.md追加
+- CLAUDE.md更新でVolumeBarController完成状況記録
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-04 22:33:41] コミット: fix: VolumeBarController音量バー0リセット問題修正
+
+- preparation.htmlで音量バー親コンテナ(.meter-group)を正しく登録
+- VolumeBarControllerでprogressBarとpercentText両方を検出
+- updateAllVolumeBars()にデバッグログ追加で要素検出状況を確認
+- 音声認識完了後のバー100%固定問題の根本原因に対処
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-04 22:56:25] コミット: feat: 音程検出早すぎ問題修正 - 音量バー表示時間保証機能追加
+
+- 最低3秒間の音量バー表示時間を保証
+- 最低3回の音程検出を必要とする条件に変更
+- UI進捗表示でユーザーに残り時間・回数を通知
+- 1回検出で即成功していた問題を解決
+- 音量バーが動かないまま次ステップに進む問題を修正
+
+実装内容:
+- MIN_DETECTION_TIME (3秒) と MIN_PITCH_DETECTIONS (3回) の制約追加
+- detectionStartTime による開始時刻記録
+- updateDetectionProgress() でリアルタイム進捗UI更新
+- 詳細なデバッグログで条件達成状況を監視
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-05 00:06:11] コミット: fix: 進捗表示が見えない問題修正 - 専用進捗エリア追加
+
+- 音量バーの下に専用の進捗表示エリアを新設
+- リアルタイムで時間・回数の進捗をパーセント表示
+- updateDetectionProgress()にデバッグログ追加
+- 視覚的に目立つブルー背景の進捗ボックス実装
+- 音声指示テキストと専用エリアの両方で進捗表示
+- 検出成功時に進捗エリアを自動非表示
+
+表示内容:
+- メイン: 「ド」を継続 (2秒, 1回検出必要)
+- 詳細: 時間: 67% (1秒残り) | 回数: 33% (2回残り)
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-05 00:11:16] コミット: debug: 150Hz一瞬表示問題のデバッグ強化 - 条件厳格化
+
+- MIN_DETECTION_TIME: 3秒 → 5秒 (テスト用延長)
+- MIN_PITCH_DETECTIONS: 3回 → 5回 (テスト用増加)
+- detectionStartTime null チェック追加
+- 詳細な条件チェックログ追加
+- 開始時刻の詳細ログ追加
+
+問題特定のための一時的な変更:
+- より長い表示時間で音量バー動作を確認
+- より多い検出回数で条件チェックロジックを検証
+- 開始時刻設定の問題を特定
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-05 00:49:51] コミット: feat: 音域テスト画面の動的実装を大幅改善
+
+- 低音域・高音域テストのUI/UX改善
+  - 分かりやすい指示メッセージ（「できるだけ低い/高い声で「あー」と発声」）
+  - アイコンの色変更（低音域：黄色、高音域：赤色、完了：緑色）
+  - フェーズ遷移時間を3秒に短縮（ユーザビリティ向上）
+
+- 円形プログレスバーとエフェクト改善
+  - resetCircularProgress()関数でリセット処理統一
+  - showRangeTestComplete()関数で完了エフェクト統一
+  - アニメーション処理の最適化
+
+- 音域データスキップ機能改善
+  - DataManager経由での音域データ取得に統一
+  - ページ読み込み時の初期化処理追加
+  - 既存データ表示の改善（音域範囲をメッセージに含める）
+
+- VolumeBarController統合改善
+  - 音域テスト開始時の適切なリセット処理
+  - 継続検出時の安定した再開処理
+  - エラーハンドリング強化
+
+- デバッグログ強化
+  - 全フェーズでの詳細ログ出力
+  - ユーザビリティ問題の早期発見支援
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

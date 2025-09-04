@@ -172,19 +172,21 @@
                 <!-- 音域テストセクション -->
                 <section class="test-section hidden" id="range-test-section">
                     <div class="section-header">
-                        <h3 class="text-section-title">音域テスト</h3>
-                        <p class="section-description">あなたの快適な音域を測定しています</p>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-section-title">音域テスト</h3>
+                                <p class="section-description">あなたの快適な音域を測定しています</p>
+                            </div>
+                            <div class="test-instruction" style="flex-shrink: 0;">
+                                <i data-lucide="mic" class="text-red-400" style="width: 32px; height: 32px;"></i>
+                            </div>
+                        </div>
                     </div>
                     
                     
                     <!-- テスト指示 -->
                     <div class="text-center mb-6">
-                        <div class="flex items-center justify-center gap-4 mb-4">
-                            <div class="test-instruction" style="flex-shrink: 0;">
-                                <i data-lucide="mic" class="text-orange-300" style="width: 24px; height: 24px;"></i>
-                            </div>
-                            <h4 class="text-sub-title text-left" id="test-instruction-text" style="margin: 0;">音域測定を開始します</h4>
-                        </div>
+                        <h4 class="text-sub-title" id="test-instruction-text">音域を測定します</h4>
                     </div>
                     
                     <!-- 検出状況 -->
@@ -211,7 +213,7 @@
                         
                     </div>
 
-                    <p class="test-status" id="test-status">測定準備中...</p>
+                    <p class="test-status" id="test-status">待機中...</p>
                 </section>
 
                 <!-- 結果表示セクション -->
@@ -653,8 +655,8 @@
         
         // 音量バー表示時間保証のための状態管理
         let detectionStartTime = null;
-        const MIN_DETECTION_TIME = 5000; // 最低5秒間は音量バー表示を保証（テスト用に延長）
-        const MIN_PITCH_DETECTIONS = 5;   // 最低5回の音程検出を要求（テスト用に増加）
+        const MIN_DETECTION_TIME = 2000; // 最低2秒間は音量バー表示を保証
+        const MIN_PITCH_DETECTIONS = 3;   // 最低3回の音程検出を要求
         
         // リアルタイム音程検出開始
         function startRealAudioDetection() {
@@ -699,6 +701,7 @@
             // 音域テスト用のグローバル変数に保存
             window.lastDetectedFrequency = result.frequency;
             window.lastDetectedClarity = result.clarity;
+            window.lastDetectedVolume = result.volume || 0;
             
             const volumeProgress = document.getElementById('volume-progress');
             const volumeValue = document.getElementById('volume-value');
@@ -1289,10 +1292,6 @@
                 stableFrequencies = [];
                 stabilityStartTime = null;
                 
-                // UI更新 - より分かりやすいメッセージ
-                testInstructionText.textContent = '低い音を測定します';
-                testStatus.textContent = 'できるだけ低い声で「あー」と発声し、3秒間同じ高さを維持してください';
-                
                 // アイコンとカウントダウン設定
                 const rangeIcon = document.getElementById('range-icon');
                 const countdownDisplay = document.getElementById('countdown-display');
@@ -1301,7 +1300,7 @@
                 if (rangeIcon) {
                     rangeIcon.setAttribute('data-lucide', 'arrow-down');
                     rangeIcon.style.display = 'block';
-                    rangeIcon.style.color = '#fbbf24';  // 黄色で目立たせる
+                    rangeIcon.style.color = 'white';  // 白色に変更
                     lucide.createIcons();
                 }
                 if (countdownDisplay) {
@@ -1320,7 +1319,15 @@
                 // 円形プログレスバーリセット
                 resetCircularProgress();
                 
-                startContinuousDetection();
+                // 3秒間のインターバルを追加
+                testInstructionText.textContent = 'できるだけ低い声を出し３秒間キープしてください';
+                testStatus.textContent = '3秒後に測定を開始します...';
+                
+                setTimeout(() => {
+                    testStatus.textContent = '待機中...';
+                    console.log('⏰ 3秒インターバル完了 - 音声検出待機開始');
+                    startContinuousDetection();
+                }, 3000);
             }
             
             function startHighRangeTest() {
@@ -1328,10 +1335,6 @@
                 currentPhase = 'high';
                 stableFrequencies = [];
                 stabilityStartTime = null;
-                
-                // UI更新 - より分かりやすいメッセージ
-                testInstructionText.textContent = '高い音を測定します';
-                testStatus.textContent = 'できるだけ高い声で「あー」と発声し、3秒間同じ高さを維持してください';
                 
                 // 高音テスト用にターゲット周波数リセット
                 window.simulationTargetFreq = null;
@@ -1344,7 +1347,7 @@
                 if (rangeIcon) {
                     rangeIcon.setAttribute('data-lucide', 'arrow-up');
                     rangeIcon.style.display = 'block';
-                    rangeIcon.style.color = '#f87171';  // 赤色で高音を表現
+                    rangeIcon.style.color = 'white';  // 白色に変更
                     lucide.createIcons();
                 }
                 if (countdownDisplay) {
@@ -1363,12 +1366,24 @@
                 // 円形プログレスバーリセット
                 resetCircularProgress();
                 
-                startContinuousDetection();
+                // 3秒間のインターバルを追加
+                testInstructionText.textContent = 'できるだけ高い声を出し３秒間キープしてください';
+                testStatus.textContent = '3秒後に測定を開始します...';
+                
+                setTimeout(() => {
+                    testStatus.textContent = '待機中...';
+                    console.log('⏰ 3秒インターバル完了 - 音声検出待機開始');
+                    startContinuousDetection();
+                }, 3000);
             }
             
             function startContinuousDetection() {
                 const stabilitySvg = document.getElementById('stability-ring');
                 const progressCircle = stabilitySvg ? stabilitySvg.querySelector('.voice-progress-circle') : null;
+                const testStatus = document.getElementById('test-status');
+                
+                // 音声検出開始フラグ
+                let voiceDetectionStarted = false;
                 
                 // 実際のオーディオ検出開始
                 detectionActive = true;
@@ -1390,24 +1405,31 @@
                 }
                 
                 detectionInterval = setInterval(() => {
-                    // 実際の音程検出結果を使用
-                    if (window.lastDetectedFrequency && window.lastDetectedFrequency > 0 && window.lastDetectedClarity > 0.6) {
+                    // 実際の音程検出結果を使用（音量閾値も追加してノイズ除外）
+                    if (window.lastDetectedFrequency && window.lastDetectedFrequency > 0 && 
+                        window.lastDetectedClarity > 0.6 && window.lastDetectedVolume > 0.02) {  // 音量閾値を2%に設定
                         const detectedHz = window.lastDetectedFrequency;
+                        
+                        // 初回音声検出時の処理
+                        if (!voiceDetectionStarted) {
+                            voiceDetectionStarted = true;
+                            console.log('🎤 ユーザーの声を検出 - 測定開始（音量:', (window.lastDetectedVolume * 100).toFixed(1), '%）');
+                            if (testStatus) {
+                                testStatus.textContent = '測定中...';
+                            }
+                        }
                         
                         // 音名取得
                         const closestNote = getClosestNote(detectedHz);
                     
-                        // UI更新（音程表示削除）
-                        // currentNote.textContent = closestNote.note;
-                        // currentFrequency.textContent = closestNote.frequency.toFixed(1) + ' Hz';
-                    
-                        // 安定性チェック（±8Hz以内で安定と判定）
-                        if (stableFrequencies.length === 0 || Math.abs(detectedHz - stableFrequencies[stableFrequencies.length - 1]) <= 8) {
+                        // 安定性チェック（±8Hz以内で安定と判定） - 音声検出開始後のみ
+                        if (voiceDetectionStarted && (stableFrequencies.length === 0 || Math.abs(detectedHz - stableFrequencies[stableFrequencies.length - 1]) <= 8)) {
                         stableFrequencies.push(detectedHz);
                         
                         // 安定性開始時刻記録
                         if (stabilityStartTime === null) {
                             stabilityStartTime = Date.now();
+                            console.log('⏱️ 安定性測定開始 - 3秒カウント開始');
                         }
                         
                         // 3秒間安定性チェック
@@ -1426,7 +1448,7 @@
                             countdownDisplay.textContent = Math.min(elapsedTime + 1, 3); // 1, 2, 3でカウントアップ
                         }
                         
-                        // 円形プログレスバー更新（SVG stroke-dashoffsetで表現）
+                        // 円形プログレスバー更新（SVG stroke-dashoffsetで表現） - 音声検出開始後のみ
                         if (progressCircle) {
                             const circumference = 452; // 2π × 72 = 452
                             const offset = circumference - (circumference * stabilityPercent / 100);
@@ -1461,6 +1483,14 @@
                         stableFrequencies = [detectedHz];
                         stabilityStartTime = Date.now();
                         
+                        // リセット時にメッセージ更新
+                        if (testStatus) {
+                            testStatus.textContent = 'リセットされました - 測定中...';
+                            setTimeout(() => {
+                                testStatus.textContent = '測定中...';
+                            }, 1500);
+                        }
+                        
                         // 音が途絶えた：数字非表示、アイコン表示
                         const countdownDisplay = document.getElementById('countdown-display');
                         const rangeIcon = document.getElementById('range-icon');
@@ -1484,6 +1514,42 @@
                             stabilitySvg.classList.remove('completed');
                         }
                     }
+                    } else if (voiceDetectionStarted && stabilityStartTime !== null) {
+                        // 音声が検出されなくなった（声が止まった）場合のリセット処理
+                        console.log('🔇 音声が途切れました - リセット');
+                        stableFrequencies = [];
+                        stabilityStartTime = null;
+                        voiceDetectionStarted = false;  // 音声検出フラグもリセット
+                        
+                        // リセット時にメッセージ更新
+                        if (testStatus) {
+                            testStatus.textContent = 'リセットされました - 待機中...';
+                            setTimeout(() => {
+                                testStatus.textContent = '待機中...';
+                            }, 1500);
+                        }
+                        
+                        // カウントダウン表示リセット
+                        const countdownDisplay = document.getElementById('countdown-display');
+                        const rangeIcon = document.getElementById('range-icon');
+                        if (countdownDisplay && rangeIcon) {
+                            countdownDisplay.style.display = 'none';
+                            rangeIcon.style.display = 'block';
+                        }
+                        
+                        // 円形プログレスバーリセット
+                        if (progressCircle) {
+                            progressCircle.style.transition = 'stroke-dashoffset 0.3s ease-out';
+                            progressCircle.style.strokeDashoffset = '452';
+                            
+                            setTimeout(() => {
+                                progressCircle.style.transition = 'stroke-dashoffset 0.1s ease';
+                            }, 300);
+                        }
+                        
+                        if (stabilitySvg) {
+                            stabilitySvg.classList.remove('completed');
+                        }
                     }
                 }, 100);
             }
@@ -1498,24 +1564,24 @@
                     
                     // 低音設定完了メッセージを表示
                     if (testInstructionText) {
-                        testInstructionText.textContent = `低音域設定完了：${note.note}`;
+                        testInstructionText.textContent = '測定完了';
                     }
                     if (testStatus) {
-                        testStatus.textContent = '3秒後に高音域の測定を開始します...';
+                        testStatus.textContent = '次の測定を準備しています...';
                     }
                     
                     console.log('⏱️ 高音域テストまで待機中...');
                     setTimeout(() => {
                         console.log('🔄 低音域 → 高音域テスト遷移');
-                        startHighRangeTest();
-                    }, 3000); // 3秒に短縮
+                        startHighRangeTest();  // 高音テスト内でも3秒インターバルがあるので合計6秒になる
+                    }, 2000); // 2秒に短縮（高音テスト内の3秒と合わせて合計5秒）
                 } else {
                     testResults.highestNote = note.note;
                     testResults.highestFrequency = frequency;
                     
                     // 高音設定完了メッセージを表示
                     if (testInstructionText) {
-                        testInstructionText.textContent = `高音域設定完了：${note.note}`;
+                        testInstructionText.textContent = '測定完了';
                     }
                     if (testStatus) {
                         testStatus.textContent = '音域測定が完了しました！';
