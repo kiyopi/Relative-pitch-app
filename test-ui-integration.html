@@ -113,10 +113,13 @@
                 <div class="mt-4">
                     <div class="flex items-center justify-between mb-2">
                         <label class="text-sm text-white-80">音量バー感度</label>
-                        <span class="text-sm text-white-60" id="volume-scale-value">5.0x</span>
+                        <span class="text-sm text-white-60" id="volume-scale-value">--</span>
                     </div>
-                    <input type="range" id="volume-scale" min="1" max="15" step="0.5" value="5" 
+                    <input type="range" id="volume-scale" min="1" max="15" step="0.1" value="" 
                            class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                    <div class="text-xs text-blue-300 mt-1" id="device-info">
+                        デバイス検出中...
+                    </div>
                 </div>
                 
                 <div class="mt-4 text-xs text-white-40">
@@ -229,11 +232,71 @@
         let isDetecting = false;
         let pianoSampler = null;
         
-        // ノイズレベル調整変数
+        // デバイス検出（CRITICAL_DECISIONS_AND_INSIGHTS.md準拠 - iPadOS 13+バグ対策）
+        function detectDeviceWithSpecs() {
+            const userAgent = navigator.userAgent; // toLowerCase削除（大文字小文字区別重要）
+            
+            // iPadOS 13+ 完全対応検出ロジック
+            const isIPhone = /iPhone/.test(userAgent);
+            const isIPad = /iPad/.test(userAgent);
+            const isIPadOS = /Macintosh/.test(userAgent) && 'ontouchend' in document; // iPadOS 13+偽装対策
+            const hasIOSNavigator = /iPad|iPhone|iPod/.test(userAgent);
+            const hasIOSPlatform = /iPad|iPhone|iPod/.test((navigator).platform || '');
+            
+            // 複数方式による総合判定
+            const isIOS = isIPhone || isIPad || isIPadOS || hasIOSNavigator || hasIOSPlatform;
+            
+            let deviceType = 'PC';
+            let sensitivityMultiplier = 1.0;
+            let volumeBarScale = 2.0;
+            
+            if (isIPhone) {
+                deviceType = 'iPhone';
+                sensitivityMultiplier = 3.0; // TECHNICAL_SPECIFICATIONS.md準拠
+                volumeBarScale = 2.0;
+            } else if (isIPad || isIPadOS) { // isIPadOS追加が重要
+                deviceType = 'iPad';
+                sensitivityMultiplier = 7.0; // TECHNICAL_SPECIFICATIONS.md準拠
+                volumeBarScale = 2.5;
+            } else if (isIOS) {
+                deviceType = 'iOS Device';
+                sensitivityMultiplier = 3.0; // フォールバック
+                volumeBarScale = 2.0;
+            }
+            
+            return {
+                deviceType,
+                sensitivityMultiplier,
+                volumeBarScale,
+                isIOS,
+                debugInfo: {
+                    userAgent: userAgent,
+                    detectionMethods: {
+                        isIPhone,
+                        isIPad,
+                        isIPadOS, // iPadOS 13+検出状態
+                        hasIOSNavigator,
+                        hasIOSPlatform,
+                        touchSupport: 'ontouchend' in document
+                    }
+                }
+            };
+        }
+        
+        // 後方互換性のための旧関数（内部で新関数使用）
+        function getOptimalVolumeBarScale() {
+            return detectDeviceWithSpecs().volumeBarScale;
+        }
+        
+        function getDetectedDevice() {
+            return detectDeviceWithSpecs().deviceType;
+        }
+
+        // ノイズレベル調整変数（デバイス別最適値）
         let currentVolumeThreshold = 1.5;
         let currentClarityThreshold = 0.6;
         let currentSensitivity = 10.0;
-        let volumeBarScale = 5.0;
+        let volumeBarScale = getOptimalVolumeBarScale();
 
         // マイク初期化
         document.getElementById('init-microphone').addEventListener('click', async () => {
@@ -465,7 +528,44 @@
             addLog(`音量バー感度を${volumeBarScale}xに調整`, 'INFO');
         });
 
-        // 🎉 ページ読み込み完了
+        // 🎉 ページ読み込み完了 + 高度デバイス検出（仕様書準拠）
+        document.addEventListener('DOMContentLoaded', function() {
+            // 新しい高度検出システムでデバイス情報取得
+            const deviceSpecs = detectDeviceWithSpecs();
+            
+            // UIに反映
+            document.getElementById('volume-scale').value = deviceSpecs.volumeBarScale;
+            document.getElementById('volume-scale-value').textContent = deviceSpecs.volumeBarScale + 'x';
+            document.getElementById('device-info').innerHTML = `
+                検出: <strong>${deviceSpecs.deviceType}</strong> 
+                (音量バー: ${deviceSpecs.volumeBarScale}x, 
+                マイク感度: ${deviceSpecs.sensitivityMultiplier}x)
+            `;
+            
+            // 詳細ログ出力（iPadOS 13+対策の動作確認）
+            addLog(`🔍 高度デバイス検出完了: ${deviceSpecs.deviceType}`, 'SUCCESS');
+            addLog(`📊 最適化設定 - 音量バー: ${deviceSpecs.volumeBarScale}x, マイク感度: ${deviceSpecs.sensitivityMultiplier}x`, 'INFO');
+            
+            // iPadOS 13+ 検出状況をデバッグログに出力
+            const debug = deviceSpecs.debugInfo.detectionMethods;
+            if (debug.isIPadOS) {
+                addLog(`⚠️ iPadOS 13+ 検出: Macintosh偽装を発見・iPad判定に修正`, 'WARNING');
+                console.log('🔍 iPadOS 13+ Detection Details:', {
+                    userAgent: deviceSpecs.debugInfo.userAgent,
+                    touchSupport: debug.touchSupport,
+                    macintoshUA: /Macintosh/.test(deviceSpecs.debugInfo.userAgent),
+                    iPadUA: /iPad/.test(deviceSpecs.debugInfo.userAgent)
+                });
+            }
+            
+            // 感度設定をグローバル変数に反映
+            currentSensitivity = deviceSpecs.sensitivityMultiplier;
+            document.getElementById('sensitivity').value = currentSensitivity;
+            document.getElementById('sensitivity-value').textContent = currentSensitivity + 'x';
+            
+            addLog(`🎯 デバイス別最適化適用完了`, 'SUCCESS');
+        });
+        
         addLog('🧪 UI統合テストページ読み込み完了', 'SUCCESS');
         updateSystemStatus('準備完了 - マイク初期化ボタンをクリック', 'info');
     </script>
