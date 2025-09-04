@@ -1695,3 +1695,23 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-05 02:47:26] コミット: feat: 音域テスト機能完全修正 - ノイズ検出・リセット・UI調整完了
+
+主な変更内容:
+- ノイズ閾値設定: 2%音量閾値で誤検出防止
+- 音声途切れ検出: カウントアップ中の声停止でリセット処理追加
+- マイクアイコン修正: 重複削除・配置最適化
+- UI色統一: 赤色テーマ適用（背景・エフェクト・アニメーション）
+- アロー系アイコン: 白色変更で視認性向上
+- テスト時間短縮: 「ド」継続時間 4秒→2秒変更
+- 3秒インターバル: 再テスト時も適用される統一仕様
+
+技術的改善:
+- 音量検出フィルタリング強化 (0.02閾値)
+- 声検出状態管理の完全リセット機能
+- プログレスバー・UI要素の色統一
+- モバイル対応レスポンシブ調整
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
