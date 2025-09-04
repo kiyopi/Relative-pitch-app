@@ -116,6 +116,15 @@
                             <span class="meter-value" id="frequency-value">261.6 Hz (C4)</span>
                         </div>
                     </div>
+                    
+                    <!-- 進捗表示エリア（新追加） -->
+                    <div class="meter-group" id="progress-display" style="display: none;">
+                        <div class="text-center p-4 bg-blue-500 bg-opacity-20 rounded-lg border border-blue-300 border-opacity-30">
+                            <div class="text-sm text-blue-200 mb-2">検出進捗</div>
+                            <div class="text-lg font-semibold text-white" id="progress-text">「ド」を発声してください</div>
+                            <div class="mt-2 text-xs text-blue-300" id="progress-detail">時間・回数の条件をクリアしてください</div>
+                        </div>
+                    </div>
 
                     <div class="success-alert" id="detection-success">
                         <i data-lucide="check-circle" style="width: 24px; height: 24px; color: #22c55e;"></i>
@@ -655,6 +664,13 @@
             detectionStartTime = Date.now(); // 開始時刻記録
             audioProcessor.startDetection();
             
+            // 進捗表示エリアを表示
+            const progressDisplay = document.getElementById('progress-display');
+            if (progressDisplay) {
+                progressDisplay.style.display = 'block';
+                console.log('📊 進捗表示エリアを表示しました');
+            }
+            
             console.log('🕐 音量バー表示保証開始:', {
                 minTime: MIN_DETECTION_TIME + 'ms',
                 minDetections: MIN_PITCH_DETECTIONS
@@ -816,25 +832,70 @@
         
         // UI進捗表示更新（音程検出プログレス）
         function updateDetectionProgress(detectionCount, elapsedTime, timeConditionMet, countConditionMet) {
+            console.log('📱 updateDetectionProgress呼び出し:', {
+                detectionCount, elapsedTime, timeConditionMet, countConditionMet
+            });
+            
             const voiceInstructionText = document.getElementById('voice-instruction-text');
-            if (!voiceInstructionText) return;
+            console.log('🎯 voice-instruction-text要素:', voiceInstructionText);
+            
+            if (!voiceInstructionText) {
+                console.error('❌ voice-instruction-text要素が見つかりません！');
+                return;
+            }
             
             const timeProgress = Math.min(100, (elapsedTime / MIN_DETECTION_TIME) * 100);
             const countProgress = Math.min(100, (detectionCount / MIN_PITCH_DETECTIONS) * 100);
             
+            let newText = '';
+            
             if (timeConditionMet && countConditionMet) {
-                voiceInstructionText.textContent = '✅ 検出完了！まもなく次のステップへ...';
+                newText = '✅ 検出完了！まもなく次のステップへ...';
             } else {
                 const timeRemaining = Math.max(0, Math.ceil((MIN_DETECTION_TIME - elapsedTime) / 1000));
                 const countRemaining = Math.max(0, MIN_PITCH_DETECTIONS - detectionCount);
                 
                 if (!timeConditionMet && !countConditionMet) {
-                    voiceInstructionText.textContent = `「ド」を継続 (${timeRemaining}秒, ${countRemaining}回検出必要)`;
+                    newText = `「ド」を継続 (${timeRemaining}秒, ${countRemaining}回検出必要)`;
                 } else if (!timeConditionMet) {
-                    voiceInstructionText.textContent = `「ド」を継続 (あと${timeRemaining}秒)`;
+                    newText = `「ド」を継続 (あと${timeRemaining}秒)`;
                 } else if (!countConditionMet) {
-                    voiceInstructionText.textContent = `「ド」を継続 (あと${countRemaining}回検出必要)`;
+                    newText = `「ド」を継続 (あと${countRemaining}回検出必要)`;
                 }
+            }
+            
+            console.log('📝 テキスト更新:', {
+                oldText: voiceInstructionText.textContent,
+                newText: newText
+            });
+            
+            voiceInstructionText.textContent = newText;
+            
+            // 視覚的に目立たせるため、色も変更
+            if (timeConditionMet && countConditionMet) {
+                voiceInstructionText.style.color = '#22c55e'; // 緑色
+            } else {
+                voiceInstructionText.style.color = '#f59e0b'; // オレンジ色
+            }
+            
+            // 専用進捗表示エリアも更新
+            const progressText = document.getElementById('progress-text');
+            const progressDetail = document.getElementById('progress-detail');
+            
+            if (progressText) {
+                progressText.textContent = newText;
+                progressText.style.color = timeConditionMet && countConditionMet ? '#22c55e' : '#ffffff';
+                console.log('📊 progress-text更新完了:', newText);
+            }
+            
+            if (progressDetail) {
+                const timeRemaining = Math.max(0, Math.ceil((MIN_DETECTION_TIME - elapsedTime) / 1000));
+                const countRemaining = Math.max(0, MIN_PITCH_DETECTIONS - detectionCount);
+                const timePercent = Math.min(100, Math.round((elapsedTime / MIN_DETECTION_TIME) * 100));
+                const countPercent = Math.min(100, Math.round((detectionCount / MIN_PITCH_DETECTIONS) * 100));
+                
+                progressDetail.textContent = `時間: ${timePercent}% (${timeRemaining}秒残り) | 回数: ${countPercent}% (${countRemaining}回残り)`;
+                console.log('📊 progress-detail更新完了:', progressDetail.textContent);
             }
         }
 
@@ -868,6 +929,13 @@
                 if (volumeValue) {
                     volumeValue.textContent = '0%';
                 }
+            }
+            
+            // 進捗表示エリアを非表示
+            const progressDisplay = document.getElementById('progress-display');
+            if (progressDisplay) {
+                progressDisplay.style.display = 'none';
+                console.log('📊 進捗表示エリアを非表示にしました');
             }
             
             const detectionSuccess = document.getElementById('detection-success');
