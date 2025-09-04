@@ -653,8 +653,8 @@
         
         // 音量バー表示時間保証のための状態管理
         let detectionStartTime = null;
-        const MIN_DETECTION_TIME = 3000; // 最低3秒間は音量バー表示を保証
-        const MIN_PITCH_DETECTIONS = 3;   // 最低3回の音程検出を要求
+        const MIN_DETECTION_TIME = 5000; // 最低5秒間は音量バー表示を保証（テスト用に延長）
+        const MIN_PITCH_DETECTIONS = 5;   // 最低5回の音程検出を要求（テスト用に増加）
         
         // リアルタイム音程検出開始
         function startRealAudioDetection() {
@@ -672,8 +672,10 @@
             }
             
             console.log('🕐 音量バー表示保証開始:', {
+                detectionStartTime: detectionStartTime,
                 minTime: MIN_DETECTION_TIME + 'ms',
-                minDetections: MIN_PITCH_DETECTIONS
+                minDetections: MIN_PITCH_DETECTIONS,
+                startTimeReadable: new Date(detectionStartTime).toLocaleTimeString()
             });
         }
 
@@ -730,9 +732,29 @@
                     result.clarity > 0.15 && result.volume > 0.03) {
                     detectedCDoPitches.push(result.frequency);
                     
-                    const elapsedTime = Date.now() - detectionStartTime;
+                    const currentTime = Date.now();
+                    
+                    // detectionStartTimeがnullでないことを確認
+                    if (detectionStartTime === null) {
+                        console.error('❌ detectionStartTimeがnullです！開始時刻が正しく設定されていません');
+                        return;
+                    }
+                    
+                    const elapsedTime = currentTime - detectionStartTime;
                     const timeConditionMet = elapsedTime >= MIN_DETECTION_TIME;
                     const countConditionMet = detectedCDoPitches.length >= MIN_PITCH_DETECTIONS;
+                    
+                    // 詳細デバッグ情報
+                    console.log('🔍 詳細条件チェック:', {
+                        currentTime: currentTime,
+                        detectionStartTime: detectionStartTime,
+                        elapsedTime: elapsedTime,
+                        MIN_DETECTION_TIME: MIN_DETECTION_TIME,
+                        MIN_PITCH_DETECTIONS: MIN_PITCH_DETECTIONS,
+                        timeConditionMet: timeConditionMet,
+                        countConditionMet: countConditionMet,
+                        detectionCount: detectedCDoPitches.length
+                    });
                     
                     console.log('✅ C4候補検出！', {
                         frequency: result.frequency,
