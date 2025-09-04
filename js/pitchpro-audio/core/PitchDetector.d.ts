@@ -1,12 +1,7 @@
-/**
- * PitchDetector - Framework-agnostic High-precision Pitch Detection
- *
- * Based on Pitchy library with McLeod Pitch Method
- * Includes harmonic correction, noise filtering, and device-specific optimization
- */
 import type { PitchDetectorConfig, PitchDetectionResult, PitchCallback, ErrorCallback, StateChangeCallback } from '../types';
 import { AudioManager } from './AudioManager';
 export declare class PitchDetector {
+    private static DEBUG_MODE;
     private audioManager;
     private pitchDetector;
     private analyser;
@@ -26,6 +21,10 @@ export declare class PitchDetector {
     private stableVolume;
     private previousFrequency;
     private harmonicHistory;
+    private frequencyHistory;
+    private stableFrequency;
+    private noSoundCounter;
+    private maxHistoryLength;
     private config;
     private disableHarmonicCorrection;
     private callbacks;

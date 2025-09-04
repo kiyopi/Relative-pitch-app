@@ -121,9 +121,7 @@ export declare class MicrophoneController {
                 activeFilters: string[];
                 lastError: Error | null;
                 currentSensitivity: number;
-            }; /**
-             * Cleanup and destroy all resources
-             */
+            };
         };
     };
     /**

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 UI統合テスト - PitchPro + UIカタログ</title>
+    
+    <!-- UIカタログと同じスタイルシート構成 -->
+    <link rel="stylesheet" href="Bolt/v2/styles/base.css">
+    <link rel="stylesheet" href="Bolt/v2/styles/results.css">
+    <link rel="stylesheet" href="Bolt/v2/styles/training.css">
+    
+    <!-- フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- 🎯 テスト環境であることを明示 -->
+        <div style="position: fixed; top: 10px; right: 10px; z-index: 9999; background: rgba(255, 193, 7, 0.9); color: #000; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 12px;">
+            🧪 UI統合テスト環境
+        </div>
+        
+        <!-- ヘッダー（UIカタログのpage-headerコンポーネント使用） -->
+        <header class="page-header">
+            <div class="page-header-content">
+                <div class="page-header-icon-wrapper">
+                    <div class="page-header-icon gradient-catalog-blue">
+                        <i data-lucide="mic" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;"></i>
+                    </div>
+                </div>
+                <div class="page-header-text">
+                    <h1 class="page-title">PitchPro統合テスト</h1>
+                    <p class="page-subtitle text-green-200">UIカタログコンポーネント + 音程検出</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main class="narrow-main">
+            <!-- 🔧 システム状態表示（UIカタログのglass-cardコンポーネント） -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="activity" class="text-blue-300"></i>
+                    <span>システム状態</span>
+                </h3>
+                <div class="text-lg text-white-80 mt-4" id="system-status">
+                    初期化されていません
+                </div>
+            </div>
+
+            <!-- 🎮 制御ボタン（UIカタログのボタンコンポーネント） -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="settings" class="text-green-300"></i>
+                    <span>制御パネル</span>
+                </h3>
+                <div class="flex gap-4 mt-4">
+                    <button id="init-microphone" class="btn-primary flex-1">
+                        <i data-lucide="mic" style="width: 20px; height: 20px;"></i>
+                        マイク初期化
+                    </button>
+                    <button id="start-detection" class="btn-success flex-1" disabled>
+                        <i data-lucide="play" style="width: 20px; height: 20px;"></i>
+                        検出開始
+                    </button>
+                    <button id="stop-detection" class="btn-secondary flex-1" disabled>
+                        <i data-lucide="stop-circle" style="width: 20px; height: 20px;"></i>
+                        検出停止
+                    </button>
+                </div>
+            </div>
+
+            <!-- 🔧 ノイズレベル調整 -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="sliders" class="text-yellow-300"></i>
+                    <span>ノイズレベル調整</span>
+                </h3>
+                
+                <!-- 音量閾値調整 -->
+                <div class="mt-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-sm text-white-80">音量閾値</label>
+                        <span class="text-sm text-white-60" id="volume-threshold-value">1.5%</span>
+                    </div>
+                    <input type="range" id="volume-threshold" min="0.5" max="5" step="0.1" value="1.5" 
+                           class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                </div>
+                
+                <!-- 明瞭度閾値調整 -->
+                <div class="mt-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-sm text-white-80">明瞭度閾値</label>
+                        <span class="text-sm text-white-60" id="clarity-threshold-value">0.6</span>
+                    </div>
+                    <input type="range" id="clarity-threshold" min="0.3" max="0.9" step="0.05" value="0.6" 
+                           class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                </div>
+                
+                <!-- マイク感度調整 -->
+                <div class="mt-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-sm text-white-80">マイク感度</label>
+                        <span class="text-sm text-white-60" id="sensitivity-value">10.0x</span>
+                    </div>
+                    <input type="range" id="sensitivity" min="1" max="20" step="0.5" value="10" 
+                           class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                </div>
+                
+                <!-- 音量バー表示調整 -->
+                <div class="mt-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-sm text-white-80">音量バー感度</label>
+                        <span class="text-sm text-white-60" id="volume-scale-value">5.0x</span>
+                    </div>
+                    <input type="range" id="volume-scale" min="1" max="15" step="0.5" value="5" 
+                           class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                </div>
+                
+                <div class="mt-4 text-xs text-white-40">
+                    💡 ノイズが多い場合は音量閾値・明瞭度閾値を上げ、マイク感度を下げてください
+                </div>
+            </div>
+
+            <!-- 🎵 音程表示（UIカタログの結果表示コンポーネント） -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="music" class="text-purple-300"></i>
+                    <span>音程検出結果</span>
+                </h3>
+                
+                <!-- 周波数表示 -->
+                <div class="result-metric-card mt-4">
+                    <div class="result-metric-value" id="frequency-display">--</div>
+                    <div class="result-metric-label">Hz</div>
+                </div>
+                
+                <!-- 音名表示 -->
+                <div class="result-metric-card mt-4">
+                    <div class="result-metric-value" id="note-display">--</div>
+                    <div class="result-metric-label">音名</div>
+                </div>
+                
+                <!-- 音量バー -->
+                <div class="mt-4">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="volume-2" class="text-yellow-300" style="width: 20px; height: 20px;"></i>
+                        <div class="progress-bar flex-1">
+                            <div class="progress-fill gradient-catalog-green" id="volume-bar" style="width: 0%;"></div>
+                        </div>
+                        <span class="text-sm text-white-60 min-w-16" id="volume-percent">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 📊 デバッグ情報 -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="bug" class="text-red-300"></i>
+                    <span>デバッグログ</span>
+                </h3>
+                <div class="mt-4 p-4 bg-black bg-opacity-50 rounded-lg max-h-64 overflow-y-auto font-mono text-sm" id="debug-log">
+                    <div class="text-blue-300">[INFO] テストページ読み込み完了</div>
+                </div>
+            </div>
+
+            <!-- 🧪 基音テスト -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="piano" class="text-orange-300"></i>
+                    <span>基音テスト</span>
+                </h3>
+                <div class="flex gap-4 mt-4">
+                    <button id="test-c4" class="btn-outline flex-1">C4 (261Hz)</button>
+                    <button id="test-a4" class="btn-outline flex-1">A4 (440Hz)</button>
+                    <button id="test-scale" class="btn-outline flex-1">ドレミスケール</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 必要なJavaScriptライブラリ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="./js/pitchpro-audio/index.umd.js"></script>
+    <script src="Bolt/v2/js/lucide-init.js"></script>
+
+    <script>
+        // 🧪 統合テスト用JavaScript（UIカタログ準拠）
+        
+        // ログ機能
+        function addLog(message, type = 'INFO') {
+            const log = document.getElementById('debug-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const colorClass = {
+                'INFO': 'text-blue-300',
+                'SUCCESS': 'text-green-300', 
+                'ERROR': 'text-red-300',
+                'WARNING': 'text-yellow-300'
+            }[type] || 'text-gray-300';
+            
+            const entry = document.createElement('div');
+            entry.className = colorClass;
+            entry.textContent = `[${type}] ${timestamp}: ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+            
+            console.log(`[${type}] ${message}`);
+        }
+
+        // システム状態更新
+        function updateSystemStatus(message, type = 'info') {
+            const statusEl = document.getElementById('system-status');
+            statusEl.textContent = message;
+            
+            // UIカタログの色クラス使用
+            statusEl.className = 'text-lg mt-4 ' + {
+                'info': 'text-white-80',
+                'success': 'text-green-300',
+                'error': 'text-red-300',
+                'warning': 'text-yellow-300'
+            }[type];
+        }
+
+        // PitchPro変数
+        let audioManager = null;
+        let pitchDetector = null;
+        let isDetecting = false;
+        let pianoSampler = null;
+        
+        // ノイズレベル調整変数
+        let currentVolumeThreshold = 1.5;
+        let currentClarityThreshold = 0.6;
+        let currentSensitivity = 10.0;
+        let volumeBarScale = 5.0;
+
+        // マイク初期化
+        document.getElementById('init-microphone').addEventListener('click', async () => {
+            try {
+                addLog('PitchPro初期化開始');
+                updateSystemStatus('初期化中...', 'warning');
+                
+                if (!window.PitchPro) {
+                    throw new Error('PitchProライブラリが読み込まれていません');
+                }
+                
+                const { AudioManager, PitchDetector } = window.PitchPro;
+                
+                // AudioManager初期化（AGC完全無効化）
+                audioManager = new AudioManager({
+                    sampleRate: 44100,
+                    channelCount: 1,
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: false,
+                    googAutoGainControl: false,
+                    googNoiseSuppression: false,
+                    googEchoCancellation: false,
+                    googHighpassFilter: false,
+                    mozAutoGainControl: false,
+                    mozNoiseSuppression: false
+                });
+                
+                await audioManager.initialize();
+                addLog('AudioManager初期化完了', 'SUCCESS');
+                
+                // PitchDetector初期化（調整可能な閾値使用）
+                pitchDetector = new PitchDetector(audioManager, {
+                    fftSize: 4096,
+                    smoothing: 0.1,
+                    clarityThreshold: currentClarityThreshold,
+                    minVolumeAbsolute: 0.01
+                });
+                
+                await pitchDetector.initialize();
+                addLog('PitchDetector初期化完了', 'SUCCESS');
+                
+                // コールバック設定
+                pitchDetector.setCallbacks({
+                    onPitchUpdate: (result) => {
+                        if (result) {
+                            // UIカタログコンポーネント使用で表示更新
+                            document.getElementById('frequency-display').textContent = 
+                                result.frequency > 0 ? result.frequency.toFixed(1) : '--';
+                            document.getElementById('note-display').textContent = result.note || '--';
+                            document.getElementById('volume-percent').textContent = 
+                                result.volume ? (result.volume).toFixed(1) + '%' : '0%';
+                            
+                            // プログレスバー更新（より直接的な調整）
+                            const rawVolume = result.volume || 0;
+                            // 直接スケール適用（平方根なし）でより敏感に反応
+                            const adjustedVolume = rawVolume * volumeBarScale;
+                            const volumePercent = Math.min(100, adjustedVolume);
+                            document.getElementById('volume-bar').style.width = volumePercent + '%';
+                        }
+                    },
+                    onError: (error) => {
+                        addLog(`音程検出エラー: ${error.message}`, 'ERROR');
+                    }
+                });
+                
+                // マイク感度設定
+                audioManager.setSensitivity(currentSensitivity);
+                addLog(`マイク感度を${currentSensitivity}xに設定`, 'SUCCESS');
+                
+                updateSystemStatus('初期化完了 - 検出開始可能', 'success');
+                document.getElementById('start-detection').disabled = false;
+                addLog('🎉 統合テスト準備完了！', 'SUCCESS');
+                
+            } catch (error) {
+                const errorMsg = `初期化失敗: ${error.message}`;
+                addLog(errorMsg, 'ERROR');
+                updateSystemStatus('初期化失敗', 'error');
+                console.error('初期化エラー:', error);
+            }
+        });
+
+        // 検出開始
+        document.getElementById('start-detection').addEventListener('click', () => {
+            if (!pitchDetector) {
+                addLog('先にマイクを初期化してください', 'ERROR');
+                return;
+            }
+            
+            try {
+                const success = pitchDetector.startDetection();
+                if (success) {
+                    isDetecting = true;
+                    updateSystemStatus('音程検出中...', 'info');
+                    addLog('音程検出開始', 'SUCCESS');
+                    
+                    document.getElementById('start-detection').disabled = true;
+                    document.getElementById('stop-detection').disabled = false;
+                }
+            } catch (error) {
+                addLog(`検出開始エラー: ${error.message}`, 'ERROR');
+            }
+        });
+
+        // 検出停止
+        document.getElementById('stop-detection').addEventListener('click', () => {
+            if (!pitchDetector || !isDetecting) return;
+            
+            try {
+                pitchDetector.stopDetection();
+                isDetecting = false;
+                updateSystemStatus('音程検出停止', 'info');
+                addLog('音程検出停止', 'INFO');
+                
+                document.getElementById('start-detection').disabled = false;
+                document.getElementById('stop-detection').disabled = true;
+                
+                // UIカタログコンポーネントの表示クリア
+                document.getElementById('frequency-display').textContent = '--';
+                document.getElementById('note-display').textContent = '--';
+                document.getElementById('volume-percent').textContent = '0%';
+                document.getElementById('volume-bar').style.width = '0%';
+                
+            } catch (error) {
+                addLog(`検出停止エラー: ${error.message}`, 'ERROR');
+            }
+        });
+
+        // Tone.js初期化
+        async function initToneJS() {
+            try {
+                if (!pianoSampler) {
+                    addLog('Tone.js音源初期化中...', 'INFO');
+                    
+                    if (Tone.context.state !== 'running') {
+                        await Tone.start();
+                    }
+                    
+                    pianoSampler = new Tone.Sampler({
+                        urls: { "C4": "C4.mp3" },
+                        baseUrl: "./",
+                        release: 1.5,
+                        volume: 6
+                    }).toDestination();
+                    
+                    await Tone.loaded();
+                    addLog('Tone.js音源準備完了', 'SUCCESS');
+                }
+            } catch (error) {
+                addLog(`Tone.js初期化エラー: ${error.message}`, 'ERROR');
+                throw error;
+            }
+        }
+
+        // 基音テスト
+        document.getElementById('test-c4').addEventListener('click', async () => {
+            try {
+                await initToneJS();
+                if (pianoSampler) {
+                    pianoSampler.triggerAttackRelease('C4', '2.0s');
+                    addLog('C4基音テスト再生', 'SUCCESS');
+                    updateSystemStatus('基音テスト: C4 (261Hz)', 'info');
+                }
+            } catch (error) {
+                addLog(`基音テストエラー: ${error.message}`, 'ERROR');
+            }
+        });
+
+        document.getElementById('test-a4').addEventListener('click', async () => {
+            try {
+                await initToneJS();
+                if (pianoSampler) {
+                    pianoSampler.triggerAttackRelease('A4', '2.0s');
+                    addLog('A4基音テスト再生', 'SUCCESS');
+                    updateSystemStatus('基音テスト: A4 (440Hz)', 'info');
+                }
+            } catch (error) {
+                addLog(`基音テストエラー: ${error.message}`, 'ERROR');
+            }
+        });
+
+        document.getElementById('test-scale').addEventListener('click', async () => {
+            try {
+                await initToneJS();
+                if (pianoSampler) {
+                    const scale = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
+                    addLog('ドレミスケール再生開始', 'SUCCESS');
+                    updateSystemStatus('スケール再生中...', 'info');
+                    
+                    for (let i = 0; i < scale.length; i++) {
+                        setTimeout(() => {
+                            pianoSampler.triggerAttackRelease(scale[i], '0.8s');
+                            addLog(`${scale[i]} 再生`, 'INFO');
+                        }, i * 1000);
+                    }
+                }
+            } catch (error) {
+                addLog(`スケールテストエラー: ${error.message}`, 'ERROR');
+            }
+        });
+
+        // 🔧 ノイズレベル調整スライダー
+        document.getElementById('volume-threshold').addEventListener('input', (e) => {
+            currentVolumeThreshold = parseFloat(e.target.value);
+            document.getElementById('volume-threshold-value').textContent = currentVolumeThreshold + '%';
+            addLog(`音量閾値を${currentVolumeThreshold}%に調整`, 'INFO');
+        });
+
+        document.getElementById('clarity-threshold').addEventListener('input', (e) => {
+            currentClarityThreshold = parseFloat(e.target.value);
+            document.getElementById('clarity-threshold-value').textContent = currentClarityThreshold;
+            addLog(`明瞭度閾値を${currentClarityThreshold}に調整`, 'INFO');
+        });
+
+        document.getElementById('sensitivity').addEventListener('input', (e) => {
+            currentSensitivity = parseFloat(e.target.value);
+            document.getElementById('sensitivity-value').textContent = currentSensitivity + 'x';
+            
+            // リアルタイム感度調整（初期化済みの場合）
+            if (audioManager) {
+                audioManager.setSensitivity(currentSensitivity);
+                addLog(`マイク感度を${currentSensitivity}xに調整`, 'INFO');
+            }
+        });
+
+        document.getElementById('volume-scale').addEventListener('input', (e) => {
+            volumeBarScale = parseFloat(e.target.value);
+            document.getElementById('volume-scale-value').textContent = volumeBarScale + 'x';
+            addLog(`音量バー感度を${volumeBarScale}xに調整`, 'INFO');
+        });
+
+        // 🎉 ページ読み込み完了
+        addLog('🧪 UI統合テストページ読み込み完了', 'SUCCESS');
+        updateSystemStatus('準備完了 - マイク初期化ボタンをクリック', 'info');
+    </script>
+</body>
+</html>
