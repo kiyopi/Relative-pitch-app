@@ -9,21 +9,18 @@
 - **3つのモード**: ランダム基音（初級8回）→連続チャレンジ（中級12回）→12音階（上級S級判定）
 
 ### 🚧 **現在の作業内容**
-- ✅ **完了**: v2環境index.html実装完了（base.css大幅拡張1,108行、全UIコンポーネント統合済み）
-- ✅ **完了**: preparation.html音域テスト最終調整（テキスト役割分担、レイアウト統一、iPhone対応）
-- ✅ **完了**: UIレイアウト調整80%完成（モバイル対応、インライン削除、プログレスバー統一）
-- ✅ **完了**: データ設計フェーズ（DATA_MANAGEMENT_SPECIFICATION.md + data-manager.js実装）
-- ✅ **完了**: PitchPro音声処理統合・2秒リセット問題修正・エラーループ防止
-- ✅ **完了**: デバイス検出システム完全修正（iPadOS 13+バグ対策）
-- ✅ **完了**: 安定版マイクロフォンシステム復活（audio-manager-stable.js + microphone-manager-stable.js）
-- ✅ **完了**: VolumeBarController統合音量制御システム実装完了（実機テスト済み設定統合）
-- 🔄 **進行中**: preparation.html/training.html本番実装統合
-- 📋 **次期作業**: トレーニング機能完全統合・リリース準備
+- ✅ **完了**: JavaScript外部ファイル化完了 - preparation.html完全分離（cc7ec5e）
+- ✅ **完了**: 音域テスト機能完全修正 - ノイズ検出・リセット・UI調整完了
+- ✅ **完了**: 音域テスト画面の動的実装を大幅改善
+- ✅ **完了**: 重要仕様書移植 - AUDIO_LIBRARY_DESIGN.md & COMPLETE_DEVELOPMENT_ROADMAP.md
+- ✅ **完了**: サブモジュール問題修正 - GitHub Pagesデプロイ対応
+- 🔄 **進行中**: preparation.html動作確認・最終調整
+- 📋 **次期作業**: training.html実装・結果表示ページ実装
 
 ### 🌿 **現在のブランチ**
-- **作業ブランチ**: `feature/data-manager-implementation`
-- **実装内容**: データ管理モジュール・pitchpro-audio統合・デバイス最適化・VolumeBarController完了
-- **次期フェーズ**: 本番ページ統合実装フェーズ
+- **作業ブランチ**: `feature/simple-externalization`
+- **実装内容**: シンプルな外部ファイル化（分割なし）・動作確実な実装
+- **次期フェーズ**: トレーニングページ・結果表示ページ実装
 
 ### ⚠️ **注意すべきこと（最重要）**
 1. **🚨 インライン記述禁止**: HTMLのstyle属性、JavaScriptでのインラインCSS絶対禁止（例外: Lucideアイコンサイズ、プログレスバー幅のみ）
@@ -34,12 +31,9 @@
 6. **🌿 Git自動化**: 作業完了時のみコミット・プッシュ実行（修正中は禁止）
 
 ### 🎯 **作業のポイント**
-- **データ管理モジュール完了**: `/js/data-manager.js`実装済み（pitchpro-audio統合、課金制御対応）
-- **PitchProオーディオ統合完了**: 2秒リセット問題修正、エラーループ防止、高度デバイス検出実装
-- **VolumeBarController統合完了**: 実機テスト済み設定統合・統一音量制御システム実装
-- **iPadOS 13+バグ修正完了**: 仕様書準拠のデバイス判定システム実装（`CRITICAL_DECISIONS_AND_INSIGHTS.md`参照）
-- **テスト環境整備**: `test-ui-integration.html`でUIカタログ準拠の統合テスト環境完成
-- **安定版マイクシステム**: `audio-manager-stable.js` + `microphone-manager-stable.js` + `test-stable-microphone.html`実装完了
+- **シンプル外部ファイル化済み**: `/js/preparation.js` (1,420行) - 分割なしの理想的実装
+- **動作確実なコードベース**: cc7ec5eから開始、音域テスト正常動作確認済み
+- **重要仕様書保持**: AUDIO_LIBRARY_DESIGN.md & COMPLETE_DEVELOPMENT_ROADMAP.md移植済み
 - **UIカタログ最優先**: 新しいスタイル作成前に`ui-catalog-essentials.html`で既存コンポーネント確認
 - **ユーティリティクラス活用**: `.flex .items-center .gap-3` `.heading-md` 等で統一
 - **プログレスバー統一**: `.progress-bar` + `.progress-fill-[type]` + 色クラス

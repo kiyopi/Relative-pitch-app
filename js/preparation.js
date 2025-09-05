@@ -388,27 +388,50 @@ let detectionStartTime = null;
 const MIN_DETECTION_TIME = 2000; // 最低2秒間は音量バー表示を保証
 const MIN_PITCH_DETECTIONS = 3;   // 最低3回の音程検出を要求
 
-// リアルタイム音程検出開始
-function startRealAudioDetection() {
-    console.log('リアルタイム音程検出開始');
-    detectionActive = true;
-    detectedCDoPitches = [];
-    detectionStartTime = Date.now(); // 開始時刻記録
-    audioProcessor.startDetection();
-    
-    // 進捗表示エリアを表示
+// 音声テスト状態管理
+let isAudioTesting = false;
+let audioTestStartTime = null;
+let audioTestDuration = 15000; // 15秒
+let detectedC4 = false;
+
+// 進捗表示更新関数
+function updateProgressDisplay(mainText, detailText) {
     const progressDisplay = document.getElementById('progress-display');
+    const progressText = document.getElementById('progress-text');
+    const progressDetail = document.getElementById('progress-detail');
+    
     if (progressDisplay) {
         progressDisplay.style.display = 'block';
-        console.log('📊 進捗表示エリアを表示しました');
     }
+    if (progressText) {
+        progressText.textContent = mainText;
+    }
+    if (progressDetail) {
+        progressDetail.textContent = detailText;
+    }
+}
+
+// リアルタイム音程検出開始（改善版）
+function startRealAudioDetection() {
+    console.log('🎵 音声テスト開始（改善版）');
     
-    console.log('🕐 音量バー表示保証開始:', {
-        detectionStartTime: detectionStartTime,
-        minTime: MIN_DETECTION_TIME + 'ms',
-        minDetections: MIN_PITCH_DETECTIONS,
-        startTimeReadable: new Date(detectionStartTime).toLocaleTimeString()
-    });
+    isAudioTesting = true;
+    audioTestStartTime = Date.now();
+    detectedC4 = false;
+    
+    detectionActive = true;
+    detectedCDoPitches = [];
+    detectionStartTime = Date.now();
+    
+    audioProcessor.startDetection();
+    
+    // 進捗表示を更新
+    updateProgressDisplay('声を出してください', '3秒間継続して発声してください');
+    
+    console.log('🕐 音声テスト開始時刻:', new Date(audioTestStartTime).toLocaleTimeString());
+    
+    // 15秒タイマー
+    setTimeout(checkAudioTestComplete, audioTestDuration);
 }
 
 // リアルタイム音程更新ハンドラー
@@ -445,88 +468,39 @@ function handleRealPitchUpdate(result) {
         const note = frequencyToNote(result.frequency);
         frequencyValue.textContent = `${result.frequency.toFixed(1)} Hz (${note})`;
         
-        // C4音程検出（超大幅緩和：200Hz未満にも対応）
-        const isFreqInRange = result.frequency >= 150 && result.frequency <= 400;
-        const isClarityOK = result.clarity > 0.15;
-        const isVolumeOK = result.volume > 0.03;
+        // 音声検出チェック（より広い範囲で人の声を検出）
+        // 男性: 80-180Hz、女性: 165-330Hz、子供: 250-400Hz
+        const volumePercent = window.lastVolumePercent || 0;
+        const isFreqInRange = result.frequency >= 80 && result.frequency <= 400;
+        const isVolumeOK = volumePercent >= 20;
         
-        console.log('🎯 C4検出チェック:', {
+        console.log('🎯 音声検出チェック（改善版）:', {
             frequency: result.frequency,
             clarity: result.clarity,
             volume: result.volume,
+            volumePercent: volumePercent,
             isInRange: isFreqInRange,
-            clarityOK: isClarityOK,
             volumeOK: isVolumeOK,
-            allConditionsMet: isFreqInRange && isClarityOK && isVolumeOK
+            detectedC4: detectedC4
         });
         
-        // 条件超超緩和：150-400Hz、clarity>0.15、volume>0.03（極小音量・低音域対応）
-        if (result.frequency >= 150 && result.frequency <= 400 && 
-            result.clarity > 0.15 && result.volume > 0.03) {
-            detectedCDoPitches.push(result.frequency);
-            
-            const currentTime = Date.now();
-            
-            // detectionStartTimeがnullでないことを確認
-            if (detectionStartTime === null) {
-                console.error('❌ detectionStartTimeがnullです！開始時刻が正しく設定されていません');
-                return;
-            }
-            
-            const elapsedTime = currentTime - detectionStartTime;
-            const timeConditionMet = elapsedTime >= MIN_DETECTION_TIME;
-            const countConditionMet = detectedCDoPitches.length >= MIN_PITCH_DETECTIONS;
-            
-            // 詳細デバッグ情報
-            console.log('🔍 詳細条件チェック:', {
-                currentTime: currentTime,
-                detectionStartTime: detectionStartTime,
-                elapsedTime: elapsedTime,
-                MIN_DETECTION_TIME: MIN_DETECTION_TIME,
-                MIN_PITCH_DETECTIONS: MIN_PITCH_DETECTIONS,
-                timeConditionMet: timeConditionMet,
-                countConditionMet: countConditionMet,
-                detectionCount: detectedCDoPitches.length
-            });
-            
-            console.log('✅ C4候補検出！', {
-                frequency: result.frequency,
-                detectedCount: detectedCDoPitches.length,
-                elapsedTime: elapsedTime + 'ms',
-                timeConditionMet: timeConditionMet,
-                countConditionMet: countConditionMet,
-                canProceed: timeConditionMet && countConditionMet
-            });
-            
-            // UI進捗表示を更新
-            updateDetectionProgress(detectedCDoPitches.length, elapsedTime, timeConditionMet, countConditionMet);
-            
-            // 最低表示時間 AND 最低検出回数の両方を満たした場合のみ成功
-            if (timeConditionMet && countConditionMet) {
-                console.log('🎉 C4検出成功！時間・回数条件をクリア → showDetectionSuccess()呼び出し');
-                showDetectionSuccess();
-            } else if (!timeConditionMet) {
-                console.log('⏳ まだ最低表示時間未達成:', {
-                    required: MIN_DETECTION_TIME + 'ms',
-                    elapsed: elapsedTime + 'ms',
-                    remaining: (MIN_DETECTION_TIME - elapsedTime) + 'ms'
-                });
-            } else if (!countConditionMet) {
-                console.log('🔢 まだ最低検出回数未達成:', {
-                    required: MIN_PITCH_DETECTIONS,
-                    current: detectedCDoPitches.length,
-                    remaining: (MIN_PITCH_DETECTIONS - detectedCDoPitches.length)
-                });
-            }
-        } else {
-            // 条件未達成の詳細ログ
-            if (result.frequency > 0) {
-                console.log('⚠️ C4検出条件未達成:', {
-                    frequency: result.frequency,
-                    frequencyInRange: result.frequency >= 150 && result.frequency <= 400,
-                    clarityOK: result.clarity > 0.15,
-                    volumeOK: result.volume > 0.03
-                });
+        // 新しい音声検出ロジック（80-400Hz、音量20%以上）
+        if (isAudioTesting && isFreqInRange && isVolumeOK) {
+            if (!detectedC4) {
+                detectedC4 = true;
+                updateProgressDisplay('声を検出しました！', `${result.frequency.toFixed(1)}Hz - 安定した音声を検出中`);
+                
+                // 成功メッセージを早めに表示
+                const detectionSuccess = document.getElementById('detection-success');
+                if (detectionSuccess) {
+                    detectionSuccess.style.display = 'flex';
+                }
+                
+                setTimeout(() => {
+                    if (isAudioTesting) {
+                        completeAudioTest();
+                    }
+                }, 2000);
             }
         }
     }
@@ -552,6 +526,9 @@ function handleVolumeUpdate(volume, volumeScale = null) {
         // volume値を0-100%に変換
         const volumePercent = Math.min(100, Math.max(0, adjustedVolume * 100));
         volumeProgress.style.width = volumePercent + '%';
+        
+        // グローバル変数に保存（音声テストで使用）
+        window.lastVolumePercent = volumePercent;
         
         // 詳細ログ出力
         console.log('🎚️ 音量バー更新:', {
@@ -652,6 +629,68 @@ function updateDetectionProgress(detectionCount, elapsedTime, timeConditionMet, 
         progressDetail.textContent = `時間: ${timePercent}% (${timeRemaining}秒残り) | 回数: ${countPercent}% (${countRemaining}回残り)`;
         console.log('📊 progress-detail更新完了:', progressDetail.textContent);
     }
+}
+
+// 音声テスト完了チェック
+function checkAudioTestComplete() {
+    if (!isAudioTesting) return;
+    
+    if (detectedC4) {
+        completeAudioTest();
+    } else {
+        // 時間切れ - 再試行を促す
+        updateProgressDisplay('時間切れ', '80-400Hzの声で2秒間継続してください');
+        audioTestStartTime = Date.now(); // タイマーリセット
+        setTimeout(checkAudioTestComplete, audioTestDuration);
+    }
+}
+
+// 音声テスト完了
+function completeAudioTest() {
+    isAudioTesting = false;
+    
+    // 音声検出停止
+    if (audioProcessor) {
+        audioProcessor.stopDetection();
+        console.log('🎵 AudioProcessor停止完了');
+    }
+    
+    // 音量バーリセット
+    const volumeProgress = document.getElementById('volume-progress');
+    const volumeValue = document.getElementById('volume-value');
+    const frequencyValue = document.getElementById('frequency-value');
+    
+    if (volumeProgress) {
+        volumeProgress.style.width = '0%';
+    }
+    if (volumeValue) {
+        volumeValue.textContent = '0%';
+    }
+    if (frequencyValue) {
+        frequencyValue.textContent = '0 Hz';
+    }
+    
+    console.log('✅ 音声テスト完了');
+    
+    // 成功メッセージ表示
+    const detectionSuccess = document.getElementById('detection-success');
+    if (detectionSuccess) {
+        detectionSuccess.style.display = 'flex';
+    }
+    
+    // 進捗表示を隠す
+    const progressDisplay = document.getElementById('progress-display');
+    if (progressDisplay) {
+        progressDisplay.style.display = 'none';
+    }
+    
+    // 音域テストボタン表示
+    const startRangeTestBtn = document.getElementById('start-range-test-btn');
+    if (startRangeTestBtn) {
+        startRangeTestBtn.classList.remove('hidden');
+    }
+    
+    updateStepStatus(2, 'completed');
 }
 
 // 検出成功表示
