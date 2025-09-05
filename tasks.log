@@ -1745,3 +1745,17 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-05 16:05:56] コミット: feat: AudioDetectionComponent統合完成 - 音域テスト機能大幅改善
+
+主要な変更:
+- AudioDetectionComponent.js新規作成: 90%重複コード問題を完全解決
+- preparation-clean.js作成: 2000行→400行のクリーン実装
+- マイク正常性条件変更: C4検出→80-400Hz範囲3秒継続（厳しすぎる条件廃止）
+- PC音量バー感度最適化: 4.0x→3.0xで適切な反応性確保
+- 音量バー閾値修正: minVolumeAbsolute: 0.001で正常動作実現
+- test-voice-range.html/test-audio-component.html追加: 独立テスト環境
+- 重要仕様書更新: CLAUDE.md & AUDIO_LIBRARY_DESIGN.mdに知見反映
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -112,6 +112,26 @@
             overflow-y: auto;
             white-space: pre-wrap;
         }
+        
+        .results-display {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .result-item {
+            margin: 10px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .result-value {
+            color: #10b981;
+            font-size: 24px;
+        }
     </style>
 </head>
 <body>
@@ -123,10 +143,23 @@
         </div>
         
         <div class="control-panel">
-            <h3>制御パネル</h3>
-            <button id="init-btn" class="btn btn-primary">1. 音響システム初期化</button>
-            <button id="test-btn" class="btn btn-success" disabled>2. 音域テスト開始</button>
-            <button id="stop-btn" class="btn" style="background: #ef4444; color: white;" disabled>テスト停止</button>
+            <h3>🎛️ 制御パネル</h3>
+            <button id="init-btn" class="btn btn-primary">
+                <i data-lucide="mic" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                1. 音響システム初期化
+            </button>
+            <button id="test-btn" class="btn btn-success" disabled>
+                <i data-lucide="play-circle" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                2. 音域テスト開始
+            </button>
+            <button id="stop-btn" class="btn" style="background: #ef4444; color: white;" disabled>
+                <i data-lucide="stop-circle" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                テスト停止
+            </button>
+            <button id="reset-btn" class="btn" style="background: #6b7280; color: white;" disabled>
+                <i data-lucide="rotate-ccw" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                リセット
+            </button>
         </div>
         
         <div class="voice-range-display">
@@ -141,19 +174,36 @@
             <div id="volume-display" style="font-size: 18px; color: #10b981;">
                 音量: 0%
             </div>
+            
+            <!-- 結果表示エリア -->
+            <div class="results-display" id="results-display" style="display: none;">
+                <h4><i data-lucide="check-circle" style="width: 20px; height: 20px; color: #10b981; margin-right: 8px;"></i>測定結果</h4>
+                <div class="result-item">
+                    低音域: <span class="result-value" id="low-result">-- Hz</span>
+                </div>
+                <div class="result-item">
+                    高音域: <span class="result-value" id="high-result">-- Hz</span>
+                </div>
+                <div class="result-item">
+                    音域幅: <span class="result-value" id="range-result">-- Hz</span>
+                </div>
+            </div>
         </div>
         
         <div class="control-panel">
-            <h3>ログ</h3>
+            <h3>📄 ログ</h3>
             <div class="log-area" id="log"></div>
-            <button onclick="clearLog()" class="btn" style="background: #6b7280; color: white; font-size: 12px;">ログクリア</button>
+            <button onclick="clearLog()" class="btn" style="background: #6b7280; color: white; font-size: 12px;">
+                <i data-lucide="trash-2" style="width: 14px; height: 14px; margin-right: 4px;"></i>
+                ログクリア
+            </button>
         </div>
     </div>
 
     <!-- 必要なJavaScriptライブラリ -->
     <script src="./js/pitchpro-audio/index.umd.js"></script>
     <script src="./js/audio-detection-component.js"></script>
-    <script src="Bolt/v2/js/lucide-init.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
     <script>
         // 統一音響検出コンポーネントを使用
@@ -170,12 +220,17 @@
         const initBtn = document.getElementById('init-btn');
         const testBtn = document.getElementById('test-btn');
         const stopBtn = document.getElementById('stop-btn');
+        const resetBtn = document.getElementById('reset-btn');
         const testPhaseEl = document.getElementById('test-phase');
         const progressFillEl = document.getElementById('progress-fill');
         const testInstructionEl = document.getElementById('test-instruction');
         const frequencyDisplayEl = document.getElementById('frequency-display');
         const volumeDisplayEl = document.getElementById('volume-display');
         const logEl = document.getElementById('log');
+        const resultsDisplayEl = document.getElementById('results-display');
+        const lowResultEl = document.getElementById('low-result');
+        const highResultEl = document.getElementById('high-result');
+        const rangeResultEl = document.getElementById('range-result');
         
         // ログ機能
         function addLog(message, level = 'info') {
@@ -240,6 +295,11 @@
             stopVoiceRangeTest();
         });
         
+        // リセット
+        resetBtn.addEventListener('click', () => {
+            resetTest();
+        });
+        
         // 音域テスト実行
         function startVoiceRangeTest() {
             addLog('🎯 音域テスト開始', 'info');
@@ -262,7 +322,7 @@
             
             // UI更新
             testPhaseEl.textContent = '低音テスト';
-            testInstructionEl.textContent = 'できるだけ低い声で「あー」を3秒間発声してください';
+            testInstructionEl.textContent = 'できるだけ低い声で「あー」を3秒間安定して発声してください';
             progressFillEl.style.width = '0%';
             
             // 音域テスト用コールバック設定
@@ -277,42 +337,31 @@
             testBtn.disabled = true;
             stopBtn.disabled = false;
             
-            addLog('🎤 低音測定開始 - 3秒間継続発声してください', 'info');
+            addLog('🎤 低音測定開始 - 3秒間安定発声してください', 'info');
         }
         
         // 音域テスト用コールバック
         function handleVoiceRangeUpdate(result) {
-            // UI更新（手動）
+            if (!isVoiceRangeTesting || !voiceRangeTestData || !detectionActive) {
+                return;
+            }
+            
+            // UI更新（統一処理）
             if (result && result.frequency > 0) {
-                frequencyDisplayEl.textContent = result.frequency.toFixed(1);
+                frequencyDisplayEl.textContent = `${result.frequency.toFixed(1)} Hz`;
                 
-                // 音量バー更新（コンポーネントと同じロジック）
+                // 音量バー更新（AudioDetectionComponentと同じロジック）
                 const status = audioDetector.getStatus();
                 const rawVolume = result.volume || 0;
                 const adjustedVolume = rawVolume * status.volumeBarScale * status.sensitivityMultiplier;
                 const volumePercent = Math.min(100, Math.max(0, adjustedVolume));
                 
-                volumeDisplayEl.textContent = volumePercent.toFixed(1) + '%';
-                progressFillEl.style.width = volumePercent + '%';
-            }
-            
-            // ログ頻度を下げる（10回に1回）
-            if (Math.random() < 0.1) {
-                addLog(`🎵 音域テスト処理: ${result.frequency?.toFixed(1)}Hz, 音量${((result.volume || 0) * 1000).toFixed(1)}`, 'info');
-            }
-            
-            if (!isVoiceRangeTesting || !voiceRangeTestData || !detectionActive) {
-                addLog('⏸️ 音域テスト非アクティブのためスキップ', 'warning');
-                return;
-            }
-            
-            // 周波数・音量表示更新
-            if (result && result.frequency > 0) {
-                frequencyDisplayEl.textContent = `${result.frequency.toFixed(1)} Hz`;
-                const volumePercent = (result.volume * 100).toFixed(1);
-                volumeDisplayEl.textContent = `音量: ${volumePercent}%`;
+                volumeDisplayEl.textContent = `音量: ${volumePercent.toFixed(1)}%`;
                 
-                addLog(`🎯 音域テスト処理: ${result.frequency.toFixed(1)}Hz, 音量${volumePercent}%`, 'info');
+                // ログ頻度を下げる（20回に1回）
+                if (Math.random() < 0.05) {
+                    addLog(`🎵 音域テスト処理: ${result.frequency.toFixed(1)}Hz, 調整音量${volumePercent.toFixed(1)}%`, 'info');
+                }
                 
                 // 測定開始時刻設定
                 if (!voiceRangeTestData.measurementStartTime) {
@@ -320,62 +369,95 @@
                     addLog('⏱️ 3秒測定開始', 'info');
                 }
                 
-                // 有効な周波数データを記録
-                if (result.frequency > 50 && result.volume > 0.01 && result.clarity > 0.5) {
+                // 進捗表示更新（音程に関係なく3秒間のバー）
+                const elapsed = Date.now() - voiceRangeTestData.measurementStartTime;
+                const progress = Math.min(100, (elapsed / 3000) * 100);
+                progressFillEl.style.width = `${progress}%`;
+                
+                // 有効な周波数データを記録（閾値を緩和）
+                if (result.frequency > 50 && result.volume > 0.005 && result.clarity > 0.3) {
                     voiceRangeTestData.detectedFrequencies.push({
                         frequency: result.frequency,
-                        time: Date.now() - voiceRangeTestData.measurementStartTime,
+                        time: elapsed,
                         volume: result.volume,
                         clarity: result.clarity
                     });
-                    
-                    // 進捗表示更新
-                    const elapsed = Date.now() - voiceRangeTestData.measurementStartTime;
-                    const progress = Math.min(100, (elapsed / 3000) * 100);
-                    progressFillEl.style.width = `${progress}%`;
-                    
-                    // 3秒経過で測定完了
-                    if (elapsed >= 3000) {
-                        completePhaseMeasurement();
-                    }
-                } else {
-                    addLog('⚠️ 無効な音声データ（音量・明瞭度不足）', 'warning');
+                }
+                
+                // 3秒経過で測定完了判定
+                if (elapsed >= 3000) {
+                    completePhaseMeasurement();
                 }
             }
         }
         
+        // 音程安定性チェック関数
+        function checkFrequencyStability(frequencies) {
+            if (frequencies.length < 10) return false;
+            
+            const freqValues = frequencies.map(f => f.frequency);
+            const mean = freqValues.reduce((a, b) => a + b) / freqValues.length;
+            
+            // 標準偏差計算
+            const variance = freqValues.reduce((acc, freq) => acc + Math.pow(freq - mean, 2), 0) / freqValues.length;
+            const stdDev = Math.sqrt(variance);
+            
+            // 平均周波数の10%以内の変動なら安定とみなす
+            const tolerance = mean * 0.1;
+            const isStable = stdDev < tolerance;
+            
+            addLog(`📊 安定性分析: 平均${mean.toFixed(1)}Hz, 標準偏差${stdDev.toFixed(1)}, 許容範囲${tolerance.toFixed(1)}`, 'info');
+            
+            return isStable;
+        }
+        
         // フェーズ測定完了
         function completePhaseMeasurement() {
-            addLog(`✅ ${currentPhase}音測定完了`, 'success');
+            addLog(`⏰ ${currentPhase}音3秒測定完了`, 'info');
             
-            if (voiceRangeTestData.detectedFrequencies.length === 0) {
-                addLog('❌ 有効な音声データが検出されませんでした', 'error');
+            // 安定性チェック: 十分なデータがあるかと音程の安定性
+            const minSamples = 15; // 最低15サンプル必要
+            const isStable = checkFrequencyStability(voiceRangeTestData.detectedFrequencies);
+            
+            if (voiceRangeTestData.detectedFrequencies.length < minSamples || !isStable) {
+                addLog(`⚠️ ${currentPhase}音測定失敗 - サンプル数:${voiceRangeTestData.detectedFrequencies.length}, 安定性:${isStable}`, 'warning');
+                addLog('🔄 再測定を開始します', 'info');
+                
+                // 再測定のためにリセット
+                voiceRangeTestData.measurementStartTime = null;
+                voiceRangeTestData.detectedFrequencies = [];
+                progressFillEl.style.width = '0%';
+                
+                const phaseText = currentPhase === 'low' ? '低音' : '高音';
+                testInstructionEl.textContent = `【再測定】できるだけ${phaseText}い声で「あー」を3秒間安定して発声してください`;
                 return;
             }
             
-            // 最低/最高周波数を計算
+            // 安定した周波数の平均値を計算
             const frequencies = voiceRangeTestData.detectedFrequencies.map(d => d.frequency);
             const avgFreq = frequencies.reduce((a, b) => a + b) / frequencies.length;
             
             if (currentPhase === 'low') {
                 voiceRangeTestData.results.lowestNote = avgFreq;
-                addLog(`📊 低音結果: ${avgFreq.toFixed(1)}Hz`, 'success');
+                addLog(`✅ 低音確定: ${avgFreq.toFixed(1)}Hz`, 'success');
                 
-                // 高音測定に移行
-                currentPhase = 'high';
-                voiceRangeTestData.phase = 'high';
-                voiceRangeTestData.measurementStartTime = null;
-                voiceRangeTestData.detectedFrequencies = [];
-                
-                testPhaseEl.textContent = '高音テスト';
-                testInstructionEl.textContent = 'できるだけ高い声で「あー」を3秒間発声してください';
-                progressFillEl.style.width = '0%';
-                
-                addLog('🎤 高音測定開始 - 3秒間継続発声してください', 'info');
+                // 高音測定に移行（1秒待機）
+                setTimeout(() => {
+                    currentPhase = 'high';
+                    voiceRangeTestData.phase = 'high';
+                    voiceRangeTestData.measurementStartTime = null;
+                    voiceRangeTestData.detectedFrequencies = [];
+                    
+                    testPhaseEl.textContent = '高音テスト';
+                    testInstructionEl.textContent = 'できるだけ高い声で「あー」を3秒間安定して発声してください';
+                    progressFillEl.style.width = '0%';
+                    
+                    addLog('🎤 高音測定開始 - 3秒間安定発声してください', 'info');
+                }, 1000);
                 
             } else {
                 voiceRangeTestData.results.highestNote = avgFreq;
-                addLog(`📊 高音結果: ${avgFreq.toFixed(1)}Hz`, 'success');
+                addLog(`✅ 高音確定: ${avgFreq.toFixed(1)}Hz`, 'success');
                 
                 // テスト完了
                 finishVoiceRangeTest();
@@ -389,18 +471,20 @@
             const results = voiceRangeTestData.results;
             const range = (results.highestNote - results.lowestNote).toFixed(1);
             
-            testPhaseEl.textContent = 'テスト完了';
-            testInstructionEl.innerHTML = `
-                <strong>測定結果</strong><br>
-                低音: ${results.lowestNote.toFixed(1)} Hz<br>
-                高音: ${results.highestNote.toFixed(1)} Hz<br>
-                音域: ${range} Hz
-            `;
+            testPhaseEl.textContent = '✅ テスト完了';
+            testInstructionEl.textContent = '測定が完了しました。下記が結果です。';
             progressFillEl.style.width = '100%';
+            
+            // 結果表示エリアを更新
+            lowResultEl.textContent = `${results.lowestNote.toFixed(1)} Hz`;
+            highResultEl.textContent = `${results.highestNote.toFixed(1)} Hz`;
+            rangeResultEl.textContent = `${range} Hz`;
+            resultsDisplayEl.style.display = 'block';
             
             addLog(`📋 最終結果 - 低音:${results.lowestNote.toFixed(1)}Hz, 高音:${results.highestNote.toFixed(1)}Hz, 範囲:${range}Hz`, 'success');
             
             stopVoiceRangeTest();
+            resetBtn.disabled = false;
         }
         
         // テスト停止
@@ -419,9 +503,38 @@
             addLog('🛑 音域テスト停止', 'info');
         }
         
+        // リセット機能
+        function resetTest() {
+            addLog('🔄 テストリセット', 'info');
+            
+            // テスト状態リセット
+            isVoiceRangeTesting = false;
+            detectionActive = false;
+            currentPhase = 'low';
+            voiceRangeTestData = null;
+            
+            // UI要素リセット
+            testPhaseEl.textContent = '待機中...';
+            testInstructionEl.textContent = '音域テストを開始してください';
+            progressFillEl.style.width = '0%';
+            frequencyDisplayEl.textContent = '-- Hz';
+            volumeDisplayEl.textContent = '音量: 0%';
+            resultsDisplayEl.style.display = 'none';
+            
+            // ボタン状態リセット
+            testBtn.disabled = false;
+            stopBtn.disabled = true;
+            resetBtn.disabled = true;
+            
+            updateStatus('テストリセット完了 - 再開可能');
+        }
+        
         // 初期化
         addLog('🚀 音域テスト専用ページ読み込み完了', 'success');
         updateStatus('音響システムの初期化が必要です');
+        
+        // Lucideアイコン初期化
+        lucide.createIcons();
     </script>
 </body>
 </html>
