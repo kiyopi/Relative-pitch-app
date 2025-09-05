@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎚️ AudioDetectionComponent 基本テスト</title>
+    <link rel="stylesheet" href="Bolt/v2/styles/base.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.2s ease;
+        }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .metric {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #10b981;
+            margin-bottom: 8px;
+        }
+        .metric-label {
+            font-size: 14px;
+            opacity: 0.7;
+            text-transform: uppercase;
+        }
+        
+        .volume-bar-section {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .status {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid #3b82f6;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            color: #93c5fd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎚️ AudioDetectionComponent 基本テスト</h1>
+        <p>コンポーネント化された音響検出システムの基本動作テスト</p>
+        
+        <div class="status" id="status">
+            ステータス: 初期化待ち
+        </div>
+        
+        <div class="test-card">
+            <h3>🎤 システム制御</h3>
+            <button id="init-btn" class="btn btn-primary">初期化</button>
+            <button id="start-btn" class="btn btn-success" disabled>検出開始</button>
+            <button id="stop-btn" class="btn btn-danger" disabled>検出停止</button>
+        </div>
+        
+        <div class="metrics">
+            <div class="metric">
+                <div class="metric-value" id="frequency">--</div>
+                <div class="metric-label">周波数 (Hz)</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="note">--</div>
+                <div class="metric-label">音名</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="device">--</div>
+                <div class="metric-label">検出デバイス</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="scale">--</div>
+                <div class="metric-label">音量バー感度</div>
+            </div>
+        </div>
+        
+        <div class="test-card">
+            <h3>🎚️ 音量バーテスト</h3>
+            <div class="volume-bar-section">
+                <h4>リアルタイム音量表示</h4>
+                <div class="flex items-center gap-3">
+                    <i data-lucide="volume-2" class="text-yellow-300" style="width: 20px; height: 20px;"></i>
+                    <div class="progress-bar flex-1">
+                        <div class="progress-fill gradient-catalog-green" id="volume-bar" style="width: 0%;"></div>
+                    </div>
+                    <span class="text-sm text-white-60 min-w-16" id="volume-percent">0%</span>
+                </div>
+                <p style="font-size: 14px; opacity: 0.8; margin-top: 12px;">
+                    💡 声を出してリアルタイム音量バーの動作を確認してください
+                </p>
+            </div>
+        </div>
+        
+        <div class="test-card">
+            <h3>⚙️ 手動設定調整</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-size: 14px;">音量閾値</label>
+                    <input type="range" id="volume-threshold" min="0.5" max="5" step="0.1" value="1.5" style="width: 100%;">
+                    <span id="volume-threshold-value">1.5%</span>
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-size: 14px;">明瞭度閾値</label>
+                    <input type="range" id="clarity-threshold" min="0.3" max="0.9" step="0.05" value="0.6" style="width: 100%;">
+                    <span id="clarity-threshold-value">0.6</span>
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-size: 14px;">マイク感度</label>
+                    <input type="range" id="mic-sensitivity" min="1" max="5" step="0.1" value="2.5" style="width: 100%;">
+                    <span id="mic-sensitivity-value">2.5x</span>
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-size: 14px;">音量バー感度</label>
+                    <input type="range" id="volume-bar-scale" min="1" max="10" step="0.1" value="3.0" style="width: 100%;">
+                    <span id="volume-bar-scale-value">3.0x</span>
+                </div>
+            </div>
+            <button id="apply-settings" class="btn btn-primary" style="margin-top: 15px;">設定適用</button>
+        </div>
+
+        <div class="test-card">
+            <h3>📊 デバイス情報</h3>
+            <div id="device-info" style="font-family: monospace; font-size: 12px; opacity: 0.8;">
+                初期化後に表示されます
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/pitchpro-audio/index.umd.js"></script>
+    <script src="./js/audio-detection-component.js"></script>
+
+    <script>
+        let audioDetector = null;
+        
+        // DOM要素
+        const statusEl = document.getElementById('status');
+        const initBtn = document.getElementById('init-btn');
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const frequencyEl = document.getElementById('frequency');
+        const noteEl = document.getElementById('note');
+        const deviceEl = document.getElementById('device');
+        const scaleEl = document.getElementById('scale');
+        const volumeBarEl = document.getElementById('volume-bar');
+        const volumePercentEl = document.getElementById('volume-percent');
+        const deviceInfoEl = document.getElementById('device-info');
+        
+        function updateStatus(message, color = '#93c5fd') {
+            statusEl.textContent = `ステータス: ${message}`;
+            statusEl.style.color = color;
+        }
+        
+        // 初期化
+        initBtn.addEventListener('click', async () => {
+            try {
+                updateStatus('初期化中...', '#f59e0b');
+                
+                audioDetector = new AudioDetectionComponent({
+                    frequencySelector: '#frequency',
+                    noteSelector: '#note',
+                    volumeBarSelector: '#volume-bar',
+                    volumePercentSelector: '#volume-percent'
+                });
+                
+                await audioDetector.initialize();
+                
+                const status = audioDetector.getStatus();
+                
+                // UI更新
+                deviceEl.textContent = status.deviceType;
+                scaleEl.textContent = status.volumeBarScale + 'x';
+                
+                deviceInfoEl.innerHTML = `
+デバイス: ${status.deviceType}
+音量バー感度: ${status.volumeBarScale}x
+マイク感度: ${status.sensitivityMultiplier}x
+コールバック: ${status.hasCallback ? '有効' : '無効'}
+                `;
+                
+                updateStatus('初期化完了', '#10b981');
+                initBtn.disabled = true;
+                startBtn.disabled = false;
+                
+                // 設定パネルのスライダーをPC設定に初期化
+                applyPCSettings();
+                
+            } catch (error) {
+                updateStatus(`初期化エラー: ${error.message}`, '#ef4444');
+                console.error('初期化エラー:', error);
+            }
+        });
+        
+        // 検出開始
+        startBtn.addEventListener('click', () => {
+            if (!audioDetector) return;
+            
+            const success = audioDetector.startDetection();
+            if (success) {
+                updateStatus('音程検出中...', '#3b82f6');
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+            } else {
+                updateStatus('検出開始失敗', '#ef4444');
+            }
+        });
+        
+        // 検出停止
+        stopBtn.addEventListener('click', () => {
+            if (!audioDetector) return;
+            
+            audioDetector.stopDetection();
+            updateStatus('検出停止', '#6b7280');
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            
+            // 表示リセット
+            frequencyEl.textContent = '--';
+            noteEl.textContent = '--';
+            if (volumeBarEl) volumeBarEl.style.width = '0%';
+            if (volumePercentEl) volumePercentEl.textContent = '0%';
+        });
+        
+        // PC最適設定を適用
+        function applyPCSettings() {
+            // PC設定値
+            const volumeThreshold = 1.5;
+            const clarityThreshold = 0.6;
+            const micSensitivity = 2.5;
+            const volumeBarScale = 3.0;
+            
+            // スライダー値更新
+            document.getElementById('volume-threshold').value = volumeThreshold;
+            document.getElementById('volume-threshold-value').textContent = volumeThreshold + '%';
+            
+            document.getElementById('clarity-threshold').value = clarityThreshold;
+            document.getElementById('clarity-threshold-value').textContent = clarityThreshold;
+            
+            document.getElementById('mic-sensitivity').value = micSensitivity;
+            document.getElementById('mic-sensitivity-value').textContent = micSensitivity + 'x';
+            
+            document.getElementById('volume-bar-scale').value = volumeBarScale;
+            document.getElementById('volume-bar-scale-value').textContent = volumeBarScale + 'x';
+            
+            console.log('✅ PC最適設定適用完了:', {
+                volumeThreshold,
+                clarityThreshold,
+                micSensitivity,
+                volumeBarScale
+            });
+        }
+        
+        // 設定値更新のイベントリスナー
+        document.getElementById('volume-threshold').addEventListener('input', (e) => {
+            document.getElementById('volume-threshold-value').textContent = e.target.value + '%';
+        });
+        
+        document.getElementById('clarity-threshold').addEventListener('input', (e) => {
+            document.getElementById('clarity-threshold-value').textContent = e.target.value;
+        });
+        
+        document.getElementById('mic-sensitivity').addEventListener('input', (e) => {
+            document.getElementById('mic-sensitivity-value').textContent = e.target.value + 'x';
+        });
+        
+        document.getElementById('volume-bar-scale').addEventListener('input', (e) => {
+            document.getElementById('volume-bar-scale-value').textContent = e.target.value + 'x';
+        });
+        
+        // 設定適用ボタン
+        document.getElementById('apply-settings').addEventListener('click', () => {
+            if (!audioDetector) {
+                console.warn('⚠️ AudioDetectionComponent未初期化');
+                return;
+            }
+            
+            const volumeThreshold = parseFloat(document.getElementById('volume-threshold').value);
+            const clarityThreshold = parseFloat(document.getElementById('clarity-threshold').value);
+            const micSensitivity = parseFloat(document.getElementById('mic-sensitivity').value);
+            const volumeBarScale = parseFloat(document.getElementById('volume-bar-scale').value);
+            
+            // コンポーネントの音量バー感度を実行時変更（簡易実装）
+            audioDetector.volumeBarScale = volumeBarScale;
+            
+            console.log('🎚️ 設定適用:', {
+                volumeThreshold,
+                clarityThreshold, 
+                micSensitivity,
+                volumeBarScale
+            });
+            
+            updateStatus(`設定適用完了 - 音量バー感度: ${volumeBarScale}x`, '#10b981');
+        });
+        
+        console.log('🎚️ AudioDetectionComponent基本テスト準備完了');
+    </script>
+</body>
+</html>

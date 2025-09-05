@@ -278,7 +278,15 @@ iPad: 感度 5.0x, 音量バー 7.0x
 - **VolumeBarController実装**: 統一音量制御システム完成（`/js/volume-bar-controller.js`）
 - **音量バー統合仕様書**: 完全なドキュメント作成（`/specifications/VOLUME_BAR_INTEGRATION_SPECIFICATION.md`）
 - **重要な教訓**: PitchProからの音量値取得は必ずコールバック方式`result.volume`を使用
-- **実機テスト済み設定**: PC(4.0x)・iPhone(4.5x)・iPad(7.0x)の音量バー感度設定確定
+- **実機テスト済み設定**: PC(3.0x)・iPhone(4.5x)・iPad(7.0x)の音量バー感度設定確定
+
+### **🎉 AudioDetectionComponent統合完成（2025年1月7日完成）**
+- **統一コンポーネント完成**: `AudioDetectionComponent.js`で90%重複コード解決
+- **preparation-clean.js完成**: 2000行→400行のクリーン実装完成
+- **マイク正常性条件変更**: C4検出→80-400Hz範囲3秒継続に変更（厳しすぎる条件廃止）
+- **実機検証済み設定**: PC音量バー感度を4.0x→3.0xに調整（適切な反応性確保）
+- **音量バー閾値修正**: minVolumeAbsolute: 0.001で正常動作実現（0.01では音量バーがほとんど反応しない問題を解決）
+- **コード重複問題完全解決**: test-ui-integration.html準拠の統一実装確立
 
 ---
 

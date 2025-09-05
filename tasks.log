@@ -1724,3 +1724,24 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-05 12:00:03] コミット: fix: サブモジュール問題完全修正 - 空ディレクトリ削除
+
+- GitHub Pages デプロイエラーの原因となった空のpitchpro-audio-processing削除
+- 音声処理機能はjs/pitchpro-audioで正常動作中
+- デプロイメント環境での問題解決
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-05 12:32:13] コミット: feat: 優秀音声テスト実装移植 - 80-400Hz検出・15秒タイムアウト・進捗表示統合
+
+- 分割版の優れた音声テスト機能をシンプル版に移植完了
+- 検出範囲拡大: 固定C4 → 80-400Hz（男性・女性・子供の声対応）
+- タイムアウト機能: 15秒自動リトライ・明確フィードバック
+- 進捗表示システム: updateProgressDisplay()統一管理
+- 音量閾値改善: 20%以上で現実的検出基準
+- 完了処理統合: completeAudioTest()で統一処理
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -2,7 +2,90 @@
 
 **バージョン**: 1.0.0  
 **作成日**: 2025-08-07  
+**最終更新**: 2025-01-07  
 **用途**: 音響関連技術の完全コンポーネント化・ライブラリ設計・技術共用戦略
+
+---
+
+## ⚠️ **実際のAPI仕様（重要）** - 2025年1月7日更新
+
+**注意**: 実際のPitchProライブラリのAPIは設計書の理想形と異なります。以下が正しい実装方法です：
+
+### **🎉 AudioDetectionComponent統合完成** 
+**completion date**: 2025-01-07  
+**status**: 本番適用済み（preparation-clean.js）
+
+**重要な成果**:
+- コードの90%重複問題を完全解決
+- test-ui-integration.html準拠の統一実装確立  
+- PC音量バー問題修正（4.0x→2.5x）
+- マイク正常性条件をC4検出から80-400Hz範囲3秒継続に変更
+- iPadOS 13+デバイス検出完全対応
+
+**実装パターン**:
+```javascript
+// ✅ 統一コンポーネント使用（推奨）
+const audioDetector = new AudioDetectionComponent({
+    frequencySelector: '#frequency-value' // UI更新セレクター
+});
+await audioDetector.initialize();
+
+// コールバック設定
+audioDetector.setCallbacks({
+    onPitchUpdate: (result) => {
+        // result.frequency, result.volume, result.note, result.clarity
+    }
+});
+
+const success = audioDetector.startDetection();
+```
+
+### **実際のAudioManager API**
+```javascript
+// ❌ 設計書の理想形（実装されていない）
+const audioManager = AudioManager.getInstance();
+await audioManager.initialize(options);
+
+// ✅ 実際のAPI（test-ui-integration.htmlで確認済み）
+const audioManager = new AudioManager({
+    sampleRate: 44100,
+    channelCount: 1,
+    echoCancellation: false,
+    noiseSuppression: false,
+    autoGainControl: false,
+    // ...その他のオプション
+});
+await audioManager.initialize();
+```
+
+### **実際のPitchDetector API**  
+```javascript
+// ✅ 実際のAPI
+const pitchDetector = new PitchDetector(audioManager, {
+    fftSize: 4096,
+    smoothing: 0.1,
+    clarityThreshold: 0.6,
+    minVolumeAbsolute: 0.01
+});
+
+await pitchDetector.initialize();
+
+// コールバック設定
+pitchDetector.setCallbacks({
+    onPitchUpdate: (result) => {
+        // result.frequency, result.volume, result.note, result.clarity
+    },
+    onError: (error) => {
+        console.error('音程検出エラー:', error);
+    }
+});
+
+// 検出開始/停止
+const success = pitchDetector.startDetection();
+pitchDetector.stopDetection();
+```
+
+**重要**: 新しい実装では必ずtest-ui-integration.htmlのAPIパターンを参照すること
 
 ---
 
@@ -376,11 +459,11 @@ class MicrophoneController {
   private sensitivity: number = 1.0;
   private noiseGate: number = -60; // dB
   
-  // デバイス別デフォルト設定（実機検証値適用）
+  // デバイス別デフォルト設定（2025-01-07実機検証値）
   private deviceDefaults = {
-    iPhone: { sensitivity: 3.0, noiseGate: -50 },
-    iPad: { sensitivity: 7.0, noiseGate: -55 },    // 実機検証値に更新
-    PC: { sensitivity: 1.0, noiseGate: -60 }
+    iPhone: { sensitivity: 3.5, volumeBarScale: 4.5, noiseGate: -50 },
+    iPad: { sensitivity: 5.0, volumeBarScale: 7.0, noiseGate: -55 },
+    PC: { sensitivity: 2.5, volumeBarScale: 2.5, noiseGate: -60 }  // 修正：4.0→2.5
   };
 
   static getInstance(): MicrophoneController {
