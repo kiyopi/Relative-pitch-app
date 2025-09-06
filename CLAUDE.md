@@ -14,8 +14,9 @@
 - ✅ **完了**: 音域テスト画面の動的実装を大幅改善
 - ✅ **完了**: 重要仕様書移植 - AUDIO_LIBRARY_DESIGN.md & COMPLETE_DEVELOPMENT_ROADMAP.md
 - ✅ **完了**: サブモジュール問題修正 - GitHub Pagesデプロイ対応
-- 🔄 **進行中**: preparation.html動作確認・最終調整
-- 📋 **次期作業**: training.html実装・結果表示ページ実装
+- 🔄 **進行中**: test-voice-range.html range-icon修正 - オリジナル実装完全移植
+- 🚨 **課題**: arrow-upアイコン表示問題（Lucideライブラリ生成失敗）
+- 📋 **次期作業**: 手動SVG実装・preparation.html統合・training.html実装
 
 ### 🌿 **現在のブランチ**
 - **作業ブランチ**: `feature/simple-externalization`
@@ -232,6 +233,32 @@ fix/ui-mobile-layout
 refactor/core-typescript-migration
 docs/glossary-update
 ```
+
+---
+
+## 🚨 **2025年1月7日 重要問題**: arrow-upアイコン表示問題
+
+### **🔍 発生中の問題**
+- **問題**: test-voice-range.html で arrow-up アイコンが表示されない
+- **症状**: 低音テスト完了後、高音テスト移行時にアイコンが空白になる
+- **根本原因**: Lucideライブラリでの arrow-up SVG生成失敗
+
+### **📋 実施した対策**
+- **オリジナル実装完全移植**: feature/css-variables-systemブランチから完全コピー
+- **詳細デバッグ機能実装**: 複数アイコンの順次テスト・詳細ログ出力
+- **手動SVG代替処理**: arrow-up 生成失敗時の自動代替機能
+- **SyntaxError修正**: 変数重複宣言エラーの解決
+
+### **🎯 次期対応方針**
+1. **手動SVG完全実装**: 全アイコンを手動SVGコードで実装
+2. **preparation.html統合**: test-voice-range.htmlの修正を本番環境に適用
+3. **Lucideライブラリ調査**: バージョン固定・代替ライブラリ検討
+4. **アイコンシステム統一**: プロジェクト全体での表示方針策定
+
+### **📁 関連ファイル**
+- **修正ファイル**: `test-voice-range.html`
+- **作業レポート**: `SESSION_WORK_REPORT.md`
+- **参照実装**: `Bolt/v2/pages/preparation.html` (feature/css-variables-system)
 
 ---
 
