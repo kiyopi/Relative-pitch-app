@@ -657,67 +657,13 @@
                 rangeIcon.style.color = 'white'; // オリジナル準拠：白色
                 rangeIcon.style.display = 'block';
                 
-                // デバッグ: アイコン変更前後を確認
-                addLog(`🔄 アイコン変更前: ${rangeIcon.getAttribute('data-lucide')}`, 'info');
+                // 本番環境準拠のシンプルなアイコン変更
+                addLog('🔄 高音テスト: arrow-upアイコンに変更', 'info');
                 
-                // 詳細なアイコンテスト
-                console.log('🔍 詳細アイコンテスト開始...');
-                addLog('🔍 アイコン生成テスト開始', 'info');
-                
-                // テスト関数
-                function testIcon(iconName, expectedResult = 'success') {
-                    return new Promise((resolve) => {
-                        // アイコン要素をクリーンアップ
-                        rangeIcon.innerHTML = '';
-                        rangeIcon.setAttribute('data-lucide', iconName);
-                        
-                        // Lucide再実行
-                        lucide.createIcons();
-                        
-                        setTimeout(() => {
-                            const svg = rangeIcon.querySelector('svg');
-                            const success = !!svg;
-                            const result = success ? 'success' : 'error';
-                            
-                            console.log(`Icon test [${iconName}]:`, {
-                                success,
-                                svgExists: !!svg,
-                                innerHTML: rangeIcon.innerHTML.substring(0, 100),
-                                outerHTML: rangeIcon.outerHTML.substring(0, 200)
-                            });
-                            
-                            addLog(`🧪 ${iconName}: ${success ? '✅成功' : '❌失敗'}`, result);
-                            
-                            resolve({ iconName, success, svg });
-                        }, 100);
-                    });
-                }
-                
-                // 複数のアイコンを順次テスト
-                async function runIconTests() {
-                    const testIcons = ['arrow-down', 'arrow-up', 'check', 'mic', 'music'];
-                    
-                    for (const icon of testIcons) {
-                        const result = await testIcon(icon);
-                        
-                        if (icon === 'arrow-up' && !result.success) {
-                            addLog('❌ arrow-up生成失敗 - 代替手段を検討', 'error');
-                            
-                            // 手動SVG生成をテスト
-                            const manualSvg = `
-                                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="m18 15-6-6-6 6"></path>
-                                </svg>
-                            `;
-                            rangeIcon.innerHTML = manualSvg;
-                            addLog('🔧 手動SVG生成を実行', 'success');
-                        }
-                    }
-                    
-                    addLog('🏁 アイコンテスト完了', 'success');
-                }
-                
-                runIconTests();
+                // preparation.html準拠の確実な方法
+                rangeIcon.setAttribute('data-lucide', 'arrow-up');
+                rangeIcon.style.color = 'white';
+                lucide.createIcons();
                 
                 // SVGが実際に生成されたか確認
                 setTimeout(() => {
@@ -825,13 +771,14 @@
                         if (stabilityDuration >= 3000) {
                             clearInterval(detectionInterval);
                             
-                            // アイコンをcheckに変更（白色）
+                            // アイコンをcheckに変更（白色統一）
                             if (rangeIcon && countdownDisplay) {
                                 countdownDisplay.style.display = 'none';
                                 rangeIcon.setAttribute('data-lucide', 'check');
-                                rangeIcon.style.color = 'white'; // オリジナル準拠：白色
+                                rangeIcon.style.color = 'white'; // 白色統一
                                 rangeIcon.style.display = 'block';
                                 lucide.createIcons();
+                                addLog('✅ 測定完了: checkアイコンに変更', 'success');
                             }
                             
                             // confirmedエフェクト
@@ -1670,38 +1617,16 @@
                     }
                     if (rangeIcon) {
                         rangeIcon.style.display = 'block';
-                        // 高音テスト用アイコンに変更（arrow-up、赤色）
-                        addLog('🔄 高音テスト: arrow-upアイコンに変更開始', 'info');
-                        
-                        // 要素をクリーンアップ
-                        rangeIcon.innerHTML = '';
+                        // 高音テスト用アイコンに変更（arrow-up、白色統一）
                         rangeIcon.setAttribute('data-lucide', 'arrow-up');
-                        rangeIcon.style.color = '#ef4444'; // 赤色
+                        rangeIcon.style.color = 'white'; // 白色統一（オリジナル準拠）
                         rangeIcon.style.transform = 'scale(1.0)'; // サイズリセット
                         rangeIcon.style.opacity = '1'; // 不透明度リセット
                         rangeIcon.style.transition = 'none'; // トランジション無効化
                         
-                        // アイコンを再描画
+                        // 本番環境準拠のシンプルな再描画
                         lucide.createIcons();
-                        
-                        // 生成結果確認
-                        setTimeout(() => {
-                            const svg = rangeIcon.querySelector('svg');
-                            if (svg) {
-                                addLog('✅ 高音テスト: arrow-upアイコン生成成功', 'success');
-                                console.log('arrow-up SVG generated successfully:', svg);
-                            } else {
-                                addLog('❌ 高音テスト: arrow-upアイコン生成失敗 - 手動SVGに代替', 'error');
-                                // 手動でarrow-up SVGを生成
-                                const manualArrowUp = `
-                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="m18 15-6-6-6 6"></path>
-                                    </svg>
-                                `;
-                                rangeIcon.innerHTML = manualArrowUp;
-                                addLog('🔧 手動SVG代替処理完了', 'success');
-                            }
-                        }, 100);
+                        addLog('🔄 高音テスト: arrow-upアイコンに変更完了', 'info');
                     }
                     
                     // マイクアイコンを緑色に（待機状態）
