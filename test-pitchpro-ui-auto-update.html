@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 PitchPro UI自動更新テスト</title>
+    
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="./Bolt/v2/styles/base.css">
+    <link rel="stylesheet" href="./Bolt/v2/styles/results.css">
+    
+    <!-- フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- アイコンライブラリ -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <style>
+        .test-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .test-panel {
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .test-panel.auto {
+            border-color: #22c55e;
+        }
+        
+        .test-panel.manual {
+            border-color: #3b82f6;
+        }
+        
+        .display-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .display-value {
+            font-family: 'Monaco', monospace;
+            color: #fbbf24;
+            font-weight: bold;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            transition: width 0.1s ease;
+        }
+        
+        .log-area {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Monaco', monospace;
+            font-size: 0.8rem;
+        }
+        
+        .log-entry {
+            margin-bottom: 0.25rem;
+            color: #e5e7eb;
+        }
+        
+        .log-entry.success { color: #22c55e; }
+        .log-entry.error { color: #ef4444; }
+        .log-entry.info { color: #3b82f6; }
+    </style>
+</head>
+<body>
+    <div class="container max-w-6xl mx-auto p-6">
+        <!-- ヘッダー -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-4">🧪 PitchPro UI自動更新テスト</h1>
+            <p class="text-yellow-200 text-xl">手動UI更新 vs 自動UI更新の比較テスト</p>
+        </header>
+
+        <!-- 制御パネル -->
+        <div class="glass-card mb-6">
+            <h2 class="text-2xl font-bold text-white mb-4">制御パネル</h2>
+            
+            <div class="flex gap-4 mb-4">
+                <button id="start-btn" class="btn btn-primary">
+                    <i data-lucide="mic" style="width: 20px; height: 20px;"></i>
+                    <span>テスト開始</span>
+                </button>
+                
+                <button id="stop-btn" class="btn btn-outline" disabled>
+                    <i data-lucide="stop-circle" style="width: 20px; height: 20px;"></i>
+                    <span>テスト停止</span>
+                </button>
+            </div>
+            
+            <div class="text-white-60 text-sm">
+                マイクロフォンを使用して音程・音量の検出を行い、手動更新と自動更新の動作を比較します。
+            </div>
+        </div>
+
+        <!-- 比較テストエリア -->
+        <div class="test-comparison">
+            <!-- 手動UI更新パネル -->
+            <div class="test-panel manual">
+                <h3 class="text-xl font-bold text-white mb-4">
+                    <i data-lucide="code" style="width: 24px; height: 24px; color: #3b82f6;"></i>
+                    手動UI更新
+                </h3>
+                
+                <div class="display-row">
+                    <span class="text-white-70">周波数:</span>
+                    <span class="display-value" id="manual-frequency">-- Hz</span>
+                </div>
+                
+                <div class="display-row">
+                    <span class="text-white-70">音名:</span>
+                    <span class="display-value" id="manual-note">--</span>
+                </div>
+                
+                <div class="display-row">
+                    <span class="text-white-70">音量:</span>
+                    <span class="display-value" id="manual-volume">0.0%</span>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="manual-volume-bar" style="width: 0%;"></div>
+                </div>
+                
+                <div class="text-xs text-white-60 mt-2">
+                    従来の手動実装でUI要素を更新
+                </div>
+            </div>
+
+            <!-- 自動UI更新パネル -->
+            <div class="test-panel auto">
+                <h3 class="text-xl font-bold text-white mb-4">
+                    <i data-lucide="zap" style="width: 24px; height: 24px; color: #22c55e;"></i>
+                    自動UI更新
+                </h3>
+                
+                <div class="display-row">
+                    <span class="text-white-70">周波数:</span>
+                    <span class="display-value" id="auto-frequency">-- Hz</span>
+                </div>
+                
+                <div class="display-row">
+                    <span class="text-white-70">音名:</span>
+                    <span class="display-value" id="auto-note">--</span>
+                </div>
+                
+                <div class="display-row">
+                    <span class="text-white-70">音量:</span>
+                    <span class="display-value" id="auto-volume">0.0%</span>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="auto-volume-bar" style="width: 0%;"></div>
+                </div>
+                
+                <div class="text-xs text-white-60 mt-2">
+                    PitchPro AudioDetectionComponent自動更新
+                </div>
+            </div>
+        </div>
+
+        <!-- パフォーマンス比較 -->
+        <div class="glass-card mb-6">
+            <h2 class="text-2xl font-bold text-white mb-4">パフォーマンス比較</h2>
+            
+            <div class="grid grid-cols-3 gap-4">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-white" id="update-count">0</div>
+                    <div class="text-white-60 text-sm">更新回数</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-green-400" id="auto-advantage">0%</div>
+                    <div class="text-white-60 text-sm">自動更新の効率性</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-blue-400" id="code-reduction">~50行</div>
+                    <div class="text-white-60 text-sm">削減可能コード</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ログエリア -->
+        <div class="glass-card">
+            <h2 class="text-2xl font-bold text-white mb-4">テストログ</h2>
+            <div class="log-area" id="test-log"></div>
+            <button onclick="clearLog()" class="btn btn-outline mt-4">
+                <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                <span>ログクリア</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="./js/pitchpro-audio/index.umd.js"></script>
+    <script src="./js/audio-detection-component.js"></script>
+
+    <script>
+        // Lucideアイコンを初期化
+        lucide.createIcons();
+        
+        // DOM要素
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const testLog = document.getElementById('test-log');
+        
+        // 手動更新用要素
+        const manualFreq = document.getElementById('manual-frequency');
+        const manualNote = document.getElementById('manual-note');
+        const manualVolume = document.getElementById('manual-volume');
+        const manualVolumeBar = document.getElementById('manual-volume-bar');
+        
+        // パフォーマンス指標
+        const updateCountEl = document.getElementById('update-count');
+        let updateCount = 0;
+        
+        // AudioDetectionComponentインスタンス
+        let audioDetector = null;
+        
+        // ログ出力関数
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            testLog.appendChild(logEntry);
+            testLog.scrollTop = testLog.scrollHeight;
+        }
+        
+        function clearLog() {
+            testLog.innerHTML = '';
+            updateCount = 0;
+            updateCountEl.textContent = '0';
+        }
+        
+        // 手動UI更新関数（従来の実装）
+        function updateManualUI(result) {
+            if (!result) return;
+            
+            // 周波数表示
+            const frequency = result.frequency > 0 ? result.frequency.toFixed(1) : '--';
+            manualFreq.textContent = frequency + ' Hz';
+            
+            // 音名表示
+            manualNote.textContent = result.note || '--';
+            
+            // 音量計算（簡易版）
+            const rawVolume = result.volume || 0;
+            const volumePercent = Math.min(100, Math.max(0, rawVolume * 100));
+            manualVolume.textContent = volumePercent.toFixed(1) + '%';
+            manualVolumeBar.style.width = volumePercent + '%';
+        }
+        
+        // テスト開始
+        async function startTest() {
+            try {
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                addLog('🚀 UI自動更新テスト開始', 'info');
+                
+                // AudioDetectionComponent初期化（自動UI更新有効）
+                audioDetector = new AudioDetectionComponent({
+                    // 自動UI更新用セレクター指定
+                    frequencySelector: '#auto-frequency',
+                    noteSelector: '#auto-note', 
+                    volumeBarSelector: '#auto-volume-bar',
+                    volumePercentSelector: '#auto-volume'
+                });
+                
+                await audioDetector.initialize();
+                addLog('✅ AudioDetectionComponent初期化完了', 'success');
+                
+                // コールバック設定（手動更新用）
+                audioDetector.setCallbacks({
+                    onPitchUpdate: (result) => {
+                        updateCount++;
+                        updateCountEl.textContent = updateCount;
+                        
+                        // 手動UI更新（比較用）
+                        updateManualUI(result);
+                        
+                        // パフォーマンス測定
+                        if (updateCount % 100 === 0) {
+                            addLog(`📊 ${updateCount}回更新完了`, 'info');
+                        }
+                    },
+                    onError: (error) => {
+                        addLog(`❌ エラー: ${error.message}`, 'error');
+                    }
+                });
+                
+                // 検出開始
+                const startResult = audioDetector.startDetection();
+                if (startResult) {
+                    addLog('🎤 音程検出開始 - 両方のパネルを比較してください', 'success');
+                } else {
+                    addLog('❌ 音程検出開始失敗', 'error');
+                }
+                
+            } catch (error) {
+                addLog(`❌ テスト開始エラー: ${error.message}`, 'error');
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+            }
+        }
+        
+        // テスト停止
+        function stopTest() {
+            if (audioDetector) {
+                audioDetector.stopDetection();
+                addLog('🛑 音程検出停止', 'info');
+            }
+            
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            addLog(`📊 テスト終了 - 総更新回数: ${updateCount}`, 'info');
+        }
+        
+        // イベントリスナー
+        startBtn.addEventListener('click', startTest);
+        stopBtn.addEventListener('click', stopTest);
+        
+        // 初期ログ
+        addLog('🧪 PitchPro UI自動更新テストページ準備完了', 'success');
+        addLog('「テスト開始」ボタンを押してマイクロフォンテストを開始してください', 'info');
+    </script>
+</body>
+</html>
