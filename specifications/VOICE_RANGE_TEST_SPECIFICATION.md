@@ -1,9 +1,9 @@
 # 音域テスト機能 - 詳細仕様書
 
-**バージョン**: 2.0.0  
+**バージョン**: 2.1.0  
 **作成日**: 2025-09-04  
-**更新日**: 2025-09-04  
-**用途**: preparation.htmlページの音域テスト機能詳細仕様（実装準拠版）
+**更新日**: 2025-01-07  
+**用途**: preparation.htmlページの音域テスト機能詳細仕様（test-voice-range.html実装準拠版）
 
 ---
 
@@ -15,12 +15,13 @@
 - **トレーニング精度向上**: 音域に適した基音でより効果的な練習を実現
 - **シンプルなUX**: 基準音なし・自由発声による直感的な測定方式
 
-### ⚠️ 重要な実装仕様（v2.0.0での変更点）
+### ⚠️ 重要な実装仕様（v2.1.0での変更点）
 1. **基準音は使用しない**: ユーザーが自由に発声する方式
-2. **3秒連続安定維持**: ±8Hz以内で3秒間途切れることなく維持が必要
-3. **音程・周波数表示なし**: アイコン・カウントダウン・チェックマークのみ表示
-4. **単回測定**: 低音域・高音域をそれぞれ1回ずつ測定
-5. **リセット機能**: 音声が途切れた場合は即座にリセット・再開
+2. **3秒間安定性判定**: 標準偏差による安定性判定（実測テストで最適値を決定予定）
+3. **音程・周波数表示あり**: テストページでは詳細情報表示
+4. **自動再測定**: 不安定な場合は自動的に再測定開始
+5. **AudioDetectionComponent統合**: 統一音響検出コンポーネント使用
+6. **リセット機能**: テストページでは廃止（簡略化）
 
 ### 実装場所
 準備ページ（`preparation.html`）の音域テストセクション内
@@ -33,46 +34,50 @@
 ```javascript
 const lowRangeTest = {
   testType: 'free_vocalization',    // 自由発声
-  instruction: 'できるだけ低い声を出し３秒間キープしてください',
+  instruction: 'できるだけ低い声を出して３秒間キープしてください',
   stabilityDuration: 3000,          // 3秒間安定維持
-  stabilityTolerance: 8,            // ±8Hz以内で安定判定
-  resetOnBreak: true,               // 途切れたらリセット
-  minDetectionVolume: 0.01,         // 最小音量閾値
-  clarityThreshold: 0.6             // 明瞭度閾値
+  stabilityMethod: 'standard_deviation',  // 標準偏差による判定
+  stabilityTolerance: 0.1,          // 平均周波数の10%以内で安定判定
+  minSamples: 15,                   // 最低15サンプル必要
+  autoRetry: true,                  // 失敗時は自動再測定
+  minDetectionVolume: 0.001,        // AudioDetectionComponent準拠
+  clarityThreshold: 0.6             // AudioDetectionComponent準拠
 };
 ```
 
 #### 実施フロー
-1. **指示表示**: 「できるだけ低い声を出し３秒間キープしてください」
-2. **待機状態**: 「測定中...」表示
-3. **音声検出**: リアルタイム周波数検出開始
-4. **安定性判定**: ±8Hz以内で3秒間連続維持をチェック
-5. **進捗表示**: 円形プログレスバーと数字カウントアップ（1, 2, 3秒）
-6. **完了判定**: 3秒達成時に「測定完了」表示とチェックマークアイコン
-7. **リセット処理**: 音声が途切れた場合は「リセットされました - 測定中...」
+1. **指示表示**: 「できるだけ低い声を出して３秒間キープしてください」
+2. **音声検出**: リアルタイム周波数・音量・明瞭度検出開始
+3. **進捗表示**: 横長プログレスバー（0→100%、3秒間）
+4. **データ収集**: 有効なサンプルを3秒間収集
+5. **安定性判定**: 標準偏差による安定性チェック（平均の10%以内）
+6. **成功判定**: 十分なサンプル数（15以上）＋安定性確認で完了
+7. **失敗時**: 自動的に再測定開始（「【再測定】できるだけ低い声を出して...」表示）
 
 ### 2. 高音テスト（自由発声方式）
 ```javascript
 const highRangeTest = {
   testType: 'free_vocalization',    // 自由発声
-  instruction: 'できるだけ高い声を出し３秒間キープしてください',
+  instruction: 'できるだけ高い声を出して３秒間キープしてください',
   stabilityDuration: 3000,          // 3秒間安定維持
-  stabilityTolerance: 8,            // ±8Hz以内で安定判定
-  resetOnBreak: true,               // 途切れたらリセット
-  waitBetweenTests: 3000,           // 低音→高音間の待機時間
-  minDetectionVolume: 0.01,         // 最小音量閾値
-  clarityThreshold: 0.6             // 明瞭度閾値
+  stabilityMethod: 'standard_deviation',  // 標準偏差による判定
+  stabilityTolerance: 0.1,          // 平均周波数の10%以内で安定判定
+  minSamples: 15,                   // 最低15サンプル必要
+  autoRetry: true,                  // 失敗時は自動再測定
+  waitBetweenTests: 1000,           // 低音→高音間の待機時間
+  minDetectionVolume: 0.001,        // AudioDetectionComponent準拠
+  clarityThreshold: 0.6             // AudioDetectionComponent準拠
 };
 ```
 
 #### 実施フロー
-1. **指示表示**: 「できるだけ高い声を出し３秒間キープしてください」
-2. **待機状態**: 「測定中...」表示
-3. **音声検出**: リアルタイム周波数検出開始
-4. **安定性判定**: ±8Hz以内で3秒間連続維持をチェック
-5. **進捗表示**: 円形プログレスバーと数字カウントアップ（1, 2, 3秒）
-6. **完了判定**: 3秒達成時に「測定完了」表示とチェックマークアイコン
-7. **結果計算**: 音域データ保存と結果画面への遷移
+1. **指示表示**: 「できるだけ高い声を出して３秒間キープしてください」
+2. **音声検出**: リアルタイム周波数・音量・明瞭度検出開始
+3. **進捗表示**: 横長プログレスバー（0→100%、3秒間）
+4. **データ収集**: 有効なサンプルを3秒間収集
+5. **安定性判定**: 標準偏差による安定性チェック（平均の10%以内）
+6. **成功判定**: 十分なサンプル数（15以上）＋安定性確認で完了
+7. **結果計算**: 低音・高音の平均値計算と結果表示
 
 ---
 
@@ -215,28 +220,33 @@ class BaseNoteRecommender {
 
 ## 🔧 技術実装詳細
 
-### 音程検出パラメータ（実装準拠版）
+### 音程検出パラメータ（test-voice-range.html実装準拠版）
 ```javascript
 const rangeTestConfig = {
-  // 安定性検出設定
-  stabilityDuration: 3000,       // 3秒間安定維持必須
-  stabilityTolerance: 8,         // ±8Hz以内で安定判定
-  detectionInterval: 100,        // 100ms間隔で検出
+  // 安定性検出設定（実測テストで最適化予定）
+  stabilityDuration: 3000,       // 3秒間測定必須
+  stabilityMethod: 'standard_deviation',  // 標準偏差による判定
+  stabilityTolerance: 0.1,       // 平均周波数の10%以内で安定判定
+  minSamples: 15,                // 最低15サンプル必要
   
-  // 音声検出設定
-  minVolumeAbsolute: 0.01,       // 最小音量閾値
-  clarityThreshold: 0.6,         // 明瞭度閾値
-  resetOnBreak: true,            // 音が途切れたら即座にリセット
+  // 音声検出設定（AudioDetectionComponent準拠）
+  minVolumeAbsolute: 0.001,      // 最小音量閾値
+  clarityThreshold: 0.6,         // 明瞭度閾値（現在0.3で緩和中）
+  autoRetry: true,               // 失敗時は自動再測定
   
-  // UI更新設定
-  progressUpdateRate: 100,       // 円形プログレス更新間隔（ms）
-  countdownDisplay: true,        // カウントダウン数字表示
-  iconAnimations: true,          // アイコンアニメーション有効
+  // UI更新設定（テストページ仕様）
+  progressType: 'horizontal',    // 横長プログレスバー
+  progressUpdateRate: 100,       // プログレス更新間隔（ms）
+  detailDisplay: true,           // 周波数・音量詳細表示
+  logOutput: true,               // 詳細ログ出力
   
   // テスト間隔設定
-  waitBetweenTests: 3000,        // 低音→高音テストの待機時間
+  waitBetweenTests: 1000,        // 低音→高音テストの待機時間
   completionDelay: 1000,         // 完了エフェクト表示時間
-  resultTransitionDelay: 2000,   // 結果画面への遷移遅延
+  
+  // 結果計算設定
+  resultMethod: 'average',       // 平均値による算出
+  displayFormat: 'frequency_hz', // Hz表示
   
   // デフォルト設定（エラー時）
   defaultRange: {
@@ -401,6 +411,27 @@ function saveDeviceQuality(quality) {
 - **基音最適化**: 推奨基音によりより正確な相対音感練習
 - **モード別最適化**: 各トレーニングモードに適した基音提案
 - **進捗管理**: 音域拡張の記録と可視化（将来機能）
+
+---
+
+---
+
+## 📝 変更履歴
+
+### v2.1.0 (2025-01-07)
+- **AudioDetectionComponent統合**: 統一音響検出コンポーネント使用
+- **安定性判定方式変更**: ±8Hz → 標準偏差による判定（実測テストで最適化予定）
+- **閾値調整**: minVolumeAbsolute: 0.001, clarityThreshold: 0.6 (AudioDetectionComponent準拠)
+- **UI仕様変更**: 横長プログレスバー + 詳細情報表示（テストページ）
+- **自動再測定**: 不安定な場合は自動的に再測定開始
+- **リセット機能廃止**: テストページでは簡略化
+- **メッセージ統一**: 「できるだけ低い/高い声を出して３秒間キープしてください」
+
+### v2.0.0 (2025-09-04)
+- 初版リリース
+- 基準音なし自由発声方式
+- 3秒間安定性判定
+- 円形プログレスバー仕様
 
 ---
 
