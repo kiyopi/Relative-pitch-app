@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 PitchPro v1.1.3ホットフィックステスト</title>
+    
+    <!-- UIカタログ準拠のスタイルシート -->
+    <link rel="stylesheet" href="Bolt/v2/styles/base.css">
+    <link rel="stylesheet" href="Bolt/v2/styles/results.css">
+    <link rel="stylesheet" href="Bolt/v2/styles/training.css">
+    
+    <!-- フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- UIカタログ準拠のページヘッダー -->
+        <header class="page-header">
+            <div class="page-header-content">
+                <div class="page-header-icon-wrapper">
+                    <div class="page-header-icon gradient-catalog-blue">
+                        <i data-lucide="mic" class="text-white" style="width: 36px; height: 36px;"></i>
+                    </div>
+                </div>
+                <div class="page-header-text">
+                    <h1 class="page-title">PitchPro v1.1.3ホットフィックステスト</h1>
+                    <p class="page-subtitle text-green-200">マイクレベル低下バグ修正 + ゲイン監視システム + Safari完全対応</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main class="narrow-main">
+            
+            <!-- システム状態表示 -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="activity" class="text-blue-300"></i>
+                    <span>システム状態</span>
+                </h3>
+                <div class="text-lg text-white-80 mt-4" id="system-status">
+                    準備中...
+                </div>
+            </div>
+
+            <!-- 制御パネル -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="settings" class="text-green-300"></i>
+                    <span>制御パネル</span>
+                </h3>
+                <div class="flex gap-4 mt-4">
+                    <button id="init-btn" class="btn btn-primary flex-1">
+                        <i data-lucide="mic" style="width: 20px; height: 20px;"></i>
+                        <span>マイク初期化</span>
+                    </button>
+                    <button id="start-btn" class="btn btn-success flex-1" disabled>
+                        <i data-lucide="play" style="width: 20px; height: 20px;"></i>
+                        <span>検出開始</span>
+                    </button>
+                    <button id="stop-btn" class="btn btn-secondary flex-1" disabled>
+                        <i data-lucide="stop-circle" style="width: 20px; height: 20px;"></i>
+                        <span>検出停止</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 音程検出結果表示 -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="music" class="text-purple-300"></i>
+                    <span>音程検出結果</span>
+                </h3>
+                
+                <!-- 周波数表示 -->
+                <div class="result-metric-card mt-4">
+                    <div class="result-metric-value" id="frequency-display">--</div>
+                    <div class="result-metric-label">Hz</div>
+                </div>
+                
+                <!-- 音名表示 -->
+                <div class="result-metric-card mt-4">
+                    <div class="result-metric-value" id="note-display">--</div>
+                    <div class="result-metric-label">音名</div>
+                </div>
+                
+                <!-- 明瞭度表示 -->
+                <div class="result-metric-card mt-4">
+                    <div class="result-metric-value" id="clarity-display">--</div>
+                    <div class="result-metric-label">明瞭度</div>
+                </div>
+            </div>
+
+            <!-- 音量プログレスバー -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="volume-2" class="text-yellow-300"></i>
+                    <span>音量レベル</span>
+                </h3>
+                
+                <!-- プログレスバー（UIカタログ準拠） -->
+                <div class="mt-4">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="volume-2" class="text-yellow-300" style="width: 20px; height: 20px;"></i>
+                        <div class="progress-bar flex-1">
+                            <div class="progress-fill gradient-catalog-green" id="volume-bar" style="width: 0%;"></div>
+                        </div>
+                        <span class="text-sm text-white-60" id="volume-percent">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- コールバック処理テスト -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="code" class="text-orange-300"></i>
+                    <span>コールバック処理テスト</span>
+                </h3>
+                
+                <div class="mt-4 space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-white-70">更新回数:</span>
+                        <span class="text-white" id="callback-count">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-white-70">有効検出:</span>
+                        <span class="text-green-300" id="valid-count">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-white-70">最後の更新:</span>
+                        <span class="text-white-60 text-sm" id="last-update">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- v1.1.1新機能: 消音検出テスト -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="volume-x" class="text-red-300"></i>
+                    <span>消音検出機能 (v1.1.1)</span>
+                </h3>
+                
+                <div class="mt-4 space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-white-70">検出状態:</span>
+                        <span class="text-white" id="silence-enabled">無効</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-white-70">現在の状態:</span>
+                        <span class="text-green-300" id="silence-status">音声あり</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-white-70">無音時間:</span>
+                        <span class="text-white-60 text-sm" id="silence-duration">--</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-white-70">警告状態:</span>
+                        <span class="text-yellow-300" id="silence-warning">なし</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ログエリア -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="terminal" class="text-red-300"></i>
+                    <span>システムログ</span>
+                </h3>
+                <div class="mt-4 p-4 bg-black bg-opacity-50 rounded-lg max-h-64 overflow-y-auto font-mono text-sm" id="log-area">
+                    <div class="text-blue-300">[INFO] テストページ準備完了</div>
+                </div>
+                <button id="clear-log" class="btn btn-outline mt-4">
+                    <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+                    <span>ログクリア</span>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="js/pitchpro-audio/pitchpro-v1.1.3.umd.js"></script>
+    
+    <!-- TODO: 外部ファイル化 /js/pitchpro-correct-test.js -->
+    <script>
+        // Lucideアイコン初期化
+        lucide.createIcons();
+        
+        // システム変数
+        let micController = null;
+        let pitchDetector = null;
+        let isDetecting = false;
+        let callbackCount = 0;
+        let validCount = 0;
+        
+        // DOM要素
+        const systemStatus = document.getElementById('system-status');
+        const initBtn = document.getElementById('init-btn');
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const frequencyDisplay = document.getElementById('frequency-display');
+        const noteDisplay = document.getElementById('note-display');
+        const clarityDisplay = document.getElementById('clarity-display');
+        const volumeBar = document.getElementById('volume-bar');
+        const volumePercent = document.getElementById('volume-percent');
+        const callbackCountEl = document.getElementById('callback-count');
+        const validCountEl = document.getElementById('valid-count');
+        const lastUpdateEl = document.getElementById('last-update');
+        const logArea = document.getElementById('log-area');
+        
+        // 消音検出用DOM要素
+        const silenceEnabledEl = document.getElementById('silence-enabled');
+        const silenceStatusEl = document.getElementById('silence-status');
+        const silenceDurationEl = document.getElementById('silence-duration');
+        const silenceWarningEl = document.getElementById('silence-warning');
+        
+        // ログ出力関数
+        function addLog(message, type = 'INFO') {
+            const timestamp = new Date().toLocaleTimeString();
+            const colorClass = {
+                'INFO': 'text-blue-300',
+                'SUCCESS': 'text-green-300',
+                'ERROR': 'text-red-300',
+                'WARNING': 'text-yellow-300'
+            }[type] || 'text-gray-300';
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = colorClass;
+            logEntry.textContent = `[${type}] ${timestamp}: ${message}`;
+            logArea.appendChild(logEntry);
+            logArea.scrollTop = logArea.scrollHeight;
+            
+            console.log(`[${type}] ${message}`);
+        }
+        
+        // システム状態更新
+        function updateSystemStatus(message, type = 'info') {
+            systemStatus.textContent = message;
+            systemStatus.className = 'text-lg mt-4 ' + {
+                'info': 'text-white-80',
+                'success': 'text-green-300',
+                'error': 'text-red-300',
+                'warning': 'text-yellow-300'
+            }[type];
+        }
+        
+        // マイク初期化（v1.1.1修正確認 - MicrophoneController再テスト）
+        async function initializeMicrophone() {
+            try {
+                updateSystemStatus('マイク初期化中...', 'warning');
+                addLog('PitchPro v1.1.1修正確認 - MicrophoneController再テスト');
+                
+                if (!window.PitchPro) {
+                    throw new Error('PitchProライブラリが見つかりません');
+                }
+                
+                addLog(`利用可能なクラス: ${Object.keys(window.PitchPro).join(', ')}`, 'INFO');
+                
+                // MicrophoneController修正確認
+                const { MicrophoneController, PitchDetector, AudioManager } = window.PitchPro;
+                
+                // AudioManager初期化（Safari Web Audio API音量低下問題の包括的対策）
+                micController = new AudioManager({
+                    sampleRate: 44100,
+                    channelCount: 1,
+                    echoCancellation: false,        // Safari音量低下根本原因1: エコーキャンセル無効化
+                    noiseSuppression: false,        // Safari音量低下根本原因2: ノイズ抑制無効化  
+                    autoGainControl: false          // Safari音量低下根本原因3: 自動ゲイン制御無効化
+                });
+                
+                await micController.initialize();
+                addLog('AudioManager初期化完了（Safari音量低下対策：AGC・EC・NS全無効）', 'SUCCESS');
+                
+                // PitchDetector初期化（Safari音量低下問題完全対策版）
+                pitchDetector = new PitchDetector(micController, {
+                    fftSize: 4096,
+                    smoothing: 0.0,  // Safari音量低下根本原因4: smoothingTimeConstant無効化（最重要）
+                    clarityThreshold: 0.4,
+                    minVolumeAbsolute: 0.0001,  // 音量閾値をさらに低く（微細音量も検出）
+                    harmonicCorrection: false,  // 処理負荷軽減でリアルタイム性向上
+                    silenceDetection: {
+                        enabled: false,  // 消音検出を無効化（Safari対応で音量検出優先）
+                        warningThreshold: 30000,
+                        timeoutThreshold: 60000,
+                        minVolumeThreshold: 0.0001,
+                        onSilenceWarning: (duration) => {
+                            addLog(`⚠️ 消音警告: ${Math.round(duration/1000)}秒間無音です`, 'WARNING');
+                        },
+                        onSilenceTimeout: () => {
+                            addLog('⏰ 消音タイムアウト: 検出を自動停止しました', 'ERROR');
+                            updateSystemStatus('消音タイムアウトにより停止', 'error');
+                        },
+                        onSilenceRecovered: () => {
+                            addLog('🔊 音声復帰: 消音状態から回復しました', 'SUCCESS');
+                        }
+                    }
+                });
+                
+                await pitchDetector.initialize();
+                
+                addLog('PitchDetector初期化完了（Safari音量低下4大対策実装済み）', 'SUCCESS');
+                
+                // 消音検出状態表示を更新
+                silenceEnabledEl.textContent = '無効（Safari音量低下対策優先）';
+                silenceEnabledEl.className = 'text-blue-400';
+                updateSystemStatus('初期化完了 - 検出開始可能', 'success');
+                
+                // ボタン状態変更
+                initBtn.disabled = true;
+                startBtn.disabled = false;
+                
+                return true;
+                
+            } catch (error) {
+                const errorMsg = `初期化失敗: ${error.message}`;
+                addLog(errorMsg, 'ERROR');
+                updateSystemStatus('初期化失敗', 'error');
+                console.error('初期化エラー:', error);
+                return false;
+            }
+        }
+        
+        // 音程検出開始
+        function startDetection() {
+            try {
+                if (!pitchDetector) {
+                    addLog('PitchDetectorが初期化されていません', 'ERROR');
+                    return;
+                }
+                
+                // 検出開始
+                pitchDetector.startDetection();
+                
+                // コールバック設定
+                pitchDetector.setCallbacks({
+                    onPitchUpdate: (result) => {
+                        callbackCount++;
+                        callbackCountEl.textContent = callbackCount;
+                        lastUpdateEl.textContent = new Date().toLocaleTimeString();
+                        
+                        // 【Safari音量低下問題根本解決】Web Audio APIから直接音量を高精度計算
+                        let volumeLevel = 0;
+                        let calculationMethod = 'Unknown';
+                        
+                        try {
+                            // PitchDetectorの内部rawAnalyserから生データを取得
+                            if (pitchDetector && pitchDetector.rawAnalyser) {
+                                const bufferLength = pitchDetector.rawAnalyser.fftSize;
+                                const dataArray = new Float32Array(bufferLength);
+                                pitchDetector.rawAnalyser.getFloatTimeDomainData(dataArray);
+                                
+                                // 高精度RMS計算（Safari最適化版）
+                                let sum = 0;
+                                let maxValue = 0;
+                                for (let i = 0; i < bufferLength; i++) {
+                                    const value = Math.abs(dataArray[i]);
+                                    sum += value * value;
+                                    maxValue = Math.max(maxValue, value);
+                                }
+                                
+                                const rms = Math.sqrt(sum / bufferLength);
+                                
+                                // Safari対応：スムーズな音量検出（自然な上昇カーブ最適化）
+                                const baseMultiplier = 2800; // 全体的に感度向上
+                                const minThreshold = 0.0005;   // 検出最小閾値
+                                const instantDropThreshold = 0.002; // 即座ゼロ化閾値
+                                
+                                // 音量計算：RMSとピーク値のバランス調整
+                                const combinedVolume = (rms * 0.85) + (maxValue * 0.15); // RMS重視で安定性確保
+                                
+                                // スムーズな音量バー反応（段階的変化なし）
+                                if (combinedVolume < instantDropThreshold) {
+                                    volumeLevel = 0; // 即座ゼロ化
+                                } else if (combinedVolume < minThreshold) {
+                                    volumeLevel = 0; // 微細音量カット
+                                } else {
+                                    // 単一の感度設定でスムーズな上昇カーブを実現
+                                    volumeLevel = Math.min(100, Math.max(0, combinedVolume * baseMultiplier));
+                                }
+                                
+                                calculationMethod = 'Safari高精度直接計算';
+                            }
+                        } catch (error) {
+                            console.warn('Direct volume calculation failed, using fallback:', error);
+                            // フォールバック：PitchProの値を使用（Safari対応感度向上）
+                            const rawVolume = result.volume || 0;
+                            volumeLevel = Math.min(100, Math.max(0, rawVolume * 800)); // 感度向上
+                            calculationMethod = 'PitchPro感度向上フォールバック';
+                        }
+                        
+                        // Safari音量低下対策デバッグ用ログ（詳細計算方法の確認）
+                        if (callbackCount % 10 === 0) {
+                            addLog(`Safari対策音量デバッグ: ${calculationMethod}, volumeLevel=${volumeLevel.toFixed(1)}%, frequency=${result.frequency || 0}`, 'INFO');
+                        }
+                        
+                        volumeBar.style.width = volumeLevel + '%';
+                        volumePercent.textContent = volumeLevel.toFixed(1) + '%';
+                        
+                        // 有効検出の確認（音程が取得できた場合）
+                        if (result.frequency > 0) {
+                            validCount++;
+                            validCountEl.textContent = validCount;
+                            
+                            // 音程情報表示
+                            frequencyDisplay.textContent = result.frequency.toFixed(1);
+                            noteDisplay.textContent = result.note || '--';
+                            clarityDisplay.textContent = result.clarity ? result.clarity.toFixed(2) : '--';
+                            
+                            // Safari音量低下対策：有効検出時の詳細デバッグ情報
+                            if (validCount % 10 === 0) {
+                                addLog(`Safari対策有効検出 ${validCount}回: ${result.frequency.toFixed(1)}Hz (${result.note}) 音量: ${volumeLevel.toFixed(1)}%`, 'INFO');
+                            }
+                        } else {
+                            // 無音時は音程表示をリセット（音量バーはそのまま）
+                            frequencyDisplay.textContent = '--';
+                            noteDisplay.textContent = '--';
+                            clarityDisplay.textContent = '--';
+                        }
+                        
+                        // 消音検出状態の表示更新（v1.1.1新機能）
+                        if (pitchDetector && pitchDetector.getSilenceStatus) {
+                            const silenceStatus = pitchDetector.getSilenceStatus();
+                            if (silenceStatus) {
+                                silenceStatusEl.textContent = silenceStatus.isSilent ? '無音中' : '音声あり';
+                                silenceStatusEl.className = silenceStatus.isSilent ? 'text-red-300' : 'text-green-300';
+                                
+                                if (silenceStatus.silenceDuration) {
+                                    const seconds = Math.round(silenceStatus.silenceDuration / 1000);
+                                    silenceDurationEl.textContent = `${seconds}秒`;
+                                } else {
+                                    silenceDurationEl.textContent = '--';
+                                }
+                                
+                                silenceWarningEl.textContent = silenceStatus.hasWarned ? '警告済み' : 'なし';
+                                silenceWarningEl.className = silenceStatus.hasWarned ? 'text-yellow-300' : 'text-gray-400';
+                            }
+                        }
+                    },
+                    onError: (error) => {
+                        addLog(`検出エラー: ${error.message}`, 'ERROR');
+                    }
+                });
+                
+                isDetecting = true;
+                updateSystemStatus('音程検出中...', 'info');
+                addLog('音程検出開始', 'SUCCESS');
+                
+                // ボタン状態変更
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                
+            } catch (error) {
+                addLog(`検出開始エラー: ${error.message}`, 'ERROR');
+            }
+        }
+        
+        // 音程検出停止
+        function stopDetection() {
+            try {
+                if (pitchDetector && isDetecting) {
+                    pitchDetector.stopDetection();
+                    isDetecting = false;
+                    
+                    // 表示をリセット
+                    frequencyDisplay.textContent = '--';
+                    noteDisplay.textContent = '--';
+                    clarityDisplay.textContent = '--';
+                    volumeBar.style.width = '0%';
+                    volumePercent.textContent = '0%';
+                    
+                    updateSystemStatus('音程検出停止', 'info');
+                    addLog('音程検出停止', 'INFO');
+                    
+                    // ボタン状態変更
+                    startBtn.disabled = false;
+                    stopBtn.disabled = true;
+                }
+            } catch (error) {
+                addLog(`検出停止エラー: ${error.message}`, 'ERROR');
+            }
+        }
+        
+        // ログクリア
+        function clearLog() {
+            logArea.innerHTML = '<div class="text-blue-300">[INFO] ログクリア完了</div>';
+            callbackCount = 0;
+            validCount = 0;
+            callbackCountEl.textContent = '0';
+            validCountEl.textContent = '0';
+            lastUpdateEl.textContent = '--';
+        }
+        
+        // イベントリスナー設定
+        initBtn.addEventListener('click', initializeMicrophone);
+        startBtn.addEventListener('click', startDetection);
+        stopBtn.addEventListener('click', stopDetection);
+        document.getElementById('clear-log').addEventListener('click', clearLog);
+        
+        // ページ読み込み完了
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSystemStatus('v1.1.3ホットフィックス版 - マイク初期化ボタンをクリック', 'info');
+            addLog('🎵 PitchPro v1.1.3 マイクレベル低下バグ修正テスト準備完了', 'SUCCESS');
+        });
+    </script>
+</body>
+</html>

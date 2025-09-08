@@ -1019,7 +1019,7 @@
 }
 
 #range-test-section .text-sub-title {
-  text-align: left !important;
+  text-align: center !important;  /* センター寄せに変更 */
   margin: 0;
 }
 
@@ -1027,6 +1027,85 @@
 @media (max-width: 768px) {
   #range-test-section .text-sub-title {
     font-size: 1rem;
+    text-align: center !important;  /* モバイルでもセンター寄せ */
+  }
+}
+
+/* マイクステータスアイコンのスタイル */
+.mic-status-container {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* 待機状態（白のグラス効果） */
+.mic-status-container.standby {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+}
+
+.mic-status-container.standby i {
+  color: white;
+  width: 36px;
+  height: 36px;
+}
+
+/* 録音状態（赤のグラス効果 + パルスアニメーション） */
+.mic-status-container.recording {
+  background: rgba(239, 68, 68, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.mic-status-container.recording i {
+  color: #ef4444;
+  width: 36px;
+  height: 36px;
+}
+
+/* パルスアニメーション（グローが広がったり縮んだり） */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3),
+                0 0 40px rgba(239, 68, 68, 0.2);
+  }
+  50% {
+    box-shadow: 0 4px 30px rgba(239, 68, 68, 0.5),
+                0 0 60px rgba(239, 68, 68, 0.4),
+                0 0 80px rgba(239, 68, 68, 0.2);
+  }
+}
+
+/* パルスリング（追加エフェクト） */
+.mic-status-container.recording::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid rgba(239, 68, 68, 0.5);
+  animation: pulseRing 2s ease-in-out infinite;
+}
+
+@keyframes pulseRing {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.3);
+    opacity: 0;
   }
 }
 

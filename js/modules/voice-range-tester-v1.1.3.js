@@ -7,8 +7,17 @@
  * 独立タイマー制御による円形プログレス安定化
  */
 class VoiceRangeTesterV113 {
-    constructor(pitchDetector, dataManager = null) {
-        this.pitchDetector = pitchDetector; // PitchDetector直接参照
+    constructor(audioDetectionComponentOrPitchDetector, dataManager = null) {
+        // AudioDetectionComponentまたはPitchDetectorに対応
+        if (audioDetectionComponentOrPitchDetector.startDetection) {
+            // AudioDetectionComponentの場合
+            this.audioDetectionComponent = audioDetectionComponentOrPitchDetector;
+            this.pitchDetector = audioDetectionComponentOrPitchDetector; // 後方互換性
+        } else {
+            // 従来のPitchDetectorの場合
+            this.pitchDetector = audioDetectionComponentOrPitchDetector;
+            this.audioDetectionComponent = null;
+        }
         this.dataManager = dataManager;
         
         // 音域テスト状態
@@ -50,6 +59,25 @@ class VoiceRangeTesterV113 {
         this.rangeTestVolumeBar = document.getElementById('range-test-volume-bar');
         this.rangeTestVolumeText = document.getElementById('range-test-volume-text');
         
+        // AudioDisplayUtility初期化（音域テスト用）
+        if (typeof AudioDisplayUtility !== 'undefined') {
+            this.audioDisplay = AudioDisplayUtility.createComplete({
+                volumeBarSelector: '#range-test-volume-bar',
+                volumeTextSelector: '#range-test-volume-text',
+                frequencySelector: '#range-test-frequency-value',
+                frequencyFormat: 'Hz',
+                debug: true,
+                logPrefix: '🎯 RangeTest'
+            });
+            console.log('✅ AudioDisplayUtility初期化完了（音域テスト用）');
+        } else {
+            console.warn('⚠️ AudioDisplayUtilityが読み込まれていません - フォールバック使用');
+            // フォールバック：従来の方式
+            this.rangeTestVolumeBar = document.getElementById('range-test-volume-bar');
+            this.rangeTestVolumeText = document.getElementById('range-test-volume-text');
+            this.rangeTestFrequencyValue = document.getElementById('range-test-frequency-value');
+        }
+        
         console.log('🎯 VoiceRangeTesterV113 初期化完了（独立タイマー制御版）');
     }
 
@@ -86,7 +114,15 @@ class VoiceRangeTesterV113 {
         this.updateMicStatus('standby'); // 緑色
         this.showRangeIcon('idle');
         this.updateStabilityRing(0); // プログレスバーリセット
-        this.updateVolumeDisplay(0); // 音量バーを0に
+        
+        // AudioDisplayUtility でリセット
+        if (this.audioDisplay) {
+            this.audioDisplay.reset();
+        } else {
+            // フォールバック：従来の方式
+            this.updateVolumeDisplay(0);
+            this.updateFrequencyDisplay(0);
+        }
         
         // データ収集停止（ミュート）
         this.isCollectingData = false;
@@ -370,17 +406,29 @@ class VoiceRangeTesterV113 {
      */
     collectVoiceData(pitchData) {
         if (!this.isCollectingData || !pitchData) {
-            // 測定中でない場合は音量バーを0にする
+            // 測定中でない場合は音量バーと周波数表示を0にする
             if (!this.isCollectingData) {
-                this.updateVolumeDisplay(0);
+                if (this.audioDisplay) {
+                    this.audioDisplay.reset();
+                } else {
+                    // フォールバック：従来の方式
+                    this.updateVolumeDisplay(0);
+                    this.updateFrequencyDisplay(0);
+                }
             }
             return;
         }
         
         const { frequency, volume } = pitchData;
         
-        // 音量バー更新（リアルタイム）- 測定中のみ
-        this.updateVolumeDisplay(volume);
+        // AudioDisplayUtility で音量・周波数表示を統合更新
+        if (this.audioDisplay) {
+            this.audioDisplay.updateAll({ volume, frequency });
+        } else {
+            // フォールバック：従来の方式
+            this.updateVolumeDisplay(volume);
+            this.updateFrequencyDisplay(frequency);
+        }
         
         // 声待機中の声検出処理
         if (this.isWaitingForVoice) {
@@ -750,7 +798,15 @@ class VoiceRangeTesterV113 {
         this.updateMicStatus('standby');
         this.showRangeIcon('idle');
         this.updateStabilityRing(0);
-        this.updateVolumeDisplay(0); // 音量バーを0にリセット
+        
+        // AudioDisplayUtility でリセット
+        if (this.audioDisplay) {
+            this.audioDisplay.reset();
+        } else {
+            // フォールバック：従来の方式
+            this.updateVolumeDisplay(0);
+            this.updateFrequencyDisplay(0);
+        }
         
         console.log('🔄 再測定用状態リセット完了');
     }
@@ -878,6 +934,19 @@ class VoiceRangeTesterV113 {
         }
         if (this.rangeTestVolumeText) {
             this.rangeTestVolumeText.textContent = volume.toFixed(1) + '%';
+        }
+    }
+
+    /**
+     * 周波数表示更新
+     */
+    updateFrequencyDisplay(frequency) {
+        if (this.rangeTestFrequencyValue) {
+            if (frequency > 0) {
+                this.rangeTestFrequencyValue.textContent = frequency.toFixed(1) + ' Hz';
+            } else {
+                this.rangeTestFrequencyValue.textContent = '0 Hz';
+            }
         }
     }
 

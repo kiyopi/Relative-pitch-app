@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@pitchpro/audio-processing": "github:kiyopi/pitchpro-audio-processing#v1.1.1"
+  }
+}

@@ -1715,3 +1715,58 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-07 16:31:56] コミット: fix: test-voice-range.html プログレスバー安定実装完成
+
+- 複雑な50ms setInterval → シンプルな1秒 setInterval に変更
+- preparation.js準拠の安定したstrokeDashoffset計算方式を採用
+- 競合するCSS transition + JavaScript setInterval問題を根本解決
+- commit 35ea8a0の完全コピー状態から設計見直しで修正完了
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-07 16:43:35] コミット: feat: test-voice-range.html適切な起点から復元
+
+- cc7ec5e（JavaScript外部ファイル化時点）から新ブランチ作成
+- commit 35ea8a0からtest-voice-range.html復元（修正前の元状態）
+- 適切な履歴管理のため、インライン分離時点を起点として設定
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-07 23:53:47] コミット: feat: PitchPro v1.1.3完全統合 + 音域テスト根本修正
+
+- VoiceRangeTesterV113作成（PitchPro v1.1.3完全対応版）
+- Safari音量低下4大対策統合（AGC・EC・NS無効化・smoothing=0.0）
+- Web Audio API直接音量計算統合
+- preparation-test.html完成（音声テスト+音域テスト統合版）
+- 音域テスト失敗問題の根本解決
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-07 23:54:31] コミット: docs: 音域テスト仕様書v2.1.0をブランチに統合
+
+- VOICE_RANGE_TEST_SPECIFICATION.md v2.1.0追加
+- PitchPro v1.1.3対応の仕様更新
+- AudioDetectionComponent統合仕様
+- 実測テスト準拠の安定性判定方式
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-08 12:26:33] コミット: feat: 音域テスト機能完全実装 - PitchPro v1.1.3対応版
+
+- 独立タイマー制御による円形プログレス安定化実装
+- 声検出トリガーによる自然な測定開始フロー
+- フェーズ管理システム (idle→ready→low→high→completed)
+- 再測定機能とエラーハンドリング完全対応
+- 音域幅判定基準を現実的に調整 (100Hz→50Hz)
+- ユーザーガイダンス改善 (ファルセット・裏声の明示)
+- マイクステータス・音量バー・周波数表示UI追加
+- デバッグログ強化による問題解決支援
+- Safari音量低下対策統合済み
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

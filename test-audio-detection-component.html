@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AudioDetectionComponent テスト - 8va相対音感トレーニング</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="Bolt/v2/styles/base.css">
+    <link rel="stylesheet" href="Bolt/v2/styles/results.css">
+    <link rel="stylesheet" href="Bolt/v2/styles/training.css">
+</head>
+<body>
+    <div class="container">
+        <!-- ヘッダー -->
+        <header class="page-header">
+            <div class="page-header-content">
+                <div class="page-header-icon-wrapper">
+                    <div class="page-header-icon gradient-catalog-blue">
+                        <i data-lucide="mic" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;"></i>
+                    </div>
+                </div>
+                <div class="page-header-text">
+                    <h1 class="page-title">AudioDetectionComponent テスト</h1>
+                    <p class="page-subtitle text-green-200">新しいPitchPro統合音声処理システム</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main class="narrow-main">
+            <div class="glass-card">
+                <div class="section-header">
+                    <h3 class="text-section-title">音声検出テスト</h3>
+                    <p class="section-description">AudioDetectionComponentの動作確認</p>
+                </div>
+
+                <!-- コントロール -->
+                <div class="flex gap-3 mb-4">
+                    <button class="btn btn-primary" id="start-btn">
+                        <i data-lucide="play" style="width: 20px; height: 20px;"></i>
+                        <span>開始</span>
+                    </button>
+                    <button class="btn btn-secondary" id="stop-btn" disabled>
+                        <i data-lucide="square" style="width: 20px; height: 20px;"></i>
+                        <span>停止</span>
+                    </button>
+                </div>
+
+                <!-- 音量表示 -->
+                <div class="mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-white-60">音量レベル</span>
+                        <span class="text-sm text-white" id="volume-text">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill gradient-catalog-green" id="volume-bar" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- 周波数・音程表示 -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <i data-lucide="activity" class="text-blue-300" style="width: 20px; height: 20px;"></i>
+                            <span>周波数</span>
+                        </div>
+                        <div class="stat-card-value" id="frequency-display">-- Hz</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <i data-lucide="music" class="text-green-300" style="width: 20px; height: 20px;"></i>
+                            <span>音程</span>
+                        </div>
+                        <div class="stat-card-value" id="note-display">--</div>
+                    </div>
+                </div>
+
+                <!-- デバイス情報 -->
+                <div class="info-alert mb-4">
+                    <i data-lucide="smartphone" style="width: 24px; height: 24px; color: #60a5fa;"></i>
+                    <div>
+                        <p class="text-sm">デバイス: <span id="device-type">検出中...</span></p>
+                        <p class="text-xs text-white-60">感度: <span id="device-sensitivity">--</span></p>
+                    </div>
+                </div>
+
+                <!-- 状態表示 -->
+                <div class="mb-4">
+                    <div class="text-sm text-white-60">
+                        状態: <span id="state-display" class="text-white">初期化前</span>
+                    </div>
+                </div>
+
+                <!-- ログ表示 -->
+                <div class="glass-card-secondary">
+                    <h4 class="heading-sm mb-3">
+                        <i data-lucide="terminal" class="text-blue-300"></i>
+                        <span>デバッグログ</span>
+                    </h4>
+                    <div id="log-display" class="text-xs text-white-60 font-mono" style="max-height: 200px; overflow-y: auto;">
+                        <!-- ログがここに表示されます -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- スクリプト -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="js/lucide-init.js"></script>
+
+    <!-- AudioDetectionComponent -->
+    <script type="module">
+        // UMDビルドを使用
+        const script = document.createElement('script');
+        script.src = './js/pitchpro-audio/dist/pitchpro.umd.js';
+        script.onload = () => {
+            const { AudioDetectionComponent } = window.PitchPro;
+            
+            let audioDetector = null;
+            const startBtn = document.getElementById('start-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            const logDisplay = document.getElementById('log-display');
+            
+            // ログ表示関数
+            function addLog(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString('ja-JP', { 
+                    hour12: false, 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit',
+                    fractionalSecondDigits: 3 
+                });
+                const logEntry = document.createElement('div');
+                const color = type === 'error' ? '#ef4444' : 
+                             type === 'warning' ? '#f59e0b' : 
+                             type === 'success' ? '#10b981' : '#60a5fa';
+                logEntry.style.color = color;
+                logEntry.textContent = `[${timestamp}] ${message}`;
+                logDisplay.appendChild(logEntry);
+                logDisplay.scrollTop = logDisplay.scrollHeight;
+                
+                // ログが多くなったら古いものを削除
+                if (logDisplay.children.length > 100) {
+                    logDisplay.removeChild(logDisplay.firstChild);
+                }
+            }
+            
+            // 開始ボタンクリック
+            startBtn.addEventListener('click', async () => {
+                try {
+                    addLog('AudioDetectionComponent初期化開始...', 'info');
+                    
+                    // コンポーネント作成
+                    audioDetector = new AudioDetectionComponent({
+                        // UI要素のセレクター
+                        volumeBarSelector: '#volume-bar',
+                        volumeTextSelector: '#volume-text',
+                        frequencySelector: '#frequency-display',
+                        noteSelector: '#note-display',
+                        
+                        // 検出設定
+                        clarityThreshold: 0.4,
+                        minVolumeAbsolute: 0.003,
+                        
+                        // デバイス最適化
+                        deviceOptimization: true,
+                        
+                        // UI更新レート
+                        uiUpdateInterval: 50, // 20fps
+                        
+                        // デバッグ
+                        debug: true,
+                        logPrefix: '🎵 AudioDetection'
+                    });
+                    
+                    // コールバック設定
+                    audioDetector.setCallbacks({
+                        onPitchUpdate: (result) => {
+                            // 音程検出時（頻度が高いので条件付きでログ）
+                            if (Math.random() < 0.1) { // 10%の確率でログ
+                                addLog(`音程検出: ${result.note} (${result.frequency.toFixed(1)}Hz, 音量: ${result.volume.toFixed(1)}%)`, 'success');
+                            }
+                        },
+                        onVolumeUpdate: (volume) => {
+                            // 音量更新（UIで表示されるのでログは不要）
+                        },
+                        onStateChange: (state) => {
+                            addLog(`状態変更: ${state}`, 'warning');
+                            document.getElementById('state-display').textContent = state;
+                            
+                            // ボタン状態更新
+                            if (state === 'detecting') {
+                                startBtn.disabled = true;
+                                stopBtn.disabled = false;
+                            } else {
+                                startBtn.disabled = false;
+                                stopBtn.disabled = true;
+                            }
+                        },
+                        onError: (error) => {
+                            addLog(`エラー: ${error.message}`, 'error');
+                        },
+                        onDeviceDetected: (specs) => {
+                            addLog(`デバイス検出: ${specs.deviceType}`, 'info');
+                            document.getElementById('device-type').textContent = specs.deviceType;
+                            document.getElementById('device-sensitivity').textContent = `${specs.deviceConfig.sensitivity}x`;
+                        }
+                    });
+                    
+                    // 初期化
+                    addLog('マイク初期化中...', 'info');
+                    await audioDetector.initialize();
+                    addLog('初期化完了', 'success');
+                    
+                    // 検出開始
+                    audioDetector.startDetection();
+                    addLog('音声検出開始', 'success');
+                    
+                } catch (error) {
+                    addLog(`初期化エラー: ${error.message}`, 'error');
+                    console.error('初期化エラー:', error);
+                }
+            });
+            
+            // 停止ボタンクリック
+            stopBtn.addEventListener('click', () => {
+                if (audioDetector) {
+                    audioDetector.stopDetection();
+                    addLog('音声検出停止', 'warning');
+                }
+            });
+            
+            // ページ離脱時のクリーンアップ
+            window.addEventListener('beforeunload', () => {
+                if (audioDetector) {
+                    audioDetector.destroy();
+                }
+            });
+            
+            addLog('AudioDetectionComponentテストページ準備完了', 'info');
+        };
+        document.head.appendChild(script);
+    </script>
+</body>
+</html>
