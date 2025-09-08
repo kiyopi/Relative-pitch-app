@@ -176,8 +176,9 @@
                                 <h3 class="text-section-title">音域テスト</h3>
                                 <p class="section-description">あなたの快適な音域を測定しています</p>
                             </div>
-                            <div class="test-instruction" style="flex-shrink: 0;">
-                                <i data-lucide="mic" class="text-red-400" style="width: 32px; height: 32px;"></i>
+                            <!-- マイクステータスアイコン（右上配置） -->
+                            <div class="mic-status-container standby" id="mic-status-container">
+                                <i data-lucide="mic" id="mic-status-icon"></i>
                             </div>
                         </div>
                     </div>
@@ -185,7 +186,7 @@
                     
                     <!-- テスト指示 -->
                     <div class="text-center mb-6">
-                        <h4 class="text-sub-title" id="test-instruction-text">音域を測定します</h4>
+                        <h4 class="text-sub-title text-center" id="test-instruction-text">音域を測定します</h4>
                     </div>
                     
                     <!-- 検出状況 -->
@@ -209,7 +210,36 @@
                             </div>
                         </div>
                         
+                        <!-- 検出状況表示（detection-metersの下） -->
+                        <div class="detection-meters" style="margin-top: 20px;">
+                            <!-- 音量レベル -->
+                            <div class="meter-group">
+                                <div class="meter-label">
+                                    <span>音量レベル</span>
+                                    <span class="meter-value" id="range-test-volume-text">0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill gradient-catalog-green" 
+                                         id="range-test-volume-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <!-- 検出周波数 -->
+                            <div class="meter-group">
+                                <div class="meter-label">
+                                    <span>検出周波数</span>
+                                    <span class="meter-value" id="range-test-frequency-value">0 Hz</span>
+                                </div>
+                            </div>
+                        </div>
                         
+                        <!-- 音域テスト開始ボタン -->
+                        <div class="text-center mt-4">
+                            <button class="btn btn-primary hidden" id="begin-range-test-btn">
+                                <i data-lucide="play" style="width: 20px; height: 20px;"></i>
+                                <span>音域テスト開始</span>
+                            </button>
+                        </div>
                     </div>
 
                     <p class="test-status" id="test-status">待機中...</p>
@@ -628,6 +658,28 @@
                     pitchDetector.startDetection();
                 } else {
                     showErrorMessage('音域テストの開始に失敗しました');
+                }
+            });
+        }
+
+        // 新規追加：音域テスト開始ボタンのイベントハンドラー
+        const beginRangeTestBtn = document.getElementById('begin-range-test-btn');
+        if (beginRangeTestBtn) {
+            beginRangeTestBtn.addEventListener('click', () => {
+                if (!voiceRangeTester) {
+                    showErrorMessage('音域テスト用システムが正常に初期化されていません');
+                    return;
+                }
+                
+                console.log('🎵 音域テスト実行開始');
+                
+                // VoiceRangeTesterV113の実際のテスト開始
+                const success = voiceRangeTester.beginActualTest();
+                if (success) {
+                    // ボタンを隠す
+                    beginRangeTestBtn.classList.add('hidden');
+                } else {
+                    showErrorMessage('音域テストの実行開始に失敗しました');
                 }
             });
         }
