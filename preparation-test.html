@@ -176,17 +176,16 @@
                                 <h3 class="text-section-title">音域テスト</h3>
                                 <p class="section-description">あなたの快適な音域を測定しています</p>
                             </div>
-                            <!-- マイクステータスアイコン（右上配置） -->
-                            <div class="mic-status-container standby" id="mic-status-container">
-                                <i data-lucide="mic" id="mic-status-icon"></i>
+                            <div class="test-instruction" style="flex-shrink: 0;">
+                                <i data-lucide="mic" class="text-red-400" style="width: 32px; height: 32px;"></i>
                             </div>
                         </div>
                     </div>
                     
                     
-                    <!-- メインステータス（音域テストバッジ上部） -->
+                    <!-- テスト指示 -->
                     <div class="text-center mb-6">
-                        <h4 class="text-sub-title text-center" id="main-status-text">音域を測定します</h4>
+                        <h4 class="text-sub-title" id="test-instruction-text">音域を測定します</h4>
                     </div>
                     
                     <!-- 検出状況 -->
@@ -210,42 +209,10 @@
                             </div>
                         </div>
                         
-                        <!-- 検出状況表示（detection-metersの下） -->
-                        <div class="detection-meters" style="margin-top: 20px;">
-                            <!-- 音量レベル（VolumeBarController対応） -->
-                            <div class="meter-group" id="range-volume-container">
-                                <div class="meter-label">
-                                    <span>音量レベル</span>
-                                    <span class="volume-text meter-value" id="range-test-volume-text">0%</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill gradient-catalog-green" 
-                                         id="range-test-volume-bar" style="width: 0%"></div>
-                                </div>
-                            </div>
-
-                            <!-- 検出周波数 -->
-                            <div class="meter-group">
-                                <div class="meter-label">
-                                    <span>検出周波数</span>
-                                    <span class="meter-value" id="range-test-frequency-value">0 Hz</span>
-                                </div>
-                            </div>
-                        </div>
                         
-                        <!-- 音域テスト開始ボタン -->
-                        <div class="text-center mt-4">
-                            <button class="btn btn-primary hidden" id="begin-range-test-btn">
-                                <i data-lucide="play" style="width: 20px; height: 20px;"></i>
-                                <span>音域テスト開始</span>
-                            </button>
-                        </div>
                     </div>
 
-                    <!-- サブ情報（音域テストバッジ下部） -->
-                    <div class="text-center mt-4">
-                        <p class="text-sm text-white-70" id="sub-info-text">待機中...</p>
-                    </div>
+                    <p class="test-status" id="test-status">待機中...</p>
                 </section>
 
                 <!-- 結果表示セクション -->
@@ -296,11 +263,8 @@
     <!-- UIライブラリ -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
-    <!-- AudioDetectionComponent（新PitchPro統合版） -->
-    <script src="js/pitchpro-audio/dist/pitchpro.umd.js" onload="console.log('✅ PitchPro UMD loaded:', !!window.PitchPro)" onerror="console.error('❌ PitchPro UMD load failed')"></script>
-    
-    <!-- VolumeBarController（統一音量制御システム） -->
-    <script src="js/volume-bar-controller.js"></script>
+    <!-- PitchPro v1.1.3（Safari音量低下対策版） -->
+    <script src="js/pitchpro-audio/pitchpro-v1.1.3.umd.js"></script>
     
     <!-- VoiceRangeTesterV113（PitchPro v1.1.3完全対応版） -->
     <script src="js/modules/voice-range-tester-v1.1.3.js"></script>
@@ -310,7 +274,9 @@
         // Lucideアイコン初期化
         lucide.createIcons();
         
-        // システム変数
+        // システム変数（pitchpro-correct-test.html成功パターン）
+        let micController = null;
+        let pitchDetector = null;
         let isAudioTesting = false;
         let audioTestStartTime = null;
         let audioTestDuration = 15000;
@@ -318,12 +284,6 @@
         
         // 音域テスト用変数
         let voiceRangeTester = null;
-        
-        // AudioDetectionComponent（統合音声処理）
-        let audioDetector = null;
-        
-        // VolumeBarController（統一音量制御）
-        let volumeController = null;
         
         // DOM要素
         const requestMicBtn = document.getElementById('request-mic-btn');
@@ -394,25 +354,6 @@
             alert(`エラー: ${message}`);
         }
 
-        // 円形プログレスバー更新関数（グローバル）
-        function updateCircularProgress(progress) {
-            const stabilityRing = document.getElementById('stability-ring');
-            const progressCircle = stabilityRing?.querySelector('.voice-progress-circle');
-            if (progressCircle) {
-                const circumference = 2 * Math.PI * 72; // r=72
-                const offset = circumference - (Math.min(100, Math.max(0, progress)) / 100) * circumference;
-                progressCircle.style.strokeDashoffset = offset.toString();
-                console.log(`🔄 円形プログレスバー更新: ${progress}% (offset: ${offset.toFixed(1)})`);
-                return true;
-            } else {
-                console.error('❌ 円形プログレスバー要素が見つかりません');
-                return false;
-            }
-        }
-        
-        // グローバルに関数を公開
-        window.updateCircularProgress = updateCircularProgress;
-
         // 進捗表示更新
         function updateProgressDisplay(mainText, detailText) {
             if (progressDisplay) {
@@ -426,150 +367,49 @@
             }
         }
 
-        // 音声テスト用の音程検出処理（AudioDetectionComponent統合版）
-        function handleAudioTestPitch(result) {
-            if (!isAudioTesting) return;
-            
-            const { frequency, note, volume } = result;
-            
-            // 検出条件: 130-180Hz帯域（C3-F#3）で適切な音量レベル
-            if (frequency >= 130 && frequency <= 180 && volume >= 15) {
-                if (!detectedC4) {
-                    detectedC4 = true;
-                    const elapsed = Date.now() - audioTestStartTime;
-                    
-                    console.log(`✅ 音声検出成功: ${frequency.toFixed(1)}Hz ${note} (音量: ${volume.toFixed(1)}%) 経過時間: ${elapsed}ms`);
-                    updateProgressDisplay('声を検出しました！', `${frequency.toFixed(1)}Hz - 安定した音声を検出中`);
-                    
-                    // 2秒後にテスト完了
-                    setTimeout(() => {
-                        completeAudioTest();
-                    }, 2000);
-                }
-            }
-        }
-
-        // マイク初期化（新AudioDetectionComponent統合版）
+        // マイク初期化（pitchpro-correct-test.html成功パターン統合）
         async function initializeMicrophone() {
             try {
-                console.log('🎤 マイク初期化開始（AudioDetectionComponent統合版）');
+                console.log('🎤 マイク初期化開始（Safari音量低下対策統合版）');
                 requestMicBtn.disabled = true;
                 requestMicBtn.innerHTML = '<i data-lucide="loader" style="width: 24px; height: 24px;"></i><span>初期化中...</span>';
                 lucide.createIcons();
                 
-                // AudioDetectionComponentの確認（UMD読み込み待機）
-                let attempts = 0;
-                const maxAttempts = 10;
-                
-                while (attempts < maxAttempts && !window.PitchPro) {
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    attempts++;
-                }
-                
-                console.log('🔍 [Preparation] AudioDetectionComponent確認:', !!window.PitchPro);
-                console.log('🔍 [Preparation] window.PitchPro内容:', window.PitchPro ? Object.keys(window.PitchPro) : 'undefined');
-                
                 if (!window.PitchPro) {
-                    throw new Error('AudioDetectionComponentライブラリの読み込みがタイムアウトしました');
+                    throw new Error('PitchProライブラリが読み込まれていません');
                 }
                 
-                const { AudioDetectionComponent } = window.PitchPro;
+                const { AudioManager, PitchDetector } = window.PitchPro;
                 
-                if (!AudioDetectionComponent) {
-                    throw new Error('AudioDetectionComponentクラスが見つかりません');
-                }
+                // AudioManager初期化（Safari Web Audio API音量低下問題の包括的対策）
+                micController = new AudioManager({
+                    sampleRate: 44100,
+                    channelCount: 1,
+                    echoCancellation: false,        // Safari音量低下根本原因1
+                    noiseSuppression: false,        // Safari音量低下根本原因2
+                    autoGainControl: false          // Safari音量低下根本原因3
+                });
                 
-                // AudioDetectionComponent初期化（統合音声処理）
-                audioDetector = new AudioDetectionComponent({
-                    // UI要素セレクター
-                    volumeBarSelector: '#volume-progress',
-                    volumeTextSelector: '#volume-value', 
-                    frequencySelector: '#frequency-value',
-                    
-                    // 検出設定
+                await micController.initialize();
+                console.log('✅ AudioManager初期化完了（Safari音量低下対策：AGC・EC・NS全無効）');
+                
+                // PitchDetector初期化（Safari音量低下問題完全対策版）
+                pitchDetector = new PitchDetector(micController, {
+                    fftSize: 4096,
+                    smoothing: 0.0,  // Safari音量低下根本原因4: smoothingTimeConstant無効化（最重要）
                     clarityThreshold: 0.4,
-                    minVolumeAbsolute: 0.003,
-                    
-                    // デバイス最適化（自動）
-                    deviceOptimization: true,
-                    
-                    // ゲイン設定の許容範囲を緩和
-                    gainTolerance: 1.8, // デフォルトの0.1から1.8に拡大
-                    strictGainValidation: false, // 厳密な検証を無効化
-                    
-                    // UI更新レート
-                    uiUpdateInterval: 50, // 20fps
-                    
-                    // デバッグ
-                    debug: true,
-                    logPrefix: '🎵 Preparation'
+                    minVolumeAbsolute: 0.0001,
+                    harmonicCorrection: false,
+                    silenceDetection: { enabled: false }
                 });
                 
-                // コールバック設定
-                audioDetector.setCallbacks({
-                    onPitchUpdate: (result) => {
-                        // デバッグ：音量レベル確認
-                        if (result.volume > 90) {
-                            console.log(`⚠️ 高音量検出: ${result.volume.toFixed(1)}% (${result.frequency?.toFixed(1)}Hz)`);
-                        }
-                        
-                        // 音程検出時の処理（音声テスト時に使用）
-                        if (isAudioTesting) {
-                            handleAudioTestPitch(result);
-                        }
-                        
-                        // 音域テスト用UI更新（グローバル関数があれば実行）
-                        if (window.rangeTestUIUpdate) {
-                            window.rangeTestUIUpdate(result);
-                        }
-                    },
-                    onVolumeUpdate: (volume) => {
-                        // 音量更新（UIは自動更新されるので追加処理は不要）
-                    },
-                    onStateChange: (state) => {
-                        console.log('状態変更:', state);
-                    },
-                    onError: (error) => {
-                        console.error('エラー:', error.message);
-                    },
-                    onDeviceDetected: (specs) => {
-                        console.log('デバイス検出:', specs.deviceType, '感度:', specs.deviceConfig.sensitivity);
-                    }
-                });
+                await pitchDetector.initialize();
+                console.log('✅ PitchDetector初期化完了（Safari音量低下4大対策実装済み）');
                 
-                await audioDetector.initialize();
-                console.log('✅ AudioDetectionComponent初期化完了');
-                
-                // VolumeBarController初期化（音域テスト用）
-                if (window.VolumeBarController) {
-                    volumeController = new VolumeBarController({
-                        debugMode: false,  // デバッグログを無効化
-                        enableSmoothing: false
-                    });
-                    
-                    // 音域テスト用音量バー登録
-                    const rangeVolumeContainer = document.getElementById('range-volume-container');
-                    if (rangeVolumeContainer) {
-                        volumeController.addVolumeBar('range-volume', rangeVolumeContainer);
-                        console.log('✅ 音域テスト用VolumeBarController初期化完了');
-                    }
-                } else {
-                    console.warn('⚠️ VolumeBarController not loaded');
-                }
-                
-                // VoiceRangeTesterV113初期化（AudioDetectionComponent統合）
+                // VoiceRangeTesterV113初期化
                 if (window.VoiceRangeTesterV113) {
-                    voiceRangeTester = new window.VoiceRangeTesterV113(audioDetector);
-                    
-                    // 円形プログレスバー更新関数をVoiceRangeTesterV113に提供
-                    if (voiceRangeTester && typeof voiceRangeTester.setProgressCallback === 'function') {
-                        voiceRangeTester.setProgressCallback((progress) => {
-                            updateCircularProgress(progress);
-                        });
-                        console.log('✅ VoiceRangeTesterV113に円形プログレスバー更新関数を設定');
-                    }
-                    
-                    console.log('✅ VoiceRangeTesterV113初期化完了（AudioDetectionComponent統合）');
+                    voiceRangeTester = new window.VoiceRangeTesterV113(pitchDetector);
+                    console.log('✅ VoiceRangeTesterV113初期化完了');
                 } else {
                     console.error('❌ VoiceRangeTesterV113が読み込まれていません');
                 }
@@ -591,10 +431,10 @@
             }
         }
 
-        // 音声テスト開始（AudioDetectionComponent使用）
+        // 音声テスト開始（pitchpro-correct-test.html成功パターン統合）
         function startAudioTest() {
-            if (!audioDetector) {
-                console.error('❌ AudioDetectionComponent が初期化されていません');
+            if (!pitchDetector) {
+                console.error('❌ PitchDetector が初期化されていません');
                 return;
             }
             
@@ -602,13 +442,110 @@
             audioTestStartTime = Date.now();
             detectedC4 = false;
             
-            // AudioDetector検出開始
-            audioDetector.startDetection();
-            console.log('🎵 音声テスト開始（AudioDetectionComponent使用）');
-            updateProgressDisplay('声を出してください', '130-180Hz帯域で発声してください（「ラ」の低い音程・音量15%以上）');
+            // pitchpro-correct-test.html成功パターン：コールバック設定
+            pitchDetector.setCallbacks({
+                onPitchUpdate: (result) => {
+                    if (!isAudioTesting || !result) return;
+                    
+                    const { frequency, note } = result;
+                    let volumeLevel = 0;
+                    
+                    // 【Safari音量低下問題根本解決】Web Audio APIから直接音量を高精度計算
+                    try {
+                        if (pitchDetector && pitchDetector.rawAnalyser) {
+                            const bufferLength = pitchDetector.rawAnalyser.fftSize;
+                            const dataArray = new Float32Array(bufferLength);
+                            pitchDetector.rawAnalyser.getFloatTimeDomainData(dataArray);
+                            
+                            // 高精度RMS計算（Safari最適化版）
+                            let sum = 0;
+                            let maxValue = 0;
+                            for (let i = 0; i < bufferLength; i++) {
+                                const value = Math.abs(dataArray[i]);
+                                sum += value * value;
+                                maxValue = Math.max(maxValue, value);
+                            }
+                            
+                            const rms = Math.sqrt(sum / bufferLength);
+                            
+                            // Safari対応：スムーズな音量検出（自然な上昇カーブ最適化）
+                            const baseMultiplier = 2800; // 全体的に感度向上
+                            const minThreshold = 0.0005;   // 検出最小閾値
+                            const instantDropThreshold = 0.002; // 即座ゼロ化閾値
+                            
+                            // 音量計算：RMSとピーク値のバランス調整
+                            const combinedVolume = (rms * 0.85) + (maxValue * 0.15);
+                            
+                            // スムーズな音量バー反応（段階的変化なし）
+                            if (combinedVolume < instantDropThreshold) {
+                                volumeLevel = 0; // 即座ゼロ化
+                            } else if (combinedVolume < minThreshold) {
+                                volumeLevel = 0; // 微細音量カット
+                            } else {
+                                // 単一の感度設定でスムーズな上昇カーブを実現
+                                volumeLevel = Math.min(100, Math.max(0, combinedVolume * baseMultiplier));
+                            }
+                        }
+                    } catch (error) {
+                        console.warn('Direct volume calculation failed, using fallback:', error);
+                        // フォールバック：PitchProの値を使用（Safari対応感度向上）
+                        const rawVolume = result.volume || 0;
+                        volumeLevel = Math.min(100, Math.max(0, rawVolume * 800)); // 感度向上
+                    }
+                    
+                    // 音量バー更新
+                    if (volumeProgress) {
+                        volumeProgress.style.width = volumeLevel + '%';
+                    }
+                    if (volumeValue) {
+                        volumeValue.textContent = volumeLevel.toFixed(1) + '%';
+                    }
+                    
+                    // 周波数表示更新
+                    if (frequencyValue) {
+                        if (frequency > 0) {
+                            frequencyValue.textContent = `${frequency.toFixed(1)} Hz`;
+                        } else {
+                            frequencyValue.textContent = '0 Hz';
+                        }
+                    }
+                    
+                    // 音声検出チェック（より広い範囲で人の声を検出）
+                    if (frequency >= 80 && frequency <= 400 && volumeLevel >= 20) {
+                        if (!detectedC4) {
+                            detectedC4 = true;
+                            updateProgressDisplay('声を検出しました！', `${frequency.toFixed(1)}Hz - 安定した音声を検出中`);
+                            
+                            // 成功メッセージを早めに表示
+                            if (detectionSuccess) {
+                                detectionSuccess.style.display = 'flex';
+                            }
+                            
+                            setTimeout(() => {
+                                if (isAudioTesting) {
+                                    completeAudioTest();
+                                }
+                            }, 2000);
+                        }
+                    }
+                },
+                onError: (error) => {
+                    console.error('🎤 音声テストエラー:', error);
+                    showErrorMessage('音声テスト中にエラーが発生しました');
+                }
+            });
             
-            // 15秒タイマー
-            setTimeout(checkAudioTestComplete, audioTestDuration);
+            // 検出開始
+            const success = pitchDetector.startDetection();
+            if (success) {
+                console.log('🎵 音声テスト開始');
+                updateProgressDisplay('声を出してください', '3秒間継続して発声してください');
+                
+                // 15秒タイマー
+                setTimeout(checkAudioTestComplete, audioTestDuration);
+            } else {
+                showErrorMessage('音声テスト開始に失敗しました');
+            }
         }
 
         // 音声テスト完了チェック
@@ -619,7 +556,7 @@
                 completeAudioTest();
             } else {
                 // 時間切れ - 再試行を促す
-                updateProgressDisplay('時間切れ', '130-180Hz帯域で再度お試しください（「ラ」の音程・音量15%以上）');
+                updateProgressDisplay('時間切れ', '130-180Hzの声で2秒間継続してください');
                 audioTestStartTime = Date.now(); // タイマーリセット
                 setTimeout(checkAudioTestComplete, audioTestDuration);
             }
@@ -629,27 +566,26 @@
         function completeAudioTest() {
             isAudioTesting = false;
             
-            // AudioDetector停止とマイクリソース解放
-            if (audioDetector) {
-                audioDetector.stopDetection();
-                console.log('🎵 AudioDetector停止完了');
-                
-                // マイクを完全に解放（重要！）
-                // 音域テスト開始時に再初期化するので問題ない
-                audioDetector.destroy();
-                console.log('🎤 マイクリソース完全解放完了');
-                
-                // 次回の使用のためにnullに設定
-                audioDetector = null;
+            // PitchDetector停止
+            if (pitchDetector) {
+                pitchDetector.stopDetection();
+                console.log('🎵 PitchDetector停止完了');
             }
             
-            // 手動でUIリセット
-            if (volumeProgress) volumeProgress.style.width = '0%';
-            if (volumeValue) volumeValue.textContent = '0%';
-            if (frequencyValue) frequencyValue.textContent = '261.6 Hz (C4)';
-            console.log('✅ UI手動リセット完了');
+            // 音量バーリセット
+            if (volumeProgress) {
+                volumeProgress.style.width = '0%';
+            }
+            if (volumeValue) {
+                volumeValue.textContent = '0%';
+            }
             
-            console.log('✅ 音声テスト完了（マイク解放済み）');
+            // 周波数表示を0Hzにリセット
+            if (frequencyValue) {
+                frequencyValue.textContent = '0 Hz';
+            }
+            
+            console.log('✅ 音声テスト完了');
             
             // 成功メッセージ表示
             if (detectionSuccess) {
@@ -675,37 +611,8 @@
         }
 
         if (startRangeTestBtn) {
-            startRangeTestBtn.addEventListener('click', async () => {
-                // AudioDetectorが既に破棄されている場合と、まだ存在する場合の両方に対応
-                if (audioDetector) {
-                    console.log('⚠️ AudioDetectorがまだ存在しています - 破棄します');
-                    audioDetector.stopDetection();
-                    audioDetector.destroy();
-                    audioDetector = null;
-                }
-                
-                // 新しいAudioDetectionComponentを音域テスト用に作成
-                console.log('🔄 音域テスト用AudioDetectionComponent新規作成');
-                const { AudioDetectionComponent } = window.PitchPro;
-                audioDetector = new AudioDetectionComponent({
-                        // UI要素セレクター（音域テスト用）
-                        volumeBarSelector: '#range-test-volume-bar',
-                        volumeTextSelector: '#range-test-volume-text', 
-                        frequencySelector: '#range-test-frequency-value',
-                        
-                        // 検出設定
-                        clarityThreshold: 0.4,
-                        minVolumeAbsolute: 0.003,
-                        deviceOptimization: true,
-                        debug: true,
-                        logPrefix: '🎵 RangeTest'
-                    });
-                    
-                // 初期化
-                await audioDetector.initialize();
-                console.log('✅ 音域テスト用AudioDetector初期化完了');
-                
-                if (!voiceRangeTester || !audioDetector) {
+            startRangeTestBtn.addEventListener('click', () => {
+                if (!voiceRangeTester || !pitchDetector) {
                     showErrorMessage('音域テスト用システムが正常に初期化されていません');
                     return;
                 }
@@ -714,180 +621,13 @@
                 showSection(rangeTestSection);
                 updateStepStatus(3, 'active');
                 
-                // AudioDetectionComponentのUI要素を音域テスト用に変更
-                console.log('🔍 audioDetector:', audioDetector);
-                console.log('🔍 audioDetector.setCallbacks:', typeof audioDetector?.setCallbacks);
-                
-                // DOM キャッシュクラス実装
-                class PreparationTestUI {
-                    constructor() {
-                        this.elements = this.cacheElements();
-                        this.config = this.getConfig();
-                        console.log('✅ PreparationTestUI初期化完了', this.elements);
-                    }
-
-                    cacheElements() {
-                        return {
-                            // 音域テスト要素
-                            rangeVolumeBar: document.getElementById('range-test-volume-bar'),
-                            rangeVolumeText: document.getElementById('range-test-volume-text'),
-                            rangeFrequencyValue: document.getElementById('range-test-frequency-value'),
-                            // マイクテスト要素（参考）
-                            micVolumeBar: document.getElementById('volume-progress'),
-                            micVolumeText: document.getElementById('volume-value'),
-                            micFrequencyValue: document.getElementById('frequency-value')
-                        };
-                    }
-
-                    getConfig() {
-                        return {
-                            FREQUENCY_RANGE: { min: 130, max: 180 },
-                            MIN_VOLUME: 15,
-                            GAIN_TOLERANCE: 1.8,
-                            UPDATE_THROTTLE: 50 // ms
-                        };
-                    }
-
-                    updateRangeTestUI(result) {
-                        if (!result) return;
-                        
-                        // 周波数更新
-                        if (result.frequency && this.elements.rangeFrequencyValue) {
-                            this.elements.rangeFrequencyValue.textContent = `${result.frequency.toFixed(1)} Hz`;
-                            this.elements.rangeFrequencyValue.style.color = '#60a5fa';
-                        }
-                        
-                        // 音量更新
-                        if (result.volume !== undefined) {
-                            const volume = Math.min(100, Math.max(0, result.volume));
-                            
-                            // 音量バー更新（強制的にスタイルを適用）
-                            if (this.elements.rangeVolumeBar) {
-                                // 既存のstyle属性を完全に上書き
-                                this.elements.rangeVolumeBar.style.cssText = `width: ${volume}% !important; background-color: #22c55e !important; height: 100% !important; border-radius: 4px !important; transition: width 0.5s ease !important;`;
-                                
-                                // デバッグ：実際のスタイル確認
-                                console.log(`🔍 range-test-volume-bar スタイル確認:`, {
-                                    width: this.elements.rangeVolumeBar.style.width,
-                                    backgroundColor: this.elements.rangeVolumeBar.style.backgroundColor,
-                                    cssText: this.elements.rangeVolumeBar.style.cssText
-                                });
-                            }
-                            
-                            // 音量テキスト更新
-                            if (this.elements.rangeVolumeText) {
-                                this.elements.rangeVolumeText.textContent = `${Math.round(volume)}%`;
-                                this.elements.rangeVolumeText.style.color = '#ffffff';
-                            }
-                            
-                            console.log(`🎯 UI更新完了: 音量=${volume}%, 周波数=${result.frequency?.toFixed(1)}Hz`);
-                        }
-                    }
-
-                    validateElements() {
-                        const missing = [];
-                        const found = [];
-                        
-                        Object.entries(this.elements).forEach(([key, element]) => {
-                            if (!element) {
-                                missing.push(key);
-                            } else {
-                                found.push({
-                                    key,
-                                    id: element.id,
-                                    classes: element.className,
-                                    tagName: element.tagName
-                                });
-                            }
-                        });
-                        
-                        if (missing.length > 0) {
-                            console.warn('⚠️ 見つからない要素:', missing);
-                        }
-                        
-                        console.log('✅ 発見された要素:', found);
-                        console.log('📊 要素統計: 発見=' + found.length + '個, 不明=' + missing.length + '個');
-                        
-                        // 特に重要な要素の詳細チェック
-                        if (this.elements.rangeVolumeBar) {
-                            console.log('🔍 range-test-volume-bar 詳細:', {
-                                element: this.elements.rangeVolumeBar,
-                                id: this.elements.rangeVolumeBar.id,
-                                className: this.elements.rangeVolumeBar.className,
-                                currentStyle: this.elements.rangeVolumeBar.style.cssText,
-                                currentWidth: this.elements.rangeVolumeBar.style.width
-                            });
-                        }
-                        
-                        return missing.length === 0;
-                    }
-                }
-
-                // PreparationTestUIインスタンス作成
-                const preparationUI = new PreparationTestUI();
-                preparationUI.validateElements();
-                
-                // クラスベースのUI更新関数
-                window.rangeTestUIUpdate = function(result) {
-                    // PreparationTestUIクラスを使用してUI更新
-                    preparationUI.updateRangeTestUI(result);
-                    
-                    // VoiceRangeTesterV113に音程検出結果を転送
-                    if (voiceRangeTester && typeof voiceRangeTester.handlePitchDetection === 'function') {
-                        voiceRangeTester.handlePitchDetection(result);
-                    }
-                };
-                
-                console.log('✅ 音域テスト用UI更新関数を定義完了（VolumeBarController統合版）');
-                
-                // 円形プログレスバー動作確認（テスト用に10%表示）
-                if (updateCircularProgress(10)) {
-                    console.log('✅ 円形プログレスバー要素確認完了');
-                }
-                
-                // 重要：VoiceRangeTesterがコールバックを上書きするため、
-                // 音域テスト開始後にコールバックを再設定する必要がある
-                
-                // 音域テスト開始（VoiceRangeTesterが独自のコールバックを設定）
+                // 音域テスト開始
                 const success = voiceRangeTester.startRangeTest();
-                
-                // VoiceRangeTester内部でwindow.rangeTestUIUpdateが呼ばれることを確認
-                console.log('🔍 window.rangeTestUIUpdate確認:', typeof window.rangeTestUIUpdate);
                 if (success) {
-                    // AudioDetector再開（必須）
-                    audioDetector.startDetection();
-                    console.log('✅ 音域テスト用AudioDetector再開完了');
-                    
-                    // デバッグ：コールバック確認
-                    setTimeout(() => {
-                        console.log('🔍 3秒後のコールバック動作テスト');
-                        console.log('  window.rangeTestUIUpdate存在:', typeof window.rangeTestUIUpdate);
-                        console.log('  audioDetector.isDetecting:', audioDetector.isDetecting);
-                    }, 3000);
+                    // PitchDetector再開
+                    pitchDetector.startDetection();
                 } else {
                     showErrorMessage('音域テストの開始に失敗しました');
-                }
-            });
-        }
-
-        // 新規追加：音域テスト開始ボタンのイベントハンドラー
-        const beginRangeTestBtn = document.getElementById('begin-range-test-btn');
-        if (beginRangeTestBtn) {
-            beginRangeTestBtn.addEventListener('click', () => {
-                if (!voiceRangeTester) {
-                    showErrorMessage('音域テスト用システムが正常に初期化されていません');
-                    return;
-                }
-                
-                console.log('🎵 音域テスト実行開始');
-                
-                // VoiceRangeTesterV113の実際のテスト開始
-                const success = voiceRangeTester.beginActualTest();
-                if (success) {
-                    // ボタンを隠す
-                    beginRangeTestBtn.classList.add('hidden');
-                } else {
-                    showErrorMessage('音域テストの実行開始に失敗しました');
                 }
             });
         }
