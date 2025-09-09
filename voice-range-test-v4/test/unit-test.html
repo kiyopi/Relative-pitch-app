@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Test - voice-range-test-v4</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../Bolt/v2/styles/base.css">
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        
+        .test-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .test-result {
+            margin: 0.5rem 0;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .test-success {
+            background: rgba(16, 185, 129, 0.2);
+            border-left: 4px solid #10b981;
+            color: #34d399;
+        }
+        
+        .test-error {
+            background: rgba(239, 68, 68, 0.2);
+            border-left: 4px solid #ef4444;
+            color: #f87171;
+        }
+        
+        .test-info {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 4px solid #3b82f6;
+            color: #60a5fa;
+        }
+        
+        .test-button {
+            margin: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .test-button:hover {
+            background: #2563eb;
+        }
+        
+        .test-button:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+        
+        .mock-ui-elements {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <header class="mb-6">
+            <h1 class="text-2xl font-bold text-white mb-2">voice-range-test-v4 単体テスト</h1>
+            <p class="text-white-70">各JavaScriptモジュールの動作を個別に検証</p>
+        </header>
+
+        <!-- モック用UI要素（非表示） -->
+        <div class="mock-ui-elements">
+            <div id="volume-progress" style="width: 0%;"></div>
+            <div id="volume-percentage">0%</div>
+            <div id="range-test-volume-bar" style="width: 0%;"></div>
+            <div id="range-test-volume-text">0%</div>
+            <div id="range-test-frequency-value">-- Hz</div>
+            <button id="start-mic-test">マイクテスト開始</button>
+            <button id="start-range-test">音域テスト開始</button>
+            <div id="recording-status">準備中</div>
+            <div id="test-progress">0/15</div>
+            <button class="record-btn" data-note="C3">記録</button>
+            <button class="record-btn" data-note="D3">記録</button>
+            <button class="record-btn" data-note="E3">記録</button>
+        </div>
+
+        <!-- AudioDetectionComponent テスト -->
+        <section class="test-section">
+            <h2 class="text-xl font-medium text-white mb-4">
+                <i data-lucide="radio" class="inline mr-2"></i>
+                AudioDetectionComponent テスト
+            </h2>
+            <div class="space-y-2">
+                <button class="test-button" onclick="testAudioDetectionComponent()">基本動作テスト</button>
+                <button class="test-button" onclick="testAudioDetectionInit()">初期化テスト</button>
+                <button class="test-button" onclick="testAudioDetectionDestroy()">破棄テスト</button>
+                <button class="test-button" onclick="testDeviceDetection()">デバイス検出テスト</button>
+            </div>
+            <div id="audio-detection-results"></div>
+        </section>
+
+        <!-- RecordingController テスト -->
+        <section class="test-section">
+            <h2 class="text-xl font-medium text-white mb-4">
+                <i data-lucide="settings" class="inline mr-2"></i>
+                RecordingController テスト
+            </h2>
+            <div class="space-y-2">
+                <button class="test-button" onclick="testRecordingController()">基本動作テスト</button>
+                <button class="test-button" onclick="testRecordingControllerInit()">初期化テスト</button>
+                <button class="test-button" onclick="testPhaseTransition()">フェーズ遷移テスト</button>
+                <button class="test-button" onclick="testEventHandlers()">イベント処理テスト</button>
+            </div>
+            <div id="recording-controller-results"></div>
+        </section>
+
+        <!-- VoiceRangeUI テスト -->
+        <section class="test-section">
+            <h2 class="text-xl font-medium text-white mb-4">
+                <i data-lucide="layout" class="inline mr-2"></i>
+                VoiceRangeUI テスト
+            </h2>
+            <div class="space-y-2">
+                <button class="test-button" onclick="testVoiceRangeUI()">基本動作テスト</button>
+                <button class="test-button" onclick="testUIElements()">UI要素テスト</button>
+                <button class="test-button" onclick="testAnimations()">アニメーションテスト</button>
+                <button class="test-button" onclick="testProgressUpdate()">進捗更新テスト</button>
+            </div>
+            <div id="voice-range-ui-results"></div>
+        </section>
+
+        <!-- VoiceRangeTesterV113 テスト -->
+        <section class="test-section">
+            <h2 class="text-xl font-medium text-white mb-4">
+                <i data-lucide="target" class="inline mr-2"></i>
+                VoiceRangeTesterV113 テスト
+            </h2>
+            <div class="space-y-2">
+                <button class="test-button" onclick="testVoiceRangeTester()">基本動作テスト</button>
+                <button class="test-button" onclick="testMeasurement()">測定機能テスト</button>
+                <button class="test-button" onclick="testAnalysis()">分析機能テスト</button>
+            </div>
+            <div id="voice-range-tester-results"></div>
+        </section>
+
+        <!-- 全体テスト -->
+        <section class="test-section">
+            <h2 class="text-xl font-medium text-white mb-4">
+                <i data-lucide="check-circle" class="inline mr-2"></i>
+                全体テスト
+            </h2>
+            <div class="space-y-2">
+                <button class="test-button" onclick="runAllTests()" id="run-all-btn">全テスト実行</button>
+                <button class="test-button" onclick="clearResults()">結果クリア</button>
+            </div>
+            <div id="overall-results"></div>
+        </section>
+    </div>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- TODO: 外部ファイル化 /voice-range-test-v4/test/unit-test.js -->
+    <script type="module">
+        // モジュールインポート
+        import { AudioDetectionComponent, VoiceRangeTesterV113 } from '../src/js/pitch-pro-integration.js';
+        import RecordingController from '../src/js/recording-controller.js';
+        import VoiceRangeUI from '../src/js/voice-range-ui.js';
+
+        // グローバル変数（テスト用）
+        window.testInstances = {};
+        window.testResults = [];
+
+        // ユーティリティ関数
+        function logResult(sectionId, message, type = 'info') {
+            const section = document.getElementById(sectionId);
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result test-${type}`;
+            resultDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            section.appendChild(resultDiv);
+            
+            // コンソールにも出力
+            console.log(`[TEST ${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearSectionResults(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.innerHTML = '';
+        }
+
+        // AudioDetectionComponent テスト関数群
+        window.testAudioDetectionComponent = async function() {
+            clearSectionResults('audio-detection-results');
+            try {
+                logResult('audio-detection-results', 'AudioDetectionComponent基本動作テスト開始', 'info');
+                
+                const detector = new AudioDetectionComponent({
+                    volumeBarSelector: '#volume-progress',
+                    volumeTextSelector: '#volume-percentage',
+                    debugMode: true
+                });
+                
+                logResult('audio-detection-results', 'インスタンス作成成功', 'success');
+                
+                // デバイス検出確認
+                const stats = detector.getStats();
+                logResult('audio-detection-results', `デバイス: ${stats.deviceType}`, 'info');
+                
+                window.testInstances.audioDetector = detector;
+                logResult('audio-detection-results', 'AudioDetectionComponent基本動作テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('audio-detection-results', `エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testAudioDetectionInit = async function() {
+            try {
+                logResult('audio-detection-results', '初期化テスト開始', 'info');
+                
+                if (!window.testInstances.audioDetector) {
+                    logResult('audio-detection-results', 'インスタンスを先に作成してください', 'error');
+                    return;
+                }
+                
+                const detector = window.testInstances.audioDetector;
+                const result = await detector.initialize();
+                
+                if (result) {
+                    logResult('audio-detection-results', '初期化成功', 'success');
+                    
+                    const stats = detector.getStats();
+                    logResult('audio-detection-results', `初期化状態: ${stats.isInitialized}`, 'info');
+                } else {
+                    logResult('audio-detection-results', '初期化失敗', 'error');
+                }
+                
+            } catch (error) {
+                logResult('audio-detection-results', `初期化エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testAudioDetectionDestroy = function() {
+            try {
+                logResult('audio-detection-results', '破棄テスト開始', 'info');
+                
+                if (!window.testInstances.audioDetector) {
+                    logResult('audio-detection-results', 'インスタンスが存在しません', 'error');
+                    return;
+                }
+                
+                const detector = window.testInstances.audioDetector;
+                detector.destroy();
+                
+                const stats = detector.getStats();
+                logResult('audio-detection-results', `破棄状態: ${stats.isDestroyed}`, 'success');
+                
+                // 再破棄テスト
+                detector.destroy();
+                logResult('audio-detection-results', '重複破棄テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('audio-detection-results', `破棄エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testDeviceDetection = function() {
+            try {
+                logResult('audio-detection-results', 'デバイス検出テスト開始', 'info');
+                
+                const detector = new AudioDetectionComponent({ debugMode: true });
+                const stats = detector.getStats();
+                
+                logResult('audio-detection-results', `検出デバイス: ${stats.deviceType}`, 'info');
+                logResult('audio-detection-results', 'User Agent確認:', 'info');
+                logResult('audio-detection-results', navigator.userAgent, 'info');
+                
+                // iPadOS検出テスト
+                const hasTouch = 'ontouchend' in document;
+                logResult('audio-detection-results', `タッチサポート: ${hasTouch}`, 'info');
+                
+                detector.destroy();
+                logResult('audio-detection-results', 'デバイス検出テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('audio-detection-results', `デバイス検出エラー: ${error.message}`, 'error');
+            }
+        };
+
+        // RecordingController テスト関数群
+        window.testRecordingController = function() {
+            clearSectionResults('recording-controller-results');
+            try {
+                logResult('recording-controller-results', 'RecordingController基本動作テスト開始', 'info');
+                
+                const controller = new RecordingController({
+                    debugMode: true
+                });
+                
+                logResult('recording-controller-results', 'インスタンス作成成功', 'success');
+                logResult('recording-controller-results', `初期フェーズ: ${controller.currentPhase}`, 'info');
+                
+                window.testInstances.recordingController = controller;
+                logResult('recording-controller-results', 'RecordingController基本動作テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('recording-controller-results', `エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testRecordingControllerInit = async function() {
+            try {
+                logResult('recording-controller-results', '初期化テスト開始', 'info');
+                
+                if (!window.testInstances.recordingController) {
+                    logResult('recording-controller-results', 'インスタンスを先に作成してください', 'error');
+                    return;
+                }
+                
+                const controller = window.testInstances.recordingController;
+                const result = await controller.initialize();
+                
+                if (result) {
+                    logResult('recording-controller-results', '初期化成功', 'success');
+                    logResult('recording-controller-results', `UI要素キャッシュ数: ${Object.keys(controller.elements).length}`, 'info');
+                } else {
+                    logResult('recording-controller-results', '初期化失敗', 'error');
+                }
+                
+            } catch (error) {
+                logResult('recording-controller-results', `初期化エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testPhaseTransition = function() {
+            try {
+                logResult('recording-controller-results', 'フェーズ遷移テスト開始', 'info');
+                
+                if (!window.testInstances.recordingController) {
+                    logResult('recording-controller-results', 'インスタンスを先に作成してください', 'error');
+                    return;
+                }
+                
+                const controller = window.testInstances.recordingController;
+                
+                // フェーズ遷移テスト
+                controller.updateUIState('mic-test');
+                logResult('recording-controller-results', `mic-testフェーズ: ${controller.currentPhase}`, 'info');
+                
+                controller.updateUIState('range-test');
+                logResult('recording-controller-results', `range-testフェーズ: ${controller.currentPhase}`, 'info');
+                
+                logResult('recording-controller-results', 'フェーズ遷移テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('recording-controller-results', `フェーズ遷移エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testEventHandlers = function() {
+            try {
+                logResult('recording-controller-results', 'イベント処理テスト開始', 'info');
+                
+                if (!window.testInstances.recordingController) {
+                    logResult('recording-controller-results', 'インスタンスを先に作成してください', 'error');
+                    return;
+                }
+                
+                const controller = window.testInstances.recordingController;
+                
+                // イベントリスナー数確認
+                const listenerCount = controller.eventListeners.size;
+                logResult('recording-controller-results', `登録イベントリスナー数: ${listenerCount}`, 'info');
+                
+                logResult('recording-controller-results', 'イベント処理テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('recording-controller-results', `イベント処理エラー: ${error.message}`, 'error');
+            }
+        };
+
+        // VoiceRangeUI テスト関数群
+        window.testVoiceRangeUI = function() {
+            clearSectionResults('voice-range-ui-results');
+            try {
+                logResult('voice-range-ui-results', 'VoiceRangeUI基本動作テスト開始', 'info');
+                
+                const ui = new VoiceRangeUI({
+                    enableAnimations: false, // テスト時はアニメーション無効
+                    debugMode: true
+                });
+                
+                logResult('voice-range-ui-results', 'インスタンス作成成功', 'success');
+                logResult('voice-range-ui-results', `初期フェーズ: ${ui.currentPhase}`, 'info');
+                
+                window.testInstances.voiceRangeUI = ui;
+                logResult('voice-range-ui-results', 'VoiceRangeUI基本動作テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('voice-range-ui-results', `エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testUIElements = function() {
+            try {
+                logResult('voice-range-ui-results', 'UI要素テスト開始', 'info');
+                
+                if (!window.testInstances.voiceRangeUI) {
+                    logResult('voice-range-ui-results', 'インスタンスを先に作成してください', 'error');
+                    return;
+                }
+                
+                const ui = window.testInstances.voiceRangeUI;
+                const result = ui.initialize();
+                
+                if (result) {
+                    logResult('voice-range-ui-results', 'UI初期化成功', 'success');
+                    logResult('voice-range-ui-results', `キャッシュUI要素数: ${Object.keys(ui.elements).length}`, 'info');
+                } else {
+                    logResult('voice-range-ui-results', 'UI初期化失敗', 'error');
+                }
+                
+            } catch (error) {
+                logResult('voice-range-ui-results', `UI要素エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testAnimations = function() {
+            try {
+                logResult('voice-range-ui-results', 'アニメーションテスト開始', 'info');
+                
+                if (!window.testInstances.voiceRangeUI) {
+                    logResult('voice-range-ui-results', 'インスタンスを先に作成してください', 'error');
+                    return;
+                }
+                
+                const ui = window.testInstances.voiceRangeUI;
+                
+                // フェーズ変更テスト
+                ui.setPhase('mic-test');
+                logResult('voice-range-ui-results', 'mic-testフェーズ設定完了', 'info');
+                
+                ui.setPhase('range-test');
+                logResult('voice-range-ui-results', 'range-testフェーズ設定完了', 'info');
+                
+                logResult('voice-range-ui-results', 'アニメーションテスト完了', 'success');
+                
+            } catch (error) {
+                logResult('voice-range-ui-results', `アニメーションエラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testProgressUpdate = function() {
+            try {
+                logResult('voice-range-ui-results', '進捗更新テスト開始', 'info');
+                
+                if (!window.testInstances.voiceRangeUI) {
+                    logResult('voice-range-ui-results', 'インスタンスを先に作成してください', 'error');
+                    return;
+                }
+                
+                const ui = window.testInstances.voiceRangeUI;
+                
+                // 進捗更新テスト
+                ui.updateProgress(5, 15);
+                logResult('voice-range-ui-results', '進捗更新 5/15 完了', 'info');
+                
+                ui.updateProgress(10, 15);
+                logResult('voice-range-ui-results', '進捗更新 10/15 完了', 'info');
+                
+                ui.updateProgress(15, 15);
+                logResult('voice-range-ui-results', '進捗更新 15/15 完了', 'info');
+                
+                logResult('voice-range-ui-results', '進捗更新テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('voice-range-ui-results', `進捗更新エラー: ${error.message}`, 'error');
+            }
+        };
+
+        // VoiceRangeTesterV113 テスト関数群
+        window.testVoiceRangeTester = function() {
+            clearSectionResults('voice-range-tester-results');
+            try {
+                logResult('voice-range-tester-results', 'VoiceRangeTesterV113基本動作テスト開始', 'info');
+                
+                const tester = new VoiceRangeTesterV113();
+                
+                logResult('voice-range-tester-results', 'インスタンス作成成功', 'success');
+                logResult('voice-range-tester-results', `対象音数: ${tester.options.targetNotes.length}`, 'info');
+                
+                window.testInstances.voiceRangeTester = tester;
+                logResult('voice-range-tester-results', 'VoiceRangeTesterV113基本動作テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('voice-range-tester-results', `エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testMeasurement = function() {
+            try {
+                logResult('voice-range-tester-results', '測定機能テスト開始', 'info');
+                
+                if (!window.testInstances.voiceRangeTester) {
+                    logResult('voice-range-tester-results', 'インスタンスを先に作成してください', 'error');
+                    return;
+                }
+                
+                const tester = window.testInstances.voiceRangeTester;
+                
+                // モック AudioDetectionComponent作成
+                const mockDetector = {
+                    setCallbacks: (callbacks) => {
+                        // モックデータで測定シミュレーション
+                        setTimeout(() => {
+                            callbacks.onPitchUpdate({
+                                volume: 75,
+                                frequency: 261.6, // C4
+                                clarity: 0.8,
+                                timestamp: Date.now()
+                            });
+                        }, 100);
+                    }
+                };
+                
+                tester.setAudioDetector(mockDetector);
+                logResult('voice-range-tester-results', 'モックAudioDetector設定完了', 'info');
+                
+                logResult('voice-range-tester-results', '測定機能テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('voice-range-tester-results', `測定機能エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testAnalysis = function() {
+            try {
+                logResult('voice-range-tester-results', '分析機能テスト開始', 'info');
+                
+                if (!window.testInstances.voiceRangeTester) {
+                    logResult('voice-range-tester-results', 'インスタンスを先に作成してください', 'error');
+                    return;
+                }
+                
+                const tester = window.testInstances.voiceRangeTester;
+                
+                // モック測定データ
+                const mockData = [
+                    { volume: 75, frequency: 261.6, clarity: 0.8, timestamp: Date.now() },
+                    { volume: 80, frequency: 260.0, clarity: 0.9, timestamp: Date.now() + 100 },
+                    { volume: 85, frequency: 263.0, clarity: 0.7, timestamp: Date.now() + 200 }
+                ];
+                
+                const targetNote = { name: 'C4', frequency: 261.6 };
+                const result = tester.analyzeMeasurementData('C4', targetNote, mockData);
+                
+                logResult('voice-range-tester-results', `分析結果: ${result.success}`, 'info');
+                logResult('voice-range-tester-results', `周波数誤差: ${result.frequencyError?.toFixed(2)}%`, 'info');
+                logResult('voice-range-tester-results', `信頼度: ${result.confidence?.toFixed(1)}%`, 'info');
+                
+                logResult('voice-range-tester-results', '分析機能テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('voice-range-tester-results', `分析機能エラー: ${error.message}`, 'error');
+            }
+        };
+
+        // 全体テスト
+        window.runAllTests = async function() {
+            clearSectionResults('overall-results');
+            const startTime = Date.now();
+            
+            try {
+                logResult('overall-results', '全体テスト開始', 'info');
+                document.getElementById('run-all-btn').disabled = true;
+                
+                // AudioDetectionComponent テスト
+                await window.testAudioDetectionComponent();
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // RecordingController テスト
+                window.testRecordingController();
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // VoiceRangeUI テスト
+                window.testVoiceRangeUI();
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // VoiceRangeTesterV113 テスト
+                window.testVoiceRangeTester();
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+                
+                logResult('overall-results', `全体テスト完了 (${duration}ms)`, 'success');
+                logResult('overall-results', 'コンソールで詳細を確認してください', 'info');
+                
+            } catch (error) {
+                logResult('overall-results', `全体テストエラー: ${error.message}`, 'error');
+            } finally {
+                document.getElementById('run-all-btn').disabled = false;
+            }
+        };
+
+        window.clearResults = function() {
+            const sections = [
+                'audio-detection-results',
+                'recording-controller-results', 
+                'voice-range-ui-results',
+                'voice-range-tester-results',
+                'overall-results'
+            ];
+            
+            sections.forEach(sectionId => clearSectionResults(sectionId));
+            window.testInstances = {};
+            console.clear();
+        };
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+            logResult('overall-results', '単体テスト環境準備完了', 'success');
+        });
+
+    </script>
+</body>
+</html>

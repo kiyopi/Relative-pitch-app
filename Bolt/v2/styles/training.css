@@ -79,11 +79,49 @@
   display: none;
 }
 
+/* 音域テストセクション表示修正 */
+#range-test-section:not(.hidden) {
+  display: block !important;
+}
+
+/* メインステータス・サブ情報表示 */
+.main-status-display {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.sub-info-display {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* セクションヘッダー */
+.section-header {
+  margin-bottom: 1.5rem;
+}
+
+.section-header h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
 /* セクション説明 */
 .section-description {
   color: rgba(255, 255, 255, 0.8);
   font-size: 1rem;
   margin-bottom: 24px;
+}
+
+/* テキストセクションタイトル */
+.text-section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
 }
 
 /* アラート系 */

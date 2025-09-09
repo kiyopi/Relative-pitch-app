@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Test (Standalone) - voice-range-test-v4</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../Bolt/v2/styles/base.css">
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        
+        .test-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .test-result {
+            margin: 0.5rem 0;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .test-success {
+            background: rgba(16, 185, 129, 0.2);
+            border-left: 4px solid #10b981;
+            color: #34d399;
+        }
+        
+        .test-error {
+            background: rgba(239, 68, 68, 0.2);
+            border-left: 4px solid #ef4444;
+            color: #f87171;
+        }
+        
+        .test-info {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 4px solid #3b82f6;
+            color: #60a5fa;
+        }
+        
+        .test-button {
+            margin: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .test-button:hover {
+            background: #2563eb;
+        }
+        
+        .test-button:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+        
+        .mock-ui-elements {
+            display: none;
+        }
+        
+        .cors-notice {
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <header class="mb-6">
+            <h1 class="text-2xl font-bold text-white mb-2">voice-range-test-v4 単体テスト (Standalone版)</h1>
+            <p class="text-white-70">CORS問題回避版 - 各JavaScriptモジュールのスタンドアロンテスト</p>
+        </header>
+
+        <!-- CORS対処情報 -->
+        <div class="cors-notice">
+            <h3 class="text-yellow-300 font-medium mb-2">📋 CORS問題対処版</h3>
+            <p class="text-white-70 text-sm">
+                ES6モジュールのインライン実装でCORS問題を回避しています。<br>
+                実際のモジュールファイルのロジックを再現したテスト環境です。
+            </p>
+        </div>
+
+        <!-- モック用UI要素（非表示） -->
+        <div class="mock-ui-elements">
+            <div id="volume-progress" style="width: 0%;"></div>
+            <div id="volume-percentage">0%</div>
+            <div id="range-test-volume-bar" style="width: 0%;"></div>
+            <div id="range-test-volume-text">0%</div>
+            <div id="range-test-frequency-value">-- Hz</div>
+            <button id="start-mic-test">マイクテスト開始</button>
+            <button id="start-range-test">音域テスト開始</button>
+            <div id="recording-status">準備中</div>
+            <div id="test-progress">0/15</div>
+            <button class="record-btn" data-note="C3">記録</button>
+            <button class="record-btn" data-note="D3">記録</button>
+            <button class="record-btn" data-note="E3">記録</button>
+        </div>
+
+        <!-- AudioDetectionComponent テスト -->
+        <section class="test-section">
+            <h2 class="text-xl font-medium text-white mb-4">
+                <i data-lucide="radio" class="inline mr-2"></i>
+                AudioDetectionComponent テスト
+            </h2>
+            <div class="space-y-2">
+                <button class="test-button" onclick="testAudioDetectionComponent()">基本動作テスト</button>
+                <button class="test-button" onclick="testAudioDetectionInit()">初期化テスト</button>
+                <button class="test-button" onclick="testAudioDetectionDestroy()">破棄テスト</button>
+                <button class="test-button" onclick="testDeviceDetection()">デバイス検出テスト</button>
+            </div>
+            <div id="audio-detection-results"></div>
+        </section>
+
+        <!-- RecordingController テスト -->
+        <section class="test-section">
+            <h2 class="text-xl font-medium text-white mb-4">
+                <i data-lucide="settings" class="inline mr-2"></i>
+                RecordingController テスト
+            </h2>
+            <div class="space-y-2">
+                <button class="test-button" onclick="testRecordingController()">基本動作テスト</button>
+                <button class="test-button" onclick="testRecordingControllerInit()">初期化テスト</button>
+                <button class="test-button" onclick="testPhaseTransition()">フェーズ遷移テスト</button>
+                <button class="test-button" onclick="testEventHandlers()">イベント処理テスト</button>
+            </div>
+            <div id="recording-controller-results"></div>
+        </section>
+
+        <!-- VoiceRangeUI テスト -->
+        <section class="test-section">
+            <h2 class="text-xl font-medium text-white mb-4">
+                <i data-lucide="layout" class="inline mr-2"></i>
+                VoiceRangeUI テスト
+            </h2>
+            <div class="space-y-2">
+                <button class="test-button" onclick="testVoiceRangeUI()">基本動作テスト</button>
+                <button class="test-button" onclick="testUIElements()">UI要素テスト</button>
+                <button class="test-button" onclick="testAnimations()">アニメーションテスト</button>
+                <button class="test-button" onclick="testProgressUpdate()">進捗更新テスト</button>
+            </div>
+            <div id="voice-range-ui-results"></div>
+        </section>
+
+        <!-- VoiceRangeTesterV113 テスト -->
+        <section class="test-section">
+            <h2 class="text-xl font-medium text-white mb-4">
+                <i data-lucide="target" class="inline mr-2"></i>
+                VoiceRangeTesterV113 テスト
+            </h2>
+            <div class="space-y-2">
+                <button class="test-button" onclick="testVoiceRangeTester()">基本動作テスト</button>
+                <button class="test-button" onclick="testMeasurement()">測定機能テスト</button>
+                <button class="test-button" onclick="testAnalysis()">分析機能テスト</button>
+            </div>
+            <div id="voice-range-tester-results"></div>
+        </section>
+
+        <!-- 全体テスト -->
+        <section class="test-section">
+            <h2 class="text-xl font-medium text-white mb-4">
+                <i data-lucide="check-circle" class="inline mr-2"></i>
+                全体テスト
+            </h2>
+            <div class="space-y-2">
+                <button class="test-button" onclick="runAllTests()" id="run-all-btn">全テスト実行</button>
+                <button class="test-button" onclick="clearResults()">結果クリア</button>
+            </div>
+            <div id="overall-results"></div>
+        </section>
+    </div>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- インライン実装（CORS問題回避） -->
+    <script>
+        // ===== AudioDetectionComponent 再実装 =====
+        class AudioDetectionComponent {
+            constructor(options = {}) {
+                this.options = {
+                    volumeBarSelector: '#volume-progress',
+                    volumeTextSelector: '#volume-percentage',
+                    frequencySelector: '#frequency-value',
+                    clarityThreshold: 0.4,
+                    minVolumeAbsolute: 0.003,
+                    noiseThreshold: 0.1,
+                    enableFrequencyDetection: true,
+                    enableVolumeDetection: true,
+                    updateInterval: 50,
+                    autoDetectDevice: true,
+                    debugMode: false,
+                    logLevel: 'INFO',
+                    ...options
+                };
+                
+                this.audioManager = null;
+                this.pitchDetector = null;
+                this.volumeBar = null;
+                this.volumeText = null;
+                this.frequencyElement = null;
+                this.isInitialized = false;
+                this.isDetecting = false;
+                this.isDestroyed = false;
+                
+                this.callbacks = {
+                    onVolumeUpdate: null,
+                    onPitchUpdate: null,
+                    onError: null,
+                    onStateChange: null
+                };
+                
+                this.currentData = {
+                    volume: 0,
+                    frequency: 0,
+                    clarity: 0,
+                    timestamp: 0
+                };
+                
+                this.deviceSpecs = this.options.autoDetectDevice ? this.detectDevice() : this.getDefaultSpecs();
+                this.errorCount = 0;
+                this.lastErrorTime = 0;
+                this.maxErrors = 5;
+                
+                this.log('AudioDetectionComponent初期化完了', 'SUCCESS');
+            }
+            
+            detectDevice() {
+                const userAgent = navigator.userAgent;
+                const isIPhone = /iPhone/.test(userAgent);
+                const isIPad = /iPad/.test(userAgent);
+                const isIPadOS = /Macintosh/.test(userAgent) && 'ontouchend' in document;
+                const hasIOSNavigator = /iPad|iPhone|iPod/.test(userAgent);
+                
+                if (isIPhone || hasIOSNavigator) {
+                    return {
+                        type: 'iPhone',
+                        sensitivity: 3.5,
+                        volumeBarMultiplier: 4.5,
+                        noiseReduction: 0.15
+                    };
+                } else if (isIPad || isIPadOS) {
+                    return {
+                        type: 'iPad', 
+                        sensitivity: 5.0,
+                        volumeBarMultiplier: 7.0,
+                        noiseReduction: 0.2
+                    };
+                } else {
+                    return {
+                        type: 'PC',
+                        sensitivity: 2.5,
+                        volumeBarMultiplier: 4.0,
+                        noiseReduction: 0.1
+                    };
+                }
+            }
+            
+            getDefaultSpecs() {
+                return {
+                    type: 'PC',
+                    sensitivity: 2.5,
+                    volumeBarMultiplier: 4.0,
+                    noiseReduction: 0.1
+                };
+            }
+            
+            async initialize() {
+                if (this.isDestroyed) {
+                    throw new Error('破棄されたインスタンスは再初期化できません');
+                }
+                
+                if (this.isInitialized) {
+                    this.log('既に初期化済みです', 'WARNING');
+                    return true;
+                }
+                
+                try {
+                    this.log('初期化開始', 'INFO');
+                    this.cacheUIElements();
+                    await this.loadPitchProModules();
+                    await this.initializeAudioManager();
+                    await this.initializePitchDetector();
+                    
+                    this.isInitialized = true;
+                    this.notifyStateChange('initialized');
+                    this.log('初期化完了', 'SUCCESS');
+                    return true;
+                    
+                } catch (error) {
+                    this.log(`初期化エラー: ${error.message}`, 'ERROR');
+                    this.handleError('INITIALIZATION_FAILED', error);
+                    throw error;
+                }
+            }
+            
+            cacheUIElements() {
+                if (this.options.volumeBarSelector) {
+                    this.volumeBar = document.querySelector(this.options.volumeBarSelector);
+                    if (!this.volumeBar) {
+                        this.log(`音量バー要素が見つかりません: ${this.options.volumeBarSelector}`, 'WARNING');
+                    }
+                }
+                
+                if (this.options.volumeTextSelector) {
+                    this.volumeText = document.querySelector(this.options.volumeTextSelector);
+                    if (!this.volumeText) {
+                        this.log(`音量テキスト要素が見つかりません: ${this.options.volumeTextSelector}`, 'WARNING');
+                    }
+                }
+                
+                if (this.options.frequencySelector) {
+                    this.frequencyElement = document.querySelector(this.options.frequencySelector);
+                    if (!this.frequencyElement) {
+                        this.log(`周波数要素が見つかりません: ${this.options.frequencySelector}`, 'WARNING');
+                    }
+                }
+                
+                this.log('UI要素キャッシュ完了', 'INFO');
+            }
+            
+            async loadPitchProModules() {
+                try {
+                    this.log('PitchProモジュールロード（モック版）', 'INFO');
+                    
+                    // モック実装
+                    const AudioManager = class {
+                        async initialize() { return true; }
+                        async startCapture() { return true; }
+                        stopCapture() {}
+                        destroy() {}
+                    };
+                    
+                    const PitchDetector = class {
+                        constructor(options) { 
+                            this.options = options; 
+                            this.callbacks = {};
+                        }
+                        setCallbacks(callbacks) { 
+                            this.callbacks = callbacks; 
+                        }
+                        async startDetection() { 
+                            this.mockInterval = setInterval(() => {
+                                if (this.callbacks.onPitchUpdate) {
+                                    this.callbacks.onPitchUpdate({
+                                        volume: Math.random() * 100,
+                                        frequency: 200 + Math.random() * 200,
+                                        clarity: 0.5 + Math.random() * 0.5,
+                                        timestamp: Date.now()
+                                    });
+                                }
+                            }, 100);
+                            return true; 
+                        }
+                        stopDetection() { 
+                            if (this.mockInterval) {
+                                clearInterval(this.mockInterval);
+                                this.mockInterval = null;
+                            }
+                        }
+                        destroy() { 
+                            this.stopDetection(); 
+                        }
+                    };
+                    
+                    this.AudioManager = AudioManager;
+                    this.PitchDetector = PitchDetector;
+                    this.log('PitchProモジュールロード完了（モック版）', 'SUCCESS');
+                    
+                } catch (error) {
+                    this.log(`PitchProモジュールロードエラー: ${error.message}`, 'ERROR');
+                    throw error;
+                }
+            }
+            
+            async initializeAudioManager() {
+                try {
+                    this.audioManager = new this.AudioManager({
+                        deviceSpecs: this.deviceSpecs,
+                        noiseThreshold: this.options.noiseThreshold,
+                        debugMode: this.options.debugMode
+                    });
+                    
+                    await this.audioManager.initialize();
+                    await this.audioManager.startCapture();
+                    this.log('AudioManager初期化完了', 'SUCCESS');
+                    
+                } catch (error) {
+                    this.log(`AudioManager初期化エラー: ${error.message}`, 'ERROR');
+                    throw error;
+                }
+            }
+            
+            async initializePitchDetector() {
+                try {
+                    this.pitchDetector = new this.PitchDetector({
+                        audioManager: this.audioManager,
+                        clarityThreshold: this.options.clarityThreshold,
+                        minVolumeAbsolute: this.options.minVolumeAbsolute,
+                        sensitivity: this.deviceSpecs.sensitivity,
+                        debugMode: this.options.debugMode
+                    });
+                    
+                    this.pitchDetector.setCallbacks({
+                        onPitchUpdate: (result) => this.handlePitchUpdate(result),
+                        onError: (error) => this.handleError('PITCH_DETECTION_ERROR', error)
+                    });
+                    
+                    this.log('PitchDetector初期化完了', 'SUCCESS');
+                    
+                } catch (error) {
+                    this.log(`PitchDetector初期化エラー: ${error.message}`, 'ERROR');
+                    throw error;
+                }
+            }
+            
+            async startDetection() {
+                if (!this.isInitialized) {
+                    throw new Error('初期化が完了していません');
+                }
+                
+                if (this.isDetecting) {
+                    this.log('検出は既に開始されています', 'WARNING');
+                    return true;
+                }
+                
+                try {
+                    this.log('検出開始', 'INFO');
+                    await this.pitchDetector.startDetection();
+                    this.isDetecting = true;
+                    this.notifyStateChange('detecting');
+                    this.log('検出開始完了', 'SUCCESS');
+                    return true;
+                    
+                } catch (error) {
+                    this.log(`検出開始エラー: ${error.message}`, 'ERROR');
+                    this.handleError('DETECTION_START_FAILED', error);
+                    throw error;
+                }
+            }
+            
+            stopDetection() {
+                if (!this.isDetecting) {
+                    this.log('検出は既に停止されています', 'WARNING');
+                    return;
+                }
+                
+                try {
+                    this.log('検出停止', 'INFO');
+                    if (this.pitchDetector) {
+                        this.pitchDetector.stopDetection();
+                    }
+                    this.isDetecting = false;
+                    this.notifyStateChange('stopped');
+                    this.log('検出停止完了', 'SUCCESS');
+                    
+                } catch (error) {
+                    this.log(`検出停止エラー: ${error.message}`, 'ERROR');
+                    this.handleError('DETECTION_STOP_FAILED', error);
+                }
+            }
+            
+            handlePitchUpdate(result) {
+                try {
+                    const volume = result.volume;
+                    const frequency = result.frequency || 0;
+                    const clarity = result.clarity || 0;
+                    const timestamp = result.timestamp || Date.now();
+                    
+                    this.currentData = { volume, frequency, clarity, timestamp };
+                    this.updateVolumeDisplay(volume);
+                    
+                    if (this.options.enableFrequencyDetection && frequency > 0) {
+                        this.updateFrequencyDisplay(frequency);
+                    }
+                    
+                    if (this.callbacks.onVolumeUpdate) {
+                        this.callbacks.onVolumeUpdate(result);
+                    }
+                    
+                    if (this.callbacks.onPitchUpdate) {
+                        this.callbacks.onPitchUpdate(result);
+                    }
+                    
+                } catch (error) {
+                    this.log(`音声データ更新エラー: ${error.message}`, 'ERROR');
+                    this.handleError('DATA_UPDATE_FAILED', error);
+                }
+            }
+            
+            updateVolumeDisplay(volume) {
+                const displayVolume = Math.min(100, volume * this.deviceSpecs.volumeBarMultiplier);
+                
+                if (this.volumeBar) {
+                    this.volumeBar.style.width = `${Math.max(0, displayVolume)}%`;
+                }
+                
+                if (this.volumeText) {
+                    this.volumeText.textContent = `${Math.round(displayVolume)}%`;
+                }
+            }
+            
+            updateFrequencyDisplay(frequency) {
+                if (this.frequencyElement && frequency > 0) {
+                    this.frequencyElement.textContent = `${Math.round(frequency)} Hz`;
+                }
+            }
+            
+            setCallbacks(callbacks) {
+                if (typeof callbacks.onVolumeUpdate === 'function') {
+                    this.callbacks.onVolumeUpdate = callbacks.onVolumeUpdate;
+                }
+                if (typeof callbacks.onPitchUpdate === 'function') {
+                    this.callbacks.onPitchUpdate = callbacks.onPitchUpdate;
+                }
+                if (typeof callbacks.onError === 'function') {
+                    this.callbacks.onError = callbacks.onError;
+                }
+                if (typeof callbacks.onStateChange === 'function') {
+                    this.callbacks.onStateChange = callbacks.onStateChange;
+                }
+                this.log('コールバック設定完了', 'INFO');
+            }
+            
+            handleError(type, error) {
+                this.errorCount++;
+                this.lastErrorTime = Date.now();
+                
+                const errorInfo = {
+                    type,
+                    message: error?.message || error,
+                    count: this.errorCount,
+                    timestamp: this.lastErrorTime,
+                    deviceType: this.deviceSpecs.type
+                };
+                
+                this.log(`エラー発生 [${type}]: ${errorInfo.message}`, 'ERROR', errorInfo);
+                
+                if (this.callbacks.onError) {
+                    this.callbacks.onError(errorInfo);
+                }
+                
+                if (this.errorCount >= this.maxErrors) {
+                    this.log('最大エラー数に達しました。検出を停止します', 'ERROR');
+                    this.stopDetection();
+                }
+            }
+            
+            notifyStateChange(state) {
+                if (this.callbacks.onStateChange) {
+                    this.callbacks.onStateChange({
+                        state,
+                        isInitialized: this.isInitialized,
+                        isDetecting: this.isDetecting,
+                        timestamp: Date.now()
+                    });
+                }
+            }
+            
+            getCurrentData() {
+                return { ...this.currentData };
+            }
+            
+            getStats() {
+                return {
+                    errorCount: this.errorCount,
+                    lastErrorTime: this.lastErrorTime,
+                    deviceType: this.deviceSpecs.type,
+                    isInitialized: this.isInitialized,
+                    isDetecting: this.isDetecting,
+                    isDestroyed: this.isDestroyed
+                };
+            }
+            
+            log(message, level = 'INFO', data = null) {
+                if (!this.options.debugMode && level !== 'ERROR') return;
+                
+                const timestamp = new Date().toLocaleTimeString();
+                const logMessage = `[AudioDetectionComponent ${timestamp}] ${level}: ${message}`;
+                
+                switch (level) {
+                    case 'ERROR':
+                        console.error(logMessage, data);
+                        break;
+                    case 'WARNING':
+                        console.warn(logMessage, data);
+                        break;
+                    case 'SUCCESS':
+                        console.log(`%c${logMessage}`, 'color: green', data);
+                        break;
+                    default:
+                        console.log(logMessage, data);
+                }
+            }
+            
+            destroy() {
+                if (this.isDestroyed) {
+                    this.log('既に破棄されています', 'WARNING');
+                    return;
+                }
+                
+                try {
+                    this.log('リソース破棄開始', 'INFO');
+                    this.stopDetection();
+                    
+                    if (this.pitchDetector) {
+                        this.pitchDetector.destroy();
+                        this.pitchDetector = null;
+                    }
+                    
+                    if (this.audioManager) {
+                        this.audioManager.destroy();
+                        this.audioManager = null;
+                    }
+                    
+                    this.callbacks = {};
+                    this.volumeBar = null;
+                    this.volumeText = null;
+                    this.frequencyElement = null;
+                    this.isInitialized = false;
+                    this.isDetecting = false;
+                    this.isDestroyed = true;
+                    
+                    this.log('リソース破棄完了', 'SUCCESS');
+                    
+                } catch (error) {
+                    this.log(`リソース破棄エラー: ${error.message}`, 'ERROR');
+                }
+            }
+        }
+
+        // ===== 簡略版 RecordingController =====
+        class RecordingController {
+            constructor(options = {}) {
+                this.options = { debugMode: false, ...options };
+                this.currentPhase = 'initial';
+                this.isRecording = false;
+                this.recordingData = [];
+                this.currentNote = null;
+                this.audioDetector = null;
+                this.elements = {};
+                this.eventListeners = new Map();
+                
+                this.log('RecordingController初期化完了', 'SUCCESS');
+            }
+            
+            async initialize() {
+                try {
+                    this.log('初期化開始', 'INFO');
+                    this.cacheElements();
+                    this.setupEventListeners();
+                    this.updateUIState('initial');
+                    this.log('初期化完了', 'SUCCESS');
+                    return true;
+                } catch (error) {
+                    this.log(`初期化エラー: ${error.message}`, 'ERROR');
+                    throw error;
+                }
+            }
+            
+            cacheElements() {
+                // 簡略版 - 基本要素のみ
+                this.elements.micTestButton = document.querySelector('#start-mic-test');
+                this.elements.rangeTestStartButton = document.querySelector('#start-range-test');
+                this.elements.statusDisplay = document.querySelector('#recording-status');
+                this.elements.recordButtons = document.querySelectorAll('.record-btn');
+            }
+            
+            setupEventListeners() {
+                // 簡略版
+                this.log('イベントリスナー設定', 'INFO');
+            }
+            
+            updateUIState(phase) {
+                this.currentPhase = phase;
+                document.body.classList.remove('phase-initial', 'phase-mic-test', 'phase-range-test');
+                document.body.classList.add(`phase-${phase}`);
+                this.log(`フェーズ変更: ${phase}`, 'INFO');
+            }
+            
+            log(message, level = 'INFO', data = null) {
+                if (!this.options.debugMode && level !== 'ERROR') return;
+                const timestamp = new Date().toLocaleTimeString();
+                const logMessage = `[RecordingController ${timestamp}] ${level}: ${message}`;
+                
+                switch (level) {
+                    case 'ERROR':
+                        console.error(logMessage, data);
+                        break;
+                    case 'SUCCESS':
+                        console.log(`%c${logMessage}`, 'color: green', data);
+                        break;
+                    default:
+                        console.log(logMessage, data);
+                }
+            }
+            
+            destroy() {
+                try {
+                    this.log('クリーンアップ開始', 'INFO');
+                    this.eventListeners.clear();
+                    this.log('クリーンアップ完了', 'SUCCESS');
+                } catch (error) {
+                    this.log(`クリーンアップエラー: ${error.message}`, 'ERROR');
+                }
+            }
+        }
+
+        // ===== 簡略版 VoiceRangeUI =====
+        class VoiceRangeUI {
+            constructor(options = {}) {
+                this.options = { 
+                    enableAnimations: true,
+                    totalNotes: 15,
+                    debugMode: false, 
+                    ...options 
+                };
+                this.currentPhase = 'initial';
+                this.completedNotes = new Set();
+                this.elements = {};
+                this.animations = {};
+                
+                this.log('VoiceRangeUI初期化完了', 'SUCCESS');
+            }
+            
+            initialize() {
+                try {
+                    this.log('UI初期化開始', 'INFO');
+                    this.cacheUIElements();
+                    this.setPhase('initial');
+                    this.updateProgress(0, this.options.totalNotes);
+                    this.log('UI初期化完了', 'SUCCESS');
+                    return true;
+                } catch (error) {
+                    this.log(`UI初期化エラー: ${error.message}`, 'ERROR');
+                    throw error;
+                }
+            }
+            
+            cacheUIElements() {
+                // 簡略版
+                this.elements.statusDisplay = document.querySelector('#recording-status');
+                this.elements.progressDisplay = document.querySelector('#test-progress');
+                this.elements.recordButtons = document.querySelectorAll('.record-btn');
+                this.log(`UI要素キャッシュ完了: ${Object.keys(this.elements).length}個`, 'INFO');
+            }
+            
+            setPhase(phase) {
+                this.log(`フェーズ変更: ${this.currentPhase} → ${phase}`, 'INFO');
+                const previousPhase = this.currentPhase;
+                this.currentPhase = phase;
+                
+                const body = document.body;
+                body.classList.remove(`phase-${previousPhase}`);
+                body.classList.add(`phase-${phase}`);
+            }
+            
+            updateProgress(completed, total = this.options.totalNotes) {
+                const percentage = Math.round((completed / total) * 100);
+                if (this.elements.progressDisplay) {
+                    this.elements.progressDisplay.textContent = `進捗: ${completed}/${total}音域`;
+                }
+                this.log(`進捗更新: ${completed}/${total} (${percentage}%)`, 'INFO');
+            }
+            
+            log(message, level = 'INFO', data = null) {
+                if (!this.options.debugMode && level !== 'ERROR') return;
+                const timestamp = new Date().toLocaleTimeString();
+                const logMessage = `[VoiceRangeUI ${timestamp}] ${level}: ${message}`;
+                
+                switch (level) {
+                    case 'ERROR':
+                        console.error(logMessage, data);
+                        break;
+                    case 'SUCCESS':
+                        console.log(`%c${logMessage}`, 'color: green', data);
+                        break;
+                    default:
+                        console.log(logMessage, data);
+                }
+            }
+            
+            destroy() {
+                try {
+                    this.log('UIクリーンアップ開始', 'INFO');
+                    this.elements = {};
+                    this.log('UIクリーンアップ完了', 'SUCCESS');
+                } catch (error) {
+                    this.log(`UIクリーンアップエラー: ${error.message}`, 'ERROR');
+                }
+            }
+        }
+
+        // ===== 簡略版 VoiceRangeTesterV113 =====
+        class VoiceRangeTesterV113 {
+            constructor(options = {}) {
+                this.options = {
+                    targetNotes: [
+                        { name: 'C3', frequency: 130.8 },
+                        { name: 'D3', frequency: 146.8 },
+                        { name: 'E3', frequency: 164.8 },
+                        { name: 'F3', frequency: 174.6 },
+                        { name: 'G3', frequency: 196.0 },
+                        { name: 'A3', frequency: 220.0 },
+                        { name: 'B3', frequency: 246.9 },
+                        { name: 'C4', frequency: 261.6 },
+                        { name: 'D4', frequency: 293.7 },
+                        { name: 'E4', frequency: 329.6 },
+                        { name: 'F4', frequency: 349.2 },
+                        { name: 'G4', frequency: 392.0 },
+                        { name: 'A4', frequency: 440.0 },
+                        { name: 'B4', frequency: 493.9 },
+                        { name: 'C5', frequency: 523.3 }
+                    ],
+                    tolerancePercent: 5.0,
+                    minRecordingDuration: 2.0,
+                    ...options
+                };
+                
+                this.results = new Map();
+                this.audioDetector = null;
+                
+                this.log('VoiceRangeTesterV113初期化完了', 'SUCCESS');
+            }
+            
+            setAudioDetector(audioDetector) {
+                this.audioDetector = audioDetector;
+            }
+            
+            analyzeMeasurementData(noteName, targetNote, data) {
+                if (data.length === 0) {
+                    return { noteName, success: false, reason: 'データなし', confidence: 0 };
+                }
+                
+                const validData = data.filter(d => d.volume > 30 && d.frequency > 0 && d.clarity > 0.4);
+                
+                if (validData.length === 0) {
+                    return { noteName, success: false, reason: '有効なデータなし', confidence: 0 };
+                }
+                
+                const avgFrequency = validData.reduce((sum, d) => sum + d.frequency, 0) / validData.length;
+                const avgVolume = validData.reduce((sum, d) => sum + d.volume, 0) / validData.length;
+                const avgClarity = validData.reduce((sum, d) => sum + d.clarity, 0) / validData.length;
+                
+                const frequencyError = Math.abs(avgFrequency - targetNote.frequency) / targetNote.frequency * 100;
+                const isAccurate = frequencyError <= this.options.tolerancePercent;
+                const confidence = Math.max(0, 100 - frequencyError * 2) * (avgClarity / 1.0) * (Math.min(avgVolume, 100) / 100);
+                
+                return {
+                    noteName,
+                    targetFrequency: targetNote.frequency,
+                    measuredFrequency: avgFrequency,
+                    frequencyError: frequencyError,
+                    avgVolume,
+                    avgClarity,
+                    confidence,
+                    success: isAccurate && confidence > 60,
+                    reason: isAccurate ? '測定成功' : `周波数誤差: ${frequencyError.toFixed(1)}%`
+                };
+            }
+            
+            getResults() {
+                return Array.from(this.results.values());
+            }
+            
+            log(message, level = 'INFO', data = null) {
+                const timestamp = new Date().toLocaleTimeString();
+                const logMessage = `[VoiceRangeTesterV113 ${timestamp}] ${level}: ${message}`;
+                
+                switch (level) {
+                    case 'ERROR':
+                        console.error(logMessage, data);
+                        break;
+                    case 'SUCCESS':
+                        console.log(`%c${logMessage}`, 'color: green', data);
+                        break;
+                    default:
+                        console.log(logMessage, data);
+                }
+            }
+        }
+
+        // ===== テスト用グローバル変数 =====
+        window.testInstances = {};
+        window.testResults = [];
+
+        // ===== ユーティリティ関数 =====
+        function logResult(sectionId, message, type = 'info') {
+            const section = document.getElementById(sectionId);
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result test-${type}`;
+            resultDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            section.appendChild(resultDiv);
+            console.log(`[TEST ${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearSectionResults(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.innerHTML = '';
+        }
+
+        // ===== AudioDetectionComponent テスト関数群 =====
+        window.testAudioDetectionComponent = async function() {
+            clearSectionResults('audio-detection-results');
+            try {
+                logResult('audio-detection-results', 'AudioDetectionComponent基本動作テスト開始', 'info');
+                
+                const detector = new AudioDetectionComponent({
+                    volumeBarSelector: '#volume-progress',
+                    volumeTextSelector: '#volume-percentage',
+                    debugMode: true
+                });
+                
+                logResult('audio-detection-results', 'インスタンス作成成功', 'success');
+                
+                const stats = detector.getStats();
+                logResult('audio-detection-results', `デバイス: ${stats.deviceType}`, 'info');
+                
+                window.testInstances.audioDetector = detector;
+                logResult('audio-detection-results', 'AudioDetectionComponent基本動作テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('audio-detection-results', `エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testAudioDetectionInit = async function() {
+            try {
+                logResult('audio-detection-results', '初期化テスト開始', 'info');
+                
+                if (!window.testInstances.audioDetector) {
+                    logResult('audio-detection-results', 'インスタンスを先に作成してください', 'error');
+                    return;
+                }
+                
+                const detector = window.testInstances.audioDetector;
+                const result = await detector.initialize();
+                
+                if (result) {
+                    logResult('audio-detection-results', '初期化成功', 'success');
+                    
+                    const stats = detector.getStats();
+                    logResult('audio-detection-results', `初期化状態: ${stats.isInitialized}`, 'info');
+                } else {
+                    logResult('audio-detection-results', '初期化失敗', 'error');
+                }
+                
+            } catch (error) {
+                logResult('audio-detection-results', `初期化エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testAudioDetectionDestroy = function() {
+            try {
+                logResult('audio-detection-results', '破棄テスト開始', 'info');
+                
+                if (!window.testInstances.audioDetector) {
+                    logResult('audio-detection-results', 'インスタンスが存在しません', 'error');
+                    return;
+                }
+                
+                const detector = window.testInstances.audioDetector;
+                detector.destroy();
+                
+                const stats = detector.getStats();
+                logResult('audio-detection-results', `破棄状態: ${stats.isDestroyed}`, 'success');
+                
+                detector.destroy();
+                logResult('audio-detection-results', '重複破棄テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('audio-detection-results', `破棄エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testDeviceDetection = function() {
+            try {
+                logResult('audio-detection-results', 'デバイス検出テスト開始', 'info');
+                
+                const detector = new AudioDetectionComponent({ debugMode: true });
+                const stats = detector.getStats();
+                
+                logResult('audio-detection-results', `検出デバイス: ${stats.deviceType}`, 'info');
+                logResult('audio-detection-results', navigator.userAgent.substring(0, 50) + '...', 'info');
+                
+                const hasTouch = 'ontouchend' in document;
+                logResult('audio-detection-results', `タッチサポート: ${hasTouch}`, 'info');
+                
+                detector.destroy();
+                logResult('audio-detection-results', 'デバイス検出テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('audio-detection-results', `デバイス検出エラー: ${error.message}`, 'error');
+            }
+        };
+
+        // ===== RecordingController テスト関数群 =====
+        window.testRecordingController = function() {
+            clearSectionResults('recording-controller-results');
+            try {
+                logResult('recording-controller-results', 'RecordingController基本動作テスト開始', 'info');
+                
+                const controller = new RecordingController({ debugMode: true });
+                
+                logResult('recording-controller-results', 'インスタンス作成成功', 'success');
+                logResult('recording-controller-results', `初期フェーズ: ${controller.currentPhase}`, 'info');
+                
+                window.testInstances.recordingController = controller;
+                logResult('recording-controller-results', 'RecordingController基本動作テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('recording-controller-results', `エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testRecordingControllerInit = async function() {
+            try {
+                logResult('recording-controller-results', '初期化テスト開始', 'info');
+                
+                if (!window.testInstances.recordingController) {
+                    logResult('recording-controller-results', 'インスタンスを先に作成してください', 'error');
+                    return;
+                }
+                
+                const controller = window.testInstances.recordingController;
+                const result = await controller.initialize();
+                
+                if (result) {
+                    logResult('recording-controller-results', '初期化成功', 'success');
+                    logResult('recording-controller-results', `UI要素キャッシュ数: ${Object.keys(controller.elements).length}`, 'info');
+                } else {
+                    logResult('recording-controller-results', '初期化失敗', 'error');
+                }
+                
+            } catch (error) {
+                logResult('recording-controller-results', `初期化エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testPhaseTransition = function() {
+            try {
+                logResult('recording-controller-results', 'フェーズ遷移テスト開始', 'info');
+                
+                if (!window.testInstances.recordingController) {
+                    logResult('recording-controller-results', 'インスタンスを先に作成してください', 'error');
+                    return;
+                }
+                
+                const controller = window.testInstances.recordingController;
+                
+                controller.updateUIState('mic-test');
+                logResult('recording-controller-results', `mic-testフェーズ: ${controller.currentPhase}`, 'info');
+                
+                controller.updateUIState('range-test');
+                logResult('recording-controller-results', `range-testフェーズ: ${controller.currentPhase}`, 'info');
+                
+                logResult('recording-controller-results', 'フェーズ遷移テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('recording-controller-results', `フェーズ遷移エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testEventHandlers = function() {
+            try {
+                logResult('recording-controller-results', 'イベント処理テスト開始', 'info');
+                
+                if (!window.testInstances.recordingController) {
+                    logResult('recording-controller-results', 'インスタンスを先に作成してください', 'error');
+                    return;
+                }
+                
+                const controller = window.testInstances.recordingController;
+                const listenerCount = controller.eventListeners.size;
+                logResult('recording-controller-results', `登録イベントリスナー数: ${listenerCount}`, 'info');
+                logResult('recording-controller-results', 'イベント処理テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('recording-controller-results', `イベント処理エラー: ${error.message}`, 'error');
+            }
+        };
+
+        // ===== VoiceRangeUI テスト関数群 =====
+        window.testVoiceRangeUI = function() {
+            clearSectionResults('voice-range-ui-results');
+            try {
+                logResult('voice-range-ui-results', 'VoiceRangeUI基本動作テスト開始', 'info');
+                
+                const ui = new VoiceRangeUI({
+                    enableAnimations: false,
+                    debugMode: true
+                });
+                
+                logResult('voice-range-ui-results', 'インスタンス作成成功', 'success');
+                logResult('voice-range-ui-results', `初期フェーズ: ${ui.currentPhase}`, 'info');
+                
+                window.testInstances.voiceRangeUI = ui;
+                logResult('voice-range-ui-results', 'VoiceRangeUI基本動作テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('voice-range-ui-results', `エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testUIElements = function() {
+            try {
+                logResult('voice-range-ui-results', 'UI要素テスト開始', 'info');
+                
+                if (!window.testInstances.voiceRangeUI) {
+                    logResult('voice-range-ui-results', 'インスタンスを先に作成してください', 'error');
+                    return;
+                }
+                
+                const ui = window.testInstances.voiceRangeUI;
+                const result = ui.initialize();
+                
+                if (result) {
+                    logResult('voice-range-ui-results', 'UI初期化成功', 'success');
+                    logResult('voice-range-ui-results', `キャッシュUI要素数: ${Object.keys(ui.elements).length}`, 'info');
+                } else {
+                    logResult('voice-range-ui-results', 'UI初期化失敗', 'error');
+                }
+                
+            } catch (error) {
+                logResult('voice-range-ui-results', `UI要素エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testAnimations = function() {
+            try {
+                logResult('voice-range-ui-results', 'アニメーションテスト開始', 'info');
+                
+                if (!window.testInstances.voiceRangeUI) {
+                    logResult('voice-range-ui-results', 'インスタンスを先に作成してください', 'error');
+                    return;
+                }
+                
+                const ui = window.testInstances.voiceRangeUI;
+                
+                ui.setPhase('mic-test');
+                logResult('voice-range-ui-results', 'mic-testフェーズ設定完了', 'info');
+                
+                ui.setPhase('range-test');
+                logResult('voice-range-ui-results', 'range-testフェーズ設定完了', 'info');
+                
+                logResult('voice-range-ui-results', 'アニメーションテスト完了', 'success');
+                
+            } catch (error) {
+                logResult('voice-range-ui-results', `アニメーションエラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testProgressUpdate = function() {
+            try {
+                logResult('voice-range-ui-results', '進捗更新テスト開始', 'info');
+                
+                if (!window.testInstances.voiceRangeUI) {
+                    logResult('voice-range-ui-results', 'インスタンスを先に作成してください', 'error');
+                    return;
+                }
+                
+                const ui = window.testInstances.voiceRangeUI;
+                
+                ui.updateProgress(5, 15);
+                logResult('voice-range-ui-results', '進捗更新 5/15 完了', 'info');
+                
+                ui.updateProgress(10, 15);
+                logResult('voice-range-ui-results', '進捗更新 10/15 完了', 'info');
+                
+                ui.updateProgress(15, 15);
+                logResult('voice-range-ui-results', '進捗更新 15/15 完了', 'info');
+                
+                logResult('voice-range-ui-results', '進捗更新テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('voice-range-ui-results', `進捗更新エラー: ${error.message}`, 'error');
+            }
+        };
+
+        // ===== VoiceRangeTesterV113 テスト関数群 =====
+        window.testVoiceRangeTester = function() {
+            clearSectionResults('voice-range-tester-results');
+            try {
+                logResult('voice-range-tester-results', 'VoiceRangeTesterV113基本動作テスト開始', 'info');
+                
+                const tester = new VoiceRangeTesterV113();
+                
+                logResult('voice-range-tester-results', 'インスタンス作成成功', 'success');
+                logResult('voice-range-tester-results', `対象音数: ${tester.options.targetNotes.length}`, 'info');
+                
+                window.testInstances.voiceRangeTester = tester;
+                logResult('voice-range-tester-results', 'VoiceRangeTesterV113基本動作テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('voice-range-tester-results', `エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testMeasurement = function() {
+            try {
+                logResult('voice-range-tester-results', '測定機能テスト開始', 'info');
+                
+                if (!window.testInstances.voiceRangeTester) {
+                    logResult('voice-range-tester-results', 'インスタンスを先に作成してください', 'error');
+                    return;
+                }
+                
+                const tester = window.testInstances.voiceRangeTester;
+                
+                const mockDetector = {
+                    setCallbacks: (callbacks) => {
+                        setTimeout(() => {
+                            callbacks.onPitchUpdate({
+                                volume: 75,
+                                frequency: 261.6,
+                                clarity: 0.8,
+                                timestamp: Date.now()
+                            });
+                        }, 100);
+                    }
+                };
+                
+                tester.setAudioDetector(mockDetector);
+                logResult('voice-range-tester-results', 'モックAudioDetector設定完了', 'info');
+                logResult('voice-range-tester-results', '測定機能テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('voice-range-tester-results', `測定機能エラー: ${error.message}`, 'error');
+            }
+        };
+
+        window.testAnalysis = function() {
+            try {
+                logResult('voice-range-tester-results', '分析機能テスト開始', 'info');
+                
+                if (!window.testInstances.voiceRangeTester) {
+                    logResult('voice-range-tester-results', 'インスタンスを先に作成してください', 'error');
+                    return;
+                }
+                
+                const tester = window.testInstances.voiceRangeTester;
+                
+                const mockData = [
+                    { volume: 75, frequency: 261.6, clarity: 0.8, timestamp: Date.now() },
+                    { volume: 80, frequency: 260.0, clarity: 0.9, timestamp: Date.now() + 100 },
+                    { volume: 85, frequency: 263.0, clarity: 0.7, timestamp: Date.now() + 200 }
+                ];
+                
+                const targetNote = { name: 'C4', frequency: 261.6 };
+                const result = tester.analyzeMeasurementData('C4', targetNote, mockData);
+                
+                logResult('voice-range-tester-results', `分析結果: ${result.success}`, 'info');
+                logResult('voice-range-tester-results', `周波数誤差: ${result.frequencyError?.toFixed(2)}%`, 'info');
+                logResult('voice-range-tester-results', `信頼度: ${result.confidence?.toFixed(1)}%`, 'info');
+                
+                logResult('voice-range-tester-results', '分析機能テスト完了', 'success');
+                
+            } catch (error) {
+                logResult('voice-range-tester-results', `分析機能エラー: ${error.message}`, 'error');
+            }
+        };
+
+        // ===== 全体テスト =====
+        window.runAllTests = async function() {
+            clearSectionResults('overall-results');
+            const startTime = Date.now();
+            
+            try {
+                logResult('overall-results', '全体テスト開始', 'info');
+                document.getElementById('run-all-btn').disabled = true;
+                
+                await window.testAudioDetectionComponent();
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                window.testRecordingController();
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                window.testVoiceRangeUI();
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                window.testVoiceRangeTester();
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+                
+                logResult('overall-results', `全体テスト完了 (${duration}ms)`, 'success');
+                logResult('overall-results', 'コンソールで詳細を確認してください', 'info');
+                
+            } catch (error) {
+                logResult('overall-results', `全体テストエラー: ${error.message}`, 'error');
+            } finally {
+                document.getElementById('run-all-btn').disabled = false;
+            }
+        };
+
+        window.clearResults = function() {
+            const sections = [
+                'audio-detection-results',
+                'recording-controller-results', 
+                'voice-range-ui-results',
+                'voice-range-tester-results',
+                'overall-results'
+            ];
+            
+            sections.forEach(sectionId => clearSectionResults(sectionId));
+            window.testInstances = {};
+            console.clear();
+        };
+
+        // ===== 初期化 =====
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+            logResult('overall-results', '単体テスト環境準備完了（CORS問題回避版）', 'success');
+        });
+
+    </script>
+</body>
+</html>

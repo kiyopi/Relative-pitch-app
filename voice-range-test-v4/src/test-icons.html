@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アイコンテスト</title>
+    <style>
+        body {
+            background: #1a1a2e;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+        
+        .icon-container {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #666;
+            margin: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .test-img {
+            width: 80px;
+            height: 80px;
+            color: white;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>アイコン表示テスト</h1>
+    
+    <div class="test-section">
+        <h3>1. PNG直接img要素テスト</h3>
+        <div class="icon-container">
+            <img src="./icons/arrow-down.png" class="test-img" alt="arrow-down">
+        </div>
+        <div class="icon-container">
+            <img src="./icons/arrow-up.png" class="test-img" alt="arrow-up">
+        </div>
+        <div class="icon-container">
+            <img src="./icons/check.png" class="test-img" alt="check">
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. JavaScriptによる動的追加テスト</h3>
+        <div class="icon-container" id="dynamic-test1"></div>
+        <div class="icon-container" id="dynamic-test2"></div>
+        <div class="icon-container" id="dynamic-test3"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. filterなしテスト</h3>
+        <div class="icon-container">
+            <img src="./icons/arrow-down.svg" style="width: 48px; height: 48px;" alt="no-filter">
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. 絶対パステスト</h3>
+        <div class="icon-container" id="absolute-test"></div>
+    </div>
+    
+    <script>
+        console.log('アイコンテスト開始');
+        
+        // 動的追加テスト
+        function createIconImg(containerId, iconType) {
+            const container = document.getElementById(containerId);
+            const img = document.createElement('img');
+            img.src = `./icons/${iconType}.png`;
+            img.style.width = '80px';
+            img.style.height = '80px';
+            img.style.display = 'block';
+            
+            img.onload = () => {
+                console.log(`✅ ${iconType} 読み込み成功`);
+            };
+            
+            img.onerror = () => {
+                console.error(`❌ ${iconType} 読み込み失敗`);
+                container.innerHTML = `<div style="color: red;">失敗</div>`;
+            };
+            
+            container.appendChild(img);
+        }
+        
+        // 動的テスト実行
+        createIconImg('dynamic-test1', 'arrow-down');
+        createIconImg('dynamic-test2', 'arrow-up');  
+        createIconImg('dynamic-test3', 'check');
+        
+        // 絶対パステスト
+        const absoluteContainer = document.getElementById('absolute-test');
+        const absoluteImg = document.createElement('img');
+        absoluteImg.src = 'http://localhost:8002/icons/arrow-down.png';
+        absoluteImg.style.width = '80px';
+        absoluteImg.style.height = '80px';
+        absoluteImg.style.display = 'block';
+        
+        absoluteImg.onload = () => {
+            console.log('✅ 絶対パス読み込み成功');
+        };
+        
+        absoluteImg.onerror = () => {
+            console.error('❌ 絶対パス読み込み失敗');
+        };
+        
+        absoluteContainer.appendChild(absoluteImg);
+    </script>
+</body>
+</html>

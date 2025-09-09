@@ -17,13 +17,14 @@
 - ✅ **完了**: デバイス検出システム完全修正（iPadOS 13+バグ対策）
 - ✅ **完了**: 安定版マイクロフォンシステム復活（audio-manager-stable.js + microphone-manager-stable.js）
 - ✅ **完了**: VolumeBarController統合音量制御システム実装完了（実機テスト済み設定統合）
-- 🔄 **進行中**: preparation.html/training.html本番実装統合
-- 📋 **次期作業**: トレーニング機能完全統合・リリース準備
+- ✅ **完了**: 音域テストv4.0包括設計完成（PitchPro役割分担・エラーハンドリング・収録制御統合）
+- 🔄 **進行中**: voice-range-test-v4フォルダでの段階的実装（4回目チャレンジ）
+- 📋 **次期作業**: Phase1-3での確実な音域テスト完成・本番統合
 
 ### 🌿 **現在のブランチ**
-- **作業ブランチ**: `feature/data-manager-implementation`
-- **実装内容**: データ管理モジュール・pitchpro-audio統合・デバイス最適化・VolumeBarController完了
-- **次期フェーズ**: 本番ページ統合実装フェーズ
+- **作業ブランチ**: `feature/preparation-test-system`
+- **実装内容**: 音域テストv4.0包括設計・PitchPro統合・エラーハンドリング完成
+- **次期フェーズ**: voice-range-test-v4での段階的実装フェーズ
 
 ### ⚠️ **注意すべきこと（最重要）**
 1. **🚨 インライン記述禁止**: HTMLのstyle属性、JavaScriptでのインラインCSS絶対禁止（例外: Lucideアイコンサイズ、プログレスバー幅のみ）
@@ -285,6 +286,48 @@ iPad: 感度 5.0x, 音量バー 7.0x
 - **音量バー統合仕様書**: 完全なドキュメント作成（`/specifications/VOLUME_BAR_INTEGRATION_SPECIFICATION.md`）
 - **重要な教訓**: PitchProからの音量値取得は必ずコールバック方式`result.volume`を使用
 - **実機テスト済み設定**: PC(4.0x)・iPhone(4.5x)・iPad(7.0x)の音量バー感度設定確定
+
+---
+
+## 🎯 **2025年1月9日 重要更新**: 音域テストv4.0包括設計完成
+
+### **🏗️ 4回目チャレンジのための完全準備**
+- **専用フォルダ構築**: `/voice-range-test-v4/`で完全分離管理
+- **PitchPro仕様理解**: AudioDetectionComponentの適切な活用方法確立
+- **役割分担明確化**: PitchPro・VoiceRangeTesterV113・収録制御メソッドの責任範囲統一
+- **エラーハンドリング包括設計**: 測定失敗6パターンの完全対応設計
+
+### **📁 voice-range-test-v4フォルダ構成**
+```
+voice-range-test-v4/
+├── docs/                              # 設計ドキュメント統合管理
+│   ├── PITCHPRO_ROLE_ASSIGNMENT.md    # PitchPro役割分担明確化  
+│   ├── RECORDING_CONTROL_METHODS.md   # 収録制御メソッド設計
+│   ├── IMPLEMENTATION_PLAN_V4.md      # v4.0実装計画（Phase1-3）
+│   ├── FLOW_GAP_ANALYSIS.md          # ユーザーフロー実装ギャップ分析
+│   └── MEASUREMENT_FAILURE_HANDLING.md # 測定失敗時エラーハンドリング
+├── src/{css,js}/                     # 構造化実装ファイル
+├── test/                             # 単体・統合・アニメーションテスト
+└── backup/original-files/            # 安全なバックアップ管理
+```
+
+### **🎯 確立された設計原則**
+1. **AudioDetectionComponent単一責任**: PitchPro統合音声処理専門
+2. **収録制御メソッド統合**: UI状態・アニメーション・フロー制御の一元化
+3. **段階的エラーハンドリング**: 即座対応→警告強化→代替手段の3段階
+4. **測定失敗パターン対応**: 音量不足・明瞭度不足・雑音干渉・システムエラー等
+5. **ユーザービリティ最優先**: 具体的メッセージ・視覚フィードバック・進捗保持
+
+### **🚀 実装フェーズ戦略**
+- **Phase 1**: HTMLベースファイル作成・CSS基本アニメーション（低リスク）
+- **Phase 2**: 収録制御メソッドJavaScript実装・PitchPro統合（中リスク）
+- **Phase 3**: アニメーション統合・エラーハンドリング実装（高リスク）
+
+### **⚠️ 重要な教訓（4回目成功のために）**
+- **PitchPro推奨値使用**: `clarityThreshold: 0.4`, `minVolumeAbsolute: 0.003`
+- **単一インスタンス運用**: AudioDetectionComponentの使い回し、セレクター変更で対応
+- **測定失敗への備え**: 音量不足・音程不明瞭・雑音干渉の包括的対応
+- **段階的実装**: 各Phase完了時の確実な動作確認で安全性確保
 
 ---
 
