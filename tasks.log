@@ -1770,3 +1770,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-08 15:39:55] コミット: feat: AudioDetectionComponent統合 - PitchPro新機能統合完了
+
+- AudioDetectionComponentビルドファイルをjs/pitchpro-audio/distにコピー
+- preparation-test.htmlを新AudioDetectionComponentで置き換え
+- 統合テストページtest-audio-detection-component.html作成
+- voice-range-testerは既にAudioDetectionComponent対応済み確認
+- Safari音量低下対策を統合したモダンな音声処理システム実装
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

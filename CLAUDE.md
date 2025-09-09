@@ -699,4 +699,55 @@ pitchDetector.setCallbacks({
 
 ---
 
+## 🎯 **2025年1月9日 重要更新**: AudioDetectionComponent UI切り替え問題の解決
+
+### **🔧 問題の概要**
+- **症状**: 音域テスト開始時、マイクテスト用の音量バー（`volume-progress`）が動作し続け、音域テスト用の音量バー（`range-test-volume-bar`）が更新されない
+- **原因**: AudioDetectionComponentが初期化時のセレクターを内部でキャッシュし、後から変更できない仕様
+- **影響**: マイクテストから音域テストへの切り替え時にUI要素が正しく更新されない
+
+### **❌ 試行錯誤した方法（すべて無効）**
+1. ID重複を疑って複数要素を一括更新
+2. コールバックの上書き防止処理
+3. DOM要素のID動的変更
+4. styleプロパティの読み取り専用化
+5. セレクター変更メソッドの探索（存在しなかった）
+
+### **✅ 正しい解決方法**
+```javascript
+// 音域テスト開始時の処理
+if (audioDetector) {
+    // 1. 既存のAudioDetectorを停止
+    audioDetector.stopDetection();
+    
+    // 2. リソースを完全に破棄（重要！）
+    audioDetector.destroy();
+    
+    // 3. 音域テスト用のセレクターで新規作成
+    audioDetector = new AudioDetectionComponent({
+        volumeBarSelector: '#range-test-volume-bar',
+        volumeTextSelector: '#range-test-volume-text',
+        frequencySelector: '#range-test-frequency-value',
+        // その他の設定...
+    });
+    
+    // 4. 再初期化
+    await audioDetector.initialize();
+}
+```
+
+### **📋 AudioDetectionComponent利用可能メソッド**
+- ✅ `stopDetection()` - 音声検出を停止
+- ✅ `destroy()` - リソースを完全に破棄
+- ❌ `cleanup()` - 存在しない
+- ❌ `release()` - 存在しない
+- ❌ `updateSelectors()` - 存在しない
+
+### **🎯 重要な教訓**
+- AudioDetectionComponentは**一度初期化したらセレクターを変更できない**
+- UI要素を切り替える場合は**destroy() → 再作成**が必須
+- PitchProのドキュメントが不足している場合は、テストページでメソッドを確認する
+
+---
+
 **このファイルは開発進行に応じて更新されます**

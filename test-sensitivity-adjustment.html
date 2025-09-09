@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マイク感度調整テスト</title>
+    <link rel="stylesheet" href="Bolt/v2/styles/base.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: white;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .slider-group {
+            margin: 1rem 0;
+        }
+        
+        .slider-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .slider {
+            width: 100%;
+            margin: 0.5rem 0;
+        }
+        
+        .value-display {
+            font-family: monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .volume-display {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .frequency-display {
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: #60a5fa;
+        }
+        
+        #log {
+            background: rgba(0,0,0,0.4);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #a0a0a0;
+            max-height: 250px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 style="text-align: center;">マイク感度調整テスト</h1>
+        
+        <!-- 現在の検出状況 -->
+        <div class="test-section">
+            <h3>現在の検出状況</h3>
+            <div class="volume-display">
+                <span style="min-width: 80px;">音量:</span>
+                <div class="progress-bar">
+                    <div class="progress-fill gradient-catalog-green" id="volume-bar" style="width: 0%;"></div>
+                </div>
+                <span class="volume-text" id="volume-text">0%</span>
+            </div>
+            
+            <div class="frequency-display">
+                周波数: <span id="frequency-display">0 Hz</span>
+            </div>
+        </div>
+        
+        <!-- 感度設定 -->
+        <div class="test-section">
+            <h3>感度設定</h3>
+            
+            <div class="slider-group">
+                <label for="minVolume">最小音量閾値 (minVolumeAbsolute)</label>
+                <input type="range" id="minVolume" class="slider" min="0.001" max="0.05" step="0.001" value="0.003">
+                <span class="value-display" id="minVolumeValue">0.003</span>
+                <p style="font-size: 0.8rem; color: #a0a0a0;">この値以下の音量は無視されます（雑音フィルター）</p>
+            </div>
+            
+            <div class="slider-group">
+                <label for="clarity">音程明瞭度閾値 (clarityThreshold)</label>
+                <input type="range" id="clarity" class="slider" min="0.1" max="1.0" step="0.1" value="0.4">
+                <span class="value-display" id="clarityValue">0.4</span>
+                <p style="font-size: 0.8rem; color: #a0a0a0;">音程検出の精度要求（高いほど厳格）</p>
+            </div>
+            
+            <div class="controls">
+                <button id="apply-btn" class="btn btn-primary">設定を適用</button>
+                <button id="reset-btn" class="btn btn-secondary">デフォルトに戻す</button>
+            </div>
+        </div>
+        
+        <!-- コントロール -->
+        <div class="test-section">
+            <h3>テストコントロール</h3>
+            <div class="controls">
+                <button id="start-btn" class="btn btn-primary">検出開始</button>
+                <button id="stop-btn" class="btn btn-secondary" disabled>検出停止</button>
+                <button id="silent-test-btn" class="btn btn-secondary">無音状態確認</button>
+            </div>
+            
+            <p style="font-size: 0.9rem; color: #a0a0a0;">
+                📋 テスト方法:<br>
+                1. 「検出開始」後、完全に無音にしてください<br>
+                2. 音量バーが0%のままか確認<br>
+                3. 感度を調整して最適値を見つけてください
+            </p>
+        </div>
+        
+        <!-- ログ -->
+        <div class="test-section">
+            <h3>デバッグログ</h3>
+            <div id="log"></div>
+        </div>
+    </div>
+    
+    <script src="js/pitchpro-audio/dist/pitchpro.umd.js"></script>
+    
+    <script>
+        let audioDetector = null;
+        let updateCounter = 0;
+        
+        // DOM要素
+        const elements = {
+            volumeBar: document.getElementById('volume-bar'),
+            volumeText: document.getElementById('volume-text'),
+            frequencyDisplay: document.getElementById('frequency-display'),
+            
+            minVolumeSlider: document.getElementById('minVolume'),
+            claritySlider: document.getElementById('clarity'),
+            minVolumeValue: document.getElementById('minVolumeValue'),
+            clarityValue: document.getElementById('clarityValue'),
+            
+            startBtn: document.getElementById('start-btn'),
+            stopBtn: document.getElementById('stop-btn'),
+            applyBtn: document.getElementById('apply-btn'),
+            resetBtn: document.getElementById('reset-btn'),
+            silentTestBtn: document.getElementById('silent-test-btn'),
+            
+            log: document.getElementById('log')
+        };
+        
+        // ログ関数
+        function log(message, type = 'INFO') {
+            const timestamp = new Date().toLocaleTimeString();
+            const emoji = {
+                'INFO': 'ℹ️',
+                'SUCCESS': '✅',
+                'ERROR': '❌',
+                'WARNING': '⚠️',
+                'DEBUG': '🔍',
+                'NOISE': '🔇'
+            }[type] || '📝';
+            
+            const logMessage = `[${timestamp}] ${emoji} ${message}\n`;
+            elements.log.textContent += logMessage;
+            elements.log.scrollTop = elements.log.scrollHeight;
+            console.log(logMessage.trim());
+        }
+        
+        // 設定値の表示更新
+        function updateValueDisplays() {
+            elements.minVolumeValue.textContent = elements.minVolumeSlider.value;
+            elements.clarityValue.textContent = elements.claritySlider.value;
+        }
+        
+        // AudioDetector初期化
+        async function initializeDetector() {
+            if (audioDetector) {
+                audioDetector.destroy();
+            }
+            
+            const minVolume = parseFloat(elements.minVolumeSlider.value);
+            const clarity = parseFloat(elements.claritySlider.value);
+            
+            log(`AudioDetector初期化: minVolume=${minVolume}, clarity=${clarity}`, 'INFO');
+            
+            const { AudioDetectionComponent } = window.PitchPro;
+            audioDetector = new AudioDetectionComponent({
+                volumeBarSelector: '#dummy',
+                volumeTextSelector: '#dummy',
+                frequencySelector: '#dummy',
+                
+                clarityThreshold: clarity,
+                minVolumeAbsolute: minVolume,
+                deviceOptimization: true,
+                debug: false,
+                logPrefix: '🎵 SensitivityTest'
+            });
+            
+            // コールバック設定
+            audioDetector.setCallbacks({
+                onPitchUpdate: (result) => {
+                    updateCounter++;
+                    
+                    // UI更新
+                    if (result.volume !== undefined) {
+                        const volume = Math.min(100, Math.max(0, result.volume));
+                        elements.volumeBar.style.width = `${volume}%`;
+                        elements.volumeText.textContent = `${volume.toFixed(1)}%`;
+                        
+                        // 低音量の検出をログ
+                        if (volume > 0 && volume < 5) {
+                            if (updateCounter % 10 === 0) { // 10回に1回ログ出力
+                                log(`微細音量検出: ${volume.toFixed(2)}% (閾値: ${minVolume})`, 'NOISE');
+                            }
+                        }
+                    }
+                    
+                    if (result.frequency) {
+                        elements.frequencyDisplay.textContent = `${result.frequency.toFixed(1)} Hz`;
+                    }
+                },
+                onError: (error) => {
+                    log(`エラー: ${error.message}`, 'ERROR');
+                }
+            });
+            
+            await audioDetector.initialize();
+            log('AudioDetector初期化完了', 'SUCCESS');
+        }
+        
+        // 検出開始
+        async function startDetection() {
+            try {
+                if (!audioDetector) {
+                    await initializeDetector();
+                }
+                
+                await audioDetector.startDetection();
+                log('検出開始', 'SUCCESS');
+                
+                elements.startBtn.disabled = true;
+                elements.stopBtn.disabled = false;
+                
+                // カウンターリセット
+                updateCounter = 0;
+                
+            } catch (error) {
+                log(`開始エラー: ${error.message}`, 'ERROR');
+            }
+        }
+        
+        // 検出停止
+        function stopDetection() {
+            if (audioDetector) {
+                audioDetector.stopDetection();
+                log('検出停止', 'INFO');
+            }
+            
+            // UI リセット
+            elements.volumeBar.style.width = '0%';
+            elements.volumeText.textContent = '0%';
+            elements.frequencyDisplay.textContent = '0 Hz';
+            
+            elements.startBtn.disabled = false;
+            elements.stopBtn.disabled = true;
+        }
+        
+        // 設定適用
+        async function applySettings() {
+            log('設定を適用中...', 'INFO');
+            
+            if (audioDetector && !elements.startBtn.disabled) {
+                // 検出中の場合は再初期化
+                const wasDetecting = !elements.stopBtn.disabled;
+                
+                if (wasDetecting) {
+                    stopDetection();
+                }
+                
+                await initializeDetector();
+                
+                if (wasDetecting) {
+                    await startDetection();
+                }
+            }
+            
+            log('設定適用完了', 'SUCCESS');
+        }
+        
+        // デフォルト設定に戻す
+        async function resetToDefault() {
+            elements.minVolumeSlider.value = '0.003';
+            elements.claritySlider.value = '0.4';
+            updateValueDisplays();
+            
+            log('デフォルト設定に戻しました', 'INFO');
+            await applySettings();
+        }
+        
+        // 無音状態テスト
+        function testSilentState() {
+            log('=== 無音状態テスト開始 ===', 'INFO');
+            log('10秒間完全に無音にしてください...', 'INFO');
+            
+            let silentCount = 0;
+            let noiseCount = 0;
+            const startTime = Date.now();
+            
+            const testInterval = setInterval(() => {
+                const currentVolume = parseFloat(elements.volumeText.textContent) || 0;
+                
+                if (currentVolume === 0) {
+                    silentCount++;
+                } else {
+                    noiseCount++;
+                    log(`雑音検出: ${currentVolume.toFixed(2)}%`, 'WARNING');
+                }
+                
+                const elapsed = Date.now() - startTime;
+                if (elapsed >= 10000) { // 10秒経過
+                    clearInterval(testInterval);
+                    
+                    const total = silentCount + noiseCount;
+                    const noiseRate = total > 0 ? (noiseCount / total * 100) : 0;
+                    
+                    log('=== 無音状態テスト結果 ===', 'INFO');
+                    log(`完全無音: ${silentCount}回, 雑音検出: ${noiseCount}回`, 'INFO');
+                    log(`雑音率: ${noiseRate.toFixed(1)}%`, noiseRate > 20 ? 'WARNING' : 'SUCCESS');
+                    
+                    if (noiseRate > 20) {
+                        log('⚠️ 感度が高すぎる可能性があります', 'WARNING');
+                        log('minVolumeAbsoluteを上げることを推奨', 'WARNING');
+                    } else {
+                        log('✅ 適切な感度設定です', 'SUCCESS');
+                    }
+                }
+            }, 200); // 200ms間隔でチェック
+        }
+        
+        // イベントリスナー
+        elements.minVolumeSlider.addEventListener('input', updateValueDisplays);
+        elements.claritySlider.addEventListener('input', updateValueDisplays);
+        
+        elements.startBtn.addEventListener('click', startDetection);
+        elements.stopBtn.addEventListener('click', stopDetection);
+        elements.applyBtn.addEventListener('click', applySettings);
+        elements.resetBtn.addEventListener('click', resetToDefault);
+        elements.silentTestBtn.addEventListener('click', testSilentState);
+        
+        // 初期化
+        updateValueDisplays();
+        log('感度調整テストページ読み込み完了', 'SUCCESS');
+        log('まず「検出開始」してから「無音状態確認」をテストしてください', 'INFO');
+    </script>
+</body>
+</html>

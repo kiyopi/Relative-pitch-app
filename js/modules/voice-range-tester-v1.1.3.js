@@ -336,8 +336,48 @@ class VoiceRangeTesterV113 {
             return;
         }
 
+        // デバッグ：既存コールバック確認
+        console.log('🔍 VoiceRangeTester: AudioDetectionComponent確認');
+        console.log('  getCallbacks method:', typeof this.pitchDetector.getCallbacks);
+        console.log('  setCallbacks method:', typeof this.pitchDetector.setCallbacks);
+        
+        // 既存のコールバックを保持（getCallbacksが存在しない場合は空オブジェクト）
+        let originalCallbacks = {};
+        if (typeof this.pitchDetector.getCallbacks === 'function') {
+            originalCallbacks = this.pitchDetector.getCallbacks() || {};
+            console.log('✅ 既存コールバック取得成功:', Object.keys(originalCallbacks));
+        } else {
+            console.warn('⚠️ getCallbacksメソッドが存在しません - 空のコールバックを使用');
+        }
+        
+        // 元のコールバックを保存（グローバルに保存）
+        if (!window.originalAudioCallbacks) {
+            window.originalAudioCallbacks = originalCallbacks;
+        }
+        
         this.pitchDetector.setCallbacks({
+            ...originalCallbacks, // 既存のコールバックを保持
             onPitchUpdate: (result) => {
+                // 【最優先】preparation-test.htmlのUI更新を強制実行
+                if (window.rangeTestUIUpdate) {
+                    try {
+                        window.rangeTestUIUpdate(result);
+                        console.log('🎯 rangeTestUIUpdate実行完了:', result.volume?.toFixed(1) + '%');
+                    } catch (error) {
+                        console.error('❌ rangeTestUIUpdate実行エラー:', error);
+                    }
+                }
+                
+                // 元のonPitchUpdateがあれば実行
+                if (originalCallbacks.onPitchUpdate) {
+                    try {
+                        originalCallbacks.onPitchUpdate(result);
+                    } catch (error) {
+                        console.error('❌ originalCallback実行エラー:', error);
+                    }
+                }
+                
+                // 音域テスト処理（rangeTestUIUpdateより後に実行）
                 if (!this.isRangeTesting || !result) return;
                 
                 // 【Safari音量低下問題根本解決】Web Audio APIから直接音量を高精度計算
@@ -360,10 +400,10 @@ class VoiceRangeTesterV113 {
                         
                         const rms = Math.sqrt(sum / bufferLength);
                         
-                        // Safari対応：音域テスト専用設定（感度向上）
-                        const baseMultiplier = 3200; // 音域テスト用に感度向上
-                        const minThreshold = 0.0003;   // より低い閾値
-                        const instantDropThreshold = 0.0015; // より敏感な即座ゼロ化
+                        // 音域テスト用設定（VOLUME_CALIBRATION_GUIDE準拠）
+                        const baseMultiplier = 25; // スケーリング係数（推奨値）
+                        const minThreshold = 0.003;   // 適切な閾値
+                        const instantDropThreshold = 0.02; // 適切な即座ゼロ化
                         
                         // 音量計算：RMSとピーク値のバランス調整
                         const combinedVolume = (rms * 0.80) + (maxValue * 0.20);
