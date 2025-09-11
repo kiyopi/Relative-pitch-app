@@ -780,16 +780,20 @@ if (audioDetector) {
 ```
 
 ### **📋 AudioDetectionComponent利用可能メソッド**
+- ✅ `initialize()` - 初期化処理
+- ✅ `startDetection()` - 音声検出開始
 - ✅ `stopDetection()` - 音声検出を停止
 - ✅ `destroy()` - リソースを完全に破棄
+- ✅ `updateSelectors()` - UI要素の動的切り替え（PitchPro Native機能）
+- ✅ `setCallbacks()` - コールバック設定
 - ❌ `cleanup()` - 存在しない
 - ❌ `release()` - 存在しない
-- ❌ `updateSelectors()` - 存在しない
 
-### **🎯 重要な教訓**
-- AudioDetectionComponentは**一度初期化したらセレクターを変更できない**
-- UI要素を切り替える場合は**destroy() → 再作成**が必須
-- PitchProのドキュメントが不足している場合は、テストページでメソッドを確認する
+### **🎯 重要な教訓（2025年1月更新）**
+- AudioDetectionComponentは**updateSelectors()でセレクターを動的変更可能**
+- UI要素切り替えは**updateSelectors()が推奨方法**（高速・効率的）
+- destroy() → 再作成は**フォールバック用途**（updateSelectors()失敗時のみ）
+- PitchPro READMEに完全なメソッド仕様が文書化されている
 
 ---
 

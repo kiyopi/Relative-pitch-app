@@ -11,47 +11,48 @@
 /**
  * AudioDetectionComponent - PitchPro統合音声検出コンポーネント
  * 
- * CLAUDE.mdの重要教訓:
- * - 一度初期化したらセレクターを変更できない
- * - UI要素を切り替える場合はdestroy() → 再作成が必須
+ * PitchPro README準拠:
+ * - AudioDetectionComponentを直接使用（公式実装）
+ * - updateSelectors()メソッドで音量バー切り替え対応
+ * - 最適化されたデフォルト値を使用（clarityThreshold: 0.4等）
  * - 音量値取得は必ずコールバック方式result.volumeを使用
  */
 class AudioDetectionComponent {
     constructor(options = {}) {
         this.options = {
-            // UI要素セレクター（初期化後変更不可）
+            // UI要素セレクター（updateSelectors()で変更可能）
             volumeBarSelector: '#volume-progress',
-            volumeTextSelector: '#volume-percentage',
+            volumeTextSelector: '#volume-percentage', 
             frequencySelector: '#frequency-value',
+            noteSelector: null,
             
-            // 音声検出設定（PitchPro推奨値使用）
-            clarityThreshold: 0.4,
-            minVolumeAbsolute: 0.003,
-            noiseThreshold: 0.1,
+            // 音声検出設定（PitchPro README推奨値）
+            clarityThreshold: 0.4,        // 40% - 実用的な信頼性閾値
+            minVolumeAbsolute: 0.003,     // 0.3% - 適切な最小音量
+            fftSize: 4096,                // 高精度FFT
+            smoothing: 0.1,               // 最小限の平滑化
             
-            // 検出制御
-            enableFrequencyDetection: true,
-            enableVolumeDetection: true,
-            updateInterval: 50, // 20fps
-            
-            // デバイス最適化（実機テスト済み設定）
-            autoDetectDevice: true,
+            // デバイス最適化設定
+            deviceOptimization: true,     // 自動デバイス最適化
+            enableHarmonicCorrection: true, // 倍音補正有効
             
             // デバッグ設定
             debugMode: false,
-            logLevel: 'INFO',
+            debug: false,
             
             ...options
         };
         
-        // PitchPro関連インスタンス
-        this.audioManager = null;
-        this.pitchDetector = null;
+        // PitchPro統合インスタンス（公式実装準拠）
+        this.audioDetector = null;
         
-        // UI要素（初期化時固定）
-        this.volumeBar = null;
-        this.volumeText = null;
-        this.frequencyElement = null;
+        // UI要素キャッシュ（updateSelectors()で更新可能）
+        this.cachedElements = {
+            volumeBar: null,
+            volumeText: null,
+            frequencyElement: null,
+            noteElement: null
+        };
         
         // 状態管理
         this.isInitialized = false;
@@ -66,75 +67,22 @@ class AudioDetectionComponent {
             onStateChange: null
         };
         
-        // データ管理
+        // 現在データ
         this.currentData = {
             volume: 0,
             frequency: 0,
             clarity: 0,
+            note: '--',
             timestamp: 0
         };
         
-        // デバイス設定（実機テスト結果反映）
-        this.deviceSpecs = this.options.autoDetectDevice ? this.detectDevice() : this.getDefaultSpecs();
-        
-        // エラー管理
-        this.errorCount = 0;
-        this.lastErrorTime = 0;
-        this.maxErrors = 5;
-        
-        this.log('AudioDetectionComponent初期化完了', 'SUCCESS');
+        this.log('AudioDetectionComponent (PitchPro準拠版) 初期化完了', 'SUCCESS');
     }
     
-    /**
-     * デバイス検出（CLAUDE.md実機テスト結果反映）
-     */
-    detectDevice() {
-        const userAgent = navigator.userAgent;
-        
-        // iPadOS 13+ バグ完全対応（CLAUDE.md重要教訓）
-        const isIPhone = /iPhone/.test(userAgent);
-        const isIPad = /iPad/.test(userAgent);
-        const isIPadOS = /Macintosh/.test(userAgent) && 'ontouchend' in document;
-        const hasIOSNavigator = /iPad|iPhone|iPod/.test(userAgent);
-        
-        if (isIPhone || hasIOSNavigator) {
-            return {
-                type: 'iPhone',
-                sensitivity: 3.5,
-                volumeBarMultiplier: 4.5,
-                noiseReduction: 0.15
-            };
-        } else if (isIPad || isIPadOS) {
-            return {
-                type: 'iPad', 
-                sensitivity: 5.0,
-                volumeBarMultiplier: 7.0,
-                noiseReduction: 0.2
-            };
-        } else {
-            return {
-                type: 'PC',
-                sensitivity: 2.5,
-                volumeBarMultiplier: 4.0,
-                noiseReduction: 0.1
-            };
-        }
-    }
+    
     
     /**
-     * デフォルトデバイス設定
-     */
-    getDefaultSpecs() {
-        return {
-            type: 'PC',
-            sensitivity: 2.5,
-            volumeBarMultiplier: 4.0,
-            noiseReduction: 0.1
-        };
-    }
-    
-    /**
-     * 初期化処理
+     * 初期化処理（PitchPro公式AudioDetectionComponent使用）
      */
     async initialize() {
         if (this.isDestroyed) {
@@ -147,24 +95,51 @@ class AudioDetectionComponent {
         }
         
         try {
-            this.log('初期化開始', 'INFO');
+            this.log('PitchPro AudioDetectionComponent 初期化開始', 'INFO');
             
-            // UI要素取得（初期化時のみ固定）
+            // PitchProライブラリ読み込み確認
+            if (!window.PitchPro) {
+                throw new Error('PitchProライブラリが読み込まれていません');
+            }
+            
+            // UI要素キャッシュ
             this.cacheUIElements();
             
-            // PitchPro モジュール動的ロード
-            await this.loadPitchProModules();
+            // PitchPro公式AudioDetectionComponent作成
+            const { AudioDetectionComponent } = window.PitchPro;
             
-            // AudioManager初期化
-            await this.initializeAudioManager();
+            if (!AudioDetectionComponent) {
+                throw new Error('AudioDetectionComponentが利用できません');
+            }
             
-            // PitchDetector初期化
-            await this.initializePitchDetector();
+            this.audioDetector = new AudioDetectionComponent({
+                volumeBarSelector: this.options.volumeBarSelector,
+                volumeTextSelector: this.options.volumeTextSelector,
+                frequencySelector: this.options.frequencySelector,
+                noteSelector: this.options.noteSelector,
+                
+                // PitchPro推奨設定
+                clarityThreshold: this.options.clarityThreshold,
+                minVolumeAbsolute: this.options.minVolumeAbsolute,
+                deviceOptimization: this.options.deviceOptimization,
+                enableHarmonicCorrection: this.options.enableHarmonicCorrection,
+                debug: this.options.debugMode
+            });
+            
+            // PitchPro AudioDetectionComponent初期化
+            await this.audioDetector.initialize();
+            
+            // コールバック設定
+            this.audioDetector.setCallbacks({
+                onPitchUpdate: (result) => this.handlePitchUpdate(result),
+                onError: (error) => this.handleError('PITCH_DETECTION_ERROR', error),
+                onStateChange: (state) => this.notifyStateChange(state)
+            });
             
             this.isInitialized = true;
             this.notifyStateChange('initialized');
             
-            this.log('初期化完了', 'SUCCESS');
+            this.log('PitchPro AudioDetectionComponent 初期化完了', 'SUCCESS');
             return true;
             
         } catch (error) {
@@ -175,30 +150,38 @@ class AudioDetectionComponent {
     }
     
     /**
-     * UI要素キャッシュ（初期化時のみ実行）
+     * UI要素キャッシュ（updateSelectors()対応）
      */
     cacheUIElements() {
         // 音量バー
         if (this.options.volumeBarSelector) {
-            this.volumeBar = document.querySelector(this.options.volumeBarSelector);
-            if (!this.volumeBar) {
+            this.cachedElements.volumeBar = document.querySelector(this.options.volumeBarSelector);
+            if (!this.cachedElements.volumeBar) {
                 this.log(`音量バー要素が見つかりません: ${this.options.volumeBarSelector}`, 'WARNING');
             }
         }
         
         // 音量テキスト
         if (this.options.volumeTextSelector) {
-            this.volumeText = document.querySelector(this.options.volumeTextSelector);
-            if (!this.volumeText) {
+            this.cachedElements.volumeText = document.querySelector(this.options.volumeTextSelector);
+            if (!this.cachedElements.volumeText) {
                 this.log(`音量テキスト要素が見つかりません: ${this.options.volumeTextSelector}`, 'WARNING');
             }
         }
         
         // 周波数表示
         if (this.options.frequencySelector) {
-            this.frequencyElement = document.querySelector(this.options.frequencySelector);
-            if (!this.frequencyElement) {
+            this.cachedElements.frequencyElement = document.querySelector(this.options.frequencySelector);
+            if (!this.cachedElements.frequencyElement) {
                 this.log(`周波数要素が見つかりません: ${this.options.frequencySelector}`, 'WARNING');
+            }
+        }
+        
+        // 音名表示
+        if (this.options.noteSelector) {
+            this.cachedElements.noteElement = document.querySelector(this.options.noteSelector);
+            if (!this.cachedElements.noteElement) {
+                this.log(`音名要素が見つかりません: ${this.options.noteSelector}`, 'WARNING');
             }
         }
         
@@ -206,140 +189,48 @@ class AudioDetectionComponent {
     }
     
     /**
-     * PitchProモジュール動的ロード
+     * セレクター更新（PitchPro公式機能）
      */
-    async loadPitchProModules() {
+    updateSelectors(newSelectors) {
+        if (!this.isInitialized || !this.audioDetector) {
+            this.log('初期化前にセレクターを更新しようとしました', 'WARNING');
+            return;
+        }
+        
         try {
-            // 実際のPitchProモジュールのパスを環境に応じて調整
-            const pitchProPath = this.resolvePitchProPath();
+            this.log('セレクター更新開始', 'INFO');
             
-            this.log(`PitchProモジュールロード: ${pitchProPath}`, 'INFO');
+            // オプション更新
+            this.options = { ...this.options, ...newSelectors };
             
-            // AudioManagerとPitchDetectorは実際のPitchProライブラリからインポート
-            // 現在はモックとして実装（実際の統合時に置き換え）
-            const { AudioManager, PitchDetector } = await this.loadPitchProMock();
-            
-            this.AudioManager = AudioManager;
-            this.PitchDetector = PitchDetector;
-            
-            this.log('PitchProモジュールロード完了', 'SUCCESS');
-            
-        } catch (error) {
-            this.log(`PitchProモジュールロードエラー: ${error.message}`, 'ERROR');
-            throw error;
-        }
-    }
-    
-    /**
-     * PitchProパス解決
-     */
-    resolvePitchProPath() {
-        // 本番環境では実際のPitchProライブラリパスを返す
-        // 開発環境ではモック版を使用
-        const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname.includes('127.0.0.1');
-        
-        if (isDevelopment) {
-            return './pitch-pro-mock.js';
-        } else {
-            return '../../js/pitchpro-audio-processing.js';
-        }
-    }
-    
-    /**
-     * PitchProモック（開発・テスト用）
-     */
-    async loadPitchProMock() {
-        // 実際のPitchProライブラリが利用できない場合のモック実装
-        const AudioManager = class {
-            async initialize() { return true; }
-            async startCapture() { return true; }
-            stopCapture() {}
-            destroy() {}
-        };
-        
-        const PitchDetector = class {
-            constructor(options) { this.options = options; this.callbacks = {}; }
-            setCallbacks(callbacks) { this.callbacks = callbacks; }
-            async startDetection() { 
-                // モック用の定期更新
-                this.mockInterval = setInterval(() => {
-                    if (this.callbacks.onPitchUpdate) {
-                        this.callbacks.onPitchUpdate({
-                            volume: Math.random() * 100,
-                            frequency: 200 + Math.random() * 200,
-                            clarity: 0.5 + Math.random() * 0.5,
-                            timestamp: Date.now()
-                        });
-                    }
-                }, 100);
-                return true; 
+            // PitchPro公式updateSelectors()使用
+            if (this.audioDetector.updateSelectors) {
+                this.audioDetector.updateSelectors(newSelectors);
+                this.log('PitchPro updateSelectors() 実行完了', 'SUCCESS');
+            } else {
+                this.log('updateSelectors()が利用できません - 手動切り替え実行', 'WARNING');
             }
-            stopDetection() { 
-                if (this.mockInterval) {
-                    clearInterval(this.mockInterval);
-                    this.mockInterval = null;
-                }
-            }
-            destroy() { this.stopDetection(); }
-        };
-        
-        return { AudioManager, PitchDetector };
-    }
-    
-    /**
-     * AudioManager初期化
-     */
-    async initializeAudioManager() {
-        try {
-            this.audioManager = new this.AudioManager({
-                deviceSpecs: this.deviceSpecs,
-                noiseThreshold: this.options.noiseThreshold,
-                debugMode: this.options.debugMode
-            });
             
-            await this.audioManager.initialize();
-            await this.audioManager.startCapture();
+            // UI要素キャッシュ更新
+            this.cacheUIElements();
             
-            this.log('AudioManager初期化完了', 'SUCCESS');
+            this.log('セレクター更新完了', 'SUCCESS');
             
         } catch (error) {
-            this.log(`AudioManager初期化エラー: ${error.message}`, 'ERROR');
-            throw error;
+            this.log(`セレクター更新エラー: ${error.message}`, 'ERROR');
+            this.handleError('SELECTOR_UPDATE_FAILED', error);
         }
     }
     
-    /**
-     * PitchDetector初期化
-     */
-    async initializePitchDetector() {
-        try {
-            this.pitchDetector = new this.PitchDetector({
-                audioManager: this.audioManager,
-                clarityThreshold: this.options.clarityThreshold,
-                minVolumeAbsolute: this.options.minVolumeAbsolute,
-                sensitivity: this.deviceSpecs.sensitivity,
-                debugMode: this.options.debugMode
-            });
-            
-            // コールバック設定
-            this.pitchDetector.setCallbacks({
-                onPitchUpdate: (result) => this.handlePitchUpdate(result),
-                onError: (error) => this.handleError('PITCH_DETECTION_ERROR', error)
-            });
-            
-            this.log('PitchDetector初期化完了', 'SUCCESS');
-            
-        } catch (error) {
-            this.log(`PitchDetector初期化エラー: ${error.message}`, 'ERROR');
-            throw error;
-        }
-    }
+    
+    
+    
     
     /**
-     * 検出開始
+     * 検出開始（PitchPro公式）
      */
     async startDetection() {
-        if (!this.isInitialized) {
+        if (!this.isInitialized || !this.audioDetector) {
             throw new Error('初期化が完了していません');
         }
         
@@ -349,15 +240,19 @@ class AudioDetectionComponent {
         }
         
         try {
-            this.log('検出開始', 'INFO');
+            this.log('PitchPro検出開始', 'INFO');
             
-            await this.pitchDetector.startDetection();
+            // PitchPro公式startDetection()使用
+            const success = await this.audioDetector.startDetection();
             
-            this.isDetecting = true;
-            this.notifyStateChange('detecting');
-            
-            this.log('検出開始完了', 'SUCCESS');
-            return true;
+            if (success) {
+                this.isDetecting = true;
+                this.notifyStateChange('detecting');
+                this.log('PitchPro検出開始完了', 'SUCCESS');
+                return true;
+            } else {
+                throw new Error('PitchPro検出開始に失敗しました');
+            }
             
         } catch (error) {
             this.log(`検出開始エラー: ${error.message}`, 'ERROR');
@@ -367,7 +262,7 @@ class AudioDetectionComponent {
     }
     
     /**
-     * 検出停止
+     * 検出停止（PitchPro公式）
      */
     stopDetection() {
         if (!this.isDetecting) {
@@ -376,16 +271,16 @@ class AudioDetectionComponent {
         }
         
         try {
-            this.log('検出停止', 'INFO');
+            this.log('PitchPro検出停止', 'INFO');
             
-            if (this.pitchDetector) {
-                this.pitchDetector.stopDetection();
+            if (this.audioDetector) {
+                this.audioDetector.stopDetection();
             }
             
             this.isDetecting = false;
             this.notifyStateChange('stopped');
             
-            this.log('検出停止完了', 'SUCCESS');
+            this.log('PitchPro検出停止完了', 'SUCCESS');
             
         } catch (error) {
             this.log(`検出停止エラー: ${error.message}`, 'ERROR');
@@ -394,14 +289,15 @@ class AudioDetectionComponent {
     }
     
     /**
-     * 音声データ更新処理（CLAUDE.md重要教訓: result.volume必須使用）
+     * 音声データ更新処理（PitchPro公式コールバック）
      */
     handlePitchUpdate(result) {
         try {
-            // CLAUDE.mdの重要教訓: 必ずresult.volumeを使用
-            const volume = result.volume;
+            // PitchPro公式結果を使用
+            const volume = result.volume || 0;
             const frequency = result.frequency || 0;
             const clarity = result.clarity || 0;
+            const note = result.note || '--';
             const timestamp = result.timestamp || Date.now();
             
             // データ更新
@@ -409,17 +305,19 @@ class AudioDetectionComponent {
                 volume,
                 frequency,
                 clarity,
+                note,
                 timestamp
             };
             
-            // UI更新
-            this.updateVolumeDisplay(volume);
-            
-            if (this.options.enableFrequencyDetection && frequency > 0) {
-                this.updateFrequencyDisplay(frequency);
+            // PitchProが自動でUI更新するが、手動更新も可能
+            if (this.audioDetector.updateUI) {
+                this.audioDetector.updateUI(result);
+            } else {
+                // フォールバック: 手動UI更新
+                this.manualUIUpdate(result);
             }
             
-            // コールバック実行
+            // カスタムコールバック実行
             if (this.callbacks.onVolumeUpdate) {
                 this.callbacks.onVolumeUpdate(result);
             }
@@ -435,30 +333,52 @@ class AudioDetectionComponent {
     }
     
     /**
-     * 音量表示更新
+     * 手動UI更新（PitchProのupdateUI()が利用できない場合のフォールバック）
      */
-    updateVolumeDisplay(volume) {
-        // デバイス別最適化適用
-        const displayVolume = Math.min(100, volume * this.deviceSpecs.volumeBarMultiplier);
-        
+    manualUIUpdate(result) {
         // 音量バー更新
-        if (this.volumeBar) {
-            this.volumeBar.style.width = `${Math.max(0, displayVolume)}%`;
+        if (this.cachedElements.volumeBar && result.volume !== undefined) {
+            const displayVolume = Math.min(100, Math.max(0, result.volume));
+            this.cachedElements.volumeBar.style.width = `${displayVolume}%`;
         }
         
         // 音量テキスト更新
-        if (this.volumeText) {
-            this.volumeText.textContent = `${Math.round(displayVolume)}%`;
+        if (this.cachedElements.volumeText && result.volume !== undefined) {
+            const displayVolume = Math.round(result.volume);
+            this.cachedElements.volumeText.textContent = `${displayVolume}%`;
+        }
+        
+        // 周波数表示更新
+        if (this.cachedElements.frequencyElement && result.frequency > 0) {
+            this.cachedElements.frequencyElement.textContent = `${result.frequency.toFixed(1)} Hz`;
+        }
+        
+        // 音名表示更新
+        if (this.cachedElements.noteElement && result.note) {
+            this.cachedElements.noteElement.textContent = result.note;
         }
     }
     
     /**
-     * 周波数表示更新
+     * 状態取得（PitchPro公式）
      */
-    updateFrequencyDisplay(frequency) {
-        if (this.frequencyElement && frequency > 0) {
-            this.frequencyElement.textContent = `${Math.round(frequency)} Hz`;
+    getStatus() {
+        const baseStatus = {
+            isInitialized: this.isInitialized,
+            isDetecting: this.isDetecting,
+            isDestroyed: this.isDestroyed,
+            currentData: this.currentData,
+            options: this.options
+        };
+        
+        if (this.audioDetector && this.audioDetector.getStatus) {
+            return {
+                ...baseStatus,
+                pitchProStatus: this.audioDetector.getStatus()
+            };
         }
+        
+        return baseStatus;
     }
     
     /**
@@ -573,7 +493,7 @@ class AudioDetectionComponent {
     }
     
     /**
-     * リソース破棄（CLAUDE.md重要教訓: destroy()が必須）
+     * リソース破棄（PitchPro公式destroy()使用）
      */
     destroy() {
         if (this.isDestroyed) {
@@ -582,37 +502,38 @@ class AudioDetectionComponent {
         }
         
         try {
-            this.log('リソース破棄開始', 'INFO');
+            this.log('PitchProリソース破棄開始', 'INFO');
             
             // 検出停止
             this.stopDetection();
             
-            // PitchDetector破棄
-            if (this.pitchDetector) {
-                this.pitchDetector.destroy();
-                this.pitchDetector = null;
-            }
-            
-            // AudioManager破棄
-            if (this.audioManager) {
-                this.audioManager.destroy();
-                this.audioManager = null;
+            // PitchPro AudioDetectionComponent破棄
+            if (this.audioDetector) {
+                if (this.audioDetector.destroy) {
+                    this.audioDetector.destroy();
+                } else if (this.audioDetector.cleanup) {
+                    this.audioDetector.cleanup();
+                }
+                this.audioDetector = null;
             }
             
             // コールバッククリア
             this.callbacks = {};
             
             // UI要素参照クリア
-            this.volumeBar = null;
-            this.volumeText = null;
-            this.frequencyElement = null;
+            this.cachedElements = {
+                volumeBar: null,
+                volumeText: null,
+                frequencyElement: null,
+                noteElement: null
+            };
             
             // 状態リセット
             this.isInitialized = false;
             this.isDetecting = false;
             this.isDestroyed = true;
             
-            this.log('リソース破棄完了', 'SUCCESS');
+            this.log('PitchProリソース破棄完了', 'SUCCESS');
             
         } catch (error) {
             this.log(`リソース破棄エラー: ${error.message}`, 'ERROR');

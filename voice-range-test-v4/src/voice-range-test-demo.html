@@ -166,12 +166,39 @@ await controller.startVoiceRangeTest();</code></pre>
 
     <!-- Scripts -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/js/pitchpro-audio/index.umd.js"></script>
     
     <!-- 統合コントローラーデモ -->
     <script type="module">
         import VoiceRangeTestController from './js/voice-range-test-controller.js';
         
         document.addEventListener('DOMContentLoaded', async function() {
+            // PitchProライブラリ読み込み確認
+            console.log('🔍 PitchPro読み込み確認:');
+            console.log('  PitchPro:', typeof PitchPro);
+            console.log('  window.PitchPro:', window.PitchPro);
+            console.log('  AudioManager:', typeof AudioManager);
+            console.log('  PitchDetector:', typeof PitchDetector);
+            console.log('  window.AudioManager:', typeof window.AudioManager);
+            console.log('  window.PitchDetector:', typeof window.PitchDetector);
+            
+            // PitchProオブジェクトから取得を試行
+            if (typeof PitchPro !== 'undefined' && PitchPro) {
+                console.log('  PitchPro.AudioManager:', PitchPro.AudioManager);
+                console.log('  PitchPro.PitchDetector:', PitchPro.PitchDetector);
+                
+                // グローバルスコープに追加
+                window.AudioManager = PitchPro.AudioManager;
+                window.PitchDetector = PitchPro.PitchDetector;
+                console.log('✅ PitchProからAudioManager・PitchDetectorを取得');
+            }
+            
+            if (typeof AudioManager === 'undefined' || typeof PitchDetector === 'undefined') {
+                console.error('❌ PitchProライブラリが読み込まれていません');
+                showNotification('PitchProライブラリの読み込みに失敗しました', 'error');
+                return;
+            }
+            
             // Lucideアイコン初期化（range-icon以外）
             lucide.createIcons();
             

@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PitchPro Native機能テスト（本番スタイル）</title>
+    
+    <!-- 本番スタイルシート使用 -->
+    <link rel="stylesheet" href="../../Bolt/v2/styles/base.css">
+    
+    <!-- フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- アイコンライブラリ -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <div class="min-h-screen p-6">
+        <div class="container max-w-4xl mx-auto">
+            <!-- ヘッダー -->
+            <header class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-white mb-4">✅ PitchPro Native機能テスト</h1>
+                <p class="text-yellow-200 text-lg">本番スタイルシート使用・UIカタログ準拠・カスタム関数なし</p>
+            </header>
+
+            <!-- 重要な改善点 -->
+            <div class="glass-card mb-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <i data-lucide="check-circle" class="text-green-300 icon-md"></i>
+                    <h3 class="heading-md text-green-300">PitchPro Native機能活用（カスタム関数排除完了）</h3>
+                </div>
+                <ul class="text-white-70 space-y-2">
+                    <li class="flex items-center gap-2">
+                        <i data-lucide="check" class="text-green-300 icon-sm"></i>
+                        <span>updateSelectors()によるUI要素の自動切り替え</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <i data-lucide="check" class="text-green-300 icon-sm"></i>
+                        <span>PitchProが管理する内部状態での音量バーリセット</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <i data-lucide="x" class="text-red-300 icon-sm"></i>
+                        <span>resetAllVolumeDisplays()等のカスタム関数は削除</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <i data-lucide="x" class="text-red-300 icon-sm"></i>
+                        <span>startDetectionWithReset()等の独自ラッパー関数は削除</span>
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <i data-lucide="x" class="text-red-300 icon-sm"></i>
+                        <span>不要な手動DOM操作は排除</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- システム状態 -->
+            <div class="glass-card mb-6">
+                <h3 class="heading-md mb-4">
+                    <i data-lucide="activity" class="text-blue-300"></i>
+                    <span>システム状態</span>
+                </h3>
+                <div id="system-status" class="status-card mb-4">初期化前...</div>
+                
+                <div class="flex gap-3 flex-wrap">
+                    <button id="init-btn" class="btn btn-primary">
+                        <i data-lucide="mic" class="icon-sm"></i>
+                        <span>初期化</span>
+                    </button>
+                    <button id="start-btn" class="btn btn-success" disabled>
+                        <i data-lucide="play" class="icon-sm"></i>
+                        <span>検出開始</span>
+                    </button>
+                    <button id="stop-btn" class="btn btn-outline" disabled>
+                        <i data-lucide="stop-circle" class="icon-sm"></i>
+                        <span>検出停止</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- モード切り替えコントロール -->
+            <div class="glass-card mb-6">
+                <h3 class="heading-md mb-4">
+                    <i data-lucide="repeat" class="text-green-300"></i>
+                    <span>モード切り替え（PitchPro Native）</span>
+                </h3>
+                <div class="info-card mb-4">
+                    <h4 class="text-white font-medium mb-2">📊 updateSelectors()による高速切り替え</h4>
+                    <p class="text-white-70">PitchProのupdateSelectors()メソッドを使用して、UI要素を瞬時に切り替えます。内部状態も自動管理されます。</p>
+                </div>
+                
+                <div class="flex gap-3 flex-wrap">
+                    <button id="mic-mode-btn" class="btn btn-outline" disabled>
+                        <i data-lucide="mic" class="icon-sm"></i>
+                        <span>マイクテスト</span>
+                    </button>
+                    <button id="range-mode-btn" class="btn btn-outline" disabled>
+                        <i data-lucide="music" class="icon-sm"></i>
+                        <span>音域テスト</span>
+                    </button>
+                    <button id="practice-mode-btn" class="btn btn-outline" disabled>
+                        <i data-lucide="headphones" class="icon-sm"></i>
+                        <span>練習モード</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- マイクテストモードUI -->
+            <div class="glass-card mb-6" id="mic-mode-section">
+                <h3 class="heading-md mb-4">
+                    <i data-lucide="mic" class="text-blue-300"></i>
+                    <span>マイクテストモード</span>
+                </h3>
+                <div class="volume-meter">
+                    <div class="flex items-center justify-between mb-2 w-full">
+                        <span class="text-white-70">マイク音量</span>
+                        <span id="mic-volume-text" class="text-white font-medium">0.0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill gradient-catalog-blue" id="mic-volume-bar" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <div class="frequency-display text-2xl font-bold text-blue-300 bg-black bg-opacity-30 px-4 py-2 rounded-lg inline-block" id="mic-frequency-display">0 Hz</div>
+                </div>
+            </div>
+            
+            <!-- 音域テストモードUI -->
+            <div class="glass-card mb-6" id="range-mode-section">
+                <h3 class="heading-md mb-4">
+                    <i data-lucide="music" class="text-green-300"></i>
+                    <span>音域テストモード</span>
+                </h3>
+                <div class="volume-meter">
+                    <div class="flex items-center justify-between mb-2 w-full">
+                        <span class="text-white-70">測定音量</span>
+                        <span id="range-volume-text" class="text-white font-medium">0.0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill gradient-catalog-green" id="range-volume-bar" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <div class="frequency-display text-2xl font-bold text-green-300 bg-black bg-opacity-30 px-4 py-2 rounded-lg inline-block" id="range-frequency-display">0 Hz</div>
+                </div>
+            </div>
+            
+            <!-- 練習モードUI -->
+            <div class="glass-card mb-6" id="practice-mode-section">
+                <h3 class="heading-md mb-4">
+                    <i data-lucide="headphones" class="text-orange-300"></i>
+                    <span>練習モード</span>
+                </h3>
+                <div class="volume-meter">
+                    <div class="flex items-center justify-between mb-2 w-full">
+                        <span class="text-white-70">練習音量</span>
+                        <span id="practice-volume-text" class="text-white font-medium">0.0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill gradient-catalog-orange" id="practice-volume-bar" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-center gap-4 mt-4">
+                    <div class="frequency-display text-2xl font-bold text-orange-300 bg-black bg-opacity-30 px-4 py-2 rounded-lg" id="practice-frequency">0 Hz</div>
+                    <div class="note-display text-xl font-bold text-yellow-300 bg-black bg-opacity-30 px-4 py-2 rounded-lg" id="practice-note">-</div>
+                </div>
+            </div>
+            
+            <!-- ログ出力 -->
+            <div class="glass-card">
+                <h3 class="heading-md mb-4">
+                    <i data-lucide="file-text" class="text-white-70"></i>
+                    <span>ログ出力</span>
+                </h3>
+                <div id="log-output" class="bg-black bg-opacity-50 p-4 rounded-lg h-64 overflow-y-auto font-mono text-sm"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PitchPro v1.1.8 UMDライブラリ (Cross-Mode UI Interference Bug Fix) -->
+    <!-- 正しいv1.1.8ファイル（AudioDetectionComponent含む） -->
+    <script src="../../js/pitchpro-audio/pitchpro-v1.1.8-correct.umd.js"></script>
+    <script>
+        // UMD版の読み込み確認
+        if (typeof PitchPro !== 'undefined') {
+            console.log('✅ PitchPro v1.1.8 UMD loaded successfully - Cross-Mode UI Interference Bug Fix');
+            console.log('Version:', PitchPro.VERSION);
+            console.log('Build Date:', PitchPro.BUILD_DATE);
+            console.log('利用可能なクラス:', Object.keys(PitchPro));
+            console.log('🎯 v1.1.6 UMD upgrade complete!');
+            
+            // updateSelectorsメソッドの確認
+            if (PitchPro.AudioDetectionComponent) {
+                const tempInstance = new PitchPro.AudioDetectionComponent({
+                    volumeBarSelector: '#test',
+                    volumeTextSelector: '#test',
+                    frequencySelector: '#test'
+                });
+                console.log('🔧 updateSelectors method:', typeof tempInstance.updateSelectors);
+                tempInstance.destroy();
+            }
+            
+            // PitchPro読み込み完了を通知
+            window.pitchProLoaded = true;
+            window.dispatchEvent(new CustomEvent('pitchpro-loaded', { detail: PitchPro }));
+        } else {
+            console.error('❌ PitchPro UMD failed to load');
+        }
+    </script>
+    
+    <!-- TODO: 外部ファイル化 /js/pitchpro-native-test.js -->
+    <script>
+        // グローバル変数宣言（最優先 - PitchProチェック前）
+        let audioDetector = null;
+        let currentMode = 'mic';
+        let logLines = [];
+        let practiceNoteObserver = null;
+        let suppressNoteUpdates = false;
+        
+        // DOM要素取得（PitchProチェック前）
+        const logContainer = document.getElementById('log-output');
+        
+        // PitchPro UMD版の読み込み確認
+        if (typeof PitchPro !== 'undefined') {
+            console.log('✅ PitchPro v1.1.6ライブラリ読み込み成功');
+            console.log('利用可能なクラス:', Object.keys(PitchPro));
+            console.log('🎯 v1.1.6テストモード実行中（UMD版）');
+            
+            // メインシステム初期化
+            
+            // PitchPro v1.1.6の実際のAudioDetectionComponentを使用
+            // 模擬実装は削除済み - フォールバックのみ保持（エラー防止用）
+            const AudioDetectionComponent = PitchPro?.AudioDetectionComponent || class FallbackAudioDetector {
+            constructor(config) {
+                this.config = config;
+                this.volumeBarSelector = config.volumeBarSelector;
+                this.volumeTextSelector = config.volumeTextSelector;
+                this.frequencySelector = config.frequencySelector;
+                this.noteSelector = config.noteSelector;
+                this.callbacks = {};
+                this.isInitialized = false;
+                this.isDetecting = false;
+                
+                // UI要素キャッシュ
+                this.volumeBar = null;
+                this.volumeText = null;
+                this.frequencyElement = null;
+                this.noteElement = null;
+                
+                log('⚠️ フォールバック: PitchProライブラリが見つかりません', 'error');
+            }
+            
+            async initialize() {
+                this.cacheElements();
+                this.isInitialized = true;
+                log('✅ フォールバック初期化完了', 'info');
+            }
+            
+            cacheElements() {
+                this.volumeBar = document.querySelector(this.volumeBarSelector);
+                this.volumeText = document.querySelector(this.volumeTextSelector);
+                this.frequencyElement = document.querySelector(this.frequencySelector);
+                if (this.noteSelector) {
+                    this.noteElement = document.querySelector(this.noteSelector);
+                }
+            }
+            
+            updateSelectors(newSelectors) {
+                log('🔄 updateSelectors()実行中...', 'info');
+                
+                // 自動UIリセット（v1.1.5新機能の模擬）
+                this.resetCurrentUI();
+                
+                // セレクター更新
+                Object.assign(this.config, newSelectors);
+                this.volumeBarSelector = newSelectors.volumeBarSelector || this.volumeBarSelector;
+                this.volumeTextSelector = newSelectors.volumeTextSelector || this.volumeTextSelector;
+                this.frequencySelector = newSelectors.frequencySelector || this.frequencySelector;
+                this.noteSelector = newSelectors.noteSelector || this.noteSelector;
+                
+                // 新しい要素を再キャッシュ
+                this.cacheElements();
+                
+                // 新しいUI要素もリセット
+                this.resetCurrentUI();
+                
+                log('✅ updateSelectors()完了 - 自動UIリセット適用済み', 'success');
+            }
+            
+            resetCurrentUI() {
+                // 現在のUI要素をリセット（v1.1.5の自動リセット機能）
+                if (this.volumeBar) {
+                    this.volumeBar.style.width = '0%';
+                }
+                if (this.volumeText) {
+                    this.volumeText.textContent = '0.0%';
+                }
+                if (this.frequencyElement) {
+                    this.frequencyElement.textContent = '0 Hz';
+                }
+                if (this.noteElement) {
+                    this.noteElement.textContent = '-';
+                }
+                
+                // 新しい要素もリセット
+                const newVolumeBar = document.querySelector(this.volumeBarSelector);
+                const newVolumeText = document.querySelector(this.volumeTextSelector);
+                const newFrequencyElement = document.querySelector(this.frequencySelector);
+                const newNoteElement = this.noteSelector ? document.querySelector(this.noteSelector) : null;
+                
+                if (newVolumeBar) newVolumeBar.style.width = '0%';
+                if (newVolumeText) newVolumeText.textContent = '0.0%';
+                if (newFrequencyElement) newFrequencyElement.textContent = '0 Hz';
+                if (newNoteElement) newNoteElement.textContent = '-';
+            }
+            
+            setCallbacks(callbacks) {
+                this.callbacks = callbacks;
+                
+                // 模擬データでコールバックをテスト
+                setTimeout(() => {
+                    if (this.isDetecting && this.callbacks.onPitchUpdate) {
+                        const mockResult = {
+                            frequency: Math.random() * 200 + 100,
+                            volume: Math.random() * 30 + 10,
+                            note: 'A',
+                            clarity: 0.8
+                        };
+                        this.updateUI(mockResult);
+                        this.callbacks.onPitchUpdate(mockResult);
+                    }
+                }, 1000);
+            }
+            
+            updateUI(result) {
+                if (this.volumeBar) {
+                    this.volumeBar.style.width = `${Math.min(100, result.volume)}%`;
+                }
+                if (this.volumeText) {
+                    this.volumeText.textContent = `${result.volume.toFixed(1)}%`;
+                }
+                if (this.frequencyElement) {
+                    this.frequencyElement.textContent = `${result.frequency.toFixed(1)} Hz`;
+                }
+                if (this.noteElement && result.note) {
+                    this.noteElement.textContent = result.note;
+                }
+            }
+            
+            async startDetection() {
+                this.isDetecting = true;
+                log('▶️ フォールバック検出開始', 'info');
+                return true;
+            }
+            
+            stopDetection() {
+                this.isDetecting = false;
+                log('⏹ フォールバック検出停止', 'info');
+            }
+            
+            destroy() {
+                this.stopDetection();
+                this.resetCurrentUI();
+                log('🗑️ フォールバック破棄完了', 'info');
+            }
+        }
+        
+        // Lucide初期化
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+        
+        // ログ出力システム
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            logLines.push(`[${timestamp}] ${message}`);
+            if (logLines.length > 100) logLines.shift();
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = `text-${type === 'success' ? 'green' : type === 'error' ? 'red' : 'blue'}-300 mb-1`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logContainer.innerHTML = logLines.map(line => {
+                const logType = line.includes('❌') ? 'red' : line.includes('✅') ? 'green' : 'blue';
+                return `<div class="text-${logType}-300 mb-1">${line}</div>`;
+            }).join('');
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            console.log(`%c${message}`, `color: ${type === 'success' ? '#22c55e' : type === 'error' ? '#ef4444' : '#3b82f6'}`);
+        }
+        
+        // ステータス更新
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('system-status');
+            statusDiv.className = `status-card text-${type === 'success' ? 'green' : type === 'error' ? 'red' : 'blue'}-300`;
+            statusDiv.textContent = message;
+        }
+        
+        // UI切り替え（本番スタイル準拠）
+        function updateModeUI(mode) {
+            // すべてのセクションのアクティブ状態をリセット
+            document.querySelectorAll('[id$="-mode-section"]').forEach(section => {
+                section.classList.remove('border-green-300');
+                section.style.borderColor = '';
+            });
+            
+            // ボタン状態更新
+            document.querySelectorAll('[id$="-mode-btn"]').forEach(btn => {
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-outline');
+            });
+            
+            // 現在のモードをアクティブに
+            const activeSection = document.getElementById(`${mode}-mode-section`);
+            const activeButton = document.getElementById(`${mode}-mode-btn`);
+            
+            if (activeSection) {
+                activeSection.classList.add('border-green-300');
+                activeSection.style.borderColor = '#22c55e';
+            }
+            if (activeButton) {
+                activeButton.classList.remove('btn-outline');
+                activeButton.classList.add('btn-primary');
+            }
+            
+            currentMode = mode;
+            log(`🔄 ${mode}モードに切り替え（PitchPro管理）`, 'info');
+        }
+        
+        // 初期化
+        document.getElementById('init-btn').addEventListener('click', async () => {
+            try {
+                updateStatus('初期化中...', 'info');
+                log('🎤 AudioDetectionComponent初期化開始', 'info');
+                
+                // PitchPro v1.1.8 AudioDetectionComponentを使用
+                if (!PitchPro.AudioDetectionComponent) {
+                    log('❌ AudioDetectionComponentが見つかりません', 'error');
+                    log('利用可能なクラス: ' + Object.keys(PitchPro).join(', '), 'error');
+                    throw new Error('AudioDetectionComponent not found in PitchPro v1.1.8');
+                }
+                
+                audioDetector = new PitchPro.AudioDetectionComponent({
+                    // 初期設定: マイクテストモード
+                    volumeBarSelector: '#mic-volume-bar',
+                    volumeTextSelector: '#mic-volume-text',
+                    frequencySelector: '#mic-frequency-display',
+                    
+                    // PitchPro推奨設定
+                    clarityThreshold: 0.4,
+                    minVolumeAbsolute: 0.003,
+                    deviceOptimization: true,
+                    debug: true
+                });
+                
+                
+                // コールバック設定
+                audioDetector.setCallbacks({
+                    onPitchUpdate: (result) => {
+                        // 練習モードの音程表示更新を監視
+                        if (currentMode === 'practice' && result.frequency > 0) {
+                            const practiceNote = document.querySelector('#practice-note');
+                            if (practiceNote && Math.random() < 0.05) { // 5%の確率でログ
+                                log(`🎼 練習モード音程更新: ${result.frequency?.toFixed(1)}Hz → DOM: "${practiceNote.textContent}"`, 'info');
+                            }
+                        }
+                        
+                        // 低頻度ログ出力（スパム防止）
+                        if (Math.random() < 0.02) { // 2%の確率
+                            log(`🎵 ${result.frequency?.toFixed(1) || 0}Hz, 音量: ${result.volume?.toFixed(1) || 0}%`, 'info');
+                        }
+                    },
+                    onError: (error) => {
+                        log(`❌ エラー: ${error.message}`, 'error');
+                        updateStatus(`エラー: ${error.message}`, 'error');
+                    },
+                    onStateChange: (state) => {
+                        log(`🔄 状態変化: ${state}`, 'info');
+                    }
+                });
+                
+                await audioDetector.initialize();
+                
+                updateStatus('初期化完了', 'success');
+                log('✅ AudioDetectionComponent初期化完了', 'success');
+                log('ℹ️ PitchPro Native機能のみを使用（カスタム関数なし）', 'success');
+                
+                // ボタン状態更新
+                document.getElementById('init-btn').disabled = true;
+                document.getElementById('start-btn').disabled = false;
+                document.getElementById('mic-mode-btn').disabled = false;
+                document.getElementById('range-mode-btn').disabled = false;
+                document.getElementById('practice-mode-btn').disabled = false;
+                
+                // デフォルトでマイクモード
+                updateModeUI('mic');
+                
+            } catch (error) {
+                log(`❌ 初期化エラー: ${error.message}`, 'error');
+                updateStatus(`初期化エラー: ${error.message}`, 'error');
+            }
+        });
+        
+        // 検出開始ボタン（PitchPro Native）
+        document.getElementById('start-btn').addEventListener('click', async () => {
+            if (!audioDetector) return;
+            
+            try {
+                log('▶️ 検出開始（PitchPro Native）', 'info');
+                
+                const started = await audioDetector.startDetection();
+                
+                if (started) {
+                    updateStatus('🎤 音声検出中...', 'success');
+                    document.getElementById('start-btn').disabled = true;
+                    document.getElementById('stop-btn').disabled = false;
+                    log('✅ 音声検出開始完了', 'success');
+                } else {
+                    log('❌ 検出開始に失敗', 'error');
+                }
+            } catch (error) {
+                log(`❌ 検出開始エラー: ${error.message}`, 'error');
+            }
+        });
+        
+        // 検出停止ボタン（PitchPro Native）
+        document.getElementById('stop-btn').addEventListener('click', () => {
+            if (!audioDetector) return;
+            
+            try {
+                log('⏹ 検出停止（PitchPro Native）', 'info');
+                
+                audioDetector.stopDetection();
+                
+                updateStatus('音声検出停止', 'info');
+                document.getElementById('start-btn').disabled = false;
+                document.getElementById('stop-btn').disabled = true;
+                log('✅ 音声検出停止完了', 'info');
+                
+            } catch (error) {
+                log(`❌ 検出停止エラー: ${error.message}`, 'error');
+            }
+        });
+        
+        // マイクテストモード（PitchPro updateSelectors使用）
+        document.getElementById('mic-mode-btn').addEventListener('click', async () => {
+            log('🔘 マイクテストボタンがクリックされました', 'info');
+            
+            if (!audioDetector) {
+                log('❌ audioDetectorが初期化されていません', 'error');
+                return;
+            }
+            
+            
+            try {
+                log('🔄 マイクテストモードに切り替え中（v1.1.8 updateSelectors使用）...', 'info');
+                
+                // 一時的に音声検出を停止
+                const wasDetecting = audioDetector && audioDetector.currentState === 'detecting';
+                if (wasDetecting) {
+                    audioDetector.stopDetection();
+                    log('⏸️ UI切り替えのため音声検出を一時停止', 'info');
+                }
+                
+                // PitchPro v1.1.8 改善版updateSelectors使用
+                if (typeof audioDetector.updateSelectors === 'function') {
+                    await audioDetector.updateSelectors({
+                        volumeBarSelector: '#mic-volume-bar',
+                        volumeTextSelector: '#mic-volume-text',
+                        frequencySelector: '#mic-frequency-display'
+                    });
+                    log('✅ v1.1.6 updateSelectors実行完了', 'success');
+                } else {
+                    log('⚠️ updateSelectors method not available', 'error');
+                    throw new Error('updateSelectors method not found on audioDetector');
+                }
+                
+                // リセット完了後に検出を再開
+                setTimeout(() => {
+                    if (wasDetecting) {
+                        audioDetector.startDetection();
+                        log('▶️ 音声検出を再開', 'info');
+                    }
+                }, 50);
+                
+                updateModeUI('mic');
+                log('✅ マイクテストモードに切り替え完了（PitchPro Native）', 'success');
+                log('🎯 updateSelectors実行: #mic-volume-bar, #mic-volume-text, #mic-frequency-display', 'info');
+                
+            } catch (error) {
+                log(`❌ マイクモード切り替えエラー: ${error.message}`, 'error');
+            }
+        });
+        
+        // 音域テストモード（PitchPro updateSelectors使用）
+        document.getElementById('range-mode-btn').addEventListener('click', async () => {
+            log('🔘 音域テストボタンがクリックされました', 'info');
+            
+            if (!audioDetector) {
+                log('❌ audioDetectorが初期化されていません', 'error');
+                return;
+            }
+            
+            
+            try {
+                log('🔄 音域テストモードに切り替え中（v1.1.8 updateSelectors使用）...', 'info');
+                
+                // 一時的に音声検出を停止
+                const wasDetecting = audioDetector && audioDetector.currentState === 'detecting';
+                if (wasDetecting) {
+                    audioDetector.stopDetection();
+                    log('⏸️ UI切り替えのため音声検出を一時停止', 'info');
+                }
+                
+                // PitchPro v1.1.8 改善版updateSelectors使用
+                if (typeof audioDetector.updateSelectors === 'function') {
+                    await audioDetector.updateSelectors({
+                        volumeBarSelector: '#range-volume-bar',
+                        volumeTextSelector: '#range-volume-text',
+                        frequencySelector: '#range-frequency-display'
+                    });
+                    log('✅ v1.1.6 updateSelectors実行完了', 'success');
+                } else {
+                    log('⚠️ updateSelectors method not available', 'error');
+                    throw new Error('updateSelectors method not found on audioDetector');
+                }
+                
+                // リセット完了後に検出を再開
+                setTimeout(() => {
+                    if (wasDetecting) {
+                        audioDetector.startDetection();
+                        log('▶️ 音声検出を再開', 'info');
+                    }
+                }, 50);
+                
+                updateModeUI('range');
+                log('✅ 音域テストモードに切り替え完了（PitchPro Native）', 'success');
+                log('🎯 updateSelectors実行: #range-volume-bar, #range-volume-text, #range-frequency-display', 'info');
+                
+            } catch (error) {
+                log(`❌ 音域モード切り替えエラー: ${error.message}`, 'error');
+            }
+        });
+        
+        // 練習モード（PitchPro updateSelectors使用）
+        document.getElementById('practice-mode-btn').addEventListener('click', async () => {
+            log('🔘 練習モードボタンがクリックされました', 'info');
+            
+            if (!audioDetector) {
+                log('❌ audioDetectorが初期化されていません', 'error');
+                return;
+            }
+            
+            try {
+                log('🔄 練習モードに切り替え中（v1.1.8 updateSelectors使用）...', 'info');
+                
+                // 一時的に音声検出を停止
+                const wasDetecting = audioDetector && audioDetector.currentState === 'detecting';
+                if (wasDetecting) {
+                    audioDetector.stopDetection();
+                    log('⏸️ UI切り替えのため音声検出を一時停止', 'info');
+                }
+                
+                // PitchPro v1.1.8 改善版updateSelectors使用
+                if (typeof audioDetector.updateSelectors === 'function') {
+                    await audioDetector.updateSelectors({
+                        volumeBarSelector: '#practice-volume-bar',
+                        volumeTextSelector: '#practice-volume-text',
+                        frequencySelector: '#practice-frequency',
+                        noteSelector: '#practice-note'
+                    });
+                    log('✅ v1.1.6 updateSelectors実行完了', 'success');
+                    log('🎯 練習モード専用音程表示も含めて完全分離', 'success');
+                } else {
+                    log('⚠️ updateSelectors method not available', 'error');
+                    throw new Error('updateSelectors method not found on audioDetector');
+                }
+                
+                // リセット完了後に検出を再開
+                setTimeout(() => {
+                    if (wasDetecting) {
+                        audioDetector.startDetection();
+                        log('▶️ 音声検出を再開', 'info');
+                    }
+                }, 50);
+                
+                updateModeUI('practice');
+                log('✅ 練習モードに切り替え完了（PitchPro Native）', 'success');
+                log('🎯 updateSelectors実行: #practice-volume-bar, #practice-volume-text, #practice-frequency, #practice-note', 'info');
+                
+            } catch (error) {
+                log(`❌ 練習モード切り替えエラー: ${error.message}`, 'error');
+            }
+        });
+        
+        // 初期ログ
+        log('✅ PitchPro Native機能のみ実装テスト準備完了', 'success');
+        log('🎯 本番スタイルシート使用・UIカタログ準拠・カスタム関数排除', 'success');
+        log('手順: 1) 初期化 → 2) 検出開始 → 3) モード切り替えテスト', 'info');
+        updateStatus('準備完了 - 初期化ボタンをクリック', 'success');
+        
+            // デフォルトでマイクモード表示
+            updateModeUI('mic');
+            
+        } else {
+            console.error('❌ PitchPro v1.1.6ライブラリが読み込まれていません');
+            alert('PitchPro v1.1.6ライブラリの読み込みに失敗しました。ページを再読み込みしてください。');
+        }
+    </script>
+</body>
+</html>

@@ -5646,7 +5646,7 @@ T.SCALE_PATTERNS = {
   12: "Perfect Octave"
 };
 let Ft = T;
-const he = "1.1.6", ue = (/* @__PURE__ */ new Date()).toISOString(), de = {
+const he = "1.1.3", ue = (/* @__PURE__ */ new Date()).toISOString(), de = {
   pitchDetector: {
     fftSize: 4096,
     smoothing: 0.1,

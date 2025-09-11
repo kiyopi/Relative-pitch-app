@@ -8,7 +8,8 @@
  * @date 2025-01-09
  */
 
-import { AudioDetectionComponent } from './pitch-pro-integration.js';
+// PitchPro公式 AudioDetectionComponent統合版
+// ESMモジュールとして使用する場合は別途インポートが必要
 
 export class VoiceRangeTestController {
     constructor(options = {}) {
@@ -57,6 +58,14 @@ export class VoiceRangeTestController {
             highPitch: null,
             range: null,
             octaves: null
+        };
+        
+        // 測定データ記録
+        this.measurementData = {
+            lowPhaseFrequencies: [],
+            highPhaseFrequencies: [],
+            currentLowestFreq: null,
+            currentHighestFreq: null
         };
         
         // UI要素キャッシュ
@@ -140,19 +149,77 @@ export class VoiceRangeTestController {
             this.audioDetector.destroy();
         }
         
-        // 音域テスト用AudioDetectionComponent作成
+        // PitchPro公式AudioDetectionComponent確認
+        // ESMモジュールの場合、外部でインポートしてコンストラクターに渡すことを想定
+        if (typeof AudioDetectionComponent === 'undefined') {
+            throw new Error('AudioDetectionComponentがインポートされていません。ESMモジュールとしてインポートしてください。');
+        }
+        
         this.audioDetector = new AudioDetectionComponent({
             volumeBarSelector: this.options.volumeBarSelector,
             volumeTextSelector: this.options.volumeTextSelector,
             frequencySelector: this.options.frequencySelector,
-            enableFrequencyDetection: true,
-            debugMode: this.options.debugMode
+            
+            // PitchPro推奨設定
+            clarityThreshold: 0.4,        // 40% - 実用的
+            minVolumeAbsolute: 0.003,     // 0.3% - 適切
+            deviceOptimization: true,     // 自動最適化
+            debug: this.options.debugMode
         });
         
         await this.audioDetector.initialize();
         await this.audioDetector.startDetection();
         
+        // PitchProコールバック設定 - リアルタイム周波数記録
+        this.audioDetector.setCallbacks({
+            onPitchUpdate: (result) => {
+                this.recordFrequencyData(result);
+            }
+        });
+        
         this.log('🎤 AudioDetection初期化完了', 'SUCCESS');
+    }
+    
+    /**
+     * 周波数データ記録
+     */
+    recordFrequencyData(result) {
+        // 測定フェーズでない場合は記録しない
+        if (this.currentPhase !== 'low-measuring' && this.currentPhase !== 'high-measuring') {
+            return;
+        }
+        
+        // 有効な周波数データのみ記録
+        if (!result.frequency || result.frequency < 50 || result.frequency > 2000) {
+            return;
+        }
+        
+        // 音量が十分でない場合は記録しない
+        if (!result.volume || result.volume < 0.1) {
+            return;
+        }
+        
+        const frequency = result.frequency;
+        const timestamp = Date.now();
+        
+        if (this.currentPhase === 'low-measuring') {
+            // 低音フェーズ: より低い周波数を優先記録
+            this.measurementData.lowPhaseFrequencies.push({ frequency, timestamp, volume: result.volume });
+            
+            if (!this.measurementData.currentLowestFreq || frequency < this.measurementData.currentLowestFreq) {
+                this.measurementData.currentLowestFreq = frequency;
+                this.log(`🔽 新しい最低音記録: ${frequency.toFixed(1)} Hz`, 'INFO');
+            }
+            
+        } else if (this.currentPhase === 'high-measuring') {
+            // 高音フェーズ: より高い周波数を優先記録
+            this.measurementData.highPhaseFrequencies.push({ frequency, timestamp, volume: result.volume });
+            
+            if (!this.measurementData.currentHighestFreq || frequency > this.measurementData.currentHighestFreq) {
+                this.measurementData.currentHighestFreq = frequency;
+                this.log(`🔼 新しい最高音記録: ${frequency.toFixed(1)} Hz`, 'INFO');
+            }
+        }
     }
     
     /**
@@ -161,6 +228,10 @@ export class VoiceRangeTestController {
     async startLowPitchPhase() {
         this.log('🔽 低音測定フェーズ開始', 'INFO');
         this.currentPhase = 'low-measuring';
+        
+        // 測定データリセット
+        this.measurementData.lowPhaseFrequencies = [];
+        this.measurementData.currentLowestFreq = null;
         
         // UI更新
         this.updateStatus('できるだけ低い声を出してください', '測定中...');
@@ -183,6 +254,10 @@ export class VoiceRangeTestController {
     async startHighPitchPhase() {
         this.log('🔼 高音測定フェーズ開始', 'INFO');
         this.currentPhase = 'high-measuring';
+        
+        // 測定データリセット
+        this.measurementData.highPhaseFrequencies = [];
+        this.measurementData.currentHighestFreq = null;
         
         // UI更新
         this.updateStatus('できるだけ高い声を出してください', '高音測定中...');
@@ -240,14 +315,27 @@ export class VoiceRangeTestController {
         
         if (phaseType === 'low') {
             this.currentPhase = 'low-complete';
-            this.updateStatus('低音測定完了', '1秒後に高音測定を開始します');
+            
+            // 実測値を取得
+            const measuredFreq = this.measurementData.currentLowestFreq || 130; // フォールバック値
+            const note = this.frequencyToNote(measuredFreq);
+            
+            this.updateStatus(`低音測定完了: ${note} (${measuredFreq.toFixed(1)}Hz)`, '1秒後に高音測定を開始します');
+            
+            // 結果を保存
+            this.testResults.lowPitch = {
+                frequency: measuredFreq,
+                note: note,
+                measurementCount: this.measurementData.lowPhaseFrequencies.length
+            };
             
             // コールバック実行
             if (this.options.onLowPitchComplete) {
                 this.options.onLowPitchComplete({
                     phase: 'low',
-                    frequency: 130, // 実際の測定値を使用
-                    note: 'C3'
+                    frequency: measuredFreq,
+                    note: note,
+                    measurementCount: this.measurementData.lowPhaseFrequencies.length
                 });
             }
             
@@ -258,15 +346,30 @@ export class VoiceRangeTestController {
             
         } else {
             this.currentPhase = 'high-complete';
-            this.updateStatus('音域測定完了！', '測定結果: C3 - C5 (2オクターブ)');
+            
+            // 実測値を取得
+            const measuredFreq = this.measurementData.currentHighestFreq || 523; // フォールバック値
+            const note = this.frequencyToNote(measuredFreq);
+            
+            // 結果を保存
+            this.testResults.highPitch = {
+                frequency: measuredFreq,
+                note: note,
+                measurementCount: this.measurementData.highPhaseFrequencies.length
+            };
+            
+            // 音域計算
+            const range = this.calculateRange();
+            this.updateStatus('音域測定完了！', `測定結果: ${range.rangeText} (${range.octaves.toFixed(1)}オクターブ)`);
             this.updateMicStatus('standby');
             
             // コールバック実行
             if (this.options.onHighPitchComplete) {
                 this.options.onHighPitchComplete({
                     phase: 'high',
-                    frequency: 523, // 実際の測定値を使用
-                    note: 'C5'
+                    frequency: measuredFreq,
+                    note: note,
+                    measurementCount: this.measurementData.highPhaseFrequencies.length
                 });
             }
             
@@ -277,18 +380,66 @@ export class VoiceRangeTestController {
     }
     
     /**
+     * 周波数から音名変換
+     */
+    frequencyToNote(frequency) {
+        if (!frequency || frequency < 50) return 'Unknown';
+        
+        // A4 = 440Hz を基準とした12平均律計算
+        const A4 = 440;
+        const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        
+        // A4からの半音数を計算
+        const semitonesFromA4 = Math.round(12 * Math.log2(frequency / A4));
+        
+        // オクターブとノート計算
+        const octave = Math.floor((semitonesFromA4 + 9) / 12) + 4;
+        const noteIndex = ((semitonesFromA4 + 9) % 12 + 12) % 12;
+        
+        return noteNames[noteIndex] + octave;
+    }
+    
+    /**
+     * 音域計算
+     */
+    calculateRange() {
+        if (!this.testResults.lowPitch || !this.testResults.highPitch) {
+            return {
+                rangeText: 'Unknown',
+                octaves: 0,
+                semitones: 0
+            };
+        }
+        
+        const lowFreq = this.testResults.lowPitch.frequency;
+        const highFreq = this.testResults.highPitch.frequency;
+        
+        // オクターブ数計算
+        const octaves = Math.log2(highFreq / lowFreq);
+        
+        // 半音数計算
+        const semitones = Math.round(12 * octaves);
+        
+        const rangeText = `${this.testResults.lowPitch.note} - ${this.testResults.highPitch.note}`;
+        
+        return {
+            rangeText,
+            octaves,
+            semitones
+        };
+    }
+    
+    /**
      * テスト完了処理
      */
     completeTest() {
         this.currentPhase = 'completed';
         
-        // 結果計算
-        this.testResults = {
-            lowPitch: { frequency: 130, note: 'C3' },
-            highPitch: { frequency: 523, note: 'C5' },
-            range: 'C3 - C5',
-            octaves: 2.0
-        };
+        // 最終的な音域計算
+        const range = this.calculateRange();
+        this.testResults.range = range.rangeText;
+        this.testResults.octaves = range.octaves;
+        this.testResults.semitones = range.semitones;
         
         // ボタン再有効化
         if (this.elements.startButton) {
