@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PitchPro v1.1.8 新アーキテクチャテスト</title>
+    <title>PitchPro v1.1.9 製品レベル統合管理テスト</title>
     
     <!-- 本番スタイルシート使用 -->
     <link rel="stylesheet" href="../../Bolt/v2/styles/base.css">
@@ -21,32 +21,32 @@
         <div class="container max-w-4xl mx-auto">
             <!-- ヘッダー -->
             <header class="text-center mb-8">
-                <h1 class="text-4xl font-bold text-white mb-4">🔧 PitchPro v1.1.8 新アーキテクチャ</h1>
-                <p class="text-yellow-200 text-lg">PitchDetector + MicrophoneController分離アーキテクチャ対応</p>
+                <h1 class="text-4xl font-bold text-white mb-4">🎉 PitchPro v1.1.9 製品レベル到達</h1>
+                <p class="text-yellow-200 text-lg">統合管理システム・4ボタンUI・完全なMicrophoneController対応</p>
             </header>
 
-            <!-- v1.1.8重要変更点 -->
+            <!-- v1.1.9製品レベル到達機能 -->
             <div class="glass-card mb-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <i data-lucide="info" class="text-blue-300 icon-md"></i>
-                    <h3 class="heading-md text-blue-300">v1.1.8 重要アーキテクチャ変更</h3>
+                    <i data-lucide="award" class="text-gold-300 icon-md"></i>
+                    <h3 class="heading-md text-gold-300">v1.1.9 製品レベル到達機能</h3>
                 </div>
                 <ul class="text-white-70 space-y-2">
                     <li class="flex items-center gap-2">
-                        <i data-lucide="x" class="text-red-300 icon-sm"></i>
-                        <span><strong>AudioDetectionComponent</strong> - 削除されました</span>
+                        <i data-lucide="check" class="text-green-300 icon-sm"></i>
+                        <span><strong>統合start()メソッド</strong> - ミュート解除+検出開始の一括実行</span>
                     </li>
                     <li class="flex items-center gap-2">
-                        <i data-lucide="plus" class="text-green-300 icon-sm"></i>
-                        <span><strong>PitchDetector</strong> - 音程検出専用クラス</span>
+                        <i data-lucide="check" class="text-green-300 icon-sm"></i>
+                        <span><strong>4ボタンUI</strong> - 7→4ボタン（42%削減）の直感的操作</span>
                     </li>
                     <li class="flex items-center gap-2">
-                        <i data-lucide="plus" class="text-green-300 icon-sm"></i>
-                        <span><strong>MicrophoneController</strong> - マイク制御専用クラス</span>
+                        <i data-lucide="check" class="text-green-300 icon-sm"></i>
+                        <span><strong>対称的操作設計</strong> - reset()⇄start()の完全対応</span>
                     </li>
                     <li class="flex items-center gap-2">
-                        <i data-lucide="arrow-right" class="text-orange-300 icon-sm"></i>
-                        <span>Cross-Mode UI Interference Bug Fixは新アーキテクチャで対応</span>
+                        <i data-lucide="check" class="text-green-300 icon-sm"></i>
+                        <span><strong>MicrophoneController統合管理</strong> - AudioDetectionComponent自動登録</span>
                     </li>
                 </ul>
             </div>
@@ -118,7 +118,7 @@
                     </div>
                 </div>
                 <div class="text-center mt-4">
-                    <div class="frequency-display text-2xl font-bold text-blue-300 bg-black bg-opacity-30 px-4 py-2 rounded-lg inline-block" id="mic-frequency-display">0 Hz</div>
+                    <div class="frequency-display text-2xl font-bold text-blue-300 bg-black bg-opacity-30 px-4 py-2 rounded-lg inline-block" id="mic-frequency">0 Hz</div>
                 </div>
             </div>
             
@@ -138,7 +138,7 @@
                     </div>
                 </div>
                 <div class="text-center mt-4">
-                    <div class="frequency-display text-2xl font-bold text-green-300 bg-black bg-opacity-30 px-4 py-2 rounded-lg inline-block" id="range-frequency-display">0 Hz</div>
+                    <div class="frequency-display text-2xl font-bold text-green-300 bg-black bg-opacity-30 px-4 py-2 rounded-lg inline-block" id="range-frequency">0 Hz</div>
                 </div>
             </div>
             
@@ -174,16 +174,22 @@
         </div>
     </div>
 
-    <!-- PitchPro v1.1.8 UMDライブラリ -->
-    <script src="../../js/pitchpro-audio/pitchpro-v1.1.8.umd.js"></script>
+    <!-- PitchPro v1.1.9 最新版UMDライブラリ -->
+    <script src="../../js/pitchpro-audio/pitchpro-v1.1.9-latest.umd.js"></script>
     <script>
         // UMD版の読み込み確認
         if (typeof PitchPro !== 'undefined') {
-            console.log('✅ PitchPro v1.1.8 UMD loaded successfully');
+            console.log('🎉 PitchPro v1.1.9 製品レベル到達版 UMD loaded successfully');
             console.log('Version:', PitchPro.VERSION);
             console.log('Build Date:', PitchPro.BUILD_DATE);
             console.log('利用可能なクラス:', Object.keys(PitchPro));
-            console.log('🎯 v1.1.8新アーキテクチャ対応版');
+            console.log('🏆 v1.1.9製品レベル統合管理システム対応版');
+            
+            console.log('🔍 v1.1.9統合管理システム機能:');
+            console.log('  - 統合start()メソッド: ミュート解除+検出開始一括');
+            console.log('  - 4ボタンUI: 7→4ボタン（42%削減）の直感的操作');
+            console.log('  - 対称的操作: reset()⇄start()完全対応');
+            console.log('  - MicrophoneController統合管理システム');
             
             // 利用可能コンポーネント確認
             console.log('🔍 利用可能コンポーネント:');
@@ -287,19 +293,27 @@
                 ['mic', 'range', 'practice'].forEach(mode => {
                     const volumeBar = document.getElementById(`${mode}-volume-bar`);
                     const volumeText = document.getElementById(`${mode}-volume-text`);
-                    const frequencyDisplay = document.getElementById(`${mode}-frequency-display`) || 
-                                             document.getElementById(`${mode}-frequency`);
+                    const frequencyDisplay = document.getElementById(`${mode}-frequency`);
                     
-                    if (volumeBar) volumeBar.style.width = '0%';
+                    if (volumeBar) {
+                        // 🔧 CSS設定をリセット
+                        volumeBar.style.width = '0%';
+                        // minWidthとmaxWidthを削除（初期値に戻す）
+                        volumeBar.style.minWidth = '';
+                        volumeBar.style.maxWidth = '';
+                        volumeBar.style.flexShrink = '';
+                    }
                     if (volumeText) volumeText.textContent = '0.0%';
-                    if (frequencyDisplay) frequencyDisplay.textContent = '0 Hz';
+                    if (frequencyDisplay) {
+                        frequencyDisplay.textContent = '0 Hz';
+                    }
                 });
                 
                 // 練習モードの音程表示もリセット
                 const practiceNote = document.getElementById('practice-note');
                 if (practiceNote) practiceNote.textContent = '-';
                 
-                log('🧹 全UI要素リセット完了', 'info');
+                log('🧹 全UI要素リセット完了（CSS強制設定クリア含む）', 'info');
             }
             
             // 現在のモード用UI要素の取得
@@ -310,8 +324,7 @@
                 return {
                     volumeBar: document.getElementById(`${prefix}-volume-bar`),
                     volumeText: document.getElementById(`${prefix}-volume-text`),
-                    frequencyDisplay: document.getElementById(`${prefix}-frequency-display`) || 
-                                     document.getElementById(`${prefix}-frequency`),
+                    frequencyDisplay: document.getElementById(`${prefix}-frequency`),
                     noteDisplay: prefix === 'practice' ? document.getElementById('practice-note') : null
                 };
             }
@@ -320,17 +333,51 @@
             function updateUI(result) {
                 const elements = getCurrentModeElements();
                 
+                // 🔍 詳細デバッグ: 音量の同期問題調査
+                if (Math.random() < 0.1) { // 10%の確率でログ
+                    console.group(`🔍 UI更新デバッグ [${currentMode}モード]`);
+                    console.log('📊 result全体:', result);
+                    console.log('🔊 result.volume値:', result.volume);
+                    console.log('📈 typeof result.volume:', typeof result.volume);
+                    console.log('🎯 現在のモード:', currentMode);
+                    console.log('📍 取得した要素:', {
+                        volumeBar: elements.volumeBar?.id,
+                        volumeText: elements.volumeText?.id,
+                        frequencyDisplay: elements.frequencyDisplay?.id
+                    });
+                }
+                
                 if (elements.volumeBar) {
-                    elements.volumeBar.style.width = `${Math.min(100, result.volume || 0)}%`;
+                    // PitchProのデフォルト値をそのまま使用
+                    const volumePercent = result.volume || 0;
+                    elements.volumeBar.style.width = `${volumePercent}%`;
+                    
+                    if (Math.random() < 0.1) {
+                        console.log(`💉 volumeBar設定: width="${volumePercent}%"`);
+                        console.log(`📏 実際のDOM width:`, elements.volumeBar.style.width);
+                    }
                 }
                 if (elements.volumeText) {
-                    elements.volumeText.textContent = `${(result.volume || 0).toFixed(1)}%`;
+                    // PitchProのデフォルト値をそのまま表示
+                    const volumeTextValue = (result.volume || 0).toFixed(1);
+                    elements.volumeText.textContent = `${volumeTextValue}%`;
+                    
+                    if (Math.random() < 0.1) {
+                        console.log(`📝 volumeText設定: "${volumeTextValue}%"`);
+                        console.log(`📄 実際のDOM text:`, elements.volumeText.textContent);
+                    }
                 }
                 if (elements.frequencyDisplay) {
-                    elements.frequencyDisplay.textContent = `${(result.frequency || 0).toFixed(1)} Hz`;
+                    // 周波数表示（pitchまたはfrequencyプロパティ）
+                    const frequency = result.pitch || result.frequency || 0;
+                    elements.frequencyDisplay.textContent = `${frequency.toFixed(1)} Hz`;
                 }
                 if (elements.noteDisplay && result.note) {
                     elements.noteDisplay.textContent = result.note;
+                }
+                
+                if (Math.random() < 0.1) {
+                    console.groupEnd();
                 }
             }
             
@@ -345,17 +392,18 @@
                     await microphoneController.initialize();
                     log('✅ MicrophoneController初期化完了', 'success');
                     
-                    // PitchDetectorを初期化
+                    // PitchDetectorを初期化（完全デフォルト値使用）
                     const audioManager = microphoneController.audioManager;
-                    pitchDetector = new PitchPro.PitchDetector(audioManager, {
-                        fftSize: 4096,
-                        smoothing: 0.1,
-                        clarityThreshold: 0.4,
-                        minVolumeAbsolute: 0.003
-                    });
+                    pitchDetector = new PitchPro.PitchDetector(audioManager);
+                    // ⚠️ 重要: カスタム設定なし、デフォルト値のみ使用
                     
                     await pitchDetector.initialize();
-                    log('✅ PitchDetector初期化完了', 'success');
+                    log('✅ PitchDetector初期化完了（デフォルト設定）', 'success');
+                    
+                    // 🎯 重要: PitchDetectorをMicrophoneControllerに登録
+                    microphoneController.registerDetector(pitchDetector);
+                    log('✅ PitchDetector → MicrophoneController 登録完了', 'success');
+                    log('🔗 v1.1.9統合管理システム準備完了', 'success');
                     
                     // コールバック設定
                     pitchDetector.setCallbacks({
@@ -370,9 +418,20 @@
                                 }
                             }
                             
-                            // 低頻度ログ出力（スパム防止）
-                            if (Math.random() < 0.02) { // 2%の確率
-                                log(`🎵 ${result.frequency?.toFixed(1) || 0}Hz, 音量: ${result.volume?.toFixed(1) || 0}%`, 'info');
+                            // 🔍 result object debug - 全プロパティを詳細ログ（2%の確率）
+                            if (Math.random() < 0.02) {
+                                console.group('🔍 PitchPro Result Object Analysis');
+                                console.log('📊 Full result object:', result);
+                                console.log('📋 Available properties:', Object.keys(result));
+                                console.log('🎵 result.frequency:', result.frequency);
+                                console.log('🔊 result.volume:', result.volume);
+                                console.log('📈 result.stableVolume:', result.stableVolume);
+                                console.log('💾 result.volumePercent:', result.volumePercent);
+                                console.log('🎯 result.rawVolume:', result.rawVolume);
+                                console.log('📊 result.normalizedVolume:', result.normalizedVolume);
+                                console.groupEnd();
+                                
+                                log(`🎵 ${result.frequency?.toFixed(1) || 0}Hz, 音量分析: volume=${result.volume?.toFixed(1) || 0}%, stableVolume=${result.stableVolume?.toFixed(1) || 0}%, volumePercent=${result.volumePercent?.toFixed(1) || 0}%`, 'info');
                             }
                         },
                         onError: (error) => {
@@ -404,88 +463,92 @@
                 }
             });
             
-            // 検出開始ボタン
+            // 統合検出開始ボタン（v1.1.9新機能）
             document.getElementById('start-btn').addEventListener('click', async () => {
-                if (!pitchDetector || !microphoneController) return;
+                if (!microphoneController) return;
                 
                 try {
-                    log('▶️ 検出開始（v1.1.8新アーキテクチャ）', 'info');
+                    log('🚀 統合start()実行（v1.1.9製品レベル機能）', 'info');
+                    log('  - ミュート解除 + 検出開始の一括実行', 'info');
                     
-                    const started = pitchDetector.startDetection();
+                    // v1.1.9の統合start()メソッド使用
+                    const started = microphoneController.start();
                     
                     if (started) {
                         isDetecting = true;
                         updateStatus('🎤 音声検出中...', 'success');
                         document.getElementById('start-btn').disabled = true;
                         document.getElementById('stop-btn').disabled = false;
-                        log('✅ 音声検出開始完了', 'success');
+                        log('✅ 統合start()完了 - ミュート解除+検出開始', 'success');
                     } else {
-                        log('❌ 検出開始に失敗', 'error');
+                        log('❌ 統合start()に失敗', 'error');
                     }
                 } catch (error) {
-                    log(`❌ 検出開始エラー: ${error.message}`, 'error');
+                    log(`❌ 統合start()エラー: ${error.message}`, 'error');
                 }
             });
             
-            // 検出停止ボタン
+            // 統合検出停止ボタン（v1.1.9統合管理）
             document.getElementById('stop-btn').addEventListener('click', () => {
-                if (!pitchDetector) return;
+                if (!microphoneController) return;
                 
                 try {
-                    log('⏹ 検出停止（v1.1.8新アーキテクチャ）', 'info');
+                    log('🛑 統合reset()実行（v1.1.9製品レベル機能）', 'info');
+                    log('  - システム完全停止 + UIリセットの一括実行', 'info');
                     
-                    pitchDetector.stopDetection();
+                    microphoneController.reset();
                     isDetecting = false;
                     
                     updateStatus('音声検出停止', 'info');
                     document.getElementById('start-btn').disabled = false;
                     document.getElementById('stop-btn').disabled = true;
-                    log('✅ 音声検出停止完了', 'info');
+                    log('✅ 統合reset()完了 - システム完全停止+UIリセット', 'success');
                     
                 } catch (error) {
-                    log(`❌ 検出停止エラー: ${error.message}`, 'error');
+                    log(`❌ 統合reset()エラー: ${error.message}`, 'error');
                 }
             });
             
-            // モード切り替え関数（v1.1.8新アーキテクチャ対応）
+            // モード切り替え関数（v1.1.9統合管理対応）
             async function switchMode(mode) {
                 log(`🔘 ${mode}モードボタンがクリックされました`, 'info');
                 
-                if (!pitchDetector || !microphoneController) {
-                    log('❌ システムが初期化されていません', 'error');
+                if (!microphoneController) {
+                    log('❌ MicrophoneControllerが初期化されていません', 'error');
                     return;
                 }
                 
                 try {
-                    log(`🔄 ${mode}モードに切り替え中（v1.1.8新アーキテクチャ）...`, 'info');
+                    log(`🔄 ${mode}モードに切り替え中（v1.1.9統合管理システム）...`, 'info');
                     
-                    // 一時的に音声検出を停止
+                    // 検出中かどうかを記録
                     const wasDetecting = isDetecting;
-                    if (wasDetecting) {
-                        pitchDetector.stopDetection();
-                        isDetecting = false;
-                        log('⏸️ UI切り替えのため音声検出を一時停止', 'info');
-                    }
                     
-                    // 全UI要素をリセット（Cross-Mode UI Interference Bug Fix）
-                    resetAllUIElements();
+                    // v1.1.9統合reset()メソッドでシステム完全停止
+                    log('🛑 統合reset()実行中...', 'info');
+                    microphoneController.reset();
+                    isDetecting = false;
+                    log('✅ 統合reset()完了 - システム完全停止+UIリセット', 'success');
                     
                     // モードUI更新
                     updateModeUI(mode);
                     
-                    // 短い待機時間後に検出を再開
-                    setTimeout(() => {
-                        if (wasDetecting && pitchDetector) {
-                            const restarted = pitchDetector.startDetection();
+                    // 必要に応じて統合start()で復帰
+                    if (wasDetecting) {
+                        setTimeout(() => {
+                            log('🚀 統合start()で完全復帰中...', 'info');
+                            const restarted = microphoneController.start();
                             if (restarted) {
                                 isDetecting = true;
-                                log('▶️ 音声検出を再開', 'info');
+                                log('✅ 統合start()完了 - 完全復帰', 'success');
+                            } else {
+                                log('❌ 統合start()復帰に失敗', 'error');
                             }
-                        }
-                    }, 100);
+                        }, 200);
+                    }
                     
-                    log(`✅ ${mode}モードに切り替え完了（v1.1.8新アーキテクチャ）`, 'success');
-                    log(`🎯 UI要素完全分離: 全要素リセット適用済み`, 'info');
+                    log(`✅ ${mode}モードに切り替え完了（v1.1.9統合管理）`, 'success');
+                    log(`🎯 統合reset()→start()による完全なモード分離`, 'info');
                     
                 } catch (error) {
                     log(`❌ ${mode}モード切り替えエラー: ${error.message}`, 'error');

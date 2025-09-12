@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>シンプル音声テスト - PitchPro v1.1.9</title>
+    
+    <!-- 本番スタイルシート使用 -->
+    <link rel="stylesheet" href="../../Bolt/v2/styles/base.css">
+    
+    <!-- フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- アイコンライブラリ -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <div class="min-h-screen p-6">
+        <div class="container max-w-2xl mx-auto">
+            <!-- ヘッダー -->
+            <header class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-white mb-4">🎤 シンプル音声テスト</h1>
+                <p class="text-yellow-200 text-lg">音量バー・周波数・音程表示のみ</p>
+            </header>
+
+            <!-- 制御ボタン -->
+            <div class="glass-card mb-6">
+                <h3 class="heading-md mb-4">
+                    <i data-lucide="play" class="text-blue-300"></i>
+                    <span>音声制御</span>
+                </h3>
+                <div class="flex gap-3 justify-center">
+                    <button id="init-btn" class="btn btn-primary">
+                        <i data-lucide="power" class="icon-sm"></i>
+                        <span>初期化</span>
+                    </button>
+                    <button id="start-btn" class="btn btn-success" disabled>
+                        <i data-lucide="mic" class="icon-sm"></i>
+                        <span>開始</span>
+                    </button>
+                    <button id="stop-btn" class="btn btn-outline" disabled>
+                        <i data-lucide="square" class="icon-sm"></i>
+                        <span>停止</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 音量表示 -->
+            <div class="glass-card mb-6">
+                <h3 class="heading-md mb-4">
+                    <i data-lucide="volume-2" class="text-green-300"></i>
+                    <span>音量レベル</span>
+                </h3>
+                <div class="volume-meter">
+                    <div class="flex items-center justify-between mb-2 w-full">
+                        <span class="text-white-70">現在の音量</span>
+                        <span id="volume-text" class="text-white font-medium">0.0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill gradient-catalog-green" id="volume-bar" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 周波数・音程表示 -->
+            <div class="glass-card mb-6">
+                <h3 class="heading-md mb-4">
+                    <i data-lucide="music" class="text-purple-300"></i>
+                    <span>音程情報</span>
+                </h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="text-center">
+                        <div class="text-white-70 text-sm mb-2">周波数</div>
+                        <div id="frequency-display" class="text-3xl font-bold text-purple-300 bg-black bg-opacity-30 px-4 py-3 rounded-lg">0.0 Hz</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-white-70 text-sm mb-2">音程</div>
+                        <div id="note-display" class="text-3xl font-bold text-yellow-300 bg-black bg-opacity-30 px-4 py-3 rounded-lg">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ステータス表示 -->
+            <div class="glass-card mb-6">
+                <h3 class="heading-md mb-4">
+                    <i data-lucide="activity" class="text-blue-300"></i>
+                    <span>システム状態</span>
+                </h3>
+                <div id="status" class="text-center text-white-70">初期化前...</div>
+            </div>
+            
+            <!-- ログ出力 -->
+            <div class="glass-card">
+                <h3 class="heading-md mb-4">
+                    <i data-lucide="file-text" class="text-white-70"></i>
+                    <span>ログ出力</span>
+                </h3>
+                <div id="log-output" class="bg-black bg-opacity-50 p-4 rounded-lg h-48 overflow-y-auto font-mono text-sm"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PitchPro v1.1.9 最新版UMDライブラリ -->
+    <script src="../../js/pitchpro-audio/pitchpro-v1.1.9-latest.umd.js"></script>
+    <script>
+        // グローバル変数
+        let microphoneController = null;
+        let pitchDetector = null;
+        let isDetecting = false;
+
+        // ログシステム
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `text-${type === 'success' ? 'green' : type === 'error' ? 'red' : 'blue'}-300 mb-1`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            
+            const logContainer = document.getElementById('log-output');
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            console.log(`%c${message}`, `color: ${type === 'success' ? '#22c55e' : type === 'error' ? '#ef4444' : '#3b82f6'}`);
+        }
+
+        // ステータス更新
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `text-center text-${type === 'success' ? 'green' : type === 'error' ? 'red' : 'blue'}-300`;
+            statusDiv.textContent = message;
+        }
+
+        // UI更新関数（シンプル版）
+        function updateUI(result) {
+            // 音量バー
+            const volumeBar = document.getElementById('volume-bar');
+            const volumeText = document.getElementById('volume-text');
+            if (volumeBar && volumeText) {
+                const volume = result.volume || 0;
+                volumeBar.style.width = `${volume}%`;
+                volumeText.textContent = `${volume.toFixed(1)}%`;
+                
+                // 🔍 音量バー詳細ログ（10%の確率）
+                if (Math.random() < 0.1) {
+                    const computedWidth = getComputedStyle(volumeBar).width;
+                    const parentWidth = getComputedStyle(volumeBar.parentElement).width;
+                    const computedStyle = getComputedStyle(volumeBar);
+                    
+                    // 期待値計算
+                    const expectedWidthPx = (volume / 100) * parseFloat(parentWidth);
+                    const actualWidthPx = parseFloat(computedWidth);
+                    const widthRatio = (actualWidthPx / expectedWidthPx * 100).toFixed(1);
+                    
+                    log(`📊 音量詳細 | result.volume: ${volume.toFixed(1)}% | 設定width: ${volumeBar.style.width}`, 'info');
+                    log(`📐 サイズ分析 | 期待width: ${expectedWidthPx.toFixed(1)}px | 実際width: ${computedWidth} | 比率: ${widthRatio}%`, 'info');
+                    log(`🎨 CSS状態 | transition: ${computedStyle.transition} | flexShrink: ${computedStyle.flexShrink} | maxWidth: ${computedStyle.maxWidth}`, 'info');
+                }
+            }
+
+            // 周波数表示
+            const frequencyDisplay = document.getElementById('frequency-display');
+            if (frequencyDisplay) {
+                const frequency = result.pitch || result.frequency || 0;
+                frequencyDisplay.textContent = `${frequency.toFixed(1)} Hz`;
+            }
+
+            // 音程表示
+            const noteDisplay = document.getElementById('note-display');
+            if (noteDisplay && result.note) {
+                noteDisplay.textContent = result.note.name || result.note || '-';
+            }
+
+            // 低頻度で全体ログ
+            if (Math.random() < 0.02) {
+                log(`🎵 周波数: ${(result.pitch || result.frequency || 0).toFixed(1)}Hz | 音量: ${(result.volume || 0).toFixed(1)}% | 音程: ${result.note?.name || result.note || '-'}`, 'info');
+            }
+        }
+
+        // 初期化
+        document.getElementById('init-btn').addEventListener('click', async () => {
+            try {
+                updateStatus('初期化中...', 'info');
+                log('🎤 PitchPro v1.1.9 初期化開始', 'info');
+                
+                // MicrophoneController初期化
+                microphoneController = new PitchPro.MicrophoneController();
+                await microphoneController.initialize();
+                log('✅ MicrophoneController初期化完了', 'success');
+                
+                // PitchDetector初期化（完全デフォルト）
+                const audioManager = microphoneController.audioManager;
+                pitchDetector = new PitchPro.PitchDetector(audioManager);
+                await pitchDetector.initialize();
+                log('✅ PitchDetector初期化完了（デフォルト設定）', 'success');
+                
+                // 登録
+                microphoneController.registerDetector(pitchDetector);
+                log('✅ PitchDetector登録完了', 'success');
+                
+                // コールバック設定
+                pitchDetector.setCallbacks({
+                    onPitchUpdate: updateUI,
+                    onError: (error) => {
+                        log(`❌ エラー: ${error.message}`, 'error');
+                        updateStatus(`エラー: ${error.message}`, 'error');
+                    },
+                    onStateChange: (state) => {
+                        log(`🔄 状態変化: ${state}`, 'info');
+                    }
+                });
+                
+                updateStatus('初期化完了', 'success');
+                log('✅ 全システム初期化完了', 'success');
+                
+                // ボタン状態更新
+                document.getElementById('init-btn').disabled = true;
+                document.getElementById('start-btn').disabled = false;
+                
+            } catch (error) {
+                log(`❌ 初期化エラー: ${error.message}`, 'error');
+                updateStatus(`初期化エラー: ${error.message}`, 'error');
+            }
+        });
+
+        // 開始
+        document.getElementById('start-btn').addEventListener('click', async () => {
+            if (!microphoneController) return;
+            
+            try {
+                log('🚀 音声検出開始', 'info');
+                const started = microphoneController.start();
+                
+                if (started) {
+                    isDetecting = true;
+                    updateStatus('🎤 音声検出中...', 'success');
+                    document.getElementById('start-btn').disabled = true;
+                    document.getElementById('stop-btn').disabled = false;
+                    log('✅ 音声検出開始完了', 'success');
+                } else {
+                    log('❌ 音声検出開始に失敗', 'error');
+                }
+            } catch (error) {
+                log(`❌ 開始エラー: ${error.message}`, 'error');
+            }
+        });
+
+        // 停止
+        document.getElementById('stop-btn').addEventListener('click', () => {
+            if (!microphoneController) return;
+            
+            try {
+                log('🛑 音声検出停止', 'info');
+                microphoneController.reset();
+                isDetecting = false;
+                
+                updateStatus('音声検出停止', 'info');
+                document.getElementById('start-btn').disabled = false;
+                document.getElementById('stop-btn').disabled = true;
+                log('✅ 音声検出停止完了', 'success');
+                
+            } catch (error) {
+                log(`❌ 停止エラー: ${error.message}`, 'error');
+            }
+        });
+
+        // Lucide初期化
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        // 初期ログ
+        if (typeof PitchPro !== 'undefined') {
+            log('✅ PitchPro v1.1.9 ライブラリ読み込み完了', 'success');
+            log('🎯 シンプル音声テストモード準備完了', 'success');
+            updateStatus('準備完了 - 初期化ボタンをクリック', 'success');
+        } else {
+            log('❌ PitchProライブラリ読み込み失敗', 'error');
+            updateStatus('ライブラリエラー', 'error');
+        }
+    </script>
+</body>
+</html>
