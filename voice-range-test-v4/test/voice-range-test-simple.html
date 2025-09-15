@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎤 音域テスト - 8va相対音感トレーニング</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎤</text></svg>">
+    
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="../../Bolt/v2/styles/base.css">
+    
+    <!-- フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- メインコンテナ -->
+    <div class="container">
+        <!-- ページヘッダー -->
+        <header class="page-header">
+            <div class="flex items-center gap-3">
+                <button id="back-button" class="nav-button" title="戻る">
+                    <i data-lucide="arrow-left" class="icon-md"></i>
+                </button>
+                <h1 class="heading-lg">
+                    <i data-lucide="mic" class="text-blue-300"></i>
+                    <span>音域テスト</span>
+                </h1>
+            </div>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main>
+            <!-- ステップ表示 -->
+            <section class="glass-card">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="list-checks" class="text-green-300 icon-md"></i>
+                    <div>
+                        <h2 class="text-section-title">音域測定準備</h2>
+                        <p class="text-white-70 text-sub-text">マイクの準備ができたら開始してください</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 音量バーセクション -->
+            <section class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="volume-2" class="text-blue-300"></i>
+                    <span>音量レベル</span>
+                </h3>
+                
+                <!-- 音量バー -->
+                <div class="progress-bar">
+                    <div id="volume-bar" class="progress-fill gradient-catalog-green" style="width: 0%;"></div>
+                </div>
+                
+                <!-- 音量情報 -->
+                <div class="flex items-center gap-4">
+                    <span class="text-white-70">音量:</span>
+                    <span id="volume-text" class="text-white">0%</span>
+                    <span class="text-white-70">周波数:</span>
+                    <span id="frequency-value" class="text-blue-300">--- Hz</span>
+                    <span class="text-white-70">ノート:</span>
+                    <span id="note-value" class="text-green-300">---</span>
+                </div>
+            </section>
+
+            <!-- 測定コントロール -->
+            <section class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="play-circle" class="text-green-300"></i>
+                    <span>測定コントロール</span>
+                </h3>
+                
+                <div class="flex gap-3">
+                    <button id="start-test-btn" class="btn btn-primary btn-w-full">
+                        <i data-lucide="mic"></i>
+                        <span>音域測定開始</span>
+                    </button>
+                    <button id="stop-test-btn" class="btn btn-outline btn-w-full" style="display: none;">
+                        <i data-lucide="square"></i>
+                        <span>測定停止</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 測定結果表示 -->
+            <section id="results-section" class="glass-card" style="display: none;">
+                <h3 class="heading-md">
+                    <i data-lucide="bar-chart-3" class="text-yellow-300"></i>
+                    <span>測定結果</span>
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="text-center">
+                        <h4 class="text-white-70">最低音</h4>
+                        <div id="lowest-note" class="text-section-title text-blue-300">---</div>
+                        <div id="lowest-frequency" class="text-white-60">--- Hz</div>
+                    </div>
+                    <div class="text-center">
+                        <h4 class="text-white-70">最高音</h4>
+                        <div id="highest-note" class="text-section-title text-red-300">---</div>
+                        <div id="highest-frequency" class="text-white-60">--- Hz</div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <h4 class="text-white-70">音域幅</h4>
+                    <div id="range-semitones" class="text-main-title text-green-300">--- セミトーン</div>
+                </div>
+            </section>
+
+            <!-- エラーメッセージ -->
+            <section id="error-section" class="glass-card" style="display: none;">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="alert-triangle" class="text-red-300 icon-md"></i>
+                    <div>
+                        <h3 class="text-section-title text-red-300">エラー</h3>
+                        <p id="error-message" class="text-white-70">---</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="../../js/pitchpro-audio/pitchpro-v1.1.9.umd.js"></script>
+    
+    <!-- TODO: 外部ファイル化 /js/voice-range-test-simple.js -->
+    <script>
+        // PitchPro AudioDetectionComponent インスタンス
+        let audioDetector = null;
+        let isTestRunning = false;
+        let lowestNote = null;
+        let highestNote = null;
+        let lowestFreq = Infinity;
+        let highestFreq = 0;
+
+        // UI要素の取得
+        const elements = {
+            startBtn: document.getElementById('start-test-btn'),
+            stopBtn: document.getElementById('stop-test-btn'),
+            volumeBar: document.getElementById('volume-bar'),
+            volumeText: document.getElementById('volume-text'),
+            frequencyValue: document.getElementById('frequency-value'),
+            noteValue: document.getElementById('note-value'),
+            resultsSection: document.getElementById('results-section'),
+            errorSection: document.getElementById('error-section'),
+            errorMessage: document.getElementById('error-message'),
+            lowestNote: document.getElementById('lowest-note'),
+            lowestFrequency: document.getElementById('lowest-frequency'),
+            highestNote: document.getElementById('highest-note'),
+            highestFrequency: document.getElementById('highest-frequency'),
+            rangeSemitones: document.getElementById('range-semitones'),
+            backButton: document.getElementById('back-button')
+        };
+
+        // AudioDetectionComponent初期化
+        async function initAudioDetection() {
+            try {
+                // PitchPro v1.1.9のAudioDetectionComponent使用
+                audioDetector = new PitchPro.AudioDetectionComponent({
+                    volumeBarSelector: '#volume-bar',
+                    volumeTextSelector: '#volume-text',
+                    frequencySelector: '#frequency-value',
+                    noteSelector: '#note-value',
+                    clarityThreshold: 0.4,
+                    minVolumeAbsolute: 0.01,
+                    deviceOptimization: true
+                });
+
+                await audioDetector.initialize();
+                
+                // コールバック設定
+                audioDetector.setCallbacks({
+                    onPitchUpdate: handlePitchUpdate,
+                    onError: handleError
+                });
+
+                console.log('AudioDetectionComponent初期化完了');
+                return true;
+            } catch (error) {
+                console.error('AudioDetectionComponent初期化エラー:', error);
+                showError('マイクの初期化に失敗しました: ' + error.message);
+                return false;
+            }
+        }
+
+        // 音程検出結果処理
+        function handlePitchUpdate(result) {
+            if (!isTestRunning || !result.frequency || !result.note) return;
+
+            const freq = result.frequency;
+            
+            // 最低音・最高音を更新
+            if (freq < lowestFreq) {
+                lowestFreq = freq;
+                lowestNote = result.note;
+            }
+            
+            if (freq > highestFreq) {
+                highestFreq = freq;
+                highestNote = result.note;
+            }
+
+            // リアルタイムで結果を更新
+            updateResults();
+        }
+
+        // エラー処理
+        function handleError(error) {
+            console.error('PitchPro エラー:', error);
+            showError('音声検出エラー: ' + error.message);
+            stopTest();
+        }
+
+        // 測定開始
+        async function startTest() {
+            if (!audioDetector) {
+                const success = await initAudioDetection();
+                if (!success) return;
+            }
+
+            try {
+                await audioDetector.startDetection();
+                isTestRunning = true;
+                
+                // 測定値をリセット
+                lowestFreq = Infinity;
+                highestFreq = 0;
+                lowestNote = null;
+                highestNote = null;
+                
+                // UI切り替え
+                elements.startBtn.style.display = 'none';
+                elements.stopBtn.style.display = 'block';
+                elements.resultsSection.style.display = 'block';
+                elements.errorSection.style.display = 'none';
+                
+                console.log('音域測定開始');
+            } catch (error) {
+                console.error('測定開始エラー:', error);
+                showError('測定開始に失敗しました: ' + error.message);
+            }
+        }
+
+        // 測定停止
+        function stopTest() {
+            if (audioDetector) {
+                audioDetector.stopDetection();
+            }
+            
+            isTestRunning = false;
+            
+            // UI切り替え
+            elements.startBtn.style.display = 'block';
+            elements.stopBtn.style.display = 'none';
+            
+            console.log('音域測定停止');
+        }
+
+        // 結果表示更新
+        function updateResults() {
+            if (lowestNote && highestNote) {
+                elements.lowestNote.textContent = lowestNote;
+                elements.lowestFrequency.textContent = `${lowestFreq.toFixed(1)} Hz`;
+                elements.highestNote.textContent = highestNote;
+                elements.highestFrequency.textContent = `${highestFreq.toFixed(1)} Hz`;
+                
+                // セミトーン計算
+                const semitones = Math.round(12 * Math.log2(highestFreq / lowestFreq));
+                elements.rangeSemitones.textContent = `${semitones} セミトーン`;
+            }
+        }
+
+        // エラー表示
+        function showError(message) {
+            elements.errorMessage.textContent = message;
+            elements.errorSection.style.display = 'block';
+        }
+
+        // イベントリスナー設定
+        elements.startBtn.addEventListener('click', startTest);
+        elements.stopBtn.addEventListener('click', stopTest);
+        elements.backButton.addEventListener('click', () => {
+            if (confirm('音域テストを終了してホームに戻りますか？')) {
+                if (audioDetector) {
+                    audioDetector.destroy();
+                }
+                window.location.href = '../../index.html';
+            }
+        });
+
+        // ページ読み込み完了時の初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            // Lucide icons初期化
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            
+            console.log('音域テスト画面初期化完了');
+        });
+
+        // ページアンロード時のクリーンアップ
+        window.addEventListener('beforeunload', () => {
+            if (audioDetector) {
+                audioDetector.destroy();
+            }
+        });
+    </script>
+</body>
+</html>
