@@ -128,7 +128,7 @@
 
     <!-- JavaScript -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <script src="../../js/pitchpro-audio/pitchpro-v1.1.9.umd.js"></script>
+    <script src="../src/js/pitchpro-v1.2.1.umd.js"></script>
     
     <!-- TODO: 外部ファイル化 /js/voice-range-test-simple.js -->
     <script>
@@ -162,7 +162,7 @@
         // AudioDetectionComponent初期化
         async function initAudioDetection() {
             try {
-                // PitchPro v1.1.9のAudioDetectionComponent使用
+                // PitchPro v1.2.1のAudioDetectionComponent使用
                 audioDetector = new PitchPro.AudioDetectionComponent({
                     volumeBarSelector: '#volume-bar',
                     volumeTextSelector: '#volume-text',
@@ -174,14 +174,15 @@
                 });
 
                 await audioDetector.initialize();
-                
+
                 // コールバック設定
                 audioDetector.setCallbacks({
                     onPitchUpdate: handlePitchUpdate,
                     onError: handleError
                 });
 
-                console.log('AudioDetectionComponent初期化完了');
+                console.log('✅ PitchPro v1.2.1 AudioDetectionComponent初期化完了');
+                console.log('🔧 利用可能機能: updateSelectors(), 改善されたエラーハンドリング');
                 return true;
             } catch (error) {
                 console.error('AudioDetectionComponent初期化エラー:', error);
@@ -226,6 +227,12 @@
             }
 
             try {
+                // v1.2.1の新機能: 必要に応じてUIセレクターを動的変更可能
+                // audioDetector.updateSelectors({
+                //     volumeBarSelector: '#custom-volume-bar',
+                //     frequencySelector: '#custom-frequency'
+                // });
+
                 await audioDetector.startDetection();
                 isTestRunning = true;
                 
@@ -301,8 +308,17 @@
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
             }
-            
-            console.log('音域テスト画面初期化完了');
+
+            // PitchPro v1.2.1情報表示
+            if (typeof PitchPro !== 'undefined') {
+                console.log('🎵 PitchPro v1.2.1 ライブラリ読み込み完了');
+                console.log('📋 利用可能クラス:', Object.keys(PitchPro));
+                if (PitchPro.VERSION) {
+                    console.log('🆔 Version:', PitchPro.VERSION);
+                }
+            }
+
+            console.log('音域テスト画面初期化完了 (PitchPro v1.2.1対応版)');
         });
 
         // ページアンロード時のクリーンアップ
