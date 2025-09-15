@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎤 包括的音域テスト - PitchPro v1.2.1</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎤</text></svg>">
+
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="../Bolt/v2/styles/base.css">
+
+    <!-- フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- メインコンテナ -->
+    <div class="container">
+        <!-- ページヘッダー -->
+        <header class="page-header">
+            <div class="flex items-center gap-3">
+                <button id="back-button" class="nav-button" title="戻る">
+                    <i data-lucide="arrow-left" class="icon-md"></i>
+                </button>
+                <h1 class="heading-lg">
+                    <i data-lucide="mic" class="text-blue-300"></i>
+                    <span>包括的音域テスト</span>
+                </h1>
+                <div class="badge badge-info">PitchPro v1.2.1</div>
+            </div>
+        </header>
+
+        <!-- プログレス表示 -->
+        <section class="glass-card">
+            <h2 class="heading-md">
+                <i data-lucide="list-checks" class="text-green-300"></i>
+                <span>テストフロー</span>
+            </h2>
+
+            <div class="flex items-center gap-4">
+                <div id="step-1" class="step-indicator active">
+                    <div class="step-number">1</div>
+                    <div class="step-label">準備</div>
+                </div>
+                <div class="step-divider"></div>
+                <div id="step-2" class="step-indicator">
+                    <div class="step-number">2</div>
+                    <div class="step-label">マイクテスト</div>
+                </div>
+                <div class="step-divider"></div>
+                <div id="step-3" class="step-indicator">
+                    <div class="step-number">3</div>
+                    <div class="step-label">音域測定</div>
+                </div>
+                <div class="step-divider"></div>
+                <div id="step-4" class="step-indicator">
+                    <div class="step-number">4</div>
+                    <div class="step-label">結果</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ステップ1: 準備段階 -->
+        <section id="preparation-section" class="glass-card">
+            <h3 class="heading-md">
+                <i data-lucide="settings" class="text-blue-300"></i>
+                <span>Step 1: システム準備</span>
+            </h3>
+
+            <div class="info-card">
+                <h4 class="text-white font-medium">デバイス検出結果</h4>
+                <div id="device-info" class="text-white-70">
+                    <div>検出中...</div>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button id="init-system-btn" class="btn btn-primary">
+                    <i data-lucide="play"></i>
+                    <span>システム初期化</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ステップ2: マイクテスト -->
+        <section id="microphone-section" class="glass-card section-hidden">
+            <h3 class="heading-md">
+                <i data-lucide="mic" class="text-green-300"></i>
+                <span>Step 2: マイクロフォンテスト</span>
+            </h3>
+
+            <!-- 音量バー表示 -->
+            <div class="volume-meter">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-white-70">マイク音量</span>
+                    <span id="mic-volume-text" class="text-white font-medium">0.0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="mic-volume-bar" class="progress-fill gradient-catalog-green"></div>
+                </div>
+            </div>
+
+            <!-- 音程情報 -->
+            <div class="flex items-center justify-center gap-6 mt-4">
+                <div class="frequency-display">
+                    <div class="text-white-70 text-sm">周波数</div>
+                    <div id="mic-frequency-value" class="text-2xl font-bold text-blue-300">--- Hz</div>
+                </div>
+                <div class="note-display">
+                    <div class="text-white-70 text-sm">音階</div>
+                    <div id="mic-note-value" class="text-2xl font-bold text-green-300">---</div>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button id="start-mic-test-btn" class="btn btn-primary">
+                    <i data-lucide="mic"></i>
+                    <span>マイクテスト開始</span>
+                </button>
+                <button id="proceed-to-range-btn" class="btn btn-success section-hidden">
+                    <i data-lucide="arrow-right"></i>
+                    <span>音域テストへ進む</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ステップ3: 音域測定 -->
+        <section id="range-test-section" class="glass-card section-hidden">
+            <h3 class="heading-md">
+                <i data-lucide="bar-chart-3" class="text-purple-300"></i>
+                <span>Step 3: 音域測定</span>
+            </h3>
+
+            <!-- 音域テストバッジ -->
+            <div class="flex items-center justify-center mb-6">
+                <div id="range-test-badge" class="range-test-badge">
+                    <svg class="progress-circle" width="120" height="120">
+                        <circle class="progress-background" cx="60" cy="60" r="50"></circle>
+                        <circle id="progress-circle" class="progress-foreground" cx="60" cy="60" r="50"></circle>
+                    </svg>
+                    <div class="badge-content">
+                        <i id="range-icon" data-lucide="arrow-down" class="icon-lg text-white"></i>
+                        <div id="countdown-display" class="countdown-text section-hidden">3</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 測定状態表示 -->
+            <div class="text-center mb-4">
+                <div id="range-test-status" class="text-section-title text-yellow-300">準備中...</div>
+                <div id="range-test-instruction" class="text-white-70 mt-2">音域測定を開始してください</div>
+            </div>
+
+            <!-- 音域テスト用音量バー -->
+            <div class="volume-meter">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-white-70">音量レベル</span>
+                    <span id="range-test-volume-text" class="text-white font-medium">0.0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="range-test-volume-bar" class="progress-fill gradient-catalog-purple"></div>
+                </div>
+            </div>
+
+            <!-- 周波数表示 -->
+            <div class="flex items-center justify-center gap-6 mt-4">
+                <div class="frequency-display">
+                    <div class="text-white-70 text-sm">現在の周波数</div>
+                    <div id="range-test-frequency-value" class="text-2xl font-bold text-purple-300">--- Hz</div>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button id="start-range-test-btn" class="btn btn-primary">
+                    <i data-lucide="play-circle"></i>
+                    <span>音域測定開始</span>
+                </button>
+                <button id="stop-range-test-btn" class="btn btn-outline section-hidden">
+                    <i data-lucide="stop-circle"></i>
+                    <span>測定停止</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ステップ4: 結果表示 -->
+        <section id="results-section" class="glass-card section-hidden">
+            <h3 class="heading-md">
+                <i data-lucide="trophy" class="text-yellow-300"></i>
+                <span>Step 4: 測定結果</span>
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="result-card">
+                    <h4 class="text-white-70 mb-2">最低音</h4>
+                    <div id="lowest-note" class="text-section-title text-blue-300">---</div>
+                    <div id="lowest-frequency" class="text-white-60">--- Hz</div>
+                </div>
+                <div class="result-card">
+                    <h4 class="text-white-70 mb-2">最高音</h4>
+                    <div id="highest-note" class="text-section-title text-red-300">---</div>
+                    <div id="highest-frequency" class="text-white-60">--- Hz</div>
+                </div>
+            </div>
+
+            <div class="result-card text-center">
+                <h4 class="text-white-70 mb-2">音域幅</h4>
+                <div id="range-semitones" class="text-main-title text-green-300">--- セミトーン</div>
+                <div id="range-octaves" class="text-white-60">--- オクターブ</div>
+            </div>
+
+            <div class="flex gap-3">
+                <button id="save-results-btn" class="btn btn-success">
+                    <i data-lucide="save"></i>
+                    <span>結果保存</span>
+                </button>
+                <button id="restart-test-btn" class="btn btn-outline">
+                    <i data-lucide="refresh-cw"></i>
+                    <span>再測定</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- エラー表示 -->
+        <section id="error-section" class="glass-card section-hidden">
+            <div class="flex items-center gap-3">
+                <i data-lucide="alert-triangle" class="text-red-300 icon-md"></i>
+                <div>
+                    <h3 class="text-section-title text-red-300">エラー</h3>
+                    <p id="error-message" class="text-white-70">---</p>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-4">
+                <button id="retry-btn" class="btn btn-outline">
+                    <i data-lucide="refresh-cw"></i>
+                    <span>再試行</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- デバッグ情報 -->
+        <section class="glass-card">
+            <h3 class="heading-md">
+                <i data-lucide="bug" class="text-gray-300"></i>
+                <span>デバッグ情報</span>
+            </h3>
+
+            <div id="debug-info" class="text-white-70 text-sm">
+                <div>PitchPro v1.2.1統合テストページ</div>
+                <div>準備完了</div>
+            </div>
+        </section>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="src/js/pitchpro-v1.2.1.umd.js"></script>
+    <script src="comprehensive-range-test.js"></script>
+</body>
+</html>
