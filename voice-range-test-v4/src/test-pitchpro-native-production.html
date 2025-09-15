@@ -178,17 +178,17 @@
         </div>
     </div>
 
-    <!-- PitchPro v1.1.8 UMDライブラリ (Cross-Mode UI Interference Bug Fix) -->
-    <!-- 正しいv1.1.8ファイル（AudioDetectionComponent含む） -->
-    <script src="../../js/pitchpro-audio/pitchpro-v1.1.8-correct.umd.js"></script>
+    <!-- PitchPro v1.2.1 UMDライブラリ (最新版テスト) -->
+    <!-- PitchPro v1.2.1 - 新機能統合テスト -->
+    <script src="js/pitchpro-v1.2.1.umd.js"></script>
     <script>
         // UMD版の読み込み確認
         if (typeof PitchPro !== 'undefined') {
-            console.log('✅ PitchPro v1.1.8 UMD loaded successfully - Cross-Mode UI Interference Bug Fix');
-            console.log('Version:', PitchPro.VERSION);
-            console.log('Build Date:', PitchPro.BUILD_DATE);
+            console.log('🎉 PitchPro v1.2.1 UMD loaded successfully - 最新版統合テスト');
+            console.log('Version:', PitchPro.VERSION || 'v1.2.1');
+            console.log('Build Date:', PitchPro.BUILD_DATE || 'Latest');
             console.log('利用可能なクラス:', Object.keys(PitchPro));
-            console.log('🎯 v1.1.6 UMD upgrade complete!');
+            console.log('🚀 v1.2.1 最新機能統合テスト実施中!');
             
             // updateSelectorsメソッドの確認
             if (PitchPro.AudioDetectionComponent) {
