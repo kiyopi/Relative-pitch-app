@@ -955,7 +955,8 @@ function updateBadgeForWaiting(iconType) {
 
     if (rangeIcon && countdownDisplay && badge) {
         const iconSrc = iconType === 'arrow-up' ? './icons/arrow-up.png' : './icons/arrow-down.png';
-        rangeIcon.innerHTML = `<img src="${iconSrc}" alt="${iconType}" style="width: 80px; height: 80px; display: block;">`;
+        // インラインスタイルを削除し、CSSクラスで制御
+        rangeIcon.innerHTML = `<img src="${iconSrc}" alt="${iconType}" class="range-icon-img">`;
         rangeIcon.style.display = 'block';
         countdownDisplay.style.display = 'none';
         badge.classList.remove('measuring', 'confirmed');
@@ -977,8 +978,8 @@ function updateBadgeForConfirmed() {
     const badge = document.querySelector('.voice-note-badge');
 
     if (rangeIcon && countdownDisplay && badge) {
-        // 80×80白色チェックアイコンを表示
-        rangeIcon.innerHTML = '<img src="./icons/check.png" alt="測定完了" style="width: 80px; height: 80px; display: block;">';
+        // インラインスタイルを削除し、CSSクラスで制御
+        rangeIcon.innerHTML = '<img src="./icons/check.png" alt="測定完了" class="range-icon-img">';
         rangeIcon.style.display = 'block';
         countdownDisplay.style.display = 'none';
 
