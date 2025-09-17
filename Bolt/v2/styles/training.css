@@ -226,24 +226,6 @@
   color: rgba(59, 130, 246, 0.8) !important;
 }
 
-#range-icon.measuring {
-  animation: range-icon-pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes range-icon-pulse {
-  0% {
-    transform: scale(1);
-    color: rgba(59, 130, 246, 0.8);
-  }
-  50% {
-    transform: scale(1.2);
-    color: rgba(59, 130, 246, 1);
-  }
-  100% {
-    transform: scale(1);
-    color: rgba(59, 130, 246, 0.8);
-  }
-}
 
 .range-info-container {
   margin-bottom: 0;
@@ -320,11 +302,6 @@
     font-size: 0.875rem;
   }
   
-  /* アイコンサイズ調整 */
-  #range-icon {
-    width: 60px !important;
-    height: 60px !important;
-  }
   
 }
 

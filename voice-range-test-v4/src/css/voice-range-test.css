@@ -1,0 +1,30 @@
+/* =================================================
+   voice-range-test.css - 音域テスト専用スタイル
+   ================================================= */
+
+/* === 音域テストアイコン === */
+.range-icon-img {
+    width: 80px;
+    height: 80px;
+    display: block;
+}
+
+/* === range-iconアニメーション === */
+#range-icon.measuring {
+    animation: range-icon-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes range-icon-pulse {
+    0% {
+        transform: scale(1);
+        color: rgba(59, 130, 246, 0.8);
+    }
+    50% {
+        transform: scale(1.2);
+        color: rgba(59, 130, 246, 1);
+    }
+    100% {
+        transform: scale(1);
+        color: rgba(59, 130, 246, 0.8);
+    }
+}

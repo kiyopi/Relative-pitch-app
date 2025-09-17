@@ -1093,12 +1093,6 @@ body::before {
     transform: translateY(-3px);
 }
 
-/* === 音域テストアイコン === */
-.range-icon-img {
-    width: 80px;
-    height: 80px;
-    display: block;
-}
 
 /* === 汎用ホバーエフェクトクラス === */
 .hover-pop {
