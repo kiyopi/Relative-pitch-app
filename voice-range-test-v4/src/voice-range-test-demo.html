@@ -21,36 +21,45 @@
                 </div>
                 <div class="page-header-text">
                     <h1 class="page-title">VoiceRangeTestController デモ</h1>
-                    <p class="page-subtitle text-purple-200">ワンメソッド呼び出しで完全な音域テスト</p>
+                    <p class="page-subtitle text-purple-200">PitchPro v1.2.1統合版 - ワンメソッド呼び出しで完全な音域テスト</p>
                 </div>
             </div>
         </header>
 
         <!-- メインコンテンツ -->
         <main class="narrow-main">
-            <!-- APIデモセクション -->
+            <!-- PitchProバージョン情報 -->
+            <div class="glass-card mb-6" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(147, 51, 234, 0.15));">
+                <h3 class="heading-md">
+                    <i data-lucide="info" class="text-purple-300"></i>
+                    <span>PitchPro v1.2.1 統合情報</span>
+                </h3>
+                <div style="padding: 10px 0;">
+                    <p class="text-sm text-white-70">🎵 音声処理エンジン: <strong>PitchPro v1.2.1</strong></p>
+                    <p class="text-sm text-white-70">📦 AudioDetectionComponent: <strong id="adc-status">確認中...</strong></p>
+                    <p class="text-sm text-white-70">🔧 デバイス最適化: <strong id="device-opt">自動検出</strong></p>
+                </div>
+            </div>
+
+            <!-- マイク許可セクション -->
             <div class="glass-card mb-6">
                 <h3 class="heading-md">
-                    <i data-lucide="code" class="text-blue-300"></i>
-                    <span>シンプルAPI呼び出し</span>
+                    <i data-lucide="mic" class="text-green-300"></i>
+                    <span>マイクロフォン許可</span>
                 </h3>
-                
-                <div class="code-block">
-                    <pre><code>// 🎯 ワンメソッドで音域テスト開始
-const controller = new VoiceRangeTestController({
-    debugMode: true,
-    onTestComplete: (results) => {
-        console.log('測定完了:', results);
-    }
-});
 
-await controller.startVoiceRangeTest();</code></pre>
+                <div style="text-align: center; padding: 20px 0;">
+                    <p class="text-sm text-white-70 mb-4">音域テストを開始するには、マイクの使用許可が必要です</p>
+
+                    <button class="btn btn-primary" id="request-mic-permission">
+                        <i data-lucide="mic" class="icon-md"></i>
+                        <span>マイク許可を要求</span>
+                    </button>
+
+                    <div id="mic-permission-status" style="margin-top: 15px;">
+                        <p class="text-sm" id="mic-status-text">マイク許可待機中...</p>
+                    </div>
                 </div>
-                
-                <button class="btn btn-primary" id="start-one-method-test">
-                    <i data-lucide="play" class="icon-md"></i>
-                    <span>ワンメソッド音域テスト開始</span>
-                </button>
             </div>
             
             <!-- 音域テスト実行エリア -->
@@ -70,7 +79,7 @@ await controller.startVoiceRangeTest();</code></pre>
                 
                 <!-- メインステータス -->
                 <div class="text-center mb-6">
-                    <h4 class="text-sub-title main-status-display" id="main-status-text">音域テストを開始してください</h4>
+                    <h4 class="text-sub-title main-status-display" id="main-status-text">マイク許可後、音域テストを開始してください</h4>
                 </div>
                 
                 <!-- 音域テストバッジ -->
@@ -123,14 +132,24 @@ await controller.startVoiceRangeTest();</code></pre>
                 
                 <!-- コントロールボタン -->
                 <div class="text-center mt-6">
-                    <button class="btn btn-primary" id="begin-range-test-btn">
+                    <button class="btn btn-primary" id="begin-range-test-btn" disabled>
                         <i data-lucide="play" class="icon-sm"></i>
                         <span>音域テスト開始</span>
                     </button>
-                    
+
                     <button class="btn btn-outline ml-3" id="stop-range-test-btn" style="display: none;">
                         <i data-lucide="square" class="icon-sm"></i>
                         <span>テスト停止</span>
+                    </button>
+
+                    <button class="btn btn-danger ml-3" id="stop-detection-btn" style="display: none;">
+                        <i data-lucide="mic-off" class="icon-sm"></i>
+                        <span>検出停止</span>
+                    </button>
+
+                    <button class="btn btn-secondary ml-3" id="retry-measurement-btn" style="display: none;">
+                        <i data-lucide="refresh-cw" class="icon-sm"></i>
+                        <span>再測定</span>
                     </button>
                 </div>
             </div>
@@ -139,26 +158,46 @@ await controller.startVoiceRangeTest();</code></pre>
             <div class="glass-card mt-6" id="results-section" style="display: none;">
                 <h3 class="heading-md">
                     <i data-lucide="bar-chart-3" class="text-green-300"></i>
-                    <span>測定結果</span>
+                    <span>音域テスト結果</span>
                 </h3>
-                
+
+                <!-- 基本結果 -->
                 <div class="result-info-container">
                     <div class="result-info-row">
-                        <span>音域範囲</span>
+                        <span>🎵 音域範囲</span>
                         <span class="result-info-value" id="result-range">-</span>
                     </div>
                     <div class="result-info-row">
-                        <span>オクターブ数</span>
+                        <span>🎹 オクターブ数</span>
                         <span class="result-info-value" id="result-octaves">-</span>
                     </div>
                     <div class="result-info-row">
-                        <span>低音周波数</span>
+                        <span>🔽 最低音</span>
                         <span class="result-info-value" id="result-low-freq">-</span>
                     </div>
                     <div class="result-info-row">
-                        <span>高音周波数</span>
+                        <span>🔼 最高音</span>
                         <span class="result-info-value" id="result-high-freq">-</span>
                     </div>
+                </div>
+
+                <!-- 詳細統計 -->
+                <div style="margin-top: 20px;">
+                    <h4 class="heading-sm">
+                        <i data-lucide="activity" class="text-blue-300"></i>
+                        <span>測定統計</span>
+                    </h4>
+                    <div class="result-info-container" id="result-details">
+                        <!-- JavaScript で動的に追加される -->
+                    </div>
+                </div>
+
+                <!-- アクションボタン -->
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="startVoiceRangeTest()">
+                        <i data-lucide="refresh-cw" class="icon-sm"></i>
+                        <span>再測定</span>
+                    </button>
                 </div>
             </div>
         </main>
@@ -166,183 +205,15 @@ await controller.startVoiceRangeTest();</code></pre>
 
     <!-- Scripts -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <!-- PitchPro v1.2.1 統合 -->
+
+    <!-- 🎵 PitchPro v1.2.1 音声処理エンジン -->
     <script src="js/pitchpro-v1.2.1.umd.js"></script>
-    
-    <!-- 統合コントローラーデモ -->
-    <script type="module">
-        // VoiceRangeTestControllerの動的インポート
-        let VoiceRangeTestController;
-
-        // 初期化関数
-        async function initializeDemo() {
-            try {
-                const module = await import('./js/voice-range-test-controller.js');
-                VoiceRangeTestController = module.VoiceRangeTestController;
-                console.log('✅ VoiceRangeTestController loaded successfully');
-            } catch (error) {
-                console.warn('⚠️ VoiceRangeTestController import failed:', error);
-                console.log('📋 デモは基本機能のみで動作します');
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', async function() {
-            // まず初期化を実行
-            await initializeDemo();
-            // PitchProライブラリ読み込み確認
-            console.log('🔍 PitchPro読み込み確認:');
-            console.log('  PitchPro:', typeof PitchPro);
-            console.log('  window.PitchPro:', window.PitchPro);
-            console.log('  AudioManager:', typeof AudioManager);
-            console.log('  PitchDetector:', typeof PitchDetector);
-            console.log('  window.AudioManager:', typeof window.AudioManager);
-            console.log('  window.PitchDetector:', typeof window.PitchDetector);
-            
-            // PitchProオブジェクトから取得を試行
-            if (typeof PitchPro !== 'undefined' && PitchPro) {
-                console.log('  PitchPro.AudioManager:', PitchPro.AudioManager);
-                console.log('  PitchPro.PitchDetector:', PitchPro.PitchDetector);
-                
-                // グローバルスコープに追加
-                window.AudioManager = PitchPro.AudioManager;
-                window.PitchDetector = PitchPro.PitchDetector;
-                console.log('✅ PitchProからAudioManager・PitchDetectorを取得');
-            }
-            
-            if (typeof AudioManager === 'undefined' || typeof PitchDetector === 'undefined') {
-                console.error('❌ PitchProライブラリが読み込まれていません');
-                showNotification('PitchProライブラリの読み込みに失敗しました', 'error');
-                return;
-            }
-            
-            // Lucideアイコン初期化（range-icon以外）
-            lucide.createIcons();
-            
-            let controller = null;
-            
-            // デバッグ用: 表示制御を確認する関数
-            window.debugBadgeDisplay = function() {
-                const rangeIcon = document.getElementById('range-icon');
-                const countdownDisplay = document.getElementById('countdown-display');
-                console.log('🔍 現在の表示状態:');
-                console.log('  rangeIcon.style.display:', rangeIcon.style.display);
-                console.log('  rangeIcon.innerHTML:', rangeIcon.innerHTML);
-                console.log('  countdownDisplay.style.display:', countdownDisplay.style.display);
-                console.log('  countdownDisplay.textContent:', countdownDisplay.textContent);
-            };
-            
-            // 🎯 ワンメソッドデモボタン
-            document.getElementById('start-one-method-test').addEventListener('click', async () => {
-                console.log('🚀 ワンメソッドテスト開始');
-
-                try {
-                    // VoiceRangeTestControllerが利用できない場合の処理
-                    if (!VoiceRangeTestController) {
-                        showNotification('⚠️ VoiceRangeTestControllerが利用できません', 'warning');
-                        console.log('📋 基本機能での動作に切り替えます');
-                        return;
-                    }
-                    // 既存のコントローラーを破棄
-                    if (controller) {
-                        controller.destroy();
-                    }
-                    
-                    // UI要素を手動でリセット（デバッグ用）
-                    const rangeIcon = document.getElementById('range-icon');
-                    const countdownDisplay = document.getElementById('countdown-display');
-                    const badge = document.querySelector('.voice-note-badge');
-                    
-                    if (rangeIcon && countdownDisplay && badge) {
-                        // 初期状態に完全リセット
-                        rangeIcon.innerHTML = ''; // 既存コンテンツをクリア
-                        rangeIcon.style.display = 'block';
-                        countdownDisplay.style.display = 'none';
-                        badge.classList.remove('measuring', 'confirmed');
-                        console.log('🔄 UI要素を初期状態にリセット');
-                    }
-                    
-                    // 新しいコントローラー作成（完全な設定）
-                    controller = new VoiceRangeTestController({
-                        debugMode: true,
-                        
-                        // コールバック設定
-                        onLowPitchComplete: (result) => {
-                            console.log('🔽 低音測定完了:', result);
-                            showNotification('低音測定完了: ' + result.note, 'success');
-                            window.debugBadgeDisplay(); // デバッグ確認
-                        },
-                        
-                        onHighPitchComplete: (result) => {
-                            console.log('🔼 高音測定完了:', result);
-                            showNotification('高音測定完了: ' + result.note, 'success');
-                            window.debugBadgeDisplay(); // デバッグ確認
-                        },
-                        
-                        onTestComplete: (results) => {
-                            console.log('🏁 音域テスト完了:', results);
-                            showNotification('音域測定完了！', 'success');
-                            displayResults(results);
-                            window.debugBadgeDisplay(); // デバッグ確認
-                        },
-                        
-                        onError: (error) => {
-                            console.error('❌ エラー:', error);
-                            showNotification('エラー: ' + error.message, 'error');
-                        }
-                    });
-                    
-                    // 🎯 ワンメソッド呼び出し！
-                    await controller.startVoiceRangeTest();
-                    
-                    // UI更新
-                    document.getElementById('stop-range-test-btn').style.display = 'inline-block';
-                    
-                } catch (error) {
-                    console.error('❌ ワンメソッドテストエラー:', error);
-                    showNotification('テスト開始エラー: ' + error.message, 'error');
-                }
-            });
-            
-            // 通常の開始ボタン（互換性確保）
-            document.getElementById('begin-range-test-btn').addEventListener('click', async () => {
-                document.getElementById('start-one-method-test').click();
-            });
-            
-            // 停止ボタン
-            document.getElementById('stop-range-test-btn').addEventListener('click', () => {
-                if (controller) {
-                    controller.stopTest();
-                    showNotification('テスト停止', 'info');
-                    document.getElementById('stop-range-test-btn').style.display = 'none';
-                }
-            });
-            
-            // 結果表示関数
-            function displayResults(results) {
-                document.getElementById('result-range').textContent = results.range || '-';
-                document.getElementById('result-octaves').textContent = results.octaves ? `${results.octaves}オクターブ` : '-';
-                document.getElementById('result-low-freq').textContent = results.lowPitch ? `${results.lowPitch.frequency.toFixed(1)} Hz (${results.lowPitch.note})` : '-';
-                document.getElementById('result-high-freq').textContent = results.highPitch ? `${results.highPitch.frequency.toFixed(1)} Hz (${results.highPitch.note})` : '-';
-                
-                document.getElementById('results-section').style.display = 'block';
-                document.getElementById('stop-range-test-btn').style.display = 'none';
-            }
-            
-            // 通知表示関数
-            function showNotification(message, type = 'info') {
-                const colors = {
-                    success: '#10b981',
-                    error: '#ef4444', 
-                    info: '#3b82f6'
-                };
-                
-                console.log(`%c${message}`, `color: ${colors[type]}; font-weight: bold;`);
-            }
-            
-            console.log('✅ VoiceRangeTestController デモ準備完了');
-            console.log('🎯 「ワンメソッド音域テスト開始」ボタンを押してテストしてください');
-            console.log('🔧 デバッグ用: window.debugBadgeDisplay() で表示状態確認');
-        });
+    <script>
+        // PitchPro v1.2.1 読み込み確認
+        console.log('%c📌 PitchPro v1.2.1 Loading...', 'color: #8b5cf6; font-weight: bold; font-size: 14px;');
     </script>
+
+    <!-- 音域テストデモメインスクリプト（PitchPro v1.2.1統合版） -->
+    <script type="module" src="js/voice-range-test-demo.js"></script>
 </body>
 </html>

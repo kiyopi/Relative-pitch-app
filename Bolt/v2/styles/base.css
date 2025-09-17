@@ -1391,7 +1391,6 @@ body::before {
   height: 100%;
   background: linear-gradient(135deg, #22c55e, #16a34a);
   border-radius: var(--radius-md);
-  transition: width 0.3s ease;
   width: 60%;
 }
 
