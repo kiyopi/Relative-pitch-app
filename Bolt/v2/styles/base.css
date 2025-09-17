@@ -1100,14 +1100,6 @@ body::before {
     display: block;
 }
 
-/* モバイル用サイズ調整 */
-@media (max-width: 768px) {
-    .range-icon-img {
-        width: 60px;
-        height: 60px;
-    }
-}
-
 /* === 汎用ホバーエフェクトクラス === */
 .hover-pop {
     transition: all 0.3s ease;
