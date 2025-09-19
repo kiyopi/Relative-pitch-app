@@ -28,3 +28,87 @@
         color: rgba(59, 130, 246, 0.8);
     }
 }
+
+/* === マイクボタン状態管理 === */
+.mic-button {
+    transition: all 0.3s ease;
+}
+
+.mic-button.mic-idle {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+}
+
+.mic-button.mic-permitted {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.mic-button.mic-active {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    animation: mic-recording-pulse 1.5s ease-in-out infinite;
+}
+
+.mic-button.mic-active i {
+    color: white !important;
+}
+
+@keyframes mic-recording-pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}
+
+/* === マイクステータスコンテナ === */
+.mic-status-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.mic-status-container.standby {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+}
+
+.mic-status-container.recording {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    animation: mic-status-pulse 1.5s ease-in-out infinite;
+}
+
+.mic-status-container.recording i {
+    color: #ef4444 !important;
+}
+
+@keyframes mic-status-pulse {
+    0% {
+        transform: scale(1);
+        background: rgba(239, 68, 68, 0.2);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+    50% {
+        transform: scale(1.1);
+        background: rgba(239, 68, 68, 0.3);
+        box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+    }
+    100% {
+        transform: scale(1);
+        background: rgba(239, 68, 68, 0.2);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}

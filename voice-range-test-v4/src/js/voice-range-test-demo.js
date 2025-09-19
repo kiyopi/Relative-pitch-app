@@ -2,7 +2,7 @@
  * voice-range-test-demo.js - 音域テストデモページメインスクリプト
  *
  * @version 2.0.0
- * @description PitchPro v1.2.1対応版統合デモ
+ * @description PitchPro v1.2.2対応版統合デモ
  * @date 2025-01-16
  */
 
@@ -62,6 +62,52 @@ function showNotification(message, type = 'info') {
     // TODO: 実際の通知UIを実装する場合はここに追加
 }
 
+// マイクステータス管理関数
+function updateMicStatus(status) {
+    const micContainer = document.getElementById('mic-status-container');
+    const micButton = document.getElementById('request-mic-permission');
+
+    if (micContainer) {
+        // 既存のクラスをクリア
+        micContainer.classList.remove('standby', 'recording');
+
+        // 新しいステータスを適用
+        switch (status) {
+            case 'standby':
+                micContainer.classList.add('standby');
+                console.log('🎤 マイクステータス: 待機中');
+                break;
+            case 'recording':
+                micContainer.classList.add('recording');
+                console.log('🎤 マイクステータス: 録音中（赤エフェクト）');
+                break;
+            default:
+                micContainer.classList.add('standby');
+                console.log('🎤 マイクステータス: デフォルト（待機中）');
+        }
+    }
+
+    // マイクボタンの状態も更新
+    if (micButton) {
+        micButton.classList.remove('mic-idle', 'mic-permitted', 'mic-active');
+
+        switch (status) {
+            case 'standby':
+                if (globalState.micPermissionGranted) {
+                    micButton.classList.add('mic-permitted');
+                } else {
+                    micButton.classList.add('mic-idle');
+                }
+                break;
+            case 'recording':
+                micButton.classList.add('mic-active');
+                break;
+            default:
+                micButton.classList.add('mic-idle');
+        }
+    }
+}
+
 // グローバル状態管理
 let globalState = {
     micPermissionGranted: false,
@@ -102,13 +148,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     await initializeDemo();
 
     // PitchProライブラリ読み込み確認
-    console.log('🔍 PitchPro v1.2.1 読み込み確認:');
+    console.log('🔍 PitchPro v1.2.2 読み込み確認:');
     console.log('  PitchPro:', typeof PitchPro);
     console.log('  window.PitchPro:', window.PitchPro);
 
     // PitchProオブジェクトから必要なクラスを取得
     if (typeof PitchPro !== 'undefined' && PitchPro) {
-        console.log('📌 PitchPro v1.2.1 検出成功');
+        console.log('📌 PitchPro v1.2.2 検出成功');
         console.log('  PitchPro.AudioManager:', PitchPro.AudioManager);
         console.log('  PitchPro.PitchDetector:', PitchPro.PitchDetector);
         console.log('  PitchPro.AudioDetectionComponent:', PitchPro.AudioDetectionComponent);
@@ -130,15 +176,15 @@ document.addEventListener('DOMContentLoaded', async function() {
         // グローバルスコープに追加（後方互換性のため）
         if (PitchPro.AudioManager) {
             window.AudioManager = PitchPro.AudioManager;
-            console.log('✅ AudioManager (v1.2.1) をグローバルスコープに追加');
+            console.log('✅ AudioManager (v1.2.2) をグローバルスコープに追加');
         }
         if (PitchPro.PitchDetector) {
             window.PitchDetector = PitchPro.PitchDetector;
-            console.log('✅ PitchDetector (v1.2.1) をグローバルスコープに追加');
+            console.log('✅ PitchDetector (v1.2.2) をグローバルスコープに追加');
         }
         if (PitchPro.AudioDetectionComponent) {
             window.AudioDetectionComponent = PitchPro.AudioDetectionComponent;
-            console.log('✅ AudioDetectionComponent (v1.2.1) をグローバルスコープに追加');
+            console.log('✅ AudioDetectionComponent (v1.2.2) をグローバルスコープに追加');
         }
     }
 
@@ -184,7 +230,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
 
     console.log('✅ VoiceRangeTestController デモ準備完了');
-    console.log('📌 PitchPro v1.2.1 統合版');
+    console.log('📌 PitchPro v1.2.2 統合版');
     console.log('🎯 「ワンメソッド音域テスト開始」ボタンを押してテストしてください');
     console.log('🔧 デバッグ用: window.debugBadgeDisplay() で表示状態確認');
 });
@@ -196,26 +242,23 @@ async function startBasicTest() {
     try {
         // グローバルインスタンスがない場合のみ作成
         if (!globalAudioDetector) {
-            console.log('🔧 AudioDetectionComponent基本テスト用作成');
+            console.log('🔧 AudioDetectionComponent基本テスト用作成 (v1.2.2)');
             globalAudioDetector = new AudioDetectionComponent({
                 volumeBarSelector: '#range-test-volume-bar',
                 volumeTextSelector: '#range-test-volume-text',
                 frequencySelector: '#range-test-frequency-value',
-                debugMode: true
+                debugMode: true,
+                // PitchPro v1.2.2: 初期化時にコールバックを設定
+                onPitchUpdate: (result) => {
+                    if (result.pitch && result.note) {
+                        console.log(`🎵 検出: ${result.note} (${result.pitch.toFixed(1)} Hz)`);
+                    }
+                }
             });
 
             await globalAudioDetector.initialize();
-            console.log('✅ AudioDetectionComponent初期化成功');
+            console.log('✅ AudioDetectionComponent初期化成功 (v1.2.2)');
         }
-
-        // コールバック設定
-        globalAudioDetector.setCallbacks({
-            onPitchUpdate: (result) => {
-                if (result.pitch && result.note) {
-                    console.log(`🎵 検出: ${result.note} (${result.pitch.toFixed(1)} Hz)`);
-                }
-            }
-        });
 
         // PitchProのstart()メソッドを使用
         if (globalAudioDetector.start) {
@@ -275,6 +318,10 @@ async function requestMicrophonePermission() {
         testButton.disabled = false;
 
         document.getElementById('main-status-text').textContent = '音域テスト開始ボタンを押してください';
+
+        // マイクステータスを許可済み状態に更新
+        updateMicStatus('standby');
+
         showNotification('マイク許可が完了しました', 'success');
 
     } catch (error) {
@@ -326,24 +373,27 @@ async function startVoiceRangeTest() {
 
         // グローバルインスタンスがない場合のみ作成
         if (!globalAudioDetector) {
-            console.log('🔧 AudioDetectionComponent初回作成');
+            console.log('🔧 AudioDetectionComponent初回作成 (v1.2.2)');
             globalAudioDetector = new AudioDetectionComponent({
                 volumeBarSelector: '#range-test-volume-bar',
                 volumeTextSelector: '#range-test-volume-text',
                 frequencySelector: '#range-test-frequency-value',
-                debugMode: true
+                debugMode: true,
+                // PitchPro v1.2.2: 初期化時にコールバックを設定
+                onPitchUpdate: (result) => {
+                    handleVoiceDetection(result, globalAudioDetector);
+                },
+                onVolumeUpdate: (volume) => {
+                    // 音量更新処理（必要に応じて）
+                },
+                onError: (error) => {
+                    console.error('❌ AudioDetectionComponent エラー:', error);
+                }
             });
 
             await globalAudioDetector.initialize();
-            console.log('✅ AudioDetectionComponent初期化完了');
+            console.log('✅ AudioDetectionComponent初期化完了 (v1.2.2)');
         }
-
-        // コールバック設定
-        globalAudioDetector.setCallbacks({
-            onPitchUpdate: (result) => {
-                handleVoiceDetection(result, globalAudioDetector);
-            }
-        });
 
         // PitchProのstart()メソッドを使用（効率的）
         if (globalAudioDetector.start) {
@@ -358,6 +408,9 @@ async function startVoiceRangeTest() {
         document.getElementById('main-status-text').textContent = '低音域測定: 声を出してください';
         document.getElementById('sub-info-text').textContent = '声を認識したら自動で測定開始します';
         updateBadgeForWaiting('arrow-down');
+
+        // マイクステータスを録音中（赤エフェクト）に更新
+        updateMicStatus('recording');
 
         document.getElementById('begin-range-test-btn').style.display = 'none';
         document.getElementById('stop-range-test-btn').style.display = 'inline-block';
@@ -669,17 +722,20 @@ function completeHighPitchMeasurement() {
     
     // 音量バーリセット
     resetVolumeDisplay();
-    
+
     // UI更新
     document.getElementById('stop-range-test-btn').style.display = 'none';
     document.getElementById('stop-detection-btn').style.display = 'none';
     document.getElementById('begin-range-test-btn').style.display = 'inline-block';
-    
+
+    // マイクステータスを待機状態に戻す
+    updateMicStatus('standby');
+
     // 円形プログレスバーを瞬時にリセット
     setTimeout(() => {
         updateCircularProgressInstantly(0);
     }, 1000);
-    
+
     showNotification('音域テスト完了！', 'success');
 }
 
@@ -752,7 +808,10 @@ function stopAllMeasurements() {
     // UI リセット（音量バーと円形プログレス）
     resetVolumeDisplay();
     resetCircularProgress();
-    
+
+    // マイクステータスを待機状態に戻す
+    updateMicStatus('standby');
+
     document.getElementById('main-status-text').textContent = 'テスト停止';
     document.getElementById('sub-info-text').textContent = '待機中...';
     updateBadgeForWaiting('arrow-down');

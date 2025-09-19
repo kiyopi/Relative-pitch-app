@@ -22,44 +22,22 @@
                 </div>
                 <div class="page-header-text">
                     <h1 class="page-title">VoiceRangeTestController デモ</h1>
-                    <p class="page-subtitle text-purple-200">PitchPro v1.2.1統合版 - ワンメソッド呼び出しで完全な音域テスト</p>
+                    <p class="page-subtitle text-purple-200">PitchPro v1.2.2統合版 - ワンメソッド呼び出しで完全な音域テスト</p>
                 </div>
             </div>
         </header>
 
         <!-- メインコンテンツ -->
         <main class="narrow-main">
-            <!-- PitchProバージョン情報 -->
-            <div class="glass-card mb-6" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(147, 51, 234, 0.15));">
-                <h3 class="heading-md">
-                    <i data-lucide="info" class="text-purple-300"></i>
-                    <span>PitchPro v1.2.1 統合情報</span>
-                </h3>
-                <div style="padding: 10px 0;">
-                    <p class="text-sm text-white-70">🎵 音声処理エンジン: <strong>PitchPro v1.2.1</strong></p>
-                    <p class="text-sm text-white-70">📦 AudioDetectionComponent: <strong id="adc-status">確認中...</strong></p>
-                    <p class="text-sm text-white-70">🔧 デバイス最適化: <strong id="device-opt">自動検出</strong></p>
-                </div>
-            </div>
-
             <!-- マイク許可セクション -->
-            <div class="glass-card mb-6">
-                <h3 class="heading-md">
-                    <i data-lucide="mic" class="text-green-300"></i>
-                    <span>マイクロフォン許可</span>
-                </h3>
+            <div style="text-align: center; padding: 20px 0;">
+                <button class="btn btn-primary mic-button mic-idle" id="request-mic-permission">
+                    <i data-lucide="mic" class="icon-md"></i>
+                    <span>マイク許可を要求</span>
+                </button>
 
-                <div style="text-align: center; padding: 20px 0;">
-                    <p class="text-sm text-white-70 mb-4">音域テストを開始するには、マイクの使用許可が必要です</p>
-
-                    <button class="btn btn-primary" id="request-mic-permission">
-                        <i data-lucide="mic" class="icon-md"></i>
-                        <span>マイク許可を要求</span>
-                    </button>
-
-                    <div id="mic-permission-status" style="margin-top: 15px;">
-                        <p class="text-sm" id="mic-status-text">マイク許可待機中...</p>
-                    </div>
+                <div id="mic-permission-status" class="mt-4" aria-live="polite">
+                    <p class="text-sm" id="mic-status-text">マイクの許可を待っています...</p>
                 </div>
             </div>
             
@@ -95,7 +73,7 @@
                             </svg>
                             <div class="voice-note-badge">
                                 <div id="range-icon" class="icon-4xl text-white" style="display: block;">
-                                    <img src="./icons/arrow-down.png" alt="初期アイコン" style="width: 80px; height: 80px; display: block;">
+                                    <img src="./icons/arrow-down.png" alt="下向き矢印" style="width: 80px; height: 80px; display: block;">
                                 </div>
                                 <p class="countdown-text" id="countdown-display" style="display: none;">3</p>
                             </div>
@@ -156,7 +134,7 @@
             </div>
             
             <!-- 結果表示エリア -->
-            <div class="glass-card mt-6" id="results-section" style="display: none;">
+            <div class="glass-card mt-6 hidden" id="results-section">
                 <h3 class="heading-md">
                     <i data-lucide="bar-chart-3" class="text-green-300"></i>
                     <span>音域テスト結果</span>
@@ -183,7 +161,7 @@
                 </div>
 
                 <!-- 詳細統計 -->
-                <div style="margin-top: 20px;">
+                <div class="mt-5">
                     <h4 class="heading-sm">
                         <i data-lucide="activity" class="text-blue-300"></i>
                         <span>測定統計</span>
@@ -194,11 +172,24 @@
                 </div>
 
                 <!-- アクションボタン -->
-                <div style="text-align: center; margin-top: 20px;">
-                    <button class="btn btn-primary" onclick="startVoiceRangeTest()">
+                <div class="text-center mt-5">
+                    <button class="btn btn-primary" id="remeasure-btn">
                         <i data-lucide="refresh-cw" class="icon-sm"></i>
                         <span>再測定</span>
                     </button>
+                </div>
+            </div>
+
+            <!-- PitchProバージョン情報 -->
+            <div class="glass-card mt-6 bg-gradient-to-br from-blue-500/15 to-purple-500/15">
+                <h3 class="heading-md">
+                    <i data-lucide="info" class="text-purple-300"></i>
+                    <span>PitchPro v1.2.2 統合情報</span>
+                </h3>
+                <div style="padding: 10px 0;">
+                    <p class="text-sm text-white-70">🎵 音声処理エンジン: <strong>PitchPro v1.2.2</strong></p>
+                    <p class="text-sm text-white-70">📦 AudioDetectionComponent: <strong id="adc-status">確認中...</strong></p>
+                    <p class="text-sm text-white-70">🔧 デバイス最適化: <strong id="device-opt">自動検出</strong></p>
                 </div>
             </div>
         </main>
@@ -207,14 +198,14 @@
     <!-- Scripts -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
-    <!-- 🎵 PitchPro v1.2.1 音声処理エンジン -->
-    <script src="js/pitchpro-v1.2.1.umd.js"></script>
+    <!-- 🎵 PitchPro v1.2.2 音声処理エンジン -->
+    <script src="js/pitchpro-v1.2.2.umd.js"></script>
     <script>
-        // PitchPro v1.2.1 読み込み確認
-        console.log('%c📌 PitchPro v1.2.1 Loading...', 'color: #8b5cf6; font-weight: bold; font-size: 14px;');
+        // PitchPro v1.2.2 読み込み確認
+        console.log('%c📌 PitchPro v1.2.2 Loading...', 'color: #8b5cf6; font-weight: bold; font-size: 14px;');
     </script>
 
-    <!-- 音域テストデモメインスクリプト（PitchPro v1.2.1統合版） -->
+    <!-- 音域テストデモメインスクリプト（PitchPro v1.2.2統合版） -->
     <script type="module" src="js/voice-range-test-demo.js"></script>
 </body>
 </html>
