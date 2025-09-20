@@ -267,6 +267,15 @@ let globalState = {
     measurementDuration: 3000, // 3秒
     idleDuration: 3000, // 3秒
 
+    // 🎵 音声安定性チェック用（雑音排除）
+    voiceStability: {
+        recentDetections: [], // 最近の検出結果を保持
+        requiredStableCount: 3, // 安定判定に必要な連続検出回数
+        maxHistoryAge: 1000, // 履歴保持時間 (ms)
+        minFrequencyForVoice: 80, // 人間の声と判定する最低周波数 (Hz)
+        maxFrequencyForVoice: 2000 // 人間の声と判定する最高周波数 (Hz)
+    },
+
     // 測定データ収集
     measurementData: {
         lowPhase: {
@@ -302,7 +311,114 @@ let globalState = {
         detectionStatus: '待機中',
         micStatus: '未許可'
     }
-};
+};;
+/**
+ * 音声の安定性をチェックして雑音を排除します
+ * @param {Object} result - PitchProからの検出結果
+ * @returns {boolean} true: 安定した音声と判定, false: 雑音または不安定
+ */
+function isStableVoiceDetection(result) {
+    const now = Date.now();
+    const stability = globalState.voiceStability;
+    
+    // 音量チェック
+    if (!result.volume || result.volume < globalState.voiceDetectionThreshold) {
+        return false;
+    }
+    
+    // 音程チェック：周波数と音程名の両方が必要
+    if (!result.frequency || !result.note) {
+        console.log('🔇 音程が検出されていません:', {
+            frequency: result.frequency,
+            note: result.note
+        });
+        return false;
+    }
+    
+    // 人間の声の周波数範囲チェック
+    if (result.frequency < stability.minFrequencyForVoice || 
+        result.frequency > stability.maxFrequencyForVoice) {
+        console.log('🚫 人間の声の範囲外:', {
+            frequency: result.frequency,
+            range: `${stability.minFrequencyForVoice}-${stability.maxFrequencyForVoice}Hz`
+        });
+        return false;
+    }
+    
+    // 古い履歴を削除
+    stability.recentDetections = stability.recentDetections.filter(
+        detection => now - detection.timestamp < stability.maxHistoryAge
+    );
+    
+    // 現在の検出を履歴に追加
+    stability.recentDetections.push({
+        timestamp: now,
+        frequency: result.frequency,
+        note: result.note,
+        volume: result.volume
+    });
+    
+    // 安定判定に必要な検出回数に達しているかチェック
+    if (stability.recentDetections.length < stability.requiredStableCount) {
+        console.log('🟡 音声安定性チェック中:', {
+            detectionCount: stability.recentDetections.length,
+            required: stability.requiredStableCount,
+            note: result.note,
+            frequency: result.frequency.toFixed(1)
+        });
+        return false;
+    }
+    
+    // 周波数の安定性チェック
+    const frequencies = stability.recentDetections.map(d => d.frequency);
+    const avgFreq = frequencies.reduce((sum, f) => sum + f, 0) / frequencies.length;
+    const maxDeviation = Math.max(...frequencies.map(f => Math.abs(f - avgFreq)));
+    const allowedDeviation = avgFreq * 0.1; // 平均周波数の10%以内
+    
+    if (maxDeviation > allowedDeviation) {
+        console.log('📊 周波数が不安定:', {
+            avgFreq: avgFreq.toFixed(1),
+            maxDeviation: maxDeviation.toFixed(1),
+            allowedDeviation: allowedDeviation.toFixed(1),
+            frequencies: frequencies.map(f => f.toFixed(1))
+        });
+        return false;
+    }
+    
+    // 音量の安定性チェック
+    const volumes = stability.recentDetections.map(d => d.volume);
+    const avgVolume = volumes.reduce((sum, v) => sum + v, 0) / volumes.length;
+    const minVolume = Math.min(...volumes);
+    
+    if (minVolume < globalState.voiceDetectionThreshold * 0.8) {
+        console.log('🔉 音量が不安定:', {
+            avgVolume: (avgVolume * 100).toFixed(1) + '%',
+            minVolume: (minVolume * 100).toFixed(1) + '%',
+            threshold: (globalState.voiceDetectionThreshold * 100).toFixed(1) + '%'
+        });
+        return false;
+    }
+    
+    console.log('✅ 安定した音声を検出:', {
+        note: result.note,
+        frequency: result.frequency.toFixed(1) + 'Hz',
+        volume: (result.volume * 100).toFixed(1) + '%',
+        detectionCount: stability.recentDetections.length,
+        avgFreq: avgFreq.toFixed(1) + 'Hz',
+        freqStability: maxDeviation.toFixed(1) + 'Hz',
+        volumeStability: (avgVolume * 100).toFixed(1) + '%'
+    });
+    
+    return true;
+}
+
+/**
+ * 音声安定性データをリセットします
+ */
+function resetVoiceStability() {
+    globalState.voiceStability.recentDetections = [];
+    console.log('🔄 音声安定性データをリセット');
+}
 
 // メイン初期化処理
 document.addEventListener('DOMContentLoaded', async function() {
@@ -526,6 +642,9 @@ async function startVoiceRangeTest() {
         // 🧪 デバッグデータをリセット
         resetDebugData();
 
+        // 🎵 音声安定性データをリセット（雑音排除機能初期化）
+        resetVoiceStability();
+
         // 既存のボタン状態を更新
         document.getElementById('begin-range-test-btn').style.display = 'none';
         document.getElementById('stop-range-test-btn').style.display = 'inline-flex';
@@ -582,7 +701,7 @@ async function startVoiceRangeTest() {
         updateDebugStatus('音声検出中', '録音中');
 
         document.getElementById('main-status-text').textContent = '低音域測定: 声を出してください';
-        document.getElementById('sub-info-text').textContent = '声を認識したら自動で測定開始します';
+        document.getElementById('sub-info-text').textContent = '安定した声を認識したら自動で測定開始します（雑音排除機能付き）';
 
         // アニメーション開始
         const rangeIcon = document.getElementById('range-icon');
@@ -618,18 +737,18 @@ function handleVoiceDetection(result, audioDetector) {
     // 測定データを常に記録（音量が閾値以下でも）
     recordMeasurementData(result);
 
-    // 音量が閾値を超えた場合のみフェーズ遷移
-    if (!result.volume || result.volume < globalState.voiceDetectionThreshold) {
-        console.log('🔇 音量が閾値以下:', {
-            volume: result.volume,
-            threshold: globalState.voiceDetectionThreshold
-        });
+    // 🎵 改良された音声安定性チェック（雑音排除）
+    if (!isStableVoiceDetection(result)) {
+        // 安定性チェックで失敗した場合は早期リターン
+        // isStableVoiceDetection内で詳細なログが出力される
         return;
     }
 
-    console.log('🔊 音量閾値超過 - フェーズ遷移チェック:', {
+    console.log('🔊 安定した音声検出 - フェーズ遷移チェック:', {
         currentPhase: globalState.currentPhase,
-        volume: result.volume
+        volume: result.volume,
+        frequency: result.frequency,
+        note: result.note
     });
 
     switch (globalState.currentPhase) {
@@ -711,6 +830,9 @@ function calculateVoiceRange() {
     // 半音数計算
     const semitones = Math.round(octaves * 12);
 
+    // 快適音域計算（検出音域の80%）
+    const comfortableRange = calculateComfortableVoiceRange(lowData.lowestFreq, highData.highestFreq);
+
     return {
         lowNote: lowData.lowestNote,
         highNote: highData.highestNote,
@@ -719,12 +841,192 @@ function calculateVoiceRange() {
         octaves: parseFloat(octaves.toFixed(2)),
         semitones: semitones,
         range: `${lowData.lowestNote} - ${highData.highestNote}`,
+        // 快適音域情報を追加
+        comfortableRange: comfortableRange,
         totalMeasurementTime: globalState.measurementData.endTime - globalState.measurementData.startTime,
         lowPhaseDataCount: lowData.frequencies.length,
         highPhaseDataCount: highData.frequencies.length,
         avgLowVolume: Math.round(lowData.avgVolume * 100),
         avgHighVolume: Math.round(highData.avgVolume * 100)
     };
+}
+
+/**
+ * 快適音域を計算します（検出音域の80%）
+ * @param {number} lowestFreq - 検出された最低周波数
+ * @param {number} highestFreq - 検出された最高周波数
+ * @returns {Object} 快適音域の情報
+ */
+function calculateComfortableVoiceRange(lowestFreq, highestFreq) {
+    // 音域の中心を対数スケールで計算
+    const centerFreqLog = (Math.log2(lowestFreq) + Math.log2(highestFreq)) / 2;
+    const centerFreq = Math.pow(2, centerFreqLog);
+    
+    // 全音域の半分の範囲（オクターブ）
+    const fullRangeOctaves = Math.log2(highestFreq / lowestFreq);
+    
+    // 快適音域は全音域の80%
+    const comfortableRangeOctaves = fullRangeOctaves * 0.8;
+    const halfComfortableRange = comfortableRangeOctaves / 2;
+    
+    // 快適音域の最低・最高周波数を計算
+    const comfortableLowFreq = centerFreq / Math.pow(2, halfComfortableRange);
+    const comfortableHighFreq = centerFreq * Math.pow(2, halfComfortableRange);
+    
+    // 周波数を音程名に変換
+    const comfortableLowNote = frequencyToNote(comfortableLowFreq);
+    const comfortableHighNote = frequencyToNote(comfortableHighFreq);
+    
+    return {
+        lowFreq: Math.round(comfortableLowFreq * 10) / 10,
+        highFreq: Math.round(comfortableHighFreq * 10) / 10,
+        lowNote: comfortableLowNote,
+        highNote: comfortableHighNote,
+        range: `${comfortableLowNote} - ${comfortableHighNote}`,
+        octaves: parseFloat(comfortableRangeOctaves.toFixed(2)),
+        semitones: Math.round(comfortableRangeOctaves * 12),
+        percentage: 80 // 元音域に対する割合
+    };
+}
+
+/**
+ * 周波数を音程名に変換します（簡易版）
+ * @param {number} frequency - 周波数 (Hz)
+ * @returns {string} 音程名 (例: "C4", "A#3")
+ */
+function frequencyToNote(frequency) {
+    const A4 = 440.0;
+    const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    
+    // A4からの半音数を計算
+    const semitonesFromA4 = Math.round(12 * Math.log2(frequency / A4));
+    
+    // オクターブとノートインデックスを計算
+    const octave = 4 + Math.floor((semitonesFromA4 + 9) / 12);
+    const noteIndex = (semitonesFromA4 + 9) % 12;
+    
+    // 負の値の処理
+    const adjustedNoteIndex = noteIndex < 0 ? noteIndex + 12 : noteIndex;
+    const adjustedOctave = noteIndex < 0 ? octave - 1 : octave;
+    
+    return `${noteNames[adjustedNoteIndex]}${adjustedOctave}`;
+}
+
+/**
+ * 測定品質を評価し、適切なバッジとメッセージを返します
+ * @param {Object} measurementData - globalState.measurementData
+ * @returns {Object} { level: string, badge: string, message: string, score: number }
+ */
+function assessMeasurementQuality(measurementData) {
+    const lowData = measurementData.lowPhase;
+    const highData = measurementData.highPhase;
+    
+    const totalDataCount = lowData.frequencies.length + highData.frequencies.length;
+    const retryCount = globalState.retryCount;
+    const measurementTime = measurementData.endTime - measurementData.startTime;
+    
+    // データ充実度スコア (0-40点)
+    let dataScore = 0;
+    if (totalDataCount >= 50) dataScore = 40;
+    else if (totalDataCount >= 30) dataScore = 30;
+    else if (totalDataCount >= 15) dataScore = 20;
+    else if (totalDataCount >= 5) dataScore = 10;
+    
+    // 測定成功率スコア (0-30点)
+    let successScore = 0;
+    if (retryCount === 0) successScore = 30;
+    else if (retryCount === 1) successScore = 20;
+    else if (retryCount === 2) successScore = 10;
+    else if (retryCount >= 3) successScore = 5;
+    
+    // 測定時間効率スコア (0-20点)
+    let timeScore = 0;
+    const timeInSeconds = measurementTime / 1000;
+    if (timeInSeconds <= 10) timeScore = 20;
+    else if (timeInSeconds <= 15) timeScore = 15;
+    else if (timeInSeconds <= 25) timeScore = 10;
+    else timeScore = 5;
+    
+    // 音量安定性スコア (0-10点)
+    let volumeScore = 0;
+    const avgVolume = (lowData.avgVolume + highData.avgVolume) / 2;
+    if (avgVolume >= 0.3) volumeScore = 10;
+    else if (avgVolume >= 0.2) volumeScore = 7;
+    else if (avgVolume >= 0.15) volumeScore = 5;
+    else volumeScore = 2;
+    
+    const totalScore = dataScore + successScore + timeScore + volumeScore;
+    
+    // 品質レベル判定
+    if (totalScore >= 85) {
+        return {
+            level: 'excellent',
+            badge: '🏆',
+            message: '優秀な測定結果',
+            score: totalScore,
+            details: {
+                dataScore,
+                successScore,
+                timeScore,
+                volumeScore,
+                totalDataCount,
+                retryCount,
+                timeInSeconds: timeInSeconds.toFixed(1),
+                avgVolume: (avgVolume * 100).toFixed(1)
+            }
+        };
+    } else if (totalScore >= 70) {
+        return {
+            level: 'good',
+            badge: '🥇',
+            message: '良好な測定結果',
+            score: totalScore,
+            details: {
+                dataScore,
+                successScore,
+                timeScore,
+                volumeScore,
+                totalDataCount,
+                retryCount,
+                timeInSeconds: timeInSeconds.toFixed(1),
+                avgVolume: (avgVolume * 100).toFixed(1)
+            }
+        };
+    } else if (totalScore >= 50) {
+        return {
+            level: 'acceptable',
+            badge: '🥉',
+            message: '測定完了',
+            score: totalScore,
+            details: {
+                dataScore,
+                successScore,
+                timeScore,
+                volumeScore,
+                totalDataCount,
+                retryCount,
+                timeInSeconds: timeInSeconds.toFixed(1),
+                avgVolume: (avgVolume * 100).toFixed(1)
+            }
+        };
+    } else {
+        return {
+            level: 'partial',
+            badge: '📊',
+            message: '部分的な測定結果',
+            score: totalScore,
+            details: {
+                dataScore,
+                successScore,
+                timeScore,
+                volumeScore,
+                totalDataCount,
+                retryCount,
+                timeInSeconds: timeInSeconds.toFixed(1),
+                avgVolume: (avgVolume * 100).toFixed(1)
+            }
+        };
+    }
 }
 
 // 音域テスト結果表示
@@ -738,10 +1040,22 @@ function displayVoiceRangeResults(results) {
     document.getElementById('result-low-freq').textContent = `${results.lowFreq.toFixed(1)} Hz (${results.lowNote})`;
     document.getElementById('result-high-freq').textContent = `${results.highFreq.toFixed(1)} Hz (${results.highNote})`;
 
+    // 測定品質評価を実行
+    const quality = assessMeasurementQuality(globalState.measurementData);
+    console.log('📊 測定品質評価:', quality);
+
     // 詳細統計があれば表示
     const detailsEl = document.getElementById('result-details');
     if (detailsEl) {
         detailsEl.innerHTML = `
+            <div class="result-info-row">
+                <span>${quality.badge} 測定品質</span>
+                <span class="result-info-value">${quality.message} (${quality.score}点)</span>
+            </div>
+            <div class="result-info-row">
+                <span>🎵 快適音域 (80%)</span>
+                <span class="result-info-value">${results.comfortableRange ? results.comfortableRange.range : '計算中...'}</span>
+            </div>
             <div class="result-info-row">
                 <span>測定時間</span>
                 <span class="result-info-value">${(results.totalMeasurementTime / 1000).toFixed(1)}秒</span>
@@ -762,10 +1076,18 @@ function displayVoiceRangeResults(results) {
                 <span>平均音量 (高音)</span>
                 <span class="result-info-value">${results.avgHighVolume}%</span>
             </div>
+            <div class="result-info-row">
+                <span>🔍 詳細スコア</span>
+                <span class="result-info-value">データ:${quality.details.dataScore} 成功:${quality.details.successScore} 時間:${quality.details.timeScore} 音量:${quality.details.volumeScore}</span>
+            </div>
         `;
     }
 
     console.log('📊 音域テスト結果:', results);
+    console.log('🏆 測定品質詳細:', quality.details);
+    if (results.comfortableRange) {
+        console.log('🎵 快適音域詳細:', results.comfortableRange);
+    }
 }
 
 /**
@@ -1026,12 +1348,15 @@ function startHighPitchPhase() {
     console.log('🔼 高音測定フェーズ開始');
     globalState.currentPhase = 'waiting-for-voice-high';
 
+    // 🎵 音声安定性データをリセット（高音測定用に初期化）
+    resetVoiceStability();
+
     // 円形プログレスバーを瞬時にリセット（アニメーション無効）
     updateCircularProgressInstantly(0);
     
     // UI更新
     document.getElementById('main-status-text').textContent = '高音域測定: 声を出してください';
-    document.getElementById('sub-info-text').textContent = '声を認識したら自動で測定開始します';
+    document.getElementById('sub-info-text').textContent = '安定した声を認識したら自動で測定開始します（雑音排除機能付き）';
     updateBadgeForWaiting('arrow-up');
 }
 
