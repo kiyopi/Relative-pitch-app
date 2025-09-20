@@ -22,7 +22,7 @@
                 </div>
                 <div class="page-header-text">
                     <h1 class="page-title">VoiceRangeTestController デモ</h1>
-                    <p class="page-subtitle text-purple-200">PitchPro v1.2.2統合版 - ワンメソッド呼び出しで完全な音域テスト</p>
+                    <p class="page-subtitle text-purple-200">PitchPro v1.3.0統合版 - ワンメソッド呼び出しで完全な音域テスト</p>
                 </div>
             </div>
         </header>
@@ -47,7 +47,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="text-section-title">音域テスト実行</h3>
-                            <p class="section-description">パッケージ化された統合音域テストシステム</p>
+                            <p class="section-description">PitchPro v1.3.0統合音域テストシステム</p>
                         </div>
                         <!-- マイクステータスアイコン -->
                         <div class="mic-status-container standby" id="mic-status-container">
@@ -180,16 +180,80 @@
                 </div>
             </div>
 
+            <!-- 🧪 テスト用: リアルタイム音域データ表示 -->
+            <div class="glass-card mt-6 bg-gradient-to-br from-green-500/15 to-blue-500/15" id="debug-range-data" style="display: none;">
+                <h3 class="heading-md">
+                    <i data-lucide="activity" class="text-green-300"></i>
+                    <span>🧪 テスト表示: リアルタイム音域データ</span>
+                </h3>
+                <div style="padding: 10px 0;">
+                    <!-- システム状態確認 -->
+                    <div class="result-info-container">
+                        <div class="result-info-row">
+                            <span>🎛️ 音声検出状態</span>
+                            <span class="result-info-value" id="debug-detection-status">待機中</span>
+                        </div>
+                        <div class="result-info-row">
+                            <span>🎤 マイク状態</span>
+                            <span class="result-info-value" id="debug-mic-status">未許可</span>
+                        </div>
+                    </div>
+
+                    <!-- 現在の検出情報 -->
+                    <div class="result-info-container mt-3">
+                        <div class="result-info-row">
+                            <span>🎵 現在の音程</span>
+                            <span class="result-info-value" id="debug-current-note">-</span>
+                        </div>
+                        <div class="result-info-row">
+                            <span>📊 現在の周波数</span>
+                            <span class="result-info-value" id="debug-current-freq">- Hz</span>
+                        </div>
+                        <div class="result-info-row">
+                            <span>🔊 現在の音量</span>
+                            <span class="result-info-value" id="debug-current-volume">- %</span>
+                        </div>
+                    </div>
+
+                    <!-- 測定中の範囲情報 -->
+                    <div class="mt-4">
+                        <h4 class="heading-sm">
+                            <i data-lucide="target" class="text-blue-300"></i>
+                            <span>測定範囲 (リアルタイム)</span>
+                        </h4>
+                        <div class="result-info-container">
+                            <div class="result-info-row">
+                                <span>🔽 検出最低音</span>
+                                <span class="result-info-value" id="debug-min-note">-</span>
+                            </div>
+                            <div class="result-info-row">
+                                <span>🔼 検出最高音</span>
+                                <span class="result-info-value" id="debug-max-note">-</span>
+                            </div>
+                            <div class="result-info-row">
+                                <span>📏 暫定音域</span>
+                                <span class="result-info-value" id="debug-temp-range">-</span>
+                            </div>
+                            <div class="result-info-row">
+                                <span>📈 検出回数</span>
+                                <span class="result-info-value" id="debug-detection-count">0回</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- PitchProバージョン情報 -->
             <div class="glass-card mt-6 bg-gradient-to-br from-blue-500/15 to-purple-500/15">
                 <h3 class="heading-md">
                     <i data-lucide="info" class="text-purple-300"></i>
-                    <span>PitchPro v1.2.2 統合情報</span>
+                    <span>PitchPro v1.3.0 統合情報</span>
                 </h3>
                 <div style="padding: 10px 0;">
-                    <p class="text-sm text-white-70">🎵 音声処理エンジン: <strong>PitchPro v1.2.2</strong></p>
+                    <p class="text-sm text-white-70">🎵 音声処理エンジン: <strong>PitchPro v1.3.0</strong></p>
                     <p class="text-sm text-white-70">📦 AudioDetectionComponent: <strong id="adc-status">確認中...</strong></p>
                     <p class="text-sm text-white-70">🔧 デバイス最適化: <strong id="device-opt">自動検出</strong></p>
+                    <p class="text-sm text-white-70">🧪 テスト表示: <button class="btn btn-secondary btn-sm" id="toggle-debug-display">デバッグ表示ON</button></p>
                 </div>
             </div>
         </main>
@@ -198,11 +262,11 @@
     <!-- Scripts -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
-    <!-- 🎵 PitchPro v1.2.2 音声処理エンジン -->
-    <script src="js/pitchpro-v1.2.2.umd.js"></script>
+    <!-- 🎵 PitchPro v1.3.0 音声処理エンジン -->
+    <script src="js/pitchpro-v1.3.0.umd.js"></script>
     <script>
-        // PitchPro v1.2.2 読み込み確認
-        console.log('%c📌 PitchPro v1.2.2 Loading...', 'color: #8b5cf6; font-weight: bold; font-size: 14px;');
+        // PitchPro v1.3.0 読み込み確認
+        console.log('%c📌 PitchPro v1.3.0 Loading...', 'color: #8b5cf6; font-weight: bold; font-size: 14px;');
     </script>
 
     <!-- 音域テストデモメインスクリプト（PitchPro v1.2.2統合版） -->
