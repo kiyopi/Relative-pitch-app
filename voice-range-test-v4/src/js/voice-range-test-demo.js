@@ -58,12 +58,20 @@ function displayResults(results) {
                     <span class="result-info-value">${globalState.debugData.tempRange || '-'}</span>
                 </div>
                 <div class="result-info-row">
-                    <span>🧪 最低検出</span>
-                    <span class="result-info-value">${globalState.debugData.minNote ? `${globalState.debugData.minFreq.toFixed(1)} Hz (${globalState.debugData.minNote})` : '-'}</span>
+                    <span>🧪 最低検出音程</span>
+                    <span class="result-info-value">${globalState.debugData.minNote || '-'}</span>
                 </div>
                 <div class="result-info-row">
-                    <span>🧪 最高検出</span>
-                    <span class="result-info-value">${globalState.debugData.maxNote ? `${globalState.debugData.maxFreq.toFixed(1)} Hz (${globalState.debugData.maxNote})` : '-'}</span>
+                    <span>🧪 最低検出周波数</span>
+                    <span class="result-info-value">${globalState.debugData.minFreq ? `${globalState.debugData.minFreq.toFixed(1)} Hz` : '-'}</span>
+                </div>
+                <div class="result-info-row">
+                    <span>🧪 最高検出音程</span>
+                    <span class="result-info-value">${globalState.debugData.maxNote || '-'}</span>
+                </div>
+                <div class="result-info-row">
+                    <span>🧪 最高検出周波数</span>
+                    <span class="result-info-value">${globalState.debugData.maxFreq ? `${globalState.debugData.maxFreq.toFixed(1)} Hz` : '-'}</span>
                 </div>
             `;
         }
@@ -132,7 +140,9 @@ function updateDebugDisplay() {
         'debug-current-freq': globalState.debugData.currentFreq ? `${globalState.debugData.currentFreq.toFixed(1)} Hz` : '- Hz',
         'debug-current-volume': globalState.debugData.currentVolume ? `${globalState.debugData.currentVolume.toFixed(1)}%` : '- %',
         'debug-min-note': globalState.debugData.minNote || '-',
+        'debug-min-freq': globalState.debugData.minFreq ? `${globalState.debugData.minFreq.toFixed(1)} Hz` : '- Hz',
         'debug-max-note': globalState.debugData.maxNote || '-',
+        'debug-max-freq': globalState.debugData.maxFreq ? `${globalState.debugData.maxFreq.toFixed(1)} Hz` : '- Hz',
         'debug-temp-range': globalState.debugData.tempRange || '-',
         'debug-detection-count': `${globalState.debugData.detectionCount}回`
     };
@@ -830,22 +840,185 @@ function completeLowPitchMeasurement() {
     console.log('✅ 低音域測定完了');
     globalState.currentPhase = 'idle-low';
 
-    // runMeasurementPhaseで既に100%設定済みなので、直接チェックマーク表示
-    setTimeout(() => {
-        updateBadgeForConfirmed();
-    }, 100); // 100ms待機
-    
-    // 低音域データ記録（仮想データ）
+    // 測定結果の検証
     const lowData = globalState.measurementData.lowPhase;
-    lowData.lowestFreq = 150 + Math.random() * 50; // 150-200Hz
-    lowData.lowestNote = 'F3-G3';
-    lowData.avgVolume = 0.8 + Math.random() * 0.15; // 80-95%
-    lowData.measurementTime = globalState.measurementDuration;
-    
-    // アイドルタイム開始
-    globalState.idleTimer = setTimeout(() => {
-        startHighPitchPhase();
-    }, globalState.idleDuration);
+    const hasValidData = lowData.frequencies.length > 0 && lowData.lowestFreq;
+
+    if (hasValidData) {
+        console.log('✅ 低音域測定成功:', {
+            dataCount: lowData.frequencies.length,
+            lowestFreq: lowData.lowestFreq,
+            lowestNote: lowData.lowestNote
+        });
+
+        // 成功時: チェックマーク表示
+        setTimeout(() => {
+            updateBadgeForConfirmed();
+        }, 100);
+
+        // 🧪 デバッグ状態更新
+        updateDebugStatus('低音測定完了', '録音中');
+
+        // アイドルタイム開始
+        globalState.idleTimer = setTimeout(() => {
+            startHighPitchPhase();
+        }, globalState.idleDuration);
+
+    } else {
+        console.warn('⚠️ 低音域測定失敗 - データが記録されませんでした');
+
+        // 失敗時の処理
+        handleLowPitchMeasurementFailure();
+    }
+}
+
+// 低音測定失敗時の処理
+function handleLowPitchMeasurementFailure() {
+    console.log('🔄 低音測定失敗 - 対処開始');
+
+    // リトライ回数チェック
+    if (globalState.retryCount < globalState.maxRetries) {
+        globalState.retryCount++;
+
+        // 🧪 デバッグ状態更新
+        updateDebugStatus(`低音測定失敗 (${globalState.retryCount}/${globalState.maxRetries})`, '録音中');
+
+        // 失敗表示
+        updateBadgeForFailure();
+        document.getElementById('main-status-text').textContent = `低音測定失敗 - 再測定します (${globalState.retryCount}/${globalState.maxRetries})`;
+        document.getElementById('sub-info-text').textContent = 'より大きな声で低い音を出してください';
+
+        // 再測定ボタンを表示
+        document.getElementById('retry-measurement-btn').style.display = 'inline-flex';
+
+        showNotification('低音の検出に失敗しました。再測定してください。', 'warning');
+
+        // 2秒後に自動再測定開始
+        setTimeout(() => {
+            retryLowPitchMeasurement();
+        }, 2000);
+
+    } else {
+        // 最大リトライ回数に達した場合
+        console.error('❌ 低音測定: 最大リトライ回数に達しました');
+
+        // 🧪 デバッグ状態更新
+        updateDebugStatus('低音測定諦め', '録音中');
+
+        updateBadgeForError();
+        document.getElementById('main-status-text').textContent = '低音測定をスキップします';
+        document.getElementById('sub-info-text').textContent = '高音測定に進みます';
+
+        showNotification('低音測定をスキップして高音測定に進みます', 'info');
+
+        // 高音測定に強制進行
+        setTimeout(() => {
+            startHighPitchPhase();
+        }, 3000);
+    }
+}
+
+// 低音測定の再試行
+function retryLowPitchMeasurement() {
+    console.log(`🔄 低音測定再試行 (${globalState.retryCount}回目)`);
+
+    // 再測定ボタンを非表示
+    document.getElementById('retry-measurement-btn').style.display = 'none';
+
+    // 待機状態に戻す
+    globalState.currentPhase = 'waiting-for-voice';
+    document.getElementById('main-status-text').textContent = '低音域測定: 声を出してください（再測定）';
+    document.getElementById('sub-info-text').textContent = 'より大きく、より低い音で歌ってください';
+
+    // バッジを待機状態に戻す
+    updateBadgeForWaiting('arrow-down');
+}
+
+// バッジの失敗表示
+function updateBadgeForFailure() {
+    const rangeIcon = document.getElementById('range-icon');
+    if (rangeIcon) {
+        rangeIcon.innerHTML = '<i data-lucide="x" style="width: 80px; height: 80px; color: #ef4444;"></i>';
+        rangeIcon.classList.remove('measuring');
+    }
+    lucide.createIcons();
+}
+
+// バッジのエラー表示
+function updateBadgeForError() {
+    const rangeIcon = document.getElementById('range-icon');
+    if (rangeIcon) {
+        rangeIcon.innerHTML = '<i data-lucide="alert-triangle" style="width: 80px; height: 80px; color: #f59e0b;"></i>';
+        rangeIcon.classList.remove('measuring');
+    }
+    lucide.createIcons();
+}
+
+// 高音測定失敗時の処理
+function handleHighPitchMeasurementFailure() {
+    console.log('🔄 高音測定失敗 - 対処開始');
+
+    // 高音測定は最後なので、低音データがあるかチェック
+    const lowData = globalState.measurementData.lowPhase;
+    const hasLowData = lowData.frequencies.length > 0 && lowData.lowestFreq;
+
+    if (hasLowData) {
+        // 低音データがある場合: 部分的な結果として表示
+        console.log('📊 低音データのみで部分結果を表示');
+
+        // 🧪 デバッグ状態更新
+        updateDebugStatus('高音測定失敗・部分結果表示', '録音停止');
+
+        updateBadgeForError();
+        document.getElementById('main-status-text').textContent = '高音測定失敗 - 低音域のみの結果を表示';
+        document.getElementById('sub-info-text').textContent = '低音域の測定結果のみ利用可能です';
+
+        showNotification('高音測定に失敗しましたが、低音域の結果を表示します', 'warning');
+
+        // 部分的な結果を表示
+        setTimeout(() => {
+            const results = calculatePartialVoiceRange();
+            displayResults(results);
+        }, 2000);
+
+    } else {
+        // 両方とも失敗した場合
+        console.error('❌ 低音・高音両方の測定に失敗');
+
+        // 🧪 デバッグ状態更新
+        updateDebugStatus('測定完全失敗', '録音停止');
+
+        updateBadgeForError();
+        document.getElementById('main-status-text').textContent = '音域測定に失敗しました';
+        document.getElementById('sub-info-text').textContent = '再測定ボタンを押してやり直してください';
+
+        // 再測定ボタンを表示
+        document.getElementById('retry-measurement-btn').style.display = 'inline-flex';
+
+        showNotification('音域測定に失敗しました。環境を確認して再測定してください。', 'error');
+    }
+}
+
+// 部分的な音域計算（低音データのみ）
+function calculatePartialVoiceRange() {
+    const lowData = globalState.measurementData.lowPhase;
+
+    // 低音データのみの場合
+    return {
+        range: `${lowData.lowestNote} ～ (高音測定失敗)`,
+        octaves: '測定不完全',
+        lowPitch: {
+            frequency: lowData.lowestFreq,
+            note: lowData.lowestNote
+        },
+        highPitch: null,
+        totalMeasurementTime: Date.now() - globalState.measurementData.startTime,
+        lowPhaseDataCount: lowData.frequencies.length,
+        highPhaseDataCount: 0,
+        avgLowVolume: (lowData.avgVolume * 100).toFixed(1),
+        avgHighVolume: '測定失敗',
+        measurementQuality: '部分的'
+    };
 }
 
 // 高音測定フェーズ開始
@@ -879,17 +1052,32 @@ function completeHighPitchMeasurement() {
     globalState.currentPhase = 'completed';
     globalState.measurementData.endTime = Date.now();
 
-    // runMeasurementPhaseで既に100%設定済みなので、直接チェックマーク表示
-    setTimeout(() => {
-        updateBadgeForConfirmed();
-    }, 100); // 100ms待機
-    
-    // 高音域データ記録（仮想データ）
+    // 測定結果の検証
     const highData = globalState.measurementData.highPhase;
-    highData.highestFreq = 350 + Math.random() * 150; // 350-500Hz
-    highData.highestNote = 'F4-C5';
-    highData.avgVolume = 0.75 + Math.random() * 0.20; // 75-95%
-    highData.measurementTime = globalState.measurementDuration;
+    const hasValidData = highData.frequencies.length > 0 && highData.highestFreq;
+
+    if (hasValidData) {
+        console.log('✅ 高音域測定成功:', {
+            dataCount: highData.frequencies.length,
+            highestFreq: highData.highestFreq,
+            highestNote: highData.highestNote
+        });
+
+        // 成功時: チェックマーク表示
+        setTimeout(() => {
+            updateBadgeForConfirmed();
+        }, 100);
+
+        // 🧪 デバッグ状態更新
+        updateDebugStatus('高音測定完了', '録音中');
+
+    } else {
+        console.warn('⚠️ 高音域測定失敗 - データが記録されませんでした');
+
+        // 失敗時の処理（高音測定は最後なので、結果表示に進む）
+        handleHighPitchMeasurementFailure();
+        return; // 早期リターンで以下の処理をスキップ
+    }
     
     // AudioDetector効率的停止
     if (globalAudioDetector) {
