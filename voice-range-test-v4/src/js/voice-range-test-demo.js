@@ -75,7 +75,6 @@ function displayResults(results) {
     }
 
     document.getElementById('results-section').classList.remove('hidden');
-    document.getElementById('stop-range-test-btn').classList.add('btn-hidden');
 
     console.log('📋 測定結果表示完了 (デバッグ情報含む)');
 }
@@ -208,24 +207,45 @@ function updateDebugStatus(detectionStatus = null, micStatus = null) {
 // マイクステータス管理関数
 function updateMicStatus(status) {
     const micContainer = document.getElementById('mic-status-container');
+    const micIcon = document.getElementById('mic-status-icon');
     const micButton = document.getElementById('request-mic-permission');
 
     if (micContainer) {
         // 既存のクラスをクリア
-        micContainer.classList.remove('standby', 'recording');
+        micContainer.classList.remove('standby', 'recording', 'muted');
 
         // 新しいステータスを適用
         switch (status) {
             case 'standby':
                 micContainer.classList.add('standby');
+                if (micIcon) {
+                    micIcon.setAttribute('data-lucide', 'mic');
+                    lucide.createIcons(); // Lucideアイコンを再描画
+                }
                 console.log('🎤 マイクステータス: 待機中');
                 break;
             case 'recording':
                 micContainer.classList.add('recording');
+                if (micIcon) {
+                    micIcon.setAttribute('data-lucide', 'mic');
+                    lucide.createIcons(); // Lucideアイコンを再描画
+                }
                 console.log('🎤 マイクステータス: 録音中（赤エフェクト）');
+                break;
+            case 'muted':
+                micContainer.classList.add('muted');
+                if (micIcon) {
+                    micIcon.setAttribute('data-lucide', 'mic-off');
+                    lucide.createIcons(); // Lucideアイコンを再描画
+                }
+                console.log('🎤 マイクステータス: ミュート中');
                 break;
             default:
                 micContainer.classList.add('standby');
+                if (micIcon) {
+                    micIcon.setAttribute('data-lucide', 'mic');
+                    lucide.createIcons(); // Lucideアイコンを再描画
+                }
                 console.log('🎤 マイクステータス: デフォルト（待機中）');
         }
     }
@@ -477,8 +497,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Lucideアイコン初期化
     lucide.createIcons();
 
-    let controller = null;
-
     // 🎤 マイク許可ボタン
     document.getElementById('request-mic-permission').addEventListener('click', async () => {
         await requestMicrophonePermission();
@@ -491,22 +509,12 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // 🔄 再測定ボタン
     document.getElementById('retry-measurement-btn').addEventListener('click', async () => {
+        console.log('🔄 再測定ボタンがクリックされました');
+        console.log('📋 現在のフェーズ:', globalState.currentPhase);
+        console.log('📊 現在のリトライ回数:', globalState.retryCount, '/', globalState.maxRetries);
         await retryCurrentMeasurement();
     });
 
-    // 停止ボタン
-    document.getElementById('stop-range-test-btn').addEventListener('click', () => {
-        if (controller) {
-            controller.stopTest();
-            showNotification('テスト停止', 'info');
-            document.getElementById('stop-range-test-btn').classList.add('btn-hidden');
-        }
-    });
-
-    // 🚨 検出停止ボタン (音声検出のみ停止、プログレス継続)
-    document.getElementById('stop-detection-btn').addEventListener('click', () => {
-        stopVoiceDetectionOnly();
-    });
 
     // 🧪 デバッグ表示切り替えボタン
     document.getElementById('toggle-debug-display').addEventListener('click', () => {
@@ -570,21 +578,6 @@ async function startBasicTest() {
         document.getElementById('main-status-text').textContent = 'マイク入力を検出中...';
         document.getElementById('sub-info-text').textContent = '声を出してテストしてください';
 
-        // 停止ボタン表示
-        document.getElementById('stop-range-test-btn').classList.remove('btn-hidden');
-        document.getElementById('stop-range-test-btn').classList.add('btn-visible-inline');
-        document.getElementById('stop-range-test-btn').onclick = () => {
-            // 効率的停止
-            if (globalAudioDetector.stop) {
-                globalAudioDetector.stop();
-                console.log('🎯 PitchPro stop()メソッド使用（基本テスト停止）');
-            } else {
-                globalAudioDetector.stopDetection();
-                console.log('🔄 stopDetection()フォールバック使用（基本テスト停止）');
-            }
-            showNotification('基本テスト停止', 'info');
-            document.getElementById('stop-range-test-btn').classList.add('btn-hidden');
-        };
 
     } catch (error) {
         console.error('❌ 基本テストエラー:', error);
@@ -649,10 +642,6 @@ async function startVoiceRangeTest() {
 
         // 既存のボタン状態を更新
         document.getElementById('begin-range-test-btn').classList.add('btn-hidden');
-        document.getElementById('stop-range-test-btn').classList.remove('btn-hidden');
-        document.getElementById('stop-range-test-btn').classList.add('btn-visible-inline');
-        document.getElementById('stop-detection-btn').classList.remove('btn-hidden');
-        document.getElementById('stop-detection-btn').classList.add('btn-visible-inline');
 
         // マイクステータスを録音中に変更
         updateMicStatus('recording');
@@ -716,8 +705,6 @@ async function startVoiceRangeTest() {
         // エラー時は元の状態に戻す
         document.getElementById('begin-range-test-btn').classList.remove('btn-hidden');
         document.getElementById('begin-range-test-btn').classList.add('btn-visible-inline');
-        document.getElementById('stop-range-test-btn').classList.add('btn-hidden');
-        document.getElementById('stop-detection-btn').classList.add('btn-hidden');
         updateMicStatus('standby');
     }
 }
@@ -1483,9 +1470,7 @@ function handleHighPitchMeasurementFailure() {
             }
 
             // UI要素リセット
-            document.getElementById('stop-range-test-btn').classList.add('btn-hidden');
-            document.getElementById('stop-detection-btn').classList.add('btn-hidden');
-            document.getElementById('begin-range-test-btn').classList.remove('btn-hidden');
+                document.getElementById('begin-range-test-btn').classList.remove('btn-hidden');
             document.getElementById('begin-range-test-btn').classList.add('btn-visible-inline');
 
             // マイクステータス表示の更新（PitchProが実際の処理を担当）
@@ -1521,9 +1506,7 @@ function handleHighPitchMeasurementFailure() {
             document.getElementById('sub-info-text').textContent = '再測定ボタンを押してやり直してください';
 
             // UI要素リセット
-            document.getElementById('stop-range-test-btn').classList.add('btn-hidden');
-            document.getElementById('stop-detection-btn').classList.add('btn-hidden');
-            document.getElementById('begin-range-test-btn').classList.remove('btn-hidden');
+                document.getElementById('begin-range-test-btn').classList.remove('btn-hidden');
             document.getElementById('begin-range-test-btn').classList.add('btn-visible-inline');
 
             // マイクステータス表示の更新（PitchProが実際の処理を担当）
@@ -1653,10 +1636,6 @@ function completeHighPitchMeasurement() {
     }
 
     // UI要素の表示切り替え（テスト完了時）
-    document.getElementById('stop-range-test-btn').classList.remove('btn-visible-inline');
-    document.getElementById('stop-range-test-btn').classList.add('btn-hidden');
-    document.getElementById('stop-detection-btn').classList.remove('btn-visible-inline');
-    document.getElementById('stop-detection-btn').classList.add('btn-hidden');
     document.getElementById('begin-range-test-btn').classList.remove('btn-visible-inline');
     document.getElementById('begin-range-test-btn').classList.add('btn-hidden');
 
@@ -1681,7 +1660,12 @@ function completeHighPitchMeasurement() {
 
 // 再測定
 async function retryCurrentMeasurement() {
+    console.log('🔄 retryCurrentMeasurement() 開始');
+    console.log('📋 現在のフェーズ:', globalState.currentPhase);
+    console.log('📊 リトライ回数チェック:', globalState.retryCount, '>=', globalState.maxRetries);
+
     if (globalState.retryCount >= globalState.maxRetries) {
+        console.log('❌ 最大再試行回数に達しました');
         showNotification('最大再試行回数に達しました', 'error');
         return;
     }
@@ -1693,15 +1677,66 @@ async function retryCurrentMeasurement() {
     clearTimeout(globalState.idleTimer);
 
     if (globalState.currentPhase.includes('low')) {
+        console.log('📉 低音再測定モード');
         globalState.currentPhase = 'waiting-for-voice';
         document.getElementById('main-status-text').textContent = '３秒間できるだけ低い声で「あー」と発声しましょう（再測定）';
+        document.getElementById('sub-info-text').textContent = 'より大きく、より低い音で歌ってください';
         updateBadgeForWaiting('arrow-down');
+
+        // 音声検出が停止している場合は再開
+        console.log('🎤 低音再測定 - 音声検出確認');
+        updateMicStatus('recording');
+        if (globalAudioDetector && !globalAudioDetector.isDetecting) {
+            await globalAudioDetector.startDetection();
+        }
     } else if (globalState.currentPhase.includes('high')) {
+        console.log('📈 高音再測定モード');
         globalState.currentPhase = 'waiting-for-voice-high';
         document.getElementById('main-status-text').textContent = '３秒間できるだけ高い声で「あー」と発声しましょう（再測定）';
+        document.getElementById('sub-info-text').textContent = 'より大きく、より高い音で歌ってください';
         updateBadgeForWaiting('arrow-up');
+
+        // 音声検出が停止している場合は再開
+        console.log('🎤 高音再測定 - 音声検出確認');
+        updateMicStatus('recording');
+        if (globalAudioDetector && !globalAudioDetector.isDetecting) {
+            await globalAudioDetector.startDetection();
+        }
+    } else if (globalState.currentPhase === 'completed') {
+        console.log('🔄 完了状態からの再測定 - 最初から開始');
+        // 測定結果をリセット
+        globalState.minDetectedFreq = null;
+        globalState.maxDetectedFreq = null;
+        globalState.retryCount = 0; // 完了状態からは回数リセット
+        globalState.highRetryCount = 0;
+
+        // 低音測定から再開
+        globalState.currentPhase = 'waiting-for-voice';
+        document.getElementById('main-status-text').textContent = '３秒間できるだけ低い声で「あー」と発声しましょう';
+        document.getElementById('sub-info-text').textContent = '安定した声を認識したら自動で測定開始します';
+        updateBadgeForWaiting('arrow-down');
+
+        // 結果表示を非表示
+        document.getElementById('results-section').classList.add('hidden');
+
+        // ボタン状態を調整
+        document.getElementById('retry-measurement-btn').classList.add('btn-hidden');
+
+        // 音声検出を再開
+        console.log('🎤 音声検出を再開します');
+        updateMicStatus('recording');
+        if (globalAudioDetector) {
+            await globalAudioDetector.startDetection();
+        }
+    } else {
+        console.log('⚠️ 不明なフェーズ:', globalState.currentPhase);
     }
 
+    // 再測定ボタンを非表示
+    document.getElementById('retry-measurement-btn').classList.remove('btn-visible-inline');
+    document.getElementById('retry-measurement-btn').classList.add('btn-hidden');
+
+    console.log('✅ 再測定処理完了');
     showNotification(`再測定を開始します (${globalState.retryCount}回目)`, 'info');
 }
 
@@ -1750,42 +1785,11 @@ function stopAllMeasurements() {
     document.getElementById('sub-info-text').textContent = '待機中...';
     updateBadgeForWaiting('arrow-down');
 
-    document.getElementById('stop-range-test-btn').style.display = 'none';
-    document.getElementById('stop-detection-btn').style.display = 'none';
     document.getElementById('retry-measurement-btn').classList.add('btn-hidden');
     document.getElementById('begin-range-test-btn').classList.remove('btn-hidden');
     document.getElementById('begin-range-test-btn').classList.add('btn-visible-inline');
 
     showNotification('測定を停止しました', 'info');
-}
-
-// 音声検出のみ停止（プログレス継続）
-function stopVoiceDetectionOnly() {
-    console.log('🚨 音声検出のみ停止（プログレス継続）');
-    
-    // AudioDetector効率的停止（破棄せず再利用のため停止のみ）
-    if (globalAudioDetector) {
-        // PitchPro v1.3.0修正版: stopDetection()メソッド復活
-        globalAudioDetector.stopDetection();
-        console.log('🎯 PitchPro v1.3.0修正版: stopDetection()で音声検出停止');
-        
-        // インスタンスは破棄せず再利用のため保持
-        window.currentAudioDetector = globalAudioDetector;
-    }
-
-    // PitchProのstopDetection()が音量バーも自動リセットするため、手動リセット不要
-    console.log('✅ PitchProが音量バー・周波数表示も自動リセット');
-    
-    // ボタン表示を調整
-    document.getElementById('stop-detection-btn').style.display = 'none';
-    document.getElementById('stop-range-test-btn').classList.remove('btn-hidden');
-    document.getElementById('stop-range-test-btn').classList.add('btn-visible-inline');
-    
-    // ステータス更新
-    document.getElementById('main-status-text').textContent = '音声検出停止中（プログレス継続）';
-    document.getElementById('sub-info-text').textContent = '測定中...';
-    
-    showNotification('音声検出を停止しました（プログレス継続中）', 'info');
 }
 
 // 音量表示リセット

@@ -44,18 +44,17 @@
             <!-- 音域テスト実行エリア -->
             <div class="glass-card">
                 <div class="section-header">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-section-title">音域テスト実行</h3>
-                            <p class="section-description">PitchPro v1.3.0統合音域テストシステム</p>
-                        </div>
+                    <div>
+                        <h3 class="text-section-title">音域テスト</h3>
                         <!-- マイクステータスアイコン -->
-                        <div class="mic-status-container standby" id="mic-status-container">
-                            <i data-lucide="mic" id="mic-status-icon"></i>
+                        <div class="text-center">
+                            <div class="mic-status-container standby" id="mic-status-container" style="margin: 12px auto 0 auto;">
+                                <i data-lucide="mic" id="mic-status-icon" style="width: 40px; height: 40px;"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- メインステータス -->
                 <div class="text-center mb-6">
                     <h4 class="voice-range-main-text" id="main-status-text">マイク許可後、音域テストを開始してください</h4>
@@ -75,7 +74,6 @@
                                 <div id="range-icon" class="icon-4xl text-white" style="display: block;">
                                     <img src="./icons/arrow-down.png" alt="下向き矢印" style="width: 80px; height: 80px; display: block;">
                                 </div>
-                                <p class="countdown-text" id="countdown-display" style="display: none;">3</p>
                             </div>
                         </div>
                     </div>
@@ -109,24 +107,14 @@
                     </div>
                 </div>
                 
-                <!-- コントロールボタン -->
+                <!-- コントロールボタン（実用機能のみ） -->
                 <div class="text-center mt-6">
                     <button class="btn btn-primary voice-range-btn" id="begin-range-test-btn" disabled>
                         <i data-lucide="play" class="icon-sm"></i>
                         <span>音域テスト開始</span>
                     </button>
 
-                    <button class="btn btn-outline ml-3 voice-range-btn btn-hidden" id="stop-range-test-btn">
-                        <i data-lucide="square" class="icon-sm"></i>
-                        <span>テスト停止</span>
-                    </button>
-
-                    <button class="btn btn-danger ml-3 system-control-btn btn-hidden" id="stop-detection-btn">
-                        <i data-lucide="mic-off" class="icon-sm"></i>
-                        <span>検出停止</span>
-                    </button>
-
-                    <button class="btn btn-secondary ml-3 voice-range-btn btn-hidden" id="retry-measurement-btn">
+                    <button class="btn btn-outline ml-3 voice-range-btn btn-hidden" id="retry-measurement-btn">
                         <i data-lucide="refresh-cw" class="icon-sm"></i>
                         <span>再測定</span>
                     </button>
@@ -261,7 +249,7 @@
                     <p class="text-sm text-white-70">🎵 音声処理エンジン: <strong>PitchPro v1.3.0</strong></p>
                     <p class="text-sm text-white-70">📦 AudioDetectionComponent: <strong id="adc-status">確認中...</strong></p>
                     <p class="text-sm text-white-70">🔧 デバイス最適化: <strong id="device-opt">自動検出</strong></p>
-                    <p class="text-sm text-white-70">🧪 テスト表示: <button class="btn btn-secondary btn-sm debug-btn" id="toggle-debug-display">デバッグ表示ON</button></p>
+                    <p class="text-sm text-white-70">🧪 テスト表示: <button class="btn btn-outline btn-sm debug-btn" id="toggle-debug-display">デバッグ表示ON</button></p>
                 </div>
             </div>
         </main>
