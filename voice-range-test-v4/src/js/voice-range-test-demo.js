@@ -1195,6 +1195,7 @@ function startLowPitchMeasurement() {
     globalState.currentPhase = 'measuring-low';
 
     document.getElementById('main-status-text').textContent = 'そのまま声をキープしましょう';
+    document.getElementById('sub-info-text').textContent = '低音測定中...';
 
     // 古いタイマーを削除し、新しい統合関数を呼び出す
     runMeasurementPhase(globalState.measurementDuration, completeLowPitchMeasurement);
@@ -1232,6 +1233,10 @@ function completeLowPitchMeasurement() {
 
         // 🧪 デバッグ状態更新
         updateDebugStatus('低音測定完了', '録音中');
+
+        // 低音測定完了時の待機表示
+        document.getElementById('main-status-text').textContent = '低音測定完了！高音測定に進みます...';
+        document.getElementById('sub-info-text').textContent = '待機中...';
 
         // アイドルタイム開始
         globalState.idleTimer = setTimeout(() => {
@@ -1342,9 +1347,23 @@ function retryHighPitchMeasurement() {
 // バッジの失敗表示
 function updateBadgeForFailure() {
     const rangeIcon = document.getElementById('range-icon');
-    if (rangeIcon) {
-        rangeIcon.innerHTML = '<i data-lucide="x" style="width: 80px; height: 80px; color: #ef4444;"></i>';
+    const badge = document.querySelector('.voice-note-badge');
+
+    if (rangeIcon && badge) {
+        // 白い❌アイコンを表示
+        rangeIcon.innerHTML = '<i data-lucide="x" style="width: 80px; height: 80px; color: white;"></i>';
         rangeIcon.classList.remove('measuring');
+        rangeIcon.style.display = 'block';
+
+        // バッジに失敗スタイルを適用（赤背景）
+        badge.classList.add('failure');
+        badge.classList.remove('measuring', 'confirmed', 'failure');
+
+        // カウントダウン表示を非表示
+        const countdownDisplay = document.getElementById('countdown-display');
+        if (countdownDisplay) {
+            countdownDisplay.style.display = 'none';
+        }
     }
     lucide.createIcons();
 }
@@ -1524,6 +1543,7 @@ function startHighPitchMeasurement() {
     globalState.currentPhase = 'measuring-high';
 
     document.getElementById('main-status-text').textContent = 'そのまま声をキープしましょう';
+    document.getElementById('sub-info-text').textContent = '高音測定中...';
 
     // 古いタイマーを削除し、新しい統合関数を呼び出す
     runMeasurementPhase(globalState.measurementDuration, completeHighPitchMeasurement);
@@ -1593,6 +1613,10 @@ function completeHighPitchMeasurement() {
     document.getElementById('stop-range-test-btn').style.display = 'none';
     document.getElementById('stop-detection-btn').style.display = 'none';
     document.getElementById('begin-range-test-btn').style.display = 'inline-block';
+
+    // 上部テキスト表示のリセット
+    document.getElementById('main-status-text').textContent = '音域テスト完了！結果を確認してください';
+    document.getElementById('sub-info-text').textContent = '結果画面で詳細をご確認いただけます';
 
     // マイクステータス表示の更新（PitchProが実際の処理を担当）
     updateMicStatus('standby');
@@ -1873,7 +1897,7 @@ function updateBadgeForWaiting(iconType) {
         rangeIcon.innerHTML = `<img src="${iconSrc}" alt="${iconType}" class="range-icon-img">`;
         rangeIcon.style.display = 'block';
         countdownDisplay.style.display = 'none';
-        badge.classList.remove('measuring', 'confirmed');
+        badge.classList.remove('measuring', 'confirmed', 'failure');
     }
 }
 
