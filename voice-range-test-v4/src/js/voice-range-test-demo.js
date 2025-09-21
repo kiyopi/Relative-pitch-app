@@ -262,18 +262,20 @@ let globalState = {
     measurementAnimationId: null, // requestAnimationFrame ID for unified measurement
     idleTimer: null,
     retryCount: 0,
+    highRetryCount: 0, // 高音測定用の独立したリトライカウンター
     maxRetries: 3,
     voiceDetectionThreshold: 0.15, // 音量閾値
+
     measurementDuration: 3000, // 3秒
     idleDuration: 3000, // 3秒
 
-    // 🎵 音声安定性チェック用（雑音排除）
+    // 🎵 音声安定性チェック用（雑音排除）- 設定を緩和
     voiceStability: {
         recentDetections: [], // 最近の検出結果を保持
-        requiredStableCount: 3, // 安定判定に必要な連続検出回数
-        maxHistoryAge: 1000, // 履歴保持時間 (ms)
-        minFrequencyForVoice: 80, // 人間の声と判定する最低周波数 (Hz)
-        maxFrequencyForVoice: 2000 // 人間の声と判定する最高周波数 (Hz)
+        requiredStableCount: 2, // 安定判定に必要な連続検出回数（3→2に緩和）
+        maxHistoryAge: 800, // 履歴保持時間 (ms)（1000→800に短縮）
+        minFrequencyForVoice: 70, // 人間の声と判定する最低周波数 (Hz)（80→70に緩和）
+        maxFrequencyForVoice: 2500 // 人間の声と判定する最高周波数 (Hz)（2000→2500に緩和）
     },
 
     // 測定データ収集
@@ -293,7 +295,9 @@ let globalState = {
             measurementTime: 0
         },
         startTime: null,
-        endTime: null
+        endTime: null,
+        // 測定成功判定の最小要件
+        minRequiredDataPoints: 20 // 3秒間で最低20個のデータが必要（約6-7fps相当）
     },
 
     // 🧪 デバッグ表示用データ
@@ -311,7 +315,7 @@ let globalState = {
         detectionStatus: '待機中',
         micStatus: '未許可'
     }
-};;
+};;;
 /**
  * 音声の安定性をチェックして雑音を排除します
  * @param {Object} result - PitchProからの検出結果
@@ -369,14 +373,14 @@ function isStableVoiceDetection(result) {
         return false;
     }
     
-    // 周波数の安定性チェック
+    // 🔧 周波数の安定性チェック（緩和版）
     const frequencies = stability.recentDetections.map(d => d.frequency);
     const avgFreq = frequencies.reduce((sum, f) => sum + f, 0) / frequencies.length;
     const maxDeviation = Math.max(...frequencies.map(f => Math.abs(f - avgFreq)));
-    const allowedDeviation = avgFreq * 0.1; // 平均周波数の10%以内
+    const allowedDeviation = avgFreq * 0.2; // 平均周波数の20%以内（10%→20%に緩和）
     
     if (maxDeviation > allowedDeviation) {
-        console.log('📊 周波数が不安定:', {
+        console.log('📊 周波数が不安定（緩和版）:', {
             avgFreq: avgFreq.toFixed(1),
             maxDeviation: maxDeviation.toFixed(1),
             allowedDeviation: allowedDeviation.toFixed(1),
@@ -385,21 +389,21 @@ function isStableVoiceDetection(result) {
         return false;
     }
     
-    // 音量の安定性チェック
+    // 🔧 音量の安定性チェック（緩和版）
     const volumes = stability.recentDetections.map(d => d.volume);
     const avgVolume = volumes.reduce((sum, v) => sum + v, 0) / volumes.length;
     const minVolume = Math.min(...volumes);
     
-    if (minVolume < globalState.voiceDetectionThreshold * 0.8) {
-        console.log('🔉 音量が不安定:', {
+    if (minVolume < globalState.voiceDetectionThreshold * 0.6) { // 0.8→0.6に緩和
+        console.log('🔉 音量が不安定（緩和版）:', {
             avgVolume: (avgVolume * 100).toFixed(1) + '%',
             minVolume: (minVolume * 100).toFixed(1) + '%',
-            threshold: (globalState.voiceDetectionThreshold * 100).toFixed(1) + '%'
+            threshold: (globalState.voiceDetectionThreshold * 0.6 * 100).toFixed(1) + '%'
         });
         return false;
     }
     
-    console.log('✅ 安定した音声を検出:', {
+    console.log('✅ 安定した音声を検出（緩和版）:', {
         note: result.note,
         frequency: result.frequency.toFixed(1) + 'Hz',
         volume: (result.volume * 100).toFixed(1) + '%',
@@ -700,8 +704,8 @@ async function startVoiceRangeTest() {
         // 🧪 デバッグ状態更新
         updateDebugStatus('音声検出中', '録音中');
 
-        document.getElementById('main-status-text').textContent = '低音域測定: 声を出してください';
-        document.getElementById('sub-info-text').textContent = '安定した声を認識したら自動で測定開始します（雑音排除機能付き）';
+        document.getElementById('main-status-text').textContent = '低音域測定: できるだけ低い声で「あー」と発声しましょう';
+        document.getElementById('sub-info-text').textContent = '安定した声を認識したら自動で測定開始します';
 
         // アニメーション開始
         const rangeIcon = document.getElementById('range-icon');
@@ -737,37 +741,58 @@ function handleVoiceDetection(result, audioDetector) {
     // 測定データを常に記録（音量が閾値以下でも）
     recordMeasurementData(result);
 
-    // 🎵 改良された音声安定性チェック（雑音排除）
-    if (!isStableVoiceDetection(result)) {
-        // 安定性チェックで失敗した場合は早期リターン
-        // isStableVoiceDetection内で詳細なログが出力される
-        return;
-    }
+    // 測定開始判定のみ厳格な雑音排除を適用
+    if (globalState.currentPhase === 'waiting-for-voice' || globalState.currentPhase === 'waiting-for-voice-high') {
+        // 🎵 測定開始時のみ厳格な音声安定性チェック（雑音排除）
+        if (!isStableVoiceDetection(result)) {
+            // 安定性チェックで失敗した場合は早期リターン
+            // isStableVoiceDetection内で詳細なログが出力される
+            return;
+        }
 
-    console.log('🔊 安定した音声検出 - フェーズ遷移チェック:', {
-        currentPhase: globalState.currentPhase,
-        volume: result.volume,
-        frequency: result.frequency,
-        note: result.note
-    });
+        console.log('🔊 安定した音声検出 - 測定開始:', {
+            currentPhase: globalState.currentPhase,
+            volume: result.volume,
+            frequency: result.frequency,
+            note: result.note
+        });
 
-    switch (globalState.currentPhase) {
-        case 'waiting-for-voice':
-            console.log('🎯 低音測定開始');
-            startLowPitchMeasurement(audioDetector);
-            break;
-        case 'waiting-for-voice-high':
-            console.log('🎯 高音測定開始');
-            startHighPitchMeasurement(audioDetector);
-            break;
-        default:
-            console.log('🤔 予期しないフェーズ:', globalState.currentPhase);
+        // 測定開始の判定
+        switch (globalState.currentPhase) {
+            case 'waiting-for-voice':
+                console.log('🎯 低音測定開始');
+                startLowPitchMeasurement(audioDetector);
+                break;
+            case 'waiting-for-voice-high':
+                console.log('🎯 高音測定開始');
+                startHighPitchMeasurement(audioDetector);
+                break;
+        }
+    } else {
+        // 測定中は基本的な音量チェックのみ（緩い判定）
+        if (result.volume && result.volume >= globalState.voiceDetectionThreshold * 0.5) {
+            console.log('🔊 測定中音声データ記録:', {
+                currentPhase: globalState.currentPhase,
+                volume: result.volume,
+                frequency: result.frequency,
+                note: result.note
+            });
+        }
     }
 }
 
 // 測定データ記録
 function recordMeasurementData(result) {
-    if (!result.frequency || !result.volume) return;
+    // 無効なデータをフィルタリング
+    if (!result.frequency || !result.volume) {
+        console.log('🔇 データ記録スキップ:', {
+            phase: globalState.currentPhase,
+            frequency: result.frequency || 'なし',
+            volume: result.volume || 'なし',
+            reason: !result.frequency ? '周波数なし' : '音量なし'
+        });
+        return;
+    }
 
     const timestamp = Date.now();
     const currentPhase = globalState.currentPhase;
@@ -791,6 +816,15 @@ function recordMeasurementData(result) {
         // 平均音量計算
         const totalVolume = data.frequencies.reduce((sum, d) => sum + d.volume, 0);
         data.avgVolume = totalVolume / data.frequencies.length;
+
+        // 低音データ記録ログ（5個おきに出力）
+        if (data.frequencies.length % 5 === 0) {
+            console.log('🔽 低音データ記録中:', {
+                'データ数': data.frequencies.length,
+                '最新音程': `${result.frequency.toFixed(1)} Hz (${result.note})`,
+                '最低音': data.lowestFreq ? `${data.lowestFreq.toFixed(1)} Hz (${data.lowestNote})` : 'なし'
+            });
+        }
     }
 
     // 高音測定フェーズ
@@ -812,6 +846,15 @@ function recordMeasurementData(result) {
         // 平均音量計算
         const totalVolume = data.frequencies.reduce((sum, d) => sum + d.volume, 0);
         data.avgVolume = totalVolume / data.frequencies.length;
+
+        // 高音データ記録ログ（5個おきに出力）
+        if (data.frequencies.length % 5 === 0) {
+            console.log('🔼 高音データ記録中:', {
+                'データ数': data.frequencies.length,
+                '最新音程': `${result.frequency.toFixed(1)} Hz (${result.note})`,
+                '最高音': data.highestFreq ? `${data.highestFreq.toFixed(1)} Hz (${data.highestNote})` : 'なし'
+            });
+        }
     }
 }
 
@@ -1151,7 +1194,7 @@ function startLowPitchMeasurement() {
     console.log('🎯 低音域測定開始 (新方式)');
     globalState.currentPhase = 'measuring-low';
 
-    document.getElementById('main-status-text').textContent = '低音域を測定中...';
+    document.getElementById('main-status-text').textContent = 'そのまま声をキープしましょう';
 
     // 古いタイマーを削除し、新しい統合関数を呼び出す
     runMeasurementPhase(globalState.measurementDuration, completeLowPitchMeasurement);
@@ -1162,9 +1205,18 @@ function completeLowPitchMeasurement() {
     console.log('✅ 低音域測定完了');
     globalState.currentPhase = 'idle-low';
 
-    // 測定結果の検証
+    // 測定結果の検証 - 厳格化された条件
     const lowData = globalState.measurementData.lowPhase;
-    const hasValidData = lowData.frequencies.length > 0 && lowData.lowestFreq;
+    const dataCount = lowData.frequencies.length;
+    const minRequired = globalState.measurementData.minRequiredDataPoints;
+    const hasValidData = dataCount >= minRequired && lowData.lowestFreq;
+
+    console.log('📊 低音測定データ検証:', {
+        'データ数': dataCount,
+        '最低必要数': minRequired,
+        '最低音': lowData.lowestFreq ? `${lowData.lowestFreq.toFixed(1)} Hz (${lowData.lowestNote})` : 'なし',
+        '判定結果': hasValidData ? '✅ 成功' : '❌ 失敗'
+    });
 
     if (hasValidData) {
         console.log('✅ 低音域測定成功:', {
@@ -1197,6 +1249,9 @@ function completeLowPitchMeasurement() {
 // 低音測定失敗時の処理
 function handleLowPitchMeasurementFailure() {
     console.log('🔄 低音測定失敗 - 対処開始');
+
+    // 円形プログレスバーを即座にリセット
+    updateCircularProgressInstantly(0);
 
     // リトライ回数チェック
     if (globalState.retryCount < globalState.maxRetries) {
@@ -1249,11 +1304,39 @@ function retryLowPitchMeasurement() {
 
     // 待機状態に戻す
     globalState.currentPhase = 'waiting-for-voice';
-    document.getElementById('main-status-text').textContent = '低音域測定: 声を出してください（再測定）';
+    document.getElementById('main-status-text').textContent = '低音域測定: できるだけ低い声で「あー」と発声しましょう（再測定）';
     document.getElementById('sub-info-text').textContent = 'より大きく、より低い音で歌ってください';
 
     // バッジを待機状態に戻す
     updateBadgeForWaiting('arrow-down');
+}
+
+// 高音測定の再試行
+function retryHighPitchMeasurement() {
+    console.log(`🔄 高音測定再試行 (${globalState.highRetryCount}回目)`);
+
+    // 再測定ボタンを非表示
+    document.getElementById('retry-measurement-btn').style.display = 'none';
+
+    // 高音測定データをクリア
+    globalState.measurementData.highPhase = {
+        frequencies: [],
+        highestFreq: null,
+        highestNote: null,
+        avgVolume: 0,
+        measurementTime: 0
+    };
+
+    // 高音測定の待機状態に戻す
+    globalState.currentPhase = 'waiting-for-voice-high';
+    document.getElementById('main-status-text').textContent = '高音域測定: できるだけ高い声で「あー」と発声しましょう（再測定）';
+    document.getElementById('sub-info-text').textContent = 'より大きく、より高い音で歌ってください';
+
+    // バッジを高音待機状態に戻す
+    updateBadgeForWaiting('arrow-up');
+
+    // 🧪 デバッグ状態更新
+    updateDebugStatus(`高音測定待機 (${globalState.highRetryCount}回目)`, '録音中');
 }
 
 // バッジの失敗表示
@@ -1280,44 +1363,119 @@ function updateBadgeForError() {
 function handleHighPitchMeasurementFailure() {
     console.log('🔄 高音測定失敗 - 対処開始');
 
-    // 高音測定は最後なので、低音データがあるかチェック
-    const lowData = globalState.measurementData.lowPhase;
-    const hasLowData = lowData.frequencies.length > 0 && lowData.lowestFreq;
+    // 円形プログレスバーを即座にリセット
+    updateCircularProgressInstantly(0);
 
-    if (hasLowData) {
-        // 低音データがある場合: 部分的な結果として表示
-        console.log('📊 低音データのみで部分結果を表示');
+    // リトライ回数チェック（高音測定用の独立したカウンター）
+    if (!globalState.highRetryCount) {
+        globalState.highRetryCount = 0;
+    }
 
-        // 🧪 デバッグ状態更新
-        updateDebugStatus('高音測定失敗・部分結果表示', '録音停止');
-
-        updateBadgeForError();
-        document.getElementById('main-status-text').textContent = '高音測定失敗 - 低音域のみの結果を表示';
-        document.getElementById('sub-info-text').textContent = '低音域の測定結果のみ利用可能です';
-
-        showNotification('高音測定に失敗しましたが、低音域の結果を表示します', 'warning');
-
-        // 部分的な結果を表示
-        setTimeout(() => {
-            const results = calculatePartialVoiceRange();
-            displayResults(results);
-        }, 2000);
-
-    } else {
-        // 両方とも失敗した場合
-        console.error('❌ 低音・高音両方の測定に失敗');
+    if (globalState.highRetryCount < globalState.maxRetries) {
+        globalState.highRetryCount++;
 
         // 🧪 デバッグ状態更新
-        updateDebugStatus('測定完全失敗', '録音停止');
+        updateDebugStatus(`高音測定失敗 (${globalState.highRetryCount}/${globalState.maxRetries})`, '録音中');
 
-        updateBadgeForError();
-        document.getElementById('main-status-text').textContent = '音域測定に失敗しました';
-        document.getElementById('sub-info-text').textContent = '再測定ボタンを押してやり直してください';
+        // 失敗表示
+        updateBadgeForFailure();
+        document.getElementById('main-status-text').textContent = `高音測定失敗 - 再測定します (${globalState.highRetryCount}/${globalState.maxRetries})`;
+        document.getElementById('sub-info-text').textContent = 'より大きな声で高い音を出してください';
 
         // 再測定ボタンを表示
         document.getElementById('retry-measurement-btn').style.display = 'inline-flex';
 
-        showNotification('音域測定に失敗しました。環境を確認して再測定してください。', 'error');
+        showNotification('高音の検出に失敗しました。再測定してください。', 'warning');
+
+        // 2秒後に自動再測定開始
+        setTimeout(() => {
+            retryHighPitchMeasurement();
+        }, 2000);
+
+    } else {
+        // 最大リトライ回数に達した場合、低音データがあるかチェック
+        console.error('❌ 高音測定: 最大リトライ回数に達しました');
+
+        const lowData = globalState.measurementData.lowPhase;
+        const dataCount = lowData.frequencies.length;
+        const minRequired = globalState.measurementData.minRequiredDataPoints;
+        const hasLowData = dataCount >= minRequired && lowData.lowestFreq;
+
+        if (hasLowData) {
+            // 低音データがある場合: 部分的な結果として表示
+            console.log('📊 低音データのみで部分結果を表示');
+
+            // 🧪 デバッグ状態更新
+            updateDebugStatus('高音測定諦め・部分結果表示', '録音停止');
+
+            updateBadgeForError();
+            document.getElementById('main-status-text').textContent = '高音測定失敗 - 低音域のみの結果を表示';
+            document.getElementById('sub-info-text').textContent = '低音域の測定結果のみ利用可能です';
+
+            showNotification('高音測定に失敗しましたが、低音域の結果を表示します', 'warning');
+
+            // PitchPro AudioDetector停止（音量バー・マイクも自動リセット）
+            if (globalAudioDetector) {
+                if (globalAudioDetector.stop) {
+                    globalAudioDetector.stop();
+                    console.log('🎯 PitchPro stop()メソッド使用（高音測定失敗・部分結果）');
+                } else {
+                    globalAudioDetector.stopDetection();
+                    console.log('🔄 PitchPro stopDetection()使用（高音測定失敗・部分結果）');
+                }
+                console.log('✅ PitchProが音量バー・マイク状態も自動リセット');
+            }
+
+            // UI要素リセット
+            document.getElementById('stop-range-test-btn').style.display = 'none';
+            document.getElementById('stop-detection-btn').style.display = 'none';
+            document.getElementById('begin-range-test-btn').style.display = 'inline-block';
+
+            // マイクステータス表示の更新（PitchProが実際の処理を担当）
+            updateMicStatus('standby');
+
+            // 部分的な結果を表示
+            setTimeout(() => {
+                const results = calculatePartialVoiceRange();
+                displayResults(results);
+            }, 2000);
+
+        } else {
+            // 両方とも失敗した場合
+            console.error('❌ 低音・高音両方の測定に失敗');
+
+            // 🧪 デバッグ状態更新
+            updateDebugStatus('測定完全失敗', '録音停止');
+
+            // PitchPro AudioDetector停止（音量バー・マイクも自動リセット）
+            if (globalAudioDetector) {
+                if (globalAudioDetector.stop) {
+                    globalAudioDetector.stop();
+                    console.log('🎯 PitchPro stop()メソッド使用（測定完全失敗）');
+                } else {
+                    globalAudioDetector.stopDetection();
+                    console.log('🔄 PitchPro stopDetection()使用（測定完全失敗）');
+                }
+                console.log('✅ PitchProが音量バー・マイク状態も自動リセット');
+            }
+
+            updateBadgeForError();
+            document.getElementById('main-status-text').textContent = '音域測定に失敗しました';
+            document.getElementById('sub-info-text').textContent = '再測定ボタンを押してやり直してください';
+
+            // UI要素リセット
+            document.getElementById('stop-range-test-btn').style.display = 'none';
+            document.getElementById('stop-detection-btn').style.display = 'none';
+            document.getElementById('begin-range-test-btn').style.display = 'inline-block';
+
+            // マイクステータス表示の更新（PitchProが実際の処理を担当）
+            updateMicStatus('standby');
+
+            // 再測定ボタンを表示
+            document.getElementById('retry-measurement-btn').style.display = 'inline-flex';
+
+            showNotification('音域測定に失敗しました。環境を確認して再測定してください。', 'error');
+        }
     }
 }
 
@@ -1355,8 +1513,8 @@ function startHighPitchPhase() {
     updateCircularProgressInstantly(0);
     
     // UI更新
-    document.getElementById('main-status-text').textContent = '高音域測定: 声を出してください';
-    document.getElementById('sub-info-text').textContent = '安定した声を認識したら自動で測定開始します（雑音排除機能付き）';
+    document.getElementById('main-status-text').textContent = '高音域測定: できるだけ高い声で「あー」と発声しましょう';
+    document.getElementById('sub-info-text').textContent = '安定した声を認識したら自動で測定開始します';
     updateBadgeForWaiting('arrow-up');
 }
 
@@ -1365,7 +1523,7 @@ function startHighPitchMeasurement() {
     console.log('🎯 高音域測定開始 (新方式)');
     globalState.currentPhase = 'measuring-high';
 
-    document.getElementById('main-status-text').textContent = '高音域を測定中...';
+    document.getElementById('main-status-text').textContent = 'そのまま声をキープしましょう';
 
     // 古いタイマーを削除し、新しい統合関数を呼び出す
     runMeasurementPhase(globalState.measurementDuration, completeHighPitchMeasurement);
@@ -1377,9 +1535,18 @@ function completeHighPitchMeasurement() {
     globalState.currentPhase = 'completed';
     globalState.measurementData.endTime = Date.now();
 
-    // 測定結果の検証
+    // 測定結果の検証 - 厳格化された条件
     const highData = globalState.measurementData.highPhase;
-    const hasValidData = highData.frequencies.length > 0 && highData.highestFreq;
+    const dataCount = highData.frequencies.length;
+    const minRequired = globalState.measurementData.minRequiredDataPoints;
+    const hasValidData = dataCount >= minRequired && highData.highestFreq;
+
+    console.log('📊 高音測定データ検証:', {
+        'データ数': dataCount,
+        '最低必要数': minRequired,
+        '最高音': highData.highestFreq ? `${highData.highestFreq.toFixed(1)} Hz (${highData.highestNote})` : 'なし',
+        '判定結果': hasValidData ? '✅ 成功' : '❌ 失敗'
+    });
 
     if (hasValidData) {
         console.log('✅ 高音域測定成功:', {
@@ -1404,32 +1571,30 @@ function completeHighPitchMeasurement() {
         return; // 早期リターンで以下の処理をスキップ
     }
     
-    // AudioDetector効率的停止
+    // PitchPro AudioDetector停止（音量バー・マイクも自動リセット）
     if (globalAudioDetector) {
         if (globalAudioDetector.stop) {
             globalAudioDetector.stop();
             console.log('🎯 PitchPro stop()メソッド使用（測定完了）');
         } else {
             globalAudioDetector.stopDetection();
-            console.log('🔄 stopDetection()フォールバック使用（測定完了）');
+            console.log('🔄 PitchPro stopDetection()使用（測定完了）');
         }
+        console.log('✅ PitchProが音量バー・マイク状態も自動リセット');
     }
-    
+
     // 結果計算と表示
     const results = calculateVoiceRange();
     if (results) {
         displayVoiceRangeResults(results);
     }
-    
-    // 音量バーリセット
-    resetVolumeDisplay();
 
-    // UI更新
+    // UI要素の表示切り替え
     document.getElementById('stop-range-test-btn').style.display = 'none';
     document.getElementById('stop-detection-btn').style.display = 'none';
     document.getElementById('begin-range-test-btn').style.display = 'inline-block';
 
-    // マイクステータスを待機状態に戻す
+    // マイクステータス表示の更新（PitchProが実際の処理を担当）
     updateMicStatus('standby');
 
     // 円形プログレスバーを瞬時にリセット
@@ -1455,11 +1620,11 @@ async function retryCurrentMeasurement() {
 
     if (globalState.currentPhase.includes('low')) {
         globalState.currentPhase = 'waiting-for-voice';
-        document.getElementById('main-status-text').textContent = '低音域測定: 声を出してください（再測定）';
+        document.getElementById('main-status-text').textContent = '低音域測定: できるだけ低い声で「あー」と発声しましょう（再測定）';
         updateBadgeForWaiting('arrow-down');
     } else if (globalState.currentPhase.includes('high')) {
         globalState.currentPhase = 'waiting-for-voice-high';
-        document.getElementById('main-status-text').textContent = '高音域測定: 声を出してください（再測定）';
+        document.getElementById('main-status-text').textContent = '高音域測定: できるだけ高い声で「あー」と発声しましょう（再測定）';
         updateBadgeForWaiting('arrow-up');
     }
 
@@ -1499,12 +1664,12 @@ function stopAllMeasurements() {
     // 状態リセット
     globalState.currentPhase = 'idle';
     globalState.retryCount = 0;
+    globalState.highRetryCount = 0; // 高音測定リトライカウンターもリセット
 
-    // UI リセット（音量バーと円形プログレス）
-    resetVolumeDisplay();
+    // 円形プログレスのみリセット（音量バーはPitchProが自動リセット）
     resetCircularProgress();
 
-    // マイクステータスを待機状態に戻す
+    // マイクステータス表示の更新（PitchProが実際の処理を担当）
     updateMicStatus('standby');
 
     document.getElementById('main-status-text').textContent = 'テスト停止';
@@ -1533,8 +1698,8 @@ function stopVoiceDetectionOnly() {
         window.currentAudioDetector = globalAudioDetector;
     }
 
-    // 音量バーと周波数表示のリセット
-    resetVolumeDisplay();
+    // PitchProのstopDetection()が音量バーも自動リセットするため、手動リセット不要
+    console.log('✅ PitchProが音量バー・周波数表示も自動リセット');
     
     // ボタン表示を調整
     document.getElementById('stop-detection-btn').style.display = 'none';
@@ -1542,7 +1707,7 @@ function stopVoiceDetectionOnly() {
     
     // ステータス更新
     document.getElementById('main-status-text').textContent = '音声検出停止中（プログレス継続）';
-    document.getElementById('sub-info-text').textContent = '円形プログレスは継続実行中です';
+    document.getElementById('sub-info-text').textContent = '測定中...';
     
     showNotification('音声検出を停止しました（プログレス継続中）', 'info');
 }
