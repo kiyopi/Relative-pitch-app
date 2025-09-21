@@ -27,12 +27,9 @@ async function initializeDemo() {
 // デバッグ用: 表示制御を確認する関数
 window.debugBadgeDisplay = function() {
     const rangeIcon = document.getElementById('range-icon');
-    const countdownDisplay = document.getElementById('countdown-display');
     console.log('🔍 現在の表示状態:');
     console.log('  rangeIcon.style.display:', rangeIcon.style.display);
     console.log('  rangeIcon.innerHTML:', rangeIcon.innerHTML);
-    console.log('  countdownDisplay.style.display:', countdownDisplay.style.display);
-    console.log('  countdownDisplay.textContent:', countdownDisplay.textContent);
 };
 
 // 結果表示関数
@@ -77,8 +74,8 @@ function displayResults(results) {
         }
     }
 
-    document.getElementById('results-section').style.display = 'block';
-    document.getElementById('stop-range-test-btn').style.display = 'none';
+    document.getElementById('results-section').classList.remove('hidden');
+    document.getElementById('stop-range-test-btn').classList.add('btn-hidden');
 
     console.log('📋 測定結果表示完了 (デバッグ情報含む)');
 }
@@ -502,7 +499,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (controller) {
             controller.stopTest();
             showNotification('テスト停止', 'info');
-            document.getElementById('stop-range-test-btn').style.display = 'none';
+            document.getElementById('stop-range-test-btn').classList.add('btn-hidden');
         }
     });
 
@@ -574,7 +571,8 @@ async function startBasicTest() {
         document.getElementById('sub-info-text').textContent = '声を出してテストしてください';
 
         // 停止ボタン表示
-        document.getElementById('stop-range-test-btn').style.display = 'inline-block';
+        document.getElementById('stop-range-test-btn').classList.remove('btn-hidden');
+        document.getElementById('stop-range-test-btn').classList.add('btn-visible-inline');
         document.getElementById('stop-range-test-btn').onclick = () => {
             // 効率的停止
             if (globalAudioDetector.stop) {
@@ -585,7 +583,7 @@ async function startBasicTest() {
                 console.log('🔄 stopDetection()フォールバック使用（基本テスト停止）');
             }
             showNotification('基本テスト停止', 'info');
-            document.getElementById('stop-range-test-btn').style.display = 'none';
+            document.getElementById('stop-range-test-btn').classList.add('btn-hidden');
         };
 
     } catch (error) {
@@ -650,9 +648,11 @@ async function startVoiceRangeTest() {
         resetVoiceStability();
 
         // 既存のボタン状態を更新
-        document.getElementById('begin-range-test-btn').style.display = 'none';
-        document.getElementById('stop-range-test-btn').style.display = 'inline-flex';
-        document.getElementById('stop-detection-btn').style.display = 'inline-flex';
+        document.getElementById('begin-range-test-btn').classList.add('btn-hidden');
+        document.getElementById('stop-range-test-btn').classList.remove('btn-hidden');
+        document.getElementById('stop-range-test-btn').classList.add('btn-visible-inline');
+        document.getElementById('stop-detection-btn').classList.remove('btn-hidden');
+        document.getElementById('stop-detection-btn').classList.add('btn-visible-inline');
 
         // マイクステータスを録音中に変更
         updateMicStatus('recording');
@@ -707,12 +707,6 @@ async function startVoiceRangeTest() {
         document.getElementById('main-status-text').textContent = '３秒間できるだけ低い声で「あー」と発声しましょう';
         document.getElementById('sub-info-text').textContent = '安定した声を認識したら自動で測定開始します';
 
-        // アニメーション開始
-        const rangeIcon = document.getElementById('range-icon');
-        if (rangeIcon) {
-            rangeIcon.classList.add('measuring');
-        }
-
         console.log('✅ 音域テスト開始完了');
 
     } catch (error) {
@@ -720,9 +714,10 @@ async function startVoiceRangeTest() {
         showNotification(`音域テスト開始に失敗しました: ${error.message}`, 'error');
         
         // エラー時は元の状態に戻す
-        document.getElementById('begin-range-test-btn').style.display = 'inline-flex';
-        document.getElementById('stop-range-test-btn').style.display = 'none';
-        document.getElementById('stop-detection-btn').style.display = 'none';
+        document.getElementById('begin-range-test-btn').classList.remove('btn-hidden');
+        document.getElementById('begin-range-test-btn').classList.add('btn-visible-inline');
+        document.getElementById('stop-range-test-btn').classList.add('btn-hidden');
+        document.getElementById('stop-detection-btn').classList.add('btn-hidden');
         updateMicStatus('standby');
     }
 }
@@ -1075,7 +1070,7 @@ function assessMeasurementQuality(measurementData) {
 // 音域テスト結果表示
 function displayVoiceRangeResults(results) {
     // 結果セクションを表示
-    document.getElementById('results-section').style.display = 'block';
+    document.getElementById('results-section').classList.remove('hidden');
 
     // 基本情報
     document.getElementById('result-range').textContent = results.range;
@@ -1148,14 +1143,16 @@ function runMeasurementPhase(duration, onComplete) {
     let animationFrameId = null;
 
     // 瞬時にプログレスを0%にリセット
-    progressCircle.style.transition = 'none';
+    progressCircle.classList.remove('progress-linear-animation', 'progress-smooth-animation');
+    progressCircle.classList.add('progress-no-animation');
     updateCircularProgress(0);
 
     // DOMの更新を強制的に反映させる（リフロー）
     progressCircle.offsetHeight;
 
     // アニメーションを再有効化
-    progressCircle.style.transition = 'stroke-dashoffset 0.1s linear';
+    progressCircle.classList.remove('progress-no-animation', 'progress-smooth-animation');
+    progressCircle.classList.add('progress-linear-animation');
 
     function tick(currentTime) {
         const elapsedTime = currentTime - startTime;
@@ -1216,6 +1213,9 @@ function startLowPitchMeasurement() {
 
     document.getElementById('main-status-text').textContent = 'そのまま声をキープしましょう';
     document.getElementById('sub-info-text').textContent = '低音測定中...';
+
+    // バッジアニメーションを開始
+    updateBadgeForMeasuring();
 
     // 古いタイマーを削除し、新しい統合関数を呼び出す
     runMeasurementPhase(globalState.measurementDuration, completeLowPitchMeasurement);
@@ -1294,7 +1294,8 @@ function handleLowPitchMeasurementFailure() {
         document.getElementById('sub-info-text').textContent = 'より大きな声で低い音を出してください';
 
         // 再測定ボタンを表示
-        document.getElementById('retry-measurement-btn').style.display = 'inline-flex';
+        document.getElementById('retry-measurement-btn').classList.remove('btn-hidden');
+        document.getElementById('retry-measurement-btn').classList.add('btn-visible-inline');
 
         showNotification('低音の検出に失敗しました。再測定してください。', 'warning');
 
@@ -1328,7 +1329,7 @@ function retryLowPitchMeasurement() {
     console.log(`🔄 低音測定再試行 (${globalState.retryCount}回目)`);
 
     // 再測定ボタンを非表示
-    document.getElementById('retry-measurement-btn').style.display = 'none';
+    document.getElementById('retry-measurement-btn').classList.add('btn-hidden');
 
     // 待機状態に戻す
     globalState.currentPhase = 'waiting-for-voice';
@@ -1344,7 +1345,7 @@ function retryHighPitchMeasurement() {
     console.log(`🔄 高音測定再試行 (${globalState.highRetryCount}回目)`);
 
     // 再測定ボタンを非表示
-    document.getElementById('retry-measurement-btn').style.display = 'none';
+    document.getElementById('retry-measurement-btn').classList.add('btn-hidden');
 
     // 高音測定データをクリア
     globalState.measurementData.highPhase = {
@@ -1376,28 +1377,40 @@ function updateBadgeForFailure() {
         // 白い❌アイコンを表示
         rangeIcon.innerHTML = '<i data-lucide="x" style="width: 80px; height: 80px; color: white;"></i>';
         rangeIcon.classList.remove('measuring');
-        rangeIcon.style.display = 'block';
+        rangeIcon.classList.add('range-icon-visible');
+        rangeIcon.classList.remove('range-icon-hidden');
 
         // バッジに失敗スタイルを適用（赤背景）
+        badge.classList.remove('measuring', 'confirmed');
         badge.classList.add('failure');
-        badge.classList.remove('measuring', 'confirmed', 'failure');
-
-        // カウントダウン表示を非表示
-        const countdownDisplay = document.getElementById('countdown-display');
-        if (countdownDisplay) {
-            countdownDisplay.style.display = 'none';
-        }
     }
+
+    // 失敗時は再測定ボタンを表示
+    document.getElementById('retry-measurement-btn').classList.remove('btn-hidden');
+    document.getElementById('retry-measurement-btn').classList.add('btn-visible-inline');
+
     lucide.createIcons();
 }
 
 // バッジのエラー表示
 function updateBadgeForError() {
     const rangeIcon = document.getElementById('range-icon');
+    const badge = document.querySelector('.voice-note-badge');
+
     if (rangeIcon) {
         rangeIcon.innerHTML = '<i data-lucide="alert-triangle" style="width: 80px; height: 80px; color: #f59e0b;"></i>';
         rangeIcon.classList.remove('measuring');
     }
+
+    if (badge) {
+        badge.classList.remove('measuring', 'confirmed');
+        badge.classList.add('failure');
+    }
+
+    // エラー時も再測定ボタンを表示
+    document.getElementById('retry-measurement-btn').classList.remove('btn-hidden');
+    document.getElementById('retry-measurement-btn').classList.add('btn-visible-inline');
+
     lucide.createIcons();
 }
 
@@ -1425,7 +1438,8 @@ function handleHighPitchMeasurementFailure() {
         document.getElementById('sub-info-text').textContent = 'より大きな声で高い音を出してください';
 
         // 再測定ボタンを表示
-        document.getElementById('retry-measurement-btn').style.display = 'inline-flex';
+        document.getElementById('retry-measurement-btn').classList.remove('btn-hidden');
+        document.getElementById('retry-measurement-btn').classList.add('btn-visible-inline');
 
         showNotification('高音の検出に失敗しました。再測定してください。', 'warning');
 
@@ -1469,9 +1483,10 @@ function handleHighPitchMeasurementFailure() {
             }
 
             // UI要素リセット
-            document.getElementById('stop-range-test-btn').style.display = 'none';
-            document.getElementById('stop-detection-btn').style.display = 'none';
-            document.getElementById('begin-range-test-btn').style.display = 'inline-block';
+            document.getElementById('stop-range-test-btn').classList.add('btn-hidden');
+            document.getElementById('stop-detection-btn').classList.add('btn-hidden');
+            document.getElementById('begin-range-test-btn').classList.remove('btn-hidden');
+            document.getElementById('begin-range-test-btn').classList.add('btn-visible-inline');
 
             // マイクステータス表示の更新（PitchProが実際の処理を担当）
             updateMicStatus('standby');
@@ -1506,15 +1521,17 @@ function handleHighPitchMeasurementFailure() {
             document.getElementById('sub-info-text').textContent = '再測定ボタンを押してやり直してください';
 
             // UI要素リセット
-            document.getElementById('stop-range-test-btn').style.display = 'none';
-            document.getElementById('stop-detection-btn').style.display = 'none';
-            document.getElementById('begin-range-test-btn').style.display = 'inline-block';
+            document.getElementById('stop-range-test-btn').classList.add('btn-hidden');
+            document.getElementById('stop-detection-btn').classList.add('btn-hidden');
+            document.getElementById('begin-range-test-btn').classList.remove('btn-hidden');
+            document.getElementById('begin-range-test-btn').classList.add('btn-visible-inline');
 
             // マイクステータス表示の更新（PitchProが実際の処理を担当）
             updateMicStatus('standby');
 
             // 再測定ボタンを表示
-            document.getElementById('retry-measurement-btn').style.display = 'inline-flex';
+            document.getElementById('retry-measurement-btn').classList.remove('btn-hidden');
+        document.getElementById('retry-measurement-btn').classList.add('btn-visible-inline');
 
             showNotification('音域測定に失敗しました。環境を確認して再測定してください。', 'error');
         }
@@ -1567,6 +1584,9 @@ function startHighPitchMeasurement() {
 
     document.getElementById('main-status-text').textContent = 'そのまま声をキープしましょう';
     document.getElementById('sub-info-text').textContent = '高音測定中...';
+
+    // バッジアニメーションを開始
+    updateBadgeForMeasuring();
 
     // 古いタイマーを削除し、新しい統合関数を呼び出す
     runMeasurementPhase(globalState.measurementDuration, completeHighPitchMeasurement);
@@ -1632,10 +1652,17 @@ function completeHighPitchMeasurement() {
         displayVoiceRangeResults(results);
     }
 
-    // UI要素の表示切り替え
-    document.getElementById('stop-range-test-btn').style.display = 'none';
-    document.getElementById('stop-detection-btn').style.display = 'none';
-    document.getElementById('begin-range-test-btn').style.display = 'inline-block';
+    // UI要素の表示切り替え（テスト完了時）
+    document.getElementById('stop-range-test-btn').classList.remove('btn-visible-inline');
+    document.getElementById('stop-range-test-btn').classList.add('btn-hidden');
+    document.getElementById('stop-detection-btn').classList.remove('btn-visible-inline');
+    document.getElementById('stop-detection-btn').classList.add('btn-hidden');
+    document.getElementById('begin-range-test-btn').classList.remove('btn-visible-inline');
+    document.getElementById('begin-range-test-btn').classList.add('btn-hidden');
+
+    // テスト完了時は再測定ボタンを表示（結果画面にも同じボタンがあるため）
+    document.getElementById('retry-measurement-btn').classList.remove('btn-hidden');
+    document.getElementById('retry-measurement-btn').classList.add('btn-visible-inline');
 
     // 上部テキスト表示のリセット
     document.getElementById('main-status-text').textContent = '音域テスト完了！結果を確認してください';
@@ -1725,8 +1752,9 @@ function stopAllMeasurements() {
 
     document.getElementById('stop-range-test-btn').style.display = 'none';
     document.getElementById('stop-detection-btn').style.display = 'none';
-    document.getElementById('retry-measurement-btn').style.display = 'none';
-    document.getElementById('begin-range-test-btn').style.display = 'inline-block';
+    document.getElementById('retry-measurement-btn').classList.add('btn-hidden');
+    document.getElementById('begin-range-test-btn').classList.remove('btn-hidden');
+    document.getElementById('begin-range-test-btn').classList.add('btn-visible-inline');
 
     showNotification('測定を停止しました', 'info');
 }
@@ -1750,7 +1778,8 @@ function stopVoiceDetectionOnly() {
     
     // ボタン表示を調整
     document.getElementById('stop-detection-btn').style.display = 'none';
-    document.getElementById('stop-range-test-btn').style.display = 'inline-block';
+    document.getElementById('stop-range-test-btn').classList.remove('btn-hidden');
+    document.getElementById('stop-range-test-btn').classList.add('btn-visible-inline');
     
     // ステータス更新
     document.getElementById('main-status-text').textContent = '音声検出停止中（プログレス継続）';
@@ -1795,13 +1824,15 @@ function updateCircularProgressInstantly(progress) {
         const offset = circumference - (progress / 100) * circumference;
         
         // アニメーション完全無効化
-        progressCircle.style.transition = 'none';
+        progressCircle.classList.remove('progress-linear-animation', 'progress-smooth-animation');
+    progressCircle.classList.add('progress-no-animation');
         progressCircle.style.strokeDashoffset = offset;
         console.log(`⚡ 円形プログレス瞬時更新: ${progress}%`);
         
         // アニメーション再有効化を大幅に遅らせる
         setTimeout(() => {
-            progressCircle.style.transition = 'stroke-dashoffset 0.3s ease';
+            progressCircle.classList.remove('progress-no-animation', 'progress-linear-animation');
+        progressCircle.classList.add('progress-smooth-animation');
         }, 200); // 20ms → 200ms
     }
 }
@@ -1818,13 +1849,15 @@ function resetCircularProgressInstantly() {
     const progressCircle = document.querySelector('.voice-progress-circle');
     if (progressCircle) {
         // アニメーションを一時的に無効化
-        progressCircle.style.transition = 'none';
+        progressCircle.classList.remove('progress-linear-animation', 'progress-smooth-animation');
+    progressCircle.classList.add('progress-no-animation');
         progressCircle.style.strokeDashoffset = '452'; // 瞬時に0%に戻す
         console.log('⚡ 円形プログレス瞬時リセット');
         
         // 少し後でアニメーションを再有効化
         setTimeout(() => {
-            progressCircle.style.transition = 'stroke-dashoffset 0.3s ease';
+            progressCircle.classList.remove('progress-no-animation', 'progress-linear-animation');
+        progressCircle.classList.add('progress-smooth-animation');
         }, 50);
     }
 }
@@ -1832,7 +1865,8 @@ function resetCircularProgressInstantly() {
 function startCircularProgressAnimation() {
     const progressCircle = document.querySelector('.voice-progress-circle');
     if (progressCircle) {
-        progressCircle.style.transition = 'stroke-dashoffset 0.3s ease';
+        progressCircle.classList.remove('progress-no-animation', 'progress-linear-animation');
+        progressCircle.classList.add('progress-smooth-animation');
         console.log('🎬 円形プログレスアニメーション開始');
     }
 }
@@ -1911,20 +1945,22 @@ function finalizeTestWithSync() {
 // バッジ表示更新関数
 function updateBadgeForWaiting(iconType) {
     const rangeIcon = document.getElementById('range-icon');
-    const countdownDisplay = document.getElementById('countdown-display');
     const badge = document.querySelector('.voice-note-badge');
 
-    if (rangeIcon && countdownDisplay && badge) {
+    if (rangeIcon && badge) {
         const iconSrc = iconType === 'arrow-up' ? './icons/arrow-up.png' : './icons/arrow-down.png';
         // インラインスタイルを削除し、CSSクラスで制御
         rangeIcon.innerHTML = `<img src="${iconSrc}" alt="${iconType}" class="range-icon-img">`;
-        rangeIcon.style.display = 'block';
-        countdownDisplay.style.display = 'none';
+        rangeIcon.classList.add('range-icon-visible');
+        rangeIcon.classList.remove('range-icon-hidden');
 
         // アイコンと背景の両方からmeasuringクラスを削除
         rangeIcon.classList.remove('measuring', 'range-icon-confirmed');
         badge.classList.remove('measuring', 'confirmed', 'failure');
     }
+
+    // 待機状態では再測定ボタンを非表示
+    document.getElementById('retry-measurement-btn').classList.add('btn-hidden');
 }
 
 function updateBadgeForMeasuring() {
@@ -1942,22 +1978,22 @@ function updateBadgeForMeasuring() {
         rangeIcon.classList.remove('range-icon-confirmed');
     }
 
-    document.getElementById('retry-measurement-btn').style.display = 'inline-block';
+    // 再測定ボタンは失敗時のみ表示（測定開始時は非表示のまま）
+    document.getElementById('retry-measurement-btn').classList.add('btn-hidden');
 }
 
 function updateBadgeForConfirmed() {
     const rangeIcon = document.getElementById('range-icon');
-    const countdownDisplay = document.getElementById('countdown-display');
     const badge = document.querySelector('.voice-note-badge');
 
-    if (rangeIcon && countdownDisplay && badge) {
+    if (rangeIcon && badge) {
         // measuringクラスを削除してフェードアニメーション停止
         rangeIcon.classList.remove('measuring');
 
         // インラインスタイルを削除し、CSSクラスで制御
         rangeIcon.innerHTML = '<img src="./icons/check.png" alt="測定完了" class="range-icon-img">';
-        rangeIcon.style.display = 'block';
-        countdownDisplay.style.display = 'none';
+        rangeIcon.classList.add('range-icon-visible');
+        rangeIcon.classList.remove('range-icon-hidden');
 
         // チェックマークバウンズアニメーション（一回のみ）
         rangeIcon.classList.add('range-icon-confirmed');
@@ -1971,5 +2007,5 @@ function updateBadgeForConfirmed() {
         badge.classList.add('confirmed');
         badge.classList.remove('measuring');
     }
-    document.getElementById('retry-measurement-btn').style.display = 'none';
+    document.getElementById('retry-measurement-btn').classList.add('btn-hidden');
 }
