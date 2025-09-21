@@ -704,7 +704,7 @@ async function startVoiceRangeTest() {
         // 🧪 デバッグ状態更新
         updateDebugStatus('音声検出中', '録音中');
 
-        document.getElementById('main-status-text').textContent = '低音域測定: できるだけ低い声で「あー」と発声しましょう';
+        document.getElementById('main-status-text').textContent = '３秒間できるだけ低い声で「あー」と発声しましょう';
         document.getElementById('sub-info-text').textContent = '安定した声を認識したら自動で測定開始します';
 
         // アニメーション開始
@@ -1161,6 +1161,26 @@ function runMeasurementPhase(duration, onComplete) {
         const elapsedTime = currentTime - startTime;
         const progress = Math.min((elapsedTime / duration) * 100, 100);
 
+        // 経過秒数を計算（1秒、2秒、3秒）
+        const elapsedSeconds = Math.floor(elapsedTime / 1000) + 1;
+        const maxSeconds = Math.ceil(duration / 1000);
+
+        // フェーズに応じたカウントダウンテキスト表示
+        if (elapsedSeconds <= maxSeconds) {
+            const currentPhase = globalState.currentPhase;
+            let measurementType = '';
+
+            if (currentPhase === 'measuring-low') {
+                measurementType = '低音測定中';
+            } else if (currentPhase === 'measuring-high') {
+                measurementType = '高音測定中';
+            } else {
+                measurementType = '測定中';
+            }
+
+            document.getElementById('sub-info-text').textContent = `${measurementType}... ${elapsedSeconds}秒`;
+        }
+
         // UIを更新
         updateCircularProgress(progress);
 
@@ -1230,6 +1250,9 @@ function completeLowPitchMeasurement() {
         setTimeout(() => {
             updateBadgeForConfirmed();
         }, 100);
+
+        // 円形プログレスバーを即座にリセット
+        updateCircularProgressInstantly(0);
 
         // 🧪 デバッグ状態更新
         updateDebugStatus('低音測定完了', '録音中');
@@ -1309,7 +1332,7 @@ function retryLowPitchMeasurement() {
 
     // 待機状態に戻す
     globalState.currentPhase = 'waiting-for-voice';
-    document.getElementById('main-status-text').textContent = '低音域測定: できるだけ低い声で「あー」と発声しましょう（再測定）';
+    document.getElementById('main-status-text').textContent = '３秒間できるだけ低い声で「あー」と発声しましょう（再測定）';
     document.getElementById('sub-info-text').textContent = 'より大きく、より低い音で歌ってください';
 
     // バッジを待機状態に戻す
@@ -1334,7 +1357,7 @@ function retryHighPitchMeasurement() {
 
     // 高音測定の待機状態に戻す
     globalState.currentPhase = 'waiting-for-voice-high';
-    document.getElementById('main-status-text').textContent = '高音域測定: できるだけ高い声で「あー」と発声しましょう（再測定）';
+    document.getElementById('main-status-text').textContent = '３秒間できるだけ高い声で「あー」と発声しましょう（再測定）';
     document.getElementById('sub-info-text').textContent = 'より大きく、より高い音で歌ってください';
 
     // バッジを高音待機状態に戻す
@@ -1427,11 +1450,11 @@ function handleHighPitchMeasurementFailure() {
             // 🧪 デバッグ状態更新
             updateDebugStatus('高音測定諦め・部分結果表示', '録音停止');
 
-            updateBadgeForError();
-            document.getElementById('main-status-text').textContent = '高音測定失敗 - 低音域のみの結果を表示';
-            document.getElementById('sub-info-text').textContent = '低音域の測定結果のみ利用可能です';
+            updateBadgeForConfirmed();
+            document.getElementById('main-status-text').textContent = '測定完了！低音域の結果を表示します';
+            document.getElementById('sub-info-text').textContent = '低音域のデータでトレーニング開始可能です';
 
-            showNotification('高音測定に失敗しましたが、低音域の結果を表示します', 'warning');
+            showNotification('低音域のデータを取得しました。トレーニングを開始できます', 'success');
 
             // PitchPro AudioDetector停止（音量バー・マイクも自動リセット）
             if (globalAudioDetector) {
@@ -1532,7 +1555,7 @@ function startHighPitchPhase() {
     updateCircularProgressInstantly(0);
     
     // UI更新
-    document.getElementById('main-status-text').textContent = '高音域測定: できるだけ高い声で「あー」と発声しましょう';
+    document.getElementById('main-status-text').textContent = '３秒間できるだけ高い声で「あー」と発声しましょう';
     document.getElementById('sub-info-text').textContent = '安定した声を認識したら自動で測定開始します';
     updateBadgeForWaiting('arrow-up');
 }
@@ -1644,11 +1667,11 @@ async function retryCurrentMeasurement() {
 
     if (globalState.currentPhase.includes('low')) {
         globalState.currentPhase = 'waiting-for-voice';
-        document.getElementById('main-status-text').textContent = '低音域測定: できるだけ低い声で「あー」と発声しましょう（再測定）';
+        document.getElementById('main-status-text').textContent = '３秒間できるだけ低い声で「あー」と発声しましょう（再測定）';
         updateBadgeForWaiting('arrow-down');
     } else if (globalState.currentPhase.includes('high')) {
         globalState.currentPhase = 'waiting-for-voice-high';
-        document.getElementById('main-status-text').textContent = '高音域測定: できるだけ高い声で「あー」と発声しましょう（再測定）';
+        document.getElementById('main-status-text').textContent = '３秒間できるだけ高い声で「あー」と発声しましょう（再測定）';
         updateBadgeForWaiting('arrow-up');
     }
 
@@ -1897,16 +1920,28 @@ function updateBadgeForWaiting(iconType) {
         rangeIcon.innerHTML = `<img src="${iconSrc}" alt="${iconType}" class="range-icon-img">`;
         rangeIcon.style.display = 'block';
         countdownDisplay.style.display = 'none';
+
+        // アイコンと背景の両方からmeasuringクラスを削除
+        rangeIcon.classList.remove('measuring', 'range-icon-confirmed');
         badge.classList.remove('measuring', 'confirmed', 'failure');
     }
 }
 
 function updateBadgeForMeasuring() {
+    const rangeIcon = document.getElementById('range-icon');
     const badge = document.querySelector('.voice-note-badge');
+
     if (badge) {
         badge.classList.add('measuring');
         badge.classList.remove('confirmed');
     }
+
+    // 矢印アイコンにもmeasuringクラスを追加してフェードアニメーション開始
+    if (rangeIcon) {
+        rangeIcon.classList.add('measuring');
+        rangeIcon.classList.remove('range-icon-confirmed');
+    }
+
     document.getElementById('retry-measurement-btn').style.display = 'inline-block';
 }
 
@@ -1916,23 +1951,25 @@ function updateBadgeForConfirmed() {
     const badge = document.querySelector('.voice-note-badge');
 
     if (rangeIcon && countdownDisplay && badge) {
+        // measuringクラスを削除してフェードアニメーション停止
+        rangeIcon.classList.remove('measuring');
+
         // インラインスタイルを削除し、CSSクラスで制御
         rangeIcon.innerHTML = '<img src="./icons/check.png" alt="測定完了" class="range-icon-img">';
         rangeIcon.style.display = 'block';
         countdownDisplay.style.display = 'none';
 
+        // チェックマークバウンズアニメーション（一回のみ）
+        rangeIcon.classList.add('range-icon-confirmed');
+
+        // アニメーション終了後にクラスを削除
+        setTimeout(() => {
+            rangeIcon.classList.remove('range-icon-confirmed');
+        }, 600);
+
         // クラス更新（緑の背景継続のため）
         badge.classList.add('confirmed');
         badge.classList.remove('measuring');
-
-        // アニメーション用の一時的なクラスを追加
-        badge.classList.add('confirming-animation');
-
-        // アニメーション完了後にアニメーション用クラスのみを削除
-        setTimeout(() => {
-            badge.classList.remove('confirming-animation');
-            // confirmedクラスは残して緑の背景を継続
-        }, 600); // 0.6s のアニメーション時間と同じ
     }
     document.getElementById('retry-measurement-btn').style.display = 'none';
 }
