@@ -138,3 +138,165 @@
         box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
     }
 }
+
+/* === 音域テスト専用テキストスタイル === */
+
+/* メインステータステキスト */
+.voice-range-main-text {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    font-weight: 500;
+    color: #ffffff;
+    margin-top: 0;
+    margin-bottom: 4px;
+}
+
+/* メインテキスト状態別バリエーション */
+.voice-range-main-text.waiting {
+    color: #bae6fd; /* text-blue-200 - 待機中 */
+}
+
+.voice-range-main-text.measuring {
+    color: #fef08a; /* text-yellow-200 - 測定中 */
+}
+
+.voice-range-main-text.success {
+    color: #bbf7d0; /* text-green-200 - 成功 */
+}
+
+.voice-range-main-text.error {
+    color: #fecaca; /* text-red-200 - エラー */
+}
+
+/* サブテキスト */
+.voice-range-sub-text {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    color: #bbf7d0; /* text-green-200と同じ色 */
+    margin-top: 0;
+    margin-bottom: 4px;
+}
+
+/* === ボタン表示制御クラス === */
+
+/* === 1. 基本表示制御 === */
+.btn-hidden {
+    display: none !important;
+}
+
+.btn-visible-inline {
+    display: inline-flex !important;
+}
+
+.btn-visible-block {
+    display: inline-block !important;
+}
+
+/* === 2. 音域テスト操作ボタン（コア機能） === */
+.voice-range-btn {
+    /* 音域テスト専用ボタンの基本スタイル */
+}
+
+/* 開始ボタン */
+#begin-range-test-btn.btn-state-ready {
+    /* 開始可能状態 */
+}
+
+#begin-range-test-btn.btn-state-disabled {
+    /* 無効状態 */
+}
+
+/* 停止ボタン */
+#stop-range-test-btn.btn-state-active {
+    /* 測定中の表示状態 */
+}
+
+/* 再測定ボタン */
+#retry-measurement-btn.btn-state-retry,
+#remeasure-btn.btn-state-retry {
+    /* リトライ可能状態 */
+}
+
+/* === 3. システム制御ボタン（補助機能） === */
+.system-control-btn {
+    /* システム制御用ボタンの基本スタイル */
+}
+
+/* マイク許可ボタン */
+#request-mic-permission.mic-state-idle {
+    /* マイク未許可状態 */
+}
+
+#request-mic-permission.mic-state-permitted {
+    /* マイク許可済み状態 */
+}
+
+/* 検出停止ボタン */
+#stop-detection-btn.btn-state-emergency {
+    /* 緊急停止状態 */
+}
+
+/* === 4. デバッグ・テスト用ボタン（開発用） === */
+.debug-btn {
+    /* デバッグ専用ボタンの基本スタイル */
+    border: 1px dashed rgba(255, 255, 255, 0.3) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.debug-btn::before {
+    content: '🧪 ';
+    opacity: 0.7;
+}
+
+/* デバッグ表示切り替え */
+#toggle-debug-display.debug-visible {
+    background: rgba(245, 158, 11, 0.2) !important;
+    color: #fbbf24 !important;
+}
+
+#toggle-debug-display.debug-hidden {
+    background: rgba(107, 114, 128, 0.2) !important;
+    color: #9ca3af !important;
+}
+
+/* セクション表示制御 */
+.section-visible {
+    display: block !important;
+}
+
+.section-hidden {
+    display: none !important;
+}
+
+/* === アイコン・UI要素表示制御 === */
+
+/* アイコン表示 */
+.icon-visible {
+    display: block !important;
+}
+
+.icon-hidden {
+    display: none !important;
+}
+
+/* === ステータス色クラス === */
+
+/* 成功色 (緑) */
+.status-success {
+    color: #10b981 !important;
+}
+
+/* エラー色 (赤) */
+.status-error {
+    color: #ef4444 !important;
+}
+
+/* 警告色 (オレンジ) */
+.status-warning {
+    color: #f59e0b !important;
+}
+
+/* 情報色 (青) */
+.status-info {
+    color: #3b82f6 !important;
+}

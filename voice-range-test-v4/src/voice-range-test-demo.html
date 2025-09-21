@@ -31,7 +31,7 @@
         <main class="narrow-main">
             <!-- マイク許可セクション -->
             <div style="text-align: center; padding: 20px 0;">
-                <button class="btn btn-primary mic-button mic-idle" id="request-mic-permission">
+                <button class="btn btn-primary mic-button mic-idle system-control-btn" id="request-mic-permission">
                     <i data-lucide="mic" class="icon-md"></i>
                     <span>マイク許可を要求</span>
                 </button>
@@ -58,7 +58,7 @@
                 
                 <!-- メインステータス -->
                 <div class="text-center mb-6">
-                    <h4 class="text-sub-title main-status-display" id="main-status-text">マイク許可後、音域テストを開始してください</h4>
+                    <h4 class="voice-range-main-text" id="main-status-text">マイク許可後、音域テストを開始してください</h4>
                 </div>
                 
                 <!-- 音域テストバッジ -->
@@ -83,7 +83,7 @@
                 
                 <!-- サブ情報 -->
                 <div class="text-center mt-4">
-                    <p class="text-sm text-white-70 sub-info-display" id="sub-info-text">待機中...</p>
+                    <p class="text-sm voice-range-sub-text" id="sub-info-text">待機中...</p>
                 </div>
 
                 <!-- 検出状況表示 -->
@@ -111,22 +111,22 @@
                 
                 <!-- コントロールボタン -->
                 <div class="text-center mt-6">
-                    <button class="btn btn-primary" id="begin-range-test-btn" disabled>
+                    <button class="btn btn-primary voice-range-btn" id="begin-range-test-btn" disabled>
                         <i data-lucide="play" class="icon-sm"></i>
                         <span>音域テスト開始</span>
                     </button>
 
-                    <button class="btn btn-outline ml-3" id="stop-range-test-btn" style="display: none;">
+                    <button class="btn btn-outline ml-3 voice-range-btn btn-hidden" id="stop-range-test-btn">
                         <i data-lucide="square" class="icon-sm"></i>
                         <span>テスト停止</span>
                     </button>
 
-                    <button class="btn btn-danger ml-3" id="stop-detection-btn" style="display: none;">
+                    <button class="btn btn-danger ml-3 system-control-btn btn-hidden" id="stop-detection-btn">
                         <i data-lucide="mic-off" class="icon-sm"></i>
                         <span>検出停止</span>
                     </button>
 
-                    <button class="btn btn-secondary ml-3" id="retry-measurement-btn" style="display: none;">
+                    <button class="btn btn-secondary ml-3 voice-range-btn btn-hidden" id="retry-measurement-btn">
                         <i data-lucide="refresh-cw" class="icon-sm"></i>
                         <span>再測定</span>
                     </button>
@@ -173,7 +173,7 @@
 
                 <!-- アクションボタン -->
                 <div class="text-center mt-5">
-                    <button class="btn btn-primary" id="remeasure-btn">
+                    <button class="btn btn-primary voice-range-btn" id="remeasure-btn">
                         <i data-lucide="refresh-cw" class="icon-sm"></i>
                         <span>再測定</span>
                     </button>
@@ -261,7 +261,7 @@
                     <p class="text-sm text-white-70">🎵 音声処理エンジン: <strong>PitchPro v1.3.0</strong></p>
                     <p class="text-sm text-white-70">📦 AudioDetectionComponent: <strong id="adc-status">確認中...</strong></p>
                     <p class="text-sm text-white-70">🔧 デバイス最適化: <strong id="device-opt">自動検出</strong></p>
-                    <p class="text-sm text-white-70">🧪 テスト表示: <button class="btn btn-secondary btn-sm" id="toggle-debug-display">デバッグ表示ON</button></p>
+                    <p class="text-sm text-white-70">🧪 テスト表示: <button class="btn btn-secondary btn-sm debug-btn" id="toggle-debug-display">デバッグ表示ON</button></p>
                 </div>
             </div>
         </main>
