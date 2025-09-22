@@ -9,11 +9,6 @@
     display: block;
 }
 
-/* === range-iconアニメーション === */
-#range-icon.measuring {
-    animation: range-icon-pulse 1.5s ease-in-out infinite;
-}
-
 /* === 失敗時のバッジスタイル === */
 .voice-note-badge.failure {
     background-color: #ef4444 !important;
@@ -40,21 +35,6 @@
     }
 }
 
-@keyframes range-icon-pulse {
-    0% {
-        opacity: 0.6;
-        color: rgba(59, 130, 246, 0.8);
-    }
-    50% {
-        opacity: 1;
-        color: rgba(59, 130, 246, 1);
-    }
-    100% {
-        opacity: 0.6;
-        color: rgba(59, 130, 246, 0.8);
-    }
-}
-
 /* === マイクボタン状態管理 === */
 .mic-button {
     transition: all 0.3s ease;
@@ -73,25 +53,26 @@
 .mic-button.mic-active {
     background: linear-gradient(135deg, #ef4444, #dc2626);
     color: white;
-    animation: mic-recording-pulse 1.5s ease-in-out infinite;
+    animation: modern-mic-active 1.8s ease-in-out infinite;
+    border: 2px solid rgba(239, 68, 68, 0.8);
 }
 
 .mic-button.mic-active i {
     color: white !important;
 }
 
-@keyframes mic-recording-pulse {
+@keyframes modern-mic-active {
     0% {
-        transform: scale(1);
         box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+        border: 2px solid rgba(239, 68, 68, 0.8);
     }
     50% {
-        transform: scale(1.05);
-        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+        box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.2);
+        border: 2px solid rgba(239, 68, 68, 1);
     }
     100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+        border: 2px solid rgba(239, 68, 68, 0.8);
     }
 }
 
@@ -100,8 +81,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     transition: all 0.3s ease;
 }
@@ -112,30 +93,49 @@
 }
 
 .mic-status-container.recording {
-    background: rgba(239, 68, 68, 0.2);
+    background: rgba(239, 68, 68, 0.15);
     color: #ef4444;
-    animation: mic-status-pulse 1.5s ease-in-out infinite;
+    animation: modern-mic-active 1.8s ease-in-out infinite;
+    border: 2px solid rgba(239, 68, 68, 0.8);
 }
 
 .mic-status-container.recording i {
     color: #ef4444 !important;
 }
 
-@keyframes mic-status-pulse {
+.mic-status-container.muted {
+    background: rgba(107, 114, 128, 0.2);
+    color: #6b7280;
+}
+
+.mic-status-container.muted i {
+    color: #6b7280 !important;
+}
+
+/* インターバル状態（低音と高音の間の待機時） */
+.mic-status-container.interval {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+    animation: interval-pulse 2s ease-in-out infinite;
+    border: 2px solid rgba(59, 130, 246, 0.8);
+}
+
+.mic-status-container.interval i {
+    color: #3b82f6 !important;
+}
+
+@keyframes interval-pulse {
     0% {
-        transform: scale(1);
-        background: rgba(239, 68, 68, 0.2);
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+        border: 2px solid rgba(59, 130, 246, 0.8);
     }
     50% {
-        transform: scale(1.1);
-        background: rgba(239, 68, 68, 0.3);
-        box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+        box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.2);
+        border: 2px solid rgba(59, 130, 246, 1);
     }
     100% {
-        transform: scale(1);
-        background: rgba(239, 68, 68, 0.2);
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+        border: 2px solid rgba(59, 130, 246, 0.8);
     }
 }
 
@@ -194,7 +194,35 @@
 
 /* === 2. 音域テスト操作ボタン（コア機能） === */
 .voice-range-btn {
-    /* 音域テスト専用ボタンの基本スタイル */
+    /* 音域テスト専用ボタンの基本スタイル（将来的な拡張用） */
+}
+
+/* === 3. システム制御ボタン（補助機能） === */
+.system-control-btn {
+    /* システム制御用ボタンの基本スタイル（将来的な拡張用） */
+}
+
+/* === 音域アイコン測定中アニメーション === */
+#range-icon.measuring {
+    animation: range-icon-pulse 1.5s ease-in-out infinite;
+}
+
+/* 画像要素にもアニメーションを適用 */
+#range-icon.measuring img {
+    animation: range-icon-pulse 1.5s ease-in-out infinite;
+}
+
+/* 矢印アイコン専用のパルスアニメーション（マイクとは分離） */
+@keyframes range-icon-pulse {
+    0% {
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.6;
+    }
 }
 
 /* 開始ボタン */
@@ -279,6 +307,15 @@
     display: none !important;
 }
 
+/* 音域テストアイコン専用 */
+.range-icon-visible {
+    display: block !important;
+}
+
+.range-icon-hidden {
+    display: none !important;
+}
+
 /* === ステータス色クラス === */
 
 /* 成功色 (緑) */
@@ -299,4 +336,21 @@
 /* 情報色 (青) */
 .status-info {
     color: #3b82f6 !important;
+}
+
+/* === プログレスバーアニメーション制御 === */
+
+/* プログレスサークルのアニメーション無効化 */
+.progress-no-animation {
+    transition: none !important;
+}
+
+/* プログレスサークルの線形アニメーション */
+.progress-linear-animation {
+    transition: stroke-dashoffset 0.1s linear !important;
+}
+
+/* プログレスサークルの滑らかなアニメーション */
+.progress-smooth-animation {
+    transition: stroke-dashoffset 0.3s ease !important;
 }

@@ -212,7 +212,7 @@ function updateMicStatus(status) {
 
     if (micContainer) {
         // 既存のクラスをクリア
-        micContainer.classList.remove('standby', 'recording', 'muted');
+        micContainer.classList.remove('standby', 'recording', 'muted', 'interval');
 
         // 新しいステータスを適用
         switch (status) {
@@ -231,6 +231,14 @@ function updateMicStatus(status) {
                     lucide.createIcons(); // Lucideアイコンを再描画
                 }
                 console.log('🎤 マイクステータス: 録音中（赤エフェクト）');
+                break;
+            case 'interval':
+                micContainer.classList.add('interval');
+                if (micIcon) {
+                    micIcon.setAttribute('data-lucide', 'mic');
+                    lucide.createIcons(); // Lucideアイコンを再描画
+                }
+                console.log('🎤 マイクステータス: インターバル（青エフェクト）');
                 break;
             case 'muted':
                 micContainer.classList.add('muted');
@@ -264,6 +272,9 @@ function updateMicStatus(status) {
                 break;
             case 'recording':
                 micButton.classList.add('mic-active');
+                break;
+            case 'interval':
+                micButton.classList.add('mic-permitted');
                 break;
             default:
                 micButton.classList.add('mic-idle');
@@ -1247,6 +1258,9 @@ function completeLowPitchMeasurement() {
         // 低音測定完了時の待機表示
         document.getElementById('main-status-text').textContent = '低音測定完了！高音測定に進みます...';
         document.getElementById('sub-info-text').textContent = '待機中...';
+        
+        // インターバル時にマイクを青に変更
+        updateMicStatus('interval');
 
         // アイドルタイム開始
         globalState.idleTimer = setTimeout(() => {
@@ -1553,7 +1567,10 @@ function startHighPitchPhase() {
 
     // 円形プログレスバーを瞬時にリセット（アニメーション無効）
     updateCircularProgressInstantly(0);
-    
+
+    // マイクステータスを録音中（赤）に戻す
+    updateMicStatus('recording');
+
     // UI更新
     document.getElementById('main-status-text').textContent = '３秒間できるだけ高い声で「あー」と発声しましょう';
     document.getElementById('sub-info-text').textContent = '安定した声を認識したら自動で測定開始します';

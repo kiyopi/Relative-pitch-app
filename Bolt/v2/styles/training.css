@@ -293,11 +293,7 @@
     justify-content: center;
     gap: 0.75rem;
   }
-  
-  .countdown-text {
-    font-size: 2rem;
-  }
-  
+
   .range-instruction-text {
     font-size: 0.875rem;
   }
@@ -878,22 +874,6 @@
   justify-content: center;
 }
 
-.countdown-container {
-  min-width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.countdown-text {
-  font-size: 4rem;
-  font-weight: 700;
-  color: white;
-  line-height: 1;
-  margin: 0;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
 .voice-range-display-container {
   position: relative;
   display: flex;

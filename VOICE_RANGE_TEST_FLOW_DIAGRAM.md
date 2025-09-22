@@ -1,8 +1,9 @@
-# 音域テストフロー図
+# 音域テストフロー図 v2.0.0
 
-**ファイル**: preparation-test.html  
-**作成日**: 2025年1月9日  
-**目的**: 音域テスト完全フロー可視化図
+**ファイル**: voice-range-test-v4
+**更新日**: 2025年1月21日
+**目的**: 音域テスト最新実装フロー可視化図
+**対象**: PitchPro v1.3.0統合版・測定失敗ハンドリング・リトライ機能完備版
 
 ---
 
@@ -10,381 +11,414 @@
 
 ```mermaid
 flowchart TD
-    A[ページ読み込み] --> B[UIカタログ・base.css読み込み]
-    B --> C[PreparationTestUI初期化]
-    C --> D[ステップ1: デバイス検出完了]
-    
-    D --> E[ステップ2: マイクテスト開始]
-    E --> F{マイクテスト結果}
-    F -->|成功| G[ステップ3: 音域テスト移行]
-    F -->|失敗| H[エラーメッセージ表示]
-    
-    G --> I[AudioDetectionComponent再初期化]
-    I --> J[VoiceRangeTesterV113初期化]
-    J --> K[音域テスト実行フロー]
-    
-    K --> L[低音テストフェーズ]
-    L --> M[高音テストフェーズ]
-    M --> N[結果保存・表示]
-    N --> O[ステップ4: トレーニング準備完了]
+    A[ページ読み込み] --> B[PitchPro v1.3.0読み込み]
+    B --> C[voice-range-test-demo.js初期化]
+    C --> D[マイク許可要求]
+
+    D --> E{マイク許可}
+    E -->|許可| F[音域テスト開始ボタン有効化]
+    E -->|拒否| G[エラーメッセージ表示]
+
+    F --> H[音域テスト開始]
+    H --> I[AudioDetectionComponent初期化]
+    I --> J[低音測定フェーズ]
+
+    J --> K{低音測定結果}
+    K -->|成功| L[高音測定フェーズ]
+    K -->|失敗| M[低音測定リトライ（最大3回）]
+    M -->|リトライ成功| L
+    M -->|最大リトライ到達| N[高音測定にスキップ]
+
+    L --> O{高音測定結果}
+    O -->|成功| P[完全な音域結果表示]
+    O -->|失敗| Q[高音測定リトライ（最大3回）]
+    Q -->|リトライ成功| P
+    Q -->|最大リトライ到達| R[部分結果表示（低音のみ）]
+
+    N --> S[高音測定フェーズ（低音失敗後）]
+    S --> T{高音測定結果}
+    T -->|成功| U[部分結果表示（高音のみ）]
+    T -->|失敗| V[測定完全失敗・再測定推奨]
 ```
 
 ---
 
-## 🔄 AudioDetectionComponent初期化フロー
+## 🔄 測定フェーズ詳細フロー
 
 ```mermaid
 flowchart TD
-    A[startRangeTest呼び出し] --> B{既存audioDetector確認}
-    B -->|存在| C[既存audioDetector破棄]
-    C --> D[audioDetector.stopDetection]
-    D --> E[audioDetector.destroy]
-    E --> F[audioDetector = null]
-    
-    B -->|なし| G[新規AudioDetectionComponent作成]
-    F --> G
-    
-    G --> H[音域テスト用セレクター設定]
-    H --> I{設定内容}
-    
-    I --> J["volumeBarSelector: '#range-test-volume-bar'"]
-    I --> K["volumeTextSelector: '#range-test-volume-text'"]
-    I --> L["frequencySelector: '#range-test-frequency-value'"]
-    I --> M["clarityThreshold: 0.4"]
-    I --> N["minVolumeAbsolute: 0.01 (調整予定)"]
-    I --> O["deviceOptimization: true"]
-    
-    J --> P[audioDetector.initialize実行]
-    K --> P
-    L --> P
-    M --> P
-    N --> P
-    O --> P
-    
-    P --> Q[VoiceRangeTesterV113初期化]
-    Q --> R[プログレスコールバック設定]
-    R --> S[音域テスト準備完了]
+    A[測定フェーズ開始] --> B[globalState.currentPhase設定]
+    B --> C{フェーズ種別}
+
+    C -->|waiting-for-voice| D[低音待機状態]
+    C -->|waiting-for-voice-high| E[高音待機状態]
+
+    D --> F[updateBadgeForWaiting: arrow-down]
+    E --> G[updateBadgeForWaiting: arrow-up]
+
+    F --> H[音声検出待機開始]
+    G --> H
+
+    H --> I{音声検出条件}
+    I --> J["volume >= 15% (voiceDetectionThreshold)"]
+    I --> K["frequency > 0"]
+    I --> L["安定性チェック（isStableVoiceDetection）"]
+
+    J --> M{全条件達成?}
+    K --> M
+    L --> M
+
+    M -->|No| N[待機継続]
+    N --> I
+
+    M -->|Yes| O[測定開始]
+    O --> P["currentPhase = 'measuring-low/high'"]
+    P --> Q[runMeasurementPhase開始]
+
+    Q --> R[3秒測定実行]
+    R --> S[requestAnimationFrame統合進捗表示]
+    S --> T[recordMeasurementData記録]
+
+    T --> U[測定完了]
+    U --> V{測定成功判定}
+    V --> W["dataCount >= 20 && 最低/最高音検出"]
+
+    W -->|成功| X[次フェーズまたは結果表示]
+    W -->|失敗| Y[失敗処理・リトライ]
 ```
 
 ---
 
-## 🎵 VoiceRangeTesterV113動作フロー
+## 🎯 測定失敗ハンドリングフロー
 
 ```mermaid
 flowchart TD
-    A[VoiceRangeTesterV113.startRangeTest] --> B[内部状態初期化]
-    B --> C["currentTestPhase = 'ready'"]
-    C --> D[低音テストフェーズ開始]
-    
-    D --> E["currentTestPhase = 'low'"]
-    E --> F[音域テストバッジ: 下矢印表示]
-    F --> G[ステータス: '低い声を出してください']
-    G --> H[音声検出待機開始]
-    
-    H --> I{音声検出条件チェック}
-    I -->|条件未達| J[待機継続]
-    J --> I
-    
-    I -->|条件達成| K[音声検出開始]
-    K --> L[stabilityStartTime記録]
-    L --> M[音域テストバッジ: アイコン非表示]
-    M --> N[カウントアップ表示開始]
-    
-    N --> O[3秒測定実行]
-    O --> P{安定度チェック}
-    P -->|不安定| Q[測定リセット]
-    Q --> H
-    
-    P -->|安定| R[低音測定完了]
-    R --> S[高音テストフェーズ開始]
-    
-    S --> T["currentTestPhase = 'high'"]
-    T --> U[音域テストバッジ: 上矢印表示]
-    U --> V[ステータス: '高い声を出してください']
-    V --> W[高音測定実行: 同様のフロー]
-    
-    W --> X[高音測定完了]
-    X --> Y["currentTestPhase = 'completed'"]
-    Y --> Z[結果保存・表示]
+    A[測定失敗検出] --> B{フェーズ判定}
+
+    B -->|低音測定失敗| C[handleLowPitchMeasurementFailure]
+    B -->|高音測定失敗| D[handleHighPitchMeasurementFailure]
+
+    C --> E{retryCount < 3?}
+    E -->|Yes| F[retryCount++]
+    F --> G[updateCircularProgressInstantly: 0%]
+    G --> H[失敗UI表示・警告通知]
+    H --> I[2秒後自動リトライ]
+    I --> J[retryLowPitchMeasurement]
+    J --> K[waiting-for-voice状態に復帰]
+
+    E -->|No| L[最大リトライ到達]
+    L --> M[高音測定に強制進行]
+    M --> N[startHighPitchPhase]
+
+    D --> O{highRetryCount < 3?}
+    O -->|Yes| P[highRetryCount++]
+    P --> Q[updateCircularProgressInstantly: 0%]
+    Q --> R[失敗UI表示・警告通知]
+    R --> S[2秒後自動リトライ]
+    S --> T[retryHighPitchMeasurement]
+    T --> U[waiting-for-voice-high状態に復帰]
+
+    O -->|No| V[最大リトライ到達]
+    V --> W{低音データ存在?}
+    W -->|Yes| X[部分結果表示（低音のみ）]
+    W -->|No| Y[測定完全失敗]
+
+    Y --> Z[再測定ボタン表示・エラー通知]
 ```
 
 ---
 
-## 🎯 音域テストバッジ更新フロー
+## 🔄 PitchPro v1.3.0統合フロー
 
 ```mermaid
 flowchart TD
-    A[VoiceRangeTesterV113内部処理] --> B[プログレス計算]
-    B --> C[progressCallback実行]
-    C --> D[updateRangeTestBadge呼び出し]
-    
-    D --> E{stability値範囲チェック}
-    E -->|0-100範囲外| F[値を0-100に制限]
-    F --> G[offset計算実行]
-    E -->|正常範囲| G
-    
-    G --> H["offset = 452 - (progress/100) * 452"]
-    H --> I[SVG円弧のstrokeDashOffset更新]
-    I --> J[視覚的プログレス表示]
-    
-    J --> K{中央アイコン状態判定}
-    K -->|音声検出前| L[アイコン表示: arrow-down/up]
-    K -->|音声検出後| M[アイコン非表示・カウント表示]
-    
-    L --> N[バッジ更新完了]
-    M --> N
-```
+    A[AudioDetectionComponent初期化] --> B[コンストラクタパターン使用]
+    B --> C[設定オブジェクト作成]
 
----
+    C --> D["volumeBarSelector: '#range-test-volume-bar'"]
+    C --> E["volumeTextSelector: '#range-test-volume-text'"]
+    C --> F["frequencySelector: '#range-test-frequency-value'"]
+    C --> G["debugMode: false（本番）"]
 
-## 🔄 コールバック連携フロー
-
-```mermaid
-flowchart TD
-    A[PitchDetector音程検出] --> B[AudioDetectionComponent内部処理]
-    B --> C[VoiceRangeTesterV113コールバック設定]
-    C --> D["window.rangeTestUIUpdate呼び出し"]
-    
-    D --> E[PreparationTestUI.updateRangeTestUI]
-    E --> F[音量バー更新]
-    E --> G[音量テキスト更新]
-    E --> H[周波数表示更新]
-    
-    F --> I[VoiceRangeTesterV113.handlePitchDetection]
-    G --> I
-    H --> I
-    
-    I --> J{音程検出結果判定}
-    J -->|有効な音程| K[安定度計算実行]
-    J -->|無効| L[待機状態継続]
-    
-    K --> M[updateRangeTestBadge実行]
-    M --> N[バッジプログレス表示]
-    
-    L --> O[アイコン表示維持]
-    N --> P[カウント・プログレス表示]
-```
-
----
-
-## 🎤 音声検出判定フロー
-
-```mermaid
-flowchart TD
-    A[音程検出結果受信] --> B{基本条件チェック}
-    B -->|NG| C[検出失敗]
-    B -->|OK| D{詳細条件チェック}
-    
-    D --> E["frequency > 0"]
-    D --> F["clarity > 0.6"]
-    D --> G["volume > 0.02"]
-    
-    E --> H{全条件達成?}
+    D --> H[onPitchUpdateコールバック設定]
+    E --> H
     F --> H
     G --> H
-    
-    H -->|No| I[音声検出継続]
-    H -->|Yes| J[音声検出成功]
-    
-    J --> K[stabilityStartTime設定]
-    K --> L[測定モード開始]
-    L --> M[安定性監視開始]
-    
-    M --> N{安定性チェック}
-    N -->|±8Hz以内| O[安定フレーム蓄積]
-    N -->|範囲外| P[測定リセット]
-    
-    O --> Q{3秒経過?}
-    Q -->|No| R[継続測定]
-    Q -->|Yes| S[測定完了]
-    
-    P --> I
-    R --> N
-    S --> T[最終結果確定]
+
+    H --> I[updateDebugData実行]
+    H --> J[handleVoiceDetection実行]
+
+    I --> K[リアルタイムデバッグ情報更新]
+    J --> L{currentPhase判定}
+
+    L -->|waiting系| M[厳格な雑音排除適用]
+    L -->|measuring系| N[緩い音量チェックのみ]
+
+    M --> O[isStableVoiceDetection実行]
+    O --> P{安定性判定}
+    P -->|安定| Q[測定開始処理]
+    P -->|不安定| R[待機継続]
+
+    N --> S[recordMeasurementData実行]
+    S --> T[有効データのみ記録]
+
+    Q --> U[音域測定進行]
+    R --> V[音声検出継続]
+    T --> W[測定データ蓄積]
 ```
 
 ---
 
-## 📱 デバイス最適化フロー
+## 📊 データ記録・検証フロー
 
 ```mermaid
 flowchart TD
-    A[AudioDetectionComponent初期化] --> B[DeviceDetection実行]
-    B --> C{デバイス判定}
-    
-    C -->|PC| D[PC設定適用]
-    D --> E["volumeMultiplier: 3.0"]
-    D --> F["sensitivityMultiplier: 2.5"]
-    D --> G["minVolumeAbsolute: 0.003"]
-    
-    C -->|iPhone| H[iPhone設定適用]
-    H --> I["volumeMultiplier: 4.5"]
-    H --> J["sensitivityMultiplier: 3.5"]
-    H --> K["minVolumeAbsolute: 0.002"]
-    
-    C -->|iPad| L[iPad設定適用]
-    L --> M["volumeMultiplier: 7.0"]
-    L --> N["sensitivityMultiplier: 5.0"]
-    L --> O["minVolumeAbsolute: 0.001 (要調整)"]
-    
-    E --> P[PitchDetector設定更新]
-    F --> P
-    G --> P
-    I --> P
-    J --> P
-    K --> P
-    M --> P
-    N --> P
-    O --> P
-    
-    P --> Q[MicrophoneController感度設定]
-    Q --> R[デバイス最適化完了]
+    A[recordMeasurementData呼び出し] --> B{データ有効性チェック}
+    B -->|無効| C[スキップログ出力]
+    B -->|有効| D[currentPhase判定]
+
+    D -->|measuring-low| E[低音データ記録]
+    D -->|measuring-high| F[高音データ記録]
+
+    E --> G[frequencies配列に追加]
+    E --> H[lowestFreq更新チェック]
+    E --> I[avgVolume計算]
+    E --> J{5個おき?}
+    J -->|Yes| K[進捗ログ出力]
+
+    F --> L[frequencies配列に追加]
+    F --> M[highestFreq更新チェック]
+    F --> N[avgVolume計算]
+    F --> O{5個おき?}
+    O -->|Yes| P[進捗ログ出力]
+
+    G --> Q[測定完了時検証]
+    L --> Q
+
+    Q --> R{成功条件チェック}
+    R --> S["dataCount >= 20"]
+    R --> T["lowestFreq/highestFreq存在"]
+
+    S --> U{成功判定}
+    T --> U
+
+    U -->|成功| V[次フェーズ進行]
+    U -->|失敗| W[詳細検証ログ出力]
+    W --> X[失敗処理呼び出し]
 ```
 
 ---
 
-## ⚠️ エラーハンドリングフロー
+## 🎨 UI状態管理フロー
 
 ```mermaid
 flowchart TD
-    A[エラー発生] --> B{エラー種別判定}
-    
+    A[UI状態変更要求] --> B{変更対象}
+
+    B -->|円形プログレスバー| C[updateCircularProgressInstantly]
+    B -->|バッジ状態| D[updateBadgeFor系関数]
+    B -->|ボタン表示| E[DOM要素style.display変更]
+    B -->|ステータステキスト| F[textContent更新]
+
+    C --> G[アニメーション無効化]
+    G --> H[strokeDashOffset即座更新]
+    H --> I[200ms後アニメーション再有効化]
+
+    D --> J{状態種別}
+    J -->|waiting| K[updateBadgeForWaiting]
+    J -->|measuring| L[updateBadgeForMeasuring]
+    J -->|confirmed| M[updateBadgeForConfirmed]
+    J -->|failure| N[updateBadgeForFailure]
+    J -->|error| O[updateBadgeForError]
+
+    K --> P[アイコン表示・プログレス非表示]
+    L --> Q[アイコン非表示・プログレス表示]
+    M --> R[チェックマーク表示]
+    N --> S[警告表示]
+    O --> T[エラー表示]
+
+    E --> U[ボタン表示/非表示切り替え]
+    F --> V[ユーザー向けメッセージ更新]
+
+    P --> W[UI状態同期完了]
+    Q --> W
+    R --> W
+    S --> W
+    T --> W
+    U --> W
+    V --> W
+```
+
+---
+
+## 🔄 PitchProメソッド活用フロー
+
+```mermaid
+flowchart TD
+    A[音域テスト終了/失敗] --> B[PitchPro停止処理]
+
+    B --> C{stopメソッド存在?}
+    C -->|Yes| D[audioDetector.stop実行]
+    C -->|No| E[audioDetector.stopDetection実行]
+
+    D --> F[PitchProによる自動リセット]
+    E --> F
+
+    F --> G[音量バー自動リセット]
+    F --> H[マイク状態自動リセット]
+    F --> I[周波数表示自動リセット]
+
+    G --> J[アプリケーション側処理]
+    H --> J
+    I --> J
+
+    J --> K[updateMicStatus: 'standby']
+    J --> L[UI要素表示切り替え]
+    J --> M[円形プログレスバーリセット]
+
+    K --> N[表示状態のみ更新]
+    L --> O[ボタン・テキスト表示調整]
+    M --> P[updateCircularProgressInstantly: 0%]
+
+    N --> Q[完全なUI状態リセット完了]
+    O --> Q
+    P --> Q
+```
+
+---
+
+## 🧪 デバッグ・ログフロー
+
+```mermaid
+flowchart TD
+    A[デバッグデータ更新] --> B[updateDebugData実行]
+    B --> C[グローバルデバッグデータ蓄積]
+
+    C --> D{デバッグ表示ON?}
+    D -->|Yes| E[updateDebugDisplay実行]
+    D -->|No| F[データのみ蓄積]
+
+    E --> G[HTML要素更新]
+    G --> H[リアルタイム検出情報表示]
+    G --> I[音域範囲情報表示]
+    G --> J[検出回数カウント表示]
+
+    F --> K[測定ログ出力]
+    K --> L{ログ種別}
+
+    L -->|データ記録| M[5個おき進捗ログ]
+    L -->|測定検証| N[成功/失敗詳細ログ]
+    L -->|失敗処理| O[リトライ状況ログ]
+    L -->|PitchPro連携| P[メソッド使用ログ]
+
+    M --> Q[コンソール出力]
+    N --> Q
+    O --> Q
+    P --> Q
+
+    H --> R[開発者向け情報提供]
+    I --> R
+    J --> R
+    Q --> R
+```
+
+---
+
+## ⚠️ エラーハンドリング詳細フロー
+
+```mermaid
+flowchart TD
+    A[エラー発生] --> B{エラー種別}
+
     B -->|初期化エラー| C[AudioDetectionComponent初期化失敗]
-    B -->|マイクアクセスエラー| D[MicrophoneAccessError]
-    B -->|音程検出エラー| E[PitchDetectionError]
-    B -->|UI更新エラー| F[DOM要素未発見エラー]
-    
-    C --> G[ErrorMessageBuilder.logError]
-    D --> G
-    E --> G
-    F --> G
-    
-    G --> H[構造化エラー作成]
-    H --> I[コールバック通知]
-    I --> J[ユーザー向けメッセージ表示]
-    
-    J --> K{復旧可能?}
-    K -->|Yes| L[自動復旧試行]
-    K -->|No| M[ユーザー操作待機]
-    
-    L --> N{復旧成功?}
-    N -->|Yes| O[正常動作復帰]
-    N -->|No| M
+    B -->|測定データ不足| D[データ数 < 20個]
+    B -->|音声検出失敗| E[音量・周波数検出不可]
+    B -->|システムエラー| F[PitchPro内部エラー]
+
+    C --> G[エラーログ出力]
+    D --> H[測定失敗処理]
+    E --> I[音声検出継続]
+    F --> J[AudioDetector再初期化]
+
+    H --> K{リトライ可能?}
+    K -->|Yes| L[自動リトライ開始]
+    K -->|No| M[部分結果表示/完全失敗]
+
+    L --> N[リトライカウンター増加]
+    N --> O[UI状態リセット]
+    O --> P[測定再開]
+
+    M --> Q[適切なユーザー通知]
+    Q --> R[再測定ボタン表示]
+
+    G --> S[開発者向けログ]
+    I --> T[検出条件緩和検討]
+    J --> U[システム復旧処理]
+
+    S --> V[問題診断情報提供]
+    T --> W[音声検出継続]
+    U --> X[正常動作復帰]
 ```
 
 ---
 
-## 🔧 リソース管理フロー
+## 🎯 成功シナリオフロー
 
 ```mermaid
 flowchart TD
-    A[コンポーネント使用開始] --> B[AudioDetectionComponent作成]
-    B --> C[MicrophoneController初期化]
-    C --> D[AudioManager初期化]
-    D --> E[PitchDetector初期化]
-    
-    E --> F[リソース使用中]
-    F --> G{終了条件}
-    
-    G -->|手動停止| H[stopDetection呼び出し]
-    G -->|エラー発生| I[エラーハンドリング]
-    G -->|テスト完了| J[正常終了]
-    
-    H --> K[destroy実行]
-    I --> K
-    J --> K
-    
-    K --> L[PitchDetector.destroy]
-    L --> M[MicrophoneController.destroy]
-    M --> N[AudioManager.destroy]
-    N --> O[DOM要素キャッシュクリア]
-    O --> P[コールバッククリア]
-    P --> Q[状態リセット]
-    Q --> R[リソース解放完了]
+    A[音域テスト開始] --> B[マイク許可確認]
+    B --> C[AudioDetectionComponent初期化成功]
+    C --> D[低音測定フェーズ開始]
+
+    D --> E[音声検出待機]
+    E --> F[安定した低音検出]
+    F --> G[3秒測定実行]
+    G --> H[20個以上データ記録]
+    H --> I[低音測定成功]
+
+    I --> J[3秒待機（idle-low）]
+    J --> K[高音測定フェーズ開始]
+    K --> L[音声検出待機]
+    L --> M[安定した高音検出]
+    M --> N[3秒測定実行]
+    N --> O[20個以上データ記録]
+    O --> P[高音測定成功]
+
+    P --> Q[PitchPro自動停止]
+    Q --> R[音域計算実行]
+    R --> S[結果表示画面]
+    S --> T[測定完了通知]
+
+    T --> U[ユーザー満足度向上]
 ```
 
 ---
 
-## 📋 データフローとUI連携
+## 📋 実装状況サマリー
 
-```mermaid
-flowchart LR
-    A[音声入力] --> B[AudioManager処理]
-    B --> C[PitchDetector解析]
-    C --> D[周波数・音量・明瞭度算出]
-    
-    D --> E[AudioDetectionComponent]
-    E --> F[UI要素更新]
-    E --> G[コールバック通知]
-    
-    F --> H["#range-test-volume-bar"]
-    F --> I["#range-test-volume-text"]
-    F --> J["#range-test-frequency-value"]
-    
-    G --> K[window.rangeTestUIUpdate]
-    K --> L[PreparationTestUI処理]
-    K --> M[VoiceRangeTesterV113処理]
-    
-    M --> N[音域テストバッジ更新]
-    M --> O[測定状態管理]
-    M --> P[結果データ保存]
-    
-    P --> Q[DataManager]
-    Q --> R[LocalStorage保存]
-```
+### ✅ 完了済み機能
+- PitchPro v1.3.0統合（コンストラクタパターン）
+- 最小データ数要件（20個）による厳格な成功判定
+- 低音・高音測定の独立したリトライシステム（各最大3回）
+- 円形プログレスバーの即座リセット機能
+- PitchProメソッドを活用したUI状態管理
+- 詳細なログ出力・デバッグ機能
+
+### 🔄 現在の動作フロー
+1. **初期化**: AudioDetectionComponent作成・設定
+2. **低音測定**: 待機→検出→測定→検証→成功/リトライ
+3. **高音測定**: 待機→検出→測定→検証→成功/リトライ
+4. **結果表示**: 完全結果/部分結果/失敗表示
+5. **クリーンアップ**: PitchPro停止・UI状態リセット
+
+### 🎯 技術的特徴
+- **責任分離**: PitchPro（音声処理）+ アプリ（UI状態管理）
+- **堅牢性**: 多層的エラーハンドリング・自動リトライ
+- **ユーザビリティ**: 明確な進捗表示・詳細なフィードバック
+- **保守性**: 構造化されたデバッグ・ログシステム
 
 ---
 
-## 🎯 クリーンアップ対象の特定
-
-### 削除すべき古いコード
-```mermaid
-flowchart TD
-    A[preparation-test.html解析] --> B{コード分類}
-    
-    B -->|削除対象| C[古いPitchProバージョン対応コード]
-    B -->|削除対象| D[重複したデバイス検出処理]  
-    B -->|削除対象| E[未使用のテスト用コード]
-    B -->|削除対象| F[不適切なコールバック処理]
-    
-    B -->|保持対象| G[AudioDetectionComponent統合]
-    B -->|保持対象| H[VoiceRangeTesterV113連携]
-    B -->|保持対象| I[音域テストバッジ機能]
-    B -->|保持対象| J[PreparationTestUI機能]
-    
-    C --> K[クリーンアップ実行]
-    D --> K
-    E --> K
-    F --> K
-    
-    G --> L[機能保持・最適化]
-    H --> L
-    I --> L
-    J --> L
-```
-
----
-
-## 🚀 実装優先度マップ
-
-```mermaid
-flowchart TD
-    A[最優先: 動作保証] --> B[AudioDetectionComponent再初期化]
-    B --> C[VoiceRangeTesterV113連携]
-    C --> D[音域テストバッジ更新]
-    
-    A --> E[高優先: 安定性] --> F[エラーハンドリング強化]
-    F --> G[リソース管理徹底]
-    G --> H[デバイス最適化調整]
-    
-    A --> I[中優先: 最適化] --> J[不要コード削除]  
-    J --> K[パフォーマンス改善]
-    K --> L[コード構造整理]
-    
-    A --> M[低優先: 拡張] --> N[新機能追加検討]
-    N --> O[UI改善検討]
-```
-
----
-
-**このフロー図を基準にクリーンアップ作業を実行する**
+**Version**: 2.0.0
+**Last Updated**: 2025年1月21日
+**Based on**: voice-range-test-v4実装 + 測定失敗ハンドリング + リトライ機能
