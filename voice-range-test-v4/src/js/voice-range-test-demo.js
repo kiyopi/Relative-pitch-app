@@ -1259,7 +1259,39 @@ function completeLowPitchMeasurement() {
         document.getElementById('main-status-text').textContent = '低音測定完了！高音測定に進みます...';
         document.getElementById('sub-info-text').textContent = '待機中...';
         
-        // インターバル時にマイクを青に変更
+        // インターバル時に音声検出を停止してマイクを青に変更
+        console.log('🔍 AudioDetector状態確認:', {
+            exists: !!globalAudioDetector,
+            isDetecting: globalAudioDetector?.isDetecting,
+            hasStopMethod: !!globalAudioDetector?.stopDetection,
+            hasUpdateSelectorsMethod: !!globalAudioDetector?.updateSelectors
+        });
+
+        // PitchProのupdateSelectors()を使用してUIリセットを試行
+        if (globalAudioDetector && globalAudioDetector.updateSelectors) {
+            try {
+                // 同じセレクターで更新することでUIリセット効果を狙う
+                globalAudioDetector.updateSelectors({
+                    volumeBarSelector: '#range-test-volume-bar',
+                    volumeTextSelector: '#range-test-volume-text', 
+                    frequencySelector: '#range-test-frequency-value'
+                });
+                console.log('🔄 PitchPro updateSelectors()でUIリセット実行');
+            } catch (error) {
+                console.warn('⚠️ updateSelectors()失敗:', error);
+                // フォールバック: 従来の方法
+                globalAudioDetector.stopDetection();
+                console.log('🔇 フォールバック: stopDetection()実行');
+            }
+        } else if (globalAudioDetector && globalAudioDetector.stopDetection) {
+            globalAudioDetector.stopDetection();
+            console.log('🔇 インターバル中: 音声検出を一時停止');
+        }
+
+        // 念のため手動でも音量バーをリセット
+        resetVolumeDisplay();
+        console.log('📊 音量バーをリセット');
+
         updateMicStatus('interval');
 
         // アイドルタイム開始
@@ -1279,8 +1311,9 @@ function completeLowPitchMeasurement() {
 function handleLowPitchMeasurementFailure() {
     console.log('🔄 低音測定失敗 - 対処開始');
 
-    // 円形プログレスバーを即座にリセット
+    // 円形プログレスバーと音量バーを即座にリセット
     updateCircularProgressInstantly(0);
+    resetVolumeDisplay();
 
     // リトライ回数チェック
     if (globalState.retryCount < globalState.maxRetries) {
@@ -1419,8 +1452,9 @@ function updateBadgeForError() {
 function handleHighPitchMeasurementFailure() {
     console.log('🔄 高音測定失敗 - 対処開始');
 
-    // 円形プログレスバーを即座にリセット
+    // 円形プログレスバーと音量バーを即座にリセット
     updateCircularProgressInstantly(0);
+    resetVolumeDisplay();
 
     // リトライ回数チェック（高音測定用の独立したカウンター）
     if (!globalState.highRetryCount) {
@@ -1568,7 +1602,18 @@ function startHighPitchPhase() {
     // 円形プログレスバーを瞬時にリセット（アニメーション無効）
     updateCircularProgressInstantly(0);
 
-    // マイクステータスを録音中（赤）に戻す
+    // 音声検出を再開してマイクステータスを録音中（赤）に戻す
+    console.log('🔍 高音測定前のAudioDetector状態:', {
+        exists: !!globalAudioDetector,
+        isDetecting: globalAudioDetector?.isDetecting,
+        hasStartMethod: !!globalAudioDetector?.startDetection
+    });
+
+    // isDetectingプロパティが存在しない場合でも開始を試みる
+    if (globalAudioDetector && globalAudioDetector.startDetection) {
+        globalAudioDetector.startDetection();
+        console.log('🎤 高音測定開始: 音声検出を再開');
+    }
     updateMicStatus('recording');
 
     // UI更新
@@ -1645,6 +1690,10 @@ function completeHighPitchMeasurement() {
         }
         console.log('✅ PitchProが音量バー・マイク状態も自動リセット');
     }
+
+    // 音量バーを手動でリセット（PitchProが自動でリセットしない場合の保険）
+    resetVolumeDisplay();
+    console.log('📊 高音測定完了: 音量バーをリセット');
 
     // 結果計算と表示
     const results = calculateVoiceRange();
@@ -1809,8 +1858,25 @@ function stopAllMeasurements() {
     showNotification('測定を停止しました', 'info');
 }
 
-// 音量表示リセット
+// 音量表示リセット（PitchPro標準機能優先）
 function resetVolumeDisplay() {
+    // PitchProのupdateSelectors()を優先使用
+    if (globalAudioDetector && globalAudioDetector.updateSelectors) {
+        try {
+            console.log('🔄 PitchPro updateSelectors()で音量バーリセット');
+            globalAudioDetector.updateSelectors({
+                volumeBarSelector: '#range-test-volume-bar',
+                volumeTextSelector: '#range-test-volume-text',
+                frequencySelector: '#range-test-frequency-value'
+            });
+            return; // 成功した場合は手動リセット不要
+        } catch (error) {
+            console.warn('⚠️ PitchPro updateSelectors()失敗、手動リセットに切り替え:', error);
+        }
+    }
+
+    // フォールバック: 手動リセット
+    console.log('📊 手動で音量バーリセット（フォールバック）');
     const volumeBar = document.getElementById('range-test-volume-bar');
     const volumeText = document.getElementById('range-test-volume-text');
     const frequency = document.getElementById('range-test-frequency-value');
