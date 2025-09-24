@@ -1209,7 +1209,7 @@ function startLowPitchMeasurement() {
     console.log('🎯 低音域測定開始 (新方式)');
     globalState.currentPhase = 'measuring-low';
 
-    document.getElementById('main-status-text').textContent = 'そのまま声をキープしましょう';
+    document.getElementById('main-status-text').textContent = 'できるだけ低い声をキープしましょう';
     document.getElementById('sub-info-text').textContent = '低音測定中...';
 
     // バッジアニメーションを開始
@@ -1627,7 +1627,7 @@ function startHighPitchMeasurement() {
     console.log('🎯 高音域測定開始 (新方式)');
     globalState.currentPhase = 'measuring-high';
 
-    document.getElementById('main-status-text').textContent = 'そのまま声をキープしましょう';
+    document.getElementById('main-status-text').textContent = 'できるだけ高い声をキープしましょう';
     document.getElementById('sub-info-text').textContent = '高音測定中...';
 
     // バッジアニメーションを開始
