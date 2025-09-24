@@ -423,12 +423,33 @@ function completeAudioTest() {
     if (progressDisplay) {
         progressDisplay.style.display = 'none';
     }
-    
-    // 音域テストボタン表示
-    if (startRangeTestBtn) {
-        startRangeTestBtn.classList.remove('hidden');
+
+    // 音域データの有無で分岐
+    if (dataManager) {
+        const savedRange = dataManager.getVoiceRangeData();
+        if (savedRange && savedRange.success) {
+            // 音域データが保存されている場合
+            console.log('📱 保存済み音域データあり - スキップ画面表示');
+            showSavedRangeDisplay(savedRange);
+
+            // 音域保存表示を表示
+            if (rangeSavedDisplay) {
+                rangeSavedDisplay.classList.remove('hidden');
+            }
+        } else {
+            // 音域データがない場合
+            console.log('📱 音域データなし - 音域テスト開始ボタン表示');
+            if (startRangeTestBtn) {
+                startRangeTestBtn.classList.remove('hidden');
+            }
+        }
+    } else {
+        // dataManagerがない場合はデフォルト動作
+        if (startRangeTestBtn) {
+            startRangeTestBtn.classList.remove('hidden');
+        }
     }
-    
+
     updateStepStatus(2, 'completed');
 }
 

@@ -2164,3 +2164,75 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-22 12:09:01] コミット: feat: マイクアニメーション改善・インターバル時青色表示実装
+
+- マイクアクティブ時のアニメーションをシンプルでモダンなデザインに改善
+- 赤グローから控えめなリング拡張エフェクトに変更（Material Design風）
+- 低音測定と高音測定の間のインターバル時にマイクを青色に変更
+- 矢印アイコンとマイクアイコンのアニメーションを分離
+- アニメーション周期を1.8秒〜2秒に統一してより洗練された表示に
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-23 18:43:07] コミット: feat: PitchPro統合改善・updateSelectors()標準機能活用実装
+
+- resetVolumeDisplay()にPitchPro updateSelectors()メソッド優先使用を実装
+- 手動音量バーリセットをフォールバック処理に変更
+- AudioDetectionComponent単一インスタンス確認完了
+- PitchProの標準機能を活用した適切な統合パターン実装
+- 音量バー・周波数表示のリセット処理を標準API経由で実行
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-24 09:53:42] コミット: feat: PitchPro v1.3.1アップグレード完了・低音検出精度向上
+
+- PitchPro v1.3.0 → v1.3.1 バージョンアップ実施
+- PC低周波検出復旧: ノイズゲート 5.0% → 2.3% 調整で100Hz検出改善
+- 音量バー更新最適化: UI更新プロセス統一・キャッシュベース要素管理
+- クロスモード要素処理改善: updateSelectors()との相乗効果実現
+- HTMLバージョン表示を v1.3.1 に完全更新
+- 公式改善と統合管理システム改善の完璧な相乗効果達成
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-24 10:27:28] コミット: fix: Safari 18 backdrop-filterバグ回避 - iPad白背景問題解決
+
+- 全てのマイクステータス状態(.standby, .recording, .muted, .interval)にSafari 18バグ回避策を適用
+- backdrop-filter: none !important で完全無効化
+- iPad Safari 18での白背景表示問題を根本解決
+- 既知のWebKitバグ(白背景+backdrop-filter組み合わせ)に対する確実な対応
+- 他ブラウザへの影響なし、視覚効果への影響最小
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-24 10:58:57] コミット: improve: 音域テストUI表示テキスト改善・ユーザビリティ向上
+
+- 測定段階別メインテキスト実装:
+  • 低音測定時: 'できるだけ低い声をキープしましょう'
+  • 高音測定時: 'できるだけ高い声をキープしましょう'
+- 音域テストセクション説明文追加: 'あなたの快適な音域を測定します'
+- 初期メインタイトル改善: '「音域テスト開始」ボタンでテストを開始してください'
+- ユーザー操作指示の明確化とUI一貫性向上
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-24 12:03:44] コミット: enhance: 音域テストUI完全最適化・視覚効果向上
+
+- サブテキスト色をtext-blue-300に統一（UIカタログ準拠）
+- 測定中アニメーション実装:
+  • measuring-pulseアニメーション（1.5s周期）
+  • 測定開始/完了時の動的クラス制御
+- 失敗時バッジスタイル完全統一:
+  • 赤色背景（#ef4444）・枠線なし
+  • 白い×アイコン（!important指定）
+  • CSS+JavaScript二重保証でオーバーライド確実
+- ユーザビリティ向上・視覚的フィードバック強化
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
