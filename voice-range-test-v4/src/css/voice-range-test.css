@@ -88,8 +88,11 @@
 }
 
 .mic-status-container.standby {
-    background: rgba(59, 130, 246, 0.2);
-    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.2) !important;
+    color: #3b82f6 !important;
+    /* iPad Safari対応 */
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
 }
 
 .mic-status-container.recording {
@@ -97,6 +100,9 @@
     color: #ef4444;
     animation: modern-mic-active 1.8s ease-in-out infinite;
     border: 2px solid rgba(239, 68, 68, 0.8);
+    /* Safari 18 backdrop-filterバグ回避 */
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
 }
 
 .mic-status-container.recording i {
@@ -106,6 +112,9 @@
 .mic-status-container.muted {
     background: rgba(107, 114, 128, 0.2);
     color: #6b7280;
+    /* Safari 18 backdrop-filterバグ回避 */
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
 }
 
 .mic-status-container.muted i {
@@ -118,6 +127,9 @@
     color: #3b82f6;
     animation: interval-pulse 2s ease-in-out infinite;
     border: 2px solid rgba(59, 130, 246, 0.8);
+    /* Safari 18 backdrop-filterバグ回避 */
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
 }
 
 .mic-status-container.interval i {
