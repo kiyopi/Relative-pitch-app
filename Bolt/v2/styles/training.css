@@ -387,7 +387,7 @@
 
 
 .voice-instruction-text {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: white;
   margin: 0;
@@ -421,6 +421,13 @@
 
 .voice-instruction::after {
   animation-delay: 1.5s;
+}
+
+/* リップルアニメーション停止用クラス */
+.voice-instruction.ripple-stopped::before,
+.voice-instruction.ripple-stopped::after {
+  animation: none !important;
+  display: none !important;
 }
 
 @keyframes ripple {
