@@ -413,12 +413,34 @@ function completeAudioTest() {
     }
     
     console.log('✅ 音声テスト完了');
-    
+
+    // 音符アイコンをcheckアイコンに変更し、背景を緑に
+    const voiceInstructionIcon = document.querySelector('.voice-instruction-icon');
+    const musicIcon = document.querySelector('.voice-instruction-icon i[data-lucide="music"]');
+
+    if (voiceInstructionIcon && musicIcon) {
+        // アニメーション終了を待つ（約4秒後）
+        setTimeout(() => {
+            // 音符アイコンをcheckアイコンに変更
+            musicIcon.setAttribute('data-lucide', 'check');
+
+            // 背景を緑に変更
+            voiceInstructionIcon.classList.add('success');
+
+            // Lucideアイコンを再初期化
+            if (window.lucide && window.lucide.createIcons) {
+                window.lucide.createIcons();
+            }
+
+            console.log('✅ 音符アイコンをcheckアイコンに変更完了');
+        }, 4000);
+    }
+
     // 成功メッセージ表示（flexレイアウトを維持）
     if (detectionSuccess) {
         detectionSuccess.style.display = 'flex';
     }
-    
+
     // 進捗表示を隠す
     if (progressDisplay) {
         progressDisplay.style.display = 'none';
@@ -468,6 +490,12 @@ if (startRangeTestBtn) {
         currentPhase = 'range-test';
         showSection(rangeTestSection);
         updateStepStatus(3, 'active');
+
+        // 音域テスト開始時に表示テキストを変更
+        const testInstructionText = document.getElementById('test-instruction-text');
+        if (testInstructionText) {
+            testInstructionText.textContent = '「ド」を発声してください';
+        }
         
         // VoiceRangeTesterのコールバック設定（直接PitchDetector使用）
         pitchDetector.setCallbacks({

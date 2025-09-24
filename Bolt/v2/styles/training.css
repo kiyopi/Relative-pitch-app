@@ -378,6 +378,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.voice-instruction-icon.success {
+  background: #22c55e;
 }
 
 
