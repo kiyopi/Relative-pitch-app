@@ -2236,3 +2236,49 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-24 14:10:56] コミット: fix: 音声テストUI改善と音域データ条件分岐実装
+
+- 音声テスト「ド」を発声してくださいのリップルアニメーション修正完了
+- リップルエフェクトの広がりを64px→400pxで適切なサイズに調整
+- Safari 18 backdrop-filterバグ回避のため完全無効化
+- 音声テスト成功メッセージの初期非表示化
+- 音域データ有無による条件分岐追加（保存済みユーザーはスキップ可能）
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-24 14:32:17] コミット: fix: GitHub Pagesアクセス問題修正 - ルートディレクトリにリダイレクト用index.html追加
+
+- ルートディレクトリに自動リダイレクト機能付きindex.html追加
+- Bolt/v2/pages/index.htmlへの自動転送実装
+- フォールバックリンクと読み込み表示追加
+- GitHub Pages 404エラー解決
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-24 16:57:28] コミット: feat: 音声テスト完了時のUI改善 - checkアイコン・緑背景・表示テキスト修正
+
+- 音域テスト開始時に「ド」を発声してくださいに表示変更
+- 音声テスト成功時にリップルアニメーション終了後checkアイコンに変更
+- 音符アイコン背景を緑色に変更（成功状態表示）
+- スムーズな遷移アニメーション追加
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-24 18:58:03] コミット: feat: 音声テスト AudioDetectionComponent 完全統合・UI改善完了
+
+- AudioDetectionComponent統合によるVolumeBarController競合解決
+- 音声テスト成功時のUI完全改善実装：
+  • テキスト「ド」を発声してください → 「音声を認識しました」
+  • アイコン音符 → チェックマーク（白色）
+  • アイコン背景デフォルト → 緑色丸形
+  • リップルアニメーション完全停止
+- ノイズ誤検出防止：音量10%以上 + 周波数80Hz以上の条件追加
+- PitchPro音量値の正しい変換処理（0-1 → パーセント変換）
+- 音声テスト完了時間を2秒 → 0.5秒に短縮（UX向上）
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
