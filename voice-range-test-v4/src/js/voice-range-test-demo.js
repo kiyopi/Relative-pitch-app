@@ -1211,6 +1211,7 @@ function startLowPitchMeasurement() {
 
     document.getElementById('main-status-text').textContent = 'できるだけ低い声をキープしましょう';
     document.getElementById('sub-info-text').textContent = '低音測定中...';
+    document.getElementById('sub-info-text').classList.add('measuring');
 
     // バッジアニメーションを開始
     updateBadgeForMeasuring();
@@ -1223,6 +1224,9 @@ function startLowPitchMeasurement() {
 function completeLowPitchMeasurement() {
     console.log('✅ 低音域測定完了');
     globalState.currentPhase = 'idle-low';
+
+    // 測定中アニメーションを停止
+    document.getElementById('sub-info-text').classList.remove('measuring');
 
     // 測定結果の検証 - 厳格化された条件
     const lowData = globalState.measurementData.lowPhase;
@@ -1409,7 +1413,7 @@ function updateBadgeForFailure() {
 
     if (rangeIcon && badge) {
         // 白い❌アイコンを表示
-        rangeIcon.innerHTML = '<i data-lucide="x" style="width: 80px; height: 80px; color: white;"></i>';
+        rangeIcon.innerHTML = '<i data-lucide="x" style="width: 80px; height: 80px; color: white !important;"></i>';
         rangeIcon.classList.remove('measuring');
         rangeIcon.classList.add('range-icon-visible');
         rangeIcon.classList.remove('range-icon-hidden');
@@ -1417,6 +1421,10 @@ function updateBadgeForFailure() {
         // バッジに失敗スタイルを適用（赤背景）
         badge.classList.remove('measuring', 'confirmed');
         badge.classList.add('failure');
+
+        // 強制的に赤色スタイルを適用
+        badge.style.backgroundColor = '#ef4444';
+        badge.style.border = 'none';
     }
 
     // 失敗時は再測定ボタンを表示
@@ -1629,6 +1637,7 @@ function startHighPitchMeasurement() {
 
     document.getElementById('main-status-text').textContent = 'できるだけ高い声をキープしましょう';
     document.getElementById('sub-info-text').textContent = '高音測定中...';
+    document.getElementById('sub-info-text').classList.add('measuring');
 
     // バッジアニメーションを開始
     updateBadgeForMeasuring();
@@ -1642,6 +1651,9 @@ function completeHighPitchMeasurement() {
     console.log('✅ 高音域測定完了');
     globalState.currentPhase = 'completed';
     globalState.measurementData.endTime = Date.now();
+
+    // 測定中アニメーションを停止
+    document.getElementById('sub-info-text').classList.remove('measuring');
 
     // 測定結果の検証 - 厳格化された条件
     const highData = globalState.measurementData.highPhase;

@@ -12,7 +12,17 @@
 /* === 失敗時のバッジスタイル === */
 .voice-note-badge.failure {
     background-color: #ef4444 !important;
-    border: 3px solid #dc2626;
+    background: #ef4444 !important;
+    border: none !important;
+}
+
+/* 失敗時のアイコンスタイル確保 */
+.voice-note-badge.failure #range-icon {
+    color: white !important;
+}
+
+.voice-note-badge.failure #range-icon i {
+    color: white !important;
 }
 
 /* === 確定時のチェックマークアニメーション === */
@@ -184,9 +194,26 @@
 .voice-range-sub-text {
     font-size: 1rem;
     line-height: 1.5rem;
-    color: #bbf7d0; /* text-green-200と同じ色 */
+    color: #93c5fd; /* text-blue-300に変更 */
     margin-top: 0;
     margin-bottom: 4px;
+}
+
+/* 測定中アニメーション */
+.voice-range-sub-text.measuring {
+    animation: measuring-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes measuring-pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 /* === ボタン表示制御クラス === */
