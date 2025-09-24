@@ -333,7 +333,8 @@ function startAudioTest() {
 
                     // 成功メッセージを表示
                     if (detectionSuccess) {
-                        detectionSuccess.style.display = 'flex';
+                        detectionSuccess.classList.remove('hidden');
+                        detectionSuccess.classList.add('flex');
                     }
 
                     // ✅ 改善: 音声検出後すぐに完了処理（遅延削除）
@@ -385,7 +386,7 @@ function startAudioTest() {
  */
 function updateProgressDisplay(mainText, detailText) {
     if (progressDisplay) {
-        progressDisplay.style.display = 'block';
+        progressDisplay.classList.remove('hidden');
     }
     if (progressText) {
         progressText.textContent = mainText;
@@ -461,10 +462,8 @@ function completeAudioTest() {
 
     // 🎯 voice-instruction-icon の背景を緑色に変更
     if (voiceInstructionContainer) {
-        // アイコン部分の背景を緑色に変更
-        voiceInstructionContainer.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
-        voiceInstructionContainer.style.border = '3px solid #22c55e';
-        voiceInstructionContainer.style.borderRadius = '50%'; // 丸い背景
+        // CSSクラスで成功状態に変更
+        voiceInstructionContainer.classList.add('success');
         console.log('✅ voice-instruction-icon背景 → 緑色変更完了');
     }
 
@@ -472,7 +471,6 @@ function completeAudioTest() {
     const voiceInstructionElement = document.querySelector('.voice-instruction');
     if (voiceInstructionElement) {
         // CSS疑似要素のアニメーションを停止
-        voiceInstructionElement.style.setProperty('--ripple-display', 'none');
         voiceInstructionElement.classList.add('ripple-stopped');
         console.log('✅ リップルアニメーション停止完了（疑似要素）');
     }
@@ -480,18 +478,19 @@ function completeAudioTest() {
     // pulse要素も確実に非表示
     const voiceInstructionPulse = document.querySelector('.voice-instruction-pulse');
     if (voiceInstructionPulse) {
-        voiceInstructionPulse.style.display = 'none';
+        voiceInstructionPulse.classList.add('hidden');
         console.log('✅ pulse要素も非表示完了');
     }
 
     // 成功メッセージ表示（flexレイアウトを維持）
     if (detectionSuccess) {
-        detectionSuccess.style.display = 'flex';
+        detectionSuccess.classList.remove('hidden');
+        detectionSuccess.classList.add('flex');
     }
 
     // 進捗表示を隠す
     if (progressDisplay) {
-        progressDisplay.style.display = 'none';
+        progressDisplay.classList.add('hidden');
     }
 
     // 音域データの有無で分岐
@@ -590,8 +589,7 @@ if (startRangeTestBtn) {
             // 背景を緑色に変更
             const voiceNoteBadge = rangeIcon.closest('.voice-note-badge');
             if (voiceNoteBadge) {
-                voiceNoteBadge.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
-                voiceNoteBadge.style.border = '3px solid #22c55e';
+                voiceNoteBadge.classList.add('confirmed');
                 console.log('✅ 音域テスト: 背景変更完了');
             }
         }

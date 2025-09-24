@@ -382,7 +382,8 @@
 }
 
 .voice-instruction-icon.success {
-  background: #22c55e;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border: 3px solid #22c55e;
 }
 
 
