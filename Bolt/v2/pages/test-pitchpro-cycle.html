@@ -93,30 +93,33 @@
                         <p class="section-description">音量と周波数検出を確認します</p>
                     </div>
 
-                    <div class="voice-instruction">
-                        <div class="voice-instruction-icon">
-                            <i data-lucide="music" style="width: 32px; height: 32px; color: white;"></i>
+                    <!-- 音声テスト中表示エリア -->
+                    <div class="audio-test-content" id="audio-test-content">
+                        <div class="voice-instruction">
+                            <div class="voice-instruction-icon">
+                                <i data-lucide="music" style="width: 32px; height: 32px; color: white;"></i>
+                            </div>
+                            <p class="voice-instruction-text" id="voice-instruction-text">「ド」を発声してください</p>
+                            <div class="voice-instruction-pulse"></div>
                         </div>
-                        <p class="voice-instruction-text" id="voice-instruction-text">「ド」を発声してください</p>
-                        <div class="voice-instruction-pulse"></div>
-                    </div>
 
-                    <!-- 音量レベル -->
-                    <div class="meter-group">
-                        <div class="meter-label">
-                            <span>音量レベル</span>
-                            <span class="meter-value" id="volume-value">0%</span>
+                        <!-- 音量レベル -->
+                        <div class="meter-group">
+                            <div class="meter-label">
+                                <span>音量レベル</span>
+                                <span class="meter-value" id="volume-value">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill gradient-catalog-green" id="volume-progress" style="width: 0%"></div>
+                            </div>
                         </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill gradient-catalog-green" id="volume-progress" style="width: 0%"></div>
-                        </div>
-                    </div>
 
-                    <!-- 検出周波数 -->
-                    <div class="meter-group">
-                        <div class="meter-label">
-                            <span>検出周波数</span>
-                            <span class="meter-value" id="frequency-value">261.6 Hz (C4)</span>
+                        <!-- 検出周波数 -->
+                        <div class="meter-group">
+                            <div class="meter-label">
+                                <span>検出周波数</span>
+                                <span class="meter-value" id="frequency-value">261.6 Hz (C4)</span>
+                            </div>
                         </div>
                     </div>
 
