@@ -621,17 +621,18 @@ class PitchProCycleManager {
                     successMessage.textContent = '音声テストは完了しました。トレーニング開始の準備ができています。';
                 }
 
-                // 即座に音域設定済み表示を開始
-                this.displaySavedRangeData(voiceRangeData.results, rangeSavedDisplay);
-
-                // 1.5秒後にテスト中表示エリアを非表示（チェックマークを見せる時間を確保）
-                console.log('⏳ 1.5秒後にテスト中表示エリアを非表示にします...');
+                // 1.5秒後にテスト中表示エリアを非表示 + 音域設定済み表示（チェックマークを見せる時間を確保）
+                console.log('⏳ 1.5秒後に画面切り替えを実行します...');
                 setTimeout(() => {
+                    // テスト中表示エリアを非表示
                     const audioTestContent = document.getElementById('audio-test-content');
                     if (audioTestContent) {
                         audioTestContent.style.display = 'none';
                         console.log('📋 audio-test-content を非表示にしました（音域設定済みのため）');
                     }
+
+                    // 音域設定済み表示を開始
+                    this.displaySavedRangeData(voiceRangeData.results, rangeSavedDisplay);
                 }, 1500);
             } else {
                 // 新規音域テストが必要 - 音域データなしの場合のメッセージ
