@@ -152,7 +152,7 @@
   margin: 0;
 }
 
-/* アラート内のアイコンサイズ（モバイル対応） - より強力なセレクタ */
+/* アラート内のアイコンサイズ（モバイル対応） - flexレイアウト対応 */
 div.info-alert i[data-lucide],
 div.success-alert i[data-lucide],
 section .info-alert i[data-lucide],
@@ -162,6 +162,8 @@ section .success-alert i[data-lucide] {
   min-width: 32px !important;
   min-height: 32px !important;
   flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  display: inline-block !important;
 }
 
 /* デスクトップでは少し小さめに */
@@ -174,6 +176,9 @@ section .success-alert i[data-lucide] {
     height: 28px !important;
     min-width: 28px !important;
     min-height: 28px !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    display: inline-block !important;
   }
 }
 
