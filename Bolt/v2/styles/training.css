@@ -145,11 +145,39 @@
   border: 1px solid rgba(34, 197, 94, 0.2);
 }
 
-.info-alert p, 
+.info-alert p,
 .success-alert p {
   color: rgba(255, 255, 255, 0.9);
   font-size: 0.9rem;
   margin: 0;
+}
+
+/* アラート内のアイコンサイズ（モバイル対応） */
+.info-alert i[data-lucide],
+.success-alert i[data-lucide] {
+  width: 32px !important;
+  height: 32px !important;
+  flex-shrink: 0;
+}
+
+/* デスクトップでは少し小さめに */
+@media (min-width: 768px) {
+  .info-alert i[data-lucide],
+  .success-alert i[data-lucide] {
+    width: 28px !important;
+    height: 28px !important;
+  }
+}
+
+/* モバイルでボタンの順序を調整 */
+@media (max-width: 767px) {
+  .flex.gap-3.mt-4 {
+    flex-direction: column-reverse;
+  }
+
+  .flex.gap-3.mt-4 button {
+    width: 100%;
+  }
 }
 
 /* メーターグループ */
