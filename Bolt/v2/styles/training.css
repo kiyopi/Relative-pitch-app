@@ -152,31 +152,58 @@
   margin: 0;
 }
 
-/* アラート内のアイコンサイズ（モバイル対応） */
-.info-alert i[data-lucide],
-.success-alert i[data-lucide] {
+/* アラート内のアイコンサイズ（モバイル対応） - より強力なセレクタ */
+div.info-alert i[data-lucide],
+div.success-alert i[data-lucide],
+section .info-alert i[data-lucide],
+section .success-alert i[data-lucide] {
   width: 32px !important;
   height: 32px !important;
-  flex-shrink: 0;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  flex-shrink: 0 !important;
 }
 
 /* デスクトップでは少し小さめに */
 @media (min-width: 768px) {
-  .info-alert i[data-lucide],
-  .success-alert i[data-lucide] {
+  div.info-alert i[data-lucide],
+  div.success-alert i[data-lucide],
+  section .info-alert i[data-lucide],
+  section .success-alert i[data-lucide] {
     width: 28px !important;
     height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
   }
 }
 
-/* モバイルでボタンの順序を調整 */
+/* モバイルでボタンの順序を調整 - より特定的なセレクタ */
 @media (max-width: 767px) {
-  .flex.gap-3.mt-4 {
-    flex-direction: column-reverse;
+  .range-info-container + .flex.gap-3.mt-4,
+  .success-alert + .flex.gap-3.mt-4 {
+    flex-direction: column-reverse !important;
+    gap: 12px !important;
   }
 
-  .flex.gap-3.mt-4 button {
-    width: 100%;
+  .range-info-container + .flex.gap-3.mt-4 button,
+  .success-alert + .flex.gap-3.mt-4 button {
+    width: 100% !important;
+  }
+}
+
+/* ネストしたglass-card（range-saved-display）の専用スタイル */
+#range-saved-display.glass-card {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* iPadでの追加対応 */
+@media (max-width: 1024px) {
+  #range-saved-display.glass-card {
+    background: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: none !important;
   }
 }
 
