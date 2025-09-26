@@ -635,7 +635,11 @@ class PitchProCycleManager {
                 });
                 console.log(`📋 ${meterGroups.length}個のmeter-group を非表示にしました（音域設定済みのため）`);
 
-                this.displaySavedRangeData(voiceRangeData.results, rangeSavedDisplay);
+                // 1.5秒のインターバル後に音域設定済み表示を開始
+                console.log('⏳ 1.5秒後に音域設定済み表示に切り替えます...');
+                setTimeout(() => {
+                    this.displaySavedRangeData(voiceRangeData.results, rangeSavedDisplay);
+                }, 1500);
             } else {
                 // 新規音域テストが必要 - 音域データなしの場合のメッセージ
                 if (successMessage) {
