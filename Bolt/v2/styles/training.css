@@ -135,13 +135,19 @@
   margin-bottom: 24px;
 }
 
-/* アイコン用の固定スペース確保 */
+/* アイコン用の固定スペース確保 - 最も強力な指定 */
 .info-alert i[data-lucide],
 .success-alert i[data-lucide] {
-  flex: 0 0 auto;
-  width: 32px;
-  height: 32px;
+  flex: 0 0 32px !important;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
   margin-top: 2px;
+  display: block !important;
+  overflow: visible !important;
 }
 
 .info-alert {
@@ -159,13 +165,19 @@
   color: rgba(255, 255, 255, 0.9);
   font-size: 0.9rem;
   margin: 0;
+  flex: 1;
 }
 
-/* アイコンとSVGに確実なサイズ適用 */
+/* すべての可能なLucideアイコン要素に適用 */
+.info-alert i[data-lucide] *,
+.success-alert i[data-lucide] *,
 .info-alert i[data-lucide] svg,
 .success-alert i[data-lucide] svg {
   width: 32px !important;
   height: 32px !important;
+  max-width: none !important;
+  max-height: none !important;
+  font-size: 32px !important;
 }
 
 /* デスクトップでは少し小さめに */
