@@ -125,14 +125,23 @@
 }
 
 /* アラート系 */
-.info-alert, 
+.info-alert,
 .success-alert {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
   padding: 16px 20px;
   border-radius: 12px;
   margin-bottom: 24px;
+}
+
+/* アイコン用の固定スペース確保 */
+.info-alert i[data-lucide],
+.success-alert i[data-lucide] {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  margin-top: 2px;
 }
 
 .info-alert {
@@ -152,72 +161,23 @@
   margin: 0;
 }
 
-/* アラート内のアイコンサイズ（モバイル対応） - SVG直接指定 */
-div.info-alert i[data-lucide],
-div.success-alert i[data-lucide],
-section .info-alert i[data-lucide],
-section .success-alert i[data-lucide] {
+/* アイコンとSVGに確実なサイズ適用 */
+.info-alert i[data-lucide] svg,
+.success-alert i[data-lucide] svg {
   width: 32px !important;
   height: 32px !important;
-  min-width: 32px !important;
-  min-height: 32px !important;
-  flex-shrink: 0 !important;
-  flex-grow: 0 !important;
-  display: inline-block !important;
-}
-
-/* Lucide SVG要素に直接適用 - 最高優先度 */
-div.info-alert i[data-lucide] svg,
-div.success-alert i[data-lucide] svg,
-section .info-alert i[data-lucide] svg,
-section .success-alert i[data-lucide] svg {
-  width: 32px !important;
-  height: 32px !important;
-  max-width: none !important;
-  max-height: none !important;
-}
-
-/* 最強のセレクタでモバイルアイコンサイズ強制 */
-@media (max-width: 767px) {
-  body .info-alert i[data-lucide],
-  body .success-alert i[data-lucide],
-  body section .info-alert i[data-lucide],
-  body section .success-alert i[data-lucide] {
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 32px !important;
-  }
-
-  body .info-alert i[data-lucide] svg,
-  body .success-alert i[data-lucide] svg,
-  body section .info-alert i[data-lucide] svg,
-  body section .success-alert i[data-lucide] svg {
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 32px !important;
-  }
 }
 
 /* デスクトップでは少し小さめに */
 @media (min-width: 768px) {
-  div.info-alert i[data-lucide],
-  div.success-alert i[data-lucide],
-  section .info-alert i[data-lucide],
-  section .success-alert i[data-lucide] {
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-    min-height: 28px !important;
-    flex-shrink: 0 !important;
-    flex-grow: 0 !important;
-    display: inline-block !important;
+  .info-alert i[data-lucide],
+  .success-alert i[data-lucide] {
+    width: 28px;
+    height: 28px;
   }
 
-  /* デスクトップのSVG直接指定 */
-  div.info-alert i[data-lucide] svg,
-  div.success-alert i[data-lucide] svg,
-  section .info-alert i[data-lucide] svg,
-  section .success-alert i[data-lucide] svg {
+  .info-alert i[data-lucide] svg,
+  .success-alert i[data-lucide] svg {
     width: 28px !important;
     height: 28px !important;
   }
