@@ -600,7 +600,8 @@ class PitchProCycleManager {
                     JSON.parse(localStorage.getItem('voiceRangeData')) : null;
             }
 
-            // 🧪 テスト用：既存音域データがある場合をシミュレート（テスト後削除）
+            // 🧪 テスト用：既存音域データがある場合をシミュレート（音域データなし確認のため一時無効化）
+            /*
             if (!voiceRangeData) {
                 console.log('🧪 テスト用音域データを作成');
                 voiceRangeData = {
@@ -612,6 +613,9 @@ class PitchProCycleManager {
                 };
                 console.log('🧪 テスト用データ:', voiceRangeData);
             }
+            */
+
+            console.log('🔍 音域データなしフローのテスト実行中:', !voiceRangeData ? '音域データなし' : '音域データあり');
 
             const successMessage = document.getElementById('detection-success-message');
 
@@ -640,12 +644,22 @@ class PitchProCycleManager {
                     successMessage.textContent = '「ド」の音程を検出できました！音域テストに進みましょう。';
                 }
 
-                if (startRangeBtn) {
-                    setTimeout(() => {
+                // 1.5秒後にテスト中表示エリアを非表示 + 音域テストボタン表示（チェックマークを見せる時間を確保）
+                console.log('⏳ 1.5秒後に音域テストボタンを表示します...');
+                setTimeout(() => {
+                    // テスト中表示エリアを非表示
+                    const audioTestContent = document.getElementById('audio-test-content');
+                    if (audioTestContent) {
+                        audioTestContent.style.display = 'none';
+                        console.log('📋 audio-test-content を非表示にしました（新規音域テストのため）');
+                    }
+
+                    // 音域テストボタンを表示
+                    if (startRangeBtn) {
                         startRangeBtn.classList.remove('hidden');
                         console.log('🎯 音域テストボタン表示完了');
-                    }, 500);
-                }
+                    }
+                }, 1500);
             }
         }
 
