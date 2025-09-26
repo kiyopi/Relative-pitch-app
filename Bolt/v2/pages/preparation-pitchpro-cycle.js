@@ -829,20 +829,14 @@ function setupMicPermissionFlow() {
             requestMicBtn.innerHTML = '<i data-lucide="loader" style="width: 24px; height: 24px;"></i><span>許可を待っています...</span>';
             if (typeof lucide !== 'undefined') lucide.createIcons();
 
-            // まず単純にマイク許可を要求
-            await navigator.mediaDevices.getUserMedia({
-                audio: true
-            });
-
-            console.log('✅ マイク許可成功！');
-
             // PitchProサイクル管理を使う場合
             if (typeof pitchProCycleManager !== 'undefined' && pitchProCycleManager && pitchProCycleManager.audioDetector) {
-                // AudioDetectionComponentの初期化
-                console.log('🎤 AudioDetectionComponent.initialize() 開始');
+                // AudioDetectionComponentの初期化（v1.3.1では内部でマイク許可も処理）
+                console.log('🎤 AudioDetectionComponent.initialize() 開始（マイク許可含む）');
                 try {
                     await pitchProCycleManager.audioDetector.initialize();
                     console.log('✅ AudioDetectionComponent.initialize() 完了');
+                    console.log('✅ マイク許可成功！');
 
                     // Phase 2: 音声テスト開始（状態管理を含む）
                     console.log('🎤 音声テスト開始');
