@@ -1142,46 +1142,7 @@
   margin-bottom: 16px;
 }
 
-/* 高さ縮小アニメーション */
-.collapse-out {
-  animation: collapseOut 1.0s cubic-bezier(0, 0, 0.8, 1) forwards;
-  overflow: hidden;
-}
 
-@keyframes collapseOut {
-  0% {
-    max-height: 200px;
-    opacity: 1;
-    margin: 24px 0;
-    padding: 24px;
-  }
-  60% {
-    opacity: 0;
-    padding: 12px 24px;
-  }
-  100% {
-    max-height: 0;
-    opacity: 0;
-    margin: 0;
-    padding: 0;
-  }
-}
-
-/* 登場アニメーション */
-.fade-in-up {
-  animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-}
-
-@keyframes fadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
 
 /* ==========================================================================
    フッター（700px制限）
