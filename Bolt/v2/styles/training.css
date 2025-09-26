@@ -128,14 +128,14 @@
 .info-alert,
 .success-alert {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 16px;
   padding: 16px 20px;
   border-radius: 12px;
   margin-bottom: 24px;
 }
 
-/* アイコン用の固定スペース確保 - 最も強力な指定 */
+/* アイコン用の固定スペース確保 - 中央配置 */
 .info-alert i[data-lucide],
 .success-alert i[data-lucide] {
   flex: 0 0 32px !important;
@@ -145,7 +145,6 @@
   min-height: 32px !important;
   max-width: 32px !important;
   max-height: 32px !important;
-  margin-top: 2px;
   display: block !important;
   overflow: visible !important;
 }
