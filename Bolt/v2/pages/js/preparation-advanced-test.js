@@ -15,7 +15,7 @@ let globalAudioDetector = null;
 // 初期化関数
 async function initializeDemo() {
     try {
-        const module = await import('./voice-range-test-controller.js');
+        const module = await import('./preparation-advanced-controller.js');
         VoiceRangeTestController = module.VoiceRangeTestController;
         console.log('✅ VoiceRangeTestController loaded successfully');
     } catch (error) {

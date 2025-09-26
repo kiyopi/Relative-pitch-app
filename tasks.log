@@ -2236,3 +2236,34 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-26 19:03:11] コミット: test: voice-range-test-v4のBolt/v2/pages/への動作確認用コピー
+
+- voice-range-test-demo.htmlをBolt/v2/pages/にコピー
+- 依存関係ファイル（js, css, icons）を同時コピー
+- CSSパス修正（../../Bolt/v2/styles/ → ../styles/）
+- PitchProライブラリパス修正（ローカルコピー版使用）
+- 統合前の動作確認用として作成
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-26 20:10:13] コミット: fix: PitchPro v1.3.1を最新版（マイク初期化二重問題解決版）に更新
+
+- voice-range-test-v4は古いバージョンのPitchProを使用していた（1/24版）
+- メインプロジェクトの最新版（1/26版）に置き換え
+- マイク初期化二重問題が解決された版を使用
+- 共通ライブラリパス（../../../js/pitchpro-audio/）を参照するように変更
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-26 20:15:34] コミット: fix: preparation-pitchpro-cycle.jsのマイク初期化二重問題を解決
+
+- PitchPro v1.3.1では内部でマイク許可を処理するため手動getUserMedia()が不要
+- 823-858行目のマイク許可ハンドラーから手動getUserMedia()呼び出しを削除
+- AudioDetectionComponent.initialize()のみでマイク許可と初期化を一本化
+- 二重初期化による遅延問題を解決
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
