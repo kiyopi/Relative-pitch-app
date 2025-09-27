@@ -14,14 +14,8 @@ let VoiceRangeTestController;
 
 // 初期化関数
 async function initializeDemo() {
-    try {
-        const module = await import('./voice-range-test-controller.js');
-        VoiceRangeTestController = module.VoiceRangeTestController;
-        console.log('✅ VoiceRangeTestController loaded successfully');
-    } catch (error) {
-        console.warn('⚠️ VoiceRangeTestController import failed:', error);
-        console.log('📋 デモは基本機能のみで動作します');
-    }
+    // 注意: VoiceRangeTestController は統合版では使用しない
+    console.log('📋 音域テストデモ初期化完了（統合版）');
 }
 
 // デバッグ用関数削除済み
@@ -35,7 +29,9 @@ function displayResults(results) {
     document.getElementById('result-high-freq').textContent = results.highPitch ?
         `${results.highPitch.frequency.toFixed(1)} Hz (${results.highPitch.note})` : '-';
 
-    document.getElementById('results-section').classList.remove('hidden');
+    // 音域テストセクションを非表示にし、結果セクションを表示
+    document.getElementById('range-test-section').classList.add('hidden');
+    document.getElementById('result-section').classList.remove('hidden');
 
     console.log('📋 測定結果表示完了');
 }
@@ -358,10 +354,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Lucideアイコン初期化
     lucide.createIcons();
 
-    // 🎤 マイク許可ボタン
-    document.getElementById('request-mic-permission').addEventListener('click', async () => {
-        await requestMicrophonePermission();
-    });
+    // 注意: マイク許可は preparation-pitchpro-cycle.js で処理される
 
     // 🎯 音域テスト開始ボタン
     document.getElementById('begin-range-test-btn').addEventListener('click', async () => {
@@ -374,6 +367,35 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.log('📋 現在のフェーズ:', globalState.currentPhase);
         console.log('リトライ回数:', globalState.retryCount, '/', globalState.maxRetries);
         await retryCurrentMeasurement();
+    });
+
+    // 🔄 再測定ボタン（結果画面用）
+    document.getElementById('remeasure-range-btn').addEventListener('click', async () => {
+        console.log('🔄 再測定ボタン（結果画面）がクリックされました');
+
+        // 保存済みの音域データをクリア
+        if (window.DataManager) {
+            window.DataManager.clearVoiceRangeData();
+            console.log('📋 音域データをクリアしました');
+        }
+
+        // 音域テストセクションに戻る
+        document.getElementById('result-section').classList.add('hidden');
+        document.getElementById('range-test-section').classList.remove('hidden');
+
+        // 音域設定済み表示を非表示
+        const rangeSavedDisplay = document.getElementById('range-saved-display');
+        if (rangeSavedDisplay) {
+            rangeSavedDisplay.classList.add('hidden');
+        }
+
+        // 音域テストの状態をリセット
+        globalState.currentPhase = 'idle';
+        globalState.retryCount = 0;
+        globalState.lowPitchData = [];
+        globalState.highPitchData = [];
+
+        console.log('🎯 音域テストの再開始準備完了');
     });
 
     console.log('✅ VoiceRangeTestController デモ準備完了');
@@ -445,46 +467,7 @@ async function startBasicTest() {
     }
 }
 
-// マイク許可要求
-async function requestMicrophonePermission() {
-    try {
-        const micStatusText = document.getElementById('mic-status-text');
-        const micButton = document.getElementById('request-mic-permission');
-        const testButton = document.getElementById('begin-range-test-btn');
-
-        micStatusText.textContent = 'マイク許可要求中...';
-        micButton.disabled = true;
-
-        // マイク許可要求
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-        // すぐに停止（許可確認のみ）
-        stream.getTracks().forEach(track => track.stop());
-
-        globalState.micPermissionGranted = true;
-        micStatusText.textContent = '✅ マイク許可済み';
-        micStatusText.style.color = '#10b981';
-        micButton.textContent = '✅ 許可済み';
-        micButton.disabled = true;
-        testButton.disabled = false;
-
-        document.getElementById('main-status-text').textContent = '音域テスト開始ボタンを押してください';
-
-        // マイクステータスを許可済み状態に更新
-        updateMicStatus('standby');
-
-        showNotification('マイク許可が完了しました', 'success');
-
-    } catch (error) {
-        console.error('❌ マイク許可エラー:', error);
-        const micStatusText = document.getElementById('mic-status-text');
-        micStatusText.textContent = '❌ マイク許可が拒否されました';
-        micStatusText.style.color = '#ef4444';
-
-        document.getElementById('request-mic-permission').disabled = false;
-        showNotification('マイク許可が必要です', 'error');
-    }
-}
+// 注意: マイク許可機能は preparation-pitchpro-cycle.js で統合処理される
 
 // 音域テスト開始
 async function startVoiceRangeTest() {
@@ -558,9 +541,22 @@ async function startVoiceRangeTest() {
             throw new Error('マイク許可が完了していません。最初からやり直してください。');
         }
 
-        // PitchPro v1.3.1: startDetection()メソッド
-        window.window.globalAudioDetector.startDetection();
-        console.log('🎯 PitchPro v1.3.1: startDetection()で音声検出開始');
+        // PitchPro v1.3.1: 既存の検出を停止してから再開
+        if (window.globalAudioDetector) {
+            // 既に検出中の場合は一旦停止
+            if (window.globalAudioDetector.stopDetection) {
+                window.globalAudioDetector.stopDetection();
+                console.log('🛑 既存の音声検出を停止');
+            }
+
+            // 少し待ってから再開（状態遷移を確実にするため）
+            setTimeout(() => {
+                if (window.globalAudioDetector.startDetection) {
+                    window.globalAudioDetector.startDetection();
+                    console.log('🎯 音域テスト開始: 音声検出を再開');
+                }
+            }, 100);
+        }
 
         document.getElementById('main-status-text').textContent = '３秒間できるだけ低い声で「あー」と発声しましょう';
         document.getElementById('sub-info-text').textContent = '安定した声を認識したら自動で測定開始します';

@@ -906,6 +906,54 @@ function setupMicPermissionFlow() {
         });
     }
 
+    // 🔄 再測定ボタン（音域設定済み表示画面用）
+    const remeasureRangeBtn = document.getElementById('remeasure-range-btn');
+    if (remeasureRangeBtn) {
+        remeasureRangeBtn.addEventListener('click', async () => {
+            console.log('🔄 再測定ボタン（音域設定済み表示）がクリックされました');
+
+            try {
+                // 音域データを削除
+                try {
+                    if (typeof DataManager !== 'undefined' && DataManager.clearVoiceRangeData) {
+                        DataManager.clearVoiceRangeData();
+                        console.log('✅ DataManager経由で音域データを削除');
+                    } else {
+                        localStorage.removeItem('voiceRangeData');
+                        console.log('✅ localStorage経由で音域データを削除');
+                    }
+                } catch (error) {
+                    console.warn('⚠️ DataManager利用不可、localStorage直接削除にフォールバック');
+                    localStorage.removeItem('voiceRangeData');
+                }
+
+                // 音域設定済み表示を非表示
+                const rangeSavedDisplay = document.getElementById('range-saved-display');
+                if (rangeSavedDisplay) {
+                    rangeSavedDisplay.classList.add('hidden');
+                    console.log('📋 音域設定済み表示を非表示にしました');
+                }
+
+                // ステップ2（音声テスト）を完了、ステップ3（音域テスト）をアクティブに
+                updateStepStatus(2, 'completed');
+                updateStepStatus(3, 'active');
+
+                // 音域テストセクションに移動
+                const audioTestSection = document.getElementById('audio-test-section');
+                const rangeTestSection = document.getElementById('range-test-section');
+
+                if (audioTestSection) audioTestSection.classList.add('hidden');
+                if (rangeTestSection) rangeTestSection.classList.remove('hidden');
+
+                console.log('✅ 音域テストセクションに移動完了');
+
+            } catch (error) {
+                console.error('❌ 音域再測定処理エラー:', error);
+                alert(`音域再測定処理に失敗しました: ${error.message}`);
+            }
+        });
+    }
+
     // 音域テスト開始ボタンのイベントリスナー（test-preparation-original.jsの成功パターン）
     const startRangeTestBtn = document.getElementById('start-range-test-btn');
     if (startRangeTestBtn) {

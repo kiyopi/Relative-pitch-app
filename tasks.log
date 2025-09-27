@@ -2267,3 +2267,15 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-27 14:19:58] コミット: fix: 音域テスト機能のAudioDetector状態管理エラーを解決
+
+- preparation.htmlに両方のJSファイル読み込みを復活
+  - preparation-pitchpro-cycle.js: 音声テスト担当
+  - voice-range-test-demo.js: 音域測定担当
+- 高音測定開始時の状態遷移を修正
+  - stopDetection()で既存検出を停止してから再開
+  - 'component state is detecting'エラーを根本解決
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
