@@ -4,9 +4,7 @@
 // Lucide初期化を確実に実行
 if (typeof lucide !== 'undefined') {
     lucide.createIcons();
-    console.log('✅ Lucide icons initialized');
 } else {
-    console.warn('⚠️ Lucide library not available');
 }
 
 // ===== PitchProサイクル管理システム =====
@@ -55,7 +53,6 @@ class PitchProCycleManager {
             CLARITY_THRESHOLD: 0.8           // 高い明瞭度（雑音除外）
         };
 
-        console.log('🔧 PitchProCycleManager 初期化完了');
     }
 
     /**
@@ -64,11 +61,9 @@ class PitchProCycleManager {
      */
     async initialize() {
         try {
-            console.log('📋 Phase 1: 初期化開始');
 
             // デバイス検出（iPadOS 13+対応）
             this.deviceSpecs = this.detectDeviceWithSpecs();
-            console.log(`🔍 デバイス検出結果: ${this.deviceSpecs.deviceType}`, this.deviceSpecs);
 
             // UI要素キャッシュ（v1.3.1キャッシュベース管理）
             this.cacheUIElements();
@@ -82,10 +77,8 @@ class PitchProCycleManager {
                 throw new Error('AudioDetectionComponentが見つかりません');
             }
 
-            console.log('✅ PitchPro.AudioDetectionComponent確認完了');
 
             // PitchPro AudioDetectionComponent作成（仕様準拠）
-            console.log('🔧 AudioDetectionComponent作成中...');
             this.audioDetector = new window.PitchPro.AudioDetectionComponent({
                 volumeBarSelector: '#volume-progress',
                 volumeTextSelector: '#volume-value',
@@ -94,13 +87,10 @@ class PitchProCycleManager {
                 autoUpdateUI: true, // PitchProに自動更新を任せる
                 debug: true
             });
-            console.log('✅ AudioDetectionComponent作成完了（PitchPro仕様準拠）');
 
             // 初期化はボタンクリック時に行うため、ここではスキップ
-            console.log('📌 AudioDetectionComponent.initialize()はボタンクリック時に実行されます');
 
             this.currentPhase = 'initialized';
-            console.log('✅ Phase 1: 初期化完了');
 
             return { success: true, phase: 'initialized' };
 
@@ -122,7 +112,6 @@ class PitchProCycleManager {
      */
     async startAudioDetection(mode = 'audiotest') {
         try {
-            console.log(`📋 Phase 2: ${mode}スタート開始`);
 
             if (this.currentPhase !== 'initialized' && this.currentPhase !== 'reset') {
                 throw new Error(`不正な状態からのスタート: ${this.currentPhase}`);
@@ -142,14 +131,13 @@ class PitchProCycleManager {
                 onPitchUpdate: (result) => this.handlePitchUpdate(result),
                 onVolumeUpdate: (volume) => this.handleVolumeUpdate(volume),
                 onError: (context, error) => this.handleAudioError(context, error),
-                onStateChange: (state) => console.log(`🎵 Audio state: ${state}`)
+                onStateChange: (state) => {}
             });
 
             // 検出開始
             await this.audioDetector.startDetection();
 
             this.currentPhase = 'started';
-            console.log(`✅ Phase 2: ${mode}スタート完了`);
 
             return { success: true, phase: 'started', mode: mode };
 
@@ -165,7 +153,6 @@ class PitchProCycleManager {
      */
     async resetForNewMode(newMode) {
         try {
-            console.log(`📋 Phase 3: ${this.state.currentMode} → ${newMode} リセット開始`);
 
             // 検出停止（PitchPro標準）
             if (this.audioDetector && this.state.detectionActive) {
@@ -173,14 +160,8 @@ class PitchProCycleManager {
             }
 
             // PitchPro UIリセット実行（正しいメソッド使用）
-            console.log('🔍 PitchPro resetDisplayElements()メソッド確認:', {
-                audioDetectorExists: !!this.audioDetector,
-                resetDisplayElementsExists: !!(this.audioDetector && this.audioDetector.resetDisplayElements),
-                audioDetectorType: this.audioDetector ? this.audioDetector.constructor.name : 'null'
-            });
 
             if (this.audioDetector && this.audioDetector.resetDisplayElements) {
-                console.log('🚀 PitchPro resetDisplayElements()実行開始...');
 
                 // reset前の音量バー状態を記録
                 const volumeBar = document.getElementById('volume-progress');
@@ -189,7 +170,6 @@ class PitchProCycleManager {
                     volumeBarWidth: volumeBar ? volumeBar.style.width : 'null',
                     volumeTextContent: volumeText ? volumeText.textContent : 'null'
                 };
-                console.log('📊 resetDisplayElements前の状態:', beforeReset);
 
                 // ✅ 正しいPitchProリセットメソッド実行
                 await this.audioDetector.resetDisplayElements();

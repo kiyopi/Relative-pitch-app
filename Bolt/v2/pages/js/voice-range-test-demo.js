@@ -1426,10 +1426,21 @@ function startHighPitchPhase() {
 
     // 音声検出を再開してマイクステータスを録音中（赤）に戻す
 
-    // isDetectingプロパティが存在しない場合でも開始を試みる
-    if (window.globalAudioDetector && window.globalAudioDetector.startDetection) {
-        window.globalAudioDetector.startDetection();
-        console.log('🎤 高音測定開始: 音声検出を再開');
+    // 既存の検出を停止してから再開する
+    if (window.globalAudioDetector) {
+        // 既に検出中の場合は一旦停止
+        if (window.globalAudioDetector.stopDetection) {
+            window.globalAudioDetector.stopDetection();
+            console.log('🛑 既存の音声検出を停止');
+        }
+
+        // 少し待ってから再開（状態遷移を確実にするため）
+        setTimeout(() => {
+            if (window.globalAudioDetector.startDetection) {
+                window.globalAudioDetector.startDetection();
+                console.log('🎤 高音測定開始: 音声検出を再開');
+            }
+        }, 100);
     }
     updateMicStatus('recording');
 
