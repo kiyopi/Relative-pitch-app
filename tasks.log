@@ -2279,3 +2279,16 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-27 15:42:55] コミット: fix: remeasure-range-btnイベントリスナー追加とAudioDetectionComponent状態管理修正
+
+- remeasure-range-btnのイベントリスナーを両JavaScriptファイルに追加
+- 音域テスト完了画面と音域設定済み表示画面の2つのコンテキストに対応
+- AudioDetectionComponent状態管理エラー修正（stopDetection追加）
+- 統合前のテスト用マイク許可処理を削除
+- voice-range-test-controller.jsの古いimport処理を削除
+- displayResults関数でrange-test-section非表示処理追加
+- 古いPitchProライブラリファイルを削除（v1.1.x系統）
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
