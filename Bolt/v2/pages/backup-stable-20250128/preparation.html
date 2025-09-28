@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../styles/base.css">
     <link rel="stylesheet" href="../styles/results.css">
     <link rel="stylesheet" href="../styles/training.css">
+    <link rel="stylesheet" href="css/preparation-range-test.css">
 </head>
 <body>
     <div class="container">
@@ -166,7 +167,140 @@
                     </button>
                 </section>
 
+                <!-- 音域テストセクション -->
+                <section class="test-section hidden" id="range-test-section">
+                    <div class="section-header">
+                        <div>
+                            <h3 class="text-section-title">音域テスト</h3>
+                            <p class="section-description">あなたの快適な音域を測定します</p>
+                            <!-- マイクステータスアイコン -->
+                            <div class="text-center">
+                                <div class="mic-status-container standby" id="mic-status-container" style="margin: 12px auto 0 auto;">
+                                    <i data-lucide="mic" id="mic-status-icon" style="width: 40px; height: 40px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- メインステータス -->
+                    <div class="text-center mb-6">
+                        <h4 class="voice-range-main-text" id="main-status-text">音域テストを開始してください</h4>
+                    </div>
+
+                    <!-- 音域テストバッジ -->
+                    <div class="range-test-layout-flex">
+                        <div class="range-test-item">
+                            <div class="voice-range-display-container">
+                                <svg class="voice-stability-svg" width="160" height="160" id="stability-ring">
+                                    <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="16"/>
+                                    <circle cx="80" cy="80" r="72" fill="none" stroke="#3b82f6" stroke-width="16"
+                                            stroke-dasharray="452" stroke-dashoffset="452"
+                                            transform="rotate(-90 80 80)" class="voice-progress-circle"/>
+                                </svg>
+                                <div class="voice-note-badge">
+                                    <div id="range-icon" class="icon-4xl text-white" style="display: block;">
+                                        <img src="./icons/arrow-down.png" alt="下向き矢印" style="width: 80px; height: 80px; display: block;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- サブ情報 -->
+                    <div class="text-center mt-4">
+                        <p class="text-sm voice-range-sub-text" id="sub-info-text">待機中...</p>
+                    </div>
+
+                    <!-- 検出状況表示 -->
+                    <div class="detection-meters" style="margin-top: 24px;">
+                        <!-- 音量レベル -->
+                        <div class="meter-group" id="range-volume-container">
+                            <div class="meter-label">
+                                <span>音量レベル</span>
+                                <span class="volume-text meter-value" id="range-test-volume-text">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill gradient-catalog-green"
+                                     id="range-test-volume-bar" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- 検出周波数 -->
+                        <div class="meter-group">
+                            <div class="meter-label">
+                                <span>検出周波数</span>
+                                <span class="meter-value" id="range-test-frequency-value">0 Hz</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- コントロールボタン -->
+                    <div class="text-center mt-6">
+                        <button class="btn btn-primary voice-range-btn" id="begin-range-test-btn">
+                            <i data-lucide="play" style="width: 20px; height: 20px;"></i>
+                            <span>音域テスト開始</span>
+                        </button>
+
+                        <button class="btn btn-outline ml-3 voice-range-btn hidden" id="retry-measurement-btn">
+                            <i data-lucide="refresh-cw" style="width: 20px; height: 20px;"></i>
+                            <span>再測定</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- 結果表示セクション -->
+                <section class="test-section hidden" id="result-section">
+                    <div class="section-header">
+                        <h3 class="text-section-title">テスト完了</h3>
+                        <p class="section-description">音域テストが完了しました</p>
+                    </div>
+
+                    <div class="result-card">
+                        <h4 class="heading-sm">
+                            <i data-lucide="music" class="text-orange-400"></i>
+                            <span>あなたの音域</span>
+                        </h4>
+                        <div class="range-info-container">
+                            <div class="range-info-row">
+                                <span>音域範囲</span>
+                                <span class="range-info-value" id="result-range">A2 - F5</span>
+                            </div>
+                            <div class="range-info-row">
+                                <span>オクターブ数</span>
+                                <span class="range-info-value" id="result-octaves">2.6オクターブ</span>
+                            </div>
+                            <div class="range-info-row">
+                                <span>低音域</span>
+                                <span class="range-info-value" id="result-low-freq">110.0 Hz (A2)</span>
+                            </div>
+                            <div class="range-info-row">
+                                <span>高音域</span>
+                                <span class="range-info-value" id="result-high-freq">698.5 Hz (F5)</span>
+                            </div>
+                        </div>
+
+                        <!-- 詳細統計表示エリア -->
+                        <div class="range-info-container" id="result-details">
+                            <!-- JavaScriptで動的に挿入される詳細統計 -->
+                        </div>
+                    </div>
+
+                    <div class="success-alert">
+                        <i data-lucide="check-circle" style="color: #22c55e; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
+                        <p>音域測定が完了しデータが保存されました。この結果でトレーニングを開始できます。次回から音域測定はスキップ可能です。</p>
+                    </div>
+
+                    <div class="flex gap-3 mt-4">
+                        <button class="btn btn-outline" id="remeasure-range-btn">
+                            <span>再測定</span>
+                            <i data-lucide="refresh-cw" style="width: 20px; height: 20px;"></i>
+                        </button>
+                        <button class="btn btn-success" id="start-training-btn">
+                            <span>この結果でトレーニング開始</span>
+                            <i data-lucide="arrow-right" style="width: 24px; height: 24px;"></i>
+                        </button>
+                    </div>
+                </section>
             </div>
         </main>
     </div>
@@ -182,7 +316,10 @@
     <!-- 3. UIライブラリ -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
-    <!-- 4. メインアプリケーション（PitchProサイクル実装） -->
+    <!-- 4. メインアプリケーション（PitchProサイクル実装 - 音声テスト担当） -->
     <script src="js/preparation-pitchpro-cycle.js"></script>
+
+    <!-- 5. 音域テスト機能（音域測定担当） -->
+    <script src="js/voice-range-test-demo.js"></script>
 </body>
 </html>
