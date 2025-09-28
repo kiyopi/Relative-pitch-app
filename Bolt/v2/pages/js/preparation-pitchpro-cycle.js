@@ -886,6 +886,11 @@ function setupMicPermissionFlow() {
                     console.log('✅ AudioDetectionComponent.initialize() 完了');
                     console.log('✅ マイク許可成功！');
 
+                    // localStorage保存（新規追加）
+                    localStorage.setItem('micPermissionGranted', 'true');
+                    localStorage.setItem('micPermissionTimestamp', new Date().toISOString());
+                    console.log('💾 micPermissionGranted localStorage保存完了');
+
                     // Phase 2: 音声テスト開始（状態管理を含む）
                     console.log('🎤 音声テスト開始');
                     const startResult = await pitchProCycleManager.startAudioDetection('audiotest');
