@@ -30,6 +30,10 @@ class PitchProCycleManager {
             frequencyDisplay: null,
             voiceInstructionText: null,
             detectionSuccess: null,
+            // 音域テストフェーズ（将来拡張用）
+            rangeVolumeBar: null,
+            rangeVolumeText: null,
+            rangeFrequencyDisplay: null
         };
 
         // 状態管理
@@ -37,7 +41,7 @@ class PitchProCycleManager {
             detectionActive: false,
             detectedPitches: [],
             detectionStartTime: null,
-            currentMode: 'permission' // permission, audiotest
+            currentMode: 'permission' // permission, audiotest, rangetest
         };
 
         // 設定値（PitchPro v1.3.1対応）
@@ -74,7 +78,7 @@ class PitchProCycleManager {
             }
 
 
-            // PitchPro AudioDetectionComponent作成（v1.3.1統合管理システム）
+            // PitchPro AudioDetectionComponent作成（仕様準拠）
             this.audioDetector = new window.PitchPro.AudioDetectionComponent({
                 volumeBarSelector: '#volume-progress',
                 volumeTextSelector: '#volume-value',
@@ -83,12 +87,6 @@ class PitchProCycleManager {
                 autoUpdateUI: true, // PitchProに自動更新を任せる
                 debug: true
             });
-
-            // v1.3.1統合管理システム - デバイス自動最適化
-            if (this.audioDetector.detectAndOptimizeDevice) {
-                await this.audioDetector.detectAndOptimizeDevice();
-                console.log('✅ デバイス自動最適化完了（統合管理）');
-            }
 
             // 初期化はボタンクリック時に行うため、ここではスキップ
 
@@ -335,6 +333,13 @@ class PitchProCycleManager {
                     };
                     break;
 
+                case 'rangetest':
+                    selectors = {
+                        volumeBarSelector: '#range-test-volume-bar',
+                        volumeTextSelector: '#range-test-volume-text',
+                        frequencySelector: '#range-test-frequency-value'
+                    };
+                    break;
 
                 default:
                     console.warn(`⚠️ 未知のモード: ${mode}`);
@@ -386,6 +391,9 @@ class PitchProCycleManager {
             case 'audiotest':
                 this.handleAudioTestPitchUpdate(result);
                 break;
+            case 'rangetest':
+                this.handleRangeTestPitchUpdate(result);
+                break;
         }
     }
 
@@ -431,6 +439,13 @@ class PitchProCycleManager {
         }
     }
 
+    /**
+     * 音域テスト用音程更新処理（将来実装）
+     */
+    handleRangeTestPitchUpdate(result) {
+        // 音域テスト統合時に実装
+        console.log('🎵 音域テスト音程更新:', result);
+    }
 
     /**
      * 音量更新ハンドラー
@@ -504,12 +519,14 @@ class PitchProCycleManager {
     async showDetectionSuccess() {
         console.log('🎉 showDetectionSuccess実行開始');
 
-        // PitchPro v1.3.1統合管理システム - FAQ推奨の完全リセット
-        if (this.audioDetector) {
-            await this.audioDetector.microphoneController.reset();
-            this.state.detectionActive = false;
-            console.log('🔄 システム完全リセット完了（FAQ推奨統合管理）');
+        // PitchProサイクル: Phase 3 リセット実行
+        const resetResult = await this.resetForNewMode('rangetest');
+        if (!resetResult.success) {
+            console.error('❌ PitchProリセット失敗:', resetResult.error);
+            return;
         }
+
+        console.log('🛑 音程検出停止完了 (PitchProサイクル管理)');
 
         // 🎵 UI状態更新：voice-instruction成功状態に変更
         const voiceInstructionIcon = document.querySelector('.voice-instruction-icon');
@@ -553,29 +570,14 @@ class PitchProCycleManager {
             detectionSuccess.classList.remove('hidden');
             console.log('✅ detection-success セクション表示完了');
 
-            // 既存の音域データをチェック（DataManager + localStorage両方確認）
+            // 既存の音域データをチェック
             let voiceRangeData = null;
             try {
-                // DataManagerから取得を試行
-                if (typeof DataManager !== 'undefined' && DataManager.getVoiceRangeData) {
-                    voiceRangeData = DataManager.getVoiceRangeData();
-                    console.log('DataManager結果:', voiceRangeData);
-                }
-
-                // DataManagerでデータが取得できない場合、localStorageを確認
-                if (!voiceRangeData) {
-                    const localData = localStorage.getItem('voiceRangeData');
-                    if (localData) {
-                        voiceRangeData = JSON.parse(localData);
-                        console.log('localStorage結果:', voiceRangeData);
-                    }
-                }
+                voiceRangeData = DataManager.getVoiceRangeData();
             } catch (error) {
-                console.warn('⚠️ DataManager利用不可、localStorage確認にフォールバック');
-                const localData = localStorage.getItem('voiceRangeData');
-                if (localData) {
-                    voiceRangeData = JSON.parse(localData);
-                }
+                console.warn('⚠️ DataManager利用不可、ローカル確認にフォールバック');
+                voiceRangeData = localStorage.getItem('voiceRangeData') ?
+                    JSON.parse(localStorage.getItem('voiceRangeData')) : null;
             }
 
             console.log('🔍 音域データチェック結果:', !voiceRangeData ? '音域データなし' : '音域データあり');
@@ -591,16 +593,15 @@ class PitchProCycleManager {
                 // 1.5秒後に画面切り替えを実行します
                 console.log('⏳ 1.5秒後に画面切り替えを実行します...');
                 setTimeout(() => {
-                    // 音声テスト部分のみを非表示（セクション全体は表示したまま）
-                    const audioTestContent = document.getElementById('audio-test-content');
-                    if (audioTestContent) {
-                        audioTestContent.classList.add('hidden');
-                        console.log('📋 audio-test-content のみを非表示にしました（音域設定済み表示のため）');
+                    // 音声テストセクションを非表示
+                    const audioTestSection = document.getElementById('audio-test-section');
+                    if (audioTestSection) {
+                        audioTestSection.classList.add('hidden');
+                        console.log('📋 audio-test-section を非表示にしました（音域設定済みのため）');
                     }
 
                     // 音域設定済み表示を開始
-                    // voiceRangeData全体を渡すように修正（timestampが親レベルにあるため）
-                    this.displaySavedRangeData(voiceRangeData, rangeSavedDisplay);
+                    this.displaySavedRangeData(voiceRangeData.results, rangeSavedDisplay);
                 }, 1500);
             } else {
                 // 新規音域テストが必要 - 音域データなしの場合のメッセージ
@@ -608,13 +609,8 @@ class PitchProCycleManager {
                     successMessage.textContent = '「ド」の音程を検出できました！音域テストに進みましょう。';
                 }
 
-                // localStorage保存（Step1完了データ）
-                localStorage.setItem('audioTestCompleted', 'true');
-                localStorage.setItem('audioTestTimestamp', new Date().toISOString());
-                localStorage.setItem('step1Completed', 'true');
-
-                // 1.5秒後にaudio-test-contentを非表示にして、Step2遷移ボタンを表示
-                console.log('⏳ 1.5秒後にStep2遷移ボタンを表示します...');
+                // 1.5秒後にaudio-test-contentを非表示にして、音域テストボタンを表示
+                console.log('⏳ 1.5秒後にaudio-test-contentを非表示にします...');
                 setTimeout(() => {
                     // audio-test-contentを非表示
                     const audioTestContent = document.getElementById('audio-test-content');
@@ -623,22 +619,10 @@ class PitchProCycleManager {
                         console.log('✅ audio-test-content を非表示にしました');
                     }
 
-                    // Step2遷移ボタンを表示・設定
+                    // 音域テストボタンを表示
                     if (startRangeBtn) {
-                        // ボタンテキストをStep2遷移用に変更
-                        const btnText = startRangeBtn.querySelector('span');
-                        if (btnText) {
-                            btnText.textContent = 'Step2: 音域テストへ進む';
-                        }
-
-                        // Step2遷移イベントを設定
-                        startRangeBtn.onclick = () => {
-                            console.log('🚀 Step2への遷移を開始');
-                            this.transitionToStep2();
-                        };
-
                         startRangeBtn.classList.remove('hidden');
-                        console.log('🎯 Step2遷移ボタン表示完了');
+                        console.log('🎯 音域テストボタン表示完了');
                     }
                 }, 1500);
             }
@@ -654,95 +638,28 @@ class PitchProCycleManager {
     /**
      * 保存済み音域データ表示（preparation.jsから統合）
      */
-    displaySavedRangeData(voiceRangeData, rangeSavedDisplay) {
-        if (!voiceRangeData || !rangeSavedDisplay) return;
+    displaySavedRangeData(results, rangeSavedDisplay) {
+        if (!results || !rangeSavedDisplay) return;
 
         const savedRange = document.getElementById('saved-range');
         const savedOctaves = document.getElementById('saved-octaves');
         const savedDate = document.getElementById('saved-date');
 
-        // voiceRangeData.resultsまたはvoiceRangeData自体を確認
-        const results = voiceRangeData.results || voiceRangeData;
-
-        // rangeフィールドの処理を修正
         if (savedRange && results.range) {
-            // results.rangeが文字列の場合（"A2 - F5"形式）
-            if (typeof results.range === 'string') {
-                savedRange.textContent = results.range;
-            }
-            // results.rangeがオブジェクトの場合（{lowest: "A2", highest: "F5"}形式）
-            else if (results.range.lowest && results.range.highest) {
-                savedRange.textContent = `${results.range.lowest} - ${results.range.highest}`;
-            }
+            savedRange.textContent = `${results.range.lowest} - ${results.range.highest}`;
         }
 
-        // octavesフィールドの処理を修正（octaveRangeまたはoctavesを確認）
-        if (savedOctaves) {
-            if (results.octaves !== undefined) {
-                savedOctaves.textContent = `${results.octaves.toFixed(1)}オクターブ`;
-            } else if (results.octaveRange !== undefined) {
-                savedOctaves.textContent = `${results.octaveRange.toFixed(1)}オクターブ`;
-            }
+        if (savedOctaves && results.octaveRange) {
+            savedOctaves.textContent = `${results.octaveRange.toFixed(1)}オクターブ`;
         }
 
-        // timestampの確認（親レベルまたはresultsレベル）
-        if (savedDate) {
-            const timestamp = voiceRangeData.timestamp || results.timestamp;
-            if (timestamp) {
-                const date = new Date(timestamp);
-                savedDate.textContent = date.toLocaleDateString('ja-JP');
-            }
+        if (savedDate && results.timestamp) {
+            const date = new Date(results.timestamp);
+            savedDate.textContent = date.toLocaleDateString('ja-JP');
         }
 
         rangeSavedDisplay.classList.remove('hidden');
         console.log('📊 保存済み音域データ表示完了');
-    }
-
-    /**
-     * Step2への遷移処理
-     */
-    async transitionToStep2() {
-        console.log('🚀 Step2遷移処理開始');
-
-        try {
-            // Step1完了データの最終保存
-            const step1CompletionData = {
-                micPermissionGranted: localStorage.getItem('micPermissionGranted'),
-                audioTestCompleted: localStorage.getItem('audioTestCompleted'),
-                step1CompletedAt: new Date().toISOString()
-            };
-
-            localStorage.setItem('step1CompletionData', JSON.stringify(step1CompletionData));
-            console.log('💾 Step1完了データ保存:', step1CompletionData);
-
-            // PitchProインスタンスのクリーンアップ（統合管理）
-            await this.cleanupPitchPro();
-
-            // Step2ページに遷移
-            console.log('🔄 preparation-step2.htmlに遷移中...');
-            window.location.href = 'preparation-step2.html';
-
-        } catch (error) {
-            console.error('❌ Step2遷移処理エラー:', error);
-            alert('Step2への遷移でエラーが発生しました。再度お試しください。');
-        }
-    }
-
-    /**
-     * PitchPro v1.3.1統合管理システム - FAQ推奨クリーンアップ
-     */
-    async cleanupPitchPro() {
-        console.log('🧹 PitchProリソースクリーンアップ開始（統合管理）');
-
-        if (this.audioDetector) {
-            await this.audioDetector.microphoneController.reset();
-            this.audioDetector = null;
-            console.log('✅ システム完全リセット＆インスタンス削除完了（FAQ推奨）');
-        }
-
-        this.currentPhase = 'abandoned';
-        this.state.detectionActive = false;
-        console.log('🧹 PitchProリソースクリーンアップ完了（統合管理）');
     }
 }
 
@@ -840,6 +757,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('📊 ステップインジケーター初期化');
     updateStepStatus(1, 'active');
 
+    // 音域テスト開始ボタンのイベントリスナーは voice-range-test-demo.js で設定される
+    console.log('📋 begin-range-test-btnイベントリスナーは voice-range-test-demo.js が担当');
 
     console.log('✅ 全ての初期化処理完了');
 });
@@ -901,9 +820,9 @@ function setupMicPermissionFlow() {
                         console.log('✅ 音声テストセクションを表示');
                     }
 
-                    // AudioDetectionComponentインスタンスをグローバルに共有（将来のStep2連携用）
+                    // AudioDetectionComponentインスタンスをグローバルに共有（voice-range-test-demo.js用）
                     window.globalAudioDetector = pitchProCycleManager.audioDetector;
-                    console.log('✅ globalAudioDetectorをStep2連携用に設定');
+                    console.log('✅ globalAudioDetectorを voice-range-test-demo.js と共有');
 
                 } catch (initError) {
                     console.warn('⚠️ AudioDetectionComponent初期化エラー:', initError);
@@ -987,14 +906,14 @@ function setupMicPermissionFlow() {
         });
     }
 
-    // 🔄 再測定ボタン（音域設定済み表示画面用）- Step2遷移に変更
+    // 🔄 再測定ボタン（音域設定済み表示画面用）
     const remeasureRangeBtn = document.getElementById('remeasure-range-btn');
     if (remeasureRangeBtn) {
         remeasureRangeBtn.addEventListener('click', async () => {
             console.log('🔄 再測定ボタン（音域設定済み表示）がクリックされました');
 
             try {
-                // 音域データを削除（再測定のため）
+                // 音域データを削除
                 try {
                     if (typeof DataManager !== 'undefined' && DataManager.clearVoiceRangeData) {
                         DataManager.clearVoiceRangeData();
@@ -1008,41 +927,29 @@ function setupMicPermissionFlow() {
                     localStorage.removeItem('voiceRangeData');
                 }
 
-                // PitchProリソースのクリーンアップ（統合管理）
-                await pitchProCycleManager.cleanupPitchPro();
+                // 音域設定済み表示を非表示
+                const rangeSavedDisplay = document.getElementById('range-saved-display');
+                if (rangeSavedDisplay) {
+                    rangeSavedDisplay.classList.add('hidden');
+                    console.log('📋 音域設定済み表示を非表示にしました');
+                }
 
-                // Step2（音域テスト）へ遷移
-                console.log('🔄 Step2（音域テスト）に遷移中...');
-                window.location.href = 'preparation-step2.html';
+                // ステップ2（音声テスト）を完了、ステップ3（音域テスト）をアクティブに
+                updateStepStatus(2, 'completed');
+                updateStepStatus(3, 'active');
+
+                // 音域テストセクションに移動
+                const audioTestSection = document.getElementById('audio-test-section');
+                const rangeTestSection = document.getElementById('range-test-section');
+
+                if (audioTestSection) audioTestSection.classList.add('hidden');
+                if (rangeTestSection) rangeTestSection.classList.remove('hidden');
+
+                console.log('✅ 音域テストセクションに移動完了');
 
             } catch (error) {
                 console.error('❌ 音域再測定処理エラー:', error);
                 alert(`音域再測定処理に失敗しました: ${error.message}`);
-            }
-        });
-    }
-
-    // 🚀 トレーニング開始ボタン（音域設定済み表示画面用）- training.html遷移に変更
-    const skipRangeTestBtn = document.getElementById('skip-range-test-btn');
-    if (skipRangeTestBtn) {
-        skipRangeTestBtn.addEventListener('click', async () => {
-            console.log('🚀 トレーニング開始ボタン（音域設定済み表示）がクリックされました');
-
-            try {
-                // 音域データ確認済みフラグ
-                localStorage.setItem('rangeDataConfirmed', 'true');
-                localStorage.setItem('step1CompletedViaExistingData', 'true');
-
-                // PitchProリソースのクリーンアップ（統合管理）
-                await pitchProCycleManager.cleanupPitchPro();
-
-                // training.htmlへ遷移
-                console.log('🚀 training.htmlに遷移中...');
-                window.location.href = '../training.html';
-
-            } catch (error) {
-                console.error('❌ トレーニング開始処理エラー:', error);
-                alert(`トレーニング開始処理に失敗しました: ${error.message}`);
             }
         });
     }
@@ -1080,10 +987,63 @@ function setupMicPermissionFlow() {
         console.warn('⚠️ 音域テストを開始ボタンが見つかりません（後で設定される可能性があります）');
     }
 
+    // begin-range-test-btn（音域テスト実行ボタン）のイベントリスナー追加
+    const beginRangeTestBtn = document.getElementById('begin-range-test-btn');
+    if (beginRangeTestBtn) {
+        beginRangeTestBtn.addEventListener('click', async () => {
+            console.log('🎯 音域テスト開始ボタンがクリックされました');
+            try {
+                // voice-range-test-demo.jsのstartVoiceRangeTest()を直接呼び出し
+                if (typeof window.startVoiceRangeTest === 'function') {
+                    await window.startVoiceRangeTest();
+                } else {
+                    console.error('❌ window.startVoiceRangeTest関数が見つかりません');
+                    showNotification('音域テスト機能が読み込まれていません', 'error');
+                }
+            } catch (error) {
+                console.error('❌ 音域テスト実行エラー:', error);
+                showNotification(`音域テスト開始に失敗しました: ${error.message}`, 'error');
+            }
+        });
+        console.log('✅ begin-range-test-btnイベントリスナー設定完了');
+    } else {
+        console.warn('⚠️ begin-range-test-btnが見つかりません');
+    }
 }
 
-// ===== ユーティリティ関数 =====
+// ===== 音域テスト統合機能 (voice-range-test-demo.jsから統合) =====
 
+/**
+ * 音域テスト開始（test-preparation-original.js成功パターン適用）
+ */
+async function startVoiceRangeTest() {
+    console.log('🎯 音域テストセクションへ移動 (成功パターン適用版)');
+
+    try {
+        // セクション切り替え：音声テスト → 音域テスト（確実な方法）
+        const audioTestSection = document.getElementById('audio-test-section');
+        const rangeTestSection = document.getElementById('range-test-section');
+
+        if (audioTestSection) {
+            audioTestSection.classList.add('hidden');
+            console.log('✅ audio-test-section を非表示にしました');
+        }
+        if (rangeTestSection) {
+            rangeTestSection.classList.remove('hidden');
+            console.log('✅ range-test-section を表示しました');
+        }
+
+        // ステップインジケーター更新
+        updateStepStatus(2, 'completed');
+        updateStepStatus(3, 'active');
+
+        console.log('✅ 音域テストセクションに移動完了');
+
+    } catch (error) {
+        console.error('❌ 音域テスト開始エラー:', error);
+        alert(`音域テスト開始に失敗しました: ${error.message}`);
+    }
+}
 
 /**
  * マイク許可ボタン状態更新
@@ -1141,3 +1101,19 @@ function updateStepStatus(stepNumber, status) {
     }
 }
 
+/**
+ * セクション表示切り替え
+ */
+function showSection(sectionToShow) {
+    const sections = [
+        document.getElementById('permission-section'),
+        document.getElementById('audio-test-section'),
+        document.getElementById('range-test-section'),
+        document.getElementById('result-section')
+    ].filter(section => section !== null);
+
+    sections.forEach(section => section.classList.add('hidden'));
+    if (sectionToShow) {
+        sectionToShow.classList.remove('hidden');
+    }
+}
