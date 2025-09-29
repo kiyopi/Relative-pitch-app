@@ -356,47 +356,52 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // 注意: マイク許可は preparation-pitchpro-cycle.js で処理される
 
-    // 🎯 音域テスト開始ボタン
-    document.getElementById('begin-range-test-btn').addEventListener('click', async () => {
-        await startVoiceRangeTest();
-    });
+    // 🎯 音域テスト開始ボタンはpreparation-controller.jsで制御されます
 
-    // 🔄 再測定ボタン
-    document.getElementById('retry-measurement-btn').addEventListener('click', async () => {
-        console.log('🔄 再測定ボタンがクリックされました');
-        console.log('📋 現在のフェーズ:', globalState.currentPhase);
-        console.log('リトライ回数:', globalState.retryCount, '/', globalState.maxRetries);
-        await retryCurrentMeasurement();
-    });
+    // 🔄 再測定ボタン（シングルページフロー対応）
+    const retryMeasurementBtn = document.getElementById('retry-measurement-btn');
+    if (retryMeasurementBtn) {
+        retryMeasurementBtn.addEventListener('click', async () => {
+            console.log('🔄 再測定ボタンがクリックされました');
+            console.log('📋 現在のフェーズ:', globalState.currentPhase);
+            console.log('リトライ回数:', globalState.retryCount, '/', globalState.maxRetries);
+            await retryCurrentMeasurement();
+        });
+    }
 
-    // 🔄 再測定ボタン（結果画面用）
-    document.getElementById('remeasure-range-btn').addEventListener('click', async () => {
-        console.log('🔄 再測定ボタン（結果画面）がクリックされました');
+    // 🔄 再測定ボタン（結果画面用・シングルページフロー対応）
+    const remeasureRangeBtn = document.getElementById('remeasure-range-btn');
+    if (remeasureRangeBtn) {
+        remeasureRangeBtn.addEventListener('click', async () => {
+            console.log('🔄 再測定ボタン（結果画面）がクリックされました');
 
-        // 保存済みの音域データをクリア
-        if (window.DataManager) {
-            window.DataManager.clearVoiceRangeData();
-            console.log('📋 音域データをクリアしました');
-        }
+            // 保存済みの音域データをクリア
+            if (window.DataManager) {
+                window.DataManager.clearVoiceRangeData();
+                console.log('📋 音域データをクリアしました');
+            }
 
-        // 音域テストセクションに戻る
-        document.getElementById('result-section').classList.add('hidden');
-        document.getElementById('range-test-section').classList.remove('hidden');
+            // 音域テストセクションに戻る
+            const resultSection = document.getElementById('result-section');
+            const rangeTestSection = document.getElementById('range-test-section');
+            if (resultSection) resultSection.classList.add('hidden');
+            if (rangeTestSection) rangeTestSection.classList.remove('hidden');
 
-        // 音域設定済み表示を非表示
-        const rangeSavedDisplay = document.getElementById('range-saved-display');
-        if (rangeSavedDisplay) {
-            rangeSavedDisplay.classList.add('hidden');
-        }
+            // 音域設定済み表示を非表示
+            const rangeSavedDisplay = document.getElementById('range-saved-display');
+            if (rangeSavedDisplay) {
+                rangeSavedDisplay.classList.add('hidden');
+            }
 
-        // 音域テストの状態をリセット
-        globalState.currentPhase = 'idle';
-        globalState.retryCount = 0;
-        globalState.lowPitchData = [];
-        globalState.highPitchData = [];
+            // 音域テストの状態をリセット
+            globalState.currentPhase = 'idle';
+            globalState.retryCount = 0;
+            globalState.lowPitchData = [];
+            globalState.highPitchData = [];
 
-        console.log('🎯 音域テストの再開始準備完了');
-    });
+            console.log('🎯 音域テストの再開始準備完了');
+        });
+    }
 
     console.log('✅ VoiceRangeTestController デモ準備完了');
     console.log('📌 PitchPro v1.3.0 統合版');
@@ -470,15 +475,18 @@ async function startBasicTest() {
 // 注意: マイク許可機能は preparation-pitchpro-cycle.js で統合処理される
 
 // 音域テスト開始
-async function startVoiceRangeTest() {
+async function startVoiceRangeTest(audioDetectorInstance) { // 引数を追加
     console.log('🎯 音域テスト開始 (v1.3.1修正版)');
 
     try {
         // 🎵 音声安定性データをリセット（雑音排除機能初期化）
         resetVoiceStability();
 
-        // 既存のボタン状態を更新
-        document.getElementById('begin-range-test-btn').classList.add('btn-hidden');
+        // 既存のボタン状態を更新（シングルページフロー対応）
+        const beginBtn = document.getElementById('begin-range-test-btn');
+        if (beginBtn) {
+            beginBtn.classList.add('btn-hidden');
+        }
 
         // マイクステータスを録音中に変更
         updateMicStatus('recording');
@@ -491,75 +499,37 @@ async function startVoiceRangeTest() {
             threshold: globalState.voiceDetectionThreshold
         });
 
-        // 既存のglobalAudioDetectorを再利用（マイク許可時に初期化済み）
-        if (window.globalAudioDetector) {
-            console.log('🔄 既存AudioDetectionComponent再利用 - 音域テスト用UI要素に切り替え');
-
-            // PitchPro updateSelectors()で音域テスト用UI要素に切り替え
-            try {
-                window.window.globalAudioDetector.updateSelectors({
-                    volumeBarSelector: '#range-test-volume-bar',
-                    volumeTextSelector: '#range-test-volume-text',
-                    frequencySelector: '#range-test-frequency-value'
-                });
-                console.log('✅ PitchPro updateSelectors()で音域テスト用UI要素に切り替え完了');
-
-                // 音域テスト用コールバックを設定
-                console.log('🔧 音域テスト用コールバック設定開始');
-                // デバッグ用カウンター
-                let debugCallbackCounter = 0;
-
-                window.window.globalAudioDetector.setCallbacks({
-                    onPitchUpdate: (result) => {
-                        debugCallbackCounter++;
-                        // 10回に1回だけログ出力（デバッグ用）
-                        if (debugCallbackCounter % 10 === 1) {
-                            console.log('🎵 音程検出 (音域テスト用・voice-range-test-demo.js) - カウント:', debugCallbackCounter);
-                        }
-                        handleVoiceDetection(result, window.globalAudioDetector);
-                    },
-                    onError: (error) => {
-                        console.error('❌ 検出エラー (音域テスト用):', error);
-                    }
-                });
-                console.log('✅ 音域テスト用コールバック設定完了');
-
-            } catch (error) {
-                console.error('❌ updateSelectors()失敗:', error);
-                // フォールバック: 既存インスタンスをそのまま使用
-                console.log('🔄 フォールバック: 既存インスタンスをそのまま使用');
-            }
-        } else {
-            console.error('❌ window.globalAudioDetectorが存在しません - マイク許可が未完了の可能性');
-            console.error('🔍 デバッグ情報:', {
-                globalAudioDetectorExists: !!window.globalAudioDetector,
-                globalAudioDetectorExists: !!window.globalAudioDetector,
-                pitchProCycleManager: typeof pitchProCycleManager !== 'undefined' ? !!pitchProCycleManager : 'undefined',
-                pitchProCycleManagerAudioDetector: typeof pitchProCycleManager !== 'undefined' && pitchProCycleManager ? !!pitchProCycleManager.audioDetector : 'N/A'
-            });
-
-            throw new Error('マイク許可が完了していません。最初からやり直してください。');
+        // 引数で渡された初期化済みインスタンスを使用
+        if (!audioDetectorInstance) {
+            throw new Error('AudioDetectorインスタンスが提供されませんでした。');
         }
+        window.globalAudioDetector = audioDetectorInstance; // グローバルにセット
 
-        // PitchPro v1.3.1: 既存の検出を停止してから再開
-        if (window.globalAudioDetector) {
-            // 既に検出中の場合は一旦停止
-            if (window.globalAudioDetector.stopDetection) {
-                window.globalAudioDetector.stopDetection();
-                console.log('🛑 既存の音声検出を停止');
+        // UIセレクタとコールバックを設定
+        await window.globalAudioDetector.updateSelectors({
+            volumeBarSelector: '#range-test-volume-bar',
+            volumeTextSelector: '#range-test-volume-text',
+            frequencySelector: '#range-test-frequency-value'
+        });
+        window.globalAudioDetector.setCallbacks({
+            onPitchUpdate: (result) => {
+                handleVoiceDetection(result, window.globalAudioDetector);
             }
+        });
 
-            // 少し待ってから再開（状態遷移を確実にするため）
-            setTimeout(() => {
-                if (window.globalAudioDetector.startDetection) {
-                    window.globalAudioDetector.startDetection();
-                    console.log('🎯 音域テスト開始: 音声検出を再開');
-                }
-            }, 100);
+        // 検出を開始
+        await window.globalAudioDetector.startDetection();
+
+        // UI更新（シングルページフロー対応）
+        const mainStatusText = document.getElementById('main-status-text');
+        if (mainStatusText) {
+            mainStatusText.textContent = '３秒間できるだけ低い声で「あー」と発声しましょう';
         }
-
-        document.getElementById('main-status-text').textContent = '３秒間できるだけ低い声で「あー」と発声しましょう';
-        document.getElementById('sub-info-text').textContent = '安定した声を認識したら自動で測定開始します';
+        
+        const subInfoText = document.getElementById('sub-info-text');
+        if (subInfoText) {
+            subInfoText.textContent = '安定した声を認識したら自動で測定開始します';
+        }
 
         console.log('✅ 音域テスト開始完了');
 
@@ -567,9 +537,12 @@ async function startVoiceRangeTest() {
         console.error('❌ 音域テスト開始エラー:', error);
         showNotification(`音域テスト開始に失敗しました: ${error.message}`, 'error');
         
-        // エラー時は元の状態に戻す
-        document.getElementById('begin-range-test-btn').classList.remove('btn-hidden');
-        document.getElementById('begin-range-test-btn').classList.add('btn-visible-inline');
+        // エラー時は元の状態に戻す（シングルページフロー対応）
+        const beginBtn = document.getElementById('begin-range-test-btn');
+        if (beginBtn) {
+            beginBtn.classList.remove('btn-hidden');
+            beginBtn.classList.add('btn-visible-inline');
+        }
         updateMicStatus('standby');
     }
 }
@@ -1045,9 +1018,17 @@ function startLowPitchMeasurement() {
     console.log('🔍 startLowPitchMeasurement実行 - 円形プログレスバー開始予定');
     globalState.currentPhase = 'measuring-low';
 
-    document.getElementById('main-status-text').textContent = 'できるだけ低い声をキープしましょう';
-    document.getElementById('sub-info-text').textContent = '低音測定中...';
-    document.getElementById('sub-info-text').classList.add('measuring');
+    // シングルページフロー対応: 安全なDOM要素アクセス
+    const mainStatusText = document.getElementById('main-status-text');
+    if (mainStatusText) {
+        mainStatusText.textContent = 'できるだけ低い声をキープしましょう';
+    }
+    
+    const subInfoText = document.getElementById('sub-info-text');
+    if (subInfoText) {
+        subInfoText.textContent = '低音測定中...';
+        subInfoText.classList.add('measuring');
+    }
 
     // バッジアニメーションを開始
     updateBadgeForMeasuring();
@@ -1890,8 +1871,11 @@ function updateBadgeForMeasuring() {
         rangeIcon.classList.remove('range-icon-confirmed');
     }
 
-    // 再測定ボタンは失敗時のみ表示（測定開始時は非表示のまま）
-    document.getElementById('retry-measurement-btn').classList.add('btn-hidden');
+    // 再測定ボタンは失敗時のみ表示（測定開始時は非表示のまま・シングルページフロー対応）
+    const retryMeasurementBtn = document.getElementById('retry-measurement-btn');
+    if (retryMeasurementBtn) {
+        retryMeasurementBtn.classList.add('btn-hidden');
+    }
 }
 
 function updateBadgeForConfirmed() {

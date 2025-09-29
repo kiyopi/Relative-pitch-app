@@ -176,7 +176,7 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
     <!-- 🎵 PitchPro v1.3.1 音声処理エンジン -->
-    <script src="js/pitchpro-v1.3.1.umd.js"></script>
+    <script src="../../../js/pitchpro-audio/pitchpro-v1.3.1.umd.js"></script>
 
     <!-- 📊 データ管理システム -->
     <script src="js/data-manager.js"></script>

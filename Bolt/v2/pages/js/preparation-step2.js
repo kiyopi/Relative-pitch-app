@@ -1,9 +1,9 @@
 /**
- * voice-range-test-demo.js - 音域テストデモページメインスクリプト
+ * preparation-step2.js - Step2音域テストメインスクリプト
  *
  * @version 2.0.0
- * @description PitchPro v1.3.0対応版統合デモ
- * @date 2025-01-16
+ * @description PitchPro v1.3.1対応版Step2実装
+ * @date 2025-01-29
  */
 
 // VoiceRangeTestControllerの動的インポート
@@ -24,33 +24,24 @@ async function initializeDemo() {
     }
 }
 
+// デバッグ用: 表示制御を確認する関数
+window.debugBadgeDisplay = function() {
+    const rangeIcon = document.getElementById('range-icon');
+    console.log('🔍 現在の表示状態:');
+    console.log('  rangeIcon.style.display:', rangeIcon.style.display);
+    console.log('  rangeIcon.innerHTML:', rangeIcon.innerHTML);
+};
 
-// 結果表示関数（削除された要素対応版）
+// 結果表示関数
 function displayResults(results) {
-    // 結果表示要素が存在する場合のみ更新
-    const resultRange = document.getElementById('result-range');
-    if (resultRange) {
-        resultRange.textContent = results.range || '-';
-    }
+    document.getElementById('result-range').textContent = results.range || '-';
+    document.getElementById('result-octaves').textContent = results.octaves ? `${results.octaves}オクターブ` : '-';
+    document.getElementById('result-low-freq').textContent = results.lowPitch ?
+        `${results.lowPitch.frequency.toFixed(1)} Hz (${results.lowPitch.note})` : '-';
+    document.getElementById('result-high-freq').textContent = results.highPitch ?
+        `${results.highPitch.frequency.toFixed(1)} Hz (${results.highPitch.note})` : '-';
 
-    const resultOctaves = document.getElementById('result-octaves');
-    if (resultOctaves) {
-        resultOctaves.textContent = results.octaves ? `${results.octaves}オクターブ` : '-';
-    }
-
-    const resultLowFreq = document.getElementById('result-low-freq');
-    if (resultLowFreq) {
-        resultLowFreq.textContent = results.lowPitch ?
-            `${results.lowPitch.frequency.toFixed(1)} Hz (${results.lowPitch.note})` : '-';
-    }
-
-    const resultHighFreq = document.getElementById('result-high-freq');
-    if (resultHighFreq) {
-        resultHighFreq.textContent = results.highPitch ?
-            `${results.highPitch.frequency.toFixed(1)} Hz (${results.highPitch.note})` : '-';
-    }
-
-    // 🧪 デバッグ情報を結果詳細に追加（要素が存在する場合のみ）
+    // 🧪 デバッグ情報を結果詳細に追加
     if (globalState.debugData.detectionCount > 0) {
         const resultDetails = document.getElementById('result-details');
         if (resultDetails) {
@@ -83,12 +74,9 @@ function displayResults(results) {
         }
     }
 
-    const resultsSection = document.getElementById('results-section');
-    if (resultsSection) {
-        resultsSection.classList.remove('hidden');
-    }
+    document.getElementById('results-section').classList.remove('hidden');
 
-    console.log('📋 測定結果表示完了 (削除された要素対応版)');
+    console.log('📋 測定結果表示完了 (デバッグ情報含む)');
 }
 
 // 通知表示関数
@@ -155,14 +143,10 @@ function updateDebugDisplay() {
         'debug-detection-count': `${globalState.debugData.detectionCount}回`
     };
 
-    // 削除されたデバッグ要素への安全な参照
     Object.entries(elements).forEach(([id, value]) => {
         const element = document.getElementById(id);
         if (element) {
             element.textContent = value;
-        } else {
-            // デバッグ要素が削除されている場合はコンソールに出力
-            console.log(`🧪 Debug[${id}]: ${value}`);
         }
     });
 }
@@ -171,21 +155,16 @@ function updateDebugDisplay() {
 function toggleDebugDisplay() {
     globalState.debugData.isVisible = !globalState.debugData.isVisible;
 
-    // 削除されたデバッグ要素への安全な参照
     const debugCard = document.getElementById('debug-range-data');
     const toggleButton = document.getElementById('toggle-debug-display');
 
     if (debugCard) {
         debugCard.style.display = globalState.debugData.isVisible ? 'block' : 'none';
-    } else {
-        console.log('🧪 debug-range-data要素が存在しません（削除済み）');
     }
 
     if (toggleButton) {
         toggleButton.textContent = globalState.debugData.isVisible ? 'デバッグ表示OFF' : 'デバッグ表示ON';
         toggleButton.className = globalState.debugData.isVisible ? 'btn btn-warning btn-sm' : 'btn btn-secondary btn-sm';
-    } else {
-        console.log('🧪 toggle-debug-display要素が存在しません（削除済み）');
     }
 
     // 表示をONにした時、蓄積されたデータを即座に表示
@@ -473,60 +452,6 @@ function resetVoiceStability() {
     console.log('🔄 音声安定性データをリセット');
 }
 
-// 🔥 PitchPro統合管理システム: 3段階制御戦略実装
-async function performThreeTierReset(reason = '通常リセット') {
-    console.log(`🔄 3段階制御戦略開始: ${reason}`);
-
-    if (!globalAudioDetector) {
-        console.log('⚠️ AudioDetectorが存在しないため、リセットをスキップします');
-        return;
-    }
-
-    try {
-        // 🎯 Level 1: 音声検出停止
-        console.log('🔄 Level 1: stopDetection() - 音声検出を停止');
-        if (globalAudioDetector.stopDetection) {
-            globalAudioDetector.stopDetection();
-            console.log('✅ Level 1完了: 音声検出停止成功');
-        } else {
-            console.log('⚠️ Level 1: stopDetection()メソッドが利用できません');
-        }
-
-        // 🎯 Level 2: 表示要素リセット
-        console.log('🔄 Level 2: resetDisplayElements() - UI表示要素をリセット');
-        if (globalAudioDetector.resetDisplayElements) {
-            globalAudioDetector.resetDisplayElements();
-            console.log('✅ Level 2完了: 表示要素リセット成功');
-        } else {
-            console.log('⚠️ Level 2: resetDisplayElements()メソッドが利用できません');
-            // 手動でUI要素をリセット
-            document.getElementById('range-test-volume-text').textContent = '0%';
-            document.getElementById('range-test-frequency-value').textContent = '0 Hz';
-            const volumeBar = document.getElementById('range-test-volume-bar');
-            if (volumeBar) volumeBar.style.width = '0%';
-            console.log('✅ Level 2代替: 手動UI要素リセット完了');
-        }
-
-        // 🎯 Level 3: MicrophoneController完全リセット（FAQ推奨）
-        console.log('🔄 Level 3: microphoneController.reset() - マイクシステム完全リセット');
-        if (globalAudioDetector.microphoneController && globalAudioDetector.microphoneController.reset) {
-            await globalAudioDetector.microphoneController.reset();
-            console.log('✅ Level 3完了: MicrophoneController.reset()成功 (FAQ推奨パターン)');
-        } else {
-            console.log('⚠️ Level 3: MicrophoneController.reset()が利用できません');
-        }
-
-        console.log('🎉 3段階制御戦略完了: 全レベルの処理が完了しました');
-
-    } catch (error) {
-        console.error('❌ 3段階制御戦略エラー:', error);
-        console.log('🔄 エラー時フォールバック: 基本的なstopDetection()のみ実行');
-        if (globalAudioDetector.stopDetection) {
-            globalAudioDetector.stopDetection();
-        }
-    }
-}
-
 // メイン初期化処理
 document.addEventListener('DOMContentLoaded', async function() {
     // まず初期化を実行
@@ -602,13 +527,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
 
 
-    // 🧪 デバッグ表示切り替えボタン（存在する場合のみ）
-    const debugToggleBtn = document.getElementById('toggle-debug-display');
-    if (debugToggleBtn) {
-        debugToggleBtn.addEventListener('click', () => {
-            toggleDebugDisplay();
-        });
-    }
+    // 🧪 デバッグ表示切り替えボタン
+    document.getElementById('toggle-debug-display').addEventListener('click', () => {
+        toggleDebugDisplay();
+    });
 
     console.log('✅ VoiceRangeTestController デモ準備完了');
     console.log('📌 PitchPro v1.3.0 統合版');
@@ -745,76 +667,39 @@ async function startVoiceRangeTest() {
 
         // グローバルインスタンスがない場合のみ作成
         if (!globalAudioDetector) {
-            console.log('🔧 AudioDetectionComponent初回作成 (PitchPro統合管理システム活用版)');
-            console.log('📋 MicrophoneController + AudioDetectionComponent統合管理で実装');
+            console.log('🔧 AudioDetectionComponent初回作成 (v1.3.0対応版)');
+            console.log('📋 setCallbacks()メソッド問題のため、コンストラクタパターンを使用');
 
-            // 🔥 PitchPro統合管理システム活用版 - Step2音域テスト専用最適化
+            // コンストラクタパターンで確実に動作させる
             globalAudioDetector = new AudioDetectionComponent({
                 volumeBarSelector: '#range-test-volume-bar',
                 volumeTextSelector: '#range-test-volume-text',
                 frequencySelector: '#range-test-frequency-value',
                 debugMode: true,
-                // 🎯 Step2専用: 音域テスト最適化コールバック設定
+                // v1.3.0対応版: コンストラクタでコールバック設定
                 onPitchUpdate: (result) => {
-                    console.log('🎵 音程検出 (Step2音域テスト専用):', result);
-
+                    console.log('🎵 音程検出 (確実動作版):', result);
                     // 🧪 デバッグデータ更新（常に実行）
                     updateDebugData(result);
                     // 🧪 デバッグ表示更新（表示ON時のみ）
                     updateDebugDisplay();
-
-                    // 🎯 Step2専用: 音域テスト用の音声検出処理
                     handleVoiceDetection(result, globalAudioDetector);
                 },
                 onError: (error) => {
-                    console.error('❌ Step2音域テスト検出エラー:', error);
-                    // 🔥 3段階制御戦略でエラー時リカバリ
-                    performThreeTierReset('エラー時リカバリ').catch(resetError => {
-                        console.error('❌ エラー時リカバリも失敗:', resetError);
-                    });
+                    console.error('❌ 検出エラー (確実動作版):', error);
                 },
                 onVolumeUpdate: (volume) => {
-                    // Step2専用: 音量閾値チェック最適化
-                    if (volume && volume > globalState.voiceDetectionThreshold) {
-                        console.log(`📊 Step2音量検出: ${(volume * 100).toFixed(1)}%`);
-                    }
-                },
-                // 🎛️ Step2専用: マイクロフォン状態変化コールバック
-                onMicrophoneStateChange: (state) => {
-                    console.log('🎤 Step2マイク状態変化:', state);
-                    updateMicStatus(state);
+                    // 音量更新処理（必要に応じて）
                 }
             });
 
             await globalAudioDetector.initialize();
-            console.log('✅ AudioDetectionComponent初期化完了 (PitchPro統合管理システム版)');
-
-            // 🔥 FAQ推奨: MicrophoneController統合管理システム活用
-            if (globalAudioDetector.microphoneController) {
-                console.log('🎛️ MicrophoneController統合管理システム検出完了');
-                console.log('📋 FAQ推奨のreset()メソッドが利用可能です');
-            } else {
-                console.warn('⚠️ MicrophoneController統合管理システムが利用できません');
-            }
+            console.log('✅ AudioDetectionComponent初期化完了 (v1.3.0対応版)');
         }
 
-        // 🎯 Step2専用: マイクテスト→音域テストへのスムーズ切り替え
-        if (globalAudioDetector.updateSelectors) {
-            try {
-                globalAudioDetector.updateSelectors({
-                    volumeBarSelector: '#range-test-volume-bar',
-                    volumeTextSelector: '#range-test-volume-text',
-                    frequencySelector: '#range-test-frequency-value'
-                });
-                console.log('✅ Step2最適化: マイクテスト→音域テストUIセレクター切り替え完了');
-            } catch (error) {
-                console.warn('⚠️ Step2 UI切り替えエラー、継続します:', error);
-            }
-        }
-
-        // PitchPro v1.3.1: startDetection()メソッド（統合管理システム版）
+        // PitchPro v1.3.0: startDetection()メソッド
         globalAudioDetector.startDetection();
-        console.log('🎯 PitchPro v1.3.1: startDetection()で音声検出開始 (Step2音域テスト専用)');
+        console.log('🎯 PitchPro v1.3.0: startDetection()で音声検出開始');
 
         // 🧪 デバッグ状態更新
         updateDebugStatus('音声検出中', '録音中');
@@ -1183,31 +1068,13 @@ function assessMeasurementQuality(measurementData) {
 // 音域テスト結果表示
 function displayVoiceRangeResults(results) {
     // 結果セクションを表示
-    const resultsSection = document.getElementById('results-section');
-    if (resultsSection) {
-        resultsSection.classList.remove('hidden');
-    }
+    document.getElementById('results-section').classList.remove('hidden');
 
-    // 基本情報（要素が存在する場合のみ更新）
-    const resultRange = document.getElementById('result-range');
-    if (resultRange) {
-        resultRange.textContent = results.range;
-    }
-
-    const resultOctaves = document.getElementById('result-octaves');
-    if (resultOctaves) {
-        resultOctaves.textContent = `${results.octaves}オクターブ (${results.semitones}半音)`;
-    }
-
-    const resultLowFreq = document.getElementById('result-low-freq');
-    if (resultLowFreq) {
-        resultLowFreq.textContent = `${results.lowFreq.toFixed(1)} Hz (${results.lowNote})`;
-    }
-
-    const resultHighFreq = document.getElementById('result-high-freq');
-    if (resultHighFreq) {
-        resultHighFreq.textContent = `${results.highFreq.toFixed(1)} Hz (${results.highNote})`;
-    }
+    // 基本情報
+    document.getElementById('result-range').textContent = results.range;
+    document.getElementById('result-octaves').textContent = `${results.octaves}オクターブ (${results.semitones}半音)`;
+    document.getElementById('result-low-freq').textContent = `${results.lowFreq.toFixed(1)} Hz (${results.lowNote})`;
+    document.getElementById('result-high-freq').textContent = `${results.highFreq.toFixed(1)} Hz (${results.highNote})`;
 
     // 測定品質評価を実行
     const quality = assessMeasurementQuality(globalState.measurementData);
@@ -1780,7 +1647,7 @@ function startHighPitchMeasurement() {
 }
 
 // 高音測定完了
-async function completeHighPitchMeasurement() {
+function completeHighPitchMeasurement() {
     console.log('✅ 高音域測定完了');
     globalState.currentPhase = 'completed';
     globalState.measurementData.endTime = Date.now();
@@ -1825,10 +1692,15 @@ async function completeHighPitchMeasurement() {
     }
     
     // PitchPro AudioDetector停止（音量バー・マイクも自動リセット）
-    // 🔥 PitchPro統合管理システム: 測定完了時の3段階制御戦略
     if (globalAudioDetector) {
-        await performThreeTierReset('高音測定完了');
-        console.log('✅ PitchPro統合管理システムで完全リセット完了');
+        if (globalAudioDetector.stop) {
+            globalAudioDetector.stop();
+            console.log('🎯 PitchPro stop()メソッド使用（測定完了）');
+        } else {
+            globalAudioDetector.stopDetection();
+            console.log('🔄 PitchPro stopDetection()使用（測定完了）');
+        }
+        console.log('✅ PitchProが音量バー・マイク状態も自動リセット');
     }
 
     // 音量バーを手動でリセット（PitchProが自動でリセットしない場合の保険）
@@ -1923,10 +1795,7 @@ async function retryCurrentMeasurement() {
         updateBadgeForWaiting('arrow-down');
 
         // 結果表示を非表示
-        const resultsSection = document.getElementById('results-section');
-        if (resultsSection) {
-            resultsSection.classList.add('hidden');
-        }
+        document.getElementById('results-section').classList.add('hidden');
 
         // ボタン状態を調整
         document.getElementById('retry-measurement-btn').classList.add('btn-hidden');
@@ -1969,10 +1838,12 @@ function stopAllMeasurements() {
         globalState.progressTimer = null;
     }
 
-    // 🔥 PitchPro統合管理システム: 3段階制御戦略で効率的停止
+    // AudioDetector効率的停止（破棄せず再利用のため停止のみ）
     if (globalAudioDetector) {
-        await performThreeTierReset('再測定前のリセット');
-
+        // PitchPro v1.3.0修正版: stopDetection()メソッド使用
+        globalAudioDetector.stopDetection();
+        console.log('🎯 PitchPro v1.3.0修正版: stopDetection()で音声検出停止');
+        
         // インスタンスは破棄せず再利用のため保持
         window.currentAudioDetector = globalAudioDetector;
     }

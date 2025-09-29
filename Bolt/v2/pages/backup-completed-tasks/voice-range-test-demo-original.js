@@ -12,10 +12,13 @@ let VoiceRangeTestController;
 // グローバルなaudioDetectorインスタンス（効率的な再利用のため）
 let globalAudioDetector = null;
 
+// Step2など他のページから使用できるようにグローバルスコープに公開
+window.globalAudioDetector = null;
+
 // 初期化関数
 async function initializeDemo() {
     try {
-        const module = await import('./preparation-advanced-controller.js');
+        const module = await import('./voice-range-test-controller.js');
         VoiceRangeTestController = module.VoiceRangeTestController;
         console.log('✅ VoiceRangeTestController loaded successfully');
     } catch (error) {
@@ -571,15 +574,20 @@ async function startBasicTest() {
 
             await globalAudioDetector.initialize();
             console.log('✅ AudioDetectionComponent初期化成功 (v1.3.0確実動作版)');
+
+            // グローバルスコープに公開（他のページから使用可能にする）
+            window.globalAudioDetector = globalAudioDetector;
+            console.log('🌍 AudioDetectorをグローバルスコープに公開');
         }
 
-        // PitchProのstart()メソッドを使用
-        if (globalAudioDetector.start) {
-            globalAudioDetector.start();
-            console.log('🎯 PitchPro start()メソッド使用（基本テスト）');
-        } else {
+        // PitchPro v1.3.1準拠: startDetection()メソッドを優先使用
+        if (globalAudioDetector.startDetection) {
             globalAudioDetector.startDetection();
-            console.log('🔄 startDetection()フォールバック使用（基本テスト）');
+            console.log('🎯 PitchPro v1.3.1: startDetection()メソッド使用');
+        } else if (globalAudioDetector.start) {
+            // 古いバージョン用のフォールバック
+            globalAudioDetector.start();
+            console.log('🔄 旧バージョンのstart()メソッド使用');
         }
 
         // 🧪 デバッグ状態更新

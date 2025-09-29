@@ -2324,3 +2324,22 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-29 18:18:46] コミット: fix: preparation-step1.html完全修正とPitchProグローバル化問題解決
+
+- マイク許可ボタン無反応問題の根本解決
+- GlobalAudioManagerとページ処理の責務分離実装
+- 音声認識ロジック修正（100Hz以上で1秒間継続）
+- 音域データ存在時の適切な表示制御
+- ステータスインジケーターの正しい動作実装
+- success-alert表示修復
+- PitchPro resetDisplayElements()による適切なUIリセット
+
+主要な修正:
+- 非同期処理の競合状態解消
+- 単一責任原則によるアーキテクチャ改善
+- ページロード時の初期状態統一
+- 音域設定済み表示の適切なタイミング制御
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
