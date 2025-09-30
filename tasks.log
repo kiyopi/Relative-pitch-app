@@ -2376,3 +2376,73 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-30 15:12:25] コミット: docs: PitchPro-SPA開発戦略とファイル参照パス修正
+
+- Vanilla JS + 自作SPAロードマップ策定
+  - 4フェーズの段階的実装計画
+  - ハッシュルーターによるSPA化戦略
+  - マイク許可問題の根本解決アプローチ
+- serenaメモリ2件追加
+  - pitchpro_spa_implementation_flow_2025_09_30.md
+  - vanilla_spa_development_roadmap_2025_09_30.md
+- HTMLファイル参照パス修正
+  - records.html: CSS/JS参照パス修正
+  - results-premium-analysis.html: ナビゲーションリンク修正
+- APP_SPECIFICATION.md確認と開発方針整理
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-30 15:40:30] コミット: feat: Phase 1 SPA アーキテクチャ実装完了 - ハッシュルーターと動的ビュー導入
+
+- index.htmlをSPAシェル化: メインコンテンツを動的コンテナに変更
+- templates/home.html作成: ホームページコンテンツをテンプレート化
+- ハッシュルーター実装: js/router.jsで#home, #preparation等の動的ナビゲーション
+- ナビゲーションリンク更新: 全てのwindow.location.hrefをlocation.hashに変更
+- ファイル参照パス修正: data-manager.js等の読み込みパス正規化
+
+🎯 重要な効果:
+- マイク許可ダイアログ問題の根本解決（ページリロード完全排除）
+- PitchProインスタンス永続化（メモリ上でのオブジェクト保持）
+- シームレスな画面遷移実現
+
+🚀 Vanilla JS + 自作SPA Phase 1 ロードマップ 100%完了
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-30 16:50:15] コミット: feat: Phase 2完了 + cleanup強化 - コントローラー分離と完全リソース管理実装
+
+## Phase 2: ページコントローラー分離完了
+- templates/preparation.html作成: HTMLテンプレート化
+- js/controllers/preparationController.js: 1148行コントローラー移行
+- 動的import実装: ES6モジュール非同期読み込み
+- router.js拡張: setupPreparationEvents()で動的コントローラー読み込み
+
+## cleanup メソッド強化実装
+- preparationController cleanupPitchPro強化:
+  * stopDetection() → microphoneController.reset() → destroy() 段階実行
+  * try-catch エラーハンドリング + 確実なnull化
+  * 詳細ログ出力による状態監視
+- SPA自動クリーンアップ機能:
+  * ページ遷移時の自動リソース解放 (handleRouteChange)
+  * ブラウザ終了時のクリーンアップ (pagehide イベント)
+  * cleanupCurrentPage() による統一クリーンアップ
+
+## 技術的改善
+- PitchPro destroy()確実実行: メモリリーク完全防止
+- AudioDetectionComponent完全破棄: WebAudioリソース解放
+- 非同期処理統一: async/await パターン適用
+- TypeScript診断エラー修正: setupTrainingEvents async化
+
+🎯 重要な効果:
+- HTML・JavaScript完全分離: 表示ロジックと制御ロジック分離
+- 動的リソース読み込み: 必要時のみJSリソース消費
+- 完全なリソース管理: 長時間使用でもメモリリークなし
+- SPA専用クリーンアップ: ページ遷移時の自動メモリ解放
+
+🚀 Phase 2 + cleanup強化 100%完了
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
