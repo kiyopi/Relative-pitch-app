@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>トレーニング記録 - 8va相対音感トレーニングアプリ</title>
+    
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/results.css">
+    
+    <!-- アイコンライブラリ -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+</head>
+<body>
+    <div class="min-h-screen">
+        <div class="container">
+            <!-- ヘッダー -->
+            <header class="flex items-center justify-between py-6">
+                <div class="flex items-center space-x-4">
+                    <button onclick="window.location.href='../index.html'" class="btn btn-secondary">
+                        <i data-lucide="home" class="icon-sm mr-2"></i>
+                        ホーム
+                    </button>
+                    <h1 class="text-2xl font-bold text-white">📊 トレーニング記録</h1>
+                </div>
+                
+                <!-- プレミアム誘導 -->
+                <button class="btn" style="background: linear-gradient(135deg, #ffd700, #ffb347); color: #333;">
+                    <i data-lucide="crown" class="icon-sm mr-2"></i>
+                    💎プレミアム版
+                </button>
+            </header>
+
+            <!-- メイン統計セクション -->
+            <section class="mb-8">
+                <div class="glass-card">
+                    <!-- 連続記録バッジ -->
+                    <div class="text-center mb-6">
+                        <div class="inline-flex items-center space-x-3 mb-4">
+                            <div class="text-6xl">🔥</div>
+                            <div>
+                                <div class="text-3xl font-bold text-white" id="streak-count">7</div>
+                                <div class="text-white-70">日間連続記録達成！</div>
+                            </div>
+                        </div>
+                        <div class="text-lg text-green-300" id="improvement-status">
+                            平均精度: ±15セント (改善中↗️)
+                        </div>
+                    </div>
+
+                    <!-- 基本統計 -->
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-300" id="total-sessions">42</div>
+                            <div class="text-white-60 text-sm">総セッション数</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-300" id="avg-accuracy">±18</div>
+                            <div class="text-white-60 text-sm">平均精度（セント）</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-yellow-300" id="pass-rate">78%</div>
+                            <div class="text-white-60 text-sm">合格率</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 成長グラフセクション -->
+            <section class="mb-8">
+                <div class="glass-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-white">📈 直近7日の精度推移</h2>
+                        <button class="btn btn-secondary text-sm" id="premium-graph-btn">
+                            <i data-lucide="lock" class="icon-xs mr-1"></i>
+                            全期間表示 💎
+                        </button>
+                    </div>
+                    <div style="height: 300px;">
+                        <canvas id="accuracyChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 最近の記録セクション -->
+            <section class="mb-8">
+                <div class="glass-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-white">📅 最近の記録</h2>
+                        <div class="text-white-60 text-sm">直近7日間のみ表示</div>
+                    </div>
+                    
+                    <div class="space-y-3" id="recent-sessions">
+                        <!-- 動的に生成されるセッション履歴 -->
+                    </div>
+
+                    <!-- プレミアム版誘導 -->
+                    <div class="mt-6 p-4 rounded-xl border-2 border-dashed border-yellow-400/30 bg-yellow-400/5">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <i data-lucide="lock" class="icon text-yellow-300"></i>
+                                <div>
+                                    <div class="text-white font-medium">7日以前の記録を見るには</div>
+                                    <div class="text-white-70 text-sm">全履歴・詳細分析・AI推奨機能</div>
+                                </div>
+                            </div>
+                            <button class="btn" style="background: linear-gradient(135deg, #ffd700, #ffb347); color: #333;">
+                                💎プレミアム版にアップグレード
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 音階別分析セクション（ロック状態） -->
+            <section class="mb-8">
+                <div class="glass-card opacity-50">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-white">🎵 音階別詳細分析</h2>
+                        <div class="flex items-center space-x-2 text-yellow-300">
+                            <i data-lucide="lock" class="icon-sm"></i>
+                            <span class="text-sm">💎プレミアム版限定</span>
+                        </div>
+                    </div>
+                    
+                    <div class="relative">
+                        <!-- ぼかし効果でプレビュー -->
+                        <div class="filter blur-sm">
+                            <div class="grid grid-cols-4 gap-3 mb-4">
+                                <div class="text-center p-3 bg-white/5 rounded-lg">
+                                    <div class="text-lg">🎵</div>
+                                    <div class="text-white-70 text-sm">ド</div>
+                                    <div class="text-green-300">±12</div>
+                                </div>
+                                <div class="text-center p-3 bg-white/5 rounded-lg">
+                                    <div class="text-lg">🎵</div>
+                                    <div class="text-white-70 text-sm">レ</div>
+                                    <div class="text-yellow-300">±25</div>
+                                </div>
+                                <div class="text-center p-3 bg-white/5 rounded-lg">
+                                    <div class="text-lg">🎵</div>
+                                    <div class="text-white-70 text-sm">ミ</div>
+                                    <div class="text-green-300">±18</div>
+                                </div>
+                                <div class="text-center p-3 bg-white/5 rounded-lg">
+                                    <div class="text-lg">🎵</div>
+                                    <div class="text-white-70 text-sm">ファ</div>
+                                    <div class="text-red-300">±35</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- オーバーレイメッセージ -->
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-center">
+                                <i data-lucide="lock" class="icon-2xl text-yellow-300 mx-auto mb-2"></i>
+                                <div class="text-white font-medium mb-2">音階別分析を見るには</div>
+                                <button class="btn" style="background: linear-gradient(135deg, #ffd700, #ffb347); color: #333;">
+                                    💎プレミアム版にアップグレード
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- アクションボタン -->
+            <section class="text-center space-y-4">
+                <button onclick="window.location.href='../index.html'" class="btn btn-primary w-full max-w-md">
+                    <i data-lucide="play" class="icon-sm mr-2"></i>
+                    新しいトレーニングを開始
+                </button>
+                
+                <div class="flex justify-center space-x-4">
+                    <button onclick="shareProgress()" class="btn btn-secondary">
+                        <i data-lucide="share-2" class="icon-sm mr-2"></i>
+                        成長記録を共有
+                    </button>
+                    <button onclick="setGoal()" class="btn btn-secondary">
+                        <i data-lucide="target" class="icon-sm mr-2"></i>
+                        目標設定 💎
+                    </button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- JavaScript - アイコン初期化システム -->
+    <script>
+        // 初期化状態の管理
+        let iconInitializationAttempts = 0;
+        const maxAttempts = 5;
+        
+        // Lucideアイコンの初期化関数
+        function initializePageIcons() {
+            iconInitializationAttempts++;
+            console.log(`🚀 Icon initialization attempt ${iconInitializationAttempts}/${maxAttempts}`);
+            
+            // 必要な要素が存在するかチェック
+            const iconElements = document.querySelectorAll('[data-lucide]');
+            console.log(`Found ${iconElements.length} icon elements`);
+            
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+                console.log('✅ [RECORDS] Lucide icons initialized');
+                return true;
+            } else {
+                console.error('❌ [RECORDS] Lucide library not loaded');
+                return false;
+            }
+        }
+        
+        // 複数のタイミングで初期化を試行
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOM Content Loaded - starting icon initialization');
+            initializePageIcons();
+        });
+        
+        window.addEventListener('load', function() {
+            console.log('🌍 Window loaded - ensuring icons are initialized');
+            initializePageIcons();
+        });
+        
+        // Records.js完了後の再初期化
+        setTimeout(() => {
+            console.log('🔄 Final icon re-initialization after all scripts loaded');
+            initializePageIcons();
+        }, 2000);
+    </script>
+    
+    <!-- Records Manager -->
+    <script src="../../js/data-manager.js"></script>
+</body>
+</html>
