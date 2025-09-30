@@ -2343,3 +2343,20 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-30 00:57:59] コミット: feat: Step1とStep2安定動作状態に復元・クリーンアップ完了
+
+- backup-completed-tasksからpreparation-step2.html復元
+- preparation-step1.htmlをe012a5c安定版に復元
+- 不要ファイル削除（失敗したシングルページフロー実装）
+- preparation-step2.htmlの参照パス修正（CSS・JavaScript）
+- Step1→Step2動作確認完了
+
+削除された不要ファイル:
+- preparation-controller.js（失敗したシングルページフロー）
+- preparation-advanced-controller.js, preparation-basic-test.js
+- backup-stable-20250128/（古いバックアップ）
+- debug-step2.html, test-initialization.html
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

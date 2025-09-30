@@ -1,0 +1,1199 @@
+/* results.css - 統合評価ページ専用スタイル */
+
+/* results.cssではコンテナ定義を削除（base.cssの定義を使用） */
+
+/* ランク説明ポップオーバー - 画面中央配置 */
+.rank-popover {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+}
+
+.rank-popover.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.rank-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 8px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.rank-item:last-child {
+    margin-bottom: 0;
+}
+
+/* ？アイコン - グラススタイル */
+.rank-info-btn {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: all 0.2s ease;
+}
+
+.rank-info-btn i {
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+    max-width: 20px !important;
+    max-height: 20px !important;
+    font-size: 20px !important;
+}
+
+.rank-info-btn:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    transform: scale(1.1);
+}
+
+/* ヘルプボタン位置調整 */
+.help-btn-position {
+    position: absolute;
+    bottom: -12px;
+    right: -16px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* テスト用：普通の箇所でのヘルプアイコン表示 */
+.help-icon-test {
+    color: white !important;
+    background: red !important;
+    border: 3px solid yellow !important;
+    border-radius: 50% !important;
+    padding: 8px !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    outline: none !important;
+    text-decoration: none !important;
+}
+
+.help-icon-test:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.help-icon-test i {
+    width: 24px !important;
+    height: 24px !important;
+}
+
+.help-icon-btn i {
+    width: 20px !important;
+    height: 20px !important;
+}
+
+/* ランク名スタイル */
+.rank-name {
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.rank-name-excellent {
+    color: #fcd34d;
+}
+
+.rank-name-good {
+    color: #86efac;
+}
+
+.rank-name-pass {
+    color: #7dd3fc;
+}
+
+.rank-name-practice {
+    color: #fca5a5;
+}
+
+.rank-range {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.75rem;
+}
+
+.popover-title {
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+/* 音別結果アイテム */
+.note-result-item {
+    background: var(--glass-bg);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.note-result-item:hover {
+    background: var(--glass-hover);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-4px);
+}
+
+/* note-result-item内のテキストスタイル - margin-bottomを0に */
+.note-result-item .text-body,
+.note-result-item .text-pitch-deviation-plus,
+.note-result-item .text-pitch-deviation-minus,
+.note-result-item .text-sub-title {
+    margin-bottom: 0;
+}
+
+/* カウントテキスト */
+.count-text {
+    min-width: 20px;
+    text-align: right;
+}
+
+/* Share Card CSS（反射エフェクト付き） */
+.share-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.share-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: rotate(45deg);
+    animation: shimmer 11s infinite;
+}
+
+@keyframes shimmer {
+    0% { 
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 1;
+    }
+    9.1% { 
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+        opacity: 1;
+    }
+    9.2% { 
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+        opacity: 0;
+    }
+    99.9% { 
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 0;
+    }
+    100% { 
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 1;
+    }
+}
+
+/* rank-sectionスタイル（新横一列レイアウト） */
+.rank-section {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rank-mode {
+    margin-bottom: 24px;
+}
+
+.rank-section .mode-title {
+    font-size: 1.6rem !important;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+}
+
+.rank-content-row {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+}
+
+.rank-icon {
+    flex-shrink: 0;
+}
+
+.rank-stats-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+}
+
+.rank-stat-item {
+    text-align: center;
+    min-width: 80px;
+}
+
+.stat-value-rank {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+    transition: transform 0.2s ease;
+    line-height: 1;
+}
+
+.stat-value-rank.grade-value {
+    font-size: 2.0rem;
+    color: #ffffff; /* グレードは白色 */
+}
+
+.stat-value-rank.avg-error {
+    color: #fbbf24; /* 平均誤差もグレードと同じ黄色 */
+}
+
+.stat-label-rank {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.1;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.rank-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    margin-bottom: 1.5rem;
+}
+
+.rank-circle-icon {
+    width: 64px;
+    height: 64px;
+}
+
+@media (max-width: 768px) {
+    .rank-content-row {
+        gap: 20px;
+    }
+    
+    .rank-stats-row {
+        gap: 20px;
+    }
+    
+    .rank-circle {
+        width: 90px;
+        height: 90px;
+    }
+    
+    .rank-circle-icon {
+        width: 54px !important;
+        height: 54px !important;
+    }
+    
+    .stat-value-rank {
+        font-size: 1.5rem;
+    }
+    
+    .stat-value-rank.grade-value {
+        font-size: 2rem;
+    }
+}
+
+/* 機能比較テーブル */
+.comparison-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.comparison-table {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.comparison-header-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.comparison-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.comparison-row-last {
+    border-bottom: none;
+}
+
+.comparison-cell {
+    padding: 1rem;
+}
+
+.comparison-feature-header {
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.comparison-plan-header {
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.comparison-feature {
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.comparison-value {
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.comparison-value:last-child {
+    border-right: none;
+}
+
+.plan-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.plan-header h4 {
+    color: white;
+    font-weight: 600;
+    margin: 0;
+}
+
+.comparison-header h4 {
+    color: white;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* 総合グレード表示 */
+.grade-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+}
+
+.grade-icon-container {
+    margin-bottom: 1.5rem;
+}
+
+.grade-text {
+    margin-bottom: 2rem;
+}
+
+.grade-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.grade-description {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.125rem;
+}
+
+.grade-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+@media (min-width: 768px) {
+    .grade-stats {
+        flex-direction: row;
+        gap: 3rem;
+    }
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+}
+
+.stat-value-avg-error {
+    color: #22c55e;
+}
+
+.stat-value-session-count {
+    color: #3b82f6;
+}
+
+/* 詳細分析ナビゲーション */
+.analysis-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.analysis-title {
+    font-weight: 600;
+    color: white;
+    font-size: 1.125rem;
+}
+
+/* 音程結果グリッド */
+.note-results-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .note-results-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.note-result-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.note-name {
+    font-weight: 600;
+    color: white;
+}
+
+.note-result-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.note-error {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.note-error.excellent {
+    color: #fbbf24;
+}
+
+.note-error.good {
+    color: #22c55e;
+}
+
+.note-frequencies {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+}
+
+.freq-target, .freq-actual {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* セッション概要3列グリッド（レスポンシブ対応） */
+.score-section {
+    padding-bottom: 1.5rem;
+}
+
+.score-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+    min-height: 80px;
+}
+
+/* PC (768px以上) */
+@media (min-width: 768px) {
+    .score-grid {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        grid-template-areas: "left center right";
+        align-items: end;
+        gap: 2rem;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+}
+
+/* セッショングリッドシステム */
+.sessions-grid-8 {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 0.75rem;
+}
+
+.sessions-grid-12 {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 0.75rem;
+}
+
+.sessions-grid-24 {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 0.5rem;
+}
+
+@media (max-width: 767px) {
+    .sessions-grid-8 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .sessions-grid-12 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .sessions-grid-24 {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .sessions-grid-24 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.session-box {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.75rem;
+    padding: 0.5rem;
+}
+
+.session-box.selected {
+    filter: brightness(1.8);
+    transform: scale(1.05);
+}
+
+.session-number {
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+    text-align: center;
+}
+
+.session-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.session-excellent {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+}
+
+.session-good {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.session-pass {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.session-practice {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+/* 詳細分析結果リスト */
+.detailed-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.result-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    align-items: center;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    gap: 1rem;
+}
+
+.note-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.note-interval {
+    font-weight: 600;
+    color: white;
+}
+
+.note-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.target-freq, .actual-freq {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 0.25rem;
+}
+
+.target-value, .actual-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+}
+
+.error-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.error-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+}
+
+.text-yellow-400 {
+    color: #fbbf24;
+}
+
+/* ランダム基音モード見出し中央寄せ */
+.rank-mode {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.mode-title {
+    text-align: center;
+    font-size: 1.6rem !important;
+    font-weight: 700;
+    color: white;
+    margin: 0;
+}
+
+/* ランク表示セクション用スタイル */
+.rank-content-row {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+}
+
+.rank-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.rank-stats-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+}
+
+.rank-stat-item {
+    text-align: center;
+    min-width: 80px;
+}
+
+.stat-value-rank {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+    transition: transform 0.2s ease;
+    line-height: 1;
+}
+
+.stat-label-rank {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.1;
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* シェアボタンスタイル */
+.share-buttons {
+    display: flex;
+    gap: 1.2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.share-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.share-btn svg {
+    width: 24px;
+    height: 24px;
+    z-index: 1;
+}
+
+.share-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 255, 255, 0.2);
+}
+
+.share-btn.twitter:hover {
+    box-shadow: 0 8px 25px rgba(29, 161, 242, 0.4), 0 0 30px rgba(29, 161, 242, 0.3);
+}
+
+.share-btn.line:hover {
+    box-shadow: 0 8px 25px rgba(0, 195, 0, 0.4), 0 0 30px rgba(0, 195, 0, 0.3);
+}
+
+.share-btn.facebook:hover {
+    box-shadow: 0 8px 25px rgba(24, 119, 242, 0.4), 0 0 30px rgba(24, 119, 242, 0.3);
+}
+
+.share-btn.copy:hover {
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4), 0 0 30px rgba(139, 92, 246, 0.3);
+}
+
+/* コピー成功アニメーション */
+.share-btn.copy.copied {
+    background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+    transform: translateY(-3px) scale(1.1);
+}
+
+.share-btn.copy.copied svg {
+    display: none;
+}
+
+.share-btn.copy.copied::after {
+    content: "✓";
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* 統計カードシステム */
+.stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.stat-icon {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.stat-icon svg {
+    width: 32px;
+    height: 32px;
+}
+
+.stat-value-grade {
+    font-size: 1.75rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* 共有カードシステム */
+.share-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+}
+
+/* モバイル時のシェアテキスト調整 */
+@media (max-width: 768px) {
+  .rank-share-section .heading-md span {
+    font-size: 1rem;
+  }
+
+  .detail-analysis-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .detail-analysis-title .dash-separator {
+    display: none;
+  }
+
+  /* モバイル時のランク表示レイアウト調整 */
+  .rank-display-grid {
+    grid-template-areas: 
+      "center center"
+      "left right" !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1.5rem 2rem !important;
+  }
+}
+
+/* ==========================================================================
+   JavaScript動的生成用スタイル（モバイル対応）
+   ========================================================================== */
+
+/* スコアセクション（JavaScript生成用） */
+.score-section {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ランク表示グリッド（JavaScript生成用） */
+.rank-display-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-areas: 'left center right';
+  align-items: end;
+  gap: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* グリッドアイテム（JavaScript生成用） */
+.rank-grid-left {
+  grid-area: left;
+  justify-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.rank-grid-center {
+  grid-area: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: flex-end;
+}
+
+.rank-grid-right {
+  grid-area: right;
+  justify-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* UI要素（JavaScript生成用） */
+.accuracy-badge-container {
+  position: relative;
+}
+
+.help-icon-btn-positioned {
+  color: white;
+  right: -16px;
+}
+
+.eval-count-text {
+  min-width: 20px;
+  text-align: right;
+}
+
+.rank-achievement-message {
+    margin-bottom: 2rem;
+}
+
+.rank-achievement-message h3 {
+    margin-bottom: 0.5rem;
+}
+
+/* シェアボタンスタイル改善 */
+.share-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    position: relative;
+}
+
+.share-btn span {
+    display: none;
+}
+
+.share-btn-twitter {
+    background: linear-gradient(135deg, #1da1f2, #1a8cd8);
+}
+
+.share-btn-line {
+    background: linear-gradient(135deg, #00c300, #00a000);
+}
+
+.share-btn-facebook {
+    background: linear-gradient(135deg, #1877f2, #145dbf);
+}
+
+.share-btn-copy {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+/* モバイル対応 */
+@media (max-width: 640px) {
+    .share-btn {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .share-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* ランク取得メッセージの下マージン調整 */
+.rank-achievement-message {
+    margin-bottom: 0;
+}
+
+/* rank-content-rowの下の横線 */
+.rank-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 32px 0 24px 0;
+}
+
+/* シェアセクション */
+.rank-share-section {
+    text-align: center;
+    margin-bottom: 0;
+}
+
+.rank-share-section h3 {
+    margin-bottom: 20px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.rank-share-section .share-buttons {
+    display: flex;
+    gap: 1.2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* 総合評価グレードアイコンシステム */
+.rank-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    margin-bottom: 1.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rank-circle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+/* グレード別背景色 */
+.rank-circle-s {
+    background: linear-gradient(135deg, #fbbf24, #d97706);
+}
+
+.rank-circle-a {
+    background: linear-gradient(135deg, #9ca3af, #6b7280);
+}
+
+.rank-circle-b {
+    background: linear-gradient(135deg, #fdba74, #ea580c);
+}
+
+.rank-circle-c {
+    background: linear-gradient(135deg, #6ee7b7, #059669);
+}
+
+.rank-circle-d {
+    background: linear-gradient(135deg, #7dd3fc, #0369a1);
+}
+
+.rank-circle-e {
+    background: linear-gradient(135deg, #fca5a5, #dc2626);
+}
+
+/* ==========================================================================
+   セッション管理コンポーネント統合スタイル（ui-catalog-results.htmlから移植）
+   ========================================================================== */
+
+/* セッションボックス基本スタイル */
+.session-box {
+    aspect-ratio: 1;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    font-size: 0.75rem;
+    padding: 0.5rem;
+    color: white;
+    font-weight: 600;
+}
+
+.session-box:hover {
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.session-number {
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+    text-align: center;
+}
+
+.session-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.session-icon i {
+    width: 16px;
+    height: 16px;
+}
+
+/* 評価レベル別スタイル（正しい透明度版） */
+.session-excellent {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(245, 158, 11, 0.2));
+    border-color: rgba(251, 191, 36, 0.4);
+}
+
+.session-good {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(22, 163, 74, 0.2));
+    border-color: rgba(34, 197, 94, 0.4);
+}
+
+.session-pass {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.2));
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.session-practice {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.2));
+    border-color: rgba(239, 68, 68, 0.4);
+}
