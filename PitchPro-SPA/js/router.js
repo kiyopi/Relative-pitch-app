@@ -7,7 +7,7 @@ class SimpleRouter {
     constructor() {
         this.routes = {
             'home': 'templates/home.html',
-            'preparation': 'pages/preparation-step1.html',
+            'preparation': 'templates/preparation.html',
             'training': 'pages/training.html',
             'records': 'pages/records.html',
             'results': 'pages/results-overview.html'
@@ -22,6 +22,16 @@ class SimpleRouter {
         window.addEventListener('hashchange', () => this.handleRouteChange());
         window.addEventListener('DOMContentLoaded', () => this.handleRouteChange());
 
+        // ページアンロード時のクリーンアップ（同期実行）
+        window.addEventListener('beforeunload', () => {
+            // beforeunloadは同期的に実行される必要があるため、
+            // 非同期クリーンアップは実行しない（代わりにpagehideを使用）
+        });
+        window.addEventListener('pagehide', () => {
+            // pagehideでクリーンアップを実行（非同期で問題ない）
+            this.cleanupCurrentPage().catch(console.error);
+        });
+
         // 初期表示
         this.handleRouteChange();
     }
@@ -32,6 +42,9 @@ class SimpleRouter {
         console.log('Route changed to:', hash);
 
         try {
+            // 現在のページのクリーンアップ
+            await this.cleanupCurrentPage();
+
             await this.loadPage(hash);
         } catch (error) {
             console.error('Route loading error:', error);
@@ -68,7 +81,7 @@ class SimpleRouter {
             }
 
             // 4. ページ固有のイベントリスナーを設定
-            this.setupPageEvents(page);
+            await this.setupPageEvents(page);
 
             console.log(`Page loaded: ${page}`);
 
@@ -78,17 +91,17 @@ class SimpleRouter {
         }
     }
 
-    setupPageEvents(page) {
+    async setupPageEvents(page) {
         // ページ固有のイベントリスナー設定
         switch (page) {
             case 'home':
                 this.setupHomeEvents();
                 break;
             case 'preparation':
-                this.setupPreparationEvents();
+                await this.setupPreparationEvents();
                 break;
             case 'training':
-                this.setupTrainingEvents();
+                await this.setupTrainingEvents();
                 break;
             default:
                 break;
@@ -116,16 +129,47 @@ class SimpleRouter {
         });
     }
 
-    setupPreparationEvents() {
-        // preparation.htmlのイベント設定
-        console.log('Setting up preparation page events');
-        // TODO: 必要に応じてpreparation固有のイベントを追加
+    async setupPreparationEvents() {
+        try {
+            console.log('Setting up preparation page events with dynamic import...');
+
+            // 動的にpreparationControllerをインポート
+            const { initializePreparationPage } = await import('./controllers/preparationController.js');
+
+            // コントローラーの初期化関数を実行
+            await initializePreparationPage();
+
+        } catch (error) {
+            console.error('Error setting up preparation page events:', error);
+            throw error;
+        }
     }
 
-    setupTrainingEvents() {
+    async setupTrainingEvents() {
         // training.htmlのイベント設定
         console.log('Setting up training page events');
+        // TODO: Phase 3でtrainingControllerの動的importを実装予定
         // TODO: 必要に応じてtraining固有のイベントを追加
+    }
+
+    // 現在のページのクリーンアップ
+    async cleanupCurrentPage() {
+        try {
+            // preparationページのクリーンアップ
+            if (typeof window.preparationManager !== 'undefined' && window.preparationManager) {
+                console.log('Cleaning up preparation page resources...');
+                await window.preparationManager.cleanupPitchPro();
+            }
+
+            // 他のページのクリーンアップもここに追加可能
+            // if (typeof window.trainingManager !== 'undefined' && window.trainingManager) {
+            //     await window.trainingManager.cleanup();
+            // }
+
+        } catch (error) {
+            console.warn('Page cleanup error:', error);
+            // クリーンアップエラーは警告レベルで続行
+        }
     }
 
     // ナビゲーション用のヘルパーメソッド
