@@ -627,14 +627,9 @@ class PitchProCycleManager {
 
                     // イベントリスナー設定
                     this.setupNoRangeDataActions();
-                    }
-                }, 1500);
-            }
+                }
+            }, 1500);
         }
-
-        // ステップインジケーター更新
-        updateStepStatus(2, 'completed');
-        updateStepStatus(3, 'active');
 
         console.log('🎉 検出成功処理完了');
     }

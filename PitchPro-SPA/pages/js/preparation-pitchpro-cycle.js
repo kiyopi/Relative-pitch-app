@@ -119,22 +119,32 @@ class PitchProCycleManager {
                 throw new Error(`不正な状態からのスタート: ${this.currentPhase}`);
             }
 
-            // モード別UI設定
-            this.updateUISelectorsForMode(mode);
-
             // 状態初期化（タイマーは初回音声検出時に開始）
             this.state.detectionActive = true;
             this.state.detectedPitches = [];
             this.state.detectionStartTime = null; // 初回音声検出時に設定
             this.state.currentMode = mode;
 
-            // コールバック設定（PitchPro標準）
+            // 【重要】コールバック設定を最初に行う
             this.audioDetector.setCallbacks({
                 onPitchUpdate: (result) => this.handlePitchUpdate(result),
                 onVolumeUpdate: (volume) => this.handleVolumeUpdate(volume),
                 onError: (context, error) => this.handleAudioError(context, error),
                 onStateChange: (state) => {}
             });
+            console.log('✅ コールバック設定完了（最初）');
+
+            // モード別UI設定（コールバック設定の後）
+            this.updateUISelectorsForMode(mode);
+
+            // updateSelectors()でコールバックがクリアされるため、再度設定
+            this.audioDetector.setCallbacks({
+                onPitchUpdate: (result) => this.handlePitchUpdate(result),
+                onVolumeUpdate: (volume) => this.handleVolumeUpdate(volume),
+                onError: (context, error) => this.handleAudioError(context, error),
+                onStateChange: (state) => {}
+            });
+            console.log('✅ コールバック再設定完了（updateSelectors後）');
 
             // 検出開始
             await this.audioDetector.startDetection();
@@ -379,7 +389,23 @@ class PitchProCycleManager {
     handlePitchUpdate(result) {
         if (!this.state.detectionActive) return;
 
-        // 周波数表示はPitchProのautoUpdateUIに任せる（手動更新削除）
+        // 【重要】コールバック設定時はautoUpdateUIが無効化されるため、手動でUI更新
+        // 音量バー更新
+        if (this.uiElements.volumeBar && result.volume !== undefined) {
+            const volumePercent = (result.volume * 100).toFixed(1);
+            this.uiElements.volumeBar.style.width = `${volumePercent}%`;
+        }
+
+        // 音量テキスト更新
+        if (this.uiElements.volumeText && result.volume !== undefined) {
+            const volumePercent = (result.volume * 100).toFixed(1);
+            this.uiElements.volumeText.textContent = `${volumePercent}%`;
+        }
+
+        // 周波数表示更新
+        if (this.uiElements.frequencyDisplay && result.frequency !== undefined) {
+            this.uiElements.frequencyDisplay.textContent = `${result.frequency.toFixed(1)} Hz`;
+        }
 
         // モード別処理
         switch (this.state.currentMode) {

@@ -2446,3 +2446,75 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-09-30 19:21:45] コミット: feat: Phase 3 UIコンポーネント抽象化実装完了
+
+Phase 3: UIコンポーネント抽象化の完全実装
+- BaseComponent基底クラス（202行）- 全コンポーネント共通基盤
+- StepIndicator（231行）- 3段階プロセス表示コンポーネント
+- ProgressBar（375行）- 汎用プログレスバー（音量バー・評価分布対応）
+- ComponentManager（246行）- 動的インポート・統一管理システム
+
+実装内容:
+- 継承ベースのコンポーネント設計
+- 自動クリーンアップ機能
+- SPA対応のインスタンス管理
+- VolumeBarController互換性確保
+
+🤖 Generated with Claude Code
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-01 14:26:40] コミット: fix: PitchPro v1.3.1 UI更新競合問題の完全解決 - SPA準備ページベーステスト完了
+
+主要な修正内容:
+- PitchProの自動UI更新とコールバック手動更新の競合によるちらつき解消
+- autoUpdateUI: trueでPitchProの最適化されたデバイス別UI更新を使用
+- handlePitchUpdate()から手動UI更新コードを削除（アプリロジックのみに専念）
+- training.cssをindex.htmlに追加してステータス表示スタイルを適用
+
+技術的詳細:
+- preparationController.js: 手動UI更新削除、autoUpdateUI維持
+- index.html: training.css読み込み追加でステップインジケーター等のスタイル適用
+- PitchProのデバイス最適化（PC: 7.5x倍率）を活用
+- UI更新競合の根本解決により、ちらつきなし・最適音量バー動作を実現
+
+動作確認完了:
+- ✅ 音声検出が正常に動作
+- ✅ UI更新がスムーズ（ちらつき完全解消）
+- ✅ 音量バーがデバイス最適化で動作
+- ✅ ステータス表示のスタイルが正常に表示
+- ✅ 1秒タイマーでの成功判定が動作
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-01 14:55:20] コミット: feat: 音域データ基盤実装 + 音声テスト完了後の分岐ロジック完成
+
+主要な実装内容:
+- DataManagerに音域データ管理機能追加（保存・取得・基音候補生成）
+- 音声テスト完了後の音域データ有無による分岐UI実装
+- 簡略版音域テストUI作成（UIカタログベース）
+
+DataManager拡張機能:
+- saveVoiceRangeData() - 簡略版対応の音域データ保存
+- getVoiceRangeData() - 有効期限チェック込み取得
+- generateBasePitchCandidates() - Training用基音候補生成
+- getRandomBasePitch() - ランダム基音選択
+- 音程計算ヘルパー関数（frequencyToMidi, midiToNote等）
+
+UI実装:
+- 音域データなし: 「音域テストに進む」ボタン表示
+- 音域データあり: 保存済みデータ表示 + 「再測定」「トレーニング開始」ボタン
+- 簡略版音域テストUI（開始前→測定中→完了の3段階）
+
+preparationController機能追加:
+- setupRangeDataActions() - 音域データあり時のボタン設定
+- setupNoRangeDataActions() - 音域データなし時のボタン設定
+- showRangeTestSection() - 音域テストセクション表示
+
+次期実装予定:
+- 簡略版音域テスト測定ロジック（最低音→最高音の2段階測定）
+- Training機能のSPA統合
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

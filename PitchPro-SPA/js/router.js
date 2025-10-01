@@ -39,13 +39,17 @@ class SimpleRouter {
     async handleRouteChange() {
         // URLハッシュから現在のページを取得
         const hash = window.location.hash.substring(1) || 'home';
+
+        // クエリパラメータを分離してページ名のみを取得
+        const page = hash.split('?')[0];
         console.log('Route changed to:', hash);
+        console.log('Page name:', page);
 
         try {
             // 現在のページのクリーンアップ
             await this.cleanupCurrentPage();
 
-            await this.loadPage(hash);
+            await this.loadPage(page, hash);
         } catch (error) {
             console.error('Route loading error:', error);
             // エラー時はホームページを表示
@@ -53,7 +57,7 @@ class SimpleRouter {
         }
     }
 
-    async loadPage(page) {
+    async loadPage(page, fullHash = '') {
         const templatePath = this.routes[page];
 
         if (!templatePath) {
@@ -81,7 +85,7 @@ class SimpleRouter {
             }
 
             // 4. ページ固有のイベントリスナーを設定
-            await this.setupPageEvents(page);
+            await this.setupPageEvents(page, fullHash);
 
             console.log(`Page loaded: ${page}`);
 
@@ -91,17 +95,17 @@ class SimpleRouter {
         }
     }
 
-    async setupPageEvents(page) {
+    async setupPageEvents(page, fullHash) {
         // ページ固有のイベントリスナー設定
         switch (page) {
             case 'home':
                 this.setupHomeEvents();
                 break;
             case 'preparation':
-                await this.setupPreparationEvents();
+                await this.setupPreparationEvents(fullHash);
                 break;
             case 'training':
-                await this.setupTrainingEvents();
+                await this.setupTrainingEvents(fullHash);
                 break;
             default:
                 break;
@@ -129,9 +133,10 @@ class SimpleRouter {
         });
     }
 
-    async setupPreparationEvents() {
+    async setupPreparationEvents(fullHash = '') {
         try {
             console.log('Setting up preparation page events with dynamic import...');
+            console.log('Full hash:', fullHash);
 
             // 動的にpreparationControllerをインポート
             const { initializePreparationPage } = await import('./controllers/preparationController.js');
@@ -159,6 +164,11 @@ class SimpleRouter {
             if (typeof window.preparationManager !== 'undefined' && window.preparationManager) {
                 console.log('Cleaning up preparation page resources...');
                 await window.preparationManager.cleanupPitchPro();
+            }
+
+            // preparationページの初期化フラグをリセット
+            if (typeof window.resetPreparationPageFlag === 'function') {
+                window.resetPreparationPageFlag();
             }
 
             // 他のページのクリーンアップもここに追加可能
