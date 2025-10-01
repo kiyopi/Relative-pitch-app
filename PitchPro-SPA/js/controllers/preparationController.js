@@ -7,6 +7,13 @@ if (typeof lucide !== 'undefined') {
 } else {
 }
 
+// ===== UIコンポーネントインポート =====
+import { createStepIndicator, createProgressBar } from '../components/index.js';
+
+// グローバルコンポーネントインスタンス
+let stepIndicatorComponent = null;
+let volumeProgressComponent = null;
+
 // ===== PitchProサイクル管理システム =====
 
 /**
@@ -40,13 +47,10 @@ class PitchProCycleManager {
             currentMode: 'permission' // permission, audiotest
         };
 
-        // 設定値（PitchPro v1.3.1対応）
+        // 設定値（PitchProデフォルト設定を使用）
         this.config = {
-            MIN_DETECTION_TIME: 1000,        // 1秒間
-            MIN_FREQUENCY: 80,               // 最低周波数（人声範囲）
-            MAX_FREQUENCY: 1200,             // 最高周波数（歌声上限）
-            VOLUME_THRESHOLD: 0.1,           // 明確な音量（環境音除外）
-            CLARITY_THRESHOLD: 0.8           // 高い明瞭度（雑音除外）
+            MIN_DETECTION_TIME: 1000,        // 1秒間（UI用のみ）
+            // PitchProのデフォルト閾値を使用（上書きしない）
         };
 
     }
@@ -74,14 +78,17 @@ class PitchProCycleManager {
             }
 
 
-            // PitchPro AudioDetectionComponent作成（v1.3.1統合管理システム）
+            // PitchPro AudioDetectionComponent作成（デフォルト設定使用）
             this.audioDetector = new window.PitchPro.AudioDetectionComponent({
                 volumeBarSelector: '#volume-progress',
                 volumeTextSelector: '#volume-value',
                 frequencySelector: '#frequency-value',
                 noteSelector: null, // 音程表示は使用しない
-                autoUpdateUI: true, // PitchProに自動更新を任せる
-                debug: true
+                autoUpdateUI: true, // PitchProの最適化されたUI更新を使用
+                debug: true,
+                // PitchProのデフォルト閾値を明示的に使用
+                clarityThreshold: 0.4,  // デフォルト値（0.8から0.4に変更）
+                volumeThreshold: 0.003  // デフォルト値（0.1から0.003に変更）
             });
 
             // v1.3.1統合管理システム - デバイス自動最適化
@@ -119,22 +126,32 @@ class PitchProCycleManager {
                 throw new Error(`不正な状態からのスタート: ${this.currentPhase}`);
             }
 
-            // モード別UI設定
-            this.updateUISelectorsForMode(mode);
-
             // 状態初期化（タイマーは初回音声検出時に開始）
             this.state.detectionActive = true;
             this.state.detectedPitches = [];
             this.state.detectionStartTime = null; // 初回音声検出時に設定
             this.state.currentMode = mode;
 
-            // コールバック設定（PitchPro標準）
+            // 【重要】コールバック設定を最初に行う
             this.audioDetector.setCallbacks({
                 onPitchUpdate: (result) => this.handlePitchUpdate(result),
                 onVolumeUpdate: (volume) => this.handleVolumeUpdate(volume),
                 onError: (context, error) => this.handleAudioError(context, error),
                 onStateChange: (state) => {}
             });
+            console.log('✅ コールバック設定完了（最初）');
+
+            // モード別UI設定（コールバック設定の後）
+            this.updateUISelectorsForMode(mode);
+
+            // updateSelectors()でコールバックがクリアされるため、再度設定
+            this.audioDetector.setCallbacks({
+                onPitchUpdate: (result) => this.handlePitchUpdate(result),
+                onVolumeUpdate: (volume) => this.handleVolumeUpdate(volume),
+                onError: (context, error) => this.handleAudioError(context, error),
+                onStateChange: (state) => {}
+            });
+            console.log('✅ コールバック再設定完了（updateSelectors後）');
 
             // 検出開始
             await this.audioDetector.startDetection();
@@ -379,9 +396,10 @@ class PitchProCycleManager {
     handlePitchUpdate(result) {
         if (!this.state.detectionActive) return;
 
-        // 周波数表示はPitchProのautoUpdateUIに任せる（手動更新削除）
+        // 【重要】autoUpdateUI: trueの場合、PitchProが自動でUI更新を行うため、
+        // ここでは手動UI更新を行わない（競合によるちらつきを防止）
 
-        // モード別処理
+        // モード別処理（アプリケーションロジックのみ）
         switch (this.state.currentMode) {
             case 'audiotest':
                 this.handleAudioTestPitchUpdate(result);
@@ -764,6 +782,23 @@ class PitchProCycleManager {
             }
         }
 
+        // UIコンポーネントのクリーンアップ
+        try {
+            if (stepIndicatorComponent && stepIndicatorComponent.instance) {
+                stepIndicatorComponent.instance.destroy();
+                stepIndicatorComponent = null;
+                console.log('✅ StepIndicatorコンポーネント破棄完了');
+            }
+
+            if (volumeProgressComponent && volumeProgressComponent.instance) {
+                volumeProgressComponent.instance.destroy();
+                volumeProgressComponent = null;
+                console.log('✅ VolumeProgressコンポーネント破棄完了');
+            }
+        } catch (error) {
+            console.warn('⚠️ UIコンポーネントクリーンアップエラー:', error.message);
+        }
+
         this.currentPhase = 'abandoned';
         this.state.detectionActive = false;
         console.log('🧹 PitchProリソースクリーンアップ完了（統合管理）');
@@ -901,49 +936,81 @@ function setupMicPermissionFlow() {
             requestMicBtn.innerHTML = '<i data-lucide="loader" style="width: 24px; height: 24px;"></i><span>許可を待っています...</span>';
             if (typeof lucide !== 'undefined') lucide.createIcons();
 
-            // PitchProサイクル管理を使う場合
-            if (typeof pitchProCycleManager !== 'undefined' && pitchProCycleManager && pitchProCycleManager.audioDetector) {
-                // AudioDetectionComponentの初期化（v1.3.1では内部でマイク許可も処理）
-                console.log('🎤 AudioDetectionComponent.initialize() 開始（マイク許可含む）');
-                try {
-                    await pitchProCycleManager.audioDetector.initialize();
-                    console.log('✅ AudioDetectionComponent.initialize() 完了');
-                    console.log('✅ マイク許可成功！');
+            // Step 1: 明示的にマイク許可要求（ブラウザのダイアログを確実に表示）
+            console.log('🎤 ブラウザのマイク許可ダイアログを表示します...');
+            console.log('🔍 navigator.mediaDevices:', navigator.mediaDevices);
+            console.log('🔍 getUserMedia available:', typeof navigator.mediaDevices?.getUserMedia);
 
-                    // localStorage保存（新規追加）
+            let stream;
+            try {
+                console.log('📞 getUserMedia() 呼び出し開始...');
+                stream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        sampleRate: 44100,
+                        channelCount: 1,
+                        echoCancellation: false,
+                        noiseSuppression: false,
+                        autoGainControl: false
+                    }
+                });
+                console.log('✅ マイク許可が完了しました！');
+                console.log('📊 Stream tracks:', stream.getTracks());
+
+                // 一旦ストリームを停止（PitchProが再度取得する）
+                stream.getTracks().forEach(track => {
+                    console.log(`🛑 Stopping track: ${track.kind} - ${track.label}`);
+                    track.stop();
+                });
+
+            } catch (permissionError) {
+                console.error('❌ マイク許可が拒否されました:', permissionError);
+                console.error('❌ Error name:', permissionError.name);
+                console.error('❌ Error message:', permissionError.message);
+                throw permissionError;
+            }
+
+            // Step 2: PitchProサイクル管理でAudioDetectionComponentを初期化
+            console.log('🔍 Checking preparationManager:', typeof window.preparationManager, window.preparationManager);
+            if (window.preparationManager && window.preparationManager.audioDetector) {
+                console.log('🎤 AudioDetectionComponent.initialize() 開始');
+                try {
+                    // 【重要】ここでawaitを確実に待つ
+                    await window.preparationManager.audioDetector.initialize();
+                    console.log('✅ AudioDetectionComponent.initialize() 完了');
+
+                    // localStorage保存
                     localStorage.setItem('micPermissionGranted', 'true');
                     localStorage.setItem('micPermissionTimestamp', new Date().toISOString());
                     console.log('💾 micPermissionGranted localStorage保存完了');
 
-                    // Phase 2: 音声テスト開始（状態管理を含む）
+                    // Step 3: 音声テスト開始（初期化完了後にのみ実行）
                     console.log('🎤 音声テスト開始');
-                    const startResult = await pitchProCycleManager.startAudioDetection('audiotest');
+                    const startResult = await window.preparationManager.startAudioDetection('audiotest');
                     if (!startResult.success) {
                         throw new Error(`音声テスト開始失敗: ${startResult.error}`);
                     }
                     console.log('✅ 音声テスト開始成功（PitchProサイクル管理）');
 
-                    // 音声テストセクションを表示
-                    const audioTestSection = document.getElementById('audio-test-section');
-                    if (audioTestSection) {
-                        audioTestSection.classList.remove('hidden');
-                        console.log('✅ 音声テストセクションを表示');
-                    }
-
-                    // AudioDetectionComponentインスタンスをグローバルに共有（将来のStep2連携用）
-                    window.globalAudioDetector = pitchProCycleManager.audioDetector;
+                    // AudioDetectionComponentインスタンスをグローバルに共有
+                    window.globalAudioDetector = window.preparationManager.audioDetector;
                     console.log('✅ globalAudioDetectorをStep2連携用に設定');
 
                 } catch (initError) {
-                    console.warn('⚠️ AudioDetectionComponent初期化エラー:', initError);
+                    console.error('❌ AudioDetectionComponent初期化エラー:', initError);
+                    throw initError;
                 }
+            } else {
+                console.error('❌ preparationManager または audioDetector が見つかりません');
             }
+
+            // Step 4: すべての初期化が完了した後にUI更新を実行
+            console.log('🎉 すべての初期化が完了 - UI切り替えを開始');
 
             // UI状態更新
             updateStepStatus(1, 'completed');
             updateStepStatus(2, 'active');
 
-            // セクション切り替え（即座に実行）
+            // セクション切り替え（すべての処理完了後に実行）
             const permissionSection = document.getElementById('permission-section');
             const audioTestSection = document.getElementById('audio-test-section');
 
@@ -953,8 +1020,7 @@ function setupMicPermissionFlow() {
                 console.log('✅ 音声テストセクションに切り替えました');
             }
 
-            // ストリームは後でPitchProが使うので停止しない
-            console.log('✅ マイク許可完了（ストリームは維持）');
+            console.log('✅ マイク許可フロー完全完了');
 
         } catch (error) {
             console.error('❌ マイク許可エラー:', error);
@@ -1148,9 +1214,24 @@ function updateMicButtonState(state) {
 // ===== UI制御ユーティリティ =====
 
 /**
- * ステップインジケーター更新
+ * ステップインジケーター更新（新コンポーネント使用）
  */
 function updateStepStatus(stepNumber, status) {
+    // 新コンポーネントが存在する場合は使用
+    if (stepIndicatorComponent) {
+        if (status === 'active') {
+            stepIndicatorComponent.instance.setCurrentStep(stepNumber - 1);
+        } else if (status === 'completed') {
+            stepIndicatorComponent.instance.completeStep(stepNumber - 1);
+            // 次のステップをアクティブにする場合
+            if (stepNumber < 3) {
+                stepIndicatorComponent.instance.setCurrentStep(stepNumber);
+            }
+        }
+        return;
+    }
+
+    // フォールバック：従来の実装
     const step = document.getElementById(`step-${stepNumber}`);
     if (!step) return;
 
@@ -1199,12 +1280,43 @@ async function loadRequiredScripts() {
     }
 }
 
+// 初期化済みフラグ（重複初期化防止）
+let isPreparationPageInitialized = false;
+
+// フラグリセット関数（ページ遷移時に呼ばれる）
+export function resetPreparationPageFlag() {
+    console.log('🔄 Resetting preparation page initialization flag');
+    isPreparationPageInitialized = false;
+}
+
+// グローバルに公開（router.jsから呼び出し可能にする）
+window.resetPreparationPageFlag = resetPreparationPageFlag;
+
 export async function initializePreparationPage() {
+    // 重複初期化チェック
+    if (isPreparationPageInitialized) {
+        console.warn('⚠️ Preparation page already initialized, skipping...');
+        return;
+    }
+
     console.log('Initializing preparation page...');
+    isPreparationPageInitialized = true;
 
     try {
-        // 必要なスクリプトを読み込み
-        await loadRequiredScripts();
+        // 必要なライブラリの確認
+        if (typeof window.PitchPro === 'undefined') {
+            console.warn('PitchPro library not loaded, some features may not work');
+        }
+        if (typeof DataManager === 'undefined') {
+            console.warn('DataManager not loaded, some features may not work');
+        }
+
+        // UIコンポーネントを初期化（オプション - エラーでも続行）
+        try {
+            await initializeUIComponents();
+        } catch (uiError) {
+            console.warn('UI components initialization failed, using fallback:', uiError);
+        }
 
         // PitchProCycleManager を初期化
         if (typeof window.preparationManager === 'undefined') {
@@ -1212,12 +1324,64 @@ export async function initializePreparationPage() {
         }
 
         // ページ固有の初期化処理
-        await window.preparationManager.initialize();
+        const initResult = await window.preparationManager.initialize();
+        if (!initResult.success) {
+            console.warn('PitchProCycleManager initialization failed:', initResult.error);
+        }
+
+        // マイク許可フローセットアップ（SPA用）
+        setupMicPermissionFlow();
+
+        // ステップインジケーター初期化
+        updateStepStatus(1, 'active');
 
         console.log('Preparation page initialized successfully');
     } catch (error) {
         console.error('Preparation page initialization failed:', error);
         throw error;
+    }
+}
+
+/**
+ * UIコンポーネント初期化
+ */
+async function initializeUIComponents() {
+    try {
+        console.log('🎨 UIコンポーネント初期化開始...');
+
+        // ステップインジケーター初期化
+        const stepContainer = document.querySelector('.step-indicators-container, .step-indicator-container, #step-indicators');
+        if (stepContainer) {
+            stepIndicatorComponent = await createStepIndicator(stepContainer, {
+                currentStep: 0,
+                onStepChange: (stepIndex, stepInfo) => {
+                    console.log(`✅ ステップ変更: ${stepIndex} - ${stepInfo?.label}`);
+                }
+            });
+            console.log('✅ StepIndicatorコンポーネント初期化完了');
+        } else {
+            console.warn('⚠️ ステップインジケーターコンテナが見つかりません');
+        }
+
+        // 音量プログレスバー初期化（VolumeBarController互換）
+        const volumeContainer = document.querySelector('#volume-progress-container, .volume-bar-container');
+        if (volumeContainer) {
+            volumeProgressComponent = await createProgressBar(volumeContainer, {
+                variant: 'volume',
+                color: 'green',
+                showText: true,
+                onProgressUpdate: (_, percentage) => {
+                    console.log(`🔊 音量更新: ${percentage.toFixed(1)}%`);
+                }
+            });
+            console.log('✅ VolumeProgressコンポーネント初期化完了');
+        }
+
+        console.log('🎨 UIコンポーネント初期化完了');
+
+    } catch (error) {
+        console.warn('⚠️ UIコンポーネント初期化エラー（フォールバック使用）:', error);
+        // エラーが発生しても処理は継続（従来のUI制御を使用）
     }
 }
 

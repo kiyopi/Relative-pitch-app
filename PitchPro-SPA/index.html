@@ -7,6 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>8va相対音感トレーニング - ホーム</title>
     <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/training.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -15,7 +16,8 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
     <!-- JavaScript モジュール -->
-    <script src="../js/data-manager.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="pages/js/core/pitchpro-v1.3.1.umd.js"></script>
 </head>
 <body>
     <div class="container">
@@ -86,12 +88,14 @@
                 headerNav.classList.toggle('active');
                 // アイコン切り替え
                 const icon = menuToggle.querySelector('i');
-                if (headerNav.classList.contains('active')) {
-                    icon.setAttribute('data-lucide', 'x');
-                } else {
-                    icon.setAttribute('data-lucide', 'menu');
+                if (icon) {
+                    if (headerNav.classList.contains('active')) {
+                        icon.setAttribute('data-lucide', 'x');
+                    } else {
+                        icon.setAttribute('data-lucide', 'menu');
+                    }
+                    lucide.createIcons();
                 }
-                lucide.createIcons();
             });
             
             // 外側クリックで閉じる
@@ -99,8 +103,10 @@
                 if (!menuToggle.contains(event.target) && !headerNav.contains(event.target)) {
                     headerNav.classList.remove('active');
                     const icon = menuToggle.querySelector('i');
-                    icon.setAttribute('data-lucide', 'menu');
-                    lucide.createIcons();
+                    if (icon) {
+                        icon.setAttribute('data-lucide', 'menu');
+                        lucide.createIcons();
+                    }
                 }
             });
         });
