@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 UIコンポーネント動作テスト</title>
+
+    <!-- favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREQAAAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA">
+
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="../Bolt/v2/styles/base.css">
+    <link rel="stylesheet" href="../Bolt/v2/styles/training.css">
+    <link rel="stylesheet" href="../Bolt/v2/templates/ui-catalog.css">
+
+    <!-- フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- アイコンライブラリ -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <style>
+        .test-controls {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        .test-control-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 6px;
+            color: #93c5fd;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .test-control-btn:hover {
+            background: rgba(59, 130, 246, 0.3);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .component-demo {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .log-output {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .demo-subtitle {
+            color: white;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="ui-catalog min-h-screen p-6">
+        <div class="container max-w-7xl mx-auto">
+            <!-- ヘッダー -->
+            <header class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-white mb-4">
+                    <i data-lucide="component" style="width: 32px; height: 32px;"></i>
+                    UIコンポーネント動作テスト
+                </h1>
+                <p class="text-purple-200 text-xl">Phase 3で実装されたコンポーネントの動作確認</p>
+            </header>
+
+            <!-- StepIndicator テスト -->
+            <section class="catalog-section">
+                <h2 class="heading-md text-blue-300 mb-4">
+                    <i data-lucide="navigation"></i>
+                    <span>StepIndicator テスト</span>
+                </h2>
+
+                <div class="test-controls">
+                    <button class="test-control-btn" onclick="stepTest.setStep(0)">ステップ1</button>
+                    <button class="test-control-btn" onclick="stepTest.setStep(1)">ステップ2</button>
+                    <button class="test-control-btn" onclick="stepTest.setStep(2)">ステップ3</button>
+                    <button class="test-control-btn" onclick="stepTest.nextStep()">次へ</button>
+                    <button class="test-control-btn" onclick="stepTest.previousStep()">前へ</button>
+                    <button class="test-control-btn" onclick="stepTest.reset()">リセット</button>
+                </div>
+
+                <div class="component-demo">
+                    <div class="component-item">
+                        <div id="step-indicator-demo" style="border: 1px dashed rgba(255,255,255,0.3); padding: 1rem; min-height: 100px;">
+                            <!-- StepIndicatorコンポーネントがここに表示されます -->
+                        </div>
+                        <p class="text-white-60 text-sm mt-2">
+                            ステップインジケーター表示エリア
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ProgressBar テスト -->
+            <section class="catalog-section">
+                <h2 class="heading-md text-green-300 mb-4">
+                    <i data-lucide="bar-chart-3"></i>
+                    <span>ProgressBar テスト</span>
+                </h2>
+
+                <div class="test-controls">
+                    <button class="test-control-btn" onclick="progressTest.setProgress(25)">25%</button>
+                    <button class="test-control-btn" onclick="progressTest.setProgress(50)">50%</button>
+                    <button class="test-control-btn" onclick="progressTest.setProgress(75)">75%</button>
+                    <button class="test-control-btn" onclick="progressTest.setProgress(100)">100%</button>
+                    <button class="test-control-btn" onclick="progressTest.increment(10)">+10%</button>
+                    <button class="test-control-btn" onclick="progressTest.reset()">リセット</button>
+                </div>
+
+                <div class="component-demo">
+                    <div class="component-item">
+                        <h4 class="demo-subtitle">基本プログレスバー</h4>
+                        <div id="progress-demo-basic" style="border: 1px dashed rgba(0,255,0,0.3); padding: 1rem; min-height: 50px;">
+                            <!-- 基本プログレスバー -->
+                        </div>
+                    </div>
+
+                    <div class="component-item">
+                        <h4 class="demo-subtitle">音量バー（Volume）</h4>
+                        <div id="progress-demo-volume" style="border: 1px dashed rgba(0,255,255,0.3); padding: 1rem; min-height: 50px;">
+                            <!-- 音量バー -->
+                        </div>
+                    </div>
+
+                    <div class="component-item">
+                        <h4 class="demo-subtitle">評価分布バー（Evaluation）</h4>
+                        <div id="progress-demo-evaluation" style="border: 1px dashed rgba(255,255,0,0.3); padding: 1rem; min-height: 50px;">
+                            <!-- 評価分布バー -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ComponentManager テスト -->
+            <section class="catalog-section">
+                <h2 class="heading-md text-purple-300 mb-4">
+                    <i data-lucide="layers"></i>
+                    <span>ComponentManager テスト</span>
+                </h2>
+
+                <div class="test-controls">
+                    <button class="test-control-btn" onclick="managerTest.createMultiple()">複数作成</button>
+                    <button class="test-control-btn" onclick="managerTest.destroyAll()">全破棄</button>
+                    <button class="test-control-btn" onclick="managerTest.showStats()">統計表示</button>
+                </div>
+
+                <div class="component-demo">
+                    <div class="component-item">
+                        <div id="manager-demo" style="border: 1px dashed rgba(255,0,255,0.3); padding: 1rem; min-height: 100px;">
+                            <!-- ComponentManagerで作成されたコンポーネントがここに表示されます -->
+                        </div>
+                        <p class="text-white-60 text-sm mt-2">
+                            ComponentManager動的作成エリア
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ログ表示 -->
+            <section class="catalog-section">
+                <h2 class="heading-md text-orange-300 mb-4">
+                    <i data-lucide="terminal"></i>
+                    <span>ログ出力</span>
+                </h2>
+                <div class="test-controls">
+                    <button class="test-control-btn" onclick="clearLog()">クリア</button>
+                </div>
+                <div id="log-output" class="log-output"></div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Components -->
+    <script type="module">
+        console.log('🚀 テストスクリプト開始');
+
+        // ログ機能（最初に設定）
+        const logElement = document.getElementById('log-output');
+        window.log = function(message) {
+            console.log(message);
+            if (logElement) {
+                const timestamp = new Date().toLocaleTimeString();
+                logElement.textContent += `[${timestamp}] ${message}\n`;
+                logElement.scrollTop = logElement.scrollHeight;
+            }
+        };
+
+        window.clearLog = function() {
+            if (logElement) {
+                logElement.textContent = '';
+            }
+        };
+
+        // フォールバック関数（最初に設定）
+        window.setupFallbackFunctions = function() {
+            window.stepTest = {
+                setStep: (stepIndex) => window.log(`📊 フォールバック: ステップ${stepIndex + 1}設定`),
+                nextStep: () => window.log('➡️ フォールバック: 次のステップ'),
+                previousStep: () => window.log('⬅️ フォールバック: 前のステップ'),
+                reset: () => window.log('🔄 フォールバック: ステップリセット')
+            };
+
+            window.progressTest = {
+                setProgress: (value) => window.log(`📊 フォールバック: プログレス${value}%設定`),
+                increment: (amount) => window.log(`⬆️ フォールバック: プログレス+${amount}%`),
+                reset: () => window.log('🔄 フォールバック: プログレスリセット')
+            };
+
+            window.managerTest = {
+                createMultiple: () => window.log('🏭 フォールバック: 複数作成'),
+                destroyAll: () => window.log('🗑️ フォールバック: 全破棄'),
+                showStats: () => window.log('📊 フォールバック: 統計表示')
+            };
+        };
+
+        // 初期フォールバック設定
+        window.setupFallbackFunctions();
+
+        let initializeComponents, createStepIndicator, createProgressBar, createVolumeBar, createEvaluationBar, componentManager;
+
+        try {
+            const componentsModule = await import('./js/components/index.js');
+            console.log('✅ コンポーネントモジュール読み込み成功:', componentsModule);
+
+            ({
+                initializeComponents,
+                createStepIndicator,
+                createProgressBar,
+                createVolumeBar,
+                createEvaluationBar,
+                componentManager
+            } = componentsModule);
+
+        } catch (error) {
+            console.error('❌ コンポーネント読み込みエラー:', error);
+
+            window.log('❌ コンポーネントの読み込みに失敗しました: ' + error.message);
+            // フォールバック関数は既に設定済み
+        }
+
+        // コンポーネント変数
+        let stepIndicator, basicProgress, volumeProgress, evaluationProgress;
+
+        // 初期化（非同期関数内に移動）
+        async function initializeTest() {
+            try {
+                window.log('🚀 コンポーネントテスト開始');
+
+                if (!initializeComponents) {
+                    window.log('❌ initializeComponents関数が見つかりません');
+                    return;
+                }
+
+                // ComponentManager初期化
+                await initializeComponents();
+                window.log('✅ ComponentManager初期化完了');
+
+                // StepIndicator作成
+                const stepContainer = document.querySelector('#step-indicator-demo');
+                window.log(`📋 StepIndicatorコンテナ確認: ${stepContainer ? '見つかりました' : '見つかりません'}`);
+
+                const stepResult = await createStepIndicator('#step-indicator-demo', {
+                    onStepChange: (stepIndex, stepInfo) => {
+                        window.log(`📊 ステップ変更: ${stepIndex} - ${stepInfo?.label}`);
+                    }
+                });
+                stepIndicator = stepResult.instance;
+
+                // DOM確認
+                const stepElement = stepContainer.querySelector('.step-indicator-container, .step-indicators-container');
+                window.log(`🔍 作成後DOM確認: ${stepElement ? 'StepIndicator要素存在' : 'StepIndicator要素なし'}`);
+                window.log(`📏 コンテナ内容: ${stepContainer.innerHTML.substring(0, 100)}...`);
+
+                window.log('✅ StepIndicator作成完了');
+
+                // 基本ProgressBar作成
+                const basicResult = await createProgressBar('#progress-demo-basic', {
+                    variant: 'gradient',
+                    color: 'green',
+                    showText: true,
+                    onProgressUpdate: (value, percentage) => {
+                        window.log(`📈 基本プログレス更新: ${percentage.toFixed(1)}%`);
+                    }
+                });
+                basicProgress = basicResult.instance;
+                window.log('✅ 基本ProgressBar作成完了');
+
+                // VolumeBar作成
+                const volumeResult = await createVolumeBar('#progress-demo-volume', {
+                    onProgressUpdate: (value, percentage) => {
+                        window.log(`🔊 音量バー更新: ${percentage.toFixed(1)}%`);
+                    }
+                });
+                volumeProgress = volumeResult.instance;
+                window.log('✅ VolumeBar作成完了');
+
+                // EvaluationBar作成
+                const evalResult = await createEvaluationBar('#progress-demo-evaluation', 'good', 3, 8);
+                evaluationProgress = evalResult.instance;
+                window.log('✅ EvaluationBar作成完了');
+
+                window.log('🎉 全コンポーネント初期化完了');
+
+            } catch (error) {
+                window.log(`❌ 初期化エラー: ${error.message}`);
+                console.error('Component test initialization failed:', error);
+            }
+        }
+
+        // 初期化の実行
+        if (initializeComponents) {
+            await initializeTest();
+
+            // 正常ロード時のテスト操作オブジェクト（フォールバックを上書き）
+            window.stepTest = {
+                setStep: (stepIndex) => {
+                    if (stepIndicator) {
+                        stepIndicator.setCurrentStep(stepIndex);
+                        window.log(`🎯 ステップ設定: ${stepIndex}`);
+                    } else {
+                        window.log(`⚠️ stepIndicator未初期化: ステップ${stepIndex}`);
+                    }
+                },
+                nextStep: () => {
+                    if (stepIndicator) {
+                        stepIndicator.nextStep();
+                        window.log('➡️ 次のステップ');
+                    }
+                },
+                previousStep: () => {
+                    if (stepIndicator) {
+                        stepIndicator.previousStep();
+                        window.log('⬅️ 前のステップ');
+                    }
+                },
+                reset: () => {
+                    if (stepIndicator) {
+                        stepIndicator.reset();
+                        window.log('🔄 ステップリセット');
+                    }
+                }
+            };
+
+            window.progressTest = {
+                setProgress: (value) => {
+                    if (basicProgress) basicProgress.updateProgress(value, true);
+                    if (volumeProgress) volumeProgress.updateProgress(value, true);
+                    window.log(`📊 プログレス設定: ${value}%`);
+                },
+                increment: (amount) => {
+                    if (basicProgress) basicProgress.increment(amount);
+                    if (volumeProgress) volumeProgress.increment(amount);
+                    window.log(`⬆️ プログレス増加: +${amount}%`);
+                },
+                reset: () => {
+                    if (basicProgress) basicProgress.reset();
+                    if (volumeProgress) volumeProgress.reset();
+                    window.log('🔄 プログレスリセット');
+                }
+            };
+
+            window.managerTest = {
+                createMultiple: async () => {
+                    try {
+                        window.log('🏭 複数コンポーネント作成開始...');
+
+                        // 直接createStepIndicatorとcreateProgressBarを使用
+                        const managerContainer = document.querySelector('#manager-demo');
+                        window.log(`📋 Managerコンテナ確認: ${managerContainer ? '見つかりました' : '見つかりません'}`);
+
+                        // 1つ目: 小さなStepIndicator
+                        const stepDiv = document.createElement('div');
+                        stepDiv.style.marginBottom = '1rem';
+                        managerContainer.appendChild(stepDiv);
+
+                        const stepResult = await createStepIndicator(stepDiv, {
+                            currentStep: 1,
+                            onStepChange: (stepIndex) => {
+                                window.log(`🔄 Manager内ステップ変更: ${stepIndex}`);
+                            }
+                        });
+                        window.log('✅ Manager内StepIndicator作成完了');
+
+                        // 2つ目: 小さなProgressBar
+                        const progressDiv = document.createElement('div');
+                        progressDiv.style.marginBottom = '1rem';
+                        managerContainer.appendChild(progressDiv);
+
+                        const progressResult = await createProgressBar(progressDiv, {
+                            variant: 'gradient',
+                            color: 'purple',
+                            value: 60,
+                            showText: true,
+                            onProgressUpdate: (value, percentage) => {
+                                window.log(`📈 Manager内プログレス: ${percentage.toFixed(1)}%`);
+                            }
+                        });
+                        window.log('✅ Manager内ProgressBar作成完了');
+
+                        window.log(`🏭 複数コンポーネント作成完了: 2個`);
+
+                    } catch (error) {
+                        window.log(`❌ 複数作成エラー: ${error.message}`);
+                        console.error('ComponentManager createMultiple error:', error);
+                    }
+                },
+                destroyAll: () => {
+                    try {
+                        const managerContainer = document.querySelector('#manager-demo');
+                        if (managerContainer) {
+                            // 手動でコンテナをクリア
+                            managerContainer.innerHTML = '<!-- ComponentManagerで作成されたコンポーネントがここに表示されます -->';
+                            window.log('🗑️ Manager内全コンポーネント破棄完了');
+                        }
+
+                        // ComponentManagerの統計も取得
+                        if (componentManager && componentManager.destroyAllComponents) {
+                            const count = componentManager.destroyAllComponents();
+                            window.log(`🗑️ ComponentManager破棄: ${count}個`);
+                        }
+                    } catch (error) {
+                        window.log(`❌ 破棄エラー: ${error.message}`);
+                    }
+                },
+                showStats: () => {
+                    try {
+                        if (componentManager && componentManager.getRegisteredComponents) {
+                            const components = componentManager.getRegisteredComponents();
+                            window.log(`📊 登録済みコンポーネント: ${components.join(', ')}`);
+                        } else {
+                            window.log('📊 ComponentManager統計: 機能利用不可');
+                        }
+
+                        // 現在のmanager-demo内のコンテンツも確認
+                        const managerContainer = document.querySelector('#manager-demo');
+                        const childCount = managerContainer ? managerContainer.children.length : 0;
+                        window.log(`📊 Manager内要素数: ${childCount}個`);
+
+                    } catch (error) {
+                        window.log(`❌ 統計エラー: ${error.message}`);
+                    }
+                }
+            };
+        } else {
+            window.log('⚠️ コンポーネント未ロード - フォールバック関数を使用');
+        }
+
+        // Lucideアイコン初期化
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

@@ -394,6 +394,12 @@ class PitchProCycleManager {
      * 音程更新ハンドラー（PitchProコールバック）
      */
     handlePitchUpdate(result) {
+        // 音域測定中の処理（detectionActiveチェックの前に実行）
+        if (this.rangeMeasurementData && this.rangeMeasurementData.currentPhase) {
+            this.handleRangeMeasurementPitchUpdate(result);
+            return;
+        }
+
         if (!this.state.detectionActive) return;
 
         // 【重要】autoUpdateUI: trueの場合、PitchProが自動でUI更新を行うため、
@@ -404,6 +410,31 @@ class PitchProCycleManager {
             case 'audiotest':
                 this.handleAudioTestPitchUpdate(result);
                 break;
+        }
+    }
+
+    /**
+     * 音域測定用音程更新処理
+     */
+    handleRangeMeasurementPitchUpdate(result) {
+        // 周波数検出条件
+        // volume は 0.0 ~ 1.0 の範囲（0.01 = 1%）
+        if (!result.frequency || result.clarity < 0.3 || result.volume < 0.01) {
+            return;
+        }
+
+        this.rangeMeasurementData.detectedCount++;
+
+        if (this.rangeMeasurementData.currentPhase === 'lowest') {
+            // 最低音測定
+            if (result.frequency < this.rangeMeasurementData.currentLowest) {
+                this.rangeMeasurementData.currentLowest = result.frequency;
+            }
+        } else if (this.rangeMeasurementData.currentPhase === 'highest') {
+            // 最高音測定
+            if (result.frequency > this.rangeMeasurementData.currentHighest) {
+                this.rangeMeasurementData.currentHighest = result.frequency;
+            }
         }
     }
 
@@ -690,6 +721,305 @@ class PitchProCycleManager {
         // ステップインジケーター更新
         updateStepStatus(2, 'completed');
         updateStepStatus(3, 'active');
+
+        // 測定開始ボタンのイベントリスナー設定
+        this.setupRangeTestButtons();
+    }
+
+    /**
+     * 音域テストボタンのイベントリスナー設定
+     */
+    setupRangeTestButtons() {
+        const startRangeTestBtn = document.getElementById('start-range-test-btn');
+        const retestRangeBtn = document.getElementById('retest-range-btn');
+        const startTrainingBtn = document.getElementById('start-training-btn');
+
+        // 測定開始ボタン
+        if (startRangeTestBtn) {
+            startRangeTestBtn.addEventListener('click', () => {
+                console.log('🎤 音域測定開始');
+                this.startRangeMeasurement();
+            });
+        }
+
+        // 再測定ボタン
+        if (retestRangeBtn) {
+            retestRangeBtn.addEventListener('click', () => {
+                console.log('🔄 音域再測定');
+                this.startRangeMeasurement();
+            });
+        }
+
+        // トレーニング開始ボタン
+        if (startTrainingBtn) {
+            startTrainingBtn.addEventListener('click', () => {
+                console.log('🎯 トレーニングページへ遷移');
+                window.location.hash = 'training';
+            });
+        }
+    }
+
+    /**
+     * 音域測定を開始
+     */
+    async startRangeMeasurement() {
+        const rangeTestIntro = document.getElementById('range-test-intro');
+        const rangeTestMeasuring = document.getElementById('range-test-measuring');
+        const rangeTestComplete = document.getElementById('range-test-complete');
+
+        // イントロを非表示、測定中を表示
+        if (rangeTestIntro) rangeTestIntro.classList.add('hidden');
+        if (rangeTestComplete) rangeTestComplete.classList.add('hidden');
+        if (rangeTestMeasuring) rangeTestMeasuring.classList.remove('hidden');
+
+        console.log('📊 音域測定フェーズ開始');
+
+        // AudioDetectorの確認
+        if (!this.audioDetector) {
+            console.error('❌ AudioDetectorが初期化されていません');
+            alert('音声検出システムが初期化されていません。ページを再読み込みしてください。');
+            return;
+        }
+
+        // 音声検出が停止している場合のみ開始
+        if (this.currentPhase === 'idle' || this.currentPhase === 'initialized') {
+            console.log('🎤 音声検出を開始...');
+            const startResult = await this.startAudioDetection('rangetest');
+            if (!startResult.success) {
+                console.error('❌ 音声検出開始失敗:', startResult.error);
+                alert('音声検出の開始に失敗しました。');
+                return;
+            }
+        } else {
+            console.log('🎤 既存の音声検出を継続使用（Phase: ' + this.currentPhase + '）');
+        }
+
+        // 測定データ初期化
+        this.rangeMeasurementData = {
+            lowestFreq: null,
+            highestFreq: null,
+            detectedFrequencies: []
+        };
+
+        // AudioDetectorのセレクターを音域テスト用に切り替え
+        console.log('🔄 音域テスト用UIセレクターに切り替え...');
+        await this.audioDetector.updateSelectors({
+            volumeBarSelector: '#range-volume-bar',
+            volumeTextSelector: '#range-volume-value',
+            frequencySelector: '#range-frequency-value',
+            noteSelector: '' // 音域テストでは音名表示不要
+        });
+        console.log('✅ UIセレクター切り替え完了');
+
+        // updateSelectors()の後、コールバックを再設定（重要！）
+        this.audioDetector.setCallbacks({
+            onPitchUpdate: (result) => this.handlePitchUpdate(result),
+            onVolumeUpdate: (volume) => this.handleVolumeUpdate(volume),
+            onError: (context, error) => this.handleAudioError(context, error),
+            onStateChange: (state) => {}
+        });
+
+        // 検出が停止している場合は再開
+        const status = this.audioDetector?.getStatus?.();
+        if (status && status.pitchDetectorStatus?.componentState !== 'detecting') {
+            await this.audioDetector.startDetection();
+        }
+
+        // 少し待ってから測定開始
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Phase 1: 最低音測定（5秒間）
+        await this.measureLowestPitch();
+
+        // Phase 2: 最高音測定（5秒間）
+        await this.measureHighestPitch();
+
+        // Phase 3: 結果計算と表示
+        this.calculateAndShowResults();
+    }
+
+    /**
+     * 最低音を測定（5秒間）
+     */
+    async measureLowestPitch() {
+        console.log('🎤 Phase 1: 最低音測定開始');
+
+        const phaseTitle = document.getElementById('range-test-phase-title');
+        const progressBar = document.getElementById('range-progress-bar');
+        const progressText = document.getElementById('range-progress-text');
+
+        if (phaseTitle) phaseTitle.textContent = '最低音を発声してください';
+
+        // 最低音検出用の変数をクラスプロパティに設定
+        this.rangeMeasurementData.currentLowest = Infinity;
+        this.rangeMeasurementData.currentPhase = 'lowest';
+        this.rangeMeasurementData.detectedCount = 0;
+
+        // 5秒間測定（プログレスバー更新）
+        const duration = 5000;
+        const intervalTime = 100;
+        let elapsed = 0;
+
+        return new Promise((resolve) => {
+            const interval = setInterval(() => {
+                elapsed += intervalTime;
+                const progress = (elapsed / duration) * 100;
+
+                if (progressBar) progressBar.style.width = `${progress}%`;
+                if (progressText) progressText.textContent = `測定中... ${Math.ceil((duration - elapsed) / 1000)}秒`;
+
+                if (elapsed >= duration) {
+                    clearInterval(interval);
+
+                    // 最低音を保存
+                    if (this.rangeMeasurementData.currentLowest < Infinity) {
+                        this.rangeMeasurementData.lowestFreq = this.rangeMeasurementData.currentLowest;
+                        console.log(`✅ 最低音検出: ${this.rangeMeasurementData.lowestFreq.toFixed(2)} Hz (${this.rangeMeasurementData.detectedCount}回検出)`);
+                    } else {
+                        console.warn('⚠️ 最低音が検出されませんでした');
+                    }
+
+                    resolve();
+                }
+            }, intervalTime);
+        });
+    }
+
+    /**
+     * 最高音を測定（5秒間）
+     */
+    async measureHighestPitch() {
+        console.log('🎤 Phase 2: 最高音測定開始');
+
+        const phaseTitle = document.getElementById('range-test-phase-title');
+        const progressBar = document.getElementById('range-progress-bar');
+        const progressText = document.getElementById('range-progress-text');
+
+        if (phaseTitle) phaseTitle.textContent = '最高音を発声してください';
+        if (progressBar) progressBar.style.width = '0%';
+
+        // 最高音検出用の変数をクラスプロパティに設定
+        this.rangeMeasurementData.currentHighest = 0;
+        this.rangeMeasurementData.currentPhase = 'highest';
+        this.rangeMeasurementData.detectedCount = 0;
+
+        // 5秒間測定
+        const duration = 5000;
+        const intervalTime = 100;
+        let elapsed = 0;
+
+        return new Promise((resolve) => {
+            const interval = setInterval(() => {
+                elapsed += intervalTime;
+                const progress = (elapsed / duration) * 100;
+
+                if (progressBar) progressBar.style.width = `${progress}%`;
+                if (progressText) progressText.textContent = `測定中... ${Math.ceil((duration - elapsed) / 1000)}秒`;
+
+                if (elapsed >= duration) {
+                    clearInterval(interval);
+
+                    // 最高音を保存
+                    if (this.rangeMeasurementData.currentHighest > 0) {
+                        this.rangeMeasurementData.highestFreq = this.rangeMeasurementData.currentHighest;
+                        console.log(`✅ 最高音検出: ${this.rangeMeasurementData.highestFreq.toFixed(2)} Hz (${this.rangeMeasurementData.detectedCount}回検出)`);
+                    } else {
+                        console.warn('⚠️ 最高音が検出されませんでした');
+                    }
+
+                    resolve();
+                }
+            }, intervalTime);
+        });
+    }
+
+    /**
+     * 測定結果を計算して表示
+     */
+    calculateAndShowResults() {
+        const { lowestFreq, highestFreq } = this.rangeMeasurementData;
+
+        // 測定フェーズをリセット（コールバックを停止）
+        this.rangeMeasurementData.currentPhase = null;
+
+        if (!lowestFreq || !highestFreq || lowestFreq === Infinity || highestFreq === 0) {
+            console.error('❌ 音域測定失敗: 周波数が検出されませんでした');
+            // エラー処理: 再測定を促す
+            alert('音域測定に失敗しました。もう一度試してください。');
+            return;
+        }
+
+        // 音名変換
+        const lowestNote = this.frequencyToNote(lowestFreq);
+        const highestNote = this.frequencyToNote(highestFreq);
+
+        // 半音数計算
+        const semitones = Math.round(12 * Math.log2(highestFreq / lowestFreq));
+
+        // 音域幅表示用（例: "2オクターブ7半音"）
+        const octaves = Math.floor(semitones / 12);
+        const remainingSemitones = semitones % 12;
+        const range = remainingSemitones > 0
+            ? `${octaves}オクターブ${remainingSemitones}半音`
+            : `${octaves}オクターブ`;
+
+        const results = {
+            lowestNote,
+            lowestFreq,
+            highestNote,
+            highestFreq,
+            range,
+            semitones
+        };
+
+        console.log('🎉 音域測定完了:', results);
+        this.showRangeMeasurementComplete(results);
+    }
+
+    /**
+     * 周波数から音名に変換（例: 440Hz → "A4"）
+     */
+    frequencyToNote(freq) {
+        const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        const midi = Math.round(12 * Math.log2(freq / 440) + 69);
+        const octave = Math.floor(midi / 12) - 1;
+        const note = notes[midi % 12];
+        return `${note}${octave}`;
+    }
+
+    /**
+     * 音域測定完了画面を表示
+     */
+    showRangeMeasurementComplete(results) {
+        const rangeTestMeasuring = document.getElementById('range-test-measuring');
+        const rangeTestComplete = document.getElementById('range-test-complete');
+
+        // 測定中を非表示、完了を表示
+        if (rangeTestMeasuring) rangeTestMeasuring.classList.add('hidden');
+        if (rangeTestComplete) rangeTestComplete.classList.remove('hidden');
+
+        // 結果表示
+        const minNote = document.getElementById('min-note');
+        const maxNote = document.getElementById('max-note');
+        const rangeSpan = document.getElementById('range-span');
+
+        if (minNote) minNote.textContent = results.lowestNote;
+        if (maxNote) maxNote.textContent = results.highestNote;
+        if (rangeSpan) rangeSpan.textContent = results.range;
+
+        // 音声検出を停止
+        if (this.audioDetector) {
+            this.audioDetector.stopDetection();
+            console.log('🔇 音声検出停止');
+        }
+
+        // DataManagerに保存
+        if (typeof DataManager !== 'undefined' && DataManager.saveVoiceRangeData) {
+            DataManager.saveVoiceRangeData(results);
+            console.log('✅ 音域データ保存完了');
+        }
+
+        console.log('🎉 音域測定完了:', results);
     }
 
     /**

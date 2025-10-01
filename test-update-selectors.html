@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>updateSelectors() テスト - PitchPro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: white;
+        }
+        .section {
+            background: #16213e;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .volume-bar {
+            width: 100%;
+            height: 20px;
+            background: #0f3460;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .volume-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            width: 0%;
+            transition: none;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            background: #0f3460;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #1a4d7a;
+        }
+        #log {
+            background: #000;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+        .log-entry {
+            margin: 2px 0;
+        }
+        .success { color: #00ff00; }
+        .error { color: #ff0000; }
+        .info { color: #00d2ff; }
+    </style>
+</head>
+<body>
+    <h1>🎤 updateSelectors() 動作テスト</h1>
+
+    <div class="section">
+        <h2>セクション1: マイクテスト用</h2>
+        <div class="volume-bar">
+            <div class="volume-fill" id="volume-bar-1"></div>
+        </div>
+        <p>音量: <span id="volume-text-1">0%</span></p>
+        <p>周波数: <span id="frequency-1">0 Hz</span></p>
+    </div>
+
+    <div class="section">
+        <h2>セクション2: 音域テスト用</h2>
+        <div class="volume-bar">
+            <div class="volume-fill" id="volume-bar-2"></div>
+        </div>
+        <p>音量: <span id="volume-text-2">0%</span></p>
+        <p>周波数: <span id="frequency-2">0 Hz</span></p>
+    </div>
+
+    <div class="section">
+        <h2>操作パネル</h2>
+        <button id="init-btn">1. 初期化</button>
+        <button id="start-btn" disabled>2. 音声検出開始</button>
+        <button id="switch-to-section2-btn" disabled>3. セクション2に切り替え</button>
+        <button id="switch-to-section1-btn" disabled>4. セクション1に戻す</button>
+        <button id="stop-btn" disabled>5. 停止</button>
+    </div>
+
+    <div class="section">
+        <h2>ログ</h2>
+        <div id="log"></div>
+    </div>
+
+    <script src="js/pitchpro-audio/pitchpro-v1.3.1.umd.js"></script>
+    <script>
+        let audioDetector = null;
+        let callbackCount = 0;
+
+        const logArea = document.getElementById('log');
+
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logArea.appendChild(entry);
+            logArea.scrollTop = logArea.scrollHeight;
+            console.log(message);
+        }
+
+        // 1. 初期化
+        document.getElementById('init-btn').addEventListener('click', async () => {
+            try {
+                log('🔧 AudioDetectionComponent 初期化開始...', 'info');
+
+                audioDetector = new window.PitchPro.AudioDetectionComponent({
+                    volumeBarSelector: '#volume-bar-1',
+                    volumeTextSelector: '#volume-text-1',
+                    frequencySelector: '#frequency-1',
+                    noteSelector: null,
+                    autoUpdateUI: true,
+                    debug: true
+                });
+
+                await audioDetector.initialize();
+                log('✅ 初期化完了', 'success');
+
+                // コールバック設定
+                audioDetector.setCallbacks({
+                    onPitchUpdate: (result) => {
+                        callbackCount++;
+                        if (callbackCount <= 5) {
+                            log(`🎵 onPitchUpdate: freq=${result.frequency?.toFixed(2)}, vol=${result.volume?.toFixed(2)}, clarity=${result.clarity?.toFixed(2)}`, 'success');
+                        }
+                    }
+                });
+                log('✅ コールバック設定完了', 'success');
+
+                document.getElementById('start-btn').disabled = false;
+            } catch (error) {
+                log(`❌ 初期化エラー: ${error.message}`, 'error');
+            }
+        });
+
+        // 2. 音声検出開始
+        document.getElementById('start-btn').addEventListener('click', async () => {
+            try {
+                log('🎤 音声検出開始...', 'info');
+                await audioDetector.startDetection();
+                log('✅ 音声検出開始完了', 'success');
+
+                document.getElementById('switch-to-section2-btn').disabled = false;
+                document.getElementById('stop-btn').disabled = false;
+                callbackCount = 0; // カウントリセット
+            } catch (error) {
+                log(`❌ 音声検出開始エラー: ${error.message}`, 'error');
+            }
+        });
+
+        // 3. セクション2に切り替え
+        document.getElementById('switch-to-section2-btn').addEventListener('click', async () => {
+            try {
+                log('🔄 セクション2にセレクター切り替え中...', 'info');
+
+                await audioDetector.updateSelectors({
+                    volumeBarSelector: '#volume-bar-2',
+                    volumeTextSelector: '#volume-text-2',
+                    frequencySelector: '#frequency-2',
+                    noteSelector: null
+                });
+                log('✅ updateSelectors() 完了', 'success');
+
+                // コールバック再設定（重要！）
+                log('🔄 コールバック再設定中...', 'info');
+                audioDetector.setCallbacks({
+                    onPitchUpdate: (result) => {
+                        callbackCount++;
+                        if (callbackCount <= 5) {
+                            log(`🎵 [セクション2] onPitchUpdate: freq=${result.frequency?.toFixed(2)}, vol=${result.volume?.toFixed(2)}`, 'success');
+                        }
+                    }
+                });
+                log('✅ コールバック再設定完了', 'success');
+
+                document.getElementById('switch-to-section1-btn').disabled = false;
+                callbackCount = 0; // カウントリセット
+            } catch (error) {
+                log(`❌ セレクター切り替えエラー: ${error.message}`, 'error');
+            }
+        });
+
+        // 4. セクション1に戻す
+        document.getElementById('switch-to-section1-btn').addEventListener('click', async () => {
+            try {
+                log('🔄 セクション1にセレクター切り替え中...', 'info');
+
+                await audioDetector.updateSelectors({
+                    volumeBarSelector: '#volume-bar-1',
+                    volumeTextSelector: '#volume-text-1',
+                    frequencySelector: '#frequency-1',
+                    noteSelector: null
+                });
+                log('✅ updateSelectors() 完了', 'success');
+
+                // コールバック再設定
+                log('🔄 コールバック再設定中...', 'info');
+                audioDetector.setCallbacks({
+                    onPitchUpdate: (result) => {
+                        callbackCount++;
+                        if (callbackCount <= 5) {
+                            log(`🎵 [セクション1] onPitchUpdate: freq=${result.frequency?.toFixed(2)}, vol=${result.volume?.toFixed(2)}`, 'success');
+                        }
+                    }
+                });
+                log('✅ コールバック再設定完了', 'success');
+
+                callbackCount = 0; // カウントリセット
+            } catch (error) {
+                log(`❌ セレクター切り替えエラー: ${error.message}`, 'error');
+            }
+        });
+
+        // 5. 停止
+        document.getElementById('stop-btn').addEventListener('click', () => {
+            try {
+                log('⏹️ 音声検出停止...', 'info');
+                audioDetector.stopDetection();
+                log('✅ 停止完了', 'success');
+            } catch (error) {
+                log(`❌ 停止エラー: ${error.message}`, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

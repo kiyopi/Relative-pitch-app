@@ -2518,3 +2518,8 @@ preparationController機能追加:
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-01 15:00:53] コミット: fix: preparationController構文エラー修正 - updateStepStatusの誤配置を解消
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
