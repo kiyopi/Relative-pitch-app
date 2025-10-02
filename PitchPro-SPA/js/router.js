@@ -117,10 +117,16 @@ class SimpleRouter {
         const trainingButtons = document.querySelectorAll('[data-route]');
 
         trainingButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
+            button.addEventListener('click', async (e) => {
                 const route = e.currentTarget.getAttribute('data-route');
                 const mode = e.currentTarget.getAttribute('data-mode');
                 const session = e.currentTarget.getAttribute('data-session');
+
+                // トレーニング/準備ページへの遷移時、PitchShifter初期化を開始
+                if (route === 'training' || route === 'preparation') {
+                    console.log('🎹 トレーニング開始 - PitchShifter初期化開始...');
+                    this.initializePitchShifterBackground();
+                }
 
                 // トレーニングモードのパラメータをハッシュに含める
                 let hash = route;
@@ -131,6 +137,63 @@ class SimpleRouter {
                 window.location.hash = hash;
             });
         });
+    }
+
+    // PitchShifterをバックグラウンドで初期化（完了を待たない）
+    async initializePitchShifterBackground() {
+        try {
+            // PitchShifterが既にロードされているか確認
+            let attempts = 0;
+            while (!window.PitchShifter && attempts < 50) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+
+            if (!window.PitchShifter) {
+                console.warn('⚠️ PitchShifterがロードされていません（5秒タイムアウト）');
+                return;
+            }
+
+            // 既に初期化済みかチェック
+            if (window.pitchShifterInstance && window.pitchShifterInstance.isInitialized) {
+                console.log('✅ PitchShifter already initialized');
+                return;
+            }
+
+            // デバイス検出
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const isIPhone = /iPhone/.test(userAgent);
+            const isIPad = /iPad/.test(userAgent) || (/Macintosh/.test(userAgent) && 'ontouchend' in document);
+            const deviceType = isIPhone ? 'iphone' : isIPad ? 'ipad' : 'pc';
+
+            const volumeSettings = {
+                pc: -6,
+                iphone: -4,
+                ipad: -5
+            };
+            const deviceVolume = volumeSettings[deviceType] || -6;
+
+            console.log(`📱 デバイス: ${deviceType}, 音量: ${deviceVolume}dB`);
+
+            // 新規作成
+            window.pitchShifterInstance = new window.PitchShifter({
+                baseUrl: 'audio/piano/',
+                release: 2.5,
+                volume: deviceVolume
+            });
+
+            // バックグラウンドで初期化（完了を待たない）
+            window.pitchShifterInstance.initialize()
+                .then(() => {
+                    console.log('✅ PitchShifter初期化完了（バックグラウンド）');
+                })
+                .catch(error => {
+                    console.warn('⚠️ PitchShifter初期化失敗（バックグラウンド）:', error);
+                });
+
+        } catch (error) {
+            console.warn('⚠️ PitchShifter初期化エラー（バックグラウンド）:', error);
+        }
     }
 
     async setupPreparationEvents(fullHash = '') {
@@ -150,11 +213,21 @@ class SimpleRouter {
         }
     }
 
-    async setupTrainingEvents() {
-        // training.htmlのイベント設定
-        console.log('Setting up training page events');
-        // TODO: Phase 3でtrainingControllerの動的importを実装予定
-        // TODO: 必要に応じてtraining固有のイベントを追加
+    async setupTrainingEvents(fullHash = '') {
+        try {
+            console.log('Setting up training page events with dynamic import...');
+            console.log('Full hash:', fullHash);
+
+            // 動的にtrainingControllerをインポート
+            const { initializeTrainingPage } = await import('./controllers/trainingController.js');
+
+            // コントローラーの初期化関数を実行
+            await initializeTrainingPage();
+
+        } catch (error) {
+            console.error('Error setting up training page events:', error);
+            throw error;
+        }
     }
 
     // 現在のページのクリーンアップ

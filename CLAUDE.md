@@ -34,6 +34,10 @@
 5. **🎚️ 音量バー制御**: `VolumeBarController`統一使用・**必ずコールバック方式**で`result.volume`取得
 6. **📝 トレーニングJS**: 開発段階ではページ内記述許可、本番実装時に外部ファイル化
 7. **🌿 Git自動化**: 作業完了時のみコミット・プッシュ実行（修正中は禁止）
+8. **🗂️ Serenaメモリ命名規則**:
+   - **永続化メモリ**: `PERM-[内容]-YYYYMMDD-HHMM`（例: `PERM-training-core-pitch-error-detection-20250112-1430`）
+   - **作業用メモ**: `TEMP-[内容]-YYYYMMDD-HHMM`（例: `TEMP-direct-access-mic-permission-issue-20250112-1445`）
+   - 永続化メモリは仕様・設計思想など長期保存が必要な情報、作業用メモは一時的な問題・タスク管理用
 
 ### 🎯 **作業のポイント**
 - **データ管理モジュール完了**: `/js/data-manager.js`実装済み（pitchpro-audio統合、課金制御対応）
