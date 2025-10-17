@@ -31,7 +31,7 @@ function displayResults(results) {
 
     // 音域テストセクションを非表示にし、結果セクションを表示
     document.getElementById('range-test-section').classList.add('hidden');
-    document.getElementById('result-section').classList.remove('hidden');
+    document.getElementById('results-section').classList.remove('hidden');
 
     console.log('📋 測定結果表示完了');
 }
@@ -382,7 +382,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
 
             // 音域テストセクションに戻る
-            const resultSection = document.getElementById('result-section');
+            const resultSection = document.getElementById('results-section');
             const rangeTestSection = document.getElementById('range-test-section');
             if (resultSection) resultSection.classList.add('hidden');
             if (rangeTestSection) rangeTestSection.classList.remove('hidden');
@@ -889,7 +889,7 @@ function assessMeasurementQuality(measurementData) {
 function displayVoiceRangeResults(results) {
     // 音域テストセクションを非表示にし、結果セクションを表示
     document.getElementById('range-test-section').classList.add('hidden');
-    document.getElementById('result-section').classList.remove('hidden');
+    document.getElementById('results-section').classList.remove('hidden');
 
     // Step 3を完了状態に更新
     const step3 = document.getElementById('step-3');

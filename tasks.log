@@ -2631,3 +2631,14 @@ Phase 2: JavaScript統合
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-17 15:07:40] コミット: fix: Step2遷移問題修正 - シングルページフロー完全実装
+
+- handleAudioTestSuccess内のStep2遷移コードを削除（line 618-635）
+- retest-range-btn（音域再測定）のStep2遷移を削除、セクション切り替えに変更（line 1008-1025）
+- start-range-test-btnは既存のイベントリスナー（line 1048-1078）が正しく機能
+- 音声テスト完了後、同一ページ内のrange-test-sectionに遷移
+- preparation-step2.htmlへの不要な遷移を完全排除
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
