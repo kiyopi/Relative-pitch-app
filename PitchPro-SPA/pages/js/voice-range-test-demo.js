@@ -1313,6 +1313,9 @@ function retryLowPitchMeasurement() {
     // 再測定ボタンを非表示
     document.getElementById('retry-measurement-btn').classList.add('btn-hidden');
 
+    // 🎵 音声安定性データをリセット（再測定用に初期化）
+    resetVoiceStability();
+
     // 待機状態に戻す
     globalState.currentPhase = 'waiting-for-voice';
     document.getElementById('main-status-text').textContent = '３秒間できるだけ低い声で「あー」と発声しましょう（再測定）';
@@ -1328,6 +1331,9 @@ function retryHighPitchMeasurement() {
 
     // 再測定ボタンを非表示
     document.getElementById('retry-measurement-btn').classList.add('btn-hidden');
+
+    // 🎵 音声安定性データをリセット（再測定用に初期化）
+    resetVoiceStability();
 
     // 高音測定データをクリア
     globalState.measurementData.highPhase = {
