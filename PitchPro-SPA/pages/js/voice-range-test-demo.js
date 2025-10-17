@@ -216,21 +216,18 @@ let globalState = {
 function isStableVoiceDetection(result) {
     const now = Date.now();
     const stability = globalState.voiceStability;
-    
-    // 音量チェック
-    if (!result.volume || result.volume < globalState.voiceDetectionThreshold) {
-        return false;
-    }
-    
-    // 音程チェック：周波数と音程名の両方が必要
+
+    // 音程チェック：周波数と音程名の両方が必要（最優先）
     if (!result.frequency || !result.note) {
         console.log('🔇 音程が検出されていません:', {
             frequency: result.frequency,
             note: result.note
         });
+        // 継続検出もリセット
+        stability.lowFreqContinuousStart = null;
         return false;
     }
-    
+
     // 人間の声の周波数範囲チェック
     if (result.frequency < stability.minFrequencyForVoice ||
         result.frequency > stability.maxFrequencyForVoice) {
@@ -244,14 +241,21 @@ function isStableVoiceDetection(result) {
     }
 
     // 🎵 v3.1.5新機能: 低音域用の代替基準（継続検出）
-    // 70Hz以上の声を1秒以上継続検出した場合、安定性チェックをバイパス
-    if (result.frequency >= stability.minFrequencyForVoice) {
+    // 100Hz以下の低音域で1秒以上継続検出した場合、安定性チェックをバイパス
+    // 低音域は音量が小さくなりやすいため、緩和された音量閾値を使用
+    const lowFreqVolumeThreshold = globalState.voiceDetectionThreshold * 0.5; // 通常の50%
+    const hasMinVolume = result.volume && result.volume >= lowFreqVolumeThreshold;
+    const isLowFrequency = result.frequency <= 100; // 100Hz以下を低音域と判定
+
+    if (isLowFrequency && result.frequency >= stability.minFrequencyForVoice && hasMinVolume) {
         // 初回検出時にタイムスタンプを記録
         if (stability.lowFreqContinuousStart === null) {
             stability.lowFreqContinuousStart = now;
             console.log('🎤 低音域継続検出開始:', {
                 frequency: result.frequency.toFixed(1) + 'Hz',
-                note: result.note
+                note: result.note,
+                volume: (result.volume * 100).toFixed(1) + '%',
+                threshold: (lowFreqVolumeThreshold * 100).toFixed(1) + '%'
             });
         }
 
@@ -269,15 +273,35 @@ function isStableVoiceDetection(result) {
             console.log('🟡 低音域継続検出中:', {
                 frequency: result.frequency.toFixed(1) + 'Hz',
                 duration: (continuousDuration / 1000).toFixed(1) + '秒',
-                required: (stability.lowFreqContinuousDuration / 1000) + '秒'
+                required: (stability.lowFreqContinuousDuration / 1000) + '秒',
+                volume: (result.volume * 100).toFixed(1) + '%'
             });
         }
     } else {
-        // 70Hz未満なので継続検出をリセット
+        // 条件を満たさない場合は継続検出をリセット
         if (stability.lowFreqContinuousStart !== null) {
-            console.log('⚠️ 低音域継続検出リセット（周波数低下）');
+            let reason = '不明';
+            if (!isLowFrequency) {
+                reason = '高音域に移行（100Hz超）';
+            } else if (!hasMinVolume) {
+                reason = '音量不足';
+            } else {
+                reason = '周波数範囲外';
+            }
+
+            console.log('⚠️ 低音域継続検出リセット:', {
+                reason: reason,
+                frequency: result.frequency ? result.frequency.toFixed(1) + 'Hz' : 'なし',
+                volume: result.volume ? (result.volume * 100).toFixed(1) + '%' : 'なし',
+                threshold: (lowFreqVolumeThreshold * 100).toFixed(1) + '%'
+            });
             stability.lowFreqContinuousStart = null;
         }
+    }
+
+    // 通常の音量チェック（継続検出で成功しなかった場合）
+    if (!result.volume || result.volume < globalState.voiceDetectionThreshold) {
+        return false;
     }
 
     // 古い履歴を削除
