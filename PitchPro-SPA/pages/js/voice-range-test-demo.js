@@ -200,8 +200,9 @@ let globalState = {
         },
         startTime: null,
         endTime: null,
-        // 測定成功判定の最小要件
-        minRequiredDataPoints: 20 // 3秒間で最低20個のデータが必要（約6-7fps相当）
+        // 測定成功判定の最小要件（v3.1.1更新）
+        minRequiredDataPoints: 60 // 3秒間で最低60個のデータが必要（2秒間の安定発声相当、30fps想定）
+        // 理論的根拠: 3秒間の構造 = Attack(1秒) + Sustain(2秒/60データ) + Release(0.3秒許容)
     }
 };;;
 /**
