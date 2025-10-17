@@ -1199,14 +1199,28 @@ function completeLowPitchMeasurement() {
     const hasContinuityError = globalState.hasContinuityFailure;
 
     // 🎵 v3.1.2新機能: 実際の発声期間をチェック（60fps以上での1秒成功を防止）
+    // 🎵 v3.1.8修正: 有効な周波数データのみを使用して期間を計算
     let actualVocalizationDuration = 0;
     let hasInsufficientDuration = false;
     if (dataCount > 0) {
-        const firstDataTime = lowData.frequencies[0].timestamp;
-        const lastDataTime = lowData.frequencies[lowData.frequencies.length - 1].timestamp;
-        actualVocalizationDuration = lastDataTime - firstDataTime;
+        // 有効な周波数データ（frequency > 0）のみをフィルタリング
+        const validFrequencyData = lowData.frequencies.filter(d => d.frequency && d.frequency > 0);
+
+        if (validFrequencyData.length > 0) {
+            const firstDataTime = validFrequencyData[0].timestamp;
+            const lastDataTime = validFrequencyData[validFrequencyData.length - 1].timestamp;
+            actualVocalizationDuration = lastDataTime - firstDataTime;
+        }
+
         const minVocalizationDuration = 1500; // 最低1.5秒の発声が必要
         hasInsufficientDuration = actualVocalizationDuration < minVocalizationDuration;
+
+        console.log('🔍 発声期間詳細分析:', {
+            '全データ数': dataCount,
+            '有効データ数': validFrequencyData.length,
+            '実際の発声期間': (actualVocalizationDuration / 1000).toFixed(2) + '秒',
+            '最低要求期間': (minVocalizationDuration / 1000) + '秒'
+        });
     }
 
     console.log('低音測定データ検証:', {
@@ -1603,14 +1617,28 @@ function completeHighPitchMeasurement() {
     const hasContinuityError = globalState.hasContinuityFailure;
 
     // 🎵 v3.1.2新機能: 実際の発声期間をチェック（60fps以上での1秒成功を防止）
+    // 🎵 v3.1.8修正: 有効な周波数データのみを使用して期間を計算
     let actualVocalizationDuration = 0;
     let hasInsufficientDuration = false;
     if (dataCount > 0) {
-        const firstDataTime = highData.frequencies[0].timestamp;
-        const lastDataTime = highData.frequencies[highData.frequencies.length - 1].timestamp;
-        actualVocalizationDuration = lastDataTime - firstDataTime;
+        // 有効な周波数データ（frequency > 0）のみをフィルタリング
+        const validFrequencyData = highData.frequencies.filter(d => d.frequency && d.frequency > 0);
+
+        if (validFrequencyData.length > 0) {
+            const firstDataTime = validFrequencyData[0].timestamp;
+            const lastDataTime = validFrequencyData[validFrequencyData.length - 1].timestamp;
+            actualVocalizationDuration = lastDataTime - firstDataTime;
+        }
+
         const minVocalizationDuration = 1500; // 最低1.5秒の発声が必要
         hasInsufficientDuration = actualVocalizationDuration < minVocalizationDuration;
+
+        console.log('🔍 発声期間詳細分析:', {
+            '全データ数': dataCount,
+            '有効データ数': validFrequencyData.length,
+            '実際の発声期間': (actualVocalizationDuration / 1000).toFixed(2) + '秒',
+            '最低要求期間': (minVocalizationDuration / 1000) + '秒'
+        });
     }
 
     console.log('高音測定データ検証:', {
