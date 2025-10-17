@@ -1128,9 +1128,15 @@ function setupMicPermissionFlow() {
             const detectionMeters = document.querySelector('.detection-meters');
             const controlButtons = document.querySelector('#range-test-section > .text-center.mt-6');
 
-            if (mainStatusText) mainStatusText.style.display = '';
+            if (mainStatusText) {
+                mainStatusText.style.display = '';
+                mainStatusText.textContent = '「音域テスト開始」ボタンでテストを開始してください';
+            }
             if (rangeTestLayoutFlex) rangeTestLayoutFlex.style.display = '';
-            if (subInfoText) subInfoText.style.display = '';
+            if (subInfoText) {
+                subInfoText.style.display = '';
+                subInfoText.textContent = '待機中...';
+            }
             if (detectionMeters) detectionMeters.style.display = '';
             if (controlButtons) controlButtons.style.display = '';
 
