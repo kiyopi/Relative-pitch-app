@@ -16,8 +16,8 @@
 - **シンプルなUX**: 基準音なし・自由発声による直感的な測定方式
 
 ### ⚠️ v3.1の主要変更点（最新）
-1. **音声連続性チェック**: 測定中の無音検出による即座の失敗判定（0.3秒以上の無音で中断）
-2. **測定中断ハンドラー**: `handleMeasurementInterruption()`関数による即座の失敗処理
+1. **音声連続性チェック**: 測定中の無音検出によるフラグベース失敗判定（0.3秒以上の無音でフラグ設定）
+2. **遅延判定方式**: 測定中はフラグのみ設定、3秒完了後に失敗判定を実施
 3. **ユーザーメッセージ強化**: 「3秒間継続して発声してください」の明確な指示
 4. **失敗フロー全体図**: 連続性チェックを含む完全なフロー図を追加
 
@@ -77,7 +77,8 @@ const lowRangeTest = {
       enabled: true,
       maxSilentFrames: 10,     // 最大無音フレーム数（約0.3秒）
       silentThreshold: 0.03,   // 音量閾値の20%（0.15 * 0.2 = 0.03）
-      interruptionAction: 'immediate_failure'  // 即座に測定失敗
+      judgmentTiming: 'deferred',  // 遅延判定（3秒完了後に判定）
+      useFlagBased: true       // フラグベース方式を使用
     }
   }
 };
@@ -92,8 +93,9 @@ const lowRangeTest = {
    - **連続性チェック（v3.1）**: 音声データの連続性を監視
      - 有効な音声検出 → 無音カウンターリセット
      - 無音検出 → 無音カウンター++
-     - 連続10フレーム無音（約0.3秒） → **即座に測定失敗**
+     - 連続10フレーム無音（約0.3秒） → **`hasContinuityFailure`フラグを設定**（測定は継続）
 6. **完了判定**: 3秒経過後`completeLowPitchMeasurement()`実行
+   - **連続性フラグチェック**: `hasContinuityFailure`が`true`の場合は失敗判定
 7. **成功/失敗処理**:
    - 成功: チェックマーク表示 → 高音テストへ
    - 失敗: `handleLowPitchMeasurementFailure()` → リトライまたはスキップ
@@ -131,7 +133,8 @@ const highRangeTest = {
       enabled: true,
       maxSilentFrames: 10,
       silentThreshold: 0.03,
-      interruptionAction: 'immediate_failure'
+      judgmentTiming: 'deferred',  // 遅延判定（3秒完了後に判定）
+      useFlagBased: true       // フラグベース方式を使用
     }
   }
 };
@@ -348,6 +351,7 @@ const globalState = {
   // 音声連続性チェック（v3.1新機能）
   silentFrameCount: 0,              // 無音フレームカウンター
   maxSilentFrames: 10,              // 最大無音フレーム数（約0.3秒）
+  hasContinuityFailure: false,      // 連続性失敗フラグ（遅延判定用）
 
   // 測定データ
   measurementData: {
@@ -469,20 +473,21 @@ function calculatePartialVoiceRange() {
 }
 ```
 
-### 測定中断処理（v3.1新機能）
+### 連続性チェック処理（v3.1新機能）
 
-#### 音声連続性チェックの実装
+#### フラグベース遅延判定の実装
 ```javascript
 /**
- * 測定データ記録と音声連続性チェック
- * 測定中に音声が途切れた場合は即座に測定失敗
+ * 測定データ記録と音声連続性チェック（フラグベース方式）
+ * 測定中に音声が途切れた場合はフラグを設定するが、測定は継続
+ * 実際の失敗判定は3秒完了後に実施
  */
 function recordMeasurementData(result) {
   const currentPhase = globalState.currentPhase;
 
-  // 測定中のみ連続性チェック
+  // 🎵 v3.1新機能: 測定中のみ音声連続性チェック
   if (currentPhase === 'measuring-low' || currentPhase === 'measuring-high') {
-    // 有効な音声データの判定
+    // 有効な音声データの判定（音量閾値の20%以上）
     const isValidVoice = result.frequency &&
                          result.volume &&
                          result.volume >= globalState.voiceDetectionThreshold * 0.2;
@@ -492,11 +497,13 @@ function recordMeasurementData(result) {
       globalState.silentFrameCount++;
 
       if (globalState.silentFrameCount > globalState.maxSilentFrames) {
-        // 連続無音検出 → 測定中断
-        console.error('❌ 測定中断: 音声が途切れました');
-        console.error(`📊 無音フレーム数: ${globalState.silentFrameCount}フレーム（0.${Math.round(globalState.silentFrameCount * 33)}秒相当）`);
-        handleMeasurementInterruption();
-        return;
+        // 連続無音検出 → フラグを立てる（即座には中断しない）
+        if (!globalState.hasContinuityFailure) {
+          console.warn('⚠️ 音声途切れ検出: 連続性失敗フラグを設定');
+          console.warn(`📊 無音フレーム数: ${globalState.silentFrameCount}フレーム（約${Math.round(globalState.silentFrameCount * 33)}ms相当）`);
+          globalState.hasContinuityFailure = true;
+        }
+        // 測定は継続（3秒後に判定）
       }
     } else {
       // 有効な音声検出 → カウンターリセット
@@ -511,29 +518,51 @@ function recordMeasurementData(result) {
 }
 
 /**
- * 測定中断ハンドラー
- * タイマー停止・UI更新・失敗処理へ移行
+ * 低音測定完了時の連続性フラグチェック
+ * 3秒経過後にフラグを確認し、失敗判定を実施
  */
-function handleMeasurementInterruption() {
-  // 測定タイマー停止
-  if (globalState.measurementTimer) {
-    clearTimeout(globalState.measurementTimer);
-    globalState.measurementTimer = null;
-  }
+function completeLowPitchMeasurement() {
+  const lowData = globalState.measurementData.lowPhase;
+  const dataCount = lowData.frequencies.length;
+  const minRequired = 15;
+  const hasValidData = dataCount >= minRequired && lowData.lowestFreq !== null;
 
-  // プログレスバーリセット
-  updateCircularProgressInstantly(0);
+  // 🎵 v3.1新機能: 連続性失敗フラグをチェック
+  const hasContinuityError = globalState.hasContinuityFailure;
 
-  // 失敗メッセージ表示
-  if (globalState.currentPhase === 'measuring-low') {
-    document.getElementById('main-status-text').textContent = '低音測定失敗';
-    document.getElementById('sub-info-text').textContent = '3秒間継続して発声してください';
+  console.log('低音測定データ検証:', {
+    'データ数': dataCount,
+    '最低必要数': minRequired,
+    '最低音': lowData.lowestFreq ? `${lowData.lowestFreq.toFixed(1)} Hz (${lowData.lowestNote})` : 'なし',
+    '連続性': hasContinuityError ? '❌ 途切れあり' : '✅ 正常',
+    '判定結果': (hasValidData && !hasContinuityError) ? '✅ 成功' : '❌ 失敗'
+  });
+
+  if (hasValidData && !hasContinuityError) {
+    // 成功処理
+    console.log('✅ 低音測定成功');
+    // ... 成功処理の続き
+  } else {
+    // 失敗処理
+    console.warn('❌ 低音測定失敗');
+    if (hasContinuityError) {
+      document.getElementById('sub-info-text').textContent = '3秒間継続して発声してください';
+    }
     handleLowPitchMeasurementFailure();
-  } else if (globalState.currentPhase === 'measuring-high') {
-    document.getElementById('main-status-text').textContent = '高音測定失敗';
-    document.getElementById('sub-info-text').textContent = '3秒間継続して発声してください';
-    handleHighPitchMeasurementFailure();
   }
+}
+
+/**
+ * 測定開始時のフラグリセット
+ * 各測定開始時に無音カウンターと連続性フラグをリセット
+ */
+function startLowPitchMeasurement() {
+  // 🎵 v3.1新機能: 無音カウンターと連続性フラグをリセット
+  globalState.silentFrameCount = 0;
+  globalState.hasContinuityFailure = false;
+  console.log('🔄 無音カウンター・連続性フラグリセット完了');
+
+  // ... 測定開始処理の続き
 }
 ```
 
@@ -541,6 +570,8 @@ function handleMeasurementInterruption() {
 
 ```
 【測定開始】
+  ↓
+【無音カウンター・連続性フラグをリセット】
   ↓
 【3秒間タイマー開始】
   ↓
@@ -554,19 +585,33 @@ function handleMeasurementInterruption() {
   │      ↓
   │    【カウンター > 10フレーム？】
   │      ├─ NO → 継続
-  │      └─ YES → 【即座に測定中断】
+  │      └─ YES → 【hasContinuityFailure = true】
   │                 ↓
-  │               handleMeasurementInterruption()
+  │               ⚠️ フラグ設定（測定は継続）
   │                 ↓
-  │               handleLowPitchMeasurementFailure()
-  │                 ↓
-  │               【リトライ判定】
-  │                 ├─ リトライ < 3回 → 再測定
-  │                 └─ リトライ >= 3回 → スキップ
+  │               【データ収集継続】
   │
-  └─ 【3秒間継続成功】
+  └─ 【3秒経過】
       ↓
-    【測定完了】→ ✅ 成功
+    completeLowPitchMeasurement()
+      ↓
+    【連続性フラグチェック】
+      ├─ hasContinuityFailure = false → ✅ 成功
+      │                                   ↓
+      │                                 チェックマーク表示
+      │                                   ↓
+      │                                 高音測定へ移行
+      │
+      └─ hasContinuityFailure = true → ❌ 失敗
+                                         ↓
+                                       失敗メッセージ表示
+                                       「3秒間継続して発声してください」
+                                         ↓
+                                       handleLowPitchMeasurementFailure()
+                                         ↓
+                                       【リトライ判定】
+                                         ├─ リトライ < 3回 → 再測定
+                                         └─ リトライ >= 3回 → スキップ
 ```
 
 ---
@@ -656,12 +701,13 @@ const measurementQualityCriteria = {
 ## 🔄 バージョン管理
 
 ### v3.1.0 (2025-01-21) 🆕
-- **音声連続性チェック**: 測定中の無音検出による即座の失敗判定機能追加
-- **無音フレームカウンター**: 最大10フレーム（約0.3秒）の連続無音で測定中断
-- **測定中断ハンドラー**: `handleMeasurementInterruption()`関数の実装
+- **音声連続性チェック**: 測定中の無音検出によるフラグベース失敗判定機能追加
+- **遅延判定方式**: 測定中はフラグのみ設定、3秒完了後に失敗判定を実施
+- **無音フレームカウンター**: 最大10フレーム（約0.3秒）の連続無音で`hasContinuityFailure`フラグ設定
+- **完了時失敗判定**: `completeLowPitchMeasurement()`および`completeHighPitchMeasurement()`でフラグチェック
 - **ユーザーメッセージ強化**: 「3秒間継続して発声してください」の明確な指示
-- **失敗フロー全体図**: 連続性チェックを含む完全なフロー図を追加
-- **globalState拡張**: `silentFrameCount`および`maxSilentFrames`プロパティ追加
+- **失敗フロー全体図**: フラグベース連続性チェックを含む完全なフロー図を追加
+- **globalState拡張**: `silentFrameCount`、`maxSilentFrames`、`hasContinuityFailure`プロパティ追加
 
 ### v3.0.0 (2025-01-20)
 - **PitchPro v1.3.0完全対応**: コンストラクタパターン、デバイス最適化
