@@ -1130,15 +1130,28 @@ function completeLowPitchMeasurement() {
     // 🎵 v3.1新機能: 連続性失敗フラグをチェック
     const hasContinuityError = globalState.hasContinuityFailure;
 
+    // 🎵 v3.1.2新機能: 実際の発声期間をチェック（60fps以上での1秒成功を防止）
+    let actualVocalizationDuration = 0;
+    let hasInsufficientDuration = false;
+    if (dataCount > 0) {
+        const firstDataTime = lowData.frequencies[0].timestamp;
+        const lastDataTime = lowData.frequencies[lowData.frequencies.length - 1].timestamp;
+        actualVocalizationDuration = lastDataTime - firstDataTime;
+        const minVocalizationDuration = 1500; // 最低1.5秒の発声が必要
+        hasInsufficientDuration = actualVocalizationDuration < minVocalizationDuration;
+    }
+
     console.log('低音測定データ検証:', {
         'データ数': dataCount,
         '最低必要数': minRequired,
         '最低音': lowData.lowestFreq ? `${lowData.lowestFreq.toFixed(1)} Hz (${lowData.lowestNote})` : 'なし',
         '連続性': hasContinuityError ? '❌ 途切れあり' : '✅ 正常',
-        '判定結果': (hasValidData && !hasContinuityError) ? '✅ 成功' : '❌ 失敗'
+        '発声期間': actualVocalizationDuration > 0 ? `${(actualVocalizationDuration / 1000).toFixed(2)}秒` : '0秒',
+        '期間判定': hasInsufficientDuration ? '❌ 短すぎる（1.5秒未満）' : '✅ 十分',
+        '判定結果': (hasValidData && !hasContinuityError && !hasInsufficientDuration) ? '✅ 成功' : '❌ 失敗'
     });
 
-    if (hasValidData && !hasContinuityError) {
+    if (hasValidData && !hasContinuityError && !hasInsufficientDuration) {
         console.log('✅ 低音域測定成功:', {
             dataCount: lowData.frequencies.length,
             lowestFreq: lowData.lowestFreq,
@@ -1530,15 +1543,28 @@ function completeHighPitchMeasurement() {
     // 🎵 v3.1新機能: 連続性失敗フラグをチェック
     const hasContinuityError = globalState.hasContinuityFailure;
 
+    // 🎵 v3.1.2新機能: 実際の発声期間をチェック（60fps以上での1秒成功を防止）
+    let actualVocalizationDuration = 0;
+    let hasInsufficientDuration = false;
+    if (dataCount > 0) {
+        const firstDataTime = highData.frequencies[0].timestamp;
+        const lastDataTime = highData.frequencies[highData.frequencies.length - 1].timestamp;
+        actualVocalizationDuration = lastDataTime - firstDataTime;
+        const minVocalizationDuration = 1500; // 最低1.5秒の発声が必要
+        hasInsufficientDuration = actualVocalizationDuration < minVocalizationDuration;
+    }
+
     console.log('高音測定データ検証:', {
         'データ数': dataCount,
         '最低必要数': minRequired,
         '最高音': highData.highestFreq ? `${highData.highestFreq.toFixed(1)} Hz (${highData.highestNote})` : 'なし',
         '連続性': hasContinuityError ? '❌ 途切れあり' : '✅ 正常',
-        '判定結果': (hasValidData && !hasContinuityError) ? '✅ 成功' : '❌ 失敗'
+        '発声期間': actualVocalizationDuration > 0 ? `${(actualVocalizationDuration / 1000).toFixed(2)}秒` : '0秒',
+        '期間判定': hasInsufficientDuration ? '❌ 短すぎる（1.5秒未満）' : '✅ 十分',
+        '判定結果': (hasValidData && !hasContinuityError && !hasInsufficientDuration) ? '✅ 成功' : '❌ 失敗'
     });
 
-    if (hasValidData && !hasContinuityError) {
+    if (hasValidData && !hasContinuityError && !hasInsufficientDuration) {
         console.log('✅ 高音域測定成功:', {
             dataCount: highData.frequencies.length,
             highestFreq: highData.highestFreq,
