@@ -2722,3 +2722,17 @@ UIカタログのボタン幅バリエーションパターンに準拠
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-17 16:03:49] コミット: docs: CLAUDE.mdにUIカタログ・絵文字禁止ルールを追加
+
+- 注意すべきこと（最重要）セクションに追加:
+  - 3. UIカタログ準拠: ui-catalog-essentials.html確認必須
+  - 4. 絵文字使用禁止: Lucideアイコンのみ使用・絵文字は一切使用しない
+- UIカタログシステム活用セクションに追加:
+  - アイコン統一: Lucideアイコンのみ使用・絵文字は一切使用しない
+
+開発ガイドライン完全性向上
+アプリ全体のUI統一方針を明確化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
