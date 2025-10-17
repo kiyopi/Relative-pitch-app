@@ -2642,3 +2642,18 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-17 15:11:20] コミット: fix: 音域測定結果表示エラー修正 - ID統一（results-section）
+
+- voice-range-test-demo.js内の全ての「result-section」を「results-section」に統一
+- 修正箇所：
+  - line 34: displayVoiceRangeResults結果表示時
+  - line 385: 再測定ボタン処理時
+  - line 892: displayVoiceRangeResults関数内（エラー発生箇所）
+- HTMLの#results-sectionと完全一致、TypeError解消
+
+エラー解決：
+TypeError: null is not an object (evaluating 'document.getElementById('result-section').classList')
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
