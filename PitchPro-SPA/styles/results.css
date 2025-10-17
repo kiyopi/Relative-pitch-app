@@ -578,6 +578,37 @@
         max-width: 800px;
         margin: 0 auto;
     }
+
+    .base-note-section {
+        grid-area: left;
+        justify-self: center;
+    }
+
+    .trophy-section {
+        grid-area: center;
+    }
+
+    .error-section {
+        grid-area: right;
+        justify-self: center;
+    }
+
+    .score-base-note {
+        font-size: 2.5rem; /* 40px */
+    }
+
+    .score-average {
+        font-size: 2.5rem; /* 40px */
+    }
+
+    /* ラベルフォントを大きく */
+    .base-note-section p {
+        font-size: 1.125rem; /* 18px */
+    }
+
+    .error-section p {
+        font-size: 1.125rem; /* 18px */
+    }
 }
 
 /* セッショングリッドシステム */

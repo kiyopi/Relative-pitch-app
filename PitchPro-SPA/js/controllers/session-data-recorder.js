@@ -1,0 +1,157 @@
+/**
+ * セッションデータ記録モジュール
+ * @version 1.0.0
+ * @description トレーニングセッションの音程誤差データを記録
+ */
+
+class SessionDataRecorder {
+    constructor() {
+        this.currentSession = null;
+        this.sessionCounter = 0;
+    }
+
+    /**
+     * 新しいセッションを開始
+     * @param {string} baseNote - 基音（例: "C4"）
+     * @param {number} baseFrequency - 基音周波数（Hz）
+     */
+    startNewSession(baseNote, baseFrequency) {
+        this.sessionCounter++;
+
+        this.currentSession = {
+            sessionId: this.sessionCounter,
+            mode: 'random', // ランダム基音モード
+            baseNote: baseNote,
+            baseFrequency: baseFrequency,
+            startTime: Date.now(),
+            pitchErrors: [],
+            completed: false
+        };
+
+        console.log('📊 新しいセッション開始:', this.currentSession);
+        return this.currentSession;
+    }
+
+    /**
+     * 音程誤差を記録
+     * @param {number} step - ステップ番号（0-7: ド-ド）
+     * @param {string} expectedNote - 期待される音名（例: "C4"）
+     * @param {number} expectedFrequency - 期待される周波数（Hz）
+     * @param {number} detectedFrequency - 検出された周波数（Hz）
+     * @param {number} clarity - 明瞭度（0-1）
+     * @param {number} volume - 音量（0-1）
+     */
+    recordPitchError(step, expectedNote, expectedFrequency, detectedFrequency, clarity, volume) {
+        if (!this.currentSession) {
+            console.warn('⚠️ セッションが開始されていません');
+            return;
+        }
+
+        // セント単位の誤差計算（1オクターブ = 1200セント）
+        const errorInCents = this.calculateCentError(detectedFrequency, expectedFrequency);
+
+        const pitchData = {
+            step,
+            expectedNote,
+            expectedFrequency,
+            detectedFrequency,
+            errorInCents: parseFloat(errorInCents.toFixed(1)), // 小数点1位
+            clarity: parseFloat(clarity.toFixed(3)),
+            volume: parseFloat(volume.toFixed(3)),
+            timestamp: Date.now()
+        };
+
+        this.currentSession.pitchErrors.push(pitchData);
+
+        console.log(`📊 音程誤差記録 [Step ${step}]:`, pitchData);
+
+        return pitchData;
+    }
+
+    /**
+     * セント単位の誤差計算
+     * @param {number} detected - 検出周波数
+     * @param {number} expected - 期待周波数
+     * @returns {number} セント単位の誤差
+     */
+    calculateCentError(detected, expected) {
+        if (!detected || !expected || detected <= 0 || expected <= 0) {
+            return 0;
+        }
+        return 1200 * Math.log2(detected / expected);
+    }
+
+    /**
+     * セッションを完了してlocalStorageに保存
+     */
+    completeSession() {
+        if (!this.currentSession) {
+            console.warn('⚠️ 完了するセッションがありません');
+            return null;
+        }
+
+        this.currentSession.completed = true;
+        this.currentSession.endTime = Date.now();
+        this.currentSession.duration = this.currentSession.endTime - this.currentSession.startTime;
+
+        console.log('✅ セッション完了:', this.currentSession);
+
+        // localStorageに保存
+        this.saveToStorage(this.currentSession);
+
+        const completedSession = { ...this.currentSession };
+        this.currentSession = null;
+
+        return completedSession;
+    }
+
+    /**
+     * localStorageにセッションデータを保存
+     */
+    saveToStorage(session) {
+        try {
+            // 既存のセッションデータを取得
+            const existingSessions = DataManager.getFromStorage('sessionData') || [];
+
+            // 新しいセッションを追加
+            existingSessions.push(session);
+
+            // 保存（最大100セッションまで保持）
+            const recentSessions = existingSessions.slice(-100);
+            DataManager.saveToStorage('sessionData', recentSessions);
+
+            console.log(`✅ セッションデータ保存完了 (総セッション数: ${recentSessions.length})`);
+
+        } catch (error) {
+            console.error('❌ セッションデータ保存エラー:', error);
+        }
+    }
+
+    /**
+     * 現在のセッション情報を取得
+     */
+    getCurrentSession() {
+        return this.currentSession;
+    }
+
+    /**
+     * セッション番号を取得
+     */
+    getSessionNumber() {
+        return this.sessionCounter;
+    }
+
+    /**
+     * セッションをリセット（エラー時など）
+     */
+    resetSession() {
+        console.warn('⚠️ セッションをリセット');
+        this.currentSession = null;
+    }
+}
+
+// グローバルインスタンス
+window.sessionDataRecorder = new SessionDataRecorder();
+
+// グローバル公開
+window.SessionDataRecorder = SessionDataRecorder;

@@ -11,6 +11,11 @@ let currentIntervalIndex = 0;
 let baseNoteInfo = null;
 const intervals = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド'];
 
+// セッションデータ記録用
+let sessionRecorder = null;
+let expectedNotes = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
+let expectedFrequencies = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25];
+
 export async function initializeTrainingPage() {
     console.log('TrainingController initializing...');
 
@@ -19,6 +24,9 @@ export async function initializeTrainingPage() {
 
     // Initialize mode UI
     initializeModeUI();
+
+    // Update session progress UI
+    updateSessionProgressUI();
 
     // Setup button (常に再登録)
     const playButton = document.getElementById('play-base-note');
@@ -204,8 +212,17 @@ async function startTraining() {
         }
 
         // ランダム基音再生（2秒）と同時にインターバル開始（2.5秒）
-        const baseNoteInfo = await pitchShifter.playRandomNote(2);
+        baseNoteInfo = await pitchShifter.playRandomNote(2);
         console.log('🎵 基音再生:', baseNoteInfo);
+
+        // セッションデータ記録開始
+        if (window.sessionDataRecorder) {
+            sessionRecorder = window.sessionDataRecorder;
+            sessionRecorder.startNewSession(baseNoteInfo.note, baseNoteInfo.frequency);
+            console.log('📊 セッションデータ記録開始');
+        } else {
+            console.warn('⚠️ SessionDataRecorderが読み込まれていません');
+        }
 
         // 基音再生と同時にインターバルカウントダウン開始（2.5秒、各0.5秒）
         console.log('⏱️ ドレミガイド開始インターバル開始（2.5秒）');
@@ -237,23 +254,27 @@ async function startTraining() {
     }
 }
 
-// インターバルカウントダウン（2.5秒間、各0.5秒）
+// インターバルカウントダウン（2.5秒間、3ブロック）
 function startIntervalCountdown(squares) {
     // すべての四角をリセット
     squares.forEach(sq => sq.classList.remove('consumed'));
 
-    // 0.5秒ごとに1つずつ消費（2.5秒で5個完了）
+    // 最初の3個のみ使用（2.5秒で3個完了、各約0.83秒）
+    const blocksToUse = 3;
+    const intervalDuration = 2500; // 2.5秒
+    const blockInterval = intervalDuration / blocksToUse; // 約833ms
+
     let count = 0;
     const intervalTimer = setInterval(() => {
-        if (count < squares.length) {
+        if (count < blocksToUse) {
             squares[count].classList.add('consumed');
             count++;
-            console.log(`⏱️ インターバル進行: ${count}/5 (${count * 0.5}秒経過)`);
+            console.log(`⏱️ インターバル進行: ${count}/${blocksToUse} (${(count * blockInterval / 1000).toFixed(2)}秒経過)`);
         } else {
             clearInterval(intervalTimer);
             console.log('✅ インターバル完了（2.5秒）');
         }
-    }, 500); // 0.5秒間隔
+    }, blockInterval); // 約833ms間隔
 }
 
 // ドレミガイド開始
@@ -305,11 +326,19 @@ async function startDoremiGuide() {
     // ドレミガイド進行（ユーザーが基音をもとに発声、アプリは音を鳴らさない）
     const noteSequence = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
 
+    // 音程データバッファをリセット
+    pitchDataBuffer = [];
+
     for (let i = 0; i < noteSequence.length; i++) {
-        // 前の音符を完了状態に
+        currentIntervalIndex = i;
+
+        // 前の音符を完了状態に & データ記録
         if (i > 0) {
             circles[i - 1]?.classList.remove('current');
             circles[i - 1]?.classList.add('completed');
+
+            // 前のステップのデータを記録
+            recordStepPitchData(i - 1);
         }
 
         // 現在の音符をハイライト
@@ -318,13 +347,14 @@ async function startDoremiGuide() {
 
         // ユーザーの発声時間を確保（700ms間隔）
         await new Promise(resolve => setTimeout(resolve, 700));
-
-        currentIntervalIndex = i + 1;
     }
 
-    // 最後の音符を完了状態に
+    // 最後の音符を完了状態に & データ記録
     circles[noteSequence.length - 1]?.classList.remove('current');
     circles[noteSequence.length - 1]?.classList.add('completed');
+    recordStepPitchData(noteSequence.length - 1);
+
+    currentIntervalIndex = noteSequence.length;
 
     // トレーニング完了
     handleSessionComplete();
@@ -332,6 +362,7 @@ async function startDoremiGuide() {
 
 // リアルタイム音程更新ハンドラ
 let lastPitchLog = null;
+let pitchDataBuffer = []; // 各ステップの音程データを一時保存
 function handlePitchUpdate(result) {
     // AudioDetectionComponentからのresultは直接PitchProの形式
     // result: { frequency, clarity, volume, note }
@@ -345,7 +376,61 @@ function handlePitchUpdate(result) {
             console.log(`🎵 音程検出: ${result.frequency.toFixed(1)}Hz (${result.note || ''}), 明瞭度: ${result.clarity.toFixed(2)}, 音量: ${(result.volume * 100).toFixed(1)}%`);
             lastPitchLog = Date.now();
         }
+
+        // 音程データをバッファに追加（明瞭度が十分な場合のみ）
+        if (currentIntervalIndex < expectedNotes.length) {
+            pitchDataBuffer.push({
+                step: currentIntervalIndex,
+                frequency: result.frequency,
+                clarity: result.clarity,
+                volume: result.volume,
+                timestamp: Date.now()
+            });
+        }
     }
+}
+
+/**
+ * 各ステップの音程データを記録
+ */
+function recordStepPitchData(step) {
+    if (!sessionRecorder) return;
+
+    // このステップの音程データを取得（直近700ms間のデータ）
+    const stepData = pitchDataBuffer.filter(d => d.step === step);
+
+    if (stepData.length === 0) {
+        console.warn(`⚠️ Step ${step}: 音程データが記録されていません`);
+        // ダミーデータで記録（エラー回避）
+        sessionRecorder.recordPitchError(
+            step,
+            expectedNotes[step],
+            expectedFrequencies[step],
+            0,
+            0,
+            0
+        );
+        return;
+    }
+
+    // 最も明瞭度が高いデータを使用
+    const bestData = stepData.reduce((best, current) =>
+        current.clarity > best.clarity ? current : best
+    );
+
+    // 基音からの相対周波数を計算
+    const relativeFrequency = bestData.frequency * Math.pow(2, step / 12);
+
+    sessionRecorder.recordPitchError(
+        step,
+        expectedNotes[step],
+        expectedFrequencies[step],
+        relativeFrequency,
+        bestData.clarity,
+        bestData.volume
+    );
+
+    console.log(`📊 Step ${step} データ記録: ${bestData.frequency.toFixed(1)}Hz → ${relativeFrequency.toFixed(1)}Hz`);
 }
 
 // セッション完了ハンドラ
@@ -369,6 +454,20 @@ function handleSessionComplete() {
         volumeBar.style.width = '0%';
         console.log('🔄 音量バーリセット');
     }
+
+    // セッションデータを保存
+    if (sessionRecorder) {
+        const completedSession = sessionRecorder.completeSession();
+        console.log('✅ セッションデータ保存完了:', completedSession);
+
+        // セッション結果ページへ遷移（SPAのハッシュルーティング）
+        const sessionNumber = sessionRecorder.getSessionNumber();
+        window.location.hash = `result-session?session=${sessionNumber}`;
+        return; // 以降の処理はスキップ
+    }
+
+    // sessionRecorderがない場合のフォールバック（開発中）
+    console.warn('⚠️ SessionDataRecorderが利用できません。結果ページへの遷移をスキップします。');
 
     // ステータステキスト更新
     const statusText = document.getElementById('training-status');
@@ -407,4 +506,29 @@ function handleSessionComplete() {
 export function resetTrainingPageFlag() {
     isInitialized = false;
     console.log('TrainingController reset');
+}
+
+/**
+ * セッション進行状況UIを更新
+ */
+function updateSessionProgressUI() {
+    // セッションカウンターを取得
+    const sessionCounter = window.sessionDataRecorder ? window.sessionDataRecorder.getSessionNumber() : 0;
+    const currentSession = sessionCounter + 1; // 次のセッション番号
+    const totalSessions = 8;
+
+    console.log(`📊 セッション進行状況: ${currentSession}/${totalSessions}`);
+
+    // 進行バーを更新
+    const progressFill = document.querySelector('.progress-section .progress-fill');
+    if (progressFill) {
+        const progressPercentage = (sessionCounter / totalSessions) * 100;
+        progressFill.style.width = `${progressPercentage}%`;
+    }
+
+    // セッションバッジを更新
+    const sessionBadge = document.querySelector('.session-badge');
+    if (sessionBadge) {
+        sessionBadge.textContent = `セッション ${currentSession}/${totalSessions}`;
+    }
 }

@@ -7,6 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>8va相対音感トレーニング - ホーム</title>
     <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/results.css">
     <link rel="stylesheet" href="styles/training.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,10 +15,29 @@
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    
+
     <!-- JavaScript モジュール -->
     <script src="js/data-manager.js"></script>
+    <script src="js/evaluation-calculator.js"></script>
+    <script src="js/controllers/session-data-recorder.js"></script>
+    <script src="pages/js/result-session-controller.js"></script>
     <script src="pages/js/core/pitchpro-v1.3.1.umd.js"></script>
+
+    <!-- Tone.js Library (Required for PitchShifter) -->
+    <script type="importmap">
+    {
+        "imports": {
+            "tone": "https://cdn.skypack.dev/tone@15.0.4"
+        }
+    }
+    </script>
+
+    <!-- PitchShifter Library -->
+    <script type="module">
+        import { PitchShifter } from './pages/js/core/reference-tones.js';
+        window.PitchShifter = PitchShifter;
+        console.log('✅ PitchShifter loaded globally');
+    </script>
 </head>
 <body>
     <div class="container">

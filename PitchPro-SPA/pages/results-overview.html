@@ -24,8 +24,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
     
     <!-- JavaScript モジュール -->
-    <script src="../../../js/data-manager.js"></script>
-    <script src="../../../js/results-controller.js"></script>
+    <script src="../js/data-manager.js"></script>
+    <script src="../js/evaluation-calculator.js"></script>
 </head>
 <body>
     <div class="container">
@@ -373,33 +373,353 @@
 
     <!-- JavaScript -->
     <script type="module">
-        // モジュールインポート（将来的に外部ファイル化）
-        
         // Lucideアイコン初期化
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             if (typeof lucide !== 'undefined' && lucide.createIcons) {
                 lucide.createIcons();
             }
+
+            // 総合評価ページ初期化
+            await initResultsOverview();
         });
-        
-        // ページ初期化
-        class ResultsOverviewPage {
-            constructor() {
-                this.sessionData = [];
-                this.currentSessionIndex = 0;
+
+        /**
+         * 総合評価ページの初期化
+         */
+        async function initResultsOverview() {
+            console.log('📊 総合評価ページ初期化開始');
+
+            // DataManagerから全セッションデータを取得
+            const sessionData = loadAllSessionData();
+
+            if (!sessionData || sessionData.length === 0) {
+                console.warn('⚠️ セッションデータが見つかりません。ダミーデータを表示します。');
+                showDummyOverview();
+                return;
             }
-            
-            async init() {
-                // TODO: データ取得
-                // TODO: コンポーネント初期化
-                // TODO: イベントリスナー設定
-                console.log('Results Overview Page initialized');
+
+            console.log('✅ セッションデータ取得:', sessionData);
+
+            // 動的グレード計算
+            const evaluation = window.EvaluationCalculator.calculateDynamicGrade(sessionData);
+            console.log('✅ 評価結果:', evaluation);
+
+            // UI更新
+            updateOverviewUI(evaluation, sessionData);
+
+            // Chart.js初期化
+            if (typeof Chart !== 'undefined') {
+                initializeCharts(sessionData);
+            }
+
+            // Lucideアイコン再初期化
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
             }
         }
-        
-        // ページ読み込み時に初期化
-        const page = new ResultsOverviewPage();
-        page.init();
+
+        /**
+         * 全セッションデータを読み込み
+         */
+        function loadAllSessionData() {
+            try {
+                const data = DataManager.getFromStorage('sessionData') || [];
+                console.log('📊 読み込んだセッションデータ:', data);
+                return data;
+            } catch (error) {
+                console.error('❌ セッションデータ読み込みエラー:', error);
+                return [];
+            }
+        }
+
+        /**
+         * 総合評価UIを更新
+         */
+        function updateOverviewUI(evaluation, sessionData) {
+            console.log('🎨 UI更新開始:', evaluation);
+
+            // モード名更新
+            const modeTitleEl = document.getElementById('main-mode-title');
+            if (modeTitleEl) {
+                modeTitleEl.textContent = evaluation.modeInfo.name;
+            }
+
+            // サブタイトル更新
+            const subtitleEl = document.querySelector('.page-subtitle');
+            if (subtitleEl) {
+                const totalNotes = evaluation.metrics.raw.totalNotes;
+                subtitleEl.textContent = `${sessionData.length}セッション (${totalNotes}音) の総合評価`;
+            }
+
+            // グレードアイコン更新
+            updateGradeIcon(evaluation.grade);
+
+            // 統計情報更新
+            updateStatistics(evaluation, sessionData);
+
+            // 達成メッセージ更新
+            const messageEl = document.getElementById('share-message');
+            if (messageEl) {
+                messageEl.textContent = evaluation.displayInfo.achievements;
+            }
+
+            // 評価分布表示
+            displayOverallDistribution(sessionData);
+
+            // セッショングリッド表示
+            displaySessionGrid(sessionData);
+        }
+
+        /**
+         * グレードアイコンを更新
+         */
+        function updateGradeIcon(grade) {
+            const iconContainer = document.querySelector('.rank-icon .rank-circle');
+            if (!iconContainer) return;
+
+            // グレード別アイコン・色設定
+            const gradeConfig = {
+                'S': { icon: 'crown', class: 'rank-circle-s', color: 'gold' },
+                'A': { icon: 'award', class: 'rank-circle-a', color: 'silver' },
+                'B': { icon: 'star', class: 'rank-circle-b', color: 'orange' },
+                'C': { icon: 'smile', class: 'rank-circle-c', color: 'green' },
+                'D': { icon: 'meh', class: 'rank-circle-d', color: 'blue' },
+                'E': { icon: 'frown', class: 'rank-circle-e', color: 'red' }
+            };
+
+            const config = gradeConfig[grade] || gradeConfig['B'];
+
+            // クラスをリセット
+            iconContainer.className = `rank-circle rank-md ${config.class}`;
+
+            // アイコン更新
+            iconContainer.innerHTML = `
+                <i data-lucide="${config.icon}" class="text-white" style="width: 64px; height: 64px;"></i>
+                <button class="help-icon-btn" style="color: white;">
+                    <i data-lucide="help-circle" style="width: 20px !important; height: 20px !important;"></i>
+                </button>
+            `;
+        }
+
+        /**
+         * 統計情報を更新
+         */
+        function updateStatistics(evaluation, sessionData) {
+            // グレード
+            const gradeEl = document.getElementById('dynamic-grade');
+            if (gradeEl) {
+                gradeEl.textContent = evaluation.grade;
+            }
+
+            // 平均誤差
+            const avgErrorEl = document.querySelector('.avg-error');
+            if (avgErrorEl) {
+                const avgError = evaluation.metrics.adjusted.avgError;
+                avgErrorEl.textContent = `±${avgError.toFixed(1)}¢`;
+            }
+
+            // 最大誤差計算
+            let maxError = 0;
+            sessionData.forEach(session => {
+                if (session.pitchErrors) {
+                    session.pitchErrors.forEach(error => {
+                        const absError = Math.abs(error.errorInCents);
+                        if (absError > maxError) {
+                            maxError = absError;
+                        }
+                    });
+                }
+            });
+
+            const maxErrorEl = document.querySelector('.max-error');
+            if (maxErrorEl) {
+                maxErrorEl.textContent = `±${maxError.toFixed(1)}¢`;
+            }
+
+            // セッション数
+            const sessionCountEl = document.querySelector('.session-count');
+            if (sessionCountEl) {
+                sessionCountEl.textContent = sessionData.length;
+            }
+        }
+
+        /**
+         * 総合評価分布を表示
+         */
+        function displayOverallDistribution(sessionData) {
+            const distribution = {
+                excellent: 0,
+                good: 0,
+                pass: 0,
+                practice: 0
+            };
+
+            let total = 0;
+
+            sessionData.forEach(session => {
+                if (!session.pitchErrors) return;
+
+                session.pitchErrors.forEach(error => {
+                    const absError = Math.abs(error.errorInCents);
+                    total++;
+
+                    if (absError <= 15) distribution.excellent++;
+                    else if (absError <= 25) distribution.good++;
+                    else if (absError <= 40) distribution.pass++;
+                    else distribution.practice++;
+                });
+            });
+
+            const container = document.querySelector('.glass-card .flex.flex-col.gap-3');
+            if (!container) return;
+
+            container.innerHTML = `
+                <!-- Excellent -->
+                <div class="flex items-center gap-3">
+                    <i data-lucide="trophy" class="text-yellow-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+                    <div class="progress-bar flex">
+                        <div class="progress-fill-custom color-eval-gold" style="width: ${(distribution.excellent / total * 100).toFixed(1)}%;"></div>
+                    </div>
+                    <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">${distribution.excellent}</span>
+                </div>
+
+                <!-- Good -->
+                <div class="flex items-center gap-3">
+                    <i data-lucide="star" class="text-green-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+                    <div class="progress-bar flex">
+                        <div class="progress-fill-custom color-eval-good" style="width: ${(distribution.good / total * 100).toFixed(1)}%;"></div>
+                    </div>
+                    <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">${distribution.good}</span>
+                </div>
+
+                <!-- Pass -->
+                <div class="flex items-center gap-3">
+                    <i data-lucide="thumbs-up" class="text-blue-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+                    <div class="progress-bar flex">
+                        <div class="progress-fill-custom color-eval-pass" style="width: ${(distribution.pass / total * 100).toFixed(1)}%;"></div>
+                    </div>
+                    <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">${distribution.pass}</span>
+                </div>
+
+                <!-- Practice -->
+                <div class="flex items-center gap-3">
+                    <i data-lucide="triangle-alert" class="text-red-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+                    <div class="progress-bar flex">
+                        <div class="progress-fill-custom color-eval-practice" style="width: ${(distribution.practice / total * 100).toFixed(1)}%;"></div>
+                    </div>
+                    <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">${distribution.practice}</span>
+                </div>
+            `;
+
+            // Lucideアイコン再初期化
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
+        /**
+         * セッショングリッドを表示
+         */
+        function displaySessionGrid(sessionData) {
+            const container = document.getElementById('session-grid-container');
+            if (!container) return;
+
+            container.innerHTML = sessionData.map((session, index) => {
+                const avgError = session.pitchErrors
+                    ? session.pitchErrors.reduce((sum, e) => sum + Math.abs(e.errorInCents), 0) / session.pitchErrors.length
+                    : 0;
+
+                let badgeClass = '';
+                if (avgError <= 15) badgeClass = 'session-excellent';
+                else if (avgError <= 25) badgeClass = 'session-good';
+                else if (avgError <= 40) badgeClass = 'session-pass';
+                else badgeClass = 'session-practice';
+
+                return `
+                    <div class="glass-card session-card ${badgeClass}">
+                        <div class="session-number">セッション ${index + 1}</div>
+                        <div class="session-base-note">${session.baseNote || 'C4'}</div>
+                        <div class="session-avg-error">±${avgError.toFixed(1)}¢</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        /**
+         * Chart.js初期化
+         */
+        function initializeCharts(sessionData) {
+            const canvas = document.getElementById('error-trend-chart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+
+            // セッション別平均誤差データ
+            const labels = sessionData.map((_, i) => `S${i + 1}`);
+            const data = sessionData.map(session => {
+                if (!session.pitchErrors || session.pitchErrors.length === 0) return 0;
+                const sum = session.pitchErrors.reduce((s, e) => s + Math.abs(e.errorInCents), 0);
+                return (sum / session.pitchErrors.length).toFixed(1);
+            });
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '平均誤差 (セント)',
+                        data: data,
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: { color: '#fff' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#fff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        /**
+         * ダミーデータ表示
+         */
+        function showDummyOverview() {
+            console.log('📊 ダミーデータで総合評価を表示');
+
+            const dummySessions = Array.from({ length: 8 }, (_, i) => ({
+                sessionId: i + 1,
+                baseNote: ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'][i],
+                pitchErrors: Array.from({ length: 8 }, (_, j) => ({
+                    step: j,
+                    errorInCents: (Math.random() - 0.5) * 30
+                }))
+            }));
+
+            const evaluation = window.EvaluationCalculator.calculateDynamicGrade(dummySessions);
+            updateOverviewUI(evaluation, dummySessions);
+
+            if (typeof Chart !== 'undefined') {
+                initializeCharts(dummySessions);
+            }
+        }
         
         // シェア機能
         function getShareText() {

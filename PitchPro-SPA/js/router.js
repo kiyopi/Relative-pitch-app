@@ -9,8 +9,10 @@ class SimpleRouter {
             'home': 'templates/home.html',
             'preparation': 'templates/preparation.html',
             'training': 'pages/training.html',
+            'result-session': 'pages/result-session.html',
             'records': 'pages/records.html',
-            'results': 'pages/results-overview.html'
+            'results': 'pages/results-overview.html',
+            'results-overview': 'pages/results-overview.html'
         };
 
         this.appRoot = document.getElementById('app-root');
@@ -106,6 +108,9 @@ class SimpleRouter {
                 break;
             case 'training':
                 await this.setupTrainingEvents(fullHash);
+                break;
+            case 'result-session':
+                await this.setupResultSessionEvents(fullHash);
                 break;
             default:
                 break;
@@ -226,6 +231,24 @@ class SimpleRouter {
 
         } catch (error) {
             console.error('Error setting up training page events:', error);
+            throw error;
+        }
+    }
+
+    async setupResultSessionEvents(fullHash = '') {
+        try {
+            console.log('Setting up result-session page events...');
+            console.log('Full hash:', fullHash);
+
+            // result-session-controller.jsのグローバル関数を呼び出し
+            if (typeof initializeResultSessionPage === 'function') {
+                await initializeResultSessionPage();
+            } else {
+                console.error('❌ initializeResultSessionPage function not found');
+            }
+
+        } catch (error) {
+            console.error('Error setting up result-session page events:', error);
             throw error;
         }
     }
