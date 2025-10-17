@@ -1149,9 +1149,10 @@ function setupMicPermissionFlow() {
                 retryMeasurementBtn.classList.add('btn-hidden');
             }
 
-            // voice-range-test-demo.jsのstartVoiceRangeTest関数を呼び出し
-            if (typeof startVoiceRangeTest === 'function') {
-                await startVoiceRangeTest(pitchProCycleManager.audioDetector);
+            // 音域テスト開始ボタンを表示（自動開始せずユーザーに準備させる）
+            const beginRangeTestBtn = document.getElementById('begin-range-test-btn');
+            if (beginRangeTestBtn) {
+                beginRangeTestBtn.classList.remove('btn-hidden');
             }
         });
     }
