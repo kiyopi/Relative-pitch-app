@@ -1121,6 +1121,19 @@ function setupMicPermissionFlow() {
                 resultsSection.classList.add('hidden');
             }
 
+            // 測定UI要素を再表示
+            const mainStatusText = document.getElementById('main-status-text');
+            const rangeTestLayoutFlex = document.querySelector('.range-test-layout-flex');
+            const subInfoText = document.getElementById('sub-info-text');
+            const detectionMeters = document.querySelector('.detection-meters');
+            const controlButtons = document.querySelector('#range-test-section > .text-center.mt-6');
+
+            if (mainStatusText) mainStatusText.style.display = '';
+            if (rangeTestLayoutFlex) rangeTestLayoutFlex.style.display = '';
+            if (subInfoText) subInfoText.style.display = '';
+            if (detectionMeters) detectionMeters.style.display = '';
+            if (controlButtons) controlButtons.style.display = '';
+
             // voice-range-test-demo.jsのstartVoiceRangeTest関数を呼び出し
             if (typeof startVoiceRangeTest === 'function') {
                 await startVoiceRangeTest(pitchProCycleManager.audioDetector);
