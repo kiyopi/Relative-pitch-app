@@ -43,10 +43,7 @@ class PitchProCycleManager {
         // 設定値（PitchPro v1.3.1対応）
         this.config = {
             MIN_DETECTION_TIME: 1000,        // 1秒間
-            MIN_FREQUENCY: 80,               // 最低周波数（人声範囲）
-            MAX_FREQUENCY: 1200,             // 最高周波数（歌声上限）
-            VOLUME_THRESHOLD: 0.1,           // 明確な音量（環境音除外）
-            CLARITY_THRESHOLD: 0.8           // 高い明瞭度（雑音除外）
+            // PitchProの内部最適化を信頼し、独自フィルタは使用しない
         };
 
     }
@@ -389,23 +386,8 @@ class PitchProCycleManager {
     handlePitchUpdate(result) {
         if (!this.state.detectionActive) return;
 
-        // 【重要】コールバック設定時はautoUpdateUIが無効化されるため、手動でUI更新
-        // 音量バー更新
-        if (this.uiElements.volumeBar && result.volume !== undefined) {
-            const volumePercent = (result.volume * 100).toFixed(1);
-            this.uiElements.volumeBar.style.width = `${volumePercent}%`;
-        }
-
-        // 音量テキスト更新
-        if (this.uiElements.volumeText && result.volume !== undefined) {
-            const volumePercent = (result.volume * 100).toFixed(1);
-            this.uiElements.volumeText.textContent = `${volumePercent}%`;
-        }
-
-        // 周波数表示更新
-        if (this.uiElements.frequencyDisplay && result.frequency !== undefined) {
-            this.uiElements.frequencyDisplay.textContent = `${result.frequency.toFixed(1)} Hz`;
-        }
+        // autoUpdateUI: true のため、PitchProが自動でUI更新
+        // ここではモード別のロジック処理のみ実行
 
         // モード別処理
         switch (this.state.currentMode) {
@@ -419,40 +401,34 @@ class PitchProCycleManager {
      * 音声テスト用音程更新処理
      */
     handleAudioTestPitchUpdate(result) {
-        // PitchProに完全委任: 音量バーが動く = 音声として認識済み
-        // PitchProの内部判定を信頼し、独自フィルタリングは不要
+        // PitchProの内部最適化を完全に信頼
+        // PitchProが値を返している = 有効な音声として認識済み
 
-        console.log(`🎤 PitchPro判定結果: freq:${result.frequency?.toFixed(1)}Hz vol:${result.volume?.toFixed(3)}`);
+        console.log(`🎤 PitchPro検出: freq:${result.frequency?.toFixed(1)}Hz vol:${(result.volume * 100)?.toFixed(1)}% clarity:${result.clarity?.toFixed(2)}`);
 
-        // PitchProの判定 + 最小限の雑音除外フィルタ（100Hz-1000Hz範囲）
-        const isPitchProDetectingVoice = result.volume > 0 && result.frequency >= 100 && result.frequency <= 1000;
+        // PitchProが有効な音声データを返している場合のみタイマー進行
+        const isValidVoice = result.volume > 0 && result.frequency > 0;
 
-        console.log(`🔍 判定詳細: vol>${0} = ${result.volume > 0}, freq>=${100} = ${result.frequency >= 100}, freq<=${1000} = ${result.frequency <= 1000}, 総合=${isPitchProDetectingVoice}`);
-
-        if (isPitchProDetectingVoice) {
-            console.log('✅ PitchPro音声認識中 - タイマー進行');
-
+        if (isValidVoice) {
             // 初回の有効音声検出時にタイマーを開始
             if (!this.state.detectionStartTime) {
                 this.state.detectionStartTime = Date.now();
-                console.log('🎬 1秒タイマー開始');
+                console.log('🎬 音声検出タイマー開始');
             }
 
             const elapsedTime = Date.now() - this.state.detectionStartTime;
-            console.log(`⏰ ${(elapsedTime/1000).toFixed(1)}秒 / 1.0秒`);
+            console.log(`⏰ 経過時間: ${(elapsedTime/1000).toFixed(1)}秒 / 1.0秒`);
 
             // 1秒間の音声検出で成功
             if (elapsedTime >= this.config.MIN_DETECTION_TIME) {
-                console.log('🎉 1秒経過 - 成功処理実行！');
+                console.log('🎉 1秒間の音声検出完了 - 成功処理実行');
                 this.showDetectionSuccess();
             }
         } else {
-            console.log(`❌ PitchPro音声未認識 (vol:${result.volume?.toFixed(3)})`);
-
-            // PitchProが音声認識していない場合はタイマーをリセット
+            // 音声未検出時はタイマーをリセット
             if (this.state.detectionStartTime) {
                 this.state.detectionStartTime = null;
-                console.log('🔄 タイマーリセット（PitchPro音声未認識）');
+                console.log('🔄 タイマーリセット（音声未検出）');
             }
         }
     }
