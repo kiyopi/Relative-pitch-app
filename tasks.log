@@ -2672,3 +2672,22 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-17 15:38:49] コミット: fix: 音域テスト結果表示の親子関係問題を修正
+
+- displayVoiceRangeResults関数で親要素(range-test-section)を非表示にしない
+- 代わりに測定中UI要素を個別に非表示:
+  - メインステータステキスト
+  - 音域テストバッジ(SVGリング)
+  - サブ情報テキスト
+  - 検出メーター
+  - コントロールボタン
+- 再測定ボタン処理で測定中UI要素を再表示
+- 親要素が非表示だと子要素も表示されない問題を解消
+
+問題解決：
+- .hidden { display: none !important; } による親要素の非表示
+- 結果セクション(results-section)が表示されない根本原因を修正
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
