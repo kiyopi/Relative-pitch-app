@@ -2704,3 +2704,21 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-17 15:59:41] コミット: refactor: 音域テスト結果のレイアウト改善 - UIカタログ準拠
+
+- training.cssにレスポンシブクラス追加:
+  - md:flex-row（768px以上で横並び）
+- preparation-step1.htmlのボタンレイアウト修正:
+  - text-center → flex flex-col md:flex-row gap-3
+  - ml-3 削除（gapで統一）
+  - モバイル：縦並び（flex-col）
+  - PC：横並び（md:flex-row）
+- range-info-containerのマージンは既存設定を活用:
+  - .range-info-container + .flex { margin-top: 24px; }
+
+UIカタログのボタン幅バリエーションパターンに準拠
+レスポンシブデザイン完全対応
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

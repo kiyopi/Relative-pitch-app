@@ -29,12 +29,14 @@
 ### ⚠️ **注意すべきこと（最重要）**
 1. **🚨 インライン記述禁止**: HTMLのstyle属性、JavaScriptでのインラインCSS絶対禁止（例外: Lucideアイコンサイズ、プログレスバー幅のみ）
 2. **📋 作業開始前必須チェック**: UIカタログ→base.css→類似実装の順で確認（新規CSS作成前）
-3. **🧪 テスト専用CSS分離**: すべてのテストページは`[機能名]-test.css`で管理・本番CSS混入禁止
-4. **📝 データ管理統合**: `/js/data-manager.js`活用でlocalStorage統一管理
-5. **🎚️ 音量バー制御**: `VolumeBarController`統一使用・**必ずコールバック方式**で`result.volume`取得
-6. **📝 トレーニングJS**: 開発段階ではページ内記述許可、本番実装時に外部ファイル化
-7. **🌿 Git自動化**: 作業完了時のみコミット・プッシュ実行（修正中は禁止）
-8. **🗂️ Serenaメモリ命名規則**:
+3. **🎨 UIカタログ準拠**: `/Bolt/v2/templates/ui-catalog-essentials.html`で既存コンポーネント確認必須
+4. **🚫 絵文字使用禁止**: アプリ全体でLucideアイコンを使用・絵文字は一切使用しない
+5. **🧪 テスト専用CSS分離**: すべてのテストページは`[機能名]-test.css`で管理・本番CSS混入禁止
+6. **📝 データ管理統合**: `/js/data-manager.js`活用でlocalStorage統一管理
+7. **🎚️ 音量バー制御**: `VolumeBarController`統一使用・**必ずコールバック方式**で`result.volume`取得
+8. **📝 トレーニングJS**: 開発段階ではページ内記述許可、本番実装時に外部ファイル化
+9. **🌿 Git自動化**: 作業完了時のみコミット・プッシュ実行（修正中は禁止）
+10. **🗂️ Serenaメモリ命名規則**:
    - **永続化メモリ**: `PERM-[内容]-YYYYMMDD-HHMM`（例: `PERM-training-core-pitch-error-detection-20250112-1430`）
    - **作業用メモ**: `TEMP-[内容]-YYYYMMDD-HHMM`（例: `TEMP-direct-access-mic-permission-issue-20250112-1445`）
    - 永続化メモリは仕様・設計思想など長期保存が必要な情報、作業用メモは一時的な問題・タスク管理用
@@ -169,6 +171,7 @@ pitchDetector.setCallbacks({
 - **基本方針**: `ui-catalog-essentials.html`で既存コンポーネント確認後に実装
 - **分離設計**: ui-catalog.css（表示専用）と base.css（実装用）完全分離
 - **統一コンポーネント**: Glass Card・プログレスバー・ボタン等の既存活用
+- **アイコン統一**: Lucideアイコンのみ使用・絵文字は一切使用しない
 
 ### **base.css活用状況（v2.0.0）**
 - **サイズ**: 1,108行（7カテゴリの機能統合完了）
