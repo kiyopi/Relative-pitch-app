@@ -1134,6 +1134,14 @@ function setupMicPermissionFlow() {
             if (detectionMeters) detectionMeters.style.display = '';
             if (controlButtons) controlButtons.style.display = '';
 
+            // バッジと円形プログレスバーを初期状態にリセット
+            if (typeof updateBadgeForWaiting === 'function') {
+                updateBadgeForWaiting('arrow-down');
+            }
+            if (typeof updateCircularProgressInstantly === 'function') {
+                updateCircularProgressInstantly(0);
+            }
+
             // voice-range-test-demo.jsのstartVoiceRangeTest関数を呼び出し
             if (typeof startVoiceRangeTest === 'function') {
                 await startVoiceRangeTest(pitchProCycleManager.audioDetector);
