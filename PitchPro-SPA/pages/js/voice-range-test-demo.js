@@ -1172,28 +1172,13 @@ function completeLowPitchMeasurement() {
         
         // インターバル時に音声検出を停止してマイクを青に変更
 
-        // PitchProのupdateSelectors()を使用してUIリセットを試行
-        if (window.globalAudioDetector && window.globalAudioDetector.updateSelectors) {
-            try {
-                // 同じセレクターで更新することでUIリセット効果を狙う
-                window.window.globalAudioDetector.updateSelectors({
-                    volumeBarSelector: '#range-test-volume-bar',
-                    volumeTextSelector: '#range-test-volume-text', 
-                    frequencySelector: '#range-test-frequency-value'
-                });
-                console.log('🔄 PitchPro updateSelectors()でUIリセット実行');
-            } catch (error) {
-                console.warn('⚠️ updateSelectors()失敗:', error);
-                // フォールバック: 従来の方法
-                window.globalAudioDetector.stopDetection();
-                console.log('🔇 フォールバック: stopDetection()実行');
-            }
-        } else if (window.globalAudioDetector && window.globalAudioDetector.stopDetection) {
+        // PitchProの音声検出を確実に停止
+        if (window.globalAudioDetector && window.globalAudioDetector.stopDetection) {
             window.globalAudioDetector.stopDetection();
-            console.log('🔇 インターバル中: 音声検出を一時停止');
+            console.log('🔇 インターバル中: 音声検出を停止');
         }
 
-        // 念のため手動でも音量バーをリセット
+        // 音量バーを手動でリセット
         resetVolumeDisplay();
         console.log('📊 音量バーをリセット');
 
