@@ -1142,6 +1142,13 @@ function setupMicPermissionFlow() {
                 updateCircularProgressInstantly(0);
             }
 
+            // retry-measurement-btnのクラスをクリーンアップ
+            const retryMeasurementBtn = document.getElementById('retry-measurement-btn');
+            if (retryMeasurementBtn) {
+                retryMeasurementBtn.classList.remove('btn-visible-inline');
+                retryMeasurementBtn.classList.add('btn-hidden');
+            }
+
             // voice-range-test-demo.jsのstartVoiceRangeTest関数を呼び出し
             if (typeof startVoiceRangeTest === 'function') {
                 await startVoiceRangeTest(pitchProCycleManager.audioDetector);
