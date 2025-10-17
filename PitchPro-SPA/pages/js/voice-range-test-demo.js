@@ -1210,11 +1210,7 @@ function handleLowPitchMeasurementFailure() {
         document.getElementById('main-status-text').textContent = `低音測定失敗 - 再測定します (${globalState.retryCount}/${globalState.maxRetries})`;
         document.getElementById('sub-info-text').textContent = 'より大きな声で低い音を出してください';
 
-        // 再測定ボタンを表示
-        document.getElementById('retry-measurement-btn').classList.remove('btn-hidden');
-        document.getElementById('retry-measurement-btn').classList.add('btn-visible-inline');
-
-        showNotification('低音の検出に失敗しました。再測定してください。', 'warning');
+        showNotification('低音の検出に失敗しました。再測定します。', 'warning');
 
         // 2秒後に自動再測定開始
         setTimeout(() => {
@@ -1301,10 +1297,6 @@ function updateBadgeForFailure() {
         badge.style.border = 'none';
     }
 
-    // 失敗時は再測定ボタンを表示
-    document.getElementById('retry-measurement-btn').classList.remove('btn-hidden');
-    document.getElementById('retry-measurement-btn').classList.add('btn-visible-inline');
-
     lucide.createIcons();
 }
 
@@ -1322,10 +1314,6 @@ function updateBadgeForError() {
         badge.classList.remove('measuring', 'confirmed');
         badge.classList.add('failure');
     }
-
-    // エラー時も再測定ボタンを表示
-    document.getElementById('retry-measurement-btn').classList.remove('btn-hidden');
-    document.getElementById('retry-measurement-btn').classList.add('btn-visible-inline');
 
     lucide.createIcons();
 }
@@ -1351,11 +1339,7 @@ function handleHighPitchMeasurementFailure() {
         document.getElementById('main-status-text').textContent = `高音測定失敗 - 再測定します (${globalState.highRetryCount}/${globalState.maxRetries})`;
         document.getElementById('sub-info-text').textContent = 'より大きな声で高い音を出してください';
 
-        // 再測定ボタンを表示
-        document.getElementById('retry-measurement-btn').classList.remove('btn-hidden');
-        document.getElementById('retry-measurement-btn').classList.add('btn-visible-inline');
-
-        showNotification('高音の検出に失敗しました。再測定してください。', 'warning');
+        showNotification('高音の検出に失敗しました。再測定します。', 'warning');
 
         // 2秒後に自動再測定開始
         setTimeout(() => {
