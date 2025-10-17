@@ -2523,3 +2523,111 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-01 17:02:33] コミット: feat: 音域測定機能完全実装 - updateSelectors()動的UI切り替えとマイク自動停止
+
+- updateSelectors()による音域テスト用UI動的切り替え実装
+- コールバック再設定による検出継続処理実装
+- volume値範囲修正（0.0-1.0対応、閾値0.01に修正）
+- currentPhaseリセットによる測定完了後のコールバック停止
+- stopDetection()によるマイク自動ミュート実装
+- 音域測定テストページ作成（updateSelectors()動作検証）
+- 最低音・最高音2フェーズ測定の完全動作確認
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-02 13:39:27] コミット: feat: トレーニング機能実装完了 - ドレミガイド・音声検出・再トレーニング機能
+
+- trainingController.js完全実装（378行のインラインスクリプトを外部ファイル化）
+- ドレミガイド開始インターバル実装（2.5秒、5つの四角アニメーション）
+- ドレミガイド進行機能（700ms間隔、ユーザー発声）
+- AudioDetectionComponentによるリアルタイム音程検出
+- トレーニング完了時の状態リセット（音量バー・マイクバッジ・UI）
+- 「もう一度」ボタンで再トレーニング機能
+- デバッグ用マイク許可ボタン追加
+- PitchShifter初期化戦略実装（2段階: router.js事前初期化 + trainingControllerフォールバック）
+- Serenaメモリ命名規則追加（PERM-/TEMP-プレフィックス + YYYYMMDD-HHMM）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-17 12:53:57] コミット: feat: トレーニングコア機能完全実装 - 音程誤差検出・動的グレード計算・結果表示
+
+- SessionDataRecorder実装: リアルタイム音程誤差記録システム
+  - セント単位の誤差計算ロジック
+  - ステップ別音程データ記録
+  - localStorage自動保存（最大100セッション）
+
+- EvaluationCalculator実装: DYNAMIC_GRADE_LOGIC準拠の動的グレード計算
+  - モード検出（ランダム8/連続12/12音階24）
+  - デバイス品質検出・補正（サンプルレート別）
+  - 基本メトリクス計算（平均誤差・優秀音割合・安定性）
+  - S〜Eグレード判定（モード別基準適用）
+
+- セッション結果ページ実装: 音程誤差可視化システム
+  - 評価分布表示（Excellent/Good/Pass/Practice）
+  - 精度バッジ表示（平均誤差に基づく）
+  - 詳細分析（8音それぞれの結果・周波数・誤差）
+  - 次セッション遷移制御
+
+- 総合評価ページ強化: 動的グレード表示
+  - EvaluationCalculator統合
+  - モード別評価基準適用
+  - デバイス品質メッセージ表示
+  - 全セッション統計表示
+
+- TrainingController統合: 音程誤差検出実装
+  - 期待音程配列定義（expectedNotes, expectedFrequencies）
+  - ドレミガイド各ステップでの誤差記録
+  - インターバルカウントダウン調整（3ブロック、2.5秒）
+  - セッション完了時データ保存
+
+- Router更新: result-sessionページルート追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-17 13:13:47] コミット: fix: 音声テスト雑音検出問題の修正 - PitchPro最適化設定を信頼
+
+- 独自フィルタリングロジック削除: PitchProの内部最適化を完全に信頼
+  - VOLUME_THRESHOLD, CLARITY_THRESHOLD, MIN_FREQUENCY, MAX_FREQUENCYを削除
+  - PitchProのデフォルト設定が既に最適化されているため
+
+- UI更新処理の最適化: autoUpdateUI: true設定を活用
+  - handlePitchUpdate内の手動UI更新を削除
+  - PitchProの自動UI更新機能に完全委任
+
+- 音声判定ロジックの簡素化: result.volume > 0 && result.frequency > 0
+  - 複雑な周波数範囲チェックを削除
+  - PitchProが値を返している = 有効な音声として信頼
+
+問題: 雑音で音量バーが40%以上動く → PitchProの最適化を信頼して解決
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-17 14:54:10] コミット: feat: 音域テスト統合完了 - Step1内にシームレスな音域テスト実装
+
+Phase 1: HTML統合
+- Step2の音域テストUIをStep1に完全統合（112行追加）
+- 音域テストセクション追加（range-test-section）
+- 結果表示エリア追加（results-section）
+- voice-range-test.css読み込み追加
+
+Phase 2: JavaScript統合
+- voice-range-test-demo.js外部スクリプトとして統合
+- 音域テスト開始ボタンのイベントリスナー追加
+- PitchProインスタンス共有実装（pitchProCycleManager.audioDetector）
+- 再測定ボタン・トレーニング開始ボタンの統合
+- 結果表示ID統一（range-results-section → results-section）
+
+実装内容:
+- シームレスなUX: ページ遷移なしで音声テスト→音域テスト→トレーニング
+- PitchPro最適化: 同一インスタンスの再利用で安定性向上
+- 既存資産活用: voice-range-test-demo.jsの成熟したコードを再利用
+
+次のステップ: Phase 3 動作確認・最終調整
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
