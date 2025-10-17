@@ -2691,3 +2691,16 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-17 15:47:57] コミット: refactor: 音域テスト結果の絵文字削除 - Lucideアイコン統一方針
+
+- 音域テスト結果表示から4つの絵文字を削除:
+  - 🎵 音域範囲 → 音域範囲
+  - 🎹 オクターブ数 → オクターブ数
+  - 🔽 最低音 → 最低音
+  - 🔼 最高音 → 最高音
+- アプリ全体でLucideアイコン統一方針に準拠
+- シンプルなテキスト表示でレイアウト改善
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -307,6 +307,13 @@
   margin-top: 24px;
 }
 
+/* レスポンシブ対応：モバイルは縦並び、タブレット以上は横並び */
+@media (min-width: 768px) {
+  .md\:flex-row {
+    flex-direction: row;
+  }
+}
+
 /* テストステータス */
 .test-status {
   text-align: center;
