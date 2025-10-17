@@ -29,9 +29,21 @@ function displayResults(results) {
     document.getElementById('result-high-freq').textContent = results.highPitch ?
         `${results.highPitch.frequency.toFixed(1)} Hz (${results.highPitch.note})` : '-';
 
-    // 音域テストセクションを非表示にし、結果セクションを表示
-    document.getElementById('range-test-section').classList.add('hidden');
+    // 結果セクションを表示（range-test-section は親要素なので非表示にしない）
     document.getElementById('results-section').classList.remove('hidden');
+
+    // 測定中UI要素を非表示
+    const mainStatusText = document.getElementById('main-status-text');
+    const rangeTestLayoutFlex = document.querySelector('.range-test-layout-flex');
+    const subInfoText = document.getElementById('sub-info-text');
+    const detectionMeters = document.querySelector('.detection-meters');
+    const controlButtons = document.querySelector('#range-test-section > .text-center.mt-6');
+
+    if (mainStatusText) mainStatusText.style.display = 'none';
+    if (rangeTestLayoutFlex) rangeTestLayoutFlex.style.display = 'none';
+    if (subInfoText) subInfoText.style.display = 'none';
+    if (detectionMeters) detectionMeters.style.display = 'none';
+    if (controlButtons) controlButtons.style.display = 'none';
 
     console.log('📋 測定結果表示完了');
 }
@@ -381,11 +393,22 @@ document.addEventListener('DOMContentLoaded', async function() {
                 console.log('📋 音域データをクリアしました');
             }
 
-            // 音域テストセクションに戻る
+            // 結果セクションを非表示
             const resultSection = document.getElementById('results-section');
-            const rangeTestSection = document.getElementById('range-test-section');
             if (resultSection) resultSection.classList.add('hidden');
-            if (rangeTestSection) rangeTestSection.classList.remove('hidden');
+
+            // 測定中UI要素を再表示
+            const mainStatusText = document.getElementById('main-status-text');
+            const rangeTestLayoutFlex = document.querySelector('.range-test-layout-flex');
+            const subInfoText = document.getElementById('sub-info-text');
+            const detectionMeters = document.querySelector('.detection-meters');
+            const controlButtons = document.querySelector('#range-test-section > .text-center.mt-6');
+
+            if (mainStatusText) mainStatusText.style.display = '';
+            if (rangeTestLayoutFlex) rangeTestLayoutFlex.style.display = '';
+            if (subInfoText) subInfoText.style.display = '';
+            if (detectionMeters) detectionMeters.style.display = '';
+            if (controlButtons) controlButtons.style.display = '';
 
             // 音域設定済み表示を非表示
             const rangeSavedDisplay = document.getElementById('range-saved-display');
@@ -887,9 +910,21 @@ function assessMeasurementQuality(measurementData) {
 
 // 音域テスト結果表示
 function displayVoiceRangeResults(results) {
-    // 音域テストセクションを非表示にし、結果セクションを表示
-    document.getElementById('range-test-section').classList.add('hidden');
+    // 結果セクションを表示（range-test-section は親要素なので非表示にしない）
     document.getElementById('results-section').classList.remove('hidden');
+
+    // 測定中UI要素を非表示
+    const mainStatusText = document.getElementById('main-status-text');
+    const rangeTestLayoutFlex = document.querySelector('.range-test-layout-flex');
+    const subInfoText = document.getElementById('sub-info-text');
+    const detectionMeters = document.querySelector('.detection-meters');
+    const controlButtons = document.querySelector('#range-test-section > .text-center.mt-6');
+
+    if (mainStatusText) mainStatusText.style.display = 'none';
+    if (rangeTestLayoutFlex) rangeTestLayoutFlex.style.display = 'none';
+    if (subInfoText) subInfoText.style.display = 'none';
+    if (detectionMeters) detectionMeters.style.display = 'none';
+    if (controlButtons) controlButtons.style.display = 'none';
 
     // Step 3を完了状態に更新
     const step3 = document.getElementById('step-3');

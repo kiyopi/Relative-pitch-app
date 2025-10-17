@@ -2657,3 +2657,18 @@ TypeError: null is not an object (evaluating 'document.getElementById('result-se
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-17 15:19:29] コミット: fix: 音域テスト結果表示CSS不一致修正 - クラス名統一
+
+- preparation-step1.html の結果表示セクションのクラス名を修正
+- 修正内容：
+  - result-info-container → range-info-container
+  - result-info-row → range-info-row
+  - result-info-value → range-info-value
+- training.css で定義されたスタイルと完全一致
+- 音域範囲・オクターブ数・最低音・最高音が正しく表示される
+
+問題解決：グラスカードのみ表示され中身が表示されない問題を解消
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
