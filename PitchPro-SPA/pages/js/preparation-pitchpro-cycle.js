@@ -1054,13 +1054,13 @@ function setupMicPermissionFlow() {
         });
     }
 
-    // 音域テスト開始ボタンのイベントリスナー（test-preparation-original.jsの成功パターン）
+    // 音域テストセクション移動ボタン（Step2へ移動）
     const startRangeTestBtn = document.getElementById('start-range-test-btn');
     if (startRangeTestBtn) {
         startRangeTestBtn.addEventListener('click', async () => {
             console.log('🎤 音域テストセクションへ移動ボタンがクリックされました');
             try {
-                // 確実な画面切り替え処理（test-preparation-original.jsと同じ）
+                // 確実な画面切り替え処理
                 const audioTestSection = document.getElementById('audio-test-section');
                 const rangeTestSection = document.getElementById('range-test-section');
 
@@ -1085,6 +1085,60 @@ function setupMicPermissionFlow() {
         });
     } else {
         console.warn('⚠️ 音域テストを開始ボタンが見つかりません（後で設定される可能性があります）');
+    }
+
+    // 音域テスト開始ボタン（実際のテスト開始）
+    const beginRangeTestBtn = document.getElementById('begin-range-test-btn');
+    if (beginRangeTestBtn) {
+        beginRangeTestBtn.addEventListener('click', async () => {
+            console.log('🎵 音域テスト開始ボタンがクリックされました');
+            try {
+                // voice-range-test-demo.jsのstartVoiceRangeTest関数を呼び出し
+                if (typeof startVoiceRangeTest === 'function') {
+                    await startVoiceRangeTest(pitchProCycleManager.audioDetector);
+                    console.log('✅ 音域テスト開始完了');
+                } else {
+                    console.error('❌ startVoiceRangeTest関数が見つかりません');
+                    alert('音域テスト機能の読み込みに失敗しました');
+                }
+            } catch (error) {
+                console.error('❌ 音域テスト開始エラー:', error);
+                alert(`音域テスト開始に失敗しました: ${error.message}`);
+            }
+        });
+    }
+
+    // 再測定ボタン
+    const remeasureBtn = document.getElementById('remeasure-btn');
+    if (remeasureBtn) {
+        remeasureBtn.addEventListener('click', async () => {
+            console.log('🔄 再測定ボタンがクリックされました');
+            // 結果セクションを非表示、音域テストを再表示
+            const resultsSection = document.getElementById('results-section');
+            if (resultsSection) {
+                resultsSection.classList.add('hidden');
+            }
+
+            // voice-range-test-demo.jsのstartVoiceRangeTest関数を呼び出し
+            if (typeof startVoiceRangeTest === 'function') {
+                await startVoiceRangeTest(pitchProCycleManager.audioDetector);
+            }
+        });
+    }
+
+    // トレーニング開始ボタン（音域テスト完了後）
+    const completeRangeTestBtn = document.getElementById('complete-range-test-btn');
+    if (completeRangeTestBtn) {
+        completeRangeTestBtn.addEventListener('click', async () => {
+            console.log('🚀 トレーニング開始ボタン（音域テスト完了後）がクリックされました');
+
+            // PitchProリソースのクリーンアップ
+            await pitchProCycleManager.cleanupPitchPro();
+
+            // training.htmlへ遷移
+            console.log('🚀 training.htmlに遷移中...');
+            window.location.href = '../training.html';
+        });
     }
 
 }
