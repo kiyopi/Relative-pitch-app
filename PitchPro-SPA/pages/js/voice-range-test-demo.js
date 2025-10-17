@@ -166,6 +166,8 @@ let globalState = {
     highRetryCount: 0, // 高音測定用の独立したリトライカウンター
     maxRetries: 3,
     voiceDetectionThreshold: 0.15, // 音量閾値
+    silentFrameCount: 0, // 無音フレームカウンター（v3.1新機能）
+    maxSilentFrames: 10, // 最大無音フレーム数（約0.3秒）
 
     measurementDuration: 3000, // 3秒
     idleDuration: 3000, // 3秒
@@ -619,10 +621,36 @@ function handleVoiceDetection(result, audioDetector) {
 
 // 測定データ記録
 function recordMeasurementData(result) {
+    const currentPhase = globalState.currentPhase;
+
+    // 🎵 v3.1新機能: 測定中のみ音声連続性チェック
+    if (currentPhase === 'measuring-low' || currentPhase === 'measuring-high') {
+        // 有効な音声データの判定（音量閾値の20%以上）
+        const isValidVoice = result.frequency &&
+                             result.volume &&
+                             result.volume >= globalState.voiceDetectionThreshold * 0.2;
+
+        if (!isValidVoice) {
+            // 無音フレームカウント
+            globalState.silentFrameCount++;
+
+            if (globalState.silentFrameCount > globalState.maxSilentFrames) {
+                // 連続無音検出 → 測定中断
+                console.error('❌ 測定中断: 音声が途切れました');
+                console.error(`📊 無音フレーム数: ${globalState.silentFrameCount}フレーム（約${Math.round(globalState.silentFrameCount * 33)}ms相当）`);
+                handleMeasurementInterruption();
+                return;
+            }
+        } else {
+            // 有効な音声検出 → カウンターリセット
+            globalState.silentFrameCount = 0;
+        }
+    }
+
     // 無効なデータをフィルタリング
     if (!result.frequency || !result.volume) {
         console.log('🔇 データ記録スキップ:', {
-            phase: globalState.currentPhase,
+            phase: currentPhase,
             frequency: result.frequency || 'なし',
             volume: result.volume || 'なし',
             reason: !result.frequency ? '周波数なし' : '音量なし'
@@ -631,7 +659,6 @@ function recordMeasurementData(result) {
     }
 
     const timestamp = Date.now();
-    const currentPhase = globalState.currentPhase;
 
     // 低音測定フェーズ
     if (currentPhase === 'measuring-low') {
@@ -1053,6 +1080,10 @@ function startLowPitchMeasurement() {
     console.log('🔍 startLowPitchMeasurement実行 - 円形プログレスバー開始予定');
     globalState.currentPhase = 'measuring-low';
 
+    // 🎵 v3.1新機能: 無音カウンターリセット
+    globalState.silentFrameCount = 0;
+    console.log('🔄 無音カウンターリセット完了');
+
     // シングルページフロー対応: 安全なDOM要素アクセス
     const mainStatusText = document.getElementById('main-status-text');
     if (mainStatusText) {
@@ -1151,6 +1182,32 @@ function completeLowPitchMeasurement() {
 
         // 失敗時の処理
         handleLowPitchMeasurementFailure();
+    }
+}
+
+// 🎵 v3.1新機能: 測定中断ハンドラー（音声連続性チェック失敗時）
+function handleMeasurementInterruption() {
+    console.log('🔄 測定中断ハンドラー起動');
+
+    // 測定タイマー停止
+    if (globalState.measurementTimer) {
+        clearTimeout(globalState.measurementTimer);
+        globalState.measurementTimer = null;
+        console.log('⏱️ 測定タイマー停止');
+    }
+
+    // プログレスバーリセット
+    updateCircularProgressInstantly(0);
+
+    // 失敗メッセージ表示とフェーズ別失敗処理
+    if (globalState.currentPhase === 'measuring-low') {
+        document.getElementById('main-status-text').textContent = '低音測定失敗';
+        document.getElementById('sub-info-text').textContent = '3秒間継続して発声してください';
+        handleLowPitchMeasurementFailure();
+    } else if (globalState.currentPhase === 'measuring-high') {
+        document.getElementById('main-status-text').textContent = '高音測定失敗';
+        document.getElementById('sub-info-text').textContent = '3秒間継続して発声してください';
+        handleHighPitchMeasurementFailure();
     }
 }
 
@@ -1466,6 +1523,10 @@ function startHighPitchPhase() {
 function startHighPitchMeasurement() {
     console.log('🎯 高音域測定開始 (新方式)');
     globalState.currentPhase = 'measuring-high';
+
+    // 🎵 v3.1新機能: 無音カウンターリセット
+    globalState.silentFrameCount = 0;
+    console.log('🔄 無音カウンターリセット完了');
 
     document.getElementById('main-status-text').textContent = 'できるだけ高い声をキープしましょう';
     document.getElementById('sub-info-text').textContent = '高音測定中...';
