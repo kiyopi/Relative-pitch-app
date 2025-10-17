@@ -262,18 +262,23 @@ function isStableVoiceDetection(result) {
         return false;
     }
     
-    // 🔧 周波数の安定性チェック（緩和版）
+    // 🔧 周波数の安定性チェック（低音域対応版）
     const frequencies = stability.recentDetections.map(d => d.frequency);
     const avgFreq = frequencies.reduce((sum, f) => sum + f, 0) / frequencies.length;
     const maxDeviation = Math.max(...frequencies.map(f => Math.abs(f - avgFreq)));
-    const allowedDeviation = avgFreq * 0.2; // 平均周波数の20%以内（10%→20%に緩和）
-    
+
+    // 低音域（100Hz以下）では30%、それ以外は20%の許容偏差
+    // 理由: 低音域は周波数が物理的に揺れやすく、80Hz付近での測定開始を確実にする
+    const deviationRate = avgFreq <= 100 ? 0.30 : 0.20;
+    const allowedDeviation = avgFreq * deviationRate;
+
     if (maxDeviation > allowedDeviation) {
-        // 周波数が不安定（緩和版） - ログ簡素化
+        // 周波数が不安定 - ログ簡素化
         console.log('⚠️ 周波数が不安定:', {
             avgFreq: avgFreq.toFixed(1),
             maxDeviation: maxDeviation.toFixed(1),
             allowedDeviation: allowedDeviation.toFixed(1),
+            deviationRate: (deviationRate * 100) + '%',
             frequencies: frequencies.map(f => f.toFixed(1))
         });
         return false;
