@@ -179,7 +179,10 @@ let globalState = {
         requiredStableCount: 2, // 安定判定に必要な連続検出回数（3→2に緩和）
         maxHistoryAge: 800, // 履歴保持時間 (ms)（1000→800に短縮）
         minFrequencyForVoice: 70, // 人間の声と判定する最低周波数 (Hz)（80→70に緩和）
-        maxFrequencyForVoice: 2500 // 人間の声と判定する最高周波数 (Hz)（2000→2500に緩和）
+        maxFrequencyForVoice: 2500, // 人間の声と判定する最高周波数 (Hz)（2000→2500に緩和）
+        // 🎵 v3.1.5新機能: 低音域用の代替基準（継続検出）
+        lowFreqContinuousStart: null, // 70Hz以上の声を最初に検出したタイムスタンプ
+        lowFreqContinuousDuration: 1000 // 継続検出時間（1秒）
     },
 
     // 測定データ収集
@@ -229,20 +232,59 @@ function isStableVoiceDetection(result) {
     }
     
     // 人間の声の周波数範囲チェック
-    if (result.frequency < stability.minFrequencyForVoice || 
+    if (result.frequency < stability.minFrequencyForVoice ||
         result.frequency > stability.maxFrequencyForVoice) {
         console.log('🚫 人間の声の範囲外:', {
             frequency: result.frequency,
             range: `${stability.minFrequencyForVoice}-${stability.maxFrequencyForVoice}Hz`
         });
+        // 範囲外なので継続検出もリセット
+        stability.lowFreqContinuousStart = null;
         return false;
     }
-    
+
+    // 🎵 v3.1.5新機能: 低音域用の代替基準（継続検出）
+    // 70Hz以上の声を1秒以上継続検出した場合、安定性チェックをバイパス
+    if (result.frequency >= stability.minFrequencyForVoice) {
+        // 初回検出時にタイムスタンプを記録
+        if (stability.lowFreqContinuousStart === null) {
+            stability.lowFreqContinuousStart = now;
+            console.log('🎤 低音域継続検出開始:', {
+                frequency: result.frequency.toFixed(1) + 'Hz',
+                note: result.note
+            });
+        }
+
+        // 継続時間をチェック
+        const continuousDuration = now - stability.lowFreqContinuousStart;
+        if (continuousDuration >= stability.lowFreqContinuousDuration) {
+            console.log('✅ 低音域継続検出で測定開始（代替基準）:', {
+                frequency: result.frequency.toFixed(1) + 'Hz',
+                note: result.note,
+                duration: (continuousDuration / 1000).toFixed(1) + '秒',
+                volume: (result.volume * 100).toFixed(1) + '%'
+            });
+            return true; // 安定性チェックをバイパス
+        } else {
+            console.log('🟡 低音域継続検出中:', {
+                frequency: result.frequency.toFixed(1) + 'Hz',
+                duration: (continuousDuration / 1000).toFixed(1) + '秒',
+                required: (stability.lowFreqContinuousDuration / 1000) + '秒'
+            });
+        }
+    } else {
+        // 70Hz未満なので継続検出をリセット
+        if (stability.lowFreqContinuousStart !== null) {
+            console.log('⚠️ 低音域継続検出リセット（周波数低下）');
+            stability.lowFreqContinuousStart = null;
+        }
+    }
+
     // 古い履歴を削除
     stability.recentDetections = stability.recentDetections.filter(
         detection => now - detection.timestamp < stability.maxHistoryAge
     );
-    
+
     // 現在の検出を履歴に追加
     stability.recentDetections.push({
         timestamp: now,
@@ -250,7 +292,7 @@ function isStableVoiceDetection(result) {
         note: result.note,
         volume: result.volume
     });
-    
+
     // 安定判定に必要な検出回数に達しているかチェック
     if (stability.recentDetections.length < stability.requiredStableCount) {
         console.log('🟡 音声安定性チェック中:', {
@@ -267,9 +309,10 @@ function isStableVoiceDetection(result) {
     const avgFreq = frequencies.reduce((sum, f) => sum + f, 0) / frequencies.length;
     const maxDeviation = Math.max(...frequencies.map(f => Math.abs(f - avgFreq)));
 
-    // 低音域（100Hz以下）では30%、それ以外は20%の許容偏差
-    // 理由: 低音域は周波数が物理的に揺れやすく、80Hz付近での測定開始を確実にする
-    const deviationRate = avgFreq <= 100 ? 0.30 : 0.20;
+    // 低音域（100Hz以下）では40%、それ以外は20%の許容偏差
+    // 理由: 低音域は周波数が物理的に大きく揺れやすい
+    //       80Hz × 40% = 32Hz → 48～112Hzの範囲で安定判定（30%では不足）
+    const deviationRate = avgFreq <= 100 ? 0.40 : 0.20;
     const allowedDeviation = avgFreq * deviationRate;
 
     if (maxDeviation > allowedDeviation) {
@@ -316,6 +359,7 @@ function isStableVoiceDetection(result) {
  */
 function resetVoiceStability() {
     globalState.voiceStability.recentDetections = [];
+    globalState.voiceStability.lowFreqContinuousStart = null; // 継続検出タイムスタンプもリセット
     console.log('🔄 音声安定性データをリセット');
 }
 
