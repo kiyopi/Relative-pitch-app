@@ -182,7 +182,7 @@ let globalState = {
         maxFrequencyForVoice: 2500, // 人間の声と判定する最高周波数 (Hz)（2000→2500に緩和）
         // 🎵 v3.1.5新機能: 低音域用の代替基準（継続検出）
         lowFreqContinuousStart: null, // 80Hz以上の声を最初に検出したタイムスタンプ
-        lowFreqContinuousDuration: 1000 // 継続検出時間（1秒）
+        lowFreqContinuousDuration: 500 // 継続検出時間（v3.1.14: 1秒→0.5秒に短縮）
     },
 
     // 測定データ収集
@@ -1302,6 +1302,16 @@ function handleLowPitchMeasurementFailure() {
     updateCircularProgressInstantly(0);
     resetVolumeDisplay();
 
+    // 🎵 v3.1.14新機能: 失敗した測定データをクリア（累積防止）
+    globalState.measurementData.lowPhase = {
+        frequencies: [],
+        lowestFreq: null,
+        lowestNote: null,
+        avgVolume: 0,
+        measurementTime: 0
+    };
+    console.log('🗑️ 失敗した低音測定データをクリア');
+
     // リトライ回数チェック
     if (globalState.retryCount < globalState.maxRetries) {
         globalState.retryCount++;
@@ -1432,6 +1442,16 @@ function handleHighPitchMeasurementFailure() {
     // 円形プログレスバーと音量バーを即座にリセット
     updateCircularProgressInstantly(0);
     resetVolumeDisplay();
+
+    // 🎵 v3.1.14新機能: 失敗した測定データをクリア（累積防止）
+    globalState.measurementData.highPhase = {
+        frequencies: [],
+        highestFreq: null,
+        highestNote: null,
+        avgVolume: 0,
+        measurementTime: 0
+    };
+    console.log('🗑️ 失敗した高音測定データをクリア');
 
     // リトライ回数チェック（高音測定用の独立したカウンター）
     if (!globalState.highRetryCount) {
