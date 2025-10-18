@@ -736,6 +736,19 @@ function recordMeasurementData(result) {
         return;
     }
 
+    // 🎵 v3.1.11新機能: 人間の声の周波数範囲チェック（異常値排除）
+    const stability = globalState.voiceStability;
+    if (result.frequency < stability.minFrequencyForVoice ||
+        result.frequency > stability.maxFrequencyForVoice) {
+        console.log('🔇 データ記録スキップ（周波数範囲外）:', {
+            phase: currentPhase,
+            frequency: `${result.frequency.toFixed(1)} Hz`,
+            validRange: `${stability.minFrequencyForVoice}-${stability.maxFrequencyForVoice} Hz`,
+            reason: '人間の声の範囲外'
+        });
+        return;
+    }
+
     const timestamp = Date.now();
 
     // 低音測定フェーズ
