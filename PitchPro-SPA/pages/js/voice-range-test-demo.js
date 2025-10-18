@@ -701,14 +701,10 @@ function recordMeasurementData(result) {
 
     // 🎵 v3.1新機能: 測定中のみ音声連続性チェック
     if (currentPhase === 'measuring-low' || currentPhase === 'measuring-high') {
-        // 🎵 v3.1.12修正: 連続性チェックの条件を緩和
-        // 有効な音声データの判定（音量閾値の10%以上、周波数範囲内）
-        const stability = globalState.voiceStability;
-        const isValidVoice = result.frequency &&
-                             result.frequency >= stability.minFrequencyForVoice &&
-                             result.frequency <= stability.maxFrequencyForVoice &&
-                             result.volume &&
-                             result.volume >= globalState.voiceDetectionThreshold * 0.1; // 20% → 10%に緩和
+        // 🎵 v3.1.13修正: 連続性チェックを音量のみで判定（周波数検出は不安定なため）
+        // 有効な音声データの判定（音量閾値の10%以上）
+        const isValidVoice = result.volume &&
+                             result.volume >= globalState.voiceDetectionThreshold * 0.1; // 1.5%以上
 
         if (!isValidVoice) {
             // 無音フレームカウント
