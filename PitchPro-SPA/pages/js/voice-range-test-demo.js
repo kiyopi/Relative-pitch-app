@@ -178,10 +178,10 @@ let globalState = {
         recentDetections: [], // 最近の検出結果を保持
         requiredStableCount: 2, // 安定判定に必要な連続検出回数（3→2に緩和）
         maxHistoryAge: 800, // 履歴保持時間 (ms)（1000→800に短縮）
-        minFrequencyForVoice: 70, // 人間の声と判定する最低周波数 (Hz)（80→70に緩和）
+        minFrequencyForVoice: 80, // 人間の声と判定する最低周波数 (Hz)（v3.1.12: 70→80に再調整、70Hzはノイズが多い）
         maxFrequencyForVoice: 2500, // 人間の声と判定する最高周波数 (Hz)（2000→2500に緩和）
         // 🎵 v3.1.5新機能: 低音域用の代替基準（継続検出）
-        lowFreqContinuousStart: null, // 70Hz以上の声を最初に検出したタイムスタンプ
+        lowFreqContinuousStart: null, // 80Hz以上の声を最初に検出したタイムスタンプ
         lowFreqContinuousDuration: 1000 // 継続検出時間（1秒）
     },
 
@@ -701,10 +701,14 @@ function recordMeasurementData(result) {
 
     // 🎵 v3.1新機能: 測定中のみ音声連続性チェック
     if (currentPhase === 'measuring-low' || currentPhase === 'measuring-high') {
-        // 有効な音声データの判定（音量閾値の20%以上）
+        // 🎵 v3.1.12修正: 連続性チェックの条件を緩和
+        // 有効な音声データの判定（音量閾値の10%以上、周波数範囲内）
+        const stability = globalState.voiceStability;
         const isValidVoice = result.frequency &&
+                             result.frequency >= stability.minFrequencyForVoice &&
+                             result.frequency <= stability.maxFrequencyForVoice &&
                              result.volume &&
-                             result.volume >= globalState.voiceDetectionThreshold * 0.2;
+                             result.volume >= globalState.voiceDetectionThreshold * 0.1; // 20% → 10%に緩和
 
         if (!isValidVoice) {
             // 無音フレームカウント
@@ -715,6 +719,7 @@ function recordMeasurementData(result) {
                 if (!globalState.hasContinuityFailure) {
                     console.warn('⚠️ 音声途切れ検出: 連続性失敗フラグを設定');
                     console.warn(`📊 無音フレーム数: ${globalState.silentFrameCount}フレーム（約${Math.round(globalState.silentFrameCount * 33)}ms相当）`);
+                    console.warn(`📊 最終チェック値: 周波数=${result.frequency ? result.frequency.toFixed(1) : 'なし'}Hz, 音量=${result.volume ? (result.volume * 100).toFixed(1) : '0'}%`);
                     globalState.hasContinuityFailure = true;
                 }
                 // 測定は継続（3秒後に判定）
