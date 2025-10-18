@@ -1451,11 +1451,11 @@ function handleHighPitchMeasurementFailure() {
             // 低音データがある場合: 部分的な結果として表示
             console.log('低音データのみで部分結果を表示');
 
-            updateBadgeForConfirmed();
-            document.getElementById('main-status-text').textContent = '測定完了！低音域の結果を表示します';
-            document.getElementById('sub-info-text').textContent = '低音域のデータでトレーニング開始可能です';
+            updateBadgeForError(); // エラーアイコン表示（部分的な結果であることを明示）
+            document.getElementById('main-status-text').textContent = '高音測定スキップ - 低音データのみで結果表示';
+            document.getElementById('sub-info-text').textContent = '低音域データのみでトレーニング可能です';
 
-            showNotification('低音域のデータを取得しました。トレーニングを開始できます', 'success');
+            showNotification('高音測定をスキップしました。低音域のデータでトレーニングを開始できます', 'info');
 
             // PitchPro AudioDetector停止（音量バー・マイクも自動リセット）
             if (window.globalAudioDetector) {
