@@ -496,6 +496,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             // 音域テストの状態をリセット
             globalState.currentPhase = 'idle';
             globalState.retryCount = 0;
+            globalState.highRetryCount = 0; // 高音測定リトライカウンターもリセット
             globalState.lowPitchData = [];
             globalState.highPitchData = [];
 
@@ -1720,22 +1721,17 @@ function completeHighPitchMeasurement() {
 async function retryCurrentMeasurement() {
     console.log('🔄 retryCurrentMeasurement() 開始');
     console.log('📋 現在のフェーズ:', globalState.currentPhase);
-    console.log('リトライ回数チェック:', globalState.retryCount, '>=', globalState.maxRetries);
 
-    if (globalState.retryCount >= globalState.maxRetries) {
-        console.log('❌ 最大再試行回数に達しました');
-        showNotification('最大再試行回数に達しました', 'error');
-        return;
-    }
-
-    globalState.retryCount++;
-    console.log(`🔄 再測定 (${globalState.retryCount}/${globalState.maxRetries})`);
+    // 手動再測定時はカウンターをリセット（新しい測定セッションとして扱う）
+    globalState.retryCount = 0;
+    globalState.highRetryCount = 0;
+    console.log('🔄 再測定カウンターをリセット');
 
     clearTimeout(globalState.measurementTimer);
     clearTimeout(globalState.idleTimer);
 
     if (globalState.currentPhase.includes('low')) {
-        console.log('📉 低音再測定モード');
+        console.log('📉 低音測定から再開');
         globalState.currentPhase = 'waiting-for-voice';
         document.getElementById('main-status-text').textContent = '３秒間できるだけ低い声で「あー」と発声しましょう（再測定）';
         document.getElementById('sub-info-text').textContent = 'より大きく、より低い音で歌ってください';
@@ -1748,7 +1744,7 @@ async function retryCurrentMeasurement() {
             await window.globalAudioDetector.startDetection();
         }
     } else if (globalState.currentPhase.includes('high')) {
-        console.log('📈 高音再測定モード');
+        console.log('📈 高音測定から再開');
         globalState.currentPhase = 'waiting-for-voice-high';
         document.getElementById('main-status-text').textContent = '３秒間できるだけ高い声で「あー」と発声しましょう（再測定）';
         document.getElementById('sub-info-text').textContent = 'より大きく、より高い音で歌ってください';
@@ -1765,8 +1761,6 @@ async function retryCurrentMeasurement() {
         // 測定結果をリセット
         globalState.minDetectedFreq = null;
         globalState.maxDetectedFreq = null;
-        globalState.retryCount = 0; // 完了状態からは回数リセット
-        globalState.highRetryCount = 0;
 
         // 低音測定から再開
         globalState.currentPhase = 'waiting-for-voice';
@@ -1794,8 +1788,8 @@ async function retryCurrentMeasurement() {
     document.getElementById('retry-measurement-btn').classList.remove('btn-visible-inline');
     document.getElementById('retry-measurement-btn').classList.add('btn-hidden');
 
-    console.log('✅ 再測定処理完了');
-    showNotification(`再測定を開始します (${globalState.retryCount}回目)`, 'info');
+    console.log('✅ 再測定処理完了（カウンター: 低音=${globalState.retryCount}, 高音=${globalState.highRetryCount}）');
+    showNotification('再測定を開始します', 'info');
 }
 
 // 全測定停止
