@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PitchPro Core Features Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #e5e5e5;
+        }
+        
+        .section {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .test-button {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .test-button:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+        
+        .danger-button {
+            background: #ef4444;
+        }
+        
+        .test-results {
+            background: #374151;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .filter-response {
+            width: 100%;
+            height: 200px;
+            background: #1f2937;
+            border-radius: 5px;
+            margin-top: 10px;
+            position: relative;
+        }
+        
+        .error { color: #ef4444; }
+        .success { color: #10b981; }
+        .warning { color: #f59e0b; }
+        .info { color: #3b82f6; }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .status-item {
+            background: #374151;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 3px solid #10b981;
+        }
+        
+        .status-item.error {
+            border-left-color: #ef4444;
+        }
+        
+        .status-item.warning {
+            border-left-color: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 PitchPro Core Features Test</h1>
+    
+    <div class="section">
+        <h2>🔈 NoiseFilter Test</h2>
+        <p>3段階ノイズフィルタリング（ハイパス・ローパス・ノッチフィルタ）をテストします。</p>
+        <button class="test-button" onclick="testNoiseFilter()">フィルタテスト開始</button>
+        <button class="test-button" onclick="testFilterPresets()">プリセットテスト</button>
+        <button class="test-button" onclick="testFilterResponse()">周波数応答テスト</button>
+        <div id="noise-filter-results" class="test-results"></div>
+        <canvas id="filter-response-canvas" class="filter-response" style="display:none;"></canvas>
+    </div>
+    
+    <div class="section">
+        <h2>🎤 MicrophoneController Test</h2>
+        <p>高レベルマイク管理インターフェースをテストします。</p>
+        <button class="test-button" onclick="testMicrophoneController()">コントローラテスト</button>
+        <button class="test-button" onclick="testMicrophonePermissions()">権限テスト</button>
+        <button class="test-button" onclick="testMicrophoneTest()">マイクテスト実行</button>
+        <button class="test-button danger-button" onclick="stopMicrophone()">マイク停止</button>
+        <div id="microphone-results" class="test-results"></div>
+        <div id="microphone-status" class="status-grid"></div>
+    </div>
+    
+    <div class="section">
+        <h2>🔄 MicrophoneLifecycleManager Test</h2>
+        <p>マイクのライフサイクル管理とリソース参照カウンティングをテストします。</p>
+        <button class="test-button" onclick="testLifecycleManager()">ライフサイクルテスト</button>
+        <button class="test-button" onclick="testReferenceCount()">参照カウンタテスト</button>
+        <div id="lifecycle-results" class="test-results"></div>
+    </div>
+    
+    <div class="section">
+        <h2>⚠️ ErrorNotificationSystem Test</h2>
+        <p>エラー通知システムをテストします。</p>
+        <button class="test-button" onclick="testErrorSystem()">エラー通知テスト</button>
+        <button class="test-button" onclick="testDifferentNotifications()">各種通知テスト</button>
+        <button class="test-button danger-button" onclick="clearNotifications()">通知クリア</button>
+        <div id="error-system-results" class="test-results"></div>
+    </div>
+
+    <script src="pitchpro.umd.js"></script>
+    <script>
+        let globalMicController = null;
+        let globalLifecycleManager = null;
+        let globalErrorSystem = null;
+
+        let log = (elementId, message, type = 'info') => {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : type === 'info' ? 'info' : '';
+            element.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            element.scrollTop = element.scrollHeight;
+        };
+
+        // NoiseFilter Test
+        async function testNoiseFilter() {
+            const resultId = 'noise-filter-results';
+            document.getElementById(resultId).innerHTML = '';
+            
+            try {
+                log(resultId, '🔈 NoiseFilter テスト開始', 'info');
+                
+                // AudioContextを作成（実際のフィルタテスト用）
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                await audioContext.resume();
+                
+                log(resultId, `✅ AudioContext作成完了 (sampleRate: ${audioContext.sampleRate})`, 'success');
+                
+                // NoiseFilterインスタンス作成
+                const noiseFilter = new PitchPro.NoiseFilter(audioContext, {
+                    highpassFreq: 80,
+                    lowpassFreq: 800,
+                    notchFreq: 60,
+                    useFilters: true
+                });
+                
+                log(resultId, '✅ NoiseFilter インスタンス作成成功', 'success');
+                
+                // 設定確認
+                const config = noiseFilter.getConfig();
+                log(resultId, `設定: ${JSON.stringify(config)}`, 'info');
+                
+                // ステータス確認
+                const status = noiseFilter.getStatus();
+                log(resultId, `ステータス: ${JSON.stringify(status)}`, 'info');
+                
+                // フィルタの有効/無効テスト
+                log(resultId, 'フィルタ無効化テスト...', 'info');
+                noiseFilter.setEnabled(false);
+                const disabledStatus = noiseFilter.getStatus();
+                log(resultId, `無効化後: useFilters=${disabledStatus.useFilters}`, disabledStatus.useFilters ? 'error' : 'success');
+                
+                noiseFilter.setEnabled(true);
+                const enabledStatus = noiseFilter.getStatus();
+                log(resultId, `有効化後: useFilters=${enabledStatus.useFilters}`, enabledStatus.useFilters ? 'success' : 'error');
+                
+                // パラメータ更新テスト
+                log(resultId, 'パラメータ更新テスト...', 'info');
+                noiseFilter.updateFrequencies({
+                    highpassFreq: 100,
+                    lowpassFreq: 700,
+                    notchFreq: 50
+                });
+                
+                const updatedConfig = noiseFilter.getConfig();
+                log(resultId, `更新後の設定: highpass=${updatedConfig.highpassFreq}Hz, lowpass=${updatedConfig.lowpassFreq}Hz, notch=${updatedConfig.notchFreq}Hz`, 'success');
+                
+                // クリーンアップ
+                noiseFilter.destroy();
+                audioContext.close();
+                
+                log(resultId, '✅ NoiseFilter テスト完了', 'success');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+                console.error('NoiseFilter test error:', error);
+            }
+        }
+        
+        async function testFilterPresets() {
+            const resultId = 'noise-filter-results';
+            
+            try {
+                log(resultId, '🎛️ フィルタプリセットテスト開始', 'info');
+                
+                const presets = ['voice', 'instrument', 'wide', 'minimal'];
+                
+                for (const preset of presets) {
+                    const config = PitchPro.NoiseFilter.getPresetConfig(preset);
+                    log(resultId, `${preset}プリセット: ${JSON.stringify(config)}`, 'info');
+                }
+                
+                log(resultId, '✅ プリセットテスト完了', 'success');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testFilterResponse() {
+            const resultId = 'noise-filter-results';
+            
+            try {
+                log(resultId, '📊 周波数応答テスト開始', 'info');
+                
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                await audioContext.resume();
+                
+                const noiseFilter = new PitchPro.NoiseFilter(audioContext);
+                
+                // テスト周波数での応答を確認
+                const testFrequencies = [50, 80, 100, 200, 440, 800, 1000, 2000];
+                
+                for (const freq of testFrequencies) {
+                    const response = noiseFilter.getFilterResponse(freq);
+                    log(resultId, `${freq}Hz: magnitude=${response.magnitude.toFixed(3)}, phase=${response.phase.toFixed(3)}`, 'info');
+                }
+                
+                noiseFilter.destroy();
+                audioContext.close();
+                
+                log(resultId, '✅ 周波数応答テスト完了', 'success');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+            }
+        }
+
+        // MicrophoneController Test
+        async function testMicrophoneController() {
+            const resultId = 'microphone-results';
+            document.getElementById(resultId).innerHTML = '';
+            
+            try {
+                log(resultId, '🎤 MicrophoneController テスト開始', 'info');
+                
+                // インスタンス作成
+                globalMicController = new PitchPro.MicrophoneController({}, {}, true);
+                
+                log(resultId, '✅ MicrophoneController インスタンス作成成功', 'success');
+                
+                // コールバック設定
+                globalMicController.setCallbacks({
+                    onStateChange: (state) => {
+                        log(resultId, `状態変更: ${state}`, 'info');
+                        updateMicrophoneStatus();
+                    },
+                    onError: (error) => {
+                        log(resultId, `エラー: ${error.message}`, 'error');
+                    },
+                    onPermissionChange: (granted) => {
+                        log(resultId, `権限変更: ${granted ? '許可' : '拒否'}`, granted ? 'success' : 'error');
+                    },
+                    onDeviceChange: (specs) => {
+                        log(resultId, `デバイス検出: ${specs.deviceType} (感度: ${specs.sensitivity})`, 'info');
+                    }
+                });
+                
+                // デバイススペック取得
+                const deviceSpecs = globalMicController.getDeviceSpecs();
+                if (deviceSpecs) {
+                    log(resultId, `デバイス: ${deviceSpecs.deviceType}, 感度: ${deviceSpecs.sensitivity}`, 'info');
+                }
+                
+                // 初期状態確認
+                updateMicrophoneStatus();
+                
+                log(resultId, '✅ MicrophoneController テスト完了', 'success');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+                console.error('MicrophoneController test error:', error);
+            }
+        }
+        
+        async function testMicrophonePermissions() {
+            const resultId = 'microphone-results';
+            
+            if (!globalMicController) {
+                log(resultId, '⚠️ 先にMicrophoneControllerテストを実行してください', 'warning');
+                return;
+            }
+            
+            try {
+                log(resultId, '🔐 権限テスト開始', 'info');
+                
+                // 権限状態確認
+                const permissionStatus = await globalMicController.checkPermissionStatus();
+                log(resultId, `現在の権限状態: ${permissionStatus}`, 'info');
+                
+                // 権限要求
+                log(resultId, '権限要求中...', 'info');
+                const granted = await globalMicController.requestPermission();
+                log(resultId, `権限要求結果: ${granted ? '成功' : '失敗'}`, granted ? 'success' : 'error');
+                
+                updateMicrophoneStatus();
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testMicrophoneTest() {
+            const resultId = 'microphone-results';
+            
+            if (!globalMicController) {
+                log(resultId, '⚠️ 先にMicrophoneControllerテストを実行してください', 'warning');
+                return;
+            }
+            
+            try {
+                log(resultId, '🧪 マイクテスト実行中... (3秒間)', 'info');
+                
+                const testResult = await globalMicController.testMicrophone(3000);
+                
+                log(resultId, `テスト結果:`, 'info');
+                log(resultId, `  成功: ${testResult.success}`, testResult.success ? 'success' : 'error');
+                log(resultId, `  最大音量: ${testResult.volume.toFixed(2)}`, 'info');
+                log(resultId, `  検出周波数: ${testResult.frequency ? testResult.frequency.toFixed(0) + 'Hz' : 'なし'}`, 'info');
+                log(resultId, `  実行時間: ${testResult.duration}ms`, 'info');
+                
+                if (testResult.error) {
+                    log(resultId, `  エラー: ${testResult.error.message}`, 'error');
+                }
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+            }
+        }
+        
+        function stopMicrophone() {
+            const resultId = 'microphone-results';
+            
+            if (!globalMicController) {
+                log(resultId, '⚠️ 停止するマイクがありません', 'warning');
+                return;
+            }
+            
+            log(resultId, '🛑 マイク停止中...', 'info');
+            globalMicController.stop();
+            log(resultId, '✅ マイク停止完了', 'success');
+            
+            updateMicrophoneStatus();
+        }
+        
+        function updateMicrophoneStatus() {
+            const statusContainer = document.getElementById('microphone-status');
+            
+            if (!globalMicController) {
+                statusContainer.innerHTML = '<div class="status-item error">MicrophoneController未初期化</div>';
+                return;
+            }
+            
+            const status = globalMicController.getStatus();
+            
+            const statusItems = [
+                { label: '状態', value: status.state, type: status.state === 'error' ? 'error' : status.state === 'active' ? 'success' : 'info' },
+                { label: '権限', value: status.isPermissionGranted ? '許可済み' : '未許可', type: status.isPermissionGranted ? 'success' : 'error' },
+                { label: 'アクティブ', value: status.isActive ? 'はい' : 'いいえ', type: status.isActive ? 'success' : 'info' },
+                { label: '準備完了', value: status.isReady ? 'はい' : 'いいえ', type: status.isReady ? 'success' : 'info' },
+                { label: '感度', value: status.sensitivity + 'x', type: 'info' },
+                { label: 'デバイス', value: status.deviceSpecs?.deviceType || 'なし', type: 'info' }
+            ];
+            
+            statusContainer.innerHTML = statusItems.map(item => 
+                `<div class="status-item ${item.type}">
+                    <strong>${item.label}:</strong> ${item.value}
+                </div>`
+            ).join('');
+        }
+
+        // LifecycleManager Test
+        async function testLifecycleManager() {
+            const resultId = 'lifecycle-results';
+            document.getElementById(resultId).innerHTML = '';
+            
+            try {
+                log(resultId, '🔄 MicrophoneLifecycleManager テスト開始', 'info');
+                
+                // AudioManagerが必要
+                const audioManager = new PitchPro.AudioManager();
+                globalLifecycleManager = new PitchPro.MicrophoneLifecycleManager(audioManager);
+                
+                log(resultId, '✅ LifecycleManager インスタンス作成成功', 'success');
+                
+                // コールバック設定
+                globalLifecycleManager.setCallbacks({
+                    onStateChange: (state) => {
+                        log(resultId, `状態変更: ${state}`, 'info');
+                    },
+                    onError: (error) => {
+                        log(resultId, `エラー: ${error.message}`, 'error');
+                    }
+                });
+                
+                // 初期状態確認
+                const initialStatus = globalLifecycleManager.getStatus();
+                log(resultId, `初期状態: ${JSON.stringify(initialStatus)}`, 'info');
+                
+                log(resultId, '✅ LifecycleManager テスト完了', 'success');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+                console.error('LifecycleManager test error:', error);
+            }
+        }
+        
+        async function testReferenceCount() {
+            const resultId = 'lifecycle-results';
+            
+            if (!globalLifecycleManager) {
+                log(resultId, '⚠️ 先にLifecycleManagerテストを実行してください', 'warning');
+                return;
+            }
+            
+            try {
+                log(resultId, '🔢 参照カウンタテスト開始', 'info');
+                
+                // 複数回取得
+                log(resultId, 'リソース取得 1回目...', 'info');
+                try {
+                    await globalLifecycleManager.acquire();
+                    log(resultId, '✅ 1回目成功', 'success');
+                } catch (error) {
+                    log(resultId, `❌ 1回目失敗: ${error.message}`, 'error');
+                }
+                
+                log(resultId, 'リソース取得 2回目...', 'info');
+                try {
+                    await globalLifecycleManager.acquire();
+                    log(resultId, '✅ 2回目成功', 'success');
+                } catch (error) {
+                    log(resultId, `❌ 2回目失敗: ${error.message}`, 'error');
+                }
+                
+                // ステータス確認
+                const status = globalLifecycleManager.getStatus();
+                log(resultId, `現在のステータス: ${JSON.stringify(status)}`, 'info');
+                
+                // 解放テスト
+                log(resultId, 'リソース解放 1回目...', 'info');
+                globalLifecycleManager.release();
+                log(resultId, '✅ 1回目解放完了', 'success');
+                
+                log(resultId, 'リソース解放 2回目...', 'info');
+                globalLifecycleManager.release();
+                log(resultId, '✅ 2回目解放完了', 'success');
+                
+                const finalStatus = globalLifecycleManager.getStatus();
+                log(resultId, `最終ステータス: ${JSON.stringify(finalStatus)}`, 'info');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+            }
+        }
+
+        // ErrorNotificationSystem Test
+        function testErrorSystem() {
+            const resultId = 'error-system-results';
+            document.getElementById(resultId).innerHTML = '';
+            
+            try {
+                log(resultId, '⚠️ ErrorNotificationSystem テスト開始', 'info');
+                
+                globalErrorSystem = new PitchPro.ErrorNotificationSystem();
+                log(resultId, '✅ ErrorNotificationSystem インスタンス作成成功', 'success');
+                
+                // 基本エラー表示
+                globalErrorSystem.showError(
+                    'テストエラー',
+                    'これはテスト用のエラーメッセージです。',
+                    { priority: 'medium', autoHide: true, duration: 3000 }
+                );
+                
+                log(resultId, '📢 エラー通知を表示しました（3秒後に自動消去）', 'success');
+                
+                // マイクエラー表示
+                setTimeout(() => {
+                    const micError = new Error('マイクアクセステストエラー');
+                    globalErrorSystem.showMicrophoneError(micError, 'test');
+                    log(resultId, '📢 マイクエラー通知を表示しました', 'success');
+                }, 1000);
+                
+                log(resultId, '✅ ErrorSystem テスト完了', 'success');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+                console.error('ErrorSystem test error:', error);
+            }
+        }
+        
+        function testDifferentNotifications() {
+            const resultId = 'error-system-results';
+            
+            if (!globalErrorSystem) {
+                log(resultId, '⚠️ 先にErrorSystemテストを実行してください', 'warning');
+                return;
+            }
+            
+            const notifications = [
+                { type: 'success', title: '成功', message: '操作が正常に完了しました', priority: 'low' },
+                { type: 'warning', title: '警告', message: '注意が必要な状況です', priority: 'medium' },
+                { type: 'error', title: 'エラー', message: '重大なエラーが発生しました', priority: 'high' },
+                { type: 'info', title: '情報', message: '追加の情報をお知らせします', priority: 'low' }
+            ];
+            
+            notifications.forEach((notif, index) => {
+                setTimeout(() => {
+                    globalErrorSystem.showNotification({
+                        type: notif.type,
+                        title: notif.title,
+                        message: notif.message,
+                        priority: notif.priority,
+                        autoHide: true,
+                        duration: 4000
+                    });
+                    log(resultId, `📢 ${notif.type}通知を表示`, 'info');
+                }, index * 500);
+            });
+        }
+        
+        function clearNotifications() {
+            const resultId = 'error-system-results';
+            
+            if (!globalErrorSystem) {
+                log(resultId, '⚠️ ErrorSystemが初期化されていません', 'warning');
+                return;
+            }
+            
+            globalErrorSystem.clearAll();
+            log(resultId, '🗑️ 全ての通知をクリアしました', 'success');
+        }
+        
+        // ページ読み込み時の初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('PitchPro Core Features Test loaded');
+            
+            // ライブラリが正常に読み込まれているか確認
+            if (typeof PitchPro === 'undefined') {
+                document.body.innerHTML = '<h1 style="color: red;">❌ PitchProライブラリが読み込まれていません</h1>';
+                return;
+            }
+            
+            // 利用可能なCore機能を確認
+            const availableFeatures = {
+                NoiseFilter: !!PitchPro.NoiseFilter,
+                MicrophoneController: !!PitchPro.MicrophoneController,
+                MicrophoneLifecycleManager: !!PitchPro.MicrophoneLifecycleManager,
+                ErrorNotificationSystem: !!PitchPro.ErrorNotificationSystem
+            };
+            
+            console.log('利用可能なCore機能:', availableFeatures);
+        });
+        
+        // ページ離脱時のクリーンアップ
+        window.addEventListener('beforeunload', () => {
+            if (globalMicController) {
+                globalMicController.destroy();
+            }
+            if (globalLifecycleManager) {
+                globalLifecycleManager.destroy();
+            }
+            if (globalErrorSystem) {
+                globalErrorSystem.destroy();
+            }
+        });
+    </script>
+</body>
+</html>

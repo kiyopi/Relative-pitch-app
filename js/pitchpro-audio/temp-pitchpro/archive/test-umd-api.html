@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UMD API Test</title>
+</head>
+<body>
+    <h1>UMD API Test</h1>
+    <div id="results"></div>
+    
+    <script src="dist/pitchpro.umd.js"></script>
+    <script>
+        const results = document.getElementById('results');
+        
+        function log(message) {
+            results.innerHTML += `<p>${message}</p>`;
+            console.log(message);
+        }
+        
+        // PitchProオブジェクトの確認
+        log('PitchPro available: ' + (typeof window.PitchPro !== 'undefined'));
+        
+        if (window.PitchPro) {
+            log('PitchPro keys: ' + Object.keys(window.PitchPro).join(', '));
+            
+            // AudioDetectionComponentの確認
+            if (window.PitchPro.AudioDetectionComponent) {
+                log('AudioDetectionComponent available: YES');
+                
+                const component = new window.PitchPro.AudioDetectionComponent({
+                    frequencySelector: '#test-freq'
+                });
+                
+                // updateSelectorsメソッドの確認
+                if (typeof component.updateSelectors === 'function') {
+                    log('updateSelectors method available: YES');
+                    log('updateSelectors is callable: ' + (component.updateSelectors instanceof Function));
+                } else {
+                    log('updateSelectors method available: NO');
+                    log('Available methods: ' + Object.getOwnPropertyNames(component).filter(name => typeof component[name] === 'function').join(', '));
+                    log('Prototype methods: ' + Object.getOwnPropertyNames(Object.getPrototypeOf(component)).filter(name => typeof component[name] === 'function').join(', '));
+                }
+            } else {
+                log('AudioDetectionComponent available: NO');
+            }
+        }
+    </script>
+</body>
+</html>

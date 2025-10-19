@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音量レベル診断ツール</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        .container {
+            background: #16213e;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #0f3460;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+        .control-panel {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 10px 20px;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #c13651;
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .metric-card {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #e94560;
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4fbdba;
+        }
+        .volume-bars {
+            margin: 20px 0;
+        }
+        .volume-bar-container {
+            margin: 10px 0;
+        }
+        .volume-bar-label {
+            font-size: 14px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .volume-bar-bg {
+            width: 100%;
+            height: 30px;
+            background: #0f3460;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        .volume-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4fbdba 0%, #e94560 100%);
+            transition: width 0.1s ease;
+            border-radius: 15px;
+        }
+        .debug-log {
+            background: #000;
+            color: #0f0;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .debug-line {
+            margin: 2px 0;
+        }
+        .controls-row {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .slider-container {
+            flex: 1;
+        }
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: #0f3460;
+            border-radius: 4px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            width: 20px;
+            height: 20px;
+            background: #e94560;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .status.ready { background: #0f3460; }
+        .status.active { background: #0d7377; }
+        .status.error { background: #c13651; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 音量レベル診断ツール</h1>
+        
+        <div class="status" id="status">初期化待機中...</div>
+        
+        <div class="control-panel">
+            <button id="startBtn">🎤 マイク開始</button>
+            <button id="stopBtn" disabled>⏹ 停止</button>
+            <button id="resetBtn">🔄 リセット</button>
+            <button id="debugBtn">🐛 デバッグログ表示/非表示</button>
+        </div>
+
+        <div class="metrics">
+            <div class="metric-card">
+                <div class="metric-label">実際のRMS値</div>
+                <div class="metric-value" id="rawRms">0.00000000</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">最大サンプル値</div>
+                <div class="metric-value" id="adjustedRms">0.000000</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">最終音量 (%)</div>
+                <div class="metric-value" id="volumePercent">0.0</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">ピーク音量</div>
+                <div class="metric-value" id="peakVolume">0.0</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">増幅係数</div>
+                <div class="metric-value" id="amplification">50</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">ゲインブースト</div>
+                <div class="metric-value" id="gainBoost">3.0</div>
+            </div>
+        </div>
+
+        <div class="volume-bars">
+            <div class="volume-bar-container">
+                <div class="volume-bar-label">
+                    <span>現在の音量 (リアルタイム)</span>
+                    <span id="currentVolumeText">0%</span>
+                </div>
+                <div class="volume-bar-bg">
+                    <div class="volume-bar" id="currentVolumeBar" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="volume-bar-container">
+                <div class="volume-bar-label">
+                    <span>平滑化音量 (5フレーム平均)</span>
+                    <span id="smoothVolumeText">0%</span>
+                </div>
+                <div class="volume-bar-bg">
+                    <div class="volume-bar" id="smoothVolumeBar" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="volume-bar-container">
+                <div class="volume-bar-label">
+                    <span>UI表示音量 (最終出力)</span>
+                    <span id="uiVolumeText">0%</span>
+                </div>
+                <div class="volume-bar-bg">
+                    <div class="volume-bar" id="uiVolumeBar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-row">
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>増幅係数</span>
+                    <span id="ampValue">50</span>
+                </div>
+                <input type="range" id="ampSlider" min="1" max="100" value="50" step="1">
+            </div>
+            
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>ゲインブースト</span>
+                    <span id="gainValue">3.0</span>
+                </div>
+                <input type="range" id="gainSlider" min="0.5" max="5.0" value="3.0" step="0.1">
+            </div>
+            
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>🎚️ 音声ストリームゲイン</span>
+                    <span id="streamGainValue">1.0</span>
+                </div>
+                <input type="range" id="streamGainSlider" min="0.1" max="20.0" value="1.0" step="0.1">
+            </div>
+        </div>
+
+        <div class="debug-log" id="debugLog" style="display: none;">
+            <div class="debug-line">デバッグログ待機中...</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { AudioManager, PitchDetector } from './dist/index.esm.js';
+        
+        let audioManager = null;
+        let pitchDetector = null;
+        let debugLines = [];
+        let peakVolume = 0;
+        let showDebug = false;
+        
+        const elements = {
+            startBtn: document.getElementById('startBtn'),
+            stopBtn: document.getElementById('stopBtn'),
+            resetBtn: document.getElementById('resetBtn'),
+            debugBtn: document.getElementById('debugBtn'),
+            status: document.getElementById('status'),
+            
+            rawRms: document.getElementById('rawRms'),
+            adjustedRms: document.getElementById('adjustedRms'),
+            volumePercent: document.getElementById('volumePercent'),
+            peakVolume: document.getElementById('peakVolume'),
+            amplification: document.getElementById('amplification'),
+            gainBoost: document.getElementById('gainBoost'),
+            
+            currentVolumeBar: document.getElementById('currentVolumeBar'),
+            currentVolumeText: document.getElementById('currentVolumeText'),
+            smoothVolumeBar: document.getElementById('smoothVolumeBar'),
+            smoothVolumeText: document.getElementById('smoothVolumeText'),
+            uiVolumeBar: document.getElementById('uiVolumeBar'),
+            uiVolumeText: document.getElementById('uiVolumeText'),
+            
+            ampSlider: document.getElementById('ampSlider'),
+            ampValue: document.getElementById('ampValue'),
+            gainSlider: document.getElementById('gainSlider'),
+            gainValue: document.getElementById('gainValue'),
+            streamGainSlider: document.getElementById('streamGainSlider'),
+            streamGainValue: document.getElementById('streamGainValue'),
+            
+            debugLog: document.getElementById('debugLog')
+        };
+        
+        function updateStatus(message, type = 'ready') {
+            elements.status.textContent = message;
+            elements.status.className = `status ${type}`;
+        }
+        
+        function addDebugLine(line) {
+            const time = new Date().toLocaleTimeString('ja-JP', { 
+                hour12: false, 
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                fractionalSecondDigits: 3 
+            });
+            debugLines.push(`[${time}] ${line}`);
+            if (debugLines.length > 100) debugLines.shift();
+            
+            if (showDebug) {
+                elements.debugLog.innerHTML = debugLines
+                    .map(line => `<div class="debug-line">${line}</div>`)
+                    .reverse()
+                    .join('');
+            }
+        }
+        
+        // Custom pitch detector that exposes internal values
+        class DebugPitchDetector extends PitchDetector {
+            getInternalMetrics() {
+                // Access internal state for debugging
+                return {
+                    currentVolume: this.currentVolume,
+                    rawVolume: this.rawVolume,
+                    stableVolume: this.stableVolume,
+                    volumeHistory: this.volumeHistory,
+                    deviceSpecs: this.deviceSpecs
+                };
+            }
+            
+            // Override detectPitch to expose raw values
+            detectPitchWithMetrics(callback) {
+                // Hook into the detection process
+                const originalCallback = this.callbacks.onPitchUpdate;
+                this.callbacks.onPitchUpdate = (result) => {
+                    callback(result, this.getInternalMetrics());
+                    if (originalCallback) originalCallback(result);
+                };
+            }
+        }
+        
+        async function initialize() {
+            try {
+                updateStatus('初期化中...', 'ready');
+                
+                audioManager = new AudioManager({
+                    sampleRate: 44100,
+                    channelCount: 1,
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: false
+                });
+                
+                await audioManager.initialize();
+                
+                pitchDetector = new DebugPitchDetector(audioManager, {
+                    fftSize: 4096,
+                    smoothing: 0.1,
+                    clarityThreshold: 0.4,
+                    minVolumeAbsolute: 0.003,
+                    volumeSensitivity: {
+                        amplificationFactor: parseFloat(elements.ampSlider.value),
+                        gainBoost: parseFloat(elements.gainSlider.value)
+                    },
+                    volumeHistory: {
+                        historyLength: 5,
+                        useTypedArray: true
+                    }
+                });
+                
+                await pitchDetector.initialize();
+                
+                // Set up metrics callback
+                pitchDetector.detectPitchWithMetrics((result, metrics) => {
+                    // Update metrics display
+                    const deviceSpecs = metrics.deviceSpecs || {};
+                    
+                    // Get actual RMS from internal metrics
+                    // Since we're using a custom DebugPitchDetector, we can access internal values
+                    const rawRmsEstimate = metrics.rawVolume > 0 ? metrics.rawVolume / 5000000 / 30 / 2 : 0;
+                    elements.rawRms.textContent = rawRmsEstimate.toFixed(8);
+                    
+                    // Calculate what the RMS should be for the current volume
+                    const targetRms = result.volume / (30 * 2 * 5000000) * 100;
+                    elements.adjustedRms.textContent = targetRms.toFixed(8);
+                    
+                    // Add calculation info to debug
+                    const scalingFactor = 30 * 2 * 5000000;
+                    addDebugLine(`Vol: ${result.volume.toFixed(2)}% | Est. RMS: ${rawRmsEstimate.toFixed(8)} | Scaling: ${scalingFactor.toLocaleString()}`);
+                    
+                    // Show what volume we'd get with different scaling
+                    const suggestedScaling = result.volume > 0 ? (50 / result.volume) * scalingFactor : scalingFactor;
+                    if (result.volume > 0 && result.volume < 40) {
+                        addDebugLine(`💡 Suggested scaling for 50% volume: ${suggestedScaling.toLocaleString()}`);
+                    }
+                    elements.volumePercent.textContent = result.volume.toFixed(2);
+                    
+                    // Update peak
+                    if (result.volume > peakVolume) {
+                        peakVolume = result.volume;
+                        elements.peakVolume.textContent = peakVolume.toFixed(2);
+                    }
+                    
+                    // Update volume bars
+                    elements.currentVolumeBar.style.width = `${Math.min(100, metrics.currentVolume)}%`;
+                    elements.currentVolumeText.textContent = `${metrics.currentVolume.toFixed(1)}%`;
+                    
+                    elements.smoothVolumeBar.style.width = `${Math.min(100, metrics.stableVolume)}%`;
+                    elements.smoothVolumeText.textContent = `${metrics.stableVolume.toFixed(1)}%`;
+                    
+                    elements.uiVolumeBar.style.width = `${Math.min(100, result.volume)}%`;
+                    elements.uiVolumeText.textContent = `${result.volume.toFixed(1)}%`;
+                    
+                    // Debug logging
+                    if (result.volume > 0.1) {
+                        addDebugLine(`Vol: ${result.volume.toFixed(2)}% | Raw: ${metrics.rawVolume.toFixed(2)}% | Stable: ${metrics.stableVolume.toFixed(2)}% | Freq: ${result.frequency.toFixed(1)}Hz`);
+                    }
+                });
+                
+                updateStatus('準備完了 - マイク開始をクリック', 'ready');
+                
+            } catch (error) {
+                console.error('初期化エラー:', error);
+                updateStatus(`エラー: ${error.message}`, 'error');
+            }
+        }
+        
+        elements.startBtn.addEventListener('click', async () => {
+            if (!pitchDetector) await initialize();
+            
+            const started = pitchDetector.startDetection();
+            if (started) {
+                updateStatus('🎤 検出中...', 'active');
+                elements.startBtn.disabled = true;
+                elements.stopBtn.disabled = false;
+                addDebugLine('音程検出開始');
+            }
+        });
+        
+        elements.stopBtn.addEventListener('click', () => {
+            if (pitchDetector) {
+                pitchDetector.stopDetection();
+                updateStatus('停止中', 'ready');
+                elements.startBtn.disabled = false;
+                elements.stopBtn.disabled = true;
+                addDebugLine('音程検出停止');
+            }
+        });
+        
+        elements.resetBtn.addEventListener('click', () => {
+            peakVolume = 0;
+            elements.peakVolume.textContent = '0.0';
+            debugLines = [];
+            elements.debugLog.innerHTML = '<div class="debug-line">デバッグログリセット</div>';
+            addDebugLine('リセット実行');
+        });
+        
+        elements.debugBtn.addEventListener('click', () => {
+            showDebug = !showDebug;
+            elements.debugLog.style.display = showDebug ? 'block' : 'none';
+        });
+        
+        // Slider controls
+        elements.ampSlider.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            elements.ampValue.textContent = value;
+            elements.amplification.textContent = value;
+            
+            if (pitchDetector) {
+                pitchDetector.updateVolumeSensitivity({
+                    amplificationFactor: value
+                });
+                addDebugLine(`増幅係数変更: ${value}`);
+            }
+        });
+        
+        elements.gainSlider.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            elements.gainValue.textContent = value.toFixed(1);
+            elements.gainBoost.textContent = value.toFixed(1);
+            
+            if (pitchDetector) {
+                pitchDetector.updateVolumeSensitivity({
+                    gainBoost: value
+                });
+                addDebugLine(`ゲインブースト変更: ${value.toFixed(1)}`);
+            }
+        });
+
+        // 🎚️ 音声ストリームゲイン制御 - 実際のマイク音量を物理的に増幅
+        elements.streamGainSlider.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            elements.streamGainValue.textContent = value.toFixed(1);
+            
+            if (audioManager) {
+                audioManager.setSensitivity(value);
+                addDebugLine(`🎚️ 音声ストリームゲイン変更: ${value.toFixed(1)}x`);
+                
+                // リアルタイムでゲイン値を確認
+                setTimeout(() => {
+                    const actualGain = audioManager.getSensitivity();
+                    addDebugLine(`✅ 実際のゲイン: ${actualGain.toFixed(1)}x`);
+                }, 100);
+            }
+        });
+        
+        // Initialize on load
+        initialize();
+    </script>
+</body>
+</html>

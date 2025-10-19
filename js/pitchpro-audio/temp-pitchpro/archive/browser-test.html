@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Browser API Test</title>
+</head>
+<body>
+    <h1>PitchPro API Test (ブラウザ環境)</h1>
+    
+    <div id="results"></div>
+    
+    <script src="dist/pitchpro.umd.js"></script>
+    <script>
+        const results = document.getElementById('results');
+        
+        function log(message) {
+            results.innerHTML += `<p style="margin: 5px 0; padding: 5px; background: #f0f0f0;">${message}</p>`;
+            console.log(message);
+        }
+        
+        try {
+            log('🔍 Testing PitchPro UMD Loading...');
+            
+            // Step 1: Check if PitchPro is available
+            log('1. PitchPro available: ' + (typeof window.PitchPro !== 'undefined'));
+            
+            if (window.PitchPro) {
+                // Step 2: Show available exports
+                const keys = Object.keys(window.PitchPro);
+                log('2. PitchPro exports: ' + keys.join(', '));
+                
+                // Step 3: Check AudioDetectionComponent specifically
+                if (window.PitchPro.AudioDetectionComponent) {
+                    log('3. AudioDetectionComponent: ✅ FOUND');
+                    
+                    // Step 4: Create instance
+                    try {
+                        const component = new window.PitchPro.AudioDetectionComponent({
+                            frequencySelector: '#test'
+                        });
+                        log('4. Component instance created: ✅ SUCCESS');
+                        
+                        // Step 5: Check for updateSelectors method
+                        if (typeof component.updateSelectors === 'function') {
+                            log('5. updateSelectors method: ✅ FOUND');
+                            log('6. updateSelectors type: ' + typeof component.updateSelectors);
+                            
+                            // Step 6: Try to call updateSelectors (without actual DOM elements)
+                            try {
+                                component.updateSelectors({
+                                    frequencySelector: '#new-selector'
+                                });
+                                log('7. updateSelectors call: ✅ SUCCESS');
+                            } catch (error) {
+                                log('7. updateSelectors call: ❌ ERROR - ' + error.message);
+                            }
+                        } else {
+                            log('5. updateSelectors method: ❌ NOT FOUND');
+                            
+                            // Show available methods
+                            const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(component))
+                                .filter(name => typeof component[name] === 'function' && name !== 'constructor');
+                            log('Available methods: ' + methods.join(', '));
+                        }
+                    } catch (error) {
+                        log('4. Component creation failed: ❌ ERROR - ' + error.message);
+                    }
+                } else {
+                    log('3. AudioDetectionComponent: ❌ NOT FOUND');
+                }
+            } else {
+                log('❌ PitchPro is not available on window');
+                log('window.PitchPro = ' + window.PitchPro);
+                log('typeof window.PitchPro = ' + typeof window.PitchPro);
+            }
+            
+        } catch (error) {
+            log('❌ Test error: ' + error.message);
+            console.error('Test error details:', error);
+        }
+    </script>
+</body>
+</html>

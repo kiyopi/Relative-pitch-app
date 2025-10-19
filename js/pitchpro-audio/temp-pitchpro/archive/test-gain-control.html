@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gain Control Test - PitchPro</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .control-group {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #0056CC;
+        }
+        .button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .status.info { background: #e3f2fd; }
+        .status.success { background: #e8f5e8; }
+        .status.error { background: #ffebee; }
+        .volume-meter {
+            width: 100%;
+            height: 20px;
+            background: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .volume-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #FFC107, #FF5722);
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎚️ Gain Control Test</h1>
+        <p>マイクのゲイン（音量増幅）をテストします</p>
+        
+        <div class="control-group">
+            <h3>マイクロフォン制御</h3>
+            <button id="initBtn" class="button">マイク初期化</button>
+            <button id="stopBtn" class="button" disabled>停止</button>
+            <div id="micStatus" class="status info">準備中...</div>
+        </div>
+
+        <div class="control-group">
+            <h3>ゲインコントロール</h3>
+            <label for="gainSlider">ゲイン: <span id="gainValue">1.0</span>x</label>
+            <input type="range" id="gainSlider" class="slider" min="0.1" max="20" step="0.1" value="1.0" disabled>
+            
+            <div>
+                <button id="gain1x" class="button" disabled>1x (標準)</button>
+                <button id="gain2x" class="button" disabled>2x (2倍)</button>
+                <button id="gain5x" class="button" disabled>5x (5倍)</button>
+                <button id="gain10x" class="button" disabled>10x (10倍)</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <h3>音量モニター</h3>
+            <div class="volume-meter">
+                <div id="volumeBar" class="volume-bar"></div>
+            </div>
+            <div id="volumeText" class="status info">音量: 0%</div>
+        </div>
+
+        <div class="control-group">
+            <h3>デバイス情報</h3>
+            <div id="deviceInfo" class="status info">-</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { MicrophoneController } from './dist/index.esm.js';
+
+        let micController = null;
+        let volumeMonitorInterval = null;
+
+        // DOM要素
+        const initBtn = document.getElementById('initBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const micStatus = document.getElementById('micStatus');
+        const gainSlider = document.getElementById('gainSlider');
+        const gainValue = document.getElementById('gainValue');
+        const volumeBar = document.getElementById('volumeBar');
+        const volumeText = document.getElementById('volumeText');
+        const deviceInfo = document.getElementById('deviceInfo');
+
+        // ボタン要素
+        const gain1xBtn = document.getElementById('gain1x');
+        const gain2xBtn = document.getElementById('gain2x');
+        const gain5xBtn = document.getElementById('gain5x');
+        const gain10xBtn = document.getElementById('gain10x');
+
+        // 初期化
+        initBtn.addEventListener('click', async () => {
+            try {
+                micStatus.textContent = 'マイク初期化中...';
+                micStatus.className = 'status info';
+                
+                micController = new MicrophoneController();
+                
+                // イベントリスナー設定
+                micController.setCallbacks({
+                    onStateChange: (state) => {
+                        micStatus.textContent = `状態: ${state}`;
+                        micStatus.className = 'status success';
+                    },
+                    onError: (error) => {
+                        micStatus.textContent = `エラー: ${error.message}`;
+                        micStatus.className = 'status error';
+                    },
+                    onDeviceChange: (specs) => {
+                        deviceInfo.textContent = `デバイス: ${specs.deviceType}, 感度: ${specs.sensitivity}x`;
+                    }
+                });
+
+                // カスタムイベントリスナー
+                window.addEventListener('pitchpro:gainChanged', (event) => {
+                    console.log('🎚️ Gain changed:', event.detail.gain);
+                });
+
+                // マイク初期化
+                await micController.initialize();
+                
+                micStatus.textContent = '初期化完了';
+                micStatus.className = 'status success';
+                
+                // UI状態更新
+                initBtn.disabled = true;
+                stopBtn.disabled = false;
+                gainSlider.disabled = false;
+                gain1xBtn.disabled = false;
+                gain2xBtn.disabled = false;
+                gain5xBtn.disabled = false;
+                gain10xBtn.disabled = false;
+                
+                // 現在のゲイン値表示
+                const currentGain = micController.getGain();
+                gainSlider.value = currentGain;
+                gainValue.textContent = currentGain.toFixed(1);
+                
+                // 音量モニタリング開始
+                startVolumeMonitoring();
+                
+                console.log('✅ マイク初期化完了');
+                
+            } catch (error) {
+                console.error('❌ 初期化エラー:', error);
+                micStatus.textContent = `初期化エラー: ${error.message}`;
+                micStatus.className = 'status error';
+            }
+        });
+
+        // 停止
+        stopBtn.addEventListener('click', () => {
+            if (micController) {
+                micController.stop();
+                stopVolumeMonitoring();
+                
+                // UI状態リセット
+                initBtn.disabled = false;
+                stopBtn.disabled = true;
+                gainSlider.disabled = true;
+                gain1xBtn.disabled = true;
+                gain2xBtn.disabled = true;
+                gain5xBtn.disabled = true;
+                gain10xBtn.disabled = true;
+                
+                micStatus.textContent = '停止しました';
+                micStatus.className = 'status info';
+                volumeText.textContent = '音量: 0%';
+                volumeBar.style.width = '0%';
+            }
+        });
+
+        // ゲインスライダー
+        gainSlider.addEventListener('input', (event) => {
+            const gain = parseFloat(event.target.value);
+            gainValue.textContent = gain.toFixed(1);
+            
+            if (micController) {
+                micController.setGain(gain);
+                console.log(`🎚️ Gain set to: ${gain}x`);
+            }
+        });
+
+        // ゲインプリセットボタン
+        gain1xBtn.addEventListener('click', () => setGain(1.0));
+        gain2xBtn.addEventListener('click', () => setGain(2.0));
+        gain5xBtn.addEventListener('click', () => setGain(5.0));
+        gain10xBtn.addEventListener('click', () => setGain(10.0));
+
+        function setGain(gain) {
+            if (micController) {
+                micController.setGain(gain);
+                gainSlider.value = gain;
+                gainValue.textContent = gain.toFixed(1);
+                console.log(`🎚️ Preset gain set to: ${gain}x`);
+            }
+        }
+
+        // 音量モニタリング
+        function startVolumeMonitoring() {
+            if (!micController) return;
+            
+            // テスト用アナライザー作成
+            const analyser = micController.audioManager.createAnalyser('volume-test', {
+                fftSize: 1024,
+                smoothingTimeConstant: 0.8
+            });
+            
+            volumeMonitorInterval = setInterval(() => {
+                const bufferLength = analyser.fftSize;
+                const dataArray = new Float32Array(bufferLength);
+                analyser.getFloatTimeDomainData(dataArray);
+                
+                // RMS音量計算
+                let sum = 0;
+                for (let i = 0; i < bufferLength; i++) {
+                    sum += Math.abs(dataArray[i]);
+                }
+                const rms = Math.sqrt(sum / bufferLength);
+                const volume = Math.min(rms * 100, 100);
+                
+                // UI更新
+                volumeBar.style.width = `${volume}%`;
+                volumeText.textContent = `音量: ${volume.toFixed(1)}%`;
+                volumeText.className = volume > 5 ? 'status success' : 'status info';
+                
+            }, 100);
+        }
+
+        function stopVolumeMonitoring() {
+            if (volumeMonitorInterval) {
+                clearInterval(volumeMonitorInterval);
+                volumeMonitorInterval = null;
+            }
+            if (micController) {
+                micController.audioManager.removeAnalyser('volume-test');
+            }
+        }
+
+        // デバイス情報表示
+        if (typeof window !== 'undefined') {
+            try {
+                const deviceSpecs = {
+                    userAgent: navigator.userAgent.substring(0, 100) + '...',
+                    platform: navigator.platform || 'Unknown'
+                };
+                deviceInfo.textContent = `UserAgent: ${deviceSpecs.userAgent}`;
+            } catch (e) {
+                deviceInfo.textContent = 'デバイス情報取得エラー';
+            }
+        }
+    </script>
+</body>
+</html>

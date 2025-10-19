@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PitchPro Advanced Features Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #e5e5e5;
+        }
+        
+        .section {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4ade80;
+        }
+        
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .test-button:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+        
+        .test-results {
+            background: #374151;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+        
+        .error {
+            color: #ef4444;
+        }
+        
+        .success {
+            color: #10b981;
+        }
+        
+        .warning {
+            color: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 PitchPro Advanced Features Test</h1>
+    
+    <div class="section">
+        <h2>🔧 HarmonicCorrection Test</h2>
+        <p>高度なハーモニック補正機能をテストします。</p>
+        <button class="test-button" onclick="testHarmonicCorrection()">テスト開始</button>
+        <div id="harmonic-results" class="test-results"></div>
+    </div>
+    
+    <div class="section">
+        <h2>🎤 VoiceAnalyzer Test</h2>
+        <p>音声品質分析機能をテストします。</p>
+        <button class="test-button" onclick="testVoiceAnalyzer()">テスト開始</button>
+        <div id="voice-results" class="test-results"></div>
+    </div>
+    
+    <div class="section">
+        <h2>⚙️ CalibrationSystem Test</h2>
+        <p>デバイス固有のキャリブレーション機能をテストします。</p>
+        <button class="test-button" onclick="testCalibrationSystem()">テスト開始</button>
+        <div id="calibration-results" class="test-results"></div>
+    </div>
+
+    <script src="pitchpro.umd.js"></script>
+    <script>
+        let log = (elementId, message, type = 'info') => {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : '';
+            element.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            element.scrollTop = element.scrollHeight;
+        };
+
+        // HarmonicCorrection Test
+        async function testHarmonicCorrection() {
+            const resultId = 'harmonic-results';
+            document.getElementById(resultId).innerHTML = '';
+            
+            try {
+                log(resultId, '🔧 HarmonicCorrection テスト開始', 'info');
+                
+                // インスタンス作成
+                const harmonicCorrection = new PitchPro.HarmonicCorrection({
+                    historyWindowMs: 1000,
+                    minConfidenceThreshold: 0.5
+                });
+                
+                log(resultId, '✅ HarmonicCorrection インスタンス作成成功', 'success');
+                
+                // テストケース1: 基本周波数
+                let result1 = harmonicCorrection.correctFrequency(440, 0.8);
+                log(resultId, `テスト1 - 440Hz: ${JSON.stringify(result1)}`, 'info');
+                
+                // テストケース2: ハーモニック（880Hz = 440Hzの2倍）
+                let result2 = harmonicCorrection.correctFrequency(880, 0.8);
+                log(resultId, `テスト2 - 880Hz: ${JSON.stringify(result2)}`, 'info');
+                
+                // 履歴を蓄積してからもう一度テスト
+                await new Promise(resolve => setTimeout(resolve, 100));
+                result2 = harmonicCorrection.correctFrequency(880, 0.8);
+                log(resultId, `テスト2(再) - 880Hz: ${JSON.stringify(result2)}`, 'info');
+                
+                // 統計情報を取得
+                const stats = harmonicCorrection.getAnalysisStats();
+                log(resultId, `統計情報: ${JSON.stringify(stats)}`, 'info');
+                
+                log(resultId, '✅ HarmonicCorrection テスト完了', 'success');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+                console.error('HarmonicCorrection test error:', error);
+            }
+        }
+
+        // VoiceAnalyzer Test
+        async function testVoiceAnalyzer() {
+            const resultId = 'voice-results';
+            document.getElementById(resultId).innerHTML = '';
+            
+            try {
+                log(resultId, '🎤 VoiceAnalyzer テスト開始', 'info');
+                
+                // インスタンス作成
+                const voiceAnalyzer = new PitchPro.VoiceAnalyzer({
+                    analysisWindowMs: 2000,
+                    vibratoMinRate: 4.0
+                });
+                
+                log(resultId, '✅ VoiceAnalyzer インスタンス作成成功', 'success');
+                
+                // 模擬データで複数回分析
+                const frequencies = [440, 442, 438, 441, 439, 443, 440, 441];
+                const volumes = [0.6, 0.65, 0.58, 0.62, 0.60, 0.67, 0.61, 0.63];
+                const clarities = [0.8, 0.82, 0.78, 0.81, 0.79, 0.83, 0.80, 0.82];
+                
+                log(resultId, 'モックデータを用いて音声分析実行中...', 'info');
+                
+                for (let i = 0; i < frequencies.length; i++) {
+                    const result = voiceAnalyzer.analyzeVoice(
+                        frequencies[i], 
+                        volumes[i], 
+                        clarities[i]
+                    );
+                    
+                    if (i === frequencies.length - 1) { // 最後の結果のみ表示
+                        log(resultId, `音声品質: ${result.quality}`, 'info');
+                        log(resultId, `安定性: ${result.stability.toFixed(3)}`, 'info');
+                        log(resultId, `推奨事項: ${result.recommendations.join(', ')}`, 'info');
+                    }
+                    
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                }
+                
+                // バッファ統計取得
+                const bufferStats = voiceAnalyzer.getBufferStats();
+                log(resultId, `バッファ統計: ${JSON.stringify(bufferStats)}`, 'info');
+                
+                log(resultId, '✅ VoiceAnalyzer テスト完了', 'success');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+                console.error('VoiceAnalyzer test error:', error);
+            }
+        }
+
+        // CalibrationSystem Test
+        async function testCalibrationSystem() {
+            const resultId = 'calibration-results';
+            document.getElementById(resultId).innerHTML = '';
+            
+            try {
+                log(resultId, '⚙️ CalibrationSystem テスト開始', 'info');
+                
+                // インスタンス作成
+                const calibrationSystem = new PitchPro.CalibrationSystem();
+                
+                log(resultId, '✅ CalibrationSystem インスタンス作成成功', 'success');
+                
+                // 初期状態確認
+                let status = calibrationSystem.getCalibrationStatus();
+                log(resultId, `初期状態 - キャリブレーション済み: ${status.isCalibrated}`, 'info');
+                log(resultId, `デバイスタイプ: ${status.deviceSpecs.deviceType}`, 'info');
+                log(resultId, `感度: ${status.deviceSpecs.sensitivity}`, 'info');
+                
+                // 保存済みキャリブレーションの読み込みテスト
+                const loaded = calibrationSystem.loadCalibration();
+                log(resultId, `保存済みキャリブレーション読み込み: ${loaded}`, loaded ? 'success' : 'warning');
+                
+                // AudioContextが必要な実際のキャリブレーションはスキップ
+                // （ブラウザでマイク権限が必要なため）
+                log(resultId, '📝 注意: 実際のキャリブレーションはマイク権限が必要なためスキップ', 'warning');
+                log(resultId, '実際のキャリブレーションテストは、AudioManagerと連携して行ってください', 'info');
+                
+                log(resultId, '✅ CalibrationSystem テスト完了', 'success');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+                console.error('CalibrationSystem test error:', error);
+            }
+        }
+        
+        // ページ読み込み時の初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('PitchPro Advanced Features Test loaded');
+            
+            // ライブラリが正常に読み込まれているか確認
+            if (typeof PitchPro === 'undefined') {
+                document.body.innerHTML = '<h1 style="color: red;">❌ PitchProライブラリが読み込まれていません</h1>';
+                return;
+            }
+            
+            // 利用可能なAdvanced機能を確認
+            const availableFeatures = {
+                HarmonicCorrection: !!PitchPro.HarmonicCorrection,
+                VoiceAnalyzer: !!PitchPro.VoiceAnalyzer,
+                CalibrationSystem: !!PitchPro.CalibrationSystem
+            };
+            
+            console.log('利用可能なAdvanced機能:', availableFeatures);
+        });
+    </script>
+</body>
+</html>

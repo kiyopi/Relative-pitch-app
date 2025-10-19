@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PitchPro Quick Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #e5e5e5;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #10b981;
+            background: #2a2a2a;
+        }
+        .error {
+            border-left-color: #ef4444;
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 PitchPro Quick Test</h1>
+    
+    <div id="results"></div>
+    
+    <script src="../dist-umd/pitchpro.umd.js"></script>
+    <script>
+        function addResult(message, isError = false) {
+            const div = document.createElement('div');
+            div.className = `test-result ${isError ? 'error' : ''}`;
+            div.textContent = message;
+            document.getElementById('results').appendChild(div);
+        }
+        
+        // Test 1: Library loading
+        try {
+            if (typeof PitchPro === 'undefined') {
+                addResult('❌ PitchProライブラリが読み込まれていません', true);
+            } else {
+                addResult('✅ PitchProライブラリ読み込み成功');
+                
+                // Test 2: Available classes
+                const classes = [
+                    'AudioManager',
+                    'PitchDetector', 
+                    'NoiseFilter',
+                    'MicrophoneController',
+                    'HarmonicCorrection',
+                    'VoiceAnalyzer',
+                    'CalibrationSystem',
+                    'FrequencyUtils',
+                    'MusicTheory',
+                    'DeviceDetection',
+                    'ErrorNotificationSystem'
+                ];
+                
+                const available = [];
+                const missing = [];
+                
+                classes.forEach(className => {
+                    if (PitchPro[className]) {
+                        available.push(className);
+                    } else {
+                        missing.push(className);
+                    }
+                });
+                
+                addResult(`✅ 利用可能なクラス (${available.length}): ${available.join(', ')}`);
+                
+                if (missing.length > 0) {
+                    addResult(`⚠️ 見つからないクラス (${missing.length}): ${missing.join(', ')}`, true);
+                }
+                
+                // Test 3: Basic functionality
+                try {
+                    const frequency = 440;
+                    const note = PitchPro.FrequencyUtils.frequencyToNote(frequency);
+                    addResult(`✅ FrequencyUtils テスト: ${frequency}Hz = ${note.name}`);
+                } catch (error) {
+                    addResult(`❌ FrequencyUtils エラー: ${error.message}`, true);
+                }
+                
+                try {
+                    const scale = PitchPro.MusicTheory.generateScale(440, 'major');
+                    addResult(`✅ MusicTheory テスト: Aメジャースケール ${scale.length}音`);
+                } catch (error) {
+                    addResult(`❌ MusicTheory エラー: ${error.message}`, true);
+                }
+                
+                // Test 4: Device detection
+                try {
+                    const deviceSpecs = PitchPro.DeviceDetection.getDeviceSpecs();
+                    addResult(`✅ DeviceDetection テスト: ${deviceSpecs.deviceType} (感度: ${deviceSpecs.sensitivity}x)`);
+                } catch (error) {
+                    addResult(`❌ DeviceDetection エラー: ${error.message}`, true);
+                }
+            }
+        } catch (error) {
+            addResult(`❌ 初期化エラー: ${error.message}`, true);
+        }
+        
+        // Test 5: AudioContext support
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) {
+                addResult('✅ AudioContext サポート確認');
+            } else {
+                addResult('❌ AudioContext サポートなし', true);
+            }
+        } catch (error) {
+            addResult(`❌ AudioContext エラー: ${error.message}`, true);
+        }
+        
+        addResult('🏁 クイックテスト完了');
+    </script>
+</body>
+</html>

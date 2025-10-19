@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PitchPro Utils Features Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #e5e5e5;
+        }
+        
+        .section {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .test-button {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .test-button:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+        
+        .test-results {
+            background: #374151;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .input-group {
+            margin: 10px 0;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #d1d5db;
+        }
+        
+        .input-group input, .input-group select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #6b7280;
+            background: #374151;
+            color: #e5e5e5;
+            margin-right: 10px;
+        }
+        
+        .scale-display, .chord-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .note-box {
+            background: #4b5563;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .error { color: #ef4444; }
+        .success { color: #10b981; }
+        .warning { color: #f59e0b; }
+        .info { color: #3b82f6; }
+        
+        .harmonics-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .harmonic-box {
+            background: #1f2937;
+            padding: 8px;
+            border-radius: 4px;
+            text-align: center;
+            border-left: 3px solid #10b981;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔢 PitchPro Utils Features Test</h1>
+    
+    <div class="section">
+        <h2>🎵 FrequencyUtils Test</h2>
+        <p>周波数変換とハーモニック分析ユーティリティをテストします。</p>
+        
+        <div class="input-group">
+            <label>テスト周波数 (Hz):</label>
+            <input type="number" id="test-frequency" value="440" min="20" max="8000" step="0.1">
+            <button class="test-button" onclick="testFrequencyConversions()">変換テスト</button>
+        </div>
+        
+        <div class="input-group">
+            <label>基本周波数 (Hz):</label>
+            <input type="number" id="fundamental-freq" value="220" min="20" max="2000" step="0.1">
+            <button class="test-button" onclick="testHarmonics()">ハーモニック分析</button>
+        </div>
+        
+        <button class="test-button" onclick="testFrequencyRanges()">楽器音域テスト</button>
+        <button class="test-button" onclick="testScientificPitch()">科学的ピッチ記法テスト</button>
+        
+        <div id="frequency-results" class="test-results"></div>
+        <div id="harmonics-display" class="harmonics-display"></div>
+    </div>
+    
+    <div class="section">
+        <h2>🎼 MusicTheory Test</h2>
+        <p>音楽理論ユーティリティ（スケール・コード・調性分析）をテストします。</p>
+        
+        <div class="input-group">
+            <label>ルート音:</label>
+            <select id="root-note">
+                <option value="C4">C4</option>
+                <option value="D4">D4</option>
+                <option value="E4">E4</option>
+                <option value="F4">F4</option>
+                <option value="G4">G4</option>
+                <option value="A4" selected>A4</option>
+                <option value="B4">B4</option>
+            </select>
+            
+            <label>スケール:</label>
+            <select id="scale-type">
+                <option value="major" selected>Major</option>
+                <option value="naturalMinor">Natural Minor</option>
+                <option value="harmonicMinor">Harmonic Minor</option>
+                <option value="dorian">Dorian</option>
+                <option value="pentatonicMajor">Pentatonic Major</option>
+                <option value="pentatonicMinor">Pentatonic Minor</option>
+                <option value="blues">Blues</option>
+            </select>
+            <button class="test-button" onclick="generateScale()">スケール生成</button>
+        </div>
+        
+        <div class="input-group">
+            <label>コードルート:</label>
+            <select id="chord-root">
+                <option value="C4" selected>C4</option>
+                <option value="D4">D4</option>
+                <option value="E4">E4</option>
+                <option value="F4">F4</option>
+                <option value="G4">G4</option>
+                <option value="A4">A4</option>
+                <option value="B4">B4</option>
+            </select>
+            
+            <label>コードタイプ:</label>
+            <select id="chord-type">
+                <option value="major" selected>Major</option>
+                <option value="minor">Minor</option>
+                <option value="diminished">Diminished</option>
+                <option value="major7">Major 7</option>
+                <option value="minor7">Minor 7</option>
+                <option value="dominant7">Dominant 7</option>
+            </select>
+            <button class="test-button" onclick="generateChord()">コード生成</button>
+        </div>
+        
+        <button class="test-button" onclick="testKeySignatures()">調号テスト</button>
+        <button class="test-button" onclick="testJustIntonation()">純正律テスト</button>
+        <button class="test-button" onclick="testChordProgression()">コード進行テスト</button>
+        
+        <div id="music-theory-results" class="test-results"></div>
+        <div id="scale-display" class="scale-display"></div>
+        <div id="chord-display" class="chord-display"></div>
+    </div>
+
+    <script src="pitchpro.umd.js"></script>
+    <script>
+        let log = (elementId, message, type = 'info') => {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : type === 'info' ? 'info' : '';
+            element.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            element.scrollTop = element.scrollHeight;
+        };
+
+        // FrequencyUtils Tests
+        function testFrequencyConversions() {
+            const resultId = 'frequency-results';
+            document.getElementById(resultId).innerHTML = '';
+            
+            try {
+                const frequency = parseFloat(document.getElementById('test-frequency').value);
+                log(resultId, `🎵 ${frequency}Hz の変換テスト開始`, 'info');
+                
+                // MIDI変換
+                const midi = PitchPro.FrequencyUtils.frequencyToMidi(frequency);
+                log(resultId, `MIDI番号: ${midi}`, 'info');
+                
+                const backToFreq = PitchPro.FrequencyUtils.midiToFrequency(midi);
+                log(resultId, `MIDIから逆変換: ${backToFreq.toFixed(2)}Hz`, 'info');
+                
+                // ノート名変換
+                const note = PitchPro.FrequencyUtils.frequencyToNote(frequency);
+                log(resultId, `ノート: ${note.name} (オクターブ: ${note.octave})`, 'success');
+                
+                // セント偏差
+                const cents = PitchPro.FrequencyUtils.frequencyToCents(frequency);
+                const formattedCents = PitchPro.FrequencyUtils.formatCents(cents);
+                log(resultId, `セント偏差: ${formattedCents}`, 'info');
+                
+                // 最も近いノート周波数
+                const closestNote = PitchPro.FrequencyUtils.getClosestNoteFrequency(frequency);
+                log(resultId, `最寄りノート周波数: ${closestNote.toFixed(2)}Hz`, 'info');
+                
+                // 楽器音域チェック
+                const inVocal = PitchPro.FrequencyUtils.isInVocalRange(frequency);
+                const inPiano = PitchPro.FrequencyUtils.isInPianoRange(frequency);
+                log(resultId, `音域チェック - 声楽: ${inVocal ? 'Yes' : 'No'}, ピアノ: ${inPiano ? 'Yes' : 'No'}`, inVocal ? 'success' : 'warning');
+                
+                // 周波数フォーマット
+                const formatted = PitchPro.FrequencyUtils.formatFrequency(frequency);
+                log(resultId, `フォーマット済み表示: ${formatted}`, 'info');
+                
+                log(resultId, '✅ 変換テスト完了', 'success');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+                console.error('FrequencyUtils conversion test error:', error);
+            }
+        }
+        
+        function testHarmonics() {
+            const resultId = 'frequency-results';
+            const harmonicsDisplay = document.getElementById('harmonics-display');
+            
+            try {
+                const fundamental = parseFloat(document.getElementById('fundamental-freq').value);
+                log(resultId, `🔊 ${fundamental}Hz のハーモニック分析開始`, 'info');
+                
+                // ハーモニック生成
+                const harmonics = PitchPro.FrequencyUtils.findHarmonics(fundamental, 8);
+                log(resultId, `ハーモニック生成: ${harmonics.length}個`, 'info');
+                
+                // ハーモニック表示
+                harmonicsDisplay.innerHTML = harmonics.map((harmonic, index) => {
+                    const note = PitchPro.FrequencyUtils.frequencyToNote(harmonic);
+                    return `<div class="harmonic-box">
+                        <div>${index + 1}次</div>
+                        <div>${harmonic.toFixed(1)}Hz</div>
+                        <div>${note.name}</div>
+                    </div>`;
+                }).join('');
+                
+                // 逆ハーモニック分析
+                const testFreq = harmonics[2]; // 3次ハーモニック
+                const harmonicCheck = PitchPro.FrequencyUtils.isHarmonic(testFreq, fundamental);
+                log(resultId, `${testFreq.toFixed(1)}Hzのハーモニック判定:`, 'info');
+                log(resultId, `  判定: ${harmonicCheck.isHarmonic ? 'Yes' : 'No'}`, harmonicCheck.isHarmonic ? 'success' : 'warning');
+                if (harmonicCheck.isHarmonic) {
+                    log(resultId, `  ハーモニック番号: ${harmonicCheck.harmonicNumber}`, 'info');
+                    log(resultId, `  理論値: ${harmonicCheck.exactFrequency?.toFixed(1)}Hz`, 'info');
+                }
+                
+                // 基音計算テスト
+                const calculatedFundamental = PitchPro.FrequencyUtils.calculateFundamental(harmonics[3], 4);
+                log(resultId, `4次ハーモニックから基音計算: ${calculatedFundamental.toFixed(1)}Hz`, 'info');
+                
+                log(resultId, '✅ ハーモニック分析完了', 'success');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+            }
+        }
+        
+        function testFrequencyRanges() {
+            const resultId = 'frequency-results';
+            
+            try {
+                log(resultId, '🎸 楽器音域テスト開始', 'info');
+                
+                const instruments = ['piano', 'guitar', 'violin', 'cello', 'voice_bass', 'voice_tenor', 'voice_alto', 'voice_soprano'];
+                
+                instruments.forEach(instrument => {
+                    const range = PitchPro.FrequencyUtils.getInstrumentRange(instrument);
+                    if (range) {
+                        const minNote = PitchPro.FrequencyUtils.frequencyToNote(range.min);
+                        const maxNote = PitchPro.FrequencyUtils.frequencyToNote(range.max);
+                        log(resultId, `${instrument}: ${range.min.toFixed(1)}Hz (${minNote.name}) - ${range.max.toFixed(1)}Hz (${maxNote.name})`, 'info');
+                    }
+                });
+                
+                log(resultId, '✅ 楽器音域テスト完了', 'success');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+            }
+        }
+        
+        function testScientificPitch() {
+            const resultId = 'frequency-results';
+            
+            try {
+                log(resultId, '🔬 科学的ピッチ記法テスト開始', 'info');
+                
+                const testNotes = ['A4', 'C4', 'F#5', 'Bb3', 'G#2'];
+                
+                testNotes.forEach(note => {
+                    const frequency = PitchPro.FrequencyUtils.scientificPitchToFrequency(note);
+                    const backToNote = PitchPro.FrequencyUtils.frequencyToScientificPitch(frequency);
+                    log(resultId, `${note} → ${frequency.toFixed(2)}Hz → ${backToNote}`, frequency > 0 ? 'success' : 'error');
+                });
+                
+                log(resultId, '✅ 科学的ピッチ記法テスト完了', 'success');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+            }
+        }
+
+        // MusicTheory Tests
+        function generateScale() {
+            const resultId = 'music-theory-results';
+            const scaleDisplay = document.getElementById('scale-display');
+            
+            try {
+                const rootNote = document.getElementById('root-note').value;
+                const scaleType = document.getElementById('scale-type').value;
+                
+                log(resultId, `🎼 ${rootNote} ${scaleType}スケール生成開始`, 'info');
+                
+                const rootFreq = PitchPro.FrequencyUtils.scientificPitchToFrequency(rootNote);
+                const scale = PitchPro.MusicTheory.generateScale(rootFreq, scaleType);
+                
+                log(resultId, `スケール生成完了: ${scale.length}音`, 'success');
+                
+                // スケール表示
+                scaleDisplay.innerHTML = scale.map((note, index) => {
+                    return `<div class="note-box">
+                        <div>${index + 1}</div>
+                        <div><strong>${note.name}</strong></div>
+                        <div>${note.frequency.toFixed(1)}Hz</div>
+                    </div>`;
+                }).join('');
+                
+                // スケールパターン表示
+                const pattern = PitchPro.MusicTheory.SCALE_PATTERNS[scaleType];
+                log(resultId, `パターン: ${pattern.join('-')}`, 'info');
+                
+                log(resultId, '✅ スケール生成完了', 'success');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+            }
+        }
+        
+        function generateChord() {
+            const resultId = 'music-theory-results';
+            const chordDisplay = document.getElementById('chord-display');
+            
+            try {
+                const chordRoot = document.getElementById('chord-root').value;
+                const chordType = document.getElementById('chord-type').value;
+                
+                log(resultId, `🎹 ${chordRoot} ${chordType}コード生成開始`, 'info');
+                
+                const rootFreq = PitchPro.FrequencyUtils.scientificPitchToFrequency(chordRoot);
+                const chord = PitchPro.MusicTheory.generateChord(rootFreq, chordType);
+                
+                log(resultId, `コード生成完了: ${chord.length}音`, 'success');
+                
+                // コード表示
+                chordDisplay.innerHTML = chord.map((note, index) => {
+                    const chordTones = ['Root', '3rd', '5th', '7th', '9th'];
+                    return `<div class="note-box">
+                        <div>${chordTones[index] || (index + 1)}</div>
+                        <div><strong>${note.name}</strong></div>
+                        <div>${note.frequency.toFixed(1)}Hz</div>
+                    </div>`;
+                }).join('');
+                
+                // コードパターン表示
+                const pattern = PitchPro.MusicTheory.CHORD_PATTERNS[chordType];
+                log(resultId, `パターン: ${pattern.join('-')}`, 'info');
+                
+                log(resultId, '✅ コード生成完了', 'success');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+            }
+        }
+        
+        function testKeySignatures() {
+            const resultId = 'music-theory-results';
+            
+            try {
+                log(resultId, '🎵 調号テスト開始', 'info');
+                
+                const majorKeys = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'F', 'Bb', 'Eb', 'Ab'];
+                const minorKeys = ['A', 'E', 'B', 'F#', 'C#', 'G#', 'D', 'G', 'C', 'F'];
+                
+                log(resultId, 'メジャーキー:', 'info');
+                majorKeys.forEach(key => {
+                    const signature = PitchPro.MusicTheory.getKeySignature(key, 'major');
+                    const accidentals = signature.sharps.length > 0 ? 
+                        `♯${signature.sharps.length}個: ${signature.sharps.join(', ')}` :
+                        signature.flats.length > 0 ? 
+                        `♭${signature.flats.length}個: ${signature.flats.join(', ')}` : 
+                        '調号なし';
+                    log(resultId, `  ${key}メジャー: ${accidentals}`, 'info');
+                });
+                
+                log(resultId, 'マイナーキー:', 'info');
+                minorKeys.forEach(key => {
+                    const signature = PitchPro.MusicTheory.getKeySignature(key, 'minor');
+                    const accidentals = signature.sharps.length > 0 ? 
+                        `♯${signature.sharps.length}個: ${signature.sharps.join(', ')}` :
+                        signature.flats.length > 0 ? 
+                        `♭${signature.flats.length}個: ${signature.flats.join(', ')}` : 
+                        '調号なし';
+                    log(resultId, `  ${key}マイナー: ${accidentals}`, 'info');
+                });
+                
+                log(resultId, '✅ 調号テスト完了', 'success');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+            }
+        }
+        
+        function testJustIntonation() {
+            const resultId = 'music-theory-results';
+            
+            try {
+                log(resultId, '🎶 純正律テスト開始', 'info');
+                
+                const justRatios = PitchPro.MusicTheory.getJustIntonationRatios();
+                
+                log(resultId, '純正律音程:', 'info');
+                Object.entries(justRatios).forEach(([interval, { ratio, cents }]) => {
+                    const equalTempCents = Object.keys(PitchPro.FrequencyUtils.INTERVALS)
+                        .find(key => key.includes(interval.replace(/([A-Z])/g, '$1').toLowerCase()));
+                    
+                    const etCents = equalTempCents ? PitchPro.FrequencyUtils.INTERVALS[equalTempCents] * 100 : 0;
+                    const deviation = etCents ? Math.round(cents - etCents) : 0;
+                    
+                    log(resultId, `  ${interval}: ${ratio.toFixed(4)} (${cents}¢, 平均律からの差: ${deviation > 0 ? '+' : ''}${deviation}¢)`, 'info');
+                });
+                
+                // 平均律から純正律への変換テスト
+                log(resultId, '平均律→純正律変換テスト:', 'info');
+                [5, 7, 12].forEach(semitones => {
+                    const conversion = PitchPro.MusicTheory.equalTemperamentToJustIntonation(semitones);
+                    log(resultId, `  ${semitones}半音: ${conversion.closestJustInterval} (偏差: ${conversion.centsDeviation?.toFixed(1)}¢)`, 'info');
+                });
+                
+                log(resultId, '✅ 純正律テスト完了', 'success');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+            }
+        }
+        
+        function testChordProgression() {
+            const resultId = 'music-theory-results';
+            
+            try {
+                log(resultId, '🎼 コード進行テスト開始', 'info');
+                
+                // 一般的なコード進行をテスト
+                const progressions = [
+                    { name: 'I-IV-V-I (王道)', pattern: [1, 4, 5, 1] },
+                    { name: 'vi-IV-I-V (4536)', pattern: [6, 4, 1, 5] },
+                    { name: 'I-vi-IV-V (循環)', pattern: [1, 6, 4, 5] }
+                ];
+                
+                progressions.forEach(({ name, pattern }) => {
+                    log(resultId, `${name}:`, 'info');
+                    
+                    // Cメジャーで生成
+                    const chords = PitchPro.MusicTheory.generateChordProgression('C', 'major', pattern);
+                    
+                    const chordNames = chords.map((chord, index) => {
+                        const roman = ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°'][pattern[index] - 1];
+                        const root = chord[0].name.replace(/\d+$/, ''); // オクターブ番号を除去
+                        return `${roman}(${root})`;
+                    });
+                    
+                    log(resultId, `  ${chordNames.join(' - ')}`, 'success');
+                });
+                
+                // ハーモニックシリーズテスト
+                log(resultId, 'ハーモニックシリーズ (C2基準):', 'info');
+                const fundamental = PitchPro.FrequencyUtils.scientificPitchToFrequency('C2');
+                const harmonicSeries = PitchPro.MusicTheory.getHarmonicSeries(fundamental, 8);
+                
+                const harmonicNames = harmonicSeries.map((note, index) => {
+                    const harmonic = index + 1;
+                    return `${harmonic}: ${note.name.replace(/\d+$/, '')}`;
+                });
+                
+                log(resultId, `  ${harmonicNames.join(', ')}`, 'info');
+                
+                log(resultId, '✅ コード進行テスト完了', 'success');
+                
+            } catch (error) {
+                log(resultId, `❌ エラー: ${error.message}`, 'error');
+            }
+        }
+        
+        // ページ読み込み時の初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('PitchPro Utils Features Test loaded');
+            
+            // ライブラリが正常に読み込まれているか確認
+            if (typeof PitchPro === 'undefined') {
+                document.body.innerHTML = '<h1 style="color: red;">❌ PitchProライブラリが読み込まれていません</h1>';
+                return;
+            }
+            
+            // 利用可能なUtils機能を確認
+            const availableFeatures = {
+                FrequencyUtils: !!PitchPro.FrequencyUtils,
+                MusicTheory: !!PitchPro.MusicTheory
+            };
+            
+            console.log('利用可能なUtils機能:', availableFeatures);
+            
+            // サンプル機能のデモンストレーション
+            const demoFrequency = 440;
+            const demoNote = PitchPro.FrequencyUtils.frequencyToNote(demoFrequency);
+            console.log(`デモ: ${demoFrequency}Hz = ${demoNote.name}`);
+        });
+    </script>
+</body>
+</html>

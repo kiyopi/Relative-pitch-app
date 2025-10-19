@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PitchPro - 無音検出デモ</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-primary { background: linear-gradient(45deg, #4CAF50, #45a049); color: white; }
+        .btn-secondary { background: linear-gradient(45deg, #2196F3, #1976D2); color: white; }
+        .btn-danger { background: linear-gradient(45deg, #f44336, #d32f2f); color: white; }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .silence-panel {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .silence-status {
+            font-size: 2em;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .silence-status.active {
+            background: rgba(76, 175, 80, 0.3);
+            color: #4CAF50;
+        }
+        
+        .silence-status.warning {
+            background: rgba(255, 193, 7, 0.3);
+            color: #FFC107;
+            animation: pulse 1s infinite;
+        }
+        
+        .silence-status.timeout {
+            background: rgba(244, 67, 54, 0.3);
+            color: #f44336;
+            animation: pulse 0.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .timer-display {
+            font-size: 1.5em;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+        }
+        
+        .settings-panel {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .setting-item label {
+            font-weight: bold;
+            opacity: 0.9;
+        }
+        
+        .setting-item input {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+        
+        .volume-display {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .volume-bar-container {
+            background: rgba(0, 0, 0, 0.3);
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            margin: 10px 0;
+        }
+        
+        .volume-bar {
+            background: linear-gradient(90deg, #4CAF50, #8BC34A, #FFEB3B);
+            height: 100%;
+            width: 0%;
+            transition: width 0.1s ease;
+            border-radius: 15px;
+        }
+        
+        .log-panel {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .log-entry.error { background: rgba(244, 67, 54, 0.3); }
+        .log-entry.success { background: rgba(76, 175, 80, 0.3); }
+        .log-entry.warning { background: rgba(255, 193, 7, 0.3); }
+        .log-entry.info { background: rgba(33, 150, 243, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔇 PitchPro 無音検出デモ</h1>
+        <p class="subtitle">インテリジェント無音検出システム</p>
+        
+        <!-- コントロール -->
+        <div class="controls">
+            <button id="init-btn" class="btn-primary">🎤 初期化</button>
+            <button id="start-btn" class="btn-secondary" disabled>▶️ 検出開始</button>
+            <button id="stop-btn" class="btn-secondary" disabled>⏸️ 検出停止</button>
+            <button id="destroy-btn" class="btn-danger" disabled>🗑️ 終了</button>
+        </div>
+        
+        <!-- 無音検出ステータス -->
+        <div class="silence-panel">
+            <h3>🔊 無音検出状態</h3>
+            <div id="silence-status" class="silence-status">待機中</div>
+            <div class="timer-display">
+                <div>無音時間: <span id="silence-duration">0.0</span>s</div>
+                <div>警告まで: <span id="warning-countdown">--</span>s</div>
+                <div>タイムアウトまで: <span id="timeout-countdown">--</span>s</div>
+            </div>
+        </div>
+        
+        <!-- 設定パネル -->
+        <div class="settings-panel">
+            <h3>⚙️ 無音検出設定</h3>
+            <div class="settings-grid">
+                <div class="setting-item">
+                    <label for="warning-threshold">警告閾値 (秒)</label>
+                    <input type="number" id="warning-threshold" value="5" min="1" max="30">
+                </div>
+                <div class="setting-item">
+                    <label for="timeout-threshold">タイムアウト閾値 (秒)</label>
+                    <input type="number" id="timeout-threshold" value="15" min="5" max="60">
+                </div>
+                <div class="setting-item">
+                    <label for="volume-threshold">音量閾値</label>
+                    <input type="number" id="volume-threshold" value="0.003" min="0.001" max="0.01" step="0.001">
+                </div>
+                <div class="setting-item">
+                    <label for="clarity-threshold">明瞭度閾値</label>
+                    <input type="number" id="clarity-threshold" value="0.4" min="0.1" max="0.9" step="0.1">
+                </div>
+            </div>
+        </div>
+        
+        <!-- 音量表示 -->
+        <div class="volume-display">
+            <h3>📊 リアルタイム音量</h3>
+            <div id="volume-text">0.0%</div>
+            <div class="volume-bar-container">
+                <div id="volume-bar" class="volume-bar"></div>
+            </div>
+        </div>
+        
+        <!-- ログ -->
+        <div class="log-panel">
+            <h3>📝 ログ</h3>
+            <div id="log-container"></div>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { AudioDetectionComponent } from './dist/index.esm.js';
+        
+        let audioDetector = null;
+        let silenceStartTime = null;
+        let warningShown = false;
+        let timeoutShown = false;
+        
+        // DOM要素
+        const elements = {
+            initBtn: document.getElementById('init-btn'),
+            startBtn: document.getElementById('start-btn'),
+            stopBtn: document.getElementById('stop-btn'),
+            destroyBtn: document.getElementById('destroy-btn'),
+            
+            silenceStatus: document.getElementById('silence-status'),
+            silenceDuration: document.getElementById('silence-duration'),
+            warningCountdown: document.getElementById('warning-countdown'),
+            timeoutCountdown: document.getElementById('timeout-countdown'),
+            
+            warningThreshold: document.getElementById('warning-threshold'),
+            timeoutThreshold: document.getElementById('timeout-threshold'),
+            volumeThreshold: document.getElementById('volume-threshold'),
+            clarityThreshold: document.getElementById('clarity-threshold'),
+            
+            volumeText: document.getElementById('volume-text'),
+            volumeBar: document.getElementById('volume-bar'),
+            logContainer: document.getElementById('log-container')
+        };
+        
+        // 設定値取得
+        function getSettings() {
+            return {
+                warningThreshold: parseFloat(elements.warningThreshold.value) * 1000,
+                timeoutThreshold: parseFloat(elements.timeoutThreshold.value) * 1000,
+                volumeThreshold: parseFloat(elements.volumeThreshold.value),
+                clarityThreshold: parseFloat(elements.clarityThreshold.value)
+            };
+        }
+        
+        // ログ機能
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            elements.logContainer.appendChild(logEntry);
+            elements.logContainer.scrollTop = elements.logContainer.scrollHeight;
+        }
+        
+        // 無音検出ロジック
+        function updateSilenceDetection(result) {
+            const settings = getSettings();
+            const now = Date.now();
+            
+            // 音が検出されているか
+            const hasSound = result.volume > settings.volumeThreshold && result.clarity > settings.clarityThreshold;
+            
+            if (hasSound) {
+                // 音が検出された - 無音状態リセット
+                if (silenceStartTime) {
+                    const silenceDuration = (now - silenceStartTime) / 1000;
+                    addLog(`音声復帰 (無音時間: ${silenceDuration.toFixed(1)}s)`, 'success');
+                    silenceStartTime = null;
+                    warningShown = false;
+                    timeoutShown = false;
+                    
+                    elements.silenceStatus.textContent = '🔊 音声検出中';
+                    elements.silenceStatus.className = 'silence-status active';
+                }
+            } else {
+                // 無音状態
+                if (!silenceStartTime) {
+                    silenceStartTime = now;
+                    addLog('無音検出開始', 'info');
+                }
+                
+                const silenceDuration = now - silenceStartTime;
+                
+                elements.silenceDuration.textContent = (silenceDuration / 1000).toFixed(1);
+                elements.warningCountdown.textContent = Math.max(0, (settings.warningThreshold - silenceDuration) / 1000).toFixed(1);
+                elements.timeoutCountdown.textContent = Math.max(0, (settings.timeoutThreshold - silenceDuration) / 1000).toFixed(1);
+                
+                if (silenceDuration >= settings.timeoutThreshold && !timeoutShown) {
+                    // タイムアウト
+                    elements.silenceStatus.textContent = '⏰ タイムアウト';
+                    elements.silenceStatus.className = 'silence-status timeout';
+                    addLog('タイムアウト発生！', 'error');
+                    timeoutShown = true;
+                } else if (silenceDuration >= settings.warningThreshold && !warningShown) {
+                    // 警告
+                    elements.silenceStatus.textContent = '⚠️ 無音警告';
+                    elements.silenceStatus.className = 'silence-status warning';
+                    addLog('無音警告！', 'warning');
+                    warningShown = true;
+                } else if (!warningShown) {
+                    // 通常の無音
+                    elements.silenceStatus.textContent = '🔇 無音検出中';
+                    elements.silenceStatus.className = 'silence-status';
+                }
+            }
+        }
+        
+        // 初期化
+        elements.initBtn.addEventListener('click', async () => {
+            try {
+                addLog('無音検出システム初期化中...', 'info');
+                
+                const settings = getSettings();
+                
+                audioDetector = new AudioDetectionComponent({
+                    autoUpdateUI: false,
+                    clarityThreshold: settings.clarityThreshold,
+                    minVolumeAbsolute: settings.volumeThreshold,
+                    debug: true
+                });
+                
+                audioDetector.setCallbacks({
+                    onPitchUpdate: (result) => {
+                        // 音量表示更新
+                        const volumePercent = Math.min(100, result.volume * 200);
+                        elements.volumeText.textContent = volumePercent.toFixed(1) + '%';
+                        elements.volumeBar.style.width = volumePercent + '%';
+                        
+                        // 無音検出処理
+                        updateSilenceDetection(result);
+                    },
+                    
+                    onStateChange: (state) => {
+                        addLog(`状態変更: ${state}`, 'info');
+                        
+                        elements.initBtn.disabled = state !== 'uninitialized';
+                        elements.startBtn.disabled = state !== 'ready' && state !== 'stopped';
+                        elements.stopBtn.disabled = state !== 'detecting';
+                        elements.destroyBtn.disabled = state === 'uninitialized';
+                    },
+                    
+                    onError: (error) => {
+                        addLog(`エラー: ${error.message}`, 'error');
+                    },
+                    
+                    onDeviceDetected: (specs) => {
+                        addLog(`デバイス: ${specs.deviceType} (感度: ${specs.sensitivity}x)`, 'success');
+                    }
+                });
+                
+                await audioDetector.initialize();
+                addLog('初期化完了！', 'success');
+                
+            } catch (error) {
+                addLog(`初期化エラー: ${error.message}`, 'error');
+            }
+        });
+        
+        // 開始
+        elements.startBtn.addEventListener('click', () => {
+            try {
+                if (audioDetector.startDetection()) {
+                    addLog('無音検出開始', 'success');
+                    silenceStartTime = null;
+                    warningShown = false;
+                    timeoutShown = false;
+                } else {
+                    addLog('開始に失敗', 'error');
+                }
+            } catch (error) {
+                addLog(`開始エラー: ${error.message}`, 'error');
+            }
+        });
+        
+        // 停止
+        elements.stopBtn.addEventListener('click', () => {
+            try {
+                audioDetector.stopDetection();
+                addLog('無音検出停止', 'info');
+                
+                // リセット
+                silenceStartTime = null;
+                elements.silenceStatus.textContent = '停止中';
+                elements.silenceStatus.className = 'silence-status';
+                elements.silenceDuration.textContent = '0.0';
+                elements.warningCountdown.textContent = '--';
+                elements.timeoutCountdown.textContent = '--';
+            } catch (error) {
+                addLog(`停止エラー: ${error.message}`, 'error');
+            }
+        });
+        
+        // 終了
+        elements.destroyBtn.addEventListener('click', () => {
+            try {
+                if (audioDetector) {
+                    audioDetector.destroy();
+                    audioDetector = null;
+                    addLog('システム終了', 'info');
+                    
+                    // UI完全リセット
+                    elements.silenceStatus.textContent = '待機中';
+                    elements.silenceStatus.className = 'silence-status';
+                    elements.silenceDuration.textContent = '0.0';
+                    elements.warningCountdown.textContent = '--';
+                    elements.timeoutCountdown.textContent = '--';
+                    elements.volumeText.textContent = '0.0%';
+                    elements.volumeBar.style.width = '0%';
+                    
+                    elements.initBtn.disabled = false;
+                    elements.startBtn.disabled = true;
+                    elements.stopBtn.disabled = true;
+                    elements.destroyBtn.disabled = true;
+                }
+            } catch (error) {
+                addLog(`終了エラー: ${error.message}`, 'error');
+            }
+        });
+        
+        // 初期ログ
+        addLog('無音検出デモ準備完了', 'success');
+        addLog('設定を調整して「初期化」ボタンをクリック', 'info');
+    </script>
+</body>
+</html>
