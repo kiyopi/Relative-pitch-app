@@ -97,6 +97,12 @@
     transition: all 0.3s ease;
 }
 
+.mic-status-container svg,
+.mic-status-container i {
+    display: block;
+    flex-shrink: 0;
+}
+
 .mic-status-container.standby {
     background: rgba(59, 130, 246, 0.2) !important;
     color: #3b82f6 !important;
