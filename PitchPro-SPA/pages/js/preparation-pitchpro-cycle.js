@@ -977,7 +977,15 @@ function setupMicPermissionFlow() {
                 const rangeTestSection = document.getElementById('range-test-section');
 
                 if (audioTestSection) audioTestSection.classList.add('hidden');
-                if (rangeTestSection) rangeTestSection.classList.remove('hidden');
+                if (rangeTestSection) {
+                    rangeTestSection.classList.remove('hidden');
+
+                    // Lucideアイコン初期化（mic-status-containerのアイコン表示確保）
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                        console.log('✅ Lucideアイコン初期化完了（音域テストセクション表示時）');
+                    }
+                }
 
                 console.log('✅ 音域テストセクションに移動完了');
 
@@ -1024,6 +1032,12 @@ function setupMicPermissionFlow() {
                 }
                 if (rangeTestSection) {
                     rangeTestSection.classList.remove('hidden');
+
+                    // Lucideアイコン初期化（mic-status-containerのアイコン表示確保）
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                        console.log('✅ Lucideアイコン初期化完了（音域テストセクション表示時）');
+                    }
                 }
 
                 console.log('✅ 音域テストセクションへ移動しました（再測定モード）');
@@ -1077,6 +1091,12 @@ function setupMicPermissionFlow() {
                 if (rangeTestSection) {
                     rangeTestSection.classList.remove('hidden');
                     console.log('✅ range-test-section を表示しました');
+
+                    // Lucideアイコン初期化（mic-status-containerのアイコン表示確保）
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                        console.log('✅ Lucideアイコン初期化完了（音域テストセクション表示時）');
+                    }
                 }
 
                 // ステップインジケーター更新

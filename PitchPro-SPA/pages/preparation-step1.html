@@ -172,6 +172,12 @@
                     <div class="section-header">
                         <h3 class="text-section-title">音域テスト</h3>
                         <p class="section-description">あなたの快適な音域を測定します</p>
+                        <!-- マイクステータスアイコン -->
+                        <div class="text-center">
+                            <div class="mic-status-container standby" id="mic-status-container" style="margin: 12px auto 0 auto;">
+                                <i data-lucide="mic" id="mic-status-icon" style="width: 40px; height: 40px;"></i>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- メインステータス -->
@@ -247,7 +253,7 @@
                         </h3>
 
                         <!-- 基本結果 -->
-                        <div class="range-info-container">
+                        <div class="range-info-container" style="margin-bottom: 0;">
                             <div class="range-info-row">
                                 <span>音域範囲</span>
                                 <span class="range-info-value" id="result-range">-</span>
@@ -260,10 +266,15 @@
                                 <span>最低音</span>
                                 <span class="range-info-value" id="result-low-freq">-</span>
                             </div>
-                            <div class="range-info-row">
+                            <div class="range-info-row" style="margin-bottom: 24px;">
                                 <span>最高音</span>
                                 <span class="range-info-value" id="result-high-freq">-</span>
                             </div>
+                        </div>
+
+                        <!-- 詳細情報・警告メッセージ表示エリア -->
+                        <div id="result-details">
+                            <!-- JavaScriptで動的に生成 -->
                         </div>
 
                         <!-- アクションボタン -->
