@@ -1195,7 +1195,7 @@ function setupMicPermissionFlow() {
             if (detectionMeters) detectionMeters.style.display = '';
             if (controlButtons) controlButtons.style.display = '';
             if (micStatusContainer) {
-                micStatusContainer.style.display = 'block';
+                micStatusContainer.style.display = '';  // CSSのdisplay: flexを使用
                 // マイクステータスを待機状態にリセット
                 if (typeof updateMicStatus === 'function') {
                     updateMicStatus('standby');
