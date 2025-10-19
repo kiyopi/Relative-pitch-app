@@ -230,6 +230,12 @@
         function initializeStep2Simple() {
             console.log('🚀 Step2シンプル初期化処理開始');
 
+            // Lucideアイコン再初期化（mic-status-containerのアイコン表示確保）
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+                console.log('✅ Lucideアイコン再初期化完了（mic-status-container対応）');
+            }
+
             // UI状態を準備完了に設定（PitchPro初期化はしない）
             const mainStatus = document.getElementById('main-status-text');
             const subInfo = document.getElementById('sub-info-text');
