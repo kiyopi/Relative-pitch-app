@@ -1346,6 +1346,103 @@ body::before {
   width: 60%;
 }
 
+/* === アラートシステム（共通） === */
+.info-alert,
+.success-alert,
+.warning-alert {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+/* アイコン用の固定スペース確保 - 中央配置 */
+.info-alert i[data-lucide],
+.success-alert i[data-lucide],
+.warning-alert i[data-lucide] {
+  flex: 0 0 32px !important;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
+  display: block !important;
+  overflow: visible !important;
+}
+
+/* アラート色バリエーション */
+.info-alert {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.success-alert {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.warning-alert {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+/* アラート内コンテナ（ネストされたdiv要素） */
+.info-alert > div,
+.success-alert > div,
+.warning-alert > div {
+  flex: 1;
+}
+
+/* アラート内テキスト */
+.info-alert p,
+.success-alert p,
+.warning-alert p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* 直接p要素の場合もflexを適用 */
+.info-alert > p,
+.success-alert > p,
+.warning-alert > p {
+  flex: 1;
+}
+
+/* すべての可能なLucideアイコン要素に適用 */
+.info-alert i[data-lucide] *,
+.success-alert i[data-lucide] *,
+.warning-alert i[data-lucide] *,
+.info-alert i[data-lucide] svg,
+.success-alert i[data-lucide] svg,
+.warning-alert i[data-lucide] svg {
+  width: 32px !important;
+  height: 32px !important;
+  max-width: none !important;
+  max-height: none !important;
+  font-size: 32px !important;
+}
+
+/* デスクトップでは少し小さめに */
+@media (min-width: 768px) {
+  .info-alert i[data-lucide],
+  .success-alert i[data-lucide],
+  .warning-alert i[data-lucide] {
+    width: 28px;
+    height: 28px;
+  }
+
+  .info-alert i[data-lucide] svg,
+  .success-alert i[data-lucide] svg,
+  .warning-alert i[data-lucide] svg {
+    width: 28px !important;
+    height: 28px !important;
+  }
+}
+
 /* === bolt-new-design移植: バッジシステム === */
 .difficulty-badge {
   padding: 6px 16px;

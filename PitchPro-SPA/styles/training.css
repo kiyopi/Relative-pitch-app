@@ -124,75 +124,8 @@
   margin-bottom: 0.5rem;
 }
 
-/* アラート系 */
-.info-alert,
-.success-alert {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
-  border-radius: 12px;
-  margin-bottom: 24px;
-}
-
-/* アイコン用の固定スペース確保 - 中央配置 */
-.info-alert i[data-lucide],
-.success-alert i[data-lucide] {
-  flex: 0 0 32px !important;
-  width: 32px !important;
-  height: 32px !important;
-  min-width: 32px !important;
-  min-height: 32px !important;
-  max-width: 32px !important;
-  max-height: 32px !important;
-  display: block !important;
-  overflow: visible !important;
-}
-
-.info-alert {
-  background: rgba(59, 130, 246, 0.1);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-}
-
-.success-alert {
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.2);
-}
-
-.info-alert p,
-.success-alert p {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.9rem;
-  margin: 0;
-  flex: 1;
-}
-
-/* すべての可能なLucideアイコン要素に適用 */
-.info-alert i[data-lucide] *,
-.success-alert i[data-lucide] *,
-.info-alert i[data-lucide] svg,
-.success-alert i[data-lucide] svg {
-  width: 32px !important;
-  height: 32px !important;
-  max-width: none !important;
-  max-height: none !important;
-  font-size: 32px !important;
-}
-
-/* デスクトップでは少し小さめに */
-@media (min-width: 768px) {
-  .info-alert i[data-lucide],
-  .success-alert i[data-lucide] {
-    width: 28px;
-    height: 28px;
-  }
-
-  .info-alert i[data-lucide] svg,
-  .success-alert i[data-lucide] svg {
-    width: 28px !important;
-    height: 28px !important;
-  }
-}
+/* === アラート系CSS（base.cssに移行完了） === */
+/* アラート基本定義はbase.cssを参照 */
 
 /* モバイルでボタンの順序を調整 - より特定的なセレクタ */
 @media (max-width: 767px) {
