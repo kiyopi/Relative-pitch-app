@@ -101,6 +101,12 @@
 .mic-status-container i {
     display: block;
     flex-shrink: 0;
+    margin: 0 auto;
+    padding: 0;
+    line-height: 1;
+    vertical-align: middle;
+    width: 40px !important;
+    height: 40px !important;
 }
 
 .mic-status-container.standby {
