@@ -1,14 +1,29 @@
 <!DOCTYPE html>
+<!--
+🧪 テスト用ページ: test-voice-range-only.html
+
+【目的】
+- 音域テスト機能の単体テスト・デバッグ用
+- Step1完了後に音域テストのみを実行
+
+【使用方法】
+1. preparation-step1.htmlでStep1を完了
+2. このページで音域テストのみを再実行
+
+【本番環境】
+- 本番では preparation-step1.html を使用
+- このファイルは開発・テスト用として保持
+-->
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>音域テストコントローラー デモ - ワンメソッド呼び出し</title>
+    <title>🧪 テスト用 - 音域テスト単体実行</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../styles/base.css">
     <link rel="stylesheet" href="../styles/results.css">
     <link rel="stylesheet" href="../styles/training.css">
-    <link rel="stylesheet" href="css/voice-range-test.css">
+    <link rel="stylesheet" href="../styles/voice-range.css">
 </head>
 <body>
     <div class="container">
@@ -21,8 +36,8 @@
                     </div>
                 </div>
                 <div class="page-header-text">
-                    <h1 class="page-title">VoiceRangeTestController デモ</h1>
-                    <p class="page-subtitle text-purple-200">PitchPro v1.3.1統合版 - ワンメソッド呼び出しで完全な音域テスト</p>
+                    <h1 class="page-title">🧪 テスト用 - 音域テスト単体実行</h1>
+                    <p class="page-subtitle text-purple-200">開発・デバッグ用 | Step1完了後に音域テストのみ実行</p>
                 </div>
             </div>
         </header>
@@ -174,16 +189,16 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
     <!-- 🎵 PitchPro v1.3.1 音声処理エンジン -->
-    <script src="js/core/pitchpro-v1.3.1.umd.js"></script>
+    <script src="../../js/core/pitchpro-v1.3.1.umd.js"></script>
 
     <!-- 📊 データ管理システム -->
     <script src="../../js/data-manager.js"></script>
 
     <!-- 🌍 グローバル音声管理システム -->
-    <script src="js/core/global-audio-manager.js"></script>
+    <script src="../../js/core/global-audio-manager.js"></script>
 
     <!-- 🎵 既存音域テスト機能 -->
-    <script src="js/voice-range-test-demo.js"></script>
+    <script src="js/voice-range-test.js"></script>
 
     <!-- 🔒 Step2シンプル初期化システム（成功パターン適用） -->
     <script>
@@ -269,7 +284,7 @@
                 const audioDetector = await window.globalAudioManager.getInstance();
                 console.log('🎵 PitchProインスタンス取得・初期化完了（ダイアログは表示されないはず）');
 
-                // 既存の音域テストロジック（voice-range-test-demo.js）を呼び出す
+                // 既存の音域テストロジック（voice-range-test.js）を呼び出す
                 if (typeof window.startVoiceRangeTest === 'function') {
                     await window.startVoiceRangeTest(audioDetector); // インスタンスを引数で渡す
                 } else {
@@ -306,7 +321,7 @@
                 if (audioDetector.setCallbacks) {
                     audioDetector.setCallbacks({
                         onPitchUpdate: (result) => {
-                            // 音域テスト中の処理は voice-range-test-demo.js が担当
+                            // 音域テスト中の処理は voice-range-test.js が担当
                             console.log('🎵 音声検出コールバック受信:', result.frequency);
                         }
                     });
@@ -364,7 +379,7 @@
                 console.error('❌ begin-range-test-btn要素が見つかりません');
             }
 
-            // グローバルインスタンスとして公開（voice-range-test-demo.jsから使用）
+            // グローバルインスタンスとして公開（voice-range-test.jsから使用）
             window.globalAudioDetector = audioDetector;
             console.log('🌍 AudioDetectorをグローバルスコープに公開');
 
