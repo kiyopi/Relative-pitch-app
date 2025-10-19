@@ -1181,6 +1181,7 @@ function setupMicPermissionFlow() {
             const subInfoText = document.getElementById('sub-info-text');
             const detectionMeters = document.querySelector('.detection-meters');
             const controlButtons = document.querySelector('#range-test-section > .text-center.mt-6');
+            const micStatusContainer = document.getElementById('mic-status-container');
 
             if (mainStatusText) {
                 mainStatusText.style.display = '';
@@ -1193,6 +1194,13 @@ function setupMicPermissionFlow() {
             }
             if (detectionMeters) detectionMeters.style.display = '';
             if (controlButtons) controlButtons.style.display = '';
+            if (micStatusContainer) {
+                micStatusContainer.style.display = '';
+                // マイクステータスを待機状態にリセット
+                if (typeof updateMicStatus === 'function') {
+                    updateMicStatus('standby');
+                }
+            }
 
             // バッジと円形プログレスバーを初期状態にリセット
             if (typeof updateBadgeForWaiting === 'function') {

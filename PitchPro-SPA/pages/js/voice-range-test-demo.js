@@ -51,14 +51,16 @@ function displayResults(results) {
     const subInfoText = document.getElementById('sub-info-text');
     const detectionMeters = document.querySelector('.detection-meters');
     const controlButtons = document.querySelector('#range-test-section > .text-center.mt-6');
+    const micStatusContainer = document.getElementById('mic-status-container');
 
     if (mainStatusText) mainStatusText.style.display = 'none';
     if (rangeTestLayoutFlex) rangeTestLayoutFlex.style.display = 'none';
     if (subInfoText) subInfoText.style.display = 'none';
     if (detectionMeters) detectionMeters.style.display = 'none';
     if (controlButtons) controlButtons.style.display = 'none';
+    if (micStatusContainer) micStatusContainer.style.display = 'none';
 
-    console.log('📋 測定結果表示完了');
+    console.log('📋 測定結果表示完了（マイクバッジも非表示）');
 }
 
 // 通知表示関数
