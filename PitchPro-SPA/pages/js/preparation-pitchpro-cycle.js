@@ -1,11 +1,7 @@
 // preparation-pitchpro-cycle.js - PitchProサイクルベース実装
 // 初期化 → スタート → リセット → 放棄 のサイクル設計
 
-// Lucide初期化を確実に実行
-if (typeof lucide !== 'undefined') {
-    lucide.createIcons();
-} else {
-}
+// Lucide初期化はDOMContentLoadedイベント内で実行（HTMLが読み込まれた後）
 
 // ===== PitchProサイクル管理システム =====
 
@@ -789,6 +785,14 @@ function waitForLibraries() {
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 DOMContentLoaded - 初期化開始');
 
+    // Lucideアイコン初期化（最優先）
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+        console.log('✅ Lucideアイコン初期化完了');
+    } else {
+        console.warn('⚠️ Lucideライブラリが読み込まれていません');
+    }
+
     // ライブラリ読み込み待機
     console.log('⏳ ライブラリ読み込み待機中...');
     await waitForLibraries();
@@ -1115,6 +1119,36 @@ function setupMicPermissionFlow() {
     if (remeasureBtn) {
         remeasureBtn.addEventListener('click', async () => {
             console.log('🔄 再測定ボタンがクリックされました');
+
+            // 🎵 v3.1.16修正: リトライカウンターと測定データを完全リセット
+            if (typeof globalState !== 'undefined') {
+                globalState.retryCount = 0;
+                globalState.highRetryCount = 0;
+                globalState.currentPhase = 'idle';
+
+                // 測定データも初期化
+                if (globalState.measurementData) {
+                    globalState.measurementData.lowPhase = {
+                        frequencies: [],
+                        lowestFreq: null,
+                        lowestNote: null,
+                        avgVolume: 0,
+                        measurementTime: 0
+                    };
+                    globalState.measurementData.highPhase = {
+                        frequencies: [],
+                        highestFreq: null,
+                        highestNote: null,
+                        avgVolume: 0,
+                        measurementTime: 0
+                    };
+                    globalState.measurementData.startTime = null;
+                    globalState.measurementData.endTime = null;
+                }
+
+                console.log('✅ リトライカウンターと測定データを完全リセット');
+            }
+
             // 結果セクションを非表示、音域テストを再表示
             const resultsSection = document.getElementById('results-section');
             if (resultsSection) {
@@ -1148,6 +1182,18 @@ function setupMicPermissionFlow() {
                 updateCircularProgressInstantly(0);
             }
 
+            // 🎵 v3.1.16修正: Stepインジケーターとコネクターをリセット
+            const step3 = document.getElementById('step-3');
+            const connector2 = document.getElementById('connector-2');
+            if (step3) {
+                step3.classList.remove('completed', 'active');
+                step3.classList.add('pending');
+            }
+            if (connector2) {
+                connector2.classList.remove('completed');
+            }
+            console.log('✅ Stepインジケーターをリセット');
+
             // retry-measurement-btnのクラスをクリーンアップ
             const retryMeasurementBtn = document.getElementById('retry-measurement-btn');
             if (retryMeasurementBtn) {
@@ -1159,6 +1205,12 @@ function setupMicPermissionFlow() {
             const beginRangeTestBtn = document.getElementById('begin-range-test-btn');
             if (beginRangeTestBtn) {
                 beginRangeTestBtn.classList.remove('btn-hidden');
+            }
+
+            // 🎵 v3.1.17修正: トレーニング開始ボタンを再表示（完全失敗時に非表示にされている可能性があるため）
+            const completeRangeTestBtn2 = document.getElementById('complete-range-test-btn');
+            if (completeRangeTestBtn2) {
+                completeRangeTestBtn2.style.display = '';
             }
         });
     }

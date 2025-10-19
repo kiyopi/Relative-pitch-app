@@ -21,6 +21,12 @@ let VoiceRangeTestController;
 
 // 初期化関数
 async function initializeDemo() {
+    // Lucideアイコン初期化
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+        console.log('✅ Lucideアイコン初期化完了（voice-range-test-demo）');
+    }
+
     // 注意: VoiceRangeTestController は統合版では使用しない
     console.log('📋 音域テストデモ初期化完了（統合版）');
 }
