@@ -1188,7 +1188,7 @@ function displayVoiceRangeResults(results) {
             // 🎵 v3.1.22: 低音・高音逆転エラー（最優先でチェック）
             detailsEl.innerHTML = `
                 <div class="warning-alert">
-                    <i data-lucide="x-circle"></i>
+                    <i data-lucide="x-circle" style="color: #f59e0b; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
                     <div>
                         <p class="alert-title">測定エラー: 低音と高音が逆転しています</p>
                         <p>低音測定: ${results.lowFreq ? results.lowFreq.toFixed(1) + ' Hz (' + results.lowNote + ')' : '不明'}</p>
@@ -1200,7 +1200,7 @@ function displayVoiceRangeResults(results) {
         } else if (results.isCompleteFail) {
             detailsEl.innerHTML = `
                 <div class="warning-alert">
-                    <i data-lucide="x-circle"></i>
+                    <i data-lucide="x-circle" style="color: #f59e0b; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
                     <div>
                         <p class="alert-title">測定完全失敗</p>
                         <p>静かな環境で、より大きく明瞭な声で再測定してください。</p>
@@ -1210,7 +1210,7 @@ function displayVoiceRangeResults(results) {
         } else if (results.isPartialResult) {
             detailsEl.innerHTML = `
                 <div class="info-alert">
-                    <i data-lucide="alert-circle"></i>
+                    <i data-lucide="alert-circle" style="color: #60a5fa; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
                     <div>
                         <p class="alert-title">部分的な測定結果（不完全）</p>
                         <p>トレーニングには低音・高音両方の測定が必要です。再測定してください。</p>
@@ -1221,7 +1221,7 @@ function displayVoiceRangeResults(results) {
             // 🎵 v3.1.22: 極端に狭い音域（0.3オクターブ未満）
             detailsEl.innerHTML = `
                 <div class="warning-alert">
-                    <i data-lucide="alert-triangle"></i>
+                    <i data-lucide="alert-triangle" style="color: #f59e0b; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
                     <div>
                         <p class="alert-title">音域が極端に狭い (${results.octaves}オクターブ)</p>
                         <p>測定エラーの可能性があります。再測定をお勧めします。</p>
@@ -1233,7 +1233,7 @@ function displayVoiceRangeResults(results) {
             // 🎵 v3.1.22: やや狭い音域（0.3～0.5オクターブ）
             detailsEl.innerHTML = `
                 <div class="info-alert">
-                    <i data-lucide="info"></i>
+                    <i data-lucide="info" style="color: #60a5fa; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
                     <div>
                         <p class="alert-title">音域がやや狭い (${results.octaves}オクターブ)</p>
                         <p>より広い音域で発声すると、効果的なトレーニングができます。</p>
@@ -1245,7 +1245,7 @@ function displayVoiceRangeResults(results) {
             // 🎵 v3.1.22統一: 通常の結果表示（0.5オクターブ以上）
             detailsEl.innerHTML = `
                 <div class="success-alert">
-                    <i data-lucide="check-circle"></i>
+                    <i data-lucide="check-circle" style="color: #22c55e; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
                     <div>
                         <p class="alert-title">測定成功</p>
                         <p>快適音域 (推奨範囲): ${results.comfortableRange ? results.comfortableRange.range : '計算中...'}</p>
