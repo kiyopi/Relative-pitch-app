@@ -1432,7 +1432,7 @@ function validateLowestFrequencyData(lowData) {
     );
 
     const nearLowestCount = nearLowestData.length;
-    const minRequiredNearLowest = 30;  // 1.0秒相当（30fps × 1.0秒）← v3.1.23調整: 45個から緩和
+    const minRequiredNearLowest = 15;  // 0.5秒相当（30fps × 0.5秒）← v3.1.24調整: 30個→15個に緩和、iPhone実機対応
 
     // 🎵 散在パターンの分析（デバッグ用）
     let segments = [];
