@@ -193,7 +193,7 @@ let globalState = {
         recentDetections: [], // 最近の検出結果を保持
         requiredStableCount: 2, // 安定判定に必要な連続検出回数（3→2に緩和）
         maxHistoryAge: 800, // 履歴保持時間 (ms)（1000→800に短縮）
-        minFrequencyForVoice: 80, // 人間の声と判定する最低周波数 (Hz)（v3.1.12: 70→80に再調整、70Hzはノイズが多い）
+        minFrequencyForVoice: 75, // 人間の声と判定する最低周波数 (Hz)（v3.1.23: 80→75に緩和、iPhone男性低音域対応）
         maxFrequencyForVoice: 2500, // 人間の声と判定する最高周波数 (Hz)（2000→2500に緩和）
         // 🎵 v3.1.20修正: 継続検出時間を大幅短縮（ノイズ除去のみ、ユーザー体験優先）
         lowFreqContinuousStart: null, // 音声検出開始タイムスタンプ
@@ -299,7 +299,7 @@ function isStableVoiceDetection(result) {
         if (stability.lowFreqContinuousStart !== null) {
             let reason = '不明';
             if (!hasValidFrequency) {
-                reason = `人間の声の範囲外（${result.frequency ? result.frequency.toFixed(1) : 'なし'}Hz、有効範囲: 80-2500Hz）`;
+                reason = `人間の声の範囲外（${result.frequency ? result.frequency.toFixed(1) : 'なし'}Hz、有効範囲: ${stability.minFrequencyForVoice}-${stability.maxFrequencyForVoice}Hz）`;
             } else if (!hasMinVolume) {
                 reason = `音量不足（${result.volume ? (result.volume * 100).toFixed(1) : '0'}% < ${(lowFreqVolumeThreshold * 100).toFixed(1)}%）`;
             }
