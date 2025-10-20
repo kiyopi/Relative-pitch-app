@@ -193,7 +193,7 @@ let globalState = {
         recentDetections: [], // 最近の検出結果を保持
         requiredStableCount: 2, // 安定判定に必要な連続検出回数（3→2に緩和）
         maxHistoryAge: 800, // 履歴保持時間 (ms)（1000→800に短縮）
-        minFrequencyForVoice: 75, // 人間の声と判定する最低周波数 (Hz)（v3.1.23: 80→75に緩和、iPhone男性低音域対応）
+        minFrequencyForVoice: 70, // 人間の声と判定する最低周波数 (Hz)（v3.1.25: 75→70に緩和、プロバス歌手対応、ノイズは連続性で排除）
         maxFrequencyForVoice: 2500, // 人間の声と判定する最高周波数 (Hz)（2000→2500に緩和）
         // 🎵 v3.1.20修正: 継続検出時間を大幅短縮（ノイズ除去のみ、ユーザー体験優先）
         lowFreqContinuousStart: null, // 音声検出開始タイムスタンプ
@@ -1432,9 +1432,24 @@ function validateLowestFrequencyData(lowData) {
     );
 
     const nearLowestCount = nearLowestData.length;
-    const minRequiredNearLowest = 15;  // 0.5秒相当（30fps × 0.5秒）← v3.1.24調整: 30個→15個に緩和、iPhone実機対応
 
-    // 🎵 散在パターンの分析（デバッグ用）
+    // 🎵 v3.1.25: 動的な基準設定（周波数帯域別）
+    let minRequiredNearLowest;
+    let requiresContinuity = false;
+    let minContinuousSegment = 0;
+
+    if (lowestFreq < 75) {
+        // 70-75Hz未満: ノイズ除去のため連続性を要求
+        minRequiredNearLowest = 15;  // 合計15個は必要
+        requiresContinuity = true;
+        minContinuousSegment = 20;  // 最大セグメントが20個以上必要（約0.7秒）
+    } else {
+        // 75Hz以上: 散在OK
+        minRequiredNearLowest = 15;  // 0.5秒相当（30fps × 0.5秒）
+        requiresContinuity = false;
+    }
+
+    // 🎵 散在パターンの分析
     let segments = [];
     let currentSegment = { start: 0, count: 0 };
 
@@ -1459,22 +1474,39 @@ function validateLowestFrequencyData(lowData) {
         segments.push(currentSegment);
     }
 
+    const maxSegmentCount = segments.length > 0 ? Math.max(...segments.map(s => s.count)) : 0;
+
     console.log('🔍 最低音付近データ分析（低音測定）:', {
         '最低音': lowestFreq.toFixed(1) + ' Hz (' + lowData.lowestNote + ')',
         '許容範囲': `${(lowestFreq - tolerance).toFixed(1)} - ${(lowestFreq + tolerance).toFixed(1)} Hz`,
         '最低音付近データ数（合計）': nearLowestCount,
         '最低要求数': minRequiredNearLowest,
+        '連続性要求': requiresContinuity ? `✅ 必要（最大セグメント${minContinuousSegment}個以上）` : '❌ 不要',
+        '最大セグメント': maxSegmentCount + '個',
         'データセグメント数': segments.length,
         'セグメント詳細': segments.map(s => `${s.count}個`).join(', '),
         '判定': nearLowestCount >= minRequiredNearLowest ? '✅ 十分' : '❌ 不足',
-        '備考': segments.length > 1 ? '散在パターン（OK）' : '連続パターン'
+        '備考': segments.length > 1 ? '散在パターン' : '連続パターン'
     });
+
+    // 70-75Hz未満の場合は連続性もチェック
+    if (requiresContinuity && maxSegmentCount < minContinuousSegment) {
+        return {
+            isValid: false,
+            reason: `最低音が70-75Hz台で連続性不足 (最大セグメント${maxSegmentCount}個 / ${minContinuousSegment}個必要)`,
+            suggestion: '70Hz台の低音を0.7秒以上連続して保持してください（ノイズ除去のため）',
+            nearLowestCount: nearLowestCount,
+            maxSegmentCount: maxSegmentCount,
+            minRequired: minContinuousSegment,
+            isScattered: true
+        };
+    }
 
     if (nearLowestCount < minRequiredNearLowest) {
         return {
             isValid: false,
             reason: `最低音付近のデータが不足 (${nearLowestCount}個 / ${minRequiredNearLowest}個必要)`,
-            suggestion: '低い声を合計1.5秒以上出してください（途中で高くなっても戻せばOK）',
+            suggestion: '低い声を合計0.5秒以上出してください（途中で高くなっても戻せばOK）',
             nearLowestCount: nearLowestCount,
             minRequired: minRequiredNearLowest,
             segments: segments
