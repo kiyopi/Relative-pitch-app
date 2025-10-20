@@ -1565,8 +1565,13 @@ function findStableHighestFrequency(highData) {
         if (nearCandidateData.length >= minRequiredNearHighest) {
             // 安定した音域を発見
             const avgFreq = nearCandidateData.reduce((sum, d) => sum + d.frequency, 0) / nearCandidateData.length;
+            // 平均周波数に最も近いデータのnoteを使用
+            const closestData = nearCandidateData.reduce((closest, d) =>
+                Math.abs(d.frequency - avgFreq) < Math.abs(closest.frequency - avgFreq) ? d : closest
+            );
             return {
                 frequency: avgFreq,
+                note: closestData.note,
                 dataCount: nearCandidateData.length,
                 isStable: true
             };
@@ -2149,7 +2154,7 @@ function completeHighPitchMeasurement() {
     if (stableHighest && stableHighest.isStable && stableHighest.frequency !== highData.highestFreq) {
         const originalHighest = highData.highestFreq;
         highData.highestFreq = stableHighest.frequency;
-        highData.highestNote = frequencyToNoteName(stableHighest.frequency);
+        highData.highestNote = stableHighest.note;
         console.log('🔄 安定した最高音に自動調整:', {
             '瞬間最高音': `${originalHighest.toFixed(1)} Hz（データ数不足）`,
             '安定最高音': `${stableHighest.frequency.toFixed(1)} Hz (${highData.highestNote})`,

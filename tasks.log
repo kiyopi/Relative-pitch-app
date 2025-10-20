@@ -2736,3 +2736,247 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-19 17:46:58] コミット: fix: mic-status-containerのSVGアイコン完全センタリング修正
+
+根本原因:
+- HTMLのインラインstyle="display: block;"がCSSのdisplay: flexを上書き
+- そのためflexboxのalign-items/justify-contentが機能していなかった
+
+修正内容:
+1. preparation-step1.html: style属性からdisplay: blockを削除
+2. preparation-step2.html: 同様にdisplay: blockを削除
+3. preparation-pitchpro-cycle.js: display = 'block'をdisplay = ''に変更（CSSのflexを使用）
+4. voice-range-test.css: .mic-status-containerにflex-shrink: 0を追加
+
+結果:
+- CSSのdisplay: flexが正しく適用される
+- align-items: centerで垂直センタリング
+- justify-content: centerで水平センタリング
+- margin: 12px auto 0 autoで全体の水平センタリング
+- SVGアイコンが60pxサークル内で完全に中央配置
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-19 22:01:13] コミット: fix: Lucideアイコン表示修正・mic-status-containerセンタリング修正・CSS/JS配置整理
+
+- Lucideアイコン初期化をDOMContentLoadedに移動
+- mic-status-containerのインラインdisplay削除でFlexboxセンタリング実現
+- CSS配置整理: /pages/css/voice-range-test.css → /styles/voice-range.css
+- JS配置整理: /pages/js/core/* → /js/core/ (共通ライブラリ統一)
+- voice-range-test-demo.js → voice-range-test.js リネーム
+- preparationController.js削除（未使用）
+- test-voice-range-only.html追加（音域テスト単体デバッグ用）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-19 22:11:29] コミット: fix: temp-pitchproサブモジュール問題を解決してGitHub Pagesビルド修正
+
+- js/pitchpro-audio/temp-pitchproをサブモジュールから通常ディレクトリに変換
+- 内部の.gitディレクトリを削除してembedded repositoryを解決
+- GitHub Pages build失敗の根本原因を修正
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-19 22:21:25] コミット: fix: CSS/JS新規ファイルを追加してGitHub Pages 404エラーを解決
+
+- /js/core/ ディレクトリ追加（共通ライブラリ統一）
+- /styles/voice-range.css 追加
+- 前回のコミットで git add 漏れしていたファイルを追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-19 22:24:24] コミット: fix: JavaScriptファイルの相対パス修正（../../ → ../）
+
+- preparation-step1.html: ../../js/ → ../js/ に修正
+- test-voice-range-only.html: ../../js/ → ../js/ に修正
+- GitHub Pages 404エラーの根本原因を解決
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-19 23:18:09] コミット: refactor: アラートCSS共通化 - base.cssに統合してネスト構造対応
+
+アラート関連CSS（info-alert, success-alert, warning-alert）をtraining.cssからbase.cssに移行し、全ページで共通利用可能にしました。
+
+主な変更:
+- base.css: アラートシステム（3種類）を追加（line 1349-1443）
+- ネストされたdiv要素とp要素の両方に対応（flex: 1適用）
+- training.css: 重複するアラート定義を削除、base.css参照に変更
+- アイコンが押しつぶされる問題を解決
+
+対応HTML構造:
+1. <alert><i></i><p>text</p></alert>（マイク許可）
+2. <alert><i></i><div><p>text</p></div></alert>（音域テスト結果）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-19 23:26:41] コミット: fix: 音域テスト結果アラートにアイコン色とサイズを追加
+
+全6種類のアラートアイコンに色とサイズのインラインスタイルを追加し、マイク許可アラートと同じ表示に統一しました。
+
+主な変更:
+- warning-alert: #f59e0b (オレンジ) - 逆転エラー、完全失敗、極端に狭い
+- info-alert: #60a5fa (青) - 部分的結果、やや狭い
+- success-alert: #22c55e (緑) - 測定成功
+- すべてのアイコンサイズを32pxに統一
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-19 23:34:16] コミット: fix: 音域テスト結果セクションのガラス効果二重適用を解消
+
+#results-sectionのglass-cardクラスを削除し、親要素のglass-cardとの二重適用を防止しました。これにより、アラート背景の透明度がマイク許可と同じになります。
+
+主な変更:
+- preparation-step1.html: #results-sectionのglass-card削除
+- test-voice-range-only.html: #results-sectionのglass-card削除
+- ガラス効果が一重になり、アラート背景色が正しく表示される
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-20 16:22:07] コミット: fix: 音域テスト周波数下限を75Hzに緩和 - iPhone男性低音域対応
+
+iPhone実機ログ分析により、79Hz台の周波数が頻繁に「範囲外」として除外され、測定失敗の原因となっていることが判明。男性低音域に対応するため、周波数下限を80Hzから75Hzに緩和しました。
+
+主な変更:
+- minFrequencyForVoice: 80Hz → 75Hz
+- 有効範囲: 80-2500Hz → 75-2500Hz
+- エラーメッセージも動的に更新されるように修正
+
+期待効果:
+- 79Hz台の検出データが有効化される
+- 低音測定の成功率向上
+- 必要データ数（45個）に到達しやすくなる
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-20 16:35:42] コミット: fix: 最低音付近データ要求数を15個に緩和 - iPhone測定成功率向上
+
+iPhone実機ログ分析により、最低音付近データ数不足が測定失敗の真の原因と判明。ユーザーが低音を一瞬だけ出してすぐに上げる行動パターンに対応するため、要求数を緩和しました。
+
+主な変更:
+- minRequiredNearLowest: 30個 → 15個（0.5秒相当）
+- 許容範囲: 最低音の±5%は維持
+
+失敗ケース分析:
+- 失敗1: 最低音付近データ 1個/30個必要 ❌
+- 失敗2: 最低音付近データ 14個/30個必要 ❌
+- 成功例: 最低音付近データ 41個/30個必要 ✅
+
+期待効果:
+- 失敗1 → 15個必要に緩和してもNG（1個）
+- 失敗2 → 15個必要なら成功（14個は惜しいが次回成功確率UP）
+- より自然な発声パターンで測定成功
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-20 16:53:04] コミット: feat: 70Hz対応＋動的ノイズ除去システム実装
+
+周波数下限を70Hzまで拡大し、プロバス歌手の音域に対応。同時に、70-75Hz帯域ではノイズ除去のため連続性要求を追加した動的基準システムを実装しました。
+
+主な変更:
+1. 周波数下限: 75Hz → 70Hz
+2. 動的な検証基準を導入:
+   - 70-75Hz未満: 最大セグメント20個以上必要（連続0.7秒）
+   - 75Hz以上: 散在OK、合計15個（連続性不要）
+
+ノイズ除去ロジック:
+- 本物の70Hz声: 連続20個は容易に達成 ✅
+- 断続的ノイズ: 連続20個は困難 ❌
+
+期待効果:
+- プロバス歌手の低音域対応
+- 環境ノイズ（50-60Hz）との確実な区別
+- 一般ユーザー（75Hz以上）は従来通り
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-20 17:16:57] コミット: feat: 音域テスト失敗時のサブテキスト赤字表示実装
+
+低音域での声量不足による失敗時の視認性向上
+
+変更内容:
+- voice-range.css: .voice-range-sub-text.error クラス追加（赤色・太字）
+- voice-range-test.js: 失敗メッセージ表示時に error クラス自動追加
+- voice-range-test.js: 成功時・待機時に error クラス自動削除
+
+対応箇所:
+- 低音測定失敗時（8箇所）
+- 高音測定失敗時（8箇所）
+- 再測定メッセージ表示時（6箇所）
+- 成功時・待機時のクラス削除（4箇所）
+
+期待効果:
+- 失敗メッセージが赤字で目立つため、ユーザーがすぐに認識可能
+- 低音域での声量不足問題への対策として、視覚的フィードバック強化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-20 17:30:27] コミット: fix: 再測定ボタン押下時の「待機中...」赤字残留問題を修正
+
+失敗→再測定で赤字が残る問題を解消
+
+問題:
+- 測定失敗後、再測定ボタン押下で「待機中...」が赤字のまま表示
+- errorクラスが削除されず、視覚的に混乱を招く状態
+
+修正箇所:
+- preparation-pitchpro-cycle.js (1194行目): remeasure-btn イベント
+- voice-range-test.js (1666行目): 低音測定完了→高音測定待機
+- voice-range-test.js (2321行目): 測定停止時
+
+修正内容:
+- 「待機中...」表示時に subInfoText.classList.remove('error') 追加
+- 失敗→待機の状態遷移で正しく青色に戻る
+
+期待効果:
+- 再測定時の視覚的な状態が正しくリセットされる
+- ユーザーが混乱せず、次の測定に集中できる
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-20 17:56:31] コミット: feat: 高音測定の安定最高音自動判定ロジック実装
+
+瞬間的なピークを無視して安定した最高音を採用
+
+問題:
+- 測定終了直前に一瞬だけ出した高音（288 Hz）が最高音として記録
+- 安定していた音域（230 Hz、90個）のデータが無視される
+- 最高音付近データ数不足（1個）で失敗判定
+
+解決策:
+- findStableHighestFrequency() 関数を新規実装
+- 最高音から降順に15個以上のデータがある音域を探索
+- 安定した音域を自動的に最高音として採用
+
+実装詳細:
+- 周波数を降順ソート（高い順）
+- 各候補周波数の±5%範囲内のデータ数をカウント
+- 15個以上のデータがある最も高い音域を「安定最高音」とする
+- 瞬間最高音と安定最高音の差をログで明示
+
+期待効果:
+- 瞬間的なピークによる失敗が解消される
+- 安定して保持できた高音が正しく評価される
+- ユーザーの実際の能力を反映した測定結果
+
+ログ出力例:
+🔄 安定した最高音に自動調整:
+  瞬間最高音: 288.4 Hz（データ数不足）
+  安定最高音: 230.1 Hz (A#)
+  安定音域データ数: 85個
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

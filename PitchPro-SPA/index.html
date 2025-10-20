@@ -21,7 +21,7 @@
     <script src="js/evaluation-calculator.js"></script>
     <script src="js/controllers/session-data-recorder.js"></script>
     <script src="pages/js/result-session-controller.js"></script>
-    <script src="pages/js/core/pitchpro-v1.3.1.umd.js"></script>
+    <script src="js/core/pitchpro-v1.3.1.umd.js"></script>
 
     <!-- Tone.js Library (Required for PitchShifter) -->
     <script type="importmap">
@@ -34,7 +34,7 @@
 
     <!-- PitchShifter Library -->
     <script type="module">
-        import { PitchShifter } from './pages/js/core/reference-tones.js';
+        import { PitchShifter } from './js/core/reference-tones.js';
         window.PitchShifter = PitchShifter;
         console.log('✅ PitchShifter loaded globally');
     </script>

@@ -203,6 +203,161 @@ if (this.dataManager) {
 
 ---
 
+## 🎨 v3.1.x UI改善アップデート
+
+### v3.1.25: エラーメッセージ視認性向上（2025年1月20日）
+
+#### 背景・課題
+- 低音域測定時、ユーザーが無意識に音量を下げてしまい失敗することが多発
+- 失敗時のメッセージが青字のままで目立たず、原因に気づきにくい
+- 測定失敗の理由を明確に伝える必要性
+
+#### 実装内容
+**CSS追加** (`/styles/voice-range.css:204-208`):
+```css
+/* サブテキスト状態別バリエーション */
+.voice-range-sub-text.error {
+    color: #fca5a5; /* text-red-300 - 失敗・エラー時 */
+    font-weight: 500;
+}
+```
+
+**JavaScript修正**:
+```javascript
+// 失敗時の処理（22箇所で適用）
+const subInfoText = document.getElementById('sub-info-text');
+if (!lowestFreqValidation.isValid) {
+    subInfoText.textContent = lowestFreqValidation.suggestion || lowestFreqValidation.reason;
+    subInfoText.classList.add('error'); // 赤字に変更
+}
+
+// 成功・待機時の処理（4箇所で適用）
+if (subInfoText) {
+    subInfoText.textContent = '安定した声を認識したら自動で測定開始します';
+    subInfoText.classList.remove('error'); // 青字に戻す
+}
+```
+
+#### 改善効果
+- ✅ 失敗メッセージが赤字で目立つようになり、ユーザーが原因を即座に認識
+- ✅ 低音域測定時の音量不足に気づきやすくなる
+- ✅ 再測定時の視覚的フィードバックが明確化
+
+---
+
+### v3.1.26: 安定最高音自動判定機能（2025年1月20日）
+
+#### 背景・課題
+**実測ログからの問題発見**:
+```
+データ90: 最高音 230.1 Hz (A#) - 85個のデータで安定
+データ95: 最高音 288.4 Hz (D) - 測定終了直前に瞬間的にヒット
+検証結果: 288.4 Hz付近に15個以上のデータが必要 → 1個のみ → 失敗
+```
+
+**ユーザーの実際の挙動**:
+- 高音域測定中、288 Hzを瞬間的にヒット
+- その後230 Hzで安定して維持（85個のデータ）
+- しかしシステムは288 Hzを「最高音」と判定し、データ不足で失敗判定
+
+**根本原因**: 瞬間的なピーク値を「最高音」として扱い、維持可能な安定周波数を無視していた
+
+#### 実装内容
+
+**新規関数**: `findStableHighestFrequency()` (`voice-range-test.js:1536-1582`)
+
+```javascript
+/**
+ * 🎵 v3.1.26新機能: 安定した最高音を自動判定
+ * 瞬間的なピーク値を無視し、十分なデータ数がある周波数を最高音とする
+ */
+function findStableHighestFrequency(highData) {
+    const minRequiredNearHighest = 15;  // 安定判定の最低データ数
+    const tolerance = 0.05;  // ±5%の範囲
+
+    // 周波数を降順にソート（高い順）
+    const sortedFreqs = [...highData.frequencies]
+        .map(d => d.frequency)
+        .filter(f => f > 0)
+        .sort((a, b) => b - a);
+
+    // 最高音から順に、安定した音域を探す
+    const candidateFreqs = [...new Set(sortedFreqs)];
+
+    for (const candidateFreq of candidateFreqs) {
+        const candidateTolerance = candidateFreq * tolerance;
+        const nearCandidateData = highData.frequencies.filter(d =>
+            d.frequency >= (candidateFreq - candidateTolerance) &&
+            d.frequency <= (candidateFreq + candidateTolerance)
+        );
+
+        if (nearCandidateData.length >= minRequiredNearHighest) {
+            // 安定した音域を発見
+            const avgFreq = nearCandidateData.reduce((sum, d) => sum + d.frequency, 0) / nearCandidateData.length;
+            return {
+                frequency: avgFreq,
+                dataCount: nearCandidateData.length,
+                isStable: true
+            };
+        }
+    }
+
+    // 安定した音域が見つからなかった
+    return {
+        frequency: sortedFreqs[0],
+        dataCount: 1,
+        isStable: false
+    };
+}
+```
+
+**適用箇所**: 高音域測定完了時に自動適用
+```javascript
+// 🎵 v3.1.26新機能: 瞬間的なピークを無視して安定した最高音を探す
+const stableHighest = findStableHighestFrequency(highData);
+if (stableHighest && stableHighest.isStable && stableHighest.frequency !== highData.highestFreq) {
+    const originalHighest = highData.highestFreq;
+    highData.highestFreq = stableHighest.frequency;
+    highData.highestNote = frequencyToNoteName(stableHighest.frequency);
+    console.log('🔄 安定した最高音に自動調整:', {
+        '瞬間最高音': `${originalHighest.toFixed(1)} Hz（データ数不足）`,
+        '安定最高音': `${stableHighest.frequency.toFixed(1)} Hz (${highData.highestNote})`,
+        '安定音域データ数': stableHighest.dataCount + '個'
+    });
+}
+```
+
+#### アルゴリズム詳細
+
+**検索戦略**:
+1. 全周波数データを降順でソート（高い順）
+2. 最高周波数から順に候補として検証
+3. 各候補周波数に対して:
+   - ±5%の範囲内のデータ数をカウント
+   - 15個以上のデータがあれば「安定」と判定
+   - その周波数を最高音として採用
+4. 安定周波数が見つからなければ、元の最高周波数を維持
+
+**判定基準**:
+- **データ数要件**: 15個以上（既存の検証基準と統一）
+- **周波数範囲**: ±5%以内（既存の検証基準と統一）
+- **平均値計算**: 範囲内データの平均周波数を採用（精度向上）
+
+#### 設計哲学
+- 低音域の検証ロジックは変更なし（仕様通り厳密に）
+- 高音域のみ自動調整（人間の発声特性に配慮）
+- 既存の検証基準（15個、±5%）を再利用（一貫性）
+
+#### 改善効果
+- ✅ 高音域測定の成功率向上（瞬間ピークによる不合理な失敗を防止）
+- ✅ ユーザーの自然な発声パターンに対応（瞬間的なピーク＋安定維持）
+- ✅ 音楽的に妥当な評価（持続可能な最高音を正しく判定）
+- ✅ 既存ロジックとの一貫性（15個、±5%基準の再利用）
+
+**コミット**: `768df2c`
+
+---
+
 ## ⚠️ 既知の問題・対策
 
 ### 1. 雑音検出問題
@@ -220,6 +375,19 @@ if (this.dataManager) {
 ### 4. UI要素の重複ID
 **問題**: 同じIDの要素が複数存在する可能性
 **対策**: PreparationTestUIクラスでキャッシュ管理
+
+### 5. iPad 低周波数制約（ハードウェア制限）
+**実測データ**:
+- **検出最低周波数**: 78.8 Hz (D#)
+- **80Hz以下の音量**: 1-2%範囲（極めて低い）
+- **音量バー反応**: 80Hz以下では視覚的にほぼ動かない
+
+**原因**: iPadマイクロフォンのハードウェア特性による物理的制約
+
+**対応方針**:
+- ソフトウェアでの調整は困難
+- 実用的な下限を78-80Hzとして受容
+- ユーザーへの説明・ガイダンス提供を検討
 
 ---
 
