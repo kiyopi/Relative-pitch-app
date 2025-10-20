@@ -1661,7 +1661,9 @@ function completeLowPitchMeasurement() {
 
         // 低音測定完了時の待機表示
         document.getElementById('main-status-text').textContent = '低音測定完了！高音測定に進みます...';
-        document.getElementById('sub-info-text').textContent = '待機中...';
+        const subInfoText = document.getElementById('sub-info-text');
+        subInfoText.textContent = '待機中...';
+        subInfoText.classList.remove('error');
         
         // インターバル時に音声検出を停止してマイクを青に変更
 
@@ -2314,7 +2316,9 @@ function stopAllMeasurements() {
     updateMicStatus('standby');
 
     document.getElementById('main-status-text').textContent = 'テスト停止';
-    document.getElementById('sub-info-text').textContent = '待機中...';
+    const subInfoText = document.getElementById('sub-info-text');
+    subInfoText.textContent = '待機中...';
+    subInfoText.classList.remove('error');
     updateBadgeForWaiting('arrow-down');
 
     document.getElementById('retry-measurement-btn').classList.add('btn-hidden');

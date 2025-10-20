@@ -1191,6 +1191,7 @@ function setupMicPermissionFlow() {
             if (subInfoText) {
                 subInfoText.style.display = '';
                 subInfoText.textContent = '待機中...';
+                subInfoText.classList.remove('error');
             }
             if (detectionMeters) detectionMeters.style.display = '';
             if (controlButtons) controlButtons.style.display = '';
