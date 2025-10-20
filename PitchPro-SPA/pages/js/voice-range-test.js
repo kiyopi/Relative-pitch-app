@@ -1533,6 +1533,54 @@ function validateLowestFrequencyData(lowData) {
  * @param {Object} highData - 高音測定データ
  * @returns {Object} 検証結果 { isValid, reason, suggestion, nearHighestCount, positionPercent }
  */
+// 🎵 v3.1.26新機能: 安定した最高音を自動判定
+function findStableHighestFrequency(highData) {
+    if (!highData.frequencies || highData.frequencies.length === 0) {
+        return null;
+    }
+
+    const minRequiredNearHighest = 15;  // 安定判定の最低データ数
+    const tolerance = 0.05;  // ±5%の範囲
+
+    // 周波数を降順にソート
+    const sortedFreqs = [...highData.frequencies]
+        .map(d => d.frequency)
+        .filter(f => f > 0)
+        .sort((a, b) => b - a);
+
+    if (sortedFreqs.length === 0) {
+        return null;
+    }
+
+    // 最高音から順に、安定した音域を探す
+    const candidateFreqs = [...new Set(sortedFreqs)];  // 重複除去
+
+    for (const candidateFreq of candidateFreqs) {
+        const candidateTolerance = candidateFreq * tolerance;
+        const nearCandidateData = highData.frequencies.filter(d =>
+            d.frequency >= (candidateFreq - candidateTolerance) &&
+            d.frequency <= (candidateFreq + candidateTolerance)
+        );
+
+        if (nearCandidateData.length >= minRequiredNearHighest) {
+            // 安定した音域を発見
+            const avgFreq = nearCandidateData.reduce((sum, d) => sum + d.frequency, 0) / nearCandidateData.length;
+            return {
+                frequency: avgFreq,
+                dataCount: nearCandidateData.length,
+                isStable: true
+            };
+        }
+    }
+
+    // 安定した音域が見つからなかった（全てのデータが散在）
+    return {
+        frequency: sortedFreqs[0],
+        dataCount: 1,
+        isStable: false
+    };
+}
+
 function validateHighestFrequencyData(highData) {
     if (!highData.highestFreq || highData.frequencies.length === 0) {
         return { isValid: false, reason: 'データ不足' };
@@ -2093,6 +2141,19 @@ function completeHighPitchMeasurement() {
             '有効データ数': validFrequencyData.length,
             '実際の発声期間': (actualVocalizationDuration / 1000).toFixed(2) + '秒',
             '最低要求期間': (minVocalizationDuration / 1000) + '秒'
+        });
+    }
+
+    // 🎵 v3.1.26新機能: 瞬間的なピークを無視して安定した最高音を探す
+    const stableHighest = findStableHighestFrequency(highData);
+    if (stableHighest && stableHighest.isStable && stableHighest.frequency !== highData.highestFreq) {
+        const originalHighest = highData.highestFreq;
+        highData.highestFreq = stableHighest.frequency;
+        highData.highestNote = frequencyToNoteName(stableHighest.frequency);
+        console.log('🔄 安定した最高音に自動調整:', {
+            '瞬間最高音': `${originalHighest.toFixed(1)} Hz（データ数不足）`,
+            '安定最高音': `${stableHighest.frequency.toFixed(1)} Hz (${highData.highestNote})`,
+            '安定音域データ数': stableHighest.dataCount + '個'
         });
     }
 
