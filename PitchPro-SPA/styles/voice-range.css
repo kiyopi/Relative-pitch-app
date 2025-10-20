@@ -200,6 +200,12 @@
     margin-bottom: 4px;
 }
 
+/* サブテキスト状態別バリエーション */
+.voice-range-sub-text.error {
+    color: #fca5a5; /* text-red-300 - 失敗・エラー時 */
+    font-weight: 500;
+}
+
 /* 測定中アニメーション */
 .voice-range-sub-text.measuring {
     animation: measuring-pulse 1.5s ease-in-out infinite;

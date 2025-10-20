@@ -645,6 +645,7 @@ async function startVoiceRangeTest(audioDetectorInstance) { // 引数を追加
         const subInfoText = document.getElementById('sub-info-text');
         if (subInfoText) {
             subInfoText.textContent = '安定した声を認識したら自動で測定開始します';
+            subInfoText.classList.remove('error');
         }
 
         console.log('✅ 音域テスト開始完了');
@@ -1685,14 +1686,19 @@ function completeLowPitchMeasurement() {
         console.warn('⚠️ 低音域測定失敗 - データが記録されませんでした');
 
         // 🎵 v3.1.23新機能: 失敗理由の詳細表示
+        const subInfoText = document.getElementById('sub-info-text');
         if (!lowestFreqValidation.isValid) {
-            document.getElementById('sub-info-text').textContent = lowestFreqValidation.suggestion || lowestFreqValidation.reason;
+            subInfoText.textContent = lowestFreqValidation.suggestion || lowestFreqValidation.reason;
+            subInfoText.classList.add('error');
         } else if (hasContinuityError) {
-            document.getElementById('sub-info-text').textContent = '3秒間継続して発声してください';
+            subInfoText.textContent = '3秒間継続して発声してください';
+            subInfoText.classList.add('error');
         } else if (hasInsufficientDuration) {
-            document.getElementById('sub-info-text').textContent = '1.5秒以上安定した発声を続けてください';
+            subInfoText.textContent = '1.5秒以上安定した発声を続けてください';
+            subInfoText.classList.add('error');
         } else if (!hasValidData) {
-            document.getElementById('sub-info-text').textContent = 'より安定した発声を続けてください';
+            subInfoText.textContent = 'より安定した発声を続けてください';
+            subInfoText.classList.add('error');
         }
 
         // 失敗時の処理
@@ -1725,7 +1731,9 @@ function handleLowPitchMeasurementFailure() {
         // 失敗表示
         updateBadgeForFailure();
         document.getElementById('main-status-text').textContent = `低音測定失敗 - 再測定します (${globalState.retryCount}/${globalState.maxRetries})`;
-        document.getElementById('sub-info-text').textContent = 'より大きな声で低い音を出してください';
+        const subInfoText = document.getElementById('sub-info-text');
+        subInfoText.textContent = 'より大きな声で低い音を出してください';
+        subInfoText.classList.add('error');
 
         showNotification('低音の検出に失敗しました。再測定します。', 'warning');
 
@@ -1740,7 +1748,9 @@ function handleLowPitchMeasurementFailure() {
 
         updateBadgeForError();
         document.getElementById('main-status-text').textContent = '低音測定をスキップします';
-        document.getElementById('sub-info-text').textContent = '高音測定に進みます';
+        const subInfoText = document.getElementById('sub-info-text');
+        subInfoText.textContent = '高音測定に進みます';
+        subInfoText.classList.remove('error');
 
         showNotification('低音測定をスキップして高音測定に進みます', 'info');
 
@@ -1764,7 +1774,9 @@ function retryLowPitchMeasurement() {
     // 待機状態に戻す
     globalState.currentPhase = 'waiting-for-voice';
     document.getElementById('main-status-text').textContent = '３秒間できるだけ低い声で「あー」と発声しましょう（再測定）';
-    document.getElementById('sub-info-text').textContent = 'より大きく、より低い音で歌ってください';
+    const subInfoText = document.getElementById('sub-info-text');
+    subInfoText.textContent = 'より大きく、より低い音で歌ってください';
+    subInfoText.classList.add('error');
 
     // バッジを待機状態に戻す
     updateBadgeForWaiting('arrow-down');
@@ -1792,7 +1804,9 @@ function retryHighPitchMeasurement() {
     // 高音測定の待機状態に戻す
     globalState.currentPhase = 'waiting-for-voice-high';
     document.getElementById('main-status-text').textContent = '３秒間できるだけ高い声で「あー」と発声しましょう（再測定）';
-    document.getElementById('sub-info-text').textContent = 'より大きく、より高い音で歌ってください';
+    const subInfoText = document.getElementById('sub-info-text');
+    subInfoText.textContent = 'より大きく、より高い音で歌ってください';
+    subInfoText.classList.add('error');
 
     // バッジを高音待機状態に戻す
     updateBadgeForWaiting('arrow-up');
@@ -1870,7 +1884,9 @@ function handleHighPitchMeasurementFailure() {
         // 失敗表示
         updateBadgeForFailure();
         document.getElementById('main-status-text').textContent = `高音測定失敗 - 再測定します (${globalState.highRetryCount}/${globalState.maxRetries})`;
-        document.getElementById('sub-info-text').textContent = 'より大きな声で高い音を出してください';
+        const subInfoText = document.getElementById('sub-info-text');
+        subInfoText.textContent = 'より大きな声で高い音を出してください';
+        subInfoText.classList.add('error');
 
         showNotification('高音の検出に失敗しました。再測定します。', 'warning');
 
@@ -2008,7 +2024,9 @@ function startHighPitchPhase() {
 
     // UI更新
     document.getElementById('main-status-text').textContent = '３秒間できるだけ高い声で「あー」と発声しましょう';
-    document.getElementById('sub-info-text').textContent = '安定した声を認識したら自動で測定開始します';
+    const subInfoText = document.getElementById('sub-info-text');
+    subInfoText.textContent = '安定した声を認識したら自動で測定開始します';
+    subInfoText.classList.remove('error');
     updateBadgeForWaiting('arrow-up');
 }
 
@@ -2108,14 +2126,19 @@ function completeHighPitchMeasurement() {
         console.warn('⚠️ 高音域測定失敗 - データが記録されませんでした');
 
         // 🎵 v3.1.23新機能: 失敗理由の詳細表示
+        const subInfoText = document.getElementById('sub-info-text');
         if (!highestFreqValidation.isValid) {
-            document.getElementById('sub-info-text').textContent = highestFreqValidation.suggestion || highestFreqValidation.reason;
+            subInfoText.textContent = highestFreqValidation.suggestion || highestFreqValidation.reason;
+            subInfoText.classList.add('error');
         } else if (hasContinuityError) {
-            document.getElementById('sub-info-text').textContent = '3秒間継続して発声してください';
+            subInfoText.textContent = '3秒間継続して発声してください';
+            subInfoText.classList.add('error');
         } else if (hasInsufficientDuration) {
-            document.getElementById('sub-info-text').textContent = '1.5秒以上安定した発声を続けてください';
+            subInfoText.textContent = '1.5秒以上安定した発声を続けてください';
+            subInfoText.classList.add('error');
         } else if (!hasValidData) {
-            document.getElementById('sub-info-text').textContent = 'より安定した発声を続けてください';
+            subInfoText.textContent = 'より安定した発声を続けてください';
+            subInfoText.classList.add('error');
         }
 
         // 失敗時の処理（高音測定は最後なので、結果表示に進む）
@@ -2185,7 +2208,9 @@ async function retryCurrentMeasurement() {
         console.log('📉 低音測定から再開');
         globalState.currentPhase = 'waiting-for-voice';
         document.getElementById('main-status-text').textContent = '３秒間できるだけ低い声で「あー」と発声しましょう（再測定）';
-        document.getElementById('sub-info-text').textContent = 'より大きく、より低い音で歌ってください';
+        const subInfoText = document.getElementById('sub-info-text');
+        subInfoText.textContent = 'より大きく、より低い音で歌ってください';
+        subInfoText.classList.add('error');
         updateBadgeForWaiting('arrow-down');
 
         // 音声検出が停止している場合は再開
@@ -2198,7 +2223,9 @@ async function retryCurrentMeasurement() {
         console.log('📈 高音測定から再開');
         globalState.currentPhase = 'waiting-for-voice-high';
         document.getElementById('main-status-text').textContent = '３秒間できるだけ高い声で「あー」と発声しましょう（再測定）';
-        document.getElementById('sub-info-text').textContent = 'より大きく、より高い音で歌ってください';
+        const subInfoText = document.getElementById('sub-info-text');
+        subInfoText.textContent = 'より大きく、より高い音で歌ってください';
+        subInfoText.classList.add('error');
         updateBadgeForWaiting('arrow-up');
 
         // 音声検出が停止している場合は再開
@@ -2216,7 +2243,9 @@ async function retryCurrentMeasurement() {
         // 低音測定から再開
         globalState.currentPhase = 'waiting-for-voice';
         document.getElementById('main-status-text').textContent = '３秒間できるだけ低い声で「あー」と発声しましょう';
-        document.getElementById('sub-info-text').textContent = '安定した声を認識したら自動で測定開始します';
+        const subInfoText = document.getElementById('sub-info-text');
+        subInfoText.textContent = '安定した声を認識したら自動で測定開始します';
+        subInfoText.classList.remove('error');
         updateBadgeForWaiting('arrow-down');
 
         // 結果表示を非表示
