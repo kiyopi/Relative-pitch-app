@@ -261,6 +261,15 @@ async function startTraining() {
             statusText.textContent = '基音を再生中...';
         }
 
+        // iOS/iPadOS対応: AudioContextを明示的にresume（ユーザーインタラクション時に必須）
+        if (typeof Tone !== 'undefined' && Tone.context) {
+            if (Tone.context.state !== 'running') {
+                console.log('🔊 AudioContext再開中... (state:', Tone.context.state + ')');
+                await Tone.context.resume();
+                console.log('✅ AudioContext再開完了 (state:', Tone.context.state + ')');
+            }
+        }
+
         // モード別基音選択と再生（2秒）
         const config = modeConfig[currentMode];
         const sessionCounter = window.sessionDataRecorder ? window.sessionDataRecorder.getSessionNumber() : 0;
