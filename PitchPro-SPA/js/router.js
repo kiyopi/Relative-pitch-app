@@ -79,11 +79,23 @@ class SimpleRouter {
 
             const html = await response.text();
 
+            // デバッグ: test-base-note-btnの内容を確認
+            if (page === 'preparation') {
+                const match = html.match(/<button[^>]*id="test-base-note-btn"[^>]*>([\s\S]*?)<\/button>/);
+                console.log('🔍 [Debug] test-base-note-btn content from fetched HTML:', match ? match[1] : 'NOT FOUND');
+            }
+
             // 2. アプリルートにHTMLを挿入
             this.appRoot.innerHTML = html;
 
             // 3. DOMの更新が完了するまで待機（次のフレームまで）
             await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+            // デバッグ: DOM挿入直後のボタン内容を確認
+            if (page === 'preparation') {
+                const btn = document.getElementById('test-base-note-btn');
+                console.log('🔍 [Debug] test-base-note-btn innerHTML after DOM insertion:', btn ? btn.innerHTML : 'NOT FOUND');
+            }
 
             // 4. ヘッダーの表示/非表示を切り替え（ホームページのみ表示）
             const appHeader = document.querySelector('.app-header');
@@ -98,6 +110,12 @@ class SimpleRouter {
             // 5. Lucideアイコンを再描画
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
+
+                // デバッグ: Lucide初期化後のボタン内容を確認
+                if (page === 'preparation') {
+                    const btn = document.getElementById('test-base-note-btn');
+                    console.log('🔍 [Debug] test-base-note-btn innerHTML after Lucide.createIcons():', btn ? btn.innerHTML : 'NOT FOUND');
+                }
             }
 
             // 6. ページ固有のイベントリスナーを設定
