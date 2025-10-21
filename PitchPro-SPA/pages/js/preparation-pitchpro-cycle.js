@@ -599,6 +599,12 @@ class PitchProCycleManager {
                     // 音域設定済み表示を開始
                     // voiceRangeData全体を渡すように修正（timestampが親レベルにあるため）
                     this.displaySavedRangeData(voiceRangeData, rangeSavedDisplay);
+
+                    // Lucideアイコン初期化（音域設定済み表示のアイコン用）
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                        console.log('✅ Lucideアイコン初期化完了（音域設定済み表示）');
+                    }
                 }, 1500);
             } else {
                 // 新規音域テストが必要 - 音域データなしの場合のメッセージ
@@ -706,9 +712,9 @@ class PitchProCycleManager {
             // PitchProインスタンスのクリーンアップ（統合管理）
             await this.cleanupPitchPro();
 
-            // Step2ページに遷移
-            console.log('🔄 preparation-step2.htmlに遷移中...');
-            window.location.href = 'preparation-step2.html';
+            // Step2ページに遷移（SPA対応 - 実際には使用されない）
+            console.log('🔄 preparation-step2へ遷移中...');
+            window.location.hash = 'preparation-step2';
 
         } catch (error) {
             console.error('❌ Step2遷移処理エラー:', error);
@@ -782,8 +788,14 @@ function waitForLibraries() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🚀 DOMContentLoaded - 初期化開始');
+// ===== SPA対応: 初期化関数をグローバルに公開 =====
+
+/**
+ * SPA環境での初期化関数
+ * preparationControllerから呼び出される
+ */
+window.initializePreparationPitchProCycle = async function() {
+    console.log('🚀 initializePreparationPitchProCycle - 初期化開始（SPA対応）');
 
     // Lucideアイコン初期化（最優先）
     if (typeof lucide !== 'undefined') {
@@ -817,6 +829,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('🚨 完全なエラー詳細:', initResult.fullError);
 
         // ボタンにエラー状態を表示
+        const requestMicBtn = document.getElementById('request-mic-btn');
         if (requestMicBtn) {
             requestMicBtn.innerHTML = '<i data-lucide="alert-circle" style="width: 24px; height: 24px;"></i><span>初期化失敗 - 詳細はコンソールを確認</span>';
             if (typeof lucide !== 'undefined') {
@@ -836,9 +849,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('📊 ステップインジケーター初期化');
     updateStepStatus(1, 'active');
 
+    // 🔍 ページロード時の音域データ存在チェックは無効化
+    // 理由: マイク許可が必須のため、常にマイク許可セクションから開始
+    // 音域データの存在チェックはマイク許可完了後に実施
+    // await checkAndDisplayExistingRangeData();
 
     console.log('✅ 全ての初期化処理完了');
-});
+};
+
+// スタンドアロンページでの動作維持（後方互換性）
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', async () => {
+        // スタンドアロンページとして直接開かれた場合のみ実行
+        if (window.location.pathname.includes('preparation-step1.html')) {
+            console.log('🚀 DOMContentLoaded - スタンドアロンモードで初期化');
+            await window.initializePreparationPitchProCycle();
+        }
+    });
+}
 
 // ===== マイク許可フロー =====
 
@@ -888,6 +916,8 @@ function setupMicPermissionFlow() {
                     console.log('💾 micPermissionGranted localStorage保存完了');
 
                     // Phase 2: 音声テスト開始（状態管理を含む）
+                    // 注: 音声テストは常に実施（マイク動作確認のため必須）
+                    // 音域データの分岐は音声テスト完了後に実施
                     console.log('🎤 音声テスト開始');
                     const startResult = await pitchProCycleManager.startAudioDetection('audiotest');
                     if (!startResult.success) {
@@ -1063,9 +1093,9 @@ function setupMicPermissionFlow() {
                 // PitchProリソースのクリーンアップ（統合管理）
                 await pitchProCycleManager.cleanupPitchPro();
 
-                // training.htmlへ遷移
-                console.log('🚀 training.htmlに遷移中...');
-                window.location.href = '../training.html';
+                // SPAのtraining画面へ遷移
+                console.log('🚀 SPAのtraining画面に遷移中...');
+                window.location.hash = 'training';
 
             } catch (error) {
                 console.error('❌ トレーニング開始処理エラー:', error);
@@ -1119,9 +1149,16 @@ function setupMicPermissionFlow() {
         beginRangeTestBtn.addEventListener('click', async () => {
             console.log('🎵 音域テスト開始ボタンがクリックされました');
             try {
-                // voice-range-test-demo.jsのstartVoiceRangeTest関数を呼び出し
+                // AudioDetectorインスタンスを取得（グローバルから）
+                const audioDetector = window.globalAudioDetector || pitchProCycleManager.audioDetector;
+
+                if (!audioDetector) {
+                    throw new Error('AudioDetectorインスタンスが見つかりません。マイク許可から再度開始してください。');
+                }
+
+                // voice-range-test.jsのstartVoiceRangeTest関数を呼び出し
                 if (typeof startVoiceRangeTest === 'function') {
-                    await startVoiceRangeTest(pitchProCycleManager.audioDetector);
+                    await startVoiceRangeTest(audioDetector);
                     console.log('✅ 音域テスト開始完了');
                 } else {
                     console.error('❌ startVoiceRangeTest関数が見つかりません');
@@ -1253,9 +1290,9 @@ function setupMicPermissionFlow() {
             // PitchProリソースのクリーンアップ
             await pitchProCycleManager.cleanupPitchPro();
 
-            // training.htmlへ遷移
-            console.log('🚀 training.htmlに遷移中...');
-            window.location.href = '../training.html';
+            // SPAのtraining画面へ遷移
+            console.log('🚀 SPAのtraining画面に遷移中...');
+            window.location.hash = 'training';
         });
     }
 
@@ -1263,6 +1300,108 @@ function setupMicPermissionFlow() {
 
 // ===== ユーティリティ関数 =====
 
+/**
+ * ページロード時の音域データ存在チェック
+ * 音域データが既に保存されている場合、音域設定済み表示を直接表示
+ */
+async function checkAndDisplayExistingRangeData() {
+    console.log('🔍 ページロード時の音域データ存在チェック開始');
+
+    // 音域データ取得（DataManager + localStorage両方確認）
+    let voiceRangeData = null;
+    try {
+        // DataManagerから取得を試行
+        if (typeof DataManager !== 'undefined' && DataManager.getVoiceRangeData) {
+            voiceRangeData = DataManager.getVoiceRangeData();
+            console.log('DataManager結果:', voiceRangeData);
+        }
+
+        // DataManagerでデータが取得できない場合、localStorageを確認
+        if (!voiceRangeData) {
+            const localData = localStorage.getItem('voiceRangeData');
+            if (localData) {
+                voiceRangeData = JSON.parse(localData);
+                console.log('localStorage結果:', voiceRangeData);
+            }
+        }
+    } catch (error) {
+        console.warn('⚠️ DataManager利用不可、localStorage確認にフォールバック');
+        const localData = localStorage.getItem('voiceRangeData');
+        if (localData) {
+            voiceRangeData = JSON.parse(localData);
+        }
+    }
+
+    // 音域データがない場合は通常フロー
+    if (!voiceRangeData) {
+        console.log('ℹ️ 音域データなし - 通常フロー（マイク許可から開始）');
+        return;
+    }
+
+    console.log('✅ 音域データ発見 - 音域設定済み表示を直接表示します');
+
+    // UI要素取得
+    const permissionSection = document.getElementById('permission-section');
+    const audioTestSection = document.getElementById('audio-test-section');
+    const rangeTestSection = document.getElementById('range-test-section');
+    const audioTestContent = document.getElementById('audio-test-content');
+    const rangeSavedDisplay = document.getElementById('range-saved-display');
+
+    // Step 1: マイク許可セクションを非表示
+    if (permissionSection) {
+        permissionSection.style.display = 'none';
+        console.log('✅ マイク許可セクションを非表示');
+    }
+
+    // Step 2: 音声テストセクションを表示状態にして、コンテンツを切り替え
+    if (audioTestSection) {
+        audioTestSection.classList.remove('hidden');
+
+        // 音声テストコンテンツを非表示
+        if (audioTestContent) {
+            audioTestContent.classList.add('hidden');
+            console.log('✅ 音声テストコンテンツを非表示');
+        }
+
+        // 音域設定済み表示を表示
+        if (rangeSavedDisplay) {
+            rangeSavedDisplay.classList.remove('hidden');
+
+            // 保存済みデータを表示
+            if (pitchProCycleManager && pitchProCycleManager.displaySavedRangeData) {
+                pitchProCycleManager.displaySavedRangeData(voiceRangeData, rangeSavedDisplay);
+                console.log('✅ 音域設定済みデータ表示完了');
+            }
+        }
+
+        console.log('✅ 音声テストセクションを音域設定済み表示モードで表示');
+    }
+
+    // Step 3: 音域テストセクションは非表示のまま（必要に応じて再測定で表示）
+    if (rangeTestSection) {
+        rangeTestSection.classList.add('hidden');
+        console.log('✅ 音域テストセクションは非表示のまま');
+    }
+
+    // Step 4: ステップインジケーター更新
+    updateStepStatus(1, 'completed');
+    updateStepStatus(2, 'completed');
+    updateStepStatus(3, 'completed');
+    console.log('✅ ステップインジケーター更新完了（全て完了状態）');
+
+    // Step 5: Lucideアイコン初期化（音域設定済み表示のアイコン用）
+    // DOM操作が完全に反映されるまで少し待機
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+        console.log('✅ Lucideアイコン再初期化完了');
+    } else {
+        console.warn('⚠️ Lucideライブラリが見つかりません');
+    }
+
+    console.log('🎉 音域設定済み表示の初期表示完了');
+}
 
 /**
  * マイク許可ボタン状態更新

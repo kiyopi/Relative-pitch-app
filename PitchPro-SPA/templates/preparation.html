@@ -111,125 +111,160 @@
                 <p id="detection-success-message">音声検出が完了しました！</p>
             </div>
 
-            <!-- 音域データがない場合: 音域テストへ進む -->
-            <div class="hidden" id="no-range-data-actions">
-                <button class="btn btn-primary" id="goto-range-test-btn">
-                    <span>音域テストに進む</span>
-                    <i data-lucide="arrow-right" style="width: 24px; height: 24px;"></i>
-                </button>
-            </div>
+            <!-- 音域テストを開始ボタン（正規版互換） -->
+            <button class="btn btn-primary hidden" id="start-range-test-btn">
+                <span>音域テストを開始</span>
+                <i data-lucide="arrow-right" style="width: 24px; height: 24px;"></i>
+            </button>
 
-            <!-- 音域データがある場合: 再測定 or トレーニング開始 -->
-            <div class="hidden" id="has-range-data-actions">
-                <div class="info-alert mb-4">
-                    <i data-lucide="check-circle" style="color: #22c55e; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
-                    <div>
-                        <p class="font-medium">音域データが保存されています</p>
-                        <p class="text-sm text-white-70" id="saved-range-info">C3 - G5 (2オクターブ7半音)</p>
+            <!-- 音域データがある場合: 詳細表示（正規版互換） -->
+            <div class="glass-card hidden" id="range-saved-display">
+                <h4 class="heading-sm">
+                    <i data-lucide="check-circle" class="text-green-400"></i>
+                    <span>音域設定済み</span>
+                </h4>
+                <div class="range-info-container">
+                    <div class="range-info-row">
+                        <span>音域範囲</span>
+                        <span class="range-info-value" id="saved-range">A2 - F5</span>
+                    </div>
+                    <div class="range-info-row">
+                        <span>オクターブ数</span>
+                        <span class="range-info-value" id="saved-octaves">2.6オクターブ</span>
+                    </div>
+                    <div class="range-info-row">
+                        <span>設定日時</span>
+                        <span class="range-info-value" id="saved-date">2024-01-01</span>
                     </div>
                 </div>
-                <div class="flex gap-3">
-                    <button class="btn btn-outline" id="remeasure-range-btn">
-                        <i data-lucide="refresh-cw" style="width: 20px; height: 20px;"></i>
+                <div class="flex gap-3 mt-4">
+                    <button class="btn btn-outline" id="retest-range-btn">
                         <span>音域を再測定</span>
+                        <i data-lucide="refresh-cw" style="width: 20px; height: 20px;"></i>
                     </button>
-                    <button class="btn btn-success" id="skip-to-training-btn">
+                    <button class="btn btn-success" id="skip-range-test-btn">
                         <span>トレーニング開始</span>
-                        <i data-lucide="play" style="width: 20px; height: 20px;"></i>
+                        <i data-lucide="skip-forward" style="width: 20px; height: 20px;"></i>
                     </button>
                 </div>
             </div>
         </section>
 
-        <!-- 音域テストセクション（簡略版） -->
+        <!-- 音域テストセクション（詳細版） -->
         <section class="test-section hidden" id="range-test-section">
             <div class="section-header">
                 <h3 class="text-section-title">音域テスト</h3>
-                <p class="section-description">最低音と最高音を測定してトレーニングを最適化します</p>
+                <p class="section-description">あなたの快適な音域を測定します</p>
+                <!-- マイクステータスアイコン -->
+                <div class="mic-status-container standby" id="mic-status-container" style="margin: 12px auto 0 auto;">
+                    <i data-lucide="mic" id="mic-status-icon" style="width: 40px; height: 40px;"></i>
+                </div>
             </div>
 
-            <!-- 開始前表示 -->
-            <div id="range-test-intro" class="range-test-intro">
-                <div class="info-alert">
-                    <i data-lucide="info" style="color: #60a5fa; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
-                    <div>
-                        <p class="font-medium mb-1">簡単な2ステップ測定</p>
-                        <p class="text-sm text-white-70">1. 出せる最低音を発声 → 2. 出せる最高音を発声</p>
+            <!-- メインステータス -->
+            <div class="text-center mb-6">
+                <h4 class="voice-range-main-text" id="main-status-text">「音域テスト開始」ボタンでテストを開始してください</h4>
+            </div>
+
+            <!-- 音域テストバッジ -->
+            <div class="range-test-layout-flex">
+                <div class="range-test-item">
+                    <div class="voice-range-display-container">
+                        <svg class="voice-stability-svg" width="160" height="160" id="stability-ring">
+                            <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="16"/>
+                            <circle cx="80" cy="80" r="72" fill="none" stroke="#3b82f6" stroke-width="16"
+                                    stroke-dasharray="452" stroke-dashoffset="452"
+                                    transform="rotate(-90 80 80)" class="voice-progress-circle"/>
+                        </svg>
+                        <div class="voice-note-badge">
+                            <div id="range-icon" class="icon-4xl text-white" style="display: block;">
+                                <img src="pages/icons/arrow-down.png" alt="下向き矢印" style="width: 80px; height: 80px; display: block;">
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <button class="btn btn-primary" id="start-range-test-btn">
-                    <i data-lucide="play" style="width: 24px; height: 24px;"></i>
-                    <span>測定開始</span>
+            </div>
+
+            <!-- サブ情報 -->
+            <div class="text-center mt-4">
+                <p class="text-sm voice-range-sub-text" id="sub-info-text">待機中...</p>
+            </div>
+
+            <!-- 検出状況表示 -->
+            <div class="detection-meters" style="margin-top: 24px;">
+                <!-- 音量レベル -->
+                <div class="meter-group" id="range-volume-container">
+                    <div class="meter-label">
+                        <span>音量レベル</span>
+                        <span class="volume-text meter-value" id="range-test-volume-text">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill gradient-catalog-green"
+                             id="range-test-volume-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- 検出周波数 -->
+                <div class="meter-group">
+                    <div class="meter-label">
+                        <span>検出周波数</span>
+                        <span class="meter-value" id="range-test-frequency-value">0 Hz</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- コントロールボタン -->
+            <div class="text-center mt-6">
+                <button class="btn btn-primary voice-range-btn" id="begin-range-test-btn">
+                    <i data-lucide="play" style="width: 20px; height: 20px;"></i>
+                    <span>音域テスト開始</span>
+                </button>
+
+                <button class="btn btn-outline ml-3 voice-range-btn hidden" id="retry-measurement-btn">
+                    <i data-lucide="refresh-cw" style="width: 20px; height: 20px;"></i>
+                    <span>再測定</span>
                 </button>
             </div>
 
-            <!-- 測定中表示 -->
-            <div id="range-test-measuring" class="range-test-measuring hidden">
-                <div class="glass-card">
-                    <h4 class="heading-md mb-4">
-                        <i data-lucide="mic" class="text-blue-300"></i>
-                        <span id="range-test-phase-title">最低音を発声してください</span>
-                    </h4>
+            <!-- 結果表示エリア -->
+            <div class="mt-6 hidden" id="results-section">
+                <h3 class="heading-md">
+                    <i data-lucide="bar-chart-3" class="text-green-300"></i>
+                    <span>音域テスト結果</span>
+                </h3>
 
-                    <!-- 音量バー -->
-                    <div class="mb-4">
-                        <div class="meter-label">
-                            <span>音量レベル</span>
-                            <span class="meter-value" id="range-volume-value">0%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill gradient-catalog-green" id="range-volume-bar" style="width: 0%;"></div>
-                        </div>
+                <!-- 基本結果 -->
+                <div class="range-info-container" style="margin-bottom: 0;">
+                    <div class="range-info-row">
+                        <span>音域範囲</span>
+                        <span class="range-info-value" id="result-range">-</span>
                     </div>
-
-                    <!-- 検出周波数 -->
-                    <div class="mb-4">
-                        <div class="meter-label">
-                            <span>検出周波数</span>
-                            <span class="meter-value" id="range-frequency-value">- Hz</span>
-                        </div>
+                    <div class="range-info-row">
+                        <span>オクターブ数</span>
+                        <span class="range-info-value" id="result-octaves">-</span>
                     </div>
-
-                    <!-- 進捗表示 -->
-                    <div class="progress-bar with-margin">
-                        <div class="progress-fill gradient-catalog-blue" id="range-progress-bar" style="width: 0%;"></div>
+                    <div class="range-info-row">
+                        <span>最低音</span>
+                        <span class="range-info-value" id="result-low-freq">-</span>
                     </div>
-                    <p class="text-sm text-white-60 text-center" id="range-progress-text">測定中...</p>
-                </div>
-            </div>
-
-            <!-- 完了表示 -->
-            <div id="range-test-complete" class="range-test-complete hidden">
-                <div class="success-alert">
-                    <i data-lucide="check-circle" style="color: #22c55e; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
-                    <p>音域測定が完了しました！</p>
-                </div>
-                <div class="glass-card">
-                    <h4 class="heading-md mb-4">
-                        <i data-lucide="music" class="text-green-300"></i>
-                        <span>測定結果</span>
-                    </h4>
-                    <div class="range-results">
-                        <div class="range-item">
-                            <span class="range-label">最低音:</span>
-                            <span class="range-value" id="min-note">-</span>
-                        </div>
-                        <div class="range-item">
-                            <span class="range-label">最高音:</span>
-                            <span class="range-value" id="max-note">-</span>
-                        </div>
-                        <div class="range-item">
-                            <span class="range-label">音域幅:</span>
-                            <span class="range-value" id="range-span">-</span>
-                        </div>
+                    <div class="range-info-row" style="margin-bottom: 24px;">
+                        <span>最高音</span>
+                        <span class="range-info-value" id="result-high-freq">-</span>
                     </div>
                 </div>
-                <div class="flex gap-3 mt-4">
-                    <button class="btn btn-outline" id="retest-range-btn">
+
+                <!-- 詳細情報・警告メッセージ表示エリア -->
+                <div id="result-details">
+                    <!-- JavaScriptで動的に生成 -->
+                </div>
+
+                <!-- アクションボタン -->
+                <div class="flex flex-col md:flex-row gap-3 mt-5">
+                    <button class="btn btn-outline" id="remeasure-btn">
                         <i data-lucide="refresh-cw" style="width: 20px; height: 20px;"></i>
                         <span>再測定</span>
                     </button>
-                    <button class="btn btn-success" id="start-training-btn">
+                    <button class="btn btn-success" id="complete-range-test-btn">
                         <span>トレーニング開始</span>
                         <i data-lucide="arrow-right" style="width: 20px; height: 20px;"></i>
                     </button>
