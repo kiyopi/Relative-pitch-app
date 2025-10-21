@@ -16,6 +16,7 @@ class SimpleRouter {
         };
 
         this.appRoot = document.getElementById('app-root');
+        this.currentPage = null; // 現在のページを追跡
         this.init();
     }
 
@@ -81,13 +82,29 @@ class SimpleRouter {
             // 2. アプリルートにHTMLを挿入
             this.appRoot.innerHTML = html;
 
-            // 3. Lucideアイコンを再描画
+            // 3. DOMの更新が完了するまで待機（次のフレームまで）
+            await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+            // 4. ヘッダーの表示/非表示を切り替え（ホームページのみ表示）
+            const appHeader = document.querySelector('.app-header');
+            if (appHeader) {
+                if (page === 'home') {
+                    appHeader.style.display = '';
+                } else {
+                    appHeader.style.display = 'none';
+                }
+            }
+
+            // 5. Lucideアイコンを再描画
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
             }
 
-            // 4. ページ固有のイベントリスナーを設定
+            // 6. ページ固有のイベントリスナーを設定
             await this.setupPageEvents(page, fullHash);
+
+            // 7. 現在のページを更新
+            this.currentPage = page;
 
             console.log(`Page loaded: ${page}`);
 
@@ -256,20 +273,27 @@ class SimpleRouter {
     // 現在のページのクリーンアップ
     async cleanupCurrentPage() {
         try {
-            // preparationページのクリーンアップ
-            if (typeof window.preparationManager !== 'undefined' && window.preparationManager) {
+            // preparationページからの離脱時のクリーンアップ
+            if (this.currentPage === 'preparation') {
                 console.log('Cleaning up preparation page resources...');
-                await window.preparationManager.cleanupPitchPro();
-            }
 
-            // preparationページの初期化フラグをリセット
-            if (typeof window.resetPreparationPageFlag === 'function') {
-                window.resetPreparationPageFlag();
+                // PitchProリソースのクリーンアップ
+                if (typeof window.preparationManager !== 'undefined' && window.preparationManager) {
+                    await window.preparationManager.cleanupPitchPro();
+                }
+
+                // 初期化フラグをリセット
+                if (typeof window.resetPreparationPageFlag === 'function') {
+                    window.resetPreparationPageFlag();
+                    console.log('Preparation page flag reset');
+                }
             }
 
             // 他のページのクリーンアップもここに追加可能
-            // if (typeof window.trainingManager !== 'undefined' && window.trainingManager) {
-            //     await window.trainingManager.cleanup();
+            // if (this.currentPage === 'training') {
+            //     if (typeof window.trainingManager !== 'undefined' && window.trainingManager) {
+            //         await window.trainingManager.cleanup();
+            //     }
             // }
 
         } catch (error) {

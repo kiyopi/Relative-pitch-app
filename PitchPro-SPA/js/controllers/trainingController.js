@@ -16,11 +16,41 @@ let sessionRecorder = null;
 let expectedNotes = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
 let expectedFrequencies = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25];
 
+// トレーニングモード管理
+let currentMode = 'random'; // 'random' | 'continuous' | '12tone'
+let voiceRangeData = null; // 音域データ
+
+// モード設定
+const modeConfig = {
+    random: {
+        maxSessions: 8,
+        title: 'ランダム基音モード',
+        hasIndividualResults: true,
+        baseNoteSelection: 'random_c3_octave'
+    },
+    continuous: {
+        maxSessions: 8,
+        title: '連続チャレンジモード',
+        hasIndividualResults: false,
+        baseNoteSelection: 'random_chromatic'
+    },
+    '12tone': {
+        maxSessions: 12,
+        title: '12音階モード',
+        hasIndividualResults: false,
+        baseNoteSelection: 'sequential_chromatic',
+        hasRangeAdjustment: true
+    }
+};
+
 export async function initializeTrainingPage() {
     console.log('TrainingController initializing...');
 
     // Wait for Lucide
     await waitForLucide();
+
+    // Load voice range data
+    loadVoiceRangeData();
 
     // Initialize mode UI
     initializeModeUI();
@@ -89,6 +119,26 @@ function waitForLucide() {
 
 function initializeModeUI() {
     console.log('Initializing mode UI...');
+
+    // モード設定を取得
+    const config = modeConfig[currentMode];
+    console.log(`📋 現在のモード: ${config.title}`);
+
+    // ページタイトルを更新
+    const pageTitle = document.querySelector('.page-title');
+    if (pageTitle) {
+        pageTitle.textContent = config.title;
+    }
+
+    // ページサブタイトルを更新
+    const pageSubtitle = document.querySelector('.page-subtitle');
+    if (pageSubtitle) {
+        const sessionCounter = window.sessionDataRecorder ? window.sessionDataRecorder.getSessionNumber() : 0;
+        const currentSession = sessionCounter + 1;
+        pageSubtitle.textContent = `セッション ${currentSession}/${config.maxSessions} 実施中`;
+    }
+
+    // アイコンを再描画
     lucide.createIcons();
 }
 
@@ -193,7 +243,7 @@ async function startTraining() {
     playButton.classList.add('btn-disabled');
 
     try {
-        // 初回クリック時は初期化を実行
+        // 初回クリック時はPitchShifter初期化を実行
         if (!pitchShifter || !pitchShifter.isInitialized) {
             console.log('⏳ 初回クリック - PitchShifter初期化開始');
             playButton.innerHTML = '<i data-lucide="loader" style="width: 24px; height: 24px;"></i><span>初期化中...</span>';
@@ -211,8 +261,12 @@ async function startTraining() {
             statusText.textContent = '基音を再生中...';
         }
 
-        // ランダム基音再生（2秒）と同時にインターバル開始（2.5秒）
-        baseNoteInfo = await pitchShifter.playRandomNote(2);
+        // モード別基音選択と再生（2秒）
+        const config = modeConfig[currentMode];
+        const sessionCounter = window.sessionDataRecorder ? window.sessionDataRecorder.getSessionNumber() : 0;
+        const selectedNote = selectBaseNote(config.baseNoteSelection, sessionCounter);
+        await pitchShifter.playNote(selectedNote.note, 2);
+        baseNoteInfo = selectedNote;
         console.log('🎵 基音再生:', baseNoteInfo);
 
         // セッションデータ記録開始
@@ -515,9 +569,10 @@ function updateSessionProgressUI() {
     // セッションカウンターを取得
     const sessionCounter = window.sessionDataRecorder ? window.sessionDataRecorder.getSessionNumber() : 0;
     const currentSession = sessionCounter + 1; // 次のセッション番号
-    const totalSessions = 8;
+    const config = modeConfig[currentMode];
+    const totalSessions = config.maxSessions;
 
-    console.log(`📊 セッション進行状況: ${currentSession}/${totalSessions}`);
+    console.log(`📊 セッション進行状況: ${currentSession}/${totalSessions} (${config.title})`);
 
     // 進行バーを更新
     const progressFill = document.querySelector('.progress-section .progress-fill');
@@ -530,5 +585,86 @@ function updateSessionProgressUI() {
     const sessionBadge = document.querySelector('.session-badge');
     if (sessionBadge) {
         sessionBadge.textContent = `セッション ${currentSession}/${totalSessions}`;
+    }
+}
+
+/**
+ * 音域データを読み込む
+ */
+function loadVoiceRangeData() {
+    try {
+        const localData = localStorage.getItem('voiceRangeData');
+        if (localData) {
+            voiceRangeData = JSON.parse(localData);
+            console.log('✅ 音域データ読み込み完了:', voiceRangeData.results);
+        } else {
+            console.warn('⚠️ 音域データが見つかりません - デフォルト範囲を使用します');
+            voiceRangeData = null;
+        }
+    } catch (error) {
+        console.error('❌ 音域データ読み込みエラー:', error);
+        voiceRangeData = null;
+    }
+}
+
+/**
+ * 音域に基づいて利用可能な音符リストを取得
+ * @returns {Array} 利用可能な音符情報の配列
+ */
+function getAvailableNotes() {
+    const allNotes = window.PitchShifter.AVAILABLE_NOTES;
+
+    if (!voiceRangeData || !voiceRangeData.results) {
+        console.warn('⚠️ 音域データなし - 全範囲を使用');
+        return allNotes;
+    }
+
+    const { lowFreq, highFreq } = voiceRangeData.results;
+
+    // 音域内の音符のみをフィルタリング（基音+1オクターブが収まる範囲）
+    const availableNotes = allNotes.filter(note => {
+        const topFreq = note.frequency * 2; // 基音+1オクターブ
+        return note.frequency >= lowFreq && topFreq <= highFreq;
+    });
+
+    console.log(`🎵 利用可能な基音: ${availableNotes.length}音 (${availableNotes[0]?.note} - ${availableNotes[availableNotes.length - 1]?.note})`);
+
+    return availableNotes.length > 0 ? availableNotes : allNotes;
+}
+
+/**
+ * モード別基音選択ロジック
+ * @param {string} selectionType - 'random_c3_octave' | 'random_chromatic' | 'sequential_chromatic'
+ * @param {number} sessionIndex - セッション番号（0始まり）
+ * @returns {Object} 選択された音符情報
+ */
+function selectBaseNote(selectionType, sessionIndex = 0) {
+    const availableNotes = getAvailableNotes();
+
+    switch (selectionType) {
+        case 'random_c3_octave':
+            // ランダム基音モード: 音域内のC3オクターブ範囲からランダム選択
+            const c3OctaveNotes = availableNotes.filter(note =>
+                note.frequency >= 261.63 && note.frequency <= 523.25
+            );
+            const randomC3Note = c3OctaveNotes[Math.floor(Math.random() * c3OctaveNotes.length)];
+            console.log(`🎲 ランダム基音モード: ${randomC3Note.note} (${randomC3Note.japaneseName})`);
+            return randomC3Note;
+
+        case 'random_chromatic':
+            // 連続チャレンジモード: 音域内のクロマチック12音からランダム選択
+            const randomNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
+            console.log(`🎲 連続チャレンジモード: ${randomNote.note} (${randomNote.japaneseName})`);
+            return randomNote;
+
+        case 'sequential_chromatic':
+            // 12音階モード: クロマチック12音を順次使用
+            const chromaticNote = availableNotes[sessionIndex % availableNotes.length];
+            console.log(`🎹 12音階モード: セッション${sessionIndex + 1} - ${chromaticNote.note} (${chromaticNote.japaneseName})`);
+            return chromaticNote;
+
+        default:
+            console.warn(`⚠️ 未知の選択タイプ: ${selectionType} - ランダム選択`);
+            return availableNotes[Math.floor(Math.random() * availableNotes.length)];
     }
 }
