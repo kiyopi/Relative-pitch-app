@@ -502,11 +502,12 @@ class PitchProCycleManager {
     async showDetectionSuccess() {
         console.log('🎉 showDetectionSuccess実行開始');
 
-        // PitchPro v1.3.1統合管理システム - FAQ推奨の完全リセット
+        // 🔧 修正: reset()ではなく、stopDetection()のみを実行
+        // reset()は全UIをリセットしてしまい、#test-base-note-btnも"--"になる問題があった
         if (this.audioDetector) {
-            await this.audioDetector.microphoneController.reset();
+            await this.audioDetector.stopDetection();
             this.state.detectionActive = false;
-            console.log('🔄 システム完全リセット完了（FAQ推奨統合管理）');
+            console.log('🔄 音声検出停止完了（reset()による不要なUIリセットを回避）');
         }
 
         // 🎵 UI状態更新：voice-instruction成功状態に変更
@@ -519,13 +520,13 @@ class PitchProCycleManager {
                 console.log('⏸️ voice-instruction-pulse アニメーション停止');
             }
 
-            // アイコン変更とスタイル更新
-            voiceInstructionIcon.innerHTML = '<i data-lucide="check" style="width: 32px; height: 32px; color: white;"></i>';
+            // アイコン変更とスタイル更新（SVGを直接挿入）
+            voiceInstructionIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 32px; height: 32px; color: white;"><path d="M20 6 9 17l-5-5"></path></svg>`;
             voiceInstructionIcon.style.backgroundColor = '#22c55e'; // 緑色背景
             voiceInstructionIcon.style.borderRadius = '50%';
 
-            // Lucideアイコンを再初期化
-            lucide.createIcons();
+            // 🔧 修正: lucide.createIcons()を呼ばない（全体の再初期化を避ける）
+            // 代わりに上記でSVGを直接挿入済み
             console.log('✅ voice-instruction-icon を成功状態に更新（緑背景＋チェックマーク）');
         }
 
@@ -580,94 +581,68 @@ class PitchProCycleManager {
 
             const successMessage = document.getElementById('detection-success-message');
 
-            if (voiceRangeData && rangeSavedDisplay) {
-                // 既存データ表示 - 音域データありの場合のメッセージ
-                if (successMessage) {
-                    successMessage.textContent = '音声テストは完了しました。音量を調整してからトレーニングを開始してください。';
+            // 音声テスト完了メッセージを表示
+            if (successMessage) {
+                successMessage.textContent = '「ド」の音程を検出できました！音量を調整してから音域テストに進みましょう。';
+            }
+
+            // 1.5秒後に音量調整セクションを表示
+            console.log('⏳ 1.5秒後に音量調整セクションを表示します...');
+            setTimeout(async () => {
+                // audio-test-contentを非表示
+                const audioTestContent = document.getElementById('audio-test-content');
+                if (audioTestContent) {
+                    audioTestContent.style.display = 'none';
+                    console.log('✅ audio-test-content を非表示にしました');
                 }
 
-                // 音量調整セクションを表示（音域データがあっても音量調整は必要）
+                // 成功メッセージを非表示
+                if (detectionSuccess) {
+                    detectionSuccess.classList.add('hidden');
+                    console.log('✅ detection-success を非表示にしました');
+                }
+
+                // セクションタイトルを「音量テスト」に変更
+                const audioTestTitle = document.getElementById('audio-test-title');
+                if (audioTestTitle) {
+                    audioTestTitle.textContent = '音量テスト';
+                    console.log('✅ セクションタイトルを「音量テスト」に変更しました');
+                }
+
+                // 音量調整セクションを表示
                 const volumeAdjustmentSection = document.getElementById('volume-adjustment-section');
                 if (volumeAdjustmentSection) {
                     volumeAdjustmentSection.classList.remove('hidden');
-                    console.log('🔊 音域データあり - volume-adjustment-section を表示しました（音量調整用）');
-
-                    // Lucideアイコン初期化（音量調整セクションのアイコン用）
-                    if (typeof lucide !== 'undefined') {
-                        lucide.createIcons();
-                        console.log('✅ Lucideアイコン初期化完了（音量調整セクション）');
-                    }
+                    console.log('🔊 音量調整セクションを表示');
                 }
 
-                // 1.5秒後に画面切り替えを実行します
-                console.log('⏳ 1.5秒後に画面切り替えを実行します...');
-                setTimeout(() => {
-                    // 音声テスト部分のみを非表示（セクション全体は表示したまま）
-                    const audioTestContent = document.getElementById('audio-test-content');
-                    if (audioTestContent) {
-                        audioTestContent.classList.add('hidden');
-                        console.log('📋 audio-test-content のみを非表示にしました（音域設定済み表示のため）');
-                    }
+                // PitchShifter初期化（音量調整で使用）
+                await this.ensurePitchShifterInitialized();
 
-                    // 音域設定済み表示を開始
-                    // voiceRangeData全体を渡すように修正（timestampが親レベルにあるため）
+                // Lucideアイコン初期化（音量調整セクションのアイコン用）
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                    console.log('✅ Lucideアイコン初期化完了（音量調整セクション）');
+                }
+
+                if (voiceRangeData && rangeSavedDisplay) {
+                    // 音域データあり - 音域設定済み表示
                     this.displaySavedRangeData(voiceRangeData, rangeSavedDisplay);
+                    console.log('✅ 音域データ表示完了');
+                } else {
+                    // 音域データなし - 音域テストボタン表示
+                    // localStorage保存（Step1完了データ）
+                    localStorage.setItem('audioTestCompleted', 'true');
+                    localStorage.setItem('audioTestTimestamp', new Date().toISOString());
+                    localStorage.setItem('step1Completed', 'true');
 
-                    // Lucideアイコン再初期化（音域設定済み表示 + 音量調整セクション）
-                    if (typeof lucide !== 'undefined') {
-                        lucide.createIcons();
-                        console.log('✅ Lucideアイコン再初期化完了（1.5秒後 - 音域データあり）');
-                    }
-                }, 1500);
-            } else {
-                // 新規音域テストが必要 - 音域データなしの場合のメッセージ
-                if (successMessage) {
-                    successMessage.textContent = '「ド」の音程を検出できました！音量を調整してから音域テストに進みましょう。';
-                }
-
-                // 音量調整セクションを表示（音域データがない場合）
-                const volumeAdjustmentSection = document.getElementById('volume-adjustment-section');
-                if (volumeAdjustmentSection) {
-                    volumeAdjustmentSection.classList.remove('hidden');
-                    console.log('🔊 音域データなし - volume-adjustment-section を表示しました');
-
-                    // Lucideアイコン初期化（音量調整セクションのアイコン用）
-                    if (typeof lucide !== 'undefined') {
-                        lucide.createIcons();
-                        console.log('✅ Lucideアイコン初期化完了（音量調整セクション）');
-                    }
-                }
-
-                // localStorage保存（Step1完了データ）
-                localStorage.setItem('audioTestCompleted', 'true');
-                localStorage.setItem('audioTestTimestamp', new Date().toISOString());
-                localStorage.setItem('step1Completed', 'true');
-
-                // 1.5秒後にaudio-test-contentを非表示にして、音域テストセクション移動ボタンを表示
-                console.log('⏳ 1.5秒後に音域テストセクション移動ボタンを表示します...');
-                setTimeout(() => {
-                    // audio-test-contentを非表示
-                    const audioTestContent = document.getElementById('audio-test-content');
-                    if (audioTestContent) {
-                        audioTestContent.style.display = 'none';
-                        console.log('✅ audio-test-content を非表示にしました');
-                    }
-
-                    // 音域テストセクション移動ボタンを表示
+                    // 音域テストボタンを表示
                     if (startRangeBtn) {
-                        // ボタンはHTMLのまま「音域テストを開始」で表示
-                        // イベントリスナーは後のコード（line 1057-1088）で設定済み
                         startRangeBtn.classList.remove('hidden');
                         console.log('🎯 音域テストセクション移動ボタン表示完了');
                     }
-
-                    // Lucideアイコン再初期化（1.5秒後のタイミングで確実に表示）
-                    if (typeof lucide !== 'undefined') {
-                        lucide.createIcons();
-                        console.log('✅ Lucideアイコン再初期化完了（1.5秒後）');
-                    }
-                }, 1500);
-            }
+                }
+            }, 1500);
         }
 
         // ステップインジケーター更新
@@ -755,6 +730,84 @@ class PitchProCycleManager {
     }
 
     /**
+     * PitchShifter初期化を確実に実施
+     */
+    async ensurePitchShifterInitialized() {
+        try {
+            // 既に初期化済みの場合はスキップ
+            if (window.pitchShifterInstance?.isInitialized) {
+                console.log('✅ PitchShifter already initialized');
+                return;
+            }
+
+            console.log('🎹 PitchShifter初期化開始...');
+
+            // PitchShifterクラスが読み込まれるまで待機
+            let attempts = 0;
+            while (!window.PitchShifter && attempts < 50) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+
+            if (!window.PitchShifter) {
+                console.warn('⚠️ PitchShifterがロードされていません（5秒タイムアウト）');
+                return;
+            }
+
+            // デバイス検出（router.jsと同じロジック）
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const isIPhone = /iPhone/.test(userAgent);
+            const isIPad = /iPad/.test(userAgent);
+            const isMacintoshWithTouch = /Macintosh/.test(userAgent) && 'ontouchend' in document;
+            const isIOSUserAgent = /iPad|iPhone|iPod/.test(userAgent);
+            const isIOSPlatform = /iPad|iPhone|iPod/.test(navigator.platform || '');
+            const isIOS = isIPhone || isIPad || isMacintoshWithTouch || isIOSUserAgent || isIOSPlatform;
+
+            // デバイスタイプ判定
+            let deviceType = 'pc';
+            if (isIPhone) {
+                deviceType = 'iphone';
+            } else if (isIPad || isMacintoshWithTouch) {
+                deviceType = 'ipad';
+            } else if (isIOS) {
+                const screenWidth = window.screen.width;
+                const screenHeight = window.screen.height;
+                const maxDimension = Math.max(screenWidth, screenHeight);
+                const minDimension = Math.min(screenWidth, screenHeight);
+
+                if (maxDimension >= 768 || (maxDimension >= 700 && minDimension >= 500)) {
+                    deviceType = 'ipad';
+                } else {
+                    deviceType = 'iphone';
+                }
+            }
+
+            const volumeSettings = {
+                pc: +8,
+                iphone: +18,
+                ipad: +20
+            };
+            const deviceVolume = volumeSettings[deviceType] || +8;
+
+            console.log(`📱 デバイス: ${deviceType}, 音量: ${deviceVolume}dB`);
+
+            // 新規作成または再作成
+            window.pitchShifterInstance = new window.PitchShifter({
+                baseUrl: 'audio/piano/',
+                release: 2.5,
+                volume: deviceVolume
+            });
+
+            // 初期化
+            await window.pitchShifterInstance.initialize();
+            console.log('✅ PitchShifter初期化完了');
+
+        } catch (error) {
+            console.warn('⚠️ PitchShifter初期化エラー:', error);
+        }
+    }
+
+    /**
      * PitchPro v1.3.1統合管理システム - FAQ推奨クリーンアップ
      */
     async cleanupPitchPro() {
@@ -829,6 +882,17 @@ function waitForLibraries() {
 window.initializePreparationPitchProCycle = async function() {
     console.log('🚀 initializePreparationPitchProCycle - 初期化開始（SPA対応）');
 
+    // ========================================================================
+    // ⚠️ デバッグ用: Lucide初期化を無効化（元のコードは下のコメントアウト部分）
+    // ========================================================================
+    // 注意: Lucideアイコン初期化はrouter.jsで既に実行されているため、
+    // ここで再度実行すると非表示要素（hidden）内のアイコンが正しく処理されない問題が発生する。
+    // そのため、ここでのLucide初期化は削除。
+    // 必要に応じて、個別の要素表示時にlucide.createIcons()を呼び出すこと。
+    // ========================================================================
+
+    /*
+    // 元のコード（デバッグ完了後に戻す）
     // Lucideアイコン初期化（最優先）
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
@@ -836,6 +900,7 @@ window.initializePreparationPitchProCycle = async function() {
     } else {
         console.warn('⚠️ Lucideライブラリが読み込まれていません');
     }
+    */
 
     // ライブラリ読み込み待機
     console.log('⏳ ライブラリ読み込み待機中...');
@@ -1481,38 +1546,53 @@ function setupVolumeAdjustmentControls() {
     if (testBaseNoteBtn) {
         testBaseNoteBtn.addEventListener('click', async () => {
             console.log('🎵 基音試聴ボタンがクリックされました');
+            console.log('🔍 PitchShifter状態:', {
+                exists: !!window.pitchShifterInstance,
+                isInitialized: window.pitchShifterInstance?.isInitialized
+            });
 
             try {
-                // PitchShifterインスタンスを取得
-                if (window.pitchShifterInstance && window.pitchShifterInstance.isInitialized) {
-                    // C4 (261.6Hz) を再生
-                    await window.pitchShifterInstance.playNote(261.6);
-                    console.log('✅ 基音C4を再生しました');
-                } else {
-                    console.warn('⚠️ PitchShifterが初期化されていません');
+                // PitchShifterインスタンスを確認
+                if (!window.pitchShifterInstance) {
+                    console.warn('⚠️ PitchShifterインスタンスが存在しません - 再生をスキップ');
+                    alert('音声システムの初期化中です。もう一度お試しください。');
+                    return;
                 }
+
+                // 初期化されていない場合は初期化を試みる
+                if (!window.pitchShifterInstance.isInitialized) {
+                    console.log('🔄 PitchShifterを初期化中...');
+                    await window.pitchShifterInstance.initialize();
+                    console.log('✅ PitchShifter初期化完了');
+                }
+
+                // C4 (261.6Hz) を再生
+                console.log('▶️ C4音を再生開始...');
+                await window.pitchShifterInstance.playNote("C4");
+                console.log('✅ 基音C4を再生しました');
             } catch (error) {
                 console.error('❌ 基音再生エラー:', error);
+                alert('音声再生に失敗しました: ' + error.message);
             }
         });
         console.log('✅ 基音試聴ボタンのイベントリスナー設定完了');
+    } else {
+        console.warn('⚠️ test-base-note-btn要素が見つかりません');
     }
 
     // 音量スライダー
     const volumeSlider = document.getElementById('app-volume-slider');
-    const volumeValue = document.getElementById('app-volume-value');
 
-    if (volumeSlider && volumeValue) {
+    if (volumeSlider) {
         volumeSlider.addEventListener('input', (e) => {
             const volumePercent = parseInt(e.target.value);
-            volumeValue.textContent = `${volumePercent}%`;
 
             // PitchShifterの音量を調整
             if (window.pitchShifterInstance && window.pitchShifterInstance.isInitialized) {
-                // 0-100% を -20dB 〜 +20dB に変換
-                // 100% = 元の音量（現在のデバイス別設定値を維持）
-                // 50% = -6dB（約半分の音量）
-                // 0% = -40dB（ほぼ無音）
+                // 音量調整範囲: 50%（中央）= 基準音量、0%（左端）= -10dB、100%（右端）= +10dB
+                // 50% = baseVolume（デフォルト・最適値）
+                // 100% = baseVolume + 10dB
+                // 0% = baseVolume - 10dB
 
                 // 現在のデバイス別基準音量を取得（router.jsと同じロジック）
                 const userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -1527,13 +1607,12 @@ function setupVolumeAdjustmentControls() {
                     baseVolume = +20;
                 }
 
-                // パーセンテージに応じて音量を調整
-                // 100% = baseVolume, 50% = baseVolume - 6dB, 0% = baseVolume - 20dB
-                const volumeReduction = (100 - volumePercent) * 0.2; // 100%差で-20dB
-                const targetVolume = baseVolume - volumeReduction;
+                // パーセンテージに応じて音量を調整（50%が基準）
+                const volumeOffset = (volumePercent - 50) * 0.2; // 50%差で±10dB
+                const targetVolume = baseVolume + volumeOffset;
 
                 window.pitchShifterInstance.setVolume(targetVolume);
-                console.log(`🔊 音量調整: ${volumePercent}% (${targetVolume.toFixed(1)}dB)`);
+                console.log(`🔊 音量調整: ${volumePercent}% (${targetVolume.toFixed(1)}dB, 基準${baseVolume}dB)`);
             }
         });
         console.log('✅ 音量スライダーのイベントリスナー設定完了');

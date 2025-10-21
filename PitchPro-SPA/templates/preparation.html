@@ -72,7 +72,7 @@
         <!-- 音声テストセクション -->
         <section class="test-section hidden" id="audio-test-section">
             <div class="section-header">
-                <h3 class="text-section-title">音声テスト</h3>
+                <h3 class="text-section-title" id="audio-test-title">音声テスト</h3>
                 <p class="section-description">音量と周波数検出を確認します</p>
             </div>
 
@@ -115,30 +115,31 @@
             <div class="hidden" id="volume-adjustment-section">
                 <!-- デバイス音量推奨 -->
                 <div class="info-alert">
-                    <i data-lucide="volume-2" style="color: #60a5fa; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
-                    <p>デバイスの音量を<strong>50%</strong>に設定することをおすすめします。基音を試聴して調整してください。</p>
+                    <i data-lucide="ear" style="color: #60a5fa; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
+                    <p>「基音を試聴」ボタンを押して音を聞き、適切な音量になるようボリュームコントローラーで調整しましょう。</p>
                 </div>
 
                 <!-- 基音試聴ボタン -->
                 <button class="btn btn-primary" id="test-base-note-btn">
-                    <i data-lucide="volume" style="width: 24px; height: 24px;"></i>
-                    <span>基音を試聴（C4）</span>
+                    <i data-lucide="volume-2" style="width: 24px; height: 24px;"></i>
+                    <span>基音を試聴</span>
                 </button>
 
-                <!-- アプリ音量調整スライダー -->
+                <!-- ボリュームコントローラー -->
                 <div class="volume-control-container">
                     <div class="volume-control-header">
-                        <span class="volume-control-label">アプリ音量</span>
-                        <span class="volume-control-value" id="app-volume-value">100%</span>
+                        <span class="volume-control-label">ボリュームコントローラー</span>
                     </div>
                     <div class="volume-slider-wrapper">
+                        <span class="volume-indicator">-</span>
                         <input type="range"
                                id="app-volume-slider"
                                class="volume-slider"
                                min="0"
                                max="100"
-                               value="100"
+                               value="50"
                                step="1">
+                        <span class="volume-indicator">+</span>
                     </div>
                 </div>
             </div>

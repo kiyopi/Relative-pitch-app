@@ -1446,6 +1446,7 @@ body::before {
 /* === 音量調整コントロール === */
 .volume-control-container {
   margin-top: 24px;
+  margin-bottom: 32px;
   padding: 20px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1455,9 +1456,9 @@ body::before {
 
 .volume-control-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
 }
 
 .volume-control-label {
@@ -1466,24 +1467,27 @@ body::before {
   color: rgba(255, 255, 255, 0.9);
 }
 
-.volume-control-value {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #60a5fa;
-  min-width: 50px;
-  text-align: right;
+.volume-slider-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
 }
 
-.volume-slider-wrapper {
-  position: relative;
-  width: 100%;
+.volume-indicator {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  min-width: 20px;
+  text-align: center;
+  user-select: none;
 }
 
 /* カスタム range input スタイル */
 .volume-slider {
   -webkit-appearance: none;
   appearance: none;
-  width: 100%;
+  flex: 1;
   height: 10px;
   border-radius: 5px;
   background: rgba(255, 255, 255, 0.1);
