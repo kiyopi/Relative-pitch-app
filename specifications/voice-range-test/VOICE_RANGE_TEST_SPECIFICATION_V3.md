@@ -1,7 +1,7 @@
 # 音域テスト機能 - 詳細仕様書 v3.1
 
-**バージョン**: 3.1.26
-**最終更新日**: 2025-01-20
+**バージョン**: 3.1.28
+**最終更新日**: 2025-10-21
 **基準実装**: voice-range-test-demo.js (PitchPro v1.3.0対応版)
 **用途**: 音域テスト機能の完全仕様書（理論・実装・UI統合版）
 
@@ -15,7 +15,111 @@
 - **トレーニング精度向上**: 音域に適した基音でより効果的な練習を実現
 - **シンプルなUX**: 基準音なし・自由発声による直感的な測定方式
 
-### ⚠️ v3.1.26の主要変更点（最新） 🆕
+### ⚠️ v3.1.28の主要変更点（最新） 🆕
+1. **SPA統合完了**: スタンドアロン版（3,000+行）を最小変更でSPA環境に統合
+2. **マイク許可永続化**: `window.globalAudioDetector`でページ間のインスタンス共有を実現
+3. **ハッシュルーティング対応**: `window.location.hash`でページリロードなしの高速遷移
+4. **UI状態同期の完全性**: 測定完了時の適切な順序制御（stopDetection → resetVolumeDisplay → updateMicStatus）
+5. **測定失敗時リトライ修正**: マイク再起動処理追加で再測定を確実に動作させる
+6. **アイコンパス解決**: SPA環境での相対パス問題を解決（`./icons/` → `pages/icons/`）
+7. **データクリーンアップ強化**: 失敗時の`silentFrameCount`・`hasContinuityFailure`完全リセット
+
+**主要変更ファイル**:
+- `voice-range-test.js` - アイコンパス修正（2箇所）、UI状態同期修正（6箇所）、リトライ機能修正（2箇所）
+- `preparation-pitchpro-cycle.js` - ハッシュルーティング（3箇所）、グローバル関数化（1箇所）
+- `templates/preparation.html` - Button ID統一修正（2箇所）
+
+**SPA統合の設計思想**:
+- ✅ **最小変更の原則**: preparation-pitchpro-cycle.jsの変更は3箇所のみ
+- ✅ **後方互換性**: スタンドアロン版の完全な動作を維持
+- ✅ **共通コード活用**: voice-range-test.jsは両版で共通使用（バージョン分岐なし）
+- ✅ **リファレンス実装**: `/pages/preparation-step1.html`を完全版リファレンスとして保持
+
+**実装コード例**:
+```javascript
+// AudioDetector永続化（SPA版）
+window.globalAudioDetector = new AudioDetectionComponent({
+    volumeBarSelector: '#volume-progress',
+    volumeTextSelector: '#volume-value',
+    // ...
+});
+
+// ページ遷移（SPA版）
+window.location.hash = '#/training'; // マイク許可維持
+
+// 測定完了時の状態同期
+if (window.globalAudioDetector && window.globalAudioDetector.stopDetection) {
+    window.globalAudioDetector.stopDetection();
+}
+resetVolumeDisplay();
+updateMicStatus('standby');
+setTimeout(() => displayResults(), 1500); // UX配慮の遅延
+```
+
+**スタンドアロン版への移植手順**:
+1. `/pages/preparation-step1.html` - 完全版リファレンス（そのまま使用可能）
+2. `preparation-pitchpro-cycle.js` - ハッシュルーティングを`window.location.href`に戻す（3箇所）
+3. AudioDetectorスコープ変更 - `window.globalAudioDetector` → `let audioDetector`
+
+**詳細仕様書**: `/specifications/voice-range-test/RANGE_TEST_BEHAVIOR_SPECIFICATION.md`に完全なSPA統合フロー記載
+
+**コミット**: voice-range-test.js v3.1.28, preparation-pitchpro-cycle.js v1.1.3, preparation.html 修正完了
+
+### ⚠️ v3.1.27の主要変更点
+1. **音域データの永続化機能**: 測定成功時にlocalStorageへ自動保存
+2. **音声テスト完了後の分岐処理**: 音域データの有無により自動分岐（音域設定済み表示 or 音域テスト開始）
+3. **再測定フローの最適化**: AudioDetectorインスタンスの適切な管理（`window.globalAudioDetector`使用）
+4. **ページロード時のフロー統一**: マイク許可→音声テスト→分岐の一貫したUX実現
+5. **トレーニング前準備の完全自動化**: 2回目以降のアクセスで音声テストのみ実施
+
+**実装関数**:
+- `displayVoiceRangeResults()` - 音域データ保存処理 (`voice-range-test.js:1297-1323`)
+- `onDetectionSuccess()` - 分岐処理 (`preparation-pitchpro-cycle.js:583-632`)
+- `setupMicPermissionFlow()` - マイク許可フロー (`preparation-pitchpro-cycle.js:877-920`)
+
+**保存データ構造**:
+```javascript
+{
+  results: {
+    range: "A2 - F5",           // 音域範囲（文字列）
+    octaves: 2.6,               // オクターブ数
+    semitones: 32,              // 半音数
+    lowFreq: 110.0,             // 最低周波数（Hz）
+    lowNote: "A2",              // 最低音（音名）
+    highFreq: 698.5,            // 最高周波数（Hz）
+    highNote: "F5",             // 最高音（音名）
+    comfortableRange: {...},    // 快適音域情報
+    isNarrowRange: false,       // 狭い音域フラグ
+    isVeryNarrowRange: false    // 極端に狭い音域フラグ
+  },
+  timestamp: "2025-10-20T10:15:30.123Z"  // 保存日時
+}
+```
+
+**分岐ロジック**:
+- **音域データあり**: 音声テスト完了後1.5秒で音域設定済み表示に自動切り替え
+  - メッセージ: 「音声テストは完了しました。トレーニング開始の準備ができています。」
+  - 表示内容: 音域範囲、オクターブ数、設定日時
+  - アクション: 「音域を再測定」「トレーニング開始」ボタン
+- **音域データなし**: 音声テスト完了後1.5秒で「音域テストを開始」ボタン表示
+  - メッセージ: 「「ド」の音程を検出できました！音域テストに進みましょう。」
+  - アクション: 「音域テストを開始」ボタン
+
+**再測定ボタン動作** (`retest-range-btn`):
+1. 音域データを削除（localStorage + DataManager）
+2. 音域設定済み表示を非表示
+3. ステップインジケーター更新（Step2完了、Step3アクティブ）
+4. 音域テストセクションに移動
+5. `window.globalAudioDetector`からAudioDetectorインスタンスを取得して測定開始
+
+**保存条件**:
+- ✅ 測定成功（`isCompleteFail = false`）
+- ✅ 部分結果ではない（`isPartialResult = false`）
+- ✅ 低音・高音逆転ではない（`isReversedRange = false`）
+
+**コミット**: voice-range-test.js v3.1.27, preparation-pitchpro-cycle.js v1.1.2
+
+### ⚠️ v3.1.26の主要変更点
 1. **安定最高音自動判定機能**: 瞬間的なピーク値を無視し、維持可能な最高音を自動検出
 2. **検索戦略の実装**: 最高周波数から降順に検証し、15個以上のデータがある周波数を採用
 3. **判定基準の統一**: 低音・高音で同じ基準（15個、±5%）を使用し一貫性を確保

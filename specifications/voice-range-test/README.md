@@ -8,24 +8,26 @@
 ## 📁 ファイル構成
 
 ### 1. VOICE_RANGE_TEST_SPECIFICATION_V3.md
-**バージョン**: 3.1.26
-**サイズ**: 54KB
+**バージョン**: 3.1.27
+**サイズ**: 56KB
 **役割**: 音域テスト機能の完全仕様書
 
 **内容**:
 - 理論・アルゴリズム詳細
 - 検証ロジック（低音・高音）
-- バージョン履歴（v3.0.0 〜 v3.1.26）
+- バージョン履歴（v3.0.0 〜 v3.1.27）
 - PitchPro v1.3.0統合仕様
 - デバイス別最適化設定
 - 既知の制約・デバイス特性
+- 音域データ永続化仕様
 
 **対象読者**: 開発者、企画者、アルゴリズム設計者
 
-**最新変更** (v3.1.26):
-- 安定最高音自動判定機能
-- エラーメッセージ視認性向上（v3.1.25）
-- iPad低周波数制約の文書化
+**最新変更** (v3.1.27):
+- 音域データの永続化機能（localStorage保存）
+- 音声テスト完了後の分岐処理
+- 再測定フローの最適化
+- ページロード時のフロー統一（マイク許可→音声テスト→分岐）
 
 ---
 
@@ -122,12 +124,70 @@
 
 ---
 
+## 🔄 SPA統合仕様（2025年10月21日追加）
+
+### ファイル構成
+
+#### スタンドアロン版（正規版）
+- `/PitchPro-SPA/pages/preparation-step1.html` - 完全版準備ページ
+- `/PitchPro-SPA/pages/js/preparation-pitchpro-cycle.js` - 正規版ロジック（1,443行）
+- `/PitchPro-SPA/pages/js/voice-range-test.js` - 音域テストロジック（2,500+行）
+- **用途**: スタンドアロン動作、実機テスト、リファレンス実装
+
+#### SPA版（現在の本番環境）
+- `/PitchPro-SPA/templates/preparation.html` - SPAテンプレート
+- `/PitchPro-SPA/js/controllers/preparationController.js` - 軽量ラッパー（34行）
+- `/PitchPro-SPA/pages/js/preparation-pitchpro-cycle.js` - SPA対応済み正規版
+- `/PitchPro-SPA/pages/js/voice-range-test.js` - 音域テストロジック（共通）
+- **用途**: 本番SPA環境、マイク許可の永続化
+
+### SPA化の設計思想
+
+**最小変更の原則**:
+- 正規版の完全なロジック（3,000+行）をそのまま活用
+- `preparation-pitchpro-cycle.js`の変更は3箇所のみ（ページ遷移をハッシュルーティングに）
+- スタンドアロン版の後方互換性を維持
+
+**主要な変更点**:
+1. **ページ遷移**: `window.location.href` → `window.location.hash`
+2. **初期化関数**: DOMContentLoadedラッパーを`window.initializePreparationPitchProCycle()`として公開
+3. **AudioDetectorインスタンス**: `window.globalAudioDetector`で永続化（ページ間共有）
+
+**メリット**:
+- マイク許可を準備ページ→トレーニングページで引き継げる
+- ページリロードなしの高速画面遷移
+- AudioDetectorインスタンスの使い回しでパフォーマンス向上
+
+### 実装時の注意点
+
+**次回、音域テストのみのアプリケーションを作成する場合**:
+
+1. **スタンドアロン版を使用**: `/pages/preparation-step1.html`が完全版リファレンス
+2. **SPA版から移植**: 以下のファイルを使用
+   - `voice-range-test.js` - そのまま使用可能
+   - `preparation-pitchpro-cycle.js` - SPA対応部分を削除（3箇所のハッシュルーティングを元に戻す）
+3. **CSS**: `/styles/voice-range.css` - 共通使用可能
+
+### バージョン管理方針
+
+- **スタンドアロン版**: 実機テスト済み、変更禁止、リファレンス実装
+- **SPA版**: 継続的に更新、本番環境
+- **共通ロジック**: `voice-range-test.js`は両方で共有
+
+---
+
 ## 📞 関連リソース
 
-### 実装ファイル
-- `/PitchPro-SPA/pages/js/voice-range-test.js` - メイン実装
+### 実装ファイル（SPA版）
+- `/PitchPro-SPA/templates/preparation.html` - SPAテンプレート
+- `/PitchPro-SPA/js/controllers/preparationController.js` - SPAコントローラー
+- `/PitchPro-SPA/pages/js/preparation-pitchpro-cycle.js` - 正規版ロジック（SPA対応）
+- `/PitchPro-SPA/pages/js/voice-range-test.js` - 音域テストロジック
 - `/PitchPro-SPA/js/core/pitchpro-v1.3.1.umd.js` - PitchProライブラリ
 - `/PitchPro-SPA/styles/voice-range.css` - 専用CSS
+
+### 実装ファイル（スタンドアロン版）
+- `/PitchPro-SPA/pages/preparation-step1.html` - 完全版準備ページ（リファレンス）
 
 ### 開発用ファイル
 - `/voice-range-test-v4/` - v4.0実装計画・ドキュメント

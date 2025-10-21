@@ -1,8 +1,408 @@
 # 音域テスト挙動仕様書
 
-**ファイル**: preparation-test.html + VoiceRangeTesterV113  
-**作成日**: 2025年1月9日  
+**ファイル**:
+- **スタンドアロン版**: preparation-step1.html + preparation-pitchpro-cycle.js + voice-range-test.js
+- **SPA版**: templates/preparation.html + preparationController.js + preparation-pitchpro-cycle.js (SPA対応) + voice-range-test.js
+
+**作成日**: 2025年1月9日
+**最終更新**: 2025年10月21日（SPA統合仕様追加）
 **目的**: 音域テスト時の完全な動作フロー定義
+
+---
+
+## 🔄 SPA統合時の動作フロー（2025年10月21日追加）
+
+### **アーキテクチャ概要**
+
+#### **スタンドアロン版（正規版）**
+```
+preparation-step1.html
+├── preparation-pitchpro-cycle.js (1,443行) - 完全なロジック
+├── voice-range-test.js (2,500+行) - 音域テストコア
+└── 完全自己完結型（ページリロードで初期化）
+```
+
+#### **SPA版（本番環境）**
+```
+templates/preparation.html (HTMLテンプレート)
+├── preparationController.js (34行) - 軽量ラッパー
+├── preparation-pitchpro-cycle.js (SPA対応版) - 正規版ロジック
+├── voice-range-test.js (共通) - 音域テストコア
+└── window.globalAudioDetector - AudioDetectorインスタンス永続化
+```
+
+### **SPA化の設計思想**
+
+#### **最小変更の原則**
+- ✅ **正規版の完全なロジック（3,000+行）をそのまま活用**
+- ✅ **preparation-pitchpro-cycle.jsの変更は3箇所のみ**（ページ遷移をハッシュルーティングに）
+- ✅ **スタンドアロン版の後方互換性を維持**
+- ✅ **voice-range-test.jsは完全共通使用**（バージョン分岐なし）
+
+#### **主要な変更点**
+1. **ページ遷移**: `window.location.href = 'training.html'` → `window.location.hash = '#/training'`
+2. **初期化関数**: DOMContentLoadedラッパーを`window.initializePreparationPitchProCycle()`として公開
+3. **AudioDetectorインスタンス**: `window.globalAudioDetector`で永続化（ページ間共有）
+
+### **SPA Controller実装**
+
+#### **preparationController.js（軽量ラッパー）**
+```javascript
+// /js/controllers/preparationController.js
+
+export async function initializePreparationPage() {
+    console.log('🚀 PreparationController initializing (SPA version)...');
+
+    // 正規版の初期化関数を呼び出す
+    if (typeof window.initializePreparationPitchProCycle === 'function') {
+        await window.initializePreparationPitchProCycle();
+        console.log('✅ 正規版の初期化完了（preparation-pitchpro-cycle.js）');
+    } else {
+        console.error('❌ window.initializePreparationPitchProCycle が見つかりません');
+        console.error('確認: pages/js/preparation-pitchpro-cycle.js が正しく読み込まれていますか？');
+    }
+}
+
+// リセット関数（router.jsから呼び出される）
+export function resetPreparationPageFlag() {
+    console.log('PreparationController reset (SPA version)');
+    // window.globalAudioDetectorはSPA全体で共有されるため、リセット不要
+}
+```
+
+**設計ポイント**:
+- **34行のみ** - 最小限のラッパーコード
+- **正規版を呼び出すだけ** - ロジックの重複を完全排除
+- **エラーハンドリング** - 正規版が読み込まれているか確認
+
+### **AudioDetector永続化の実装**
+
+#### **スタンドアロン版（ページ内スコープ）**
+```javascript
+// preparation-pitchpro-cycle.js（スタンドアロン版）
+
+let audioDetector = null; // ページ内スコープ
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // AudioDetector初期化
+    audioDetector = new AudioDetectionComponent({
+        volumeBarSelector: '#volume-progress',
+        volumeTextSelector: '#volume-value',
+        // ...
+    });
+
+    await audioDetector.initialize();
+
+    // ページ遷移（リロード）
+    window.location.href = 'training.html';
+    // → マイク許可が失われる
+});
+```
+
+#### **SPA版（グローバルスコープ）**
+```javascript
+// preparation-pitchpro-cycle.js（SPA対応版）
+
+// グローバルスコープで永続化
+if (!window.globalAudioDetector) {
+    window.globalAudioDetector = null;
+}
+
+window.initializePreparationPitchProCycle = async function() {
+    // AudioDetector初期化（グローバル変数に保存）
+    window.globalAudioDetector = new AudioDetectionComponent({
+        volumeBarSelector: '#volume-progress',
+        volumeTextSelector: '#volume-value',
+        // ...
+    });
+
+    await window.globalAudioDetector.initialize();
+
+    // ページ遷移（ハッシュルーティング）
+    window.location.hash = '#/training';
+    // → マイク許可が維持される
+};
+```
+
+**メリット**:
+- ✅ **マイク許可の永続化** - 準備ページ→トレーニングページで引き継ぎ
+- ✅ **高速画面遷移** - ページリロードなしの即座切り替え
+- ✅ **パフォーマンス向上** - AudioDetectorインスタンスの使い回し
+
+### **ページ遷移の実装比較**
+
+#### **スタンドアロン版（3箇所）**
+```javascript
+// 1. 音域テスト完了→トレーニング開始
+completeRangeTestBtn.addEventListener('click', () => {
+    window.location.href = 'training.html';
+});
+
+// 2. 音域データ保存済み→スキップ
+skipRangeTestBtn.addEventListener('click', () => {
+    window.location.href = 'training.html';
+});
+
+// 3. 音声テスト完了→音域テスト開始
+startRangeTestBtn.addEventListener('click', () => {
+    showSection(rangeTestSection);
+});
+```
+
+#### **SPA版（3箇所のみ変更）**
+```javascript
+// 1. 音域テスト完了→トレーニング開始
+completeRangeTestBtn.addEventListener('click', () => {
+    window.location.hash = '#/training'; // ← 変更
+});
+
+// 2. 音域データ保存済み→スキップ
+skipRangeTestBtn.addEventListener('click', () => {
+    window.location.hash = '#/training'; // ← 変更
+});
+
+// 3. 音声テスト完了→音域テスト開始（変更なし）
+startRangeTestBtn.addEventListener('click', () => {
+    showSection(rangeTestSection); // ← 同じ
+});
+```
+
+**変更箇所**: `window.location.href` → `window.location.hash` のみ
+
+### **HTMLテンプレートの統一**
+
+#### **Button ID統一問題の修正**
+```html
+<!-- 修正前（SPA版で不一致） -->
+<button class="btn btn-primary hidden" id="goto-range-test-btn">
+    <span>音域テストを開始</span>
+</button>
+
+<!-- 修正後（正規版に統一） -->
+<button class="btn btn-primary hidden" id="start-range-test-btn">
+    <span>音域テストを開始</span>
+</button>
+```
+
+**修正理由**:
+- `preparation-pitchpro-cycle.js:540`が`#start-range-test-btn`を期待
+- SPA版テンプレートのID不一致によりボタンが表示されなかった
+
+### **アイコンパス解決（SPA環境対応）**
+
+#### **問題: 相対パスの不正解決**
+```javascript
+// voice-range-test.js（修正前）
+const iconSrc = iconType === 'arrow-up'
+    ? './icons/arrow-up.png'    // ← SPA環境で解決できない
+    : './icons/arrow-down.png';
+```
+
+#### **解決: 絶対パスに変更**
+```javascript
+// voice-range-test.js（修正後）
+const iconSrc = iconType === 'arrow-up'
+    ? 'pages/icons/arrow-up.png'    // ← SPA環境で正しく解決
+    : 'pages/icons/arrow-down.png';
+```
+
+**修正箇所**: 2箇所（`voice-range-test.js:2602, 2648`）
+
+### **状態管理の完全性**
+
+#### **測定完了時のUI状態同期**
+```javascript
+// 高音域測定完了時の処理（voice-range-test.js:2216-2250）
+
+// ✅ 1. バッジ状態更新
+setTimeout(() => {
+    updateBadgeForConfirmed(); // チェックマーク表示
+}, 100);
+
+// ✅ 2. プログレスバーリセット
+updateCircularProgressInstantly(0);
+
+// ✅ 3. 検出停止→音量リセット→マイク状態更新（順序重要）
+if (window.globalAudioDetector && window.globalAudioDetector.stopDetection) {
+    window.globalAudioDetector.stopDetection();
+}
+resetVolumeDisplay();
+updateMicStatus('standby');
+
+// ✅ 4. 遅延後に結果表示（UX配慮）
+setTimeout(() => {
+    const results = calculateVoiceRange();
+    if (results) {
+        displayVoiceRangeResults(results);
+    }
+}, 1500);
+```
+
+**重要な修正ポイント**:
+- **修正前**: チェックマーク表示後、即座に結果画面へ遷移（チェックマークが見えない）
+- **修正後**: 1500ms遅延でユーザーがチェックマークを確認できる
+- **順序重要**: `stopDetection()` → `resetVolumeDisplay()` → `updateMicStatus()`
+
+### **測定失敗時のリトライ機能**
+
+#### **問題: マイクミュート状態でリトライ不可**
+```javascript
+// 修正前（マイク起動忘れ）
+function retryLowPitchMeasurement() {
+    resetVoiceStability();
+    updateCircularProgressInstantly(0);
+    // ← startDetection()がない
+    // ← updateMicStatus()がない
+}
+```
+
+#### **修正後（完全な状態復帰）**
+```javascript
+// 修正後（voice-range-test.js:1858-1886）
+function retryLowPitchMeasurement() {
+    resetVoiceStability();
+
+    // データクリーンアップ
+    globalState.silentFrameCount = 0;
+    globalState.hasContinuityFailure = false;
+
+    updateCircularProgressInstantly(0);
+
+    // マイク再起動（重要）
+    if (window.globalAudioDetector && window.globalAudioDetector.startDetection) {
+        setTimeout(() => {
+            window.globalAudioDetector.startDetection();
+            updateMicStatus('recording');
+        }, 100);
+    }
+}
+```
+
+**修正箇所**: 2箇所（低音リトライ・高音リトライ）
+
+### **高音測定フェーズの非同期処理修正**
+
+#### **問題: 非同期タイミングずれ**
+```javascript
+// 修正前（voice-range-test.js:2112-2131）
+function startHighPitchPhase() {
+    setTimeout(() => {
+        if (window.globalAudioDetector.startDetection) {
+            window.globalAudioDetector.startDetection();
+        }
+    }, 100);
+
+    updateMicStatus('recording'); // ← タイミングが早すぎる
+}
+```
+
+#### **修正後（同期化）**
+```javascript
+// 修正後
+function startHighPitchPhase() {
+    setTimeout(() => {
+        if (window.globalAudioDetector.startDetection) {
+            window.globalAudioDetector.startDetection();
+        }
+        updateMicStatus('recording'); // ← setTimeout内に移動
+    }, 100);
+}
+```
+
+**修正理由**: `startDetection()`完了前に`updateMicStatus()`が呼ばれる問題を解決
+
+### **データクリーンアップの完全性**
+
+#### **測定失敗時のデータリリース**
+```javascript
+// リトライ関数でのデータリセット（voice-range-test.js:1858-1927）
+
+function retryLowPitchMeasurement() {
+    // 基本リセット
+    resetVoiceStability();
+
+    // 追加リセット（重要）
+    globalState.silentFrameCount = 0;        // 無音フレームカウントリセット
+    globalState.hasContinuityFailure = false; // 連続性失敗フラグリセット
+
+    updateCircularProgressInstantly(0);
+}
+
+function retryHighPitchMeasurement() {
+    // 同様のリセット処理
+    resetVoiceStability();
+    globalState.silentFrameCount = 0;
+    globalState.hasContinuityFailure = false;
+    updateCircularProgressInstantly(0);
+}
+```
+
+**検証結果**: 失敗時の音域データが完全にリリースされることを確認
+
+### **SPA統合のベストプラクティス**
+
+#### **1. グローバル変数管理**
+- ✅ **window.globalAudioDetector**: AudioDetectorインスタンス永続化
+- ✅ **window.initializePreparationPitchProCycle**: 初期化関数の公開
+- ⚠️ **注意**: グローバル変数の最小化、必要な場合のみ使用
+
+#### **2. ハッシュルーティング統一**
+- ✅ **ページ遷移**: `window.location.hash` 使用
+- ✅ **外部遷移**: `window.location.href` 維持（必要時）
+- ⚠️ **注意**: 遷移後のページ初期化処理を適切に実装
+
+#### **3. 状態同期の厳格性**
+- ✅ **順序遵守**: `stopDetection()` → `resetVolumeDisplay()` → `updateMicStatus()`
+- ✅ **非同期処理**: setTimeout内で状態更新を同期
+- ✅ **UX配慮**: 視覚フィードバックのための適切な遅延（1500ms等）
+
+#### **4. リソース管理**
+- ✅ **AudioDetector永続化**: ページ間でインスタンス使い回し
+- ✅ **データクリーンアップ**: 失敗時の完全なリセット
+- ✅ **メモリリーク防止**: 不要なイベントリスナーの適切な削除
+
+### **次回スタンドアロン版を作成する場合の移植手順**
+
+#### **Step 1: ファイル取得**
+1. `/pages/preparation-step1.html` - 完全版リファレンス（変更なし使用可能）
+2. `/pages/js/voice-range-test.js` - そのまま使用可能
+3. `/pages/js/preparation-pitchpro-cycle.js` - SPA対応部分を削除（3箇所）
+
+#### **Step 2: preparation-pitchpro-cycle.jsの修正**
+```javascript
+// 修正箇所1: グローバル関数化を削除
+// 修正前（SPA版）
+window.initializePreparationPitchProCycle = async function() {
+    // ...
+};
+
+// 修正後（スタンドアロン版）
+document.addEventListener('DOMContentLoaded', async () => {
+    // ...
+});
+
+// 修正箇所2-4: ハッシュルーティングを元に戻す
+// 修正前（SPA版）
+window.location.hash = '#/training';
+
+// 修正後（スタンドアロン版）
+window.location.href = 'training.html';
+```
+
+#### **Step 3: AudioDetectorスコープ変更**
+```javascript
+// 修正前（SPA版 - グローバル）
+window.globalAudioDetector = new AudioDetectionComponent({ ... });
+
+// 修正後（スタンドアロン版 - ページ内）
+let audioDetector = new AudioDetectionComponent({ ... });
+```
+
+#### **Step 4: 動作確認**
+- ✅ マイク許可フロー正常動作
+- ✅ 音声テスト完了→音域テスト遷移
+- ✅ 音域テスト完了→トレーニングページ遷移
+- ✅ 画像パス解決（`pages/icons/`は共通使用可能）
 
 ---
 
