@@ -551,13 +551,6 @@ class PitchProCycleManager {
             detectionSuccess.classList.remove('hidden');
             console.log('✅ detection-success セクション表示完了');
 
-            // 音量調整セクションを表示
-            const volumeAdjustmentSection = document.getElementById('volume-adjustment-section');
-            if (volumeAdjustmentSection) {
-                volumeAdjustmentSection.classList.remove('hidden');
-                console.log('✅ volume-adjustment-section を表示しました');
-            }
-
             // 既存の音域データをチェック（DataManager + localStorage両方確認）
             let voiceRangeData = null;
             try {
@@ -593,6 +586,13 @@ class PitchProCycleManager {
                     successMessage.textContent = '音声テストは完了しました。トレーニング開始の準備ができています。';
                 }
 
+                // 音量調整セクションを非表示（音域データがある場合は不要）
+                const volumeAdjustmentSection = document.getElementById('volume-adjustment-section');
+                if (volumeAdjustmentSection) {
+                    volumeAdjustmentSection.classList.add('hidden');
+                    console.log('🔇 音域データあり - volume-adjustment-section を非表示にしました');
+                }
+
                 // 1.5秒後に画面切り替えを実行します
                 console.log('⏳ 1.5秒後に画面切り替えを実行します...');
                 setTimeout(() => {
@@ -616,7 +616,20 @@ class PitchProCycleManager {
             } else {
                 // 新規音域テストが必要 - 音域データなしの場合のメッセージ
                 if (successMessage) {
-                    successMessage.textContent = '「ド」の音程を検出できました！音域テストに進みましょう。';
+                    successMessage.textContent = '「ド」の音程を検出できました！音量を調整してから音域テストに進みましょう。';
+                }
+
+                // 音量調整セクションを表示（音域データがない場合）
+                const volumeAdjustmentSection = document.getElementById('volume-adjustment-section');
+                if (volumeAdjustmentSection) {
+                    volumeAdjustmentSection.classList.remove('hidden');
+                    console.log('🔊 音域データなし - volume-adjustment-section を表示しました');
+
+                    // Lucideアイコン初期化（音量調整セクションのアイコン用）
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                        console.log('✅ Lucideアイコン初期化完了（音量調整セクション）');
+                    }
                 }
 
                 // localStorage保存（Step1完了データ）
