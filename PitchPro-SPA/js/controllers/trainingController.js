@@ -155,8 +155,8 @@ function getDeviceVolume() {
     const device = getDeviceType();
     const volumeSettings = {
         pc: +6,      // +6dB: 約2倍音量（デフォルト-6dBから+12dB）
-        iphone: +8,  // +8dB: 約2.5倍音量（iPhone音量不足対策）
-        ipad: +10    // +10dB: 約3倍音量（iPad音量不足対策）
+        iphone: +16, // +16dB: 約6倍音量（iPhone音量不足対策 - 倍増）
+        ipad: +18    // +18dB: 約8倍音量（iPad音声再生問題対策）
     };
     return volumeSettings[device] || +6;
 }
@@ -220,6 +220,17 @@ async function initializePitchShifter() {
         await pitchShifter.initialize();
         console.log('✅ PitchShifter初期化完了（フォールバック）');
 
+        // iOS/iPadOS対応: 初期化後にAudioContextを確実に起動
+        if (typeof Tone !== 'undefined' && Tone.context) {
+            if (Tone.context.state !== 'running') {
+                console.log('🔊 AudioContext起動中（初期化後）... (state:', Tone.context.state + ')');
+                await Tone.context.resume();
+                console.log('✅ AudioContext起動完了（初期化後） (state:', Tone.context.state + ')');
+            } else {
+                console.log('✅ AudioContext既に起動済み (state:', Tone.context.state + ')');
+            }
+        }
+
         // グローバルインスタンスとして登録
         window.pitchShifterInstance = pitchShifter;
 
@@ -264,10 +275,23 @@ async function startTraining() {
 
         // iOS/iPadOS対応: AudioContextを明示的にresume（ユーザーインタラクション時に必須）
         if (typeof Tone !== 'undefined' && Tone.context) {
+            console.log('🔊 AudioContext状態確認... (state:', Tone.context.state + ')');
+
+            // Tone.start()を明示的に呼び出し（iOS/iPadOS対応）
+            if (Tone.context.state === 'suspended') {
+                console.log('🔊 Tone.start()実行中...');
+                await Tone.start();
+                console.log('✅ Tone.start()完了 (state:', Tone.context.state + ')');
+            }
+
+            // resume()で確実に起動
             if (Tone.context.state !== 'running') {
                 console.log('🔊 AudioContext再開中... (state:', Tone.context.state + ')');
                 await Tone.context.resume();
                 console.log('✅ AudioContext再開完了 (state:', Tone.context.state + ')');
+
+                // 安定化のため少し待機（iOS/iPadOS対策）
+                await new Promise(resolve => setTimeout(resolve, 100));
             }
         }
 
@@ -275,6 +299,8 @@ async function startTraining() {
         const config = modeConfig[currentMode];
         const sessionCounter = window.sessionDataRecorder ? window.sessionDataRecorder.getSessionNumber() : 0;
         const selectedNote = selectBaseNote(config.baseNoteSelection, sessionCounter);
+
+        console.log(`🎵 基音再生開始: ${selectedNote.note} (${selectedNote.frequency.toFixed(1)}Hz)`);
         await pitchShifter.playNote(selectedNote.note, 2);
         baseNoteInfo = selectedNote;
         console.log('🎵 基音再生:', baseNoteInfo);
