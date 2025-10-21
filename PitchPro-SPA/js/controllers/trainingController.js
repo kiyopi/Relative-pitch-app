@@ -154,11 +154,11 @@ function getDeviceType() {
 function getDeviceVolume() {
     const device = getDeviceType();
     const volumeSettings = {
-        pc: 0,       // 0dB: 100%音量（デフォルト-6dBから+6dB）
-        iphone: 0,   // 0dB: iPhone音量不足対策
-        ipad: +2     // +2dB: iPad音量不足対策（特に小さいため）
+        pc: +6,      // +6dB: 約2倍音量（デフォルト-6dBから+12dB）
+        iphone: +8,  // +8dB: 約2.5倍音量（iPhone音量不足対策）
+        ipad: +10    // +10dB: 約3倍音量（iPad音量不足対策）
     };
-    return volumeSettings[device] || 0;
+    return volumeSettings[device] || +6;
 }
 
 // PitchShifter初期化（シングルトンパターン + グローバルインスタンス活用）
