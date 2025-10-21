@@ -70,8 +70,8 @@ class SimpleRouter {
         }
 
         try {
-            // 1. HTMLテンプレートを読み込み
-            const response = await fetch(templatePath);
+            // 1. HTMLテンプレートを読み込み（キャッシュ回避）
+            const response = await fetch(`${templatePath}?v=${Date.now()}`);
 
             if (!response.ok) {
                 throw new Error(`Failed to load ${templatePath}: ${response.status}`);
