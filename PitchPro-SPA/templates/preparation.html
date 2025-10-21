@@ -29,12 +29,12 @@
             <!-- 接続線 -->
             <div class="step-connector" id="connector-1"></div>
 
-            <!-- Step 2: 音声テスト -->
+            <!-- Step 2: 音声・音量確認 -->
             <div class="flex-1 text-center">
                 <div class="step-indicator" id="step-2">
-                    <i data-lucide="speech" style="width: 24px; height: 24px;"></i>
+                    <i data-lucide="audio-lines" style="width: 24px; height: 24px;"></i>
                 </div>
-                <p class="text-xs text-white-60 mt-2">音声テスト</p>
+                <p class="text-xs text-white-60 mt-2">音声・音量</p>
             </div>
 
             <!-- 接続線 -->
@@ -109,6 +109,38 @@
             <div class="success-alert hidden" id="detection-success">
                 <i data-lucide="check-circle" style="color: #22c55e; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
                 <p id="detection-success-message">音声検出が完了しました！</p>
+            </div>
+
+            <!-- 音量調整セクション -->
+            <div class="hidden" id="volume-adjustment-section">
+                <!-- デバイス音量推奨 -->
+                <div class="info-alert">
+                    <i data-lucide="volume-2" style="color: #60a5fa; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
+                    <p>デバイスの音量を<strong>50%</strong>に設定することをおすすめします。基音を試聴して調整してください。</p>
+                </div>
+
+                <!-- 基音試聴ボタン -->
+                <button class="btn btn-primary" id="test-base-note-btn">
+                    <i data-lucide="volume" style="width: 24px; height: 24px;"></i>
+                    <span>基音を試聴（C4）</span>
+                </button>
+
+                <!-- アプリ音量調整スライダー -->
+                <div class="volume-control-container">
+                    <div class="volume-control-header">
+                        <span class="volume-control-label">アプリ音量</span>
+                        <span class="volume-control-value" id="app-volume-value">100%</span>
+                    </div>
+                    <div class="volume-slider-wrapper">
+                        <input type="range"
+                               id="app-volume-slider"
+                               class="volume-slider"
+                               min="0"
+                               max="100"
+                               value="100"
+                               step="1">
+                    </div>
+                </div>
             </div>
 
             <!-- 音域テストを開始ボタン（正規版互換） -->

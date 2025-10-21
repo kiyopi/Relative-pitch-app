@@ -551,6 +551,13 @@ class PitchProCycleManager {
             detectionSuccess.classList.remove('hidden');
             console.log('✅ detection-success セクション表示完了');
 
+            // 音量調整セクションを表示
+            const volumeAdjustmentSection = document.getElementById('volume-adjustment-section');
+            if (volumeAdjustmentSection) {
+                volumeAdjustmentSection.classList.remove('hidden');
+                console.log('✅ volume-adjustment-section を表示しました');
+            }
+
             // 既存の音域データをチェック（DataManager + localStorage両方確認）
             let voiceRangeData = null;
             try {
@@ -844,6 +851,10 @@ window.initializePreparationPitchProCycle = async function() {
     // マイク許可ボタンイベント設定（必ず実行）
     console.log('🎤 マイク許可ボタンイベント設定開始');
     setupMicPermissionFlow();
+
+    // 音量調整コントロール設定
+    console.log('🔊 音量調整コントロール設定開始');
+    setupVolumeAdjustmentControls();
 
     // ステップインジケーター初期化
     console.log('📊 ステップインジケーター初期化');
@@ -1432,6 +1443,78 @@ function updateMicButtonState(state) {
     }
 
     lucide.createIcons();
+}
+
+/**
+ * 音量調整コントロール設定
+ */
+function setupVolumeAdjustmentControls() {
+    console.log('🔊 音量調整コントロール設定開始');
+
+    // 基音試聴ボタン
+    const testBaseNoteBtn = document.getElementById('test-base-note-btn');
+    if (testBaseNoteBtn) {
+        testBaseNoteBtn.addEventListener('click', async () => {
+            console.log('🎵 基音試聴ボタンがクリックされました');
+
+            try {
+                // PitchShifterインスタンスを取得
+                if (window.pitchShifterInstance && window.pitchShifterInstance.isInitialized) {
+                    // C4 (261.6Hz) を再生
+                    await window.pitchShifterInstance.playNote(261.6);
+                    console.log('✅ 基音C4を再生しました');
+                } else {
+                    console.warn('⚠️ PitchShifterが初期化されていません');
+                }
+            } catch (error) {
+                console.error('❌ 基音再生エラー:', error);
+            }
+        });
+        console.log('✅ 基音試聴ボタンのイベントリスナー設定完了');
+    }
+
+    // 音量スライダー
+    const volumeSlider = document.getElementById('app-volume-slider');
+    const volumeValue = document.getElementById('app-volume-value');
+
+    if (volumeSlider && volumeValue) {
+        volumeSlider.addEventListener('input', (e) => {
+            const volumePercent = parseInt(e.target.value);
+            volumeValue.textContent = `${volumePercent}%`;
+
+            // PitchShifterの音量を調整
+            if (window.pitchShifterInstance && window.pitchShifterInstance.isInitialized) {
+                // 0-100% を -20dB 〜 +20dB に変換
+                // 100% = 元の音量（現在のデバイス別設定値を維持）
+                // 50% = -6dB（約半分の音量）
+                // 0% = -40dB（ほぼ無音）
+
+                // 現在のデバイス別基準音量を取得（router.jsと同じロジック）
+                const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+                const isIPhone = /iPhone/.test(userAgent);
+                const isIPad = /iPad/.test(userAgent);
+                const isMacintoshWithTouch = /Macintosh/.test(userAgent) && 'ontouchend' in document;
+
+                let baseVolume = +8; // PC default
+                if (isIPhone) {
+                    baseVolume = +18;
+                } else if (isIPad || isMacintoshWithTouch) {
+                    baseVolume = +20;
+                }
+
+                // パーセンテージに応じて音量を調整
+                // 100% = baseVolume, 50% = baseVolume - 6dB, 0% = baseVolume - 20dB
+                const volumeReduction = (100 - volumePercent) * 0.2; // 100%差で-20dB
+                const targetVolume = baseVolume - volumeReduction;
+
+                window.pitchShifterInstance.setVolume(targetVolume);
+                console.log(`🔊 音量調整: ${volumePercent}% (${targetVolume.toFixed(1)}dB)`);
+            }
+        });
+        console.log('✅ 音量スライダーのイベントリスナー設定完了');
+    }
+
+    console.log('🎉 音量調整コントロール設定完了');
 }
 
 // ===== UI制御ユーティリティ =====
