@@ -189,11 +189,11 @@ class SimpleRouter {
             const deviceType = isIPhone ? 'iphone' : isIPad ? 'ipad' : 'pc';
 
             const volumeSettings = {
-                pc: -6,
-                iphone: -4,
-                ipad: -5
+                pc: +6,      // +6dB: 約2倍音量（デフォルト-6dBから+12dB）
+                iphone: +16, // +16dB: 約6倍音量（iPhone音量不足対策）
+                ipad: +18    // +18dB: 約8倍音量（iPad音声再生問題対策）
             };
-            const deviceVolume = volumeSettings[deviceType] || -6;
+            const deviceVolume = volumeSettings[deviceType] || +6;
 
             console.log(`📱 デバイス: ${deviceType}, 音量: ${deviceVolume}dB`);
 

@@ -167,6 +167,13 @@ async function initializePitchShifter() {
     if (window.pitchShifterInstance && window.pitchShifterInstance.isInitialized) {
         console.log('✅ Using global PitchShifter instance (initialized from home page)');
         pitchShifter = window.pitchShifterInstance;
+
+        // デバイス別音量設定を適用（グローバルインスタンスの音量を更新）
+        const deviceVolume = getDeviceVolume();
+        const deviceType = getDeviceType();
+        console.log(`🔊 音量更新: ${deviceType}用に${deviceVolume}dBに設定`);
+        pitchShifter.setVolume(deviceVolume);
+
         return pitchShifter;
     }
 
