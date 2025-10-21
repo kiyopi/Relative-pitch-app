@@ -613,10 +613,10 @@ class PitchProCycleManager {
                     // voiceRangeData全体を渡すように修正（timestampが親レベルにあるため）
                     this.displaySavedRangeData(voiceRangeData, rangeSavedDisplay);
 
-                    // Lucideアイコン初期化（音域設定済み表示のアイコン用）
+                    // Lucideアイコン再初期化（音域設定済み表示 + 音量調整セクション）
                     if (typeof lucide !== 'undefined') {
                         lucide.createIcons();
-                        console.log('✅ Lucideアイコン初期化完了（音域設定済み表示）');
+                        console.log('✅ Lucideアイコン再初期化完了（1.5秒後 - 音域データあり）');
                     }
                 }, 1500);
             } else {
@@ -659,6 +659,12 @@ class PitchProCycleManager {
                         // イベントリスナーは後のコード（line 1057-1088）で設定済み
                         startRangeBtn.classList.remove('hidden');
                         console.log('🎯 音域テストセクション移動ボタン表示完了');
+                    }
+
+                    // Lucideアイコン再初期化（1.5秒後のタイミングで確実に表示）
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                        console.log('✅ Lucideアイコン再初期化完了（1.5秒後）');
                     }
                 }, 1500);
             }
