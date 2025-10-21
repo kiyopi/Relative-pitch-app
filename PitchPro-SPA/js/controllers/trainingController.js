@@ -142,23 +142,55 @@ function initializeModeUI() {
     lucide.createIcons();
 }
 
-// デバイス検出
+// デバイス検出（PitchPro実装準拠）
 function getDeviceType() {
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+    // 複数の判定方法を組み合わせた包括的な検出（PitchPro方式）
     const isIPhone = /iPhone/.test(userAgent);
-    const isIPad = /iPad/.test(userAgent) || (/Macintosh/.test(userAgent) && 'ontouchend' in document);
-    return isIPhone ? 'iphone' : isIPad ? 'ipad' : 'pc';
+    const isIPad = /iPad/.test(userAgent);
+    const isMacintoshWithTouch = /Macintosh/.test(userAgent) && 'ontouchend' in document;
+    const isIOSUserAgent = /iPad|iPhone|iPod/.test(userAgent);
+    const isIOSPlatform = /iPad|iPhone|iPod/.test(navigator.platform || '');
+    const isIOS = isIPhone || isIPad || isMacintoshWithTouch || isIOSUserAgent || isIOSPlatform;
+
+    // デバイスタイプ判定
+    if (isIPhone) {
+        return 'iphone';
+    } else if (isIPad || isMacintoshWithTouch) {
+        return 'ipad';
+    } else if (isIOS) {
+        // スクリーンサイズで判定（PitchPro方式）
+        return detectIOSDeviceTypeByScreen();
+    } else {
+        return 'pc';
+    }
+}
+
+// スクリーンサイズによるiOS デバイスタイプ判定（PitchPro実装）
+function detectIOSDeviceTypeByScreen() {
+    const screenWidth = window.screen.width;
+    const screenHeight = window.screen.height;
+    const maxDimension = Math.max(screenWidth, screenHeight);
+    const minDimension = Math.min(screenWidth, screenHeight);
+
+    // iPad判定: 長辺768px以上、または長辺700px以上かつ短辺500px以上
+    if (maxDimension >= 768 || (maxDimension >= 700 && minDimension >= 500)) {
+        return 'ipad';
+    } else {
+        return 'iphone';
+    }
 }
 
 // デバイス別音量設定（実機テストで最適化）
 function getDeviceVolume() {
     const device = getDeviceType();
     const volumeSettings = {
-        pc: +6,      // +6dB: 約2倍音量（デフォルト-6dBから+12dB）
-        iphone: +16, // +16dB: 約6倍音量（iPhone音量不足対策 - 倍増）
-        ipad: +18    // +18dB: 約8倍音量（iPad音声再生問題対策）
+        pc: +8,      // +8dB: デバイス音量50%時に最適化
+        iphone: +18, // +18dB: デバイス音量50%時に最適化
+        ipad: +20    // +20dB: デバイス音量50%時に最適化（Tone.js推奨上限）
     };
-    return volumeSettings[device] || +6;
+    return volumeSettings[device] || +8;
 }
 
 // PitchShifter初期化（シングルトンパターン + グローバルインスタンス活用）
