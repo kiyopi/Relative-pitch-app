@@ -150,15 +150,15 @@ function getDeviceType() {
     return isIPhone ? 'iphone' : isIPad ? 'ipad' : 'pc';
 }
 
-// デバイス別音量設定
+// デバイス別音量設定（実機テストで最適化）
 function getDeviceVolume() {
     const device = getDeviceType();
     const volumeSettings = {
-        pc: -6,
-        iphone: -4,
-        ipad: -5
+        pc: 0,       // 0dB: 100%音量（デフォルト-6dBから+6dB）
+        iphone: 0,   // 0dB: iPhone音量不足対策
+        ipad: +2     // +2dB: iPad音量不足対策（特に小さいため）
     };
-    return volumeSettings[device] || -6;
+    return volumeSettings[device] || 0;
 }
 
 // PitchShifter初期化（シングルトンパターン + グローバルインスタンス活用）
@@ -210,6 +210,7 @@ async function initializePitchShifter() {
         const deviceType = getDeviceType();
         console.log(`📱 デバイス: ${deviceType}, 音量: ${deviceVolume}dB`);
 
+        // デバイス別最適化音量を設定
         pitchShifter = new window.PitchShifter({
             baseUrl: 'audio/piano/',
             release: 2.5,
