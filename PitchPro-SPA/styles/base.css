@@ -1448,11 +1448,9 @@ body::before {
   margin-top: 24px;
   margin-bottom: 32px;
   padding: 20px;
-  background: rgba(30, 58, 138, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(30, 58, 138, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 }
 
 .volume-control-header {
