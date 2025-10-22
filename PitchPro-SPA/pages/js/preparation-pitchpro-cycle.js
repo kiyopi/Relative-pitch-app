@@ -108,8 +108,29 @@ class PitchProCycleManager {
     async startAudioDetection(mode = 'audiotest') {
         try {
 
+            // 既に開始されている場合は、一度停止してからリスタート
+            if (this.currentPhase === 'started' || this.state.detectionActive) {
+                console.log('⚠️ 既に開始されているため、一度停止してから再開します');
+                console.log(`   現在のフェーズ: ${this.currentPhase}, 検出中: ${this.state.detectionActive}`);
+
+                try {
+                    await this.audioDetector.stopDetection();
+                    this.state.detectionActive = false;
+                    this.currentPhase = 'initialized'; // フェーズをリセット
+                    // 少し待機してリソースが解放されるのを待つ
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    console.log('✅ 停止完了、再開準備完了');
+                } catch (stopError) {
+                    console.warn('⚠️ 停止エラー（続行）:', stopError);
+                    // エラーでも続行（フェーズとフラグはリセット）
+                    this.state.detectionActive = false;
+                    this.currentPhase = 'initialized';
+                }
+            }
+
             if (this.currentPhase !== 'initialized' && this.currentPhase !== 'reset') {
-                throw new Error(`不正な状態からのスタート: ${this.currentPhase}`);
+                console.warn(`⚠️ 想定外の状態からのスタート: ${this.currentPhase} → 強制的にinitializedに変更`);
+                this.currentPhase = 'initialized';
             }
 
             // 状態初期化（タイマーは初回音声検出時に開始）
@@ -141,6 +162,7 @@ class PitchProCycleManager {
 
             // 検出開始
             await this.audioDetector.startDetection();
+            console.log('✅ 検出開始完了');
 
             this.currentPhase = 'started';
 
@@ -148,6 +170,7 @@ class PitchProCycleManager {
 
         } catch (error) {
             console.error(`❌ Phase 2: ${mode}スタート失敗:`, error);
+            this.state.detectionActive = false;
             return { success: false, error: error.message, phase: this.currentPhase };
         }
     }
@@ -975,6 +998,8 @@ if (typeof document !== 'undefined') {
  * マイク許可フローセットアップ
  * PitchProサイクル: 初期化 → スタート の流れ
  */
+let micPermissionListenerAdded = false; // イベントリスナー重複防止フラグ
+
 function setupMicPermissionFlow() {
     console.log('🔧 setupMicPermissionFlow開始');
     const requestMicBtn = document.getElementById('request-mic-btn');
@@ -987,6 +1012,12 @@ function setupMicPermissionFlow() {
             console.log('🔄 マイクボタン再検索...');
             setupMicPermissionFlow();
         }, 1000);
+        return;
+    }
+
+    // 既にイベントリスナーが追加されている場合はスキップ
+    if (micPermissionListenerAdded) {
+        console.log('✅ イベントリスナーは既に設定済み（スキップ）');
         return;
     }
 
@@ -1086,6 +1117,10 @@ function setupMicPermissionFlow() {
             alert(`マイク許可エラー: ${error.message}`);
         }
     });
+
+    // イベントリスナー追加完了フラグを立てる
+    micPermissionListenerAdded = true;
+    console.log('✅ マイク許可ボタンのイベントリスナー設定完了（重複防止フラグON）');
 
     // 再テストボタンのイベントリスナー
     const retestRangeBtn = document.getElementById('retest-range-btn');
