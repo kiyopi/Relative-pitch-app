@@ -688,6 +688,14 @@ body::before {
   outline: none !important;
 }
 
+/* iOS専用: タップハイライトを無効化 */
+#test-base-note-btn {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
 .btn i {
   width: 24px;
   height: 24px;

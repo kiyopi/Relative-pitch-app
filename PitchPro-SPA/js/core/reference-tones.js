@@ -30,7 +30,9 @@ const t = class t {
           C4: "C4.mp3"
         },
         baseUrl: this.config.baseUrl,
-        release: this.config.release
+        release: this.config.release,
+        attack: 5e-3
+        // 5ms fade-in to prevent pop noise
       }).toDestination(), this.sampler.volume.value = this.config.volume, console.log("📥 [PitchShifter] Loading audio sample..."), await l.loaded(), this.isInitialized = !0, console.log("✅ [PitchShifter] Initialization complete");
     } catch (e) {
       throw console.error("❌ [PitchShifter] Initialization failed:", e), new Error(`PitchShifter initialization failed: ${e}`);
