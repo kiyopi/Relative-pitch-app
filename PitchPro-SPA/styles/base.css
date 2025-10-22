@@ -717,7 +717,6 @@ body::before {
   transition: none;
 }
 
-.base-note-button:hover,
 .base-note-button:active,
 .base-note-button:focus,
 .base-note-button:focus-visible {
@@ -730,6 +729,34 @@ body::before {
   outline: none !important;
   opacity: 1 !important;
   filter: none !important;
+}
+
+/* iPad専用: hoverを完全無効化 */
+@media (pointer: coarse) {
+  .base-note-button:hover {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3) !important;
+    transform: none !important;
+    outline: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+}
+
+/* デスクトップ用: hoverを無効化 */
+@media (pointer: fine) {
+  .base-note-button:hover {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3) !important;
+    transform: none !important;
+    outline: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
 }
 
 .base-note-button:disabled {
