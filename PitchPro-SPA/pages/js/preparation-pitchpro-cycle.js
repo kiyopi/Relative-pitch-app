@@ -1691,6 +1691,10 @@ function setupVolumeAdjustmentControls() {
                     if (typeof lucide !== 'undefined') {
                         lucide.createIcons();
                     }
+
+                    // フォーカスを外す（Lucide再初期化でフォーカスが戻る可能性があるため）
+                    btn.blur();
+
                     console.log('✅ ボタン状態を復元しました');
                 }, 2000);
 
@@ -1713,6 +1717,9 @@ function setupVolumeAdjustmentControls() {
                 if (typeof lucide !== 'undefined') {
                     lucide.createIcons();
                 }
+
+                // フォーカスを外す
+                btn.blur();
             }
         });
         console.log('✅ 基音試聴ボタンのイベントリスナー設定完了');
