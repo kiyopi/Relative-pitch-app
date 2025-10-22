@@ -330,15 +330,24 @@ function displayDetailedAnalysis(pitchErrors) {
 function updateNextSessionButton(sessionNumber) {
     const buttons = document.querySelectorAll('.btn-next-session');
 
+    // localStorageから現在のモードのセッション数を取得
+    const allSessions = DataManager.getFromStorage('sessionData') || [];
+    const currentMode = 'random'; // 現在はランダムモードのみ実装
+    const completedSessionsInMode = allSessions.filter(s => s.mode === currentMode && s.completed).length;
+
+    console.log(`📊 モード別セッション進行: ${currentMode}モードで${completedSessionsInMode}/8セッション完了`);
+
     buttons.forEach(button => {
-        if (sessionNumber >= 8) {
+        if (completedSessionsInMode >= 8) {
             // 8セッション完了時は総合評価へ
             button.onclick = () => window.location.hash = 'results-overview';
             button.innerHTML = '<i data-lucide="trophy" style="width: 24px; height: 24px;"></i><span>総合評価を見る</span>';
+            console.log('✅ 8セッション完了 - 総合評価ボタン表示');
         } else {
             // 次のセッションへ
             button.onclick = () => window.location.hash = 'training';
             button.innerHTML = '<i data-lucide="arrow-right" style="width: 24px; height: 24px;"></i><span>次の基音へ</span>';
+            console.log(`➡️ セッション${completedSessionsInMode + 1}/8 - 次のセッションボタン表示`);
         }
     });
 

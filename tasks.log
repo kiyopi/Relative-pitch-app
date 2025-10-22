@@ -3999,3 +3999,29 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 20:07:22] コミット: fix: セッションID衝突問題を修正
+
+- SessionDataRecorder: ページリロード時もセッションIDが衝突しないよう、localStorageから最大IDを取得して初期化
+- result-session-controller.js: 重複IDがある場合は最新のセッションデータを取得するよう改善
+- 詳細ログ出力を追加してデバッグを容易化
+
+## 修正内容
+
+### SessionDataRecorder (session-data-recorder.js)
+- constructor内でlocalStorageから既存セッションの最大IDを取得
+- sessionCounterを最大ID+1から開始することで重複を防止
+- 初期化時のログ出力を追加
+
+### result-session-controller.js
+- loadSessionData関数で重複IDの処理を改善
+- filter()で該当IDのセッションをすべて取得し、最新のもの（配列の最後）を使用
+- 重複検出時の警告ログを追加
+- セッションデータ読み込み時の詳細ログを追加
+
+## 解決した問題
+- トレーニング完了後、セッション評価画面で古いセッションデータが表示される問題
+- ページリロード後にsessionCounterが0にリセットされ、同じIDが再利用される問題
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
