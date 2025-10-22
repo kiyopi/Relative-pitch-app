@@ -29,7 +29,7 @@
 ### ⚠️ **注意すべきこと（最重要）**
 1. **🚨 インライン記述禁止**: HTMLのstyle属性、JavaScriptでのインラインCSS絶対禁止（例外: Lucideアイコンサイズ、プログレスバー幅のみ）
 2. **📋 作業開始前必須チェック**: UIカタログ→base.css→類似実装の順で確認（新規CSS作成前）
-3. **🎨 UIカタログ準拠**: `/Bolt/v2/templates/ui-catalog-essentials.html`で既存コンポーネント確認必須
+3. **🎨 UIカタログ準拠**: `/UI-Catalog/ui-catalog-essentials.html`で既存コンポーネント確認必須
 4. **🚫 絵文字使用禁止**: アプリ全体でLucideアイコンを使用・絵文字は一切使用しない
 5. **🧪 テスト専用CSS分離**: すべてのテストページは`[機能名]-test.css`で管理・本番CSS混入禁止
 6. **📝 データ管理統合**: `/js/data-manager.js`活用でlocalStorage統一管理
@@ -164,6 +164,55 @@ pitchDetector.setCallbacks({
 - `RELEASE_AND_MONETIZATION_PLAN.md`: リリース計画・収益化戦略書（v1.0.0）
 - `GLOSSARY.md`: プロジェクト用語集（v1.0.0）
 - `CLAUDE.md`: 開発ガイドライン（本ファイル）
+- `README.md`: プロジェクト概要・構造ドキュメント
+
+## 📁 **プロジェクト構造（重要）**
+
+### **メインアプリケーション（本番環境）**
+```
+PitchPro-SPA/          ★ 正式なアプリケーション
+├── index.html         ← エントリーポイント（SPAルーター）
+├── styles/
+│   ├── base.css       ← 共通スタイル
+│   ├── results.css    ← 結果表示スタイル
+│   └── training.css   ← トレーニングスタイル
+├── js/
+│   ├── router.js      ← SPAルーティングシステム
+│   └── controllers/
+│       ├── preparationController.js  ← 準備画面
+│       └── trainingController.js     ← トレーニング画面
+└── pages/             ← HTMLテンプレート
+```
+
+### **UI開発リファレンス**
+```
+UI-Catalog/            ★ UI開発時の参照用カタログ
+├── ui-catalog-index.html         ← カタログトップページ
+├── ui-catalog-essentials.html    ← 必須UIコンポーネント集
+├── ui-catalog-components.html    ← 詳細コンポーネント
+├── ui-catalog-results-*.html     ← 結果表示UI
+├── ui-catalog.css                ← カタログ表示専用CSS
+└── ui-catalog.js                 ← カタログ機能スクリプト
+```
+
+### **開発時デモページ（参照用・本番非使用）**
+```
+Bolt/                  ⚠️ 開発時デモページ（使用禁止）
+└── v2/
+    └── pages/
+        └── index.html  ← 旧デモページ（編集禁止）
+```
+
+### **⚠️ 重要な注意事項**
+1. **正しいindex.html**: `/PitchPro-SPA/index.html`が本番アプリケーション
+2. **ルートindex.html**: 自動的に`PitchPro-SPA/index.html`にリダイレクト
+3. **UIカタログパス**: `/UI-Catalog/ui-catalog-essentials.html`で確認
+4. **Boltフォルダ**: 開発時デモページ、編集・使用禁止
+
+### **作業時の確認順序**
+1. **UIカタログ確認**: `/UI-Catalog/ui-catalog-essentials.html`
+2. **base.css確認**: `/PitchPro-SPA/styles/base.css`
+3. **類似実装確認**: `/PitchPro-SPA/js/controllers/`
 
 ## 🎨 **CSS・UI設計方針**
 

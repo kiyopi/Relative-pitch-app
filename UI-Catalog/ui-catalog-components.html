@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 UIカタログ コンポーネント</title>
+    
+    <!-- favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
+    
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="../PitchPro-SPA/styles/base.css">
+    <link rel="stylesheet" href="ui-catalog.css">
+    
+    <!-- フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- アイコンライブラリ -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <div class="ui-catalog min-h-screen p-6">
+        <div class="container max-w-7xl mx-auto">
+            <!-- ヘッダー -->
+            <header class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-white mb-4">UIカタログ コンポーネント</h1>
+                <p class="text-green-200 text-xl">汎用UI要素・インタラクティブコンポーネント</p>
+            </header>
+
+            <!-- カタログナビゲーション：JavaScript自動生成 -->
+            <nav id="catalog-nav" style="text-align: center; margin: 2rem 0;">
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;" id="catalog-nav-links">
+                    <!-- JavaScriptで自動生成されます -->
+                </div>
+            </nav>
+
+            <!-- メインコンテンツエリア -->
+            <main id="catalog-content">
+                
+                <!-- ページヘッダーシステム -->
+                <section id="page-headers" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">📄 ページヘッダー</h2>
+                    <p class="text-white-70 mb-6">統一されたページヘッダーレイアウトシステム</p>
+                    
+                    <h3 class="text-white font-medium mb-4">完全なヘッダー構造（旧版）</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; text-align: center; padding: 20px 0 40px;">
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                                    <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
+                                        <div style="width: 6rem; height: 6rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                                            <i data-lucide="file-chart-column-increasing" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;" ></i>
+                                        </div>
+                                    </div>
+                                    <h1 style="font-size: 2.5rem; font-weight: 700; color: white; margin-bottom: 16px;">総合評価</h1>
+                                    <p style="font-size: 1.25rem; color: #86efac; margin-bottom: 12px;">8セッション (64音) の総合評価</p>
+                                    <p style="font-size: 1rem; color: #93c5fd;">ランダム基音モードの結果</p>
+                                </div>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;div class="page-header"&gt;
+    &lt;div class="page-header-content"&gt;
+        &lt;div class="page-header-icon-wrapper"&gt;
+            &lt;div class="page-header-icon gradient-catalog-purple"&gt;
+                &lt;i data-lucide="file-chart-column-increasing" 
+                   class="text-white" 
+                   data-stroke-width="2" 
+                   style="width: 48px; height: 48px;"&gt;&lt;/i&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;h1 class="page-title"&gt;総合評価&lt;/h1&gt;
+        &lt;p class="page-subtitle text-green-200"&gt;8セッション (64音) の総合評価&lt;/p&gt;
+        &lt;p class="page-description text-blue-200"&gt;ランダム基音モードの結果&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-white font-medium mb-4">新ヘッダー構造（横並び・コンパクト）</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <div class="page-header" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;">
+                                <div class="page-header-content">
+                                    <div class="page-header-icon-wrapper">
+                                        <div class="page-header-icon gradient-catalog-green">
+                                            <i data-lucide="target" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;"></i>
+                                        </div>
+                                    </div>
+                                    <div class="page-header-text">
+                                        <h1 class="page-title">ランダム基音モード</h1>
+                                        <p class="page-subtitle text-green-200">トレーニング実施中</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;div class="page-header"&gt;
+    &lt;div class="page-header-content"&gt;
+        &lt;div class="page-header-icon-wrapper"&gt;
+            &lt;div class="page-header-icon gradient-catalog-green"&gt;
+                &lt;i data-lucide="target" 
+                   class="text-white" 
+                   data-stroke-width="2" 
+                   style="width: 36px; height: 36px;"&gt;&lt;/i&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="page-header-text"&gt;
+            &lt;h1 class="page-title"&gt;ランダム基音モード&lt;/h1&gt;
+            &lt;p class="page-subtitle text-green-200"&gt;トレーニング実施中&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-white font-medium mb-4">使用ガイドライン</h3>
+                    <div class="component-item">
+                        <div class="bg-white/5 rounded-lg p-4">
+                            <h4 class="text-white font-medium mb-2">新ヘッダー構造（推奨）</h4>
+                            <ul class="text-white-70 text-sm space-y-2 mb-4">
+                                <li>• <code class="text-blue-300">page-header</code>: 横並びレイアウト（flex, align-items: center, gap: 1.25rem）</li>
+                                <li>• <code class="text-blue-300">page-header-content</code>: アイコンとテキストの配置（flex, gap: 1rem）</li>
+                                <li>• <code class="text-blue-300">page-header-text</code>: タイトルとサブタイトルグループ（flex column, gap: 0.125rem）</li>
+                                <li>• <code class="text-blue-300">page-header-icon</code>: 4rem × 4rem、内部アイコン36px</li>
+                                <li>• <code class="text-blue-300">page-title</code>: 2.25rem（text-main-titleと同じ）</li>
+                                <li>• <code class="text-blue-300">page-subtitle</code>: 1.125rem、text-green-200クラス必須</li>
+                            </ul>
+                            <h4 class="text-white font-medium mb-2">旧構造（参考）</h4>
+                            <ul class="text-white-70 text-sm space-y-2">
+                                <li>• <code class="text-blue-300">page-header</code>: 縦並びレイアウト（text-align: center, padding: 40px 0）</li>
+                                <li>• <code class="text-blue-300">page-header-icon</code>: 6rem × 6rem、内部アイコン48px</li>
+                                <li>• <code class="text-blue-300">page-title</code>: メインタイトル（margin-top: 0がデフォルト）</li>
+                                <li>• <code class="text-blue-300">page-subtitle</code>: サブタイトル + 色クラス組み合わせ可能（margin-top: 0がデフォルト）</li>
+                                <li>• <code class="text-blue-300">page-description</code>: 説明文 + 色クラス組み合わせ可能</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+                <!-- ページヘッダーアイコン -->
+                <section id="page-header-icons" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">🎯 ページヘッダーアイコン</h2>
+                    <p class="text-white-70 mb-6">各ページトップの統一されたヘッダーアイコン（64px × 64px、内部アイコン36px）</p>
+                    
+                    <div class="component-grid grid-cols-2 md:grid-cols-4" style="justify-items: center;">
+                        <div class="component-item text-center">
+                            <div class="page-header-icon gradient-catalog-purple">
+                                <i data-lucide="file-chart-column-increasing" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;" ></i>
+                            </div>
+                            <h3 class="text-white font-medium">紫グラデーション</h3>
+                            <p class="text-white-60 text-sm">総合評価ページ</p>
+                        </div>
+                        
+                        <div class="component-item text-center">
+                            <div class="page-header-icon gradient-catalog-blue">
+                                <i data-lucide="mic" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;" ></i>
+                            </div>
+                            <h3 class="text-white font-medium">青グラデーション</h3>
+                            <p class="text-white-60 text-sm">マイクテストページ</p>
+                        </div>
+                        
+                        <div class="component-item text-center">
+                            <div class="page-header-icon gradient-catalog-green">
+                                <i data-lucide="target" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;" ></i>
+                            </div>
+                            <h3 class="text-white font-medium">緑グラデーション</h3>
+                            <p class="text-white-60 text-sm">トレーニングページ</p>
+                        </div>
+                        
+                        <div class="component-item text-center">
+                            <div class="page-header-icon gradient-catalog-orange">
+                                <i data-lucide="activity" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;" ></i>
+                            </div>
+                            <h3 class="text-white font-medium">オレンジグラデーション</h3>
+                            <p class="text-white-60 text-sm">記録ページ</p>
+                        </div>
+                    </div>
+                    
+                    <div class="code-sample">
+&lt;div class="page-header-icon gradient-catalog-purple"&gt;
+  &lt;i data-lucide="file-chart-column-increasing" 
+     class="text-white" 
+     data-stroke-width="2" 
+     &gt;&lt;/i&gt;
+&lt;/div&gt;</div>
+                    
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+                <!-- カードコンポーネント -->
+                <section id="cards" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">💳 カードコンポーネント</h2>
+                    <p class="text-white-70 mb-6">Glass morphismを活用したカードシステム</p>
+                    <p class="text-green-300 text-sm mb-4">💡 全てのカードサイズでデフォルト下マージン（var(--space-6)）が設定済み</p>
+                    
+                    <h3 class="text-white font-medium mb-4">基本カード</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <div class="glass-card mb-4">
+                                <h4 class="text-white font-medium mb-2">ガラスカード</h4>
+                                <p class="text-white-70 text-sm">背景にぼかし効果と透明度を適用したカード</p>
+                                <p class="text-yellow-300 text-xs mt-2">⚠️ デモ用にmb-4を追加（実際はデフォルトマージンのみ使用）</p>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;!-- 基本ガラスカード（デフォルトで下マージン var(--space-6) 設定済み） --&gt;
+&lt;div class="glass-card"&gt;
+    &lt;h4 class="text-white font-medium"&gt;ガラスカード&lt;/h4&gt;
+    &lt;p class="text-white-70"&gt;コンテンツ&lt;/p&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </div>
+                        
+                    <h3 class="text-white font-medium mb-4">サイズバリエーション</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <div class="space-y-3">
+                                <div class="glass-card-sm">
+                                    <p class="text-white text-sm">Small カード</p>
+                                </div>
+                                <div class="glass-card">
+                                    <p class="text-white text-sm">通常カード</p>
+                                </div>
+                                <div class="glass-card-lg">
+                                    <p class="text-white text-sm">Large カード</p>
+                                </div>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;!-- 全サイズ統一マージン: var(--space-6) --&gt;
+&lt;div class="glass-card-sm"&gt;Small&lt;/div&gt;
+&lt;div class="glass-card"&gt;通常&lt;/div&gt;
+&lt;div class="glass-card-lg"&gt;Large&lt;/div&gt;
+
+&lt;!-- 注意: mb-* クラスの追加は不要（デフォルトマージン適用済み） --&gt;</div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+                <!-- プログレスバー -->
+                <section id="progress" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">📊 プログレスバー</h2>
+                    <p class="text-white-70 mb-6">進行状況表示用プログレスバー</p>
+                    
+                    <h3 class="text-white font-medium mb-4">基本プログレスバー</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <div>
+                                <p class="text-white-70 text-sm mb-2">60%完了</p>
+                                <div class="progress-bar">
+                                    <div class="progress-fill gradient-catalog-green" style="width: 60%;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;!-- 基本プログレスバー（緑グラデーション） --&gt;
+&lt;div class="progress-bar"&gt;
+    &lt;div class="progress-fill gradient-catalog-green" style="width: [動的値]%;"&gt;&lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </div>
+                        
+                    <h3 class="text-white font-medium mb-4">トレーニング用進行バーセクション</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <div class="progress-section progress-section-training">
+                                <div class="flex items-center gap-4">
+                                    <div class="progress-bar with-margin">
+                                        <div class="progress-fill gradient-catalog-blue" style="width: 25%;"></div>
+                                    </div>
+                                    <div class="session-badge">
+                                        セッション 1/8
+                                    </div>
+                                    <button class="btn btn-primary">
+                                        <i data-lucide="arrow-right" class="icon-sm"></i>
+                                        <span>次の基音へ</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;!-- トレーニング用進行バーセクション --&gt;
+&lt;div class="progress-section progress-section-training"&gt;
+    &lt;div class="flex items-center gap-4"&gt;
+        &lt;div class="progress-bar with-margin"&gt;
+            &lt;div class="progress-fill gradient-catalog-blue" style="width: [動的値]%;"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="session-badge"&gt;
+            セッション [現在]/[総数]
+        &lt;/div&gt;
+        &lt;button class="btn btn-primary"&gt;
+            &lt;i data-lucide="arrow-right" class="icon-sm"&gt;&lt;/i&gt;
+            &lt;span&gt;次の基音へ&lt;/span&gt;
+        &lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </div>
+
+                    
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+                <!-- フッターコンポーネント -->
+                <section id="footer" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">📄 フッターコンポーネント</h2>
+                    <p class="text-white-70 mb-6">統一されたページフッターシステム - ページタイプに応じた幅制御</p>
+                    
+                    <h3 class="text-white font-medium mb-4">フッター幅バリエーション</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <!-- ページ全幅フッター -->
+                            <div class="mb-6">
+                                <h4 class="text-white font-medium mb-2">ページ全幅フッター</h4>
+                                <p class="text-white-60 text-sm mb-3">メインページ・結果ページ用（情報量多）</p>
+                                <footer class="footer-base">
+                                    <p class="footer-copyright">© 2024 8va相対音感トレーニングアプリ</p>
+                                    <p class="footer-tagline">音楽の新しい扉を開こう</p>
+                                </footer>
+                            </div>
+                            
+                            <!-- 700px制限フッター（シミュレーション） -->
+                            <div class="mb-6">
+                                <h4 class="text-white font-medium mb-2">700px制限フッター</h4>
+                                <p class="text-white-60 text-sm mb-3">トレーニングページ用（シンプル構成）</p>
+                                <footer class="footer-base" style="max-width: 700px; margin: 0 auto;">
+                                    <p class="footer-copyright">© 2024 8va相対音感トレーニングアプリ</p>
+                                    <p class="footer-tagline">音楽の新しい扉を開こう</p>
+                                </footer>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;!-- ページ全幅フッター（index.html, results-overview.html用） --&gt;
+&lt;footer class="footer-base"&gt;
+    &lt;p class="footer-copyright"&gt;© 2024 8va相対音感トレーニングアプリ&lt;/p&gt;
+    &lt;p class="footer-tagline"&gt;音楽の新しい扉を開こう&lt;/p&gt;
+&lt;/footer&gt;
+
+&lt;!-- 700px制限フッター（training.html, preparation.html用） --&gt;
+&lt;!-- training.css読み込み時に自動的に700px制限が適用されます --&gt;
+&lt;footer class="footer-base"&gt;
+    &lt;p class="footer-copyright"&gt;© 2024 8va相対音感トレーニングアプリ&lt;/p&gt;
+    &lt;p class="footer-tagline"&gt;音楽の新しい扉を開こう&lt;/p&gt;
+&lt;/footer&gt;</div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-white font-medium mb-4">使用ガイドライン</h3>
+                    <div class="component-item">
+                        <div class="bg-white/5 rounded-lg p-4">
+                            <h4 class="text-white font-medium mb-2">フッター幅制御</h4>
+                            <ul class="text-white-70 text-sm space-y-2 mb-4">
+                                <li>• <code class="text-blue-300">ページ全幅</code>: index.html, results-overview.html（情報量多）</li>
+                                <li>• <code class="text-blue-300">700px制限</code>: training.html, preparation.html（シンプル構成）</li>
+                                <li>• <code class="text-blue-300">自動制御</code>: training.css読み込み時に700px制限が自動適用</li>
+                                <li>• <code class="text-blue-300">統一デザイン</code>: 共通の.footer-baseクラスで基本スタイル管理</li>
+                            </ul>
+                            <h4 class="text-white font-medium mb-2">実装方針</h4>
+                            <ul class="text-white-70 text-sm space-y-2">
+                                <li>• base.css: 基本フッタースタイル（幅制限なし）</li>
+                                <li>• training.css: 700px制限を追加（該当ページ用）</li>
+                                <li>• ページの情報密度に応じた適切な幅制御</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+                <!-- メインコンテンツ幅システム -->
+                <section id="main-content-width" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">📐 メインコンテンツ幅システム</h2>
+                    <p class="text-white-70 mb-6">ページタイプに応じた最適なコンテンツ幅制御</p>
+                    
+                    <h3 class="text-white font-medium mb-4">幅制御パターン</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <!-- ページ幅最大パターン -->
+                            <div class="mb-6">
+                                <h4 class="text-white font-medium mb-2">ページ幅最大（.wide-main）</h4>
+                                <p class="text-white-60 text-sm mb-3">ホーム・総合評価用（情報量多・PC最適）</p>
+                                <div class="bg-white/5 rounded-lg p-4">
+                                    <div style="max-width: 1200px; margin: 0 auto; background: rgba(0,255,0,0.1); padding: 12px; text-align: center; border-radius: 6px;">
+                                        <span class="text-green-300 text-sm">最大1200px幅 + パディング</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 700px制限パターン -->
+                            <div class="mb-6">
+                                <h4 class="text-white font-medium mb-2">700px制限（.narrow-main）</h4>
+                                <p class="text-white-60 text-sm mb-3">トレーニング・準備用（シンプル構成・モバイル最適）</p>
+                                <div class="bg-white/5 rounded-lg p-4">
+                                    <div style="max-width: 700px; margin: 0 auto; background: rgba(0,255,255,0.1); padding: 12px; text-align: center; border-radius: 6px;">
+                                        <span class="text-cyan-300 text-sm">700px固定幅</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;!-- ページ幅最大パターン（index.html, results-overview.html） --&gt;
+&lt;main class="wide-main"&gt;
+    &lt;div class="container"&gt;
+        &lt;!-- コンテンツ --&gt;
+    &lt;/div&gt;
+&lt;/main&gt;
+
+&lt;!-- 700px制限パターン（training.html, preparation.html） --&gt;
+&lt;main class="narrow-main"&gt;
+    &lt;!-- コンテンツ --&gt;
+&lt;/main&gt;</div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-white font-medium mb-4">使用ガイドライン</h3>
+                    <div class="component-item">
+                        <div class="bg-white/5 rounded-lg p-4">
+                            <h4 class="text-white font-medium mb-2">適用基準</h4>
+                            <ul class="text-white-70 text-sm space-y-2 mb-4">
+                                <li>• <code class="text-blue-300">ページ幅最大</code>: 情報密度が高い、複数セクション、PCでの閲覧重視</li>
+                                <li>• <code class="text-blue-300">700px制限</code>: シンプル構成、単一フォーカス、モバイル最適化</li>
+                                <li>• <code class="text-blue-300">統一管理</code>: base.cssで一元管理、個別CSSでの重複禁止</li>
+                                <li>• <code class="text-blue-300">レスポンシブ</code>: モバイルでは自動的に画面幅に調整</li>
+                            </ul>
+                            <h4 class="text-white font-medium mb-2">実装方針</h4>
+                            <ul class="text-white-70 text-sm space-y-2">
+                                <li>• base.css: 統一クラス定義（.wide-main, .narrow-main）</li>
+                                <li>• 個別CSS: 幅制御スタイル削除（重複回避）</li>
+                                <li>• 新規ページ: 内容に応じて適切なクラス選択</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+            </main>
+
+            <!-- フッター -->
+            <footer class="catalog-section">
+                <div class="text-center">
+                    <p class="text-white-60 text-sm">© 2024 8va相対音感トレーニングアプリ v2</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="ui-catalog.js"></script>
+</body>
+</html>

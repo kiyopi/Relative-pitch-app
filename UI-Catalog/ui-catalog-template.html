@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 {{CATALOG_TITLE}}</title>
+    
+    <!-- favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
+    
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="../PitchPro-SPA/styles/base.css">
+    <link rel="stylesheet" href="ui-catalog.css">
+    
+    <!-- フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- アイコンライブラリ -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <div class="ui-catalog min-h-screen p-6">
+        <div class="container max-w-7xl mx-auto">
+            <!-- ヘッダー -->
+            <header class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-white mb-4">{{CATALOG_TITLE}}</h1>
+                <p class="text-purple-200 text-xl">{{CATALOG_DESCRIPTION}}</p>
+            </header>
+
+            <!-- カタログナビゲーション：JavaScript自動生成 -->
+            <nav id="catalog-nav" style="text-align: center; margin: 2rem 0;">
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;" id="catalog-nav-links">
+                    <!-- JavaScriptで自動生成されます -->
+                </div>
+            </nav>
+
+            <!-- メインコンテンツエリア（各カタログで置換） -->
+            <main id="catalog-content">
+                {{CATALOG_CONTENT}}
+            </main>
+
+            <!-- 🔧 component-itemテンプレートパーツ（開発時参照用） -->
+            <!-- 
+                📝 使用方法:
+                1. セクション全体をコピー
+                2. {{変数名}}を実際の値に置換
+                3. 見出し(h3)はcomponent-itemの「外」に配置
+                4. デモコンテンツはcomponent-itemの「中」に配置
+                
+                🚨 重要: 見出しをcomponent-item内に入れない（構造が分かりにくくなる）
+            -->
+            <template id="component-item-template">
+                <!-- ✅ 正しい構造: 見出しをcomponent-itemの外に配置 -->
+                <section id="{{SECTION_ID}}" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">{{SECTION_TITLE}}</h2>
+                    <p class="text-white-70 mb-6">{{SECTION_DESCRIPTION}}</p>
+                    
+                    <!-- 個別コンポーネント -->
+                    <h3 class="text-white font-medium mb-4">{{COMPONENT_NAME}}</h3>
+                    
+                    <div class="component-item">
+                        <!-- ここにコンポーネントデモを配置 -->
+                        {{COMPONENT_DEMO}}
+                        
+                        <!-- コードサンプル（必要に応じて） -->
+                        <div class="code-sample">
+{{COMPONENT_CODE}}
+                        </div>
+                    </div>
+                    
+                    <!-- 複数のコンポーネントバリエーション -->
+                    <h3 class="text-white font-medium mb-4">{{VARIANT_NAME}}</h3>
+                    
+                    <div class="component-item">
+                        {{VARIANT_DEMO}}
+                    </div>
+                    
+                    <!-- ページトップに戻るボタン -->
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+                
+                <!-- ❌ 間違った構造（使用禁止） -->
+                <div class="component-item-wrong-example" style="display: none;">
+                    <div class="component-item">
+                        <h3 class="text-white font-medium mb-4">間違い：見出しがcomponent-item内にある</h3>
+                        <!-- この構造は使用禁止 -->
+                    </div>
+                </div>
+            </template>
+
+            <!-- フッター -->
+            <footer class="catalog-section">
+                <div class="text-center">
+                    <p class="text-white-60 text-sm">© 2024 8va相対音感トレーニングアプリ v2</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="ui-catalog.js"></script>
+</body>
+</html>

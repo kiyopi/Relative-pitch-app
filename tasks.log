@@ -2980,3 +2980,1022 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-20 18:28:09] コミット: fix: frequencyToNoteName未定義エラー修正 + 音域テスト仕様書整理
+
+## 🐛 バグ修正
+- **v3.1.26エラー修正**: findStableHighestFrequency関数でnoteプロパティも返すように修正
+- frequencyToNoteName関数（存在しない）の呼び出しをstableHighest.noteに変更
+- 平均周波数に最も近いデータのnoteを使用するロジック追加
+
+## 📁 仕様書整理
+- **専用フォルダ作成**: specifications/voice-range-test/
+- **3つの仕様書を統合管理**:
+  - VOICE_RANGE_TEST_SPECIFICATION_V3.md (v3.1.26)
+  - RANGE_TEST_BEHAVIOR_SPECIFICATION.md
+  - VOICE_RANGE_TEST_FLOW_DIAGRAM.md (v2.0.0)
+- **README.md追加**: 使い方ガイド・ファイル構成説明
+- **旧v2.1.0仕様書削除**: specifications/VOICE_RANGE_TEST_SPECIFICATION.md
+
+## 📝 仕様書更新
+- v3.1.26: 安定最高音自動判定機能の詳細仕様
+- v3.1.25: エラーメッセージ視認性向上の詳細仕様
+- iPad低周波数制約（78-80Hz）の文書化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-21 17:21:48] コミット: docs: 音域テスト仕様書にSPA統合ドキュメント追加（v3.1.28）
+
+- README.md: SPA統合仕様セクション追加（71行）
+- RANGE_TEST_BEHAVIOR_SPECIFICATION.md: SPA統合時の動作フロー追加（395行）
+- VOICE_RANGE_TEST_SPECIFICATION_V3.md: v3.1.28バージョン追加
+
+主要な追加内容:
+- スタンドアロン版とSPA版のアーキテクチャ比較
+- AudioDetector永続化の実装パターン
+- ページ遷移のハッシュルーティング対応
+- UI状態同期の完全性（測定完了・失敗時）
+- 測定失敗時リトライ機能の修正詳細
+- アイコンパス解決（SPA環境対応）
+- データクリーンアップの完全性検証
+- SPA統合のベストプラクティス
+- スタンドアロン版への移植手順（4ステップ）
+
+次回音域テストのみのアプリケーション作成時の完全リファレンス
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-21 17:23:34] コミット: feat: 音域テストSPA統合完了 - 最小変更で3,000+行の正規版ロジック活用
+
+主要変更:
+- voice-range-test.js: アイコンパス修正（2箇所）、UI状態同期修正（6箇所）、リトライ機能修正（2箇所）
+- preparation-pitchpro-cycle.js: ハッシュルーティング対応（3箇所）、グローバル関数化（1箇所）
+- templates/preparation.html: Button ID統一修正（2箇所）
+- preparationController.js: 新規追加（34行の軽量ラッパー）
+
+実装内容:
+1. AudioDetector永続化（window.globalAudioDetector）
+   - ページ間でマイク許可を維持
+   - 準備ページ→トレーニングページでインスタンス共有
+
+2. ページ遷移のハッシュルーティング化
+   - window.location.href → window.location.hash
+   - ページリロードなしの高速画面遷移
+
+3. UI状態同期の完全性
+   - stopDetection() → resetVolumeDisplay() → updateMicStatus()
+   - 測定完了時の適切な順序制御
+   - 1500ms遅延でチェックマーク視認性確保
+
+4. 測定失敗時リトライ機能修正
+   - startDetection()再起動処理追加
+   - updateMicStatus('recording')で状態復帰
+   - silentFrameCount/hasContinuityFailureの完全リセット
+
+5. アイコンパス解決（SPA環境対応）
+   - ./icons/ → pages/icons/（2箇所）
+   - 相対パス問題の完全解決
+
+設計原則:
+- ✅ 最小変更の原則（preparation-pitchpro-cycle.jsは3箇所のみ）
+- ✅ 後方互換性維持（スタンドアロン版は完全動作）
+- ✅ 共通コード活用（voice-range-test.jsは両版で共通）
+- ✅ リファレンス実装保持（/pages/preparation-step1.html）
+
+動作検証:
+- ✅ マイク許可フロー正常動作
+- ✅ 音声テスト完了→音域テスト遷移
+- ✅ 音域テスト完了→トレーニングページ遷移（マイク許可維持）
+- ✅ 測定失敗時のリトライ動作確認
+- ✅ チェックマーク表示とプログレスバーリセット確認
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-21 17:25:22] コミット: feat: index.htmlに音域テスト正規版スクリプト追加（SPA統合対応）
+
+変更内容:
+- voice-range.css スタイルシート追加
+- voice-range-test.js 正規版ロジック追加（2,500+行）
+- preparation-pitchpro-cycle.js 正規版フロー追加（1,443行）
+
+目的:
+- SPA環境で音域テスト正規版（3,000+行）を使用可能に
+- preparationController.js（34行）が正規版初期化関数を呼び出し
+- マイク許可の永続化（window.globalAudioDetector）を実現
+
+読み込み順序:
+1. PitchPro Core (pitchpro-v1.3.1.umd.js)
+2. 音域テストロジック (voice-range-test.js)
+3. 準備フローロジック (preparation-pitchpro-cycle.js)
+4. SPAコントローラー (preparationController.js) - router.jsから呼び出し
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-21 17:27:06] コミット: chore: スタンドアロン版にバージョンクエリパラメータ追加（キャッシュバスティング）
+
+変更内容:
+- voice-range-test.js?v=3.1.27 追加
+- preparation-pitchpro-cycle.js?v=1.1.3 追加
+
+目的:
+- ブラウザキャッシュの強制更新
+- 開発・テスト時の最新版確実読み込み
+- バージョン管理の明確化
+
+影響範囲:
+- スタンドアロン版のみ（SPA版には影響なし）
+- ロジック変更なし（キャッシュ制御のみ）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-21 17:30:04] コミット: feat: トレーニングモード管理システムと音域データ統合実装
+
+主要機能（trainingController.js）:
+1. 3つのトレーニングモード実装
+   - ランダム基音モード（8セッション、C3オクターブ範囲）
+   - 連続チャレンジモード（8セッション、クロマチック12音）
+   - 12音階モード（12セッション、順次使用）
+
+2. 音域データ統合
+   - localStorageから音域データ読み込み
+   - getAvailableNotes(): 音域範囲内の利用可能音符フィルタリング
+   - 基音+1オクターブが音域内に収まる範囲のみ使用
+
+3. モード別基音選択ロジック
+   - selectBaseNote(): 選択タイプ別の基音決定
+   - random_c3_octave: 音域内C3オクターブからランダム
+   - random_chromatic: 音域内クロマチックからランダム
+   - sequential_chromatic: セッション番号に基づく順次選択
+
+4. モード別UI更新
+   - ページタイトル動的更新（モード名表示）
+   - セッション進行状況の詳細表示
+   - モード設定に基づくセッション数管理
+
+主要改善（router.js）:
+1. 現在ページ追跡機能
+   - this.currentPage プロパティでページ状態管理
+   - ページ遷移時のクリーンアップ条件分岐
+
+2. DOM更新待機処理
+   - requestAnimationFrame二重フレーム待機
+   - DOMレンダリング完了の確実な保証
+
+3. ヘッダー表示制御
+   - ホームページのみヘッダー表示
+   - 準備・トレーニングページでは非表示
+
+4. クリーンアップ最適化
+   - preparationページのみ条件付きクリーンアップ
+   - 不要なリソース解放を防止
+
+統合効果:
+- ✅ 音域測定データの実用化（測定→トレーニング活用）
+- ✅ APP_SPECIFICATION準拠の3モード実装
+- ✅ ユーザー音域に最適化された基音選択
+- ✅ モード別UI・ロジックの完全分離
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-21 17:52:12] コミット: fix: iPad/iOS基音再生時のAudioContext resume追加
+
+問題:
+- iPadで基音スタートボタン押下時に音が鳴らない
+- 2回目以降のセッションで特に発生
+- 原因: iOS/iPadOSではユーザーインタラクション毎にAudioContext.resume()が必須
+
+修正内容:
+- startTraining()関数内、playNote()呼び出し前にAudioContext状態チェック
+- state !== 'running'の場合、Tone.context.resume()を明示的に実行
+- 詳細なログ出力（state確認、resume前後）
+
+実装コード:
+```javascript
+// iOS/iPadOS対応: AudioContextを明示的にresume
+if (typeof Tone !== 'undefined' && Tone.context) {
+    if (Tone.context.state !== 'running') {
+        console.log('🔊 AudioContext再開中... (state:', Tone.context.state + ')');
+        await Tone.context.resume();
+        console.log('✅ AudioContext再開完了 (state:', Tone.context.state + ')');
+    }
+}
+```
+
+動作:
+- ✅ 初回クリック: 音が鳴る（初期化時のTone.start()で既にrunning）
+- ✅ 2回目以降: AudioContextをresumeしてから再生（iOS制約対応）
+- ✅ PC: state === 'running'のためスキップ（パフォーマンス影響なし）
+
+検証:
+- iPad/iPhoneで2回目以降のセッションでも音が正常に再生される
+- コンソールでAudioContext状態遷移を確認可能
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-21 18:18:24] コミット: feat: デバイス別音量設定を追加（iPhone/iPad音量不足対策）
+
+問題:
+- iPhone/iPadで基音が小さい（デバイス音量50%で聞こえにくい）
+- PitchShifterのデフォルト音量（-6dB）がすべてのデバイスで同じ
+- PitchShifter側にデバイス別最適化が未実装
+
+解決策:
+- trainingController.jsにデバイス別音量設定を実装
+- 実機テストで最適化する前提の初期値を設定
+
+実装内容:
+```javascript
+function getDeviceVolume() {
+    const device = getDeviceType();
+    const volumeSettings = {
+        pc: 0,       // 0dB: 100%音量（デフォルト-6dBから+6dB）
+        iphone: 0,   // 0dB: iPhone音量不足対策
+        ipad: +2     // +2dB: iPad音量不足対策（特に小さいため）
+    };
+    return volumeSettings[device] || 0;
+}
+```
+
+音量変化:
+- PC: -6dB → 0dB (+6dB = 約2倍)
+- iPhone: -4dB → 0dB (+4dB = 約1.6倍)
+- iPad: -5dB → +2dB (+7dB = 約2.2倍)
+
+次のステップ:
+- 実機で音量確認
+- 必要に応じて値を調整（ipad: +4, iphone: +2など）
+
+注記:
+- PitchShifter側の実装は将来的な課題として保留
+- 当面はアプリ側で音量制御
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-21 18:26:06] コミット: fix: デバイス別音量を大幅に増加（実機確認で音量不足）
+
+問題:
+- 前回の設定（PC: 0dB, iPhone: 0dB, iPad: +2dB）で音量が全然足りない
+- デバイス音量50%で聞こえにくい状態が継続
+
+修正内容:
+```javascript
+const volumeSettings = {
+    pc: +6,      // +6dB: 約2倍音量（従来-6dBから+12dB増）
+    iphone: +8,  // +8dB: 約2.5倍音量（従来-4dBから+12dB増）
+    ipad: +10    // +10dB: 約3倍音量（従来-5dBから+15dB増）
+};
+```
+
+音量変化:
+- PC: -6dB → +6dB (+12dB = 約4倍)
+- iPhone: -4dB → +8dB (+12dB = 約4倍)
+- iPad: -5dB → +10dB (+15dB = 約5.6倍)
+
+次のステップ:
+- GitHub Pagesで実機確認
+- 必要に応じてさらに調整（+12dB, +15dBなど）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-21 18:41:21] コミット: fix: iPad音声再生問題 + iPhone音量倍増対応
+
+- iPad音が鳴らない問題を修正
+  - PitchShifter初期化後にAudioContext.resume()を追加
+  - playNote()直前にTone.start()を明示的に呼び出し
+  - AudioContext起動後に100ms安定化待機を追加
+- デバイス別音量を大幅に増加
+  - iPhone: +8dB → +16dB (約6倍音量、倍増対応)
+  - iPad: +10dB → +18dB (約8倍音量、再生問題対策)
+  - PC: +6dB (変更なし)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-21 18:47:50] コミット: fix: ホームページ経由時のiPad音量不足問題を解決
+
+- router.jsの古い音量設定を最新値に更新
+  - PC: -6dB → +6dB
+  - iPhone: -4dB → +16dB
+  - iPad: -5dB → +18dB
+- trainingController.jsでグローバルインスタンス使用時にsetVolume()を呼び出し
+  - ホームページから遷移した場合も正しい音量が適用される
+  - リロードしなくても常に最新の音量設定が使用される
+
+問題の原因:
+- ホームページでPitchShifter初期化時に古い音量設定を使用
+- トレーニングページでグローバルインスタンス再利用時に音量を更新していなかった
+- そのため「リロードすると音が大きくなる」現象が発生
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-21 19:30:53] コミット: feat: PitchPro準拠のデバイス判定 + 音量最適化（デバイス音量50%基準）
+
+デバイス判定の改善:
+- PitchPro実装に準拠した包括的なデバイス判定を実装
+- 複数の判定方法を組み合わせ（userAgent, platform, タッチサポート）
+- スクリーンサイズによる判定を追加（iPadOS 13+完全対応）
+- iPad判定: 長辺768px以上、または長辺700px+短辺500px以上
+
+音量設定の最適化:
+- デバイス音量50%時により聞きやすくするため全デバイス+2dB増加
+- PC: +6dB → +8dB
+- iPhone: +16dB → +18dB
+- iPad: +18dB → +20dB（Tone.js推奨上限）
+
+実機テスト結果:
+- デバイス音量50%: 少し小さい → ちょうど良い
+- デバイス音量100%: 少しうるさい程度 → 許容範囲
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-21 19:41:39] コミット: docs: PitchShifter仕様書をv2.0に更新
+
+仕様書更新内容:
+- バージョンv1.0.0 → v2.0.0（2025-10-21）
+- PitchPro準拠のデバイス判定実装を詳細記載
+- 音量設定v2.0（デバイス音量50%基準）を反映
+- 動的音量更新機能（setVolume()）の追加
+- iOS 17対応のベストプラクティスを追記
+
+主要な追加セクション:
+- デバイス検出ロジックv2.0（PitchPro準拠）
+- 音量設定v2.0（デバイス音量50%基準）
+- iOS 17対応のベストプラクティス
+- 動的音量更新（v2.0新機能）
+- v2.0テスト項目（8項目）
+- 変更履歴セクション
+
+更新されたコード例:
+- router.js: initializePitchShifterBackground() v2.0
+- trainingController.js: initializePitchShifter() v2.0
+- デバイス判定関数: getDeviceType() + detectIOSDeviceTypeByScreen()
+
+音量設定変更履歴テーブル追加:
+- v1.0: PC -6dB, iPhone -4dB, iPad -5dB
+- v1.5: PC +6dB, iPhone +16dB, iPad +18dB
+- v2.0: PC +8dB, iPhone +18dB, iPad +20dB
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-21 20:21:32] コミット: feat: 音量調整機能実装完了 - 基音試聴・音量スライダー追加
+
+- preparation.htmlに音量調整セクション追加（音声テスト完了後表示）
+- base.cssに音量スライダーのカスタムスタイル追加（UIカタログ準拠）
+- preparation-pitchpro-cycle.jsに基音試聴・音量調整機能実装
+- デバイス音量50%推奨のinfo-alert追加
+- Glass morphismデザインの音量スライダー実装（青系グラデーション）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-21 20:28:08] コミット: fix: 音量調整セクションの表示制御修正
+
+- 音域データありの場合: 音量調整セクションを非表示（音域設定済み表示のみ）
+- 音域データなしの場合: 音量調整セクションを表示
+- レイアウト乱れの修正完了
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-21 20:29:55] コミット: fix: 音域データありの場合も音量調整セクションを表示
+
+- 音域データの有無に関わらず音量調整は常に必要
+- 音域データあり: 音量調整 + 音域設定済み表示 + トレーニング開始ボタン
+- 音域データなし: 音量調整 + 音域テスト開始ボタン
+- デバイス変更時やユーザーの音量調整ニーズに対応
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-21 20:46:26] コミット: fix: 1.5秒インターバル後のLucideアイコン再初期化を追加
+
+- 音声テスト完了後の1.5秒インターバルを考慮
+- setTimeout内でLucideアイコンを再初期化して確実に表示
+- 音域データあり・なし両方のケースで対応
+- 基音試聴ボタンのアイコンが正しく表示されるように修正
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-21 20:55:33] コミット: fix: HTMLテンプレート読み込みにキャッシュバスター追加
+
+- fetch時にタイムスタンプパラメータを追加してキャッシュ回避
+- ブラウザが古いHTMLをキャッシュする問題を解決
+- 基音試聴ボタンが正しく表示されるように修正
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-21 22:38:07] コミット: debug: test-base-note-btnの内容変化を追跡するデバッグコード追加
+
+- fetch後のHTML内容を確認
+- DOM挿入直後の状態を確認
+- Lucide初期化後の状態を確認
+- ボタンが--になる原因を特定するため
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 01:26:38] コミット: feat: 音量調整UI改善 + 段階的表示遷移 + PitchShifter統合強化
+
+主要な変更:
+- ボリュームコントローラーUI実装（-/+表示、デフォルト50%中央、パーセント表示削除）
+- 1.5秒インターバル復元による段階的UI遷移（音声テスト完了→音量調整表示）
+- セクションタイトル動的変更機能（「音声テスト」→「音量テスト」）
+- PitchShifter確実初期化メソッド追加（ensurePitchShifterInitialized）
+- 基音試聴ボタン修正（音名"C4"使用、自動初期化対応）
+- 音量計算ロジック改善（50%=基準音量、±10dB範囲）
+- アイコン変更（ear, volume-2）、文言改善
+- デバッグコード削除（router.js, preparation-pitchpro-cycle.js）
+
+バグ修正:
+- PitchShifterインスタンス不在問題の解決（音量調整セクション表示時に確実に初期化）
+- playNote()パラメータ修正（周波数261.6 → 音名"C4"）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 13:16:52] コミット: fix: iPad Safari音量コントローラーガラス効果修正
+
+- 背景色を白ベースから青ベースに変更（rgba(255,255,255,0.05) → rgba(30,58,138,0.2)）
+- -webkit-backdrop-filterプレフィックス追加でiPad Safari対応
+- 透明度調整（5% → 20%）で適度なガラス効果を実現
+
+バグ修正:
+- iPadでvolume-control-containerが真っ白になる問題を解決
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 13:28:30] コミット: fix: iPad Safari音量コントローラー2重ガラス効果問題を解決
+
+問題の原因:
+- .glass-card（親要素）内の.volume-control-containerに追加のbackdrop-filterを適用
+- 2重のガラス効果でiPad Safariが白く表示される
+
+修正内容:
+- backdrop-filter、box-shadow、グラデーションを削除
+- シンプルな半透明背景に変更（rgba(30, 58, 138, 0.25)）
+- 親要素の.glass-cardがガラス効果を提供するため、子要素では不要
+
+バグ修正:
+- iPad Safariで音量コントローラーが白く表示される問題を完全解決
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 13:37:32] コミット: fix: 音量コントローラー背景色を白ベース半透明に統一
+
+- 背景色を青ベース（rgba(30, 58, 138, 0.25)）から白ベース（rgba(255, 255, 255, 0.05)）に変更
+- ボーダー色を統一（rgba(255, 255, 255, 0.1)）
+- 他の要素（info-alertなど）とスタイルを統一
+
+修正理由:
+- 独自に青色にしていたため、他のデバイスでも不統一な見た目になっていた
+- 親要素.glass-cardのガラス効果を活かし、子要素はシンプルな白ベース半透明に統一
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 13:48:28] コミット: fix: リロード後の音声テスト失敗問題を改善
+
+問題:
+- リロード後にマイク許可→音声テストで、声を出しても成功しない時がある
+- 古いリソースが残っている可能性
+
+修正内容:
+- マイク許可ボタンクリック時に既存の検出を完全停止
+- AudioDetectionComponent初期化前にクリーンアップ実行
+- 初期化後500ms待機でマイクストリーム安定化を確保
+
+変更点:
+- stopDetection()による既存リソースのクリーンアップ追加
+- マイクストリーム安定化待機（500ms）追加
+- エラーハンドリング強化（クリーンアップエラーは警告レベル）
+
+期待効果:
+- リロード後も確実にクリーンな状態から音声テスト開始
+- マイクストリーム安定化により検出成功率向上
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 14:02:21] コミット: fix: リロード後の音声テスト失敗問題を完全解決
+
+問題:
+- リロード後にマイク許可→音声テストで、声を出しても成功しない時がある
+- 複数の根本原因: イベントリスナー重複、状態管理不整合、リソース未クリーンアップ
+
+修正内容:
+1. イベントリスナー重複防止
+   - micPermissionListenerAddedフラグで重複登録を防止
+   - setupMicPermissionFlow()の複数回呼び出しに対応
+
+2. マイク許可時のクリーンアップ強化
+   - 既存の検出を完全停止してから初期化
+   - 500ms待機でマイクストリーム安定化
+
+3. startAudioDetection内の状態管理改善
+   - 既に開始されている場合は停止→リセット→再開
+   - 想定外の状態からの起動を許可（強制的にinitializedに変更）
+   - エラー時のdetectionActiveフラグクリア
+
+期待効果:
+- リロード後も確実にクリーンな状態から音声テスト開始
+- イベントリスナー重複による多重起動を防止
+- 状態不整合による検出失敗を解消
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 14:11:35] コミット: fix: SPA環境でリロード後にマイク許可ボタンが反応しない問題を修正
+
+問題:
+- リロード後にマイク許可ボタンをクリックしても何も起こらない
+- イベントリスナー重複防止フラグ（micPermissionListenerAdded）がグローバルスコープで永続化
+- SPA環境ではページ遷移後もフラグがtrueのまま残り、新しいDOM要素へのイベントリスナー設定がスキップされる
+
+修正内容:
+- initializePreparationPitchProCycle関数の最初でmicPermissionListenerAddedフラグをfalseにリセット
+- preparationページロード毎にフラグがリセットされ、イベントリスナーが正しく設定される
+
+期待効果:
+- リロード後もマイク許可ボタンが正常に動作
+- イベントリスナー重複防止機能は維持
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 14:15:07] コミット: fix: preparation-pitchpro-cycle.jsにキャッシュバスター追加
+
+問題:
+- ブラウザがpreparation-pitchpro-cycle.jsの古いバージョンをキャッシュ
+- 前回のコミットで追加したmicPermissionListenerAddedリセットコードが反映されない
+- リロード後もマイク許可ボタンが反応しない
+
+修正内容:
+- index.htmlのpreparation-pitchpro-cycle.js読み込みにキャッシュバスター（?v=2）を追加
+- ブラウザが新しいバージョンのファイルを強制的に読み込むよう設定
+
+使用方法:
+- コミット後、ブラウザでCmd+Shift+R（Mac）またはCtrl+Shift+R（Windows）でハードリフレッシュ
+- ログに「🔄 イベントリスナーフラグをリセット」が表示されることを確認
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 14:20:52] コミット: feat: ボリュームコントローラーの音量調整範囲を拡大
+
+変更内容:
+- 音量調整範囲を±10dBから±15dBに拡大
+- 係数を0.2から0.3に変更
+- より大きな音量変化でユーザーの好みに合わせやすく改善
+
+調整範囲:
+- 0% (左端): baseVolume - 15dB
+- 50% (中央): baseVolume (デフォルト・最適値)
+- 100% (右端): baseVolume + 15dB
+
+デバイス別基準音量:
+- PC: +8dB
+- iPhone: +18dB
+- iPad: +20dB
+
+キャッシュバスター:
+- index.htmlでv2→v3に更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 14:28:31] コミット: feat: ボリュームコントローラーの音量調整範囲を2倍に拡大（±30dB）
+
+変更内容:
+- 音量調整範囲を±15dBから±30dBに拡大（2倍）
+- 係数を0.3から0.6に変更
+- より広い音量調整でユーザーの環境に柔軟に対応
+
+調整範囲:
+- 0% (左端): baseVolume - 30dB
+- 50% (中央): baseVolume (デフォルト・最適値)
+- 100% (右端): baseVolume + 30dB
+
+デバイス別最大音量例:
+- PC: +8dB + 30dB = +38dB (100%時)
+- iPhone: +18dB + 30dB = +48dB (100%時)
+- iPad: +20dB + 30dB = +50dB (100%時)
+
+キャッシュバスター:
+- index.htmlでv3→v4に更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 14:32:08] コミット: fix: 基音試聴ボタンの押下状態問題を解決 + 再生中UI改善
+
+問題:
+- ボタンクリック後、押下状態（フォーカス）が残る
+- ボリュームコントローラー操作で元に戻るが、操作しないと残り続ける
+- 再生中に連打できてしまう
+
+修正内容:
+1. クリック直後にblur()でフォーカスを外す（押下状態解除）
+2. 再生中はボタンを無効化（disabled = true）
+3. アイコンをloader-2に変更（回転アニメーション）
+4. テキストを「再生中...」に変更
+5. 2秒後（PitchShifter再生時間）に自動的に元に戻す
+6. エラー時も確実にボタン状態を復元
+
+UI改善効果:
+- 押下状態が残らない
+- 再生中は視覚的に分かりやすい（loader-2アイコン回転）
+- 連打防止で音声の重複再生を防止
+
+キャッシュバスター:
+- index.htmlでv4→v5に更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 14:34:41] コミット: fix: Lucideアイコン初期化後のDOM要素取得エラーを修正
+
+問題:
+- Lucideがiタグをsvgに置き換えるため、querySelector('i')がnullを返す
+- icon.getAttribute()でTypeErrorが発生
+- ボタン状態の変更・復元が失敗
+
+根本原因:
+- Lucide初期化前: <i data-lucide="volume-2">
+- Lucide初期化後: <svg data-lucide="volume-2">
+- querySelector('i')は初期化後に機能しない
+
+修正内容:
+1. querySelector('[data-lucide]')を優先使用
+   - Lucide初期化前後で動作
+   - data-lucide属性はiタグ・svgタグ両方に存在
+
+2. フォールバック検索の実装
+   - querySelector('[data-lucide]') || querySelector('svg') || querySelector('i')
+   - より確実な要素取得
+
+3. null安全性の追加
+   - 要素が見つからない場合のガード処理
+   - エラーハンドリング部分も同様に修正
+
+4. setTimeout内での再取得
+   - Lucide置き換え後の要素を確実に取得
+   - 復元時のエラーを防止
+
+期待効果:
+- Lucideアイコン初期化の前後で安定動作
+- ボタン状態変更・復元が確実に実行
+- TypeErrorの完全解消
+
+キャッシュバスター:
+- index.htmlでv5→v6に更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 14:43:47] コミット: fix: PitchPro標準メソッドresetDisplayElements()を使用してUI要素をリセット
+
+問題:
+- stopDetection()のみでは音量バーがリセットされない
+- stopDetection()は検出停止するが、最後の測定値をUIに保持する仕様
+
+解決策:
+- PitchPro標準メソッドresetDisplayElements()を追加使用
+- 手動リセットではなく、PitchProの自動管理に任せる
+
+resetDisplayElements()の効果:
+- 音量バー → 0%
+- 音量テキスト → "0.0%"
+- 周波数表示 → "0.0 Hz"
+- 音名表示 → "-"
+
+メソッドの役割分担:
+- stopDetection(): 検出停止、最後の測定値を保持
+- resetDisplayElements(): UI要素のみリセット
+- reset(): 完全リセット（UI + 全リソース）
+
+メリット:
+- 手動リセットと自動リセットの混在を回避
+- PitchProの設計思想に沿った実装
+- メンテナンス性の向上
+
+キャッシュバスター:
+- index.htmlでv6→v7に更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 14:52:42] コミット: fix: リロード時の基音試聴ボタン「再生中...」状態残留を修正
+
+問題:
+- ボタンクリック → 「再生中...」状態（disabled=true）
+- 2秒のsetTimeoutで復元予定
+- setTimeout完了前にリロード → setTimeoutは消える
+- DOM状態（disabled=true、「再生中...」）が残る
+- 戻ってきた時にボタンが押せない
+
+修正内容:
+- setupVolumeAdjustmentControls()の最初でボタン状態を強制リセット
+- リロード・ページ遷移からの復帰時に確実に元の状態に戻す
+
+リセット処理:
+1. disabled = false に設定
+2. data-lucide属性を 'volume-2' に変更
+3. テキストを '基音を試聴' に変更
+4. Lucideアイコンを再初期化
+
+期待効果:
+- リロード後も常にボタンが使用可能
+- 「再生中...」状態が残らない
+- SPA環境でのページ遷移にも対応
+
+キャッシュバスター:
+- index.htmlでv7→v8に更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 14:57:07] コミット: fix: ボタン状態復元後のフォーカス残留問題を修正
+
+問題:
+- 基音試聴ボタンをクリック
+- クリック直後にblur()でフォーカス解除 ✓
+- 2秒後にボタン状態を復元
+- lucide.createIcons()でLucideアイコン再初期化
+- 再初期化の過程でボタンに再度フォーカスが当たる ✗
+- ボタンの押下状態（青い輪郭等）が残る
+
+根本原因:
+- lucide.createIcons()がページ全体のLucideアイコンを再初期化
+- この過程でボタンが再度フォーカスを受け取る
+- クリック直後のblur()だけでは不十分
+
+修正内容:
+1. setTimeout内でボタン状態復元後にblur()を追加
+2. エラーハンドリング内でも同様にblur()を追加
+3. Lucide再初期化後に確実にフォーカスを外す
+
+修正箇所:
+- 正常系: lucide.createIcons() → btn.blur()
+- エラー系: lucide.createIcons() → btn.blur()
+
+期待効果:
+- ボタン状態復元後にフォーカスが残らない
+- 押下状態（青い輪郭等）が表示されない
+- UI体験の向上
+
+キャッシュバスター:
+- index.htmlでv8→v9に更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 15:03:03] コミット: fix: 基音試聴ボタンの連続クリック・重複実行問題を完全解決
+
+問題:
+- ボタンクリック → disabled設定前にダブルクリック発生
+- 複数のsetTimeoutが重複実行
+- PitchShifter「Already playing」警告
+- 「✅ ボタン状態を復元しました」が2回表示
+- ボタンが「再生中...」のまま戻らない
+
+根本原因:
+- disabled設定のタイミングが遅い
+- 連続クリックを防ぐ仕組みがない
+- 複数のsetTimeoutが同時に動作
+
+修正内容:
+1. 再生中フラグ（isPlayingBaseNote）を追加
+2. クリック時に最優先でフラグをチェック
+3. 再生中なら早期リターン（「⚠️ 既に再生中のため、クリックを無視します」）
+4. 再生開始時にフラグをtrue
+5. 再生完了時（setTimeout内）にフラグをfalse
+6. エラー時もフラグをfalse
+7. ページ初期化時にフラグをリセット
+
+実装ポイント:
+- クリックハンドラの最初でフラグチェック（最優先）
+- disabled設定より先にフラグで制御
+- setTimeout重複実行を完全防止
+- SPA環境でのフラグ永続化対策
+
+期待効果:
+- ダブルクリック・連続クリックの完全防止
+- setTimeout重複実行の防止
+- ボタン状態が確実に復元される
+- PitchShifter「Already playing」警告の解消
+
+キャッシュバスター:
+- index.htmlでv9→v10に更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 15:09:46] コミット: fix: ボタンのフォーカス時ハイライト効果を無効化
+
+問題:
+- 基音試聴ボタンクリック後、ハイライト（青い輪郭等）が残る
+- JavaScriptでblur()を実行しても、Lucide再初期化のタイミングでハイライトが復活
+
+解決策:
+- CSSで .btn:focus にoutline: none; box-shadow: none; を追加
+- すべてのボタンに適用され、フォーカス時のハイライトが表示されない
+- JavaScriptでの複雑な処理が不要になる
+
+修正内容:
+```css
+/* フォーカス時のハイライトを無効化 */
+.btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+```
+
+メリット:
+- シンプルなCSS解決でメンテナンス性向上
+- JavaScriptの複雑なDOM再取得・タイミング調整が不要
+- すべてのボタンに一律適用
+
+アクセシビリティ考慮:
+- キーボードナビゲーション使用時のフォーカス視覚化は失われる
+- ただし、本アプリはタッチ・マウス操作が主で、音声入力UIのため許容範囲内
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 15:23:10] コミット: fix: 基音試聴ボタンのみフォーカスハイライト無効化に変更
+
+- .btn:focus → #test-base-note-btn:focus
+- 他のボタンのアクセシビリティ保護
+- 基音試聴ボタンのみ押下状態を視覚的に無効化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 15:30:57] コミット: fix: 基音試聴ボタンのフォーカスハイライト無効化を強化
+
+- :focus-visible にも対応
+- !important で確実に適用
+- box-shadowは.btn-primaryの基本スタイルを維持
+- outline のみを無効化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 15:39:58] コミット: fix: ボタンフォーカスハイライト問題の根本的解決
+
+- box-shadow固定値を削除、outlineのみ無効化に変更
+- これによりJavaScript側のblur()が正常に機能
+- 基音試聴ボタンの押下状態が正しく復帰するように修正
+- 全ボタンの:hoverスタイルも正常に動作
+
+根本原因: box-shadow固定値がCSSフォーカス制御を妨害していた
+解決方法: outlineのみ!importantで無効化し、box-shadowは各ボタンクラスに委譲
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 16:04:51] コミット: fix: 音声再生時のポップノイズとiOSタップハイライトを修正
+
+## PitchShifter修正
+- attack: 0.005 (5ms fade-in) を追加してポップノイズを防止
+- Tone.js Samplerの立ち上がりを緩やかに調整
+- node_modules/@pitchpro/reference-tonesをリビルドして適用
+
+## iOS対応
+- -webkit-tap-highlight-color: transparent 追加
+- -webkit-touch-callout: none 追加
+- user-select: none 追加
+- iPhone/iPadでのタップ後のハイライトを完全無効化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 16:08:07] コミット: fix: iOS:activeスタイルを明示的に無効化
+
+- #test-base-note-btn:active で通常スタイルを強制適用
+- タップ時のブラウザデフォルト:activeスタイルを上書き
+- background/transform/box-shadowをデフォルト状態に固定
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 16:14:05] コミット: fix: iOS タップハイライト問題のベストプラクティス実装
+
+## CSS修正
+- -webkit-tap-highlight-color: rgba(0,0,0,0) に変更（transparentから）
+- より確実なiOSハイライト無効化
+
+## JavaScript修正
+- グローバルtouchstartイベントリスナー追加（:active疑似クラスを機能させるため）
+- ボタンにtouchendイベントリスナー追加（タップ終了時に確実にblur）
+- 10msのsetTimeoutでタイミング調整
+
+## 参考
+- Stack Overflow: iOS Safari :active pseudo-class handling
+- Stack Overflow: Mobile Safari focus retention issue
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 16:20:15] コミット: refactor: 基音試聴ボタンをシンプルな単独クラスで実装
+
+## 変更内容
+- .btn-no-highlight クラスを新規作成
+- すべてのインタラクティブ状態を無効化（:hover, :active, :focus, :focus-visible）
+- 基音試聴ボタンにクラスを適用
+
+## 削除
+- グローバルtouchstartイベントリスナー削除
+- touchendイベントリスナー削除
+- 複雑なJavaScript処理をすべて削除
+
+## 方針
+- CSSのみでシンプルに実装
+- このボタンのみ特殊な動作を許容
+- 他のボタンには影響なし
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 16:24:53] コミット: refactor: 基音試聴ボタンを完全独立クラスに変更
+
+## 変更内容
+- .base-note-button クラスを新規作成（完全独立）
+- .btn, .btn-primary の影響を受けない独自実装
+- すべてのスタイルを独自定義（display, padding, background等）
+
+## 削除
+- .btn-no-highlight クラス削除
+- .btn, .btn-primary クラスの使用を中止
+
+## スタイル
+- すべてのインタラクティブ状態で同じスタイルを強制
+- :hover, :active, :focus, :focus-visible すべて無効化
+- transition: none でアニメーション無効化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 16:27:11] コミット: fix: base-note-buttonの全スタイルに!importantを追加
+
+## 変更内容
+- すべてのインタラクティブ状態に!important追加
+- opacity: 1 !important 追加（暗くなるのを防止）
+- filter: none !important 追加（フィルター効果を無効化）
+
+## 対策
+- タップ後にボタンが暗くなる現象を防止
+- ブラウザのデフォルトスタイルを完全にオーバーライド
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 16:30:05] コミット: fix: iPad専用hoverスタイル無効化をメディアクエリで実装
+
+## 変更内容
+- :hoverを別ルールで分離
+- @media (pointer: coarse) - iPad/タッチデバイス用
+- @media (pointer: fine) - デスクトップ用
+- 両方で:hoverスタイルを強制的に固定
+
+## 対策
+- iPadでタップ後にボタンが暗くなる現象を防止
+- iPadの:hover疑似クラスを確実に無効化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 17:12:27] コミット: feat: 音域テスト判定基準をv3.2.0に更新 - トレーニング要件準拠
+
+音域判定基準を大幅に変更し、トレーニング要件（基音+1オクターブ）に準拠:
+
+- 最低音域要件: 0.3オクターブ → 1.0オクターブに引き上げ（3倍以上厳格化）
+- 判定フラグ再定義: isVeryNarrowRange削除 → isInsufficientRange追加
+- トレーニング禁止条件: 1.0オクターブ未満は開始ボタン非表示
+- 警告レベル見直し: 1.0～1.5オクターブは警告付き許可
+- 設計思想転換: アクセシビリティ優先 → 品質保証優先
+- UI警告メッセージ更新: 具体的なトレーニング要件を明示
+- localStorage保存条件: 音域不足の場合は保存しない
+
+変更ファイル:
+- PitchPro-SPA/pages/js/voice-range-test.js (v3.2.0)
+- specifications/voice-range-test/VOICE_RANGE_TEST_SPECIFICATION_V3.md
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -9,12 +9,13 @@ let initializationPromise = null;
 let audioDetector = null;
 let currentIntervalIndex = 0;
 let baseNoteInfo = null;
-const intervals = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド'];
 
 // セッションデータ記録用
 let sessionRecorder = null;
-let expectedNotes = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
-let expectedFrequencies = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25];
+
+// 相対音程（ドレミ...）と半音ステップの対応
+const intervals = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド'];
+const semitoneSteps = [0, 2, 4, 5, 7, 9, 11, 12]; // ド=0, レ=+2半音, ミ=+4半音...
 
 // トレーニングモード管理
 let currentMode = 'random'; // 'random' | 'continuous' | '12tone'
@@ -453,12 +454,13 @@ async function startDoremiGuide() {
     }
 
     // ドレミガイド進行（ユーザーが基音をもとに発声、アプリは音を鳴らさない）
-    const noteSequence = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'];
+    // 注: ガイド表示は相対音程（ドレミ...）を使用
+    const guideCount = 8; // ド～ド（1オクターブ）
 
     // 音程データバッファをリセット
     pitchDataBuffer = [];
 
-    for (let i = 0; i < noteSequence.length; i++) {
+    for (let i = 0; i < guideCount; i++) {
         currentIntervalIndex = i;
 
         // 前の音符を完了状態に & データ記録
@@ -472,18 +474,21 @@ async function startDoremiGuide() {
 
         // 現在の音符をハイライト
         circles[i]?.classList.add('current');
-        console.log(`🎵 音程: ${intervals[i]} (${noteSequence[i]})`);
+
+        // 期待される周波数を計算してログ出力
+        const expectedFreq = baseNoteInfo.frequency * Math.pow(2, semitoneSteps[i] / 12);
+        console.log(`🎵 音程: ${intervals[i]} (+${semitoneSteps[i]}半音, 期待: ${expectedFreq.toFixed(1)}Hz)`);
 
         // ユーザーの発声時間を確保（700ms間隔）
         await new Promise(resolve => setTimeout(resolve, 700));
     }
 
     // 最後の音符を完了状態に & データ記録
-    circles[noteSequence.length - 1]?.classList.remove('current');
-    circles[noteSequence.length - 1]?.classList.add('completed');
-    recordStepPitchData(noteSequence.length - 1);
+    circles[guideCount - 1]?.classList.remove('current');
+    circles[guideCount - 1]?.classList.add('completed');
+    recordStepPitchData(guideCount - 1);
 
-    currentIntervalIndex = noteSequence.length;
+    currentIntervalIndex = guideCount;
 
     // トレーニング完了
     handleSessionComplete();
@@ -507,7 +512,7 @@ function handlePitchUpdate(result) {
         }
 
         // 音程データをバッファに追加（明瞭度が十分な場合のみ）
-        if (currentIntervalIndex < expectedNotes.length) {
+        if (currentIntervalIndex < intervals.length) {
             pitchDataBuffer.push({
                 step: currentIntervalIndex,
                 frequency: result.frequency,
@@ -528,16 +533,20 @@ function recordStepPitchData(step) {
     // このステップの音程データを取得（直近700ms間のデータ）
     const stepData = pitchDataBuffer.filter(d => d.step === step);
 
+    // 基音からの期待される周波数を計算（正しい計算）
+    const expectedFrequency = baseNoteInfo.frequency * Math.pow(2, semitoneSteps[step] / 12);
+    const expectedNoteName = intervals[step]; // 相対音程名（ドレミ...）
+
     if (stepData.length === 0) {
-        console.warn(`⚠️ Step ${step}: 音程データが記録されていません`);
+        console.warn(`⚠️ Step ${step} (${expectedNoteName}): 音程データが記録されていません`);
         // ダミーデータで記録（エラー回避）
         sessionRecorder.recordPitchError(
             step,
-            expectedNotes[step],
-            expectedFrequencies[step],
-            0,
-            0,
-            0
+            expectedNoteName,
+            expectedFrequency,
+            0,  // 検出周波数なし
+            0,  // 明瞭度なし
+            0   // 音量なし
         );
         return;
     }
@@ -547,19 +556,22 @@ function recordStepPitchData(step) {
         current.clarity > best.clarity ? current : best
     );
 
-    // 基音からの相対周波数を計算
-    const relativeFrequency = bestData.frequency * Math.pow(2, step / 12);
+    // セント誤差を計算（デバッグ用）
+    const centError = 1200 * Math.log2(bestData.frequency / expectedFrequency);
 
     sessionRecorder.recordPitchError(
         step,
-        expectedNotes[step],
-        expectedFrequencies[step],
-        relativeFrequency,
+        expectedNoteName,           // 相対音程名（ドレミ...）
+        expectedFrequency,          // 期待される周波数（基音ベース）
+        bestData.frequency,         // 実際に検出された周波数
         bestData.clarity,
         bestData.volume
     );
 
-    console.log(`📊 Step ${step} データ記録: ${bestData.frequency.toFixed(1)}Hz → ${relativeFrequency.toFixed(1)}Hz`);
+    console.log(`📊 Step ${step} (${expectedNoteName}) データ記録:`);
+    console.log(`   期待: ${expectedFrequency.toFixed(1)}Hz`);
+    console.log(`   検出: ${bestData.frequency.toFixed(1)}Hz`);
+    console.log(`   誤差: ${centError >= 0 ? '+' : ''}${centError.toFixed(1)}¢`);
 }
 
 // セッション完了ハンドラ
@@ -694,17 +706,47 @@ function getAvailableNotes() {
         return allNotes;
     }
 
-    const { lowFreq, highFreq } = voiceRangeData.results;
+    // 快適範囲（comfortableRange）を優先使用、なければ全音域を使用
+    const rangeData = voiceRangeData.results.comfortableRange || voiceRangeData.results;
+    const { lowFreq, highFreq } = rangeData;
+
+    console.log(`🎤 使用する音域: ${lowFreq.toFixed(1)}Hz - ${highFreq.toFixed(1)}Hz (${(Math.log2(highFreq / lowFreq)).toFixed(2)}オクターブ)`);
+    console.log(`🎵 PitchShifter音符範囲: ${allNotes[0].note} (${allNotes[0].frequency.toFixed(1)}Hz) - ${allNotes[allNotes.length - 1].note} (${allNotes[allNotes.length - 1].frequency.toFixed(1)}Hz)`);
 
     // 音域内の音符のみをフィルタリング（基音+1オクターブが収まる範囲）
     const availableNotes = allNotes.filter(note => {
         const topFreq = note.frequency * 2; // 基音+1オクターブ
-        return note.frequency >= lowFreq && topFreq <= highFreq;
+        const isInRange = note.frequency >= lowFreq && topFreq <= highFreq;
+        return isInRange;
     });
 
-    console.log(`🎵 利用可能な基音: ${availableNotes.length}音 (${availableNotes[0]?.note} - ${availableNotes[availableNotes.length - 1]?.note})`);
+    console.log(`🎵 利用可能な基音: ${availableNotes.length}音`);
+    if (availableNotes.length > 0) {
+        console.log(`   範囲: ${availableNotes[0].note} (${availableNotes[0].frequency.toFixed(1)}Hz) - ${availableNotes[availableNotes.length - 1].note} (${availableNotes[availableNotes.length - 1].frequency.toFixed(1)}Hz)`);
+    } else {
+        console.warn(`⚠️ 音域内に利用可能な基音がありません`);
+        console.warn(`   必要範囲: ${lowFreq.toFixed(1)}Hz - ${(highFreq / 2).toFixed(1)}Hz (基音+1オクターブが${highFreq.toFixed(1)}Hzに収まる範囲)`);
+        console.warn(`   PitchShifter最低音: ${allNotes[0].frequency.toFixed(1)}Hz`);
+    }
 
-    return availableNotes.length > 0 ? availableNotes : allNotes;
+    // 利用可能な基音がない場合、音域の中央付近の音を使用（フォールバック）
+    if (availableNotes.length === 0) {
+        console.warn('⚠️ フォールバック: 音域中央付近の音を選択');
+        const midFreq = (lowFreq + highFreq) / 2;
+        const fallbackNotes = allNotes.filter(note =>
+            Math.abs(note.frequency - midFreq) < midFreq * 0.3 // 中央±30%の範囲
+        );
+
+        if (fallbackNotes.length > 0) {
+            console.log(`✅ フォールバック基音: ${fallbackNotes.length}音 (${fallbackNotes[0].note} - ${fallbackNotes[fallbackNotes.length - 1].note})`);
+            return fallbackNotes;
+        }
+
+        console.error('❌ フォールバック失敗: 全範囲を使用');
+        return allNotes;
+    }
+
+    return availableNotes;
 }
 
 /**
@@ -718,25 +760,24 @@ function selectBaseNote(selectionType, sessionIndex = 0) {
 
     switch (selectionType) {
         case 'random_c3_octave':
-            // ランダム基音モード: 音域内のC3オクターブ範囲からランダム選択
-            const c3OctaveNotes = availableNotes.filter(note =>
-                note.frequency >= 261.63 && note.frequency <= 523.25
-            );
-            const randomC3Note = c3OctaveNotes[Math.floor(Math.random() * c3OctaveNotes.length)];
-            console.log(`🎲 ランダム基音モード: ${randomC3Note.note} (${randomC3Note.japaneseName})`);
-            return randomC3Note;
+            // ランダム基音モード: 音域内から利用可能な基音をランダム選択
+            // availableNotesは既に「基音+1オクターブが音域内に収まる」条件でフィルタリング済み
+            // 基音の音名（C, D, E...）は相対音感トレーニングでは重要ではない
+            const randomNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
+            console.log(`🎲 ランダム基音モード: ${randomNote.note} (${randomNote.frequency.toFixed(1)}Hz)`);
+            return randomNote;
 
         case 'random_chromatic':
-            // 連続チャレンジモード: 音域内のクロマチック12音からランダム選択
-            const randomNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
-            console.log(`🎲 連続チャレンジモード: ${randomNote.note} (${randomNote.japaneseName})`);
-            return randomNote;
+            // 連続チャレンジモード: 音域内から利用可能な基音をランダム選択
+            const chromaticNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
+            console.log(`🎲 連続チャレンジモード: ${chromaticNote.note} (${chromaticNote.frequency.toFixed(1)}Hz)`);
+            return chromaticNote;
 
         case 'sequential_chromatic':
             // 12音階モード: クロマチック12音を順次使用
-            const chromaticNote = availableNotes[sessionIndex % availableNotes.length];
-            console.log(`🎹 12音階モード: セッション${sessionIndex + 1} - ${chromaticNote.note} (${chromaticNote.japaneseName})`);
-            return chromaticNote;
+            const sequentialNote = availableNotes[sessionIndex % availableNotes.length];
+            console.log(`🎹 12音階モード: セッション${sessionIndex + 1} - ${sequentialNote.note} (${sequentialNote.frequency.toFixed(1)}Hz)`);
+            return sequentialNote;
 
         default:
             console.warn(`⚠️ 未知の選択タイプ: ${selectionType} - ランダム選択`);

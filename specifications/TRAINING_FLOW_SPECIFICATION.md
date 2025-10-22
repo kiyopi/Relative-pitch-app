@@ -1,5 +1,19 @@
 # トレーニング進行フロー仕様書
 
+**バージョン**: 2.0.0
+**作成日**: 2025-08-08
+**更新日**: 2025-01-22
+
+**v2.0.0 更新内容**（2025-01-22）:
+- 12音階モードの2段階システム実装
+  - 音域対応12音階モード（12tone-adaptive）: 1.0オクターブ以上で利用可能
+  - 12音階モード完全版（12tone）: 2.0オクターブ必須、S級判定可能
+- 音域要件の明確化（v3.2.0音域テスト仕様に準拠）
+- 動的セッション数決定ロジックの追加
+- 音域チェック・ロック画面の仕様追加
+
+---
+
 ## 1. 共通フロー（全モード共通）
 
 ### 1.1 基本的な流れ
@@ -26,11 +40,19 @@ const modeConfig = {
         icon: 'zap',              // ホームページと統一
         description: 'クロマチック12音'
     },
-    twelve: {
-        name: '12音階モード',
+    '12tone-adaptive': {
+        name: '音域対応12音階モード',
+        totalSessions: 'dynamic',  // 利用可能な音数に応じて決定
+        icon: 'music-2',           // ホームページと統一
+        description: 'あなたの音域内で練習',
+        minOctaves: 1.0            // 最低音域要件
+    },
+    '12tone': {
+        name: '12音階モード完全版',
         totalSessions: 12,
-        icon: 'music',            // ホームページと統一
-        description: '全音域対応'
+        icon: 'music',             // ホームページと統一
+        description: 'クロマチック12音完全対応',
+        minOctaves: 2.0            // 最低音域要件
     }
 };
 
@@ -169,14 +191,185 @@ window.onload = function() {
 }
 ```
 
-### 2.3 12音階モード（twelve）
+### 2.3 音域対応12音階モード（12tone-adaptive）※v1.5.0実装予定
 
 #### 特徴
-- **セッション数**: 12回（または24回）
-- **基音選択**: クロマチック12音を順次使用
-- **評価**: 総合評価のみ
+- **対象**: ランダム基音・連続チャレンジモードを習得した中級者
+- **セッション数**: 音域内で使用可能な音数に応じて動的決定（例：9音なら9セッション）
+- **基音選択**: 音域内で使用可能な音を順次使用（C3, D3, E3...）
+- **評価**: 総合評価のみ（個別評価なし）
+- **進行**: 自動（連続モードと同様）
+- **最低音域要件**: **1.0オクターブ以上**
+
+#### なぜ音域対応版が必要なのか
+一般人の快適に歌える音域は1.0～1.5オクターブです。12音階完全版（2.0オクターブ必須）に挑戦する前に、自分の音域内で練習できる段階的なモードが必要です。
+
+#### 音域データに基づく基音選択ロジック
+```javascript
+// 音域データから利用可能な基音を取得
+function getAvailableNotesForAdaptiveMode() {
+    const voiceRangeData = DataManager.getVoiceRangeData();
+
+    if (!voiceRangeData || !voiceRangeData.results) {
+        console.warn('⚠️ 音域データなし - デフォルト範囲使用');
+        return getDefaultNotes();
+    }
+
+    const { lowestFreq, highestFreq } = voiceRangeData.results;
+    const allChromaticNotes = PitchShifter.AVAILABLE_NOTES; // C4～E5の15音
+
+    // 基音+1オクターブが音域内に収まる音のみを選択
+    const availableNotes = allChromaticNotes.filter(note => {
+        const topFreq = note.frequency * 2; // 基音+1オクターブ
+        return note.frequency >= lowestFreq && topFreq <= highestFreq;
+    });
+
+    console.log(`🎵 音域対応12音階モード: ${availableNotes.length}音が利用可能`);
+    console.log(`   範囲: ${availableNotes[0]?.note} - ${availableNotes[availableNotes.length - 1]?.note}`);
+
+    return availableNotes;
+}
+
+// セッション数を動的決定
+function getTotalSessions(mode) {
+    if (mode === '12tone-adaptive') {
+        const availableNotes = getAvailableNotesForAdaptiveMode();
+        return availableNotes.length; // 9音なら9セッション
+    }
+    return modeConfig[mode].totalSessions;
+}
+```
+
+#### 画面遷移フロー
+```
+preparation.html（音域テスト必須 - 1.0オクターブ以上必要）
+    ↓
+training.html?mode=12tone-adaptive&session=1
+    ↓ トレーニング完了後2秒で自動遷移
+training.html?mode=12tone-adaptive&session=2
+    ↓ 自動進行
+    ...（利用可能な音数まで自動継続）
+    ↓
+results-overview.html（総合評価・A-E級判定のみ、S級なし）
+```
+
+#### 音域不足時の処理
+```javascript
+// 音域チェック
+function checkVoiceRangeForAdaptiveMode() {
+    const voiceRangeData = DataManager.getVoiceRangeData();
+
+    if (!voiceRangeData) {
+        // 音域データなし → preparation.htmlへリダイレクト
+        console.error('❌ 音域データが未保存');
+        window.location.href = 'preparation.html';
+        return false;
+    }
+
+    const octaves = voiceRangeData.results.octaves || 0;
+
+    if (octaves < 1.0) {
+        // 1.0オクターブ未満 → エラー表示
+        showVoiceRangeError(
+            '音域不足',
+            `このモードには最低1.0オクターブの音域が必要です。\n現在の音域: ${octaves.toFixed(2)}オクターブ`,
+            'preparation.html'
+        );
+        return false;
+    }
+
+    return true;
+}
+```
+
+#### スクリプト実装
+```javascript
+function handleTrainingComplete() {
+    if (mode === '12tone-adaptive') {
+        const totalSessions = getTotalSessions(mode); // 動的取得
+
+        if (sessionNum < totalSessions) {
+            // 次セッションに自動遷移
+            setTimeout(() => {
+                const nextSession = sessionNum + 1;
+                window.location.href = `training.html?mode=12tone-adaptive&session=${nextSession}`;
+            }, 2000);
+        } else {
+            // 総合評価に自動遷移
+            setTimeout(() => {
+                window.location.href = 'results-overview.html?mode=12tone-adaptive';
+            }, 2000);
+        }
+    }
+}
+
+// ページ初期化時の音域チェック
+window.addEventListener('DOMContentLoaded', function() {
+    if (mode === '12tone-adaptive') {
+        if (!checkVoiceRangeForAdaptiveMode()) {
+            return; // エラー時は処理中断
+        }
+
+        // 利用可能な音数を取得してUI更新
+        const totalSessions = getTotalSessions(mode);
+        updateSessionProgressUI(sessionNum, totalSessions);
+    }
+});
+```
+
+### 2.4 12音階モード完全版（12tone）※v1.6.0実装予定
+
+#### 特徴
+- **対象**: 音域対応版を習得し、2.0オクターブ以上の音域を持つ上級者
+- **セッション数**: 12回（クロマチック12音すべて）
+- **基音選択**: クロマチック12音を順次使用（C4, C#4, D4...B4）
+- **評価**: 総合評価のみ（**S級判定可能**）
 - **進行**: 自動
-- **特別機能**: 音域調整（開始前のみ）
+- **最低音域要件**: **2.0オクターブ必須**
+
+#### 音域不足時の表示
+```
+🔒 12音階モード（完全版）
+必要音域: 2.0オクターブ以上
+現在の音域: 1.6オクターブ
+
+このモードは相対音感トレーニングの最終目標です。
+12音すべてを使いこなせるようになりましょう。
+
+【音域を広げる準備】
+1. まずは「音域対応12音階モード」で練習
+2. ボイストレーニングで音域を拡張
+3. 音域テストを再実施
+
+[音域対応12音階モードを試す] [キャンセル]
+```
+
+#### 音域チェックロジック
+```javascript
+function checkVoiceRangeForCompleteMode() {
+    const voiceRangeData = DataManager.getVoiceRangeData();
+
+    if (!voiceRangeData) {
+        window.location.href = 'preparation.html';
+        return false;
+    }
+
+    const octaves = voiceRangeData.results.octaves || 0;
+
+    if (octaves < 2.0) {
+        // 2.0オクターブ未満 → ロック画面表示
+        showModeLockedDialog({
+            mode: '12tone',
+            requiredOctaves: 2.0,
+            currentOctaves: octaves,
+            alternativeMode: '12tone-adaptive'
+        });
+        return false;
+    }
+
+    return true;
+}
+```
 
 #### 画面遷移フロー
 ```
@@ -301,13 +494,14 @@ if (mode === 'twelve') {
 ## 3. セッション間の自動進行
 
 ### 3.1 連続・12音モードの自動開始
+
 ```javascript
 // ページ読み込み時の処理
 window.addEventListener('DOMContentLoaded', function() {
     const config = modeConfig[mode];
-    
+
     // 連続・12音モードでセッション2以降は自動開始
-    if ((mode === 'continuous' || mode === 'twelve') && sessionNum > 1) {
+    if ((mode === 'continuous' || mode === '12tone-adaptive' || mode === '12tone') && sessionNum > 1) {
         const button = document.getElementById('play-base-note');
         
         // ボタンテキストを変更

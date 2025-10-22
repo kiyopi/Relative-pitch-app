@@ -49,14 +49,24 @@ async function loadSessionData(sessionNumber) {
             return null;
         }
 
-        // 指定されたセッション番号のデータを取得
-        const session = allSessions.find(s => s.sessionId === sessionNumber);
+        // 指定されたセッション番号のデータを取得（重複IDがある場合は最新のものを使用）
+        const matchingSessions = allSessions.filter(s => s.sessionId === sessionNumber);
 
-        if (!session) {
-            // 最新のセッションを使用
-            return allSessions[allSessions.length - 1];
+        if (matchingSessions.length === 0) {
+            console.warn(`⚠️ セッションID ${sessionNumber} が見つかりません。最新セッションを使用します。`);
+            const latestSession = allSessions[allSessions.length - 1];
+            console.log(`📊 最新セッション使用: ID ${latestSession.sessionId}, 基音 ${latestSession.baseNote}`);
+            return latestSession;
         }
 
+        // 重複IDがある場合は最新のものを取得（配列の最後）
+        const session = matchingSessions[matchingSessions.length - 1];
+
+        if (matchingSessions.length > 1) {
+            console.warn(`⚠️ セッションID ${sessionNumber} が${matchingSessions.length}件見つかりました。最新のものを使用します。`);
+        }
+
+        console.log(`📊 セッションデータ読み込み: ID ${session.sessionId}, 基音 ${session.baseNote} (${session.baseFrequency.toFixed(1)}Hz)`);
         return session;
 
     } catch (error) {

@@ -7,7 +7,14 @@
 class SessionDataRecorder {
     constructor() {
         this.currentSession = null;
-        this.sessionCounter = 0;
+
+        // ページリロード時もセッションIDが衝突しないよう、localStorageから最大IDを取得
+        const existingSessions = DataManager.getFromStorage('sessionData') || [];
+        this.sessionCounter = existingSessions.length > 0
+            ? Math.max(...existingSessions.map(s => s.sessionId))
+            : 0;
+
+        console.log(`📊 SessionDataRecorder初期化: sessionCounter = ${this.sessionCounter}`);
     }
 
     /**
