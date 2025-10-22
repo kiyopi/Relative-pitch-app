@@ -682,22 +682,26 @@ body::before {
   overflow: hidden;
 }
 
-/* フォーカス時のハイライトを無効化（基音試聴ボタンのみ） */
-#test-base-note-btn:focus,
-#test-base-note-btn:focus-visible {
-  outline: none !important;
-}
-
-/* iOS専用: タップハイライトを無効化 */
-#test-base-note-btn {
+/* ハイライトなしボタン（基音試聴専用） */
+.btn-no-highlight {
   -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
   -webkit-touch-callout: none !important;
   -webkit-user-select: none !important;
   user-select: none !important;
 }
 
-/* iOS:activeスタイルを無効化 */
-#test-base-note-btn:active {
+.btn-no-highlight:focus,
+.btn-no-highlight:focus-visible {
+  outline: none !important;
+}
+
+.btn-no-highlight:active {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+  transform: none !important;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3) !important;
+}
+
+.btn-no-highlight:hover {
   background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
   transform: none !important;
   box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3) !important;

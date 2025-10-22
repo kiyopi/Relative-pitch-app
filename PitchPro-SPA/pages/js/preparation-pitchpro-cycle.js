@@ -3,9 +3,6 @@
 
 // Lucide初期化はDOMContentLoadedイベント内で実行（HTMLが読み込まれた後）
 
-// iOS対策: グローバルtouchstartイベントリスナー（:active疑似クラスを機能させるため）
-document.addEventListener("touchstart", function() {}, false);
-
 // ===== PitchProサイクル管理システム =====
 
 /**
@@ -1743,15 +1740,6 @@ function setupVolumeAdjustmentControls() {
                 isPlayingBaseNote = false;
             }
         });
-
-        // iOS対策: touchendイベントでフォーカスを外す
-        testBaseNoteBtn.addEventListener('touchend', (e) => {
-            // タップ終了時に確実にフォーカスを外す
-            setTimeout(() => {
-                e.currentTarget.blur();
-            }, 10);
-        });
-
         console.log('✅ 基音試聴ボタンのイベントリスナー設定完了');
     } else {
         console.warn('⚠️ test-base-note-btn要素が見つかりません');
