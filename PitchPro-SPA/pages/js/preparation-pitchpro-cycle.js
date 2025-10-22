@@ -909,6 +909,7 @@ window.initializePreparationPitchProCycle = async function() {
 
     // SPA環境でのリロード対策: グローバルフラグをリセット
     micPermissionListenerAdded = false;
+    isPlayingBaseNote = false;
     console.log('🔄 イベントリスナーフラグをリセット');
 
     // ========================================================================
@@ -1595,6 +1596,8 @@ function updateMicButtonState(state) {
 /**
  * 音量調整コントロール設定
  */
+let isPlayingBaseNote = false; // 基音再生中フラグ（連続クリック防止）
+
 function setupVolumeAdjustmentControls() {
     console.log('🔊 音量調整コントロール設定開始');
 
@@ -1620,6 +1623,12 @@ function setupVolumeAdjustmentControls() {
 
         // イベントリスナー設定
         testBaseNoteBtn.addEventListener('click', async (e) => {
+            // 再生中は早期リターン（連続クリック防止）
+            if (isPlayingBaseNote) {
+                console.log('⚠️ 既に再生中のため、クリックを無視します');
+                return;
+            }
+
             console.log('🎵 基音試聴ボタンがクリックされました');
             console.log('🔍 PitchShifter状態:', {
                 exists: !!window.pitchShifterInstance,
@@ -1628,6 +1637,9 @@ function setupVolumeAdjustmentControls() {
 
             // フォーカスを外す（押下状態を解除）
             e.currentTarget.blur();
+
+            // 再生中フラグを立てる
+            isPlayingBaseNote = true;
 
             try {
                 // PitchShifterインスタンスを確認
@@ -1695,6 +1707,9 @@ function setupVolumeAdjustmentControls() {
                     // フォーカスを外す（Lucide再初期化でフォーカスが戻る可能性があるため）
                     btn.blur();
 
+                    // 再生中フラグを下ろす
+                    isPlayingBaseNote = false;
+
                     console.log('✅ ボタン状態を復元しました');
                 }, 2000);
 
@@ -1720,6 +1735,9 @@ function setupVolumeAdjustmentControls() {
 
                 // フォーカスを外す
                 btn.blur();
+
+                // 再生中フラグを下ろす
+                isPlayingBaseNote = false;
             }
         });
         console.log('✅ 基音試聴ボタンのイベントリスナー設定完了');
