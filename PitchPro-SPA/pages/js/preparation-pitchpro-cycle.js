@@ -1598,9 +1598,27 @@ function updateMicButtonState(state) {
 function setupVolumeAdjustmentControls() {
     console.log('🔊 音量調整コントロール設定開始');
 
-    // 基音試聴ボタン
+    // 基音試聴ボタンの状態をリセット（リロード時の「再生中...」状態を解除）
     const testBaseNoteBtn = document.getElementById('test-base-note-btn');
     if (testBaseNoteBtn) {
+        const icon = testBaseNoteBtn.querySelector('[data-lucide]') || testBaseNoteBtn.querySelector('svg') || testBaseNoteBtn.querySelector('i');
+        const text = testBaseNoteBtn.querySelector('span');
+
+        testBaseNoteBtn.disabled = false;
+        if (icon) {
+            icon.setAttribute('data-lucide', 'volume-2');
+        }
+        if (text) {
+            text.textContent = '基音を試聴';
+        }
+
+        // Lucideアイコンを更新
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+        console.log('🔄 基音試聴ボタンの状態をリセット');
+
+        // イベントリスナー設定
         testBaseNoteBtn.addEventListener('click', async (e) => {
             console.log('🎵 基音試聴ボタンがクリックされました');
             console.log('🔍 PitchShifter状態:', {
