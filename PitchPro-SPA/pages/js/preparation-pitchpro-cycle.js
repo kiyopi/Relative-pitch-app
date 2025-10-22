@@ -525,12 +525,14 @@ class PitchProCycleManager {
     async showDetectionSuccess() {
         console.log('🎉 showDetectionSuccess実行開始');
 
-        // 🔧 修正: reset()ではなく、stopDetection()のみを実行
-        // reset()は全UIをリセットしてしまい、#test-base-note-btnも"--"になる問題があった
+        // 🔧 修正: stopDetection() + resetDisplayElements()を使用
+        // stopDetection(): 検出停止、最後の測定値を保持
+        // resetDisplayElements(): UI要素のみリセット（音量バー→0%、周波数→0 Hz等）
         if (this.audioDetector) {
             await this.audioDetector.stopDetection();
+            this.audioDetector.resetDisplayElements(); // PitchPro標準メソッドでUIリセット
             this.state.detectionActive = false;
-            console.log('🔄 音声検出停止完了（reset()による不要なUIリセットを回避）');
+            console.log('🔄 音声検出停止完了 + UI要素リセット（resetDisplayElements使用）');
         }
 
         // 🎵 UI状態更新：voice-instruction成功状態に変更
