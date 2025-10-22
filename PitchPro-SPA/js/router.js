@@ -346,12 +346,49 @@ class SimpleRouter {
                 }
             }
 
-            // 他のページのクリーンアップもここに追加可能
-            // if (this.currentPage === 'training') {
-            //     if (typeof window.trainingManager !== 'undefined' && window.trainingManager) {
-            //         await window.trainingManager.cleanup();
-            //     }
-            // }
+            // trainingページからの離脱時のクリーンアップ
+            if (this.currentPage === 'training') {
+                console.log('Cleaning up training page resources...');
+
+                // 音声検出停止
+                if (window.audioDetector) {
+                    console.log('🛑 AudioDetector停止中...');
+                    window.audioDetector.stopDetection();
+                }
+
+                // マイクストリーム明示的解放
+                if (window.audioStream) {
+                    console.log('🎤 マイクストリーム解放中...');
+                    window.audioStream.getTracks().forEach(track => track.stop());
+                    window.audioStream = null;
+                }
+
+                // PitchShifter停止（メソッドが存在する場合）
+                if (window.pitchShifterInstance) {
+                    console.log('🎹 PitchShifter停止中...');
+                    if (typeof window.pitchShifterInstance.dispose === 'function') {
+                        window.pitchShifterInstance.dispose();
+                    }
+                    window.pitchShifterInstance = null;
+                }
+
+                // セッションデータ処理
+                if (window.sessionDataRecorder) {
+                    const currentSession = window.sessionDataRecorder.getCurrentSession();
+                    if (currentSession && !currentSession.completed) {
+                        console.warn('⚠️ 未完了セッションあり - 途中データは破棄されます');
+                    }
+                    window.sessionDataRecorder.resetSession();
+                }
+
+                // 初期化フラグリセット
+                if (typeof window.resetTrainingPageFlag === 'function') {
+                    window.resetTrainingPageFlag();
+                    console.log('Training page flag reset');
+                }
+
+                console.log('✅ Training page cleanup complete');
+            }
 
         } catch (error) {
             console.warn('Page cleanup error:', error);

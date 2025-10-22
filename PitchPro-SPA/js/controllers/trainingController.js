@@ -53,6 +53,14 @@ export async function initializeTrainingPage() {
     // Load voice range data
     loadVoiceRangeData();
 
+    // 【新規追加】音域データ必須チェック
+    if (!checkVoiceRangeData()) {
+        console.error('❌ 音域データが設定されていません');
+        alert('音域テストを先に完了してください。');
+        window.location.hash = 'preparation';
+        return;
+    }
+
     // Initialize mode UI
     initializeModeUI();
 
@@ -649,6 +657,9 @@ export function resetTrainingPageFlag() {
     console.log('TrainingController reset');
 }
 
+// グローバルに公開（router.jsから呼び出し可能にする）
+window.resetTrainingPageFlag = resetTrainingPageFlag;
+
 /**
  * セッション進行状況UIを更新
  */
@@ -692,6 +703,32 @@ function loadVoiceRangeData() {
         console.error('❌ 音域データ読み込みエラー:', error);
         voiceRangeData = null;
     }
+}
+
+/**
+ * 音域データの存在と妥当性をチェック
+ * @returns {boolean} データが有効な場合true
+ */
+function checkVoiceRangeData() {
+    // 音域データが存在しない
+    if (!voiceRangeData || !voiceRangeData.results) {
+        return false;
+    }
+
+    // comfortableRangeの存在確認
+    const rangeData = voiceRangeData.results.comfortableRange || voiceRangeData.results;
+    if (!rangeData.lowFreq || !rangeData.highFreq) {
+        return false;
+    }
+
+    // オクターブ数が1以上か確認
+    const octaves = Math.log2(rangeData.highFreq / rangeData.lowFreq);
+    if (octaves < 1.0) {
+        console.warn(`⚠️ オクターブ数不足: ${octaves.toFixed(2)}オクターブ（1.0以上必要）`);
+        return false;
+    }
+
+    return true;
 }
 
 /**
