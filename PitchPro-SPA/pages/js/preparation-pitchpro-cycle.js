@@ -905,6 +905,10 @@ function waitForLibraries() {
 window.initializePreparationPitchProCycle = async function() {
     console.log('🚀 initializePreparationPitchProCycle - 初期化開始（SPA対応）');
 
+    // SPA環境でのリロード対策: グローバルフラグをリセット
+    micPermissionListenerAdded = false;
+    console.log('🔄 イベントリスナーフラグをリセット');
+
     // ========================================================================
     // ⚠️ デバッグ用: Lucide初期化を無効化（元のコードは下のコメントアウト部分）
     // ========================================================================
