@@ -682,6 +682,12 @@ body::before {
   overflow: hidden;
 }
 
+/* フォーカス時のハイライトを無効化 */
+.btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
 .btn i {
   width: 24px;
   height: 24px;
