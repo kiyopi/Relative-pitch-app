@@ -1644,10 +1644,10 @@ function setupVolumeAdjustmentControls() {
 
             // PitchShifterの音量を調整
             if (window.pitchShifterInstance && window.pitchShifterInstance.isInitialized) {
-                // 音量調整範囲: 50%（中央）= 基準音量、0%（左端）= -15dB、100%（右端）= +15dB
+                // 音量調整範囲: 50%（中央）= 基準音量、0%（左端）= -30dB、100%（右端）= +30dB
                 // 50% = baseVolume（デフォルト・最適値）
-                // 100% = baseVolume + 15dB
-                // 0% = baseVolume - 15dB
+                // 100% = baseVolume + 30dB
+                // 0% = baseVolume - 30dB
 
                 // 現在のデバイス別基準音量を取得（router.jsと同じロジック）
                 const userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -1663,7 +1663,7 @@ function setupVolumeAdjustmentControls() {
                 }
 
                 // パーセンテージに応じて音量を調整（50%が基準）
-                const volumeOffset = (volumePercent - 50) * 0.3; // 50%差で±15dB
+                const volumeOffset = (volumePercent - 50) * 0.6; // 50%差で±30dB
                 const targetVolume = baseVolume + volumeOffset;
 
                 window.pitchShifterInstance.setVolume(targetVolume);
