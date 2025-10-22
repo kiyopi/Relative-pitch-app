@@ -1,9 +1,18 @@
 /**
  * voice-range-test-demo.js - 音域テストデモページメインスクリプト
  *
- * @version 3.1.21
+ * @version 3.2.0
  * @description PitchPro v1.3.1対応版統合デモ
- * @date 2025-01-16
+ * @date 2025-01-22
+ *
+ * v3.2.0更新内容（音域判定基準の変更 - トレーニング要件対応）:
+ * - 最低音域要件を0.3オクターブ → 1.0オクターブに変更
+ * - 理由: トレーニングでは基音から1オクターブ上まで歌う必要がある
+ * - isVeryNarrowRange削除 → isInsufficientRange追加（<1.0オクターブ = トレーニング不可）
+ * - isNarrowRange再定義（1.0～1.5オクターブ = 警告付き許可）
+ * - 1.0オクターブ未満の場合はトレーニング開始ボタンを非表示
+ * - UI警告メッセージの更新（具体的な要件を明示）
+ * - localStorage保存条件に音域不足を追加
  *
  * v3.1.21更新内容（部分結果時のトレーニング開始制限）:
  * - 部分結果（片方のみ測定成功）の場合、トレーニング開始ボタンを非表示
@@ -863,8 +872,8 @@ function calculateVoiceRange() {
     // 🎵 v3.1.16新機能: 部分結果対応（低音のみ、または高音のみ）
     let octaves, semitones, comfortableRange;
     let range, lowNote, highNote, lowFreq, highFreq;
-    let isNarrowRange = false;       // 🎵 v3.1.22: やや狭い音域フラグ (0.3～0.5オクターブ)
-    let isVeryNarrowRange = false;   // 🎵 v3.1.22: 極端に狭い音域フラグ (0.3オクターブ未満)
+    let isInsufficientRange = false; // 🎵 v3.2.0: 音域不足フラグ (1.0オクターブ未満) - トレーニング不可
+    let isNarrowRange = false;       // 🎵 v3.2.0: やや狭い音域フラグ (1.0～1.5オクターブ) - 警告付き許可
     let isReversedRange = false;     // 🎵 v3.1.22: 低音・高音逆転フラグ
 
     if (hasLowData && hasHighData) {
@@ -887,16 +896,18 @@ function calculateVoiceRange() {
             comfortableRange = calculateComfortableVoiceRange(lowData.lowestFreq, highData.highestFreq);
             range = `${lowData.lowestNote} - ${highData.highestNote}`;
 
-            // 🎵 v3.1.22新機能: 音域差の検証（アクセシビリティ考慮）
-            // 理由: 音域が狭い場合は警告表示するが、トレーニングは許可する
-            if (octaves < 0.3) {
-                isVeryNarrowRange = true;
-                console.warn(`⚠️ 極端に狭い音域検出: ${octaves.toFixed(2)}オクターブ`);
-                console.warn(`   低音: ${lowData.lowestFreq.toFixed(1)}Hz (${lowData.lowestNote}) | 高音: ${highData.highestFreq.toFixed(1)}Hz (${highData.highestNote})`);
-            } else if (octaves < 0.5) {
+            // 🎵 v3.2.0新機能: 音域差の検証（トレーニング要件に基づく判定）
+            // 理由: トレーニングには基音から1オクターブ上まで歌う必要があるため、最低1.0オクターブが必要
+            if (octaves < 1.0) {
+                isInsufficientRange = true;
+                console.error(`❌ 音域不足検出: ${octaves.toFixed(2)}オクターブ（最低1.0オクターブ必要）`);
+                console.error(`   低音: ${lowData.lowestFreq.toFixed(1)}Hz (${lowData.lowestNote}) | 高音: ${highData.highestFreq.toFixed(1)}Hz (${highData.highestNote})`);
+                console.error(`   トレーニング不可: 基音から1オクターブ上まで歌う必要があります`);
+            } else if (octaves < 1.5) {
                 isNarrowRange = true;
                 console.warn(`⚠️ やや狭い音域検出: ${octaves.toFixed(2)}オクターブ`);
                 console.warn(`   低音: ${lowData.lowestFreq.toFixed(1)}Hz (${lowData.lowestNote}) | 高音: ${highData.highestFreq.toFixed(1)}Hz (${highData.highestNote})`);
+                console.warn(`   警告: トレーニングは可能ですが、基音の選択肢が限られます`);
             }
         }
 
@@ -941,8 +952,8 @@ function calculateVoiceRange() {
         avgLowVolume: Math.round(lowData.avgVolume * 100),
         avgHighVolume: Math.round(highData.avgVolume * 100),
         isPartialResult: !hasLowData || !hasHighData,  // 部分結果フラグ
-        isNarrowRange: isNarrowRange,                  // 🎵 v3.1.22: やや狭い音域フラグ
-        isVeryNarrowRange: isVeryNarrowRange,          // 🎵 v3.1.22: 極端に狭い音域フラグ
+        isInsufficientRange: isInsufficientRange,      // 🎵 v3.2.0: 音域不足フラグ (1.0オクターブ未満)
+        isNarrowRange: isNarrowRange,                  // 🎵 v3.2.0: やや狭い音域フラグ (1.0～1.5オクターブ)
         isReversedRange: isReversedRange               // 🎵 v3.1.22: 低音・高音逆転フラグ
     };
 }
@@ -1218,32 +1229,32 @@ function displayVoiceRangeResults(results) {
                     </div>
                 </div>
             `;
-        } else if (results.isVeryNarrowRange) {
-            // 🎵 v3.1.22: 極端に狭い音域（0.3オクターブ未満）
+        } else if (results.isInsufficientRange) {
+            // 🎵 v3.2.0: 音域不足（1.0オクターブ未満） - トレーニング不可
             detailsEl.innerHTML = `
                 <div class="warning-alert">
                     <i data-lucide="alert-triangle" style="color: #f59e0b; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
                     <div>
-                        <p class="alert-title">音域が極端に狭い (${results.octaves}オクターブ)</p>
-                        <p>測定エラーの可能性があります。再測定をお勧めします。</p>
-                        <p class="alert-note">トレーニングは可能ですが、効果が限定的な場合があります。</p>
+                        <p class="alert-title">音域不足 (${results.octaves}オクターブ) - トレーニング不可</p>
+                        <p>このトレーニングでは基音から1オクターブ上まで歌う必要があります。</p>
+                        <p class="alert-note">最低1.0オクターブの音域が必要です。再測定してください。</p>
                     </div>
                 </div>
             `;
         } else if (results.isNarrowRange) {
-            // 🎵 v3.1.22: やや狭い音域（0.3～0.5オクターブ）
+            // 🎵 v3.2.0: やや狭い音域（1.0～1.5オクターブ） - 警告付き許可
             detailsEl.innerHTML = `
                 <div class="info-alert">
                     <i data-lucide="info" style="color: #60a5fa; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
                     <div>
                         <p class="alert-title">音域がやや狭い (${results.octaves}オクターブ)</p>
-                        <p>より広い音域で発声すると、効果的なトレーニングができます。</p>
+                        <p>トレーニングは可能ですが、選択できる基音の種類が限られます。</p>
                         <p class="alert-note">快適音域: ${results.comfortableRange ? results.comfortableRange.range : '計算中...'}</p>
                     </div>
                 </div>
             `;
         } else {
-            // 🎵 v3.1.22統一: 通常の結果表示（0.5オクターブ以上）
+            // 🎵 v3.2.0: 通常の結果表示（1.5オクターブ以上）
             detailsEl.innerHTML = `
                 <div class="success-alert">
                     <i data-lucide="check-circle" style="color: #22c55e; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
@@ -1257,15 +1268,17 @@ function displayVoiceRangeResults(results) {
     }
 
     // 🎵 v3.1.21修正: 部分結果または完全失敗の場合はトレーニング開始ボタンを非表示
-    // 🎵 v3.1.22追加: 音域が狭い場合でもトレーニングは許可（アクセシビリティ考慮）
     // 🎵 v3.1.22追加: 低音・高音逆転の場合もトレーニング不可
-    // 理由: 不完全な音域データでトレーニングを開始させない（品質保証）
+    // 🎵 v3.2.0追加: 音域不足（1.0オクターブ未満）の場合もトレーニング不可
+    // 理由: 不完全な音域データまたは基音+1オクターブを歌えない音域でトレーニングを開始させない（品質保証）
     const completeRangeTestBtn = document.getElementById('complete-range-test-btn');
     if (completeRangeTestBtn) {
-        if (results.isCompleteFail || results.isPartialResult || results.isReversedRange) {
+        if (results.isCompleteFail || results.isPartialResult || results.isReversedRange || results.isInsufficientRange) {
             completeRangeTestBtn.style.display = 'none';
             if (results.isReversedRange) {
                 console.log('❌ 低音・高音逆転のためトレーニング開始ボタンを非表示');
+            } else if (results.isInsufficientRange) {
+                console.log('❌ 音域不足（1.0オクターブ未満）のためトレーニング開始ボタンを非表示');
             } else if (results.isCompleteFail) {
                 console.log('❌ 完全失敗のためトレーニング開始ボタンを非表示');
             } else if (results.isPartialResult) {
@@ -1273,10 +1286,8 @@ function displayVoiceRangeResults(results) {
             }
         } else {
             completeRangeTestBtn.style.display = '';
-            if (results.isVeryNarrowRange) {
-                console.log('⚠️ 音域が極端に狭いが、トレーニング開始は可能（ユーザー判断に委ねる）');
-            } else if (results.isNarrowRange) {
-                console.log('ℹ️ 音域がやや狭いが、トレーニング開始は可能');
+            if (results.isNarrowRange) {
+                console.log('⚠️ 音域がやや狭い（1.0～1.5オクターブ）が、トレーニング開始は可能');
             } else {
                 console.log('✅ 両方測定成功 - トレーニング開始可能');
             }
@@ -1295,7 +1306,7 @@ function displayVoiceRangeResults(results) {
     }
 
     // 💾 音域データをlocalStorageに保存（完全失敗・部分結果・逆転以外の場合のみ）
-    if (!results.isCompleteFail && !results.isPartialResult && !results.isReversedRange) {
+    if (!results.isCompleteFail && !results.isPartialResult && !results.isReversedRange && !results.isInsufficientRange) {
         const voiceRangeData = {
             results: {
                 range: results.range,
@@ -1307,7 +1318,7 @@ function displayVoiceRangeResults(results) {
                 highNote: results.highNote,
                 comfortableRange: results.comfortableRange,
                 isNarrowRange: results.isNarrowRange,
-                isVeryNarrowRange: results.isVeryNarrowRange
+                isInsufficientRange: results.isInsufficientRange  // v3.2.0: 更新
             },
             timestamp: new Date().toISOString()
         };
