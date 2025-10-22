@@ -696,6 +696,13 @@ body::before {
   user-select: none !important;
 }
 
+/* iOS:activeスタイルを無効化 */
+#test-base-note-btn:active {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+  transform: none !important;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3) !important;
+}
+
 .btn i {
   width: 24px;
   height: 24px;
