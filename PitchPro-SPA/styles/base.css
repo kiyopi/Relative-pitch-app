@@ -682,8 +682,8 @@ body::before {
   overflow: hidden;
 }
 
-/* フォーカス時のハイライトを無効化 */
-.btn:focus {
+/* フォーカス時のハイライトを無効化（基音試聴ボタンのみ） */
+#test-base-note-btn:focus {
   outline: none;
   box-shadow: none;
 }
