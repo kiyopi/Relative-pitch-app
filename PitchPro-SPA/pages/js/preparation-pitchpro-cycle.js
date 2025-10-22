@@ -1004,11 +1004,27 @@ function setupMicPermissionFlow() {
 
             // PitchProサイクル管理を使う場合
             if (typeof pitchProCycleManager !== 'undefined' && pitchProCycleManager && pitchProCycleManager.audioDetector) {
+                // リロード後の古いリソースを完全にクリーンアップ
+                console.log('🧹 リロード後クリーンアップ開始...');
+                try {
+                    if (pitchProCycleManager.audioDetector.microphoneController) {
+                        await pitchProCycleManager.audioDetector.stopDetection();
+                        console.log('✅ 既存の検出を停止');
+                    }
+                } catch (cleanupError) {
+                    console.warn('⚠️ クリーンアップエラー（続行）:', cleanupError);
+                }
+
                 // AudioDetectionComponentの初期化（v1.3.1では内部でマイク許可も処理）
                 console.log('🎤 AudioDetectionComponent.initialize() 開始（マイク許可含む）');
                 try {
                     await pitchProCycleManager.audioDetector.initialize();
                     console.log('✅ AudioDetectionComponent.initialize() 完了');
+
+                    // 初期化後、少し待ってからマイクストリームが安定するのを待つ
+                    console.log('⏳ マイクストリーム安定化待機中...');
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    console.log('✅ マイクストリーム安定化完了');
                     console.log('✅ マイク許可成功！');
 
                     // localStorage保存（新規追加）
