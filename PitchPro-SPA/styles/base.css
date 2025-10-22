@@ -722,12 +722,14 @@ body::before {
 .base-note-button:focus,
 .base-note-button:focus-visible {
   /* すべてのインタラクティブ状態で通常スタイルを維持 */
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  color: #ffffff;
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
-  transform: none;
-  outline: none;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3) !important;
+  transform: none !important;
+  outline: none !important;
+  opacity: 1 !important;
+  filter: none !important;
 }
 
 .base-note-button:disabled {
