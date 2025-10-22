@@ -1626,8 +1626,16 @@ function setupVolumeAdjustmentControls() {
 
                 // ボタンを無効化して「再生中」状態に変更
                 const btn = e.currentTarget;
-                const icon = btn.querySelector('i');
+                const icon = btn.querySelector('[data-lucide]') || btn.querySelector('svg') || btn.querySelector('i');
                 const text = btn.querySelector('span');
+
+                if (!icon || !text) {
+                    console.warn('⚠️ ボタン内の要素が見つかりません');
+                    // 要素が見つからない場合は音声だけ再生
+                    await window.pitchShifterInstance.playNote("C4");
+                    return;
+                }
+
                 const originalIconName = icon.getAttribute('data-lucide');
                 const originalText = text.textContent;
 
@@ -1647,9 +1655,17 @@ function setupVolumeAdjustmentControls() {
 
                 // 2秒後にボタンを元に戻す（PitchShifterの再生時間）
                 setTimeout(() => {
+                    // アイコン要素を再取得（Lucideで置き換わっている可能性があるため）
+                    const currentIcon = btn.querySelector('[data-lucide]') || btn.querySelector('svg');
+                    const currentText = btn.querySelector('span');
+
                     btn.disabled = false;
-                    icon.setAttribute('data-lucide', originalIconName);
-                    text.textContent = originalText;
+                    if (currentIcon) {
+                        currentIcon.setAttribute('data-lucide', originalIconName);
+                    }
+                    if (currentText) {
+                        currentText.textContent = originalText;
+                    }
 
                     // Lucideアイコンを更新
                     if (typeof lucide !== 'undefined') {
@@ -1664,11 +1680,16 @@ function setupVolumeAdjustmentControls() {
 
                 // エラー時もボタンを元に戻す
                 const btn = e.currentTarget;
-                const icon = btn.querySelector('i');
+                const icon = btn.querySelector('[data-lucide]') || btn.querySelector('svg') || btn.querySelector('i');
                 const text = btn.querySelector('span');
+
                 btn.disabled = false;
-                icon.setAttribute('data-lucide', 'volume-2');
-                text.textContent = '基音を試聴';
+                if (icon) {
+                    icon.setAttribute('data-lucide', 'volume-2');
+                }
+                if (text) {
+                    text.textContent = '基音を試聴';
+                }
                 if (typeof lucide !== 'undefined') {
                     lucide.createIcons();
                 }
