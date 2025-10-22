@@ -1599,12 +1599,15 @@ function setupVolumeAdjustmentControls() {
     // 基音試聴ボタン
     const testBaseNoteBtn = document.getElementById('test-base-note-btn');
     if (testBaseNoteBtn) {
-        testBaseNoteBtn.addEventListener('click', async () => {
+        testBaseNoteBtn.addEventListener('click', async (e) => {
             console.log('🎵 基音試聴ボタンがクリックされました');
             console.log('🔍 PitchShifter状態:', {
                 exists: !!window.pitchShifterInstance,
                 isInitialized: window.pitchShifterInstance?.isInitialized
             });
+
+            // フォーカスを外す（押下状態を解除）
+            e.currentTarget.blur();
 
             try {
                 // PitchShifterインスタンスを確認
@@ -1621,13 +1624,54 @@ function setupVolumeAdjustmentControls() {
                     console.log('✅ PitchShifter初期化完了');
                 }
 
+                // ボタンを無効化して「再生中」状態に変更
+                const btn = e.currentTarget;
+                const icon = btn.querySelector('i');
+                const text = btn.querySelector('span');
+                const originalIconName = icon.getAttribute('data-lucide');
+                const originalText = text.textContent;
+
+                btn.disabled = true;
+                icon.setAttribute('data-lucide', 'loader-2');
+                text.textContent = '再生中...';
+
+                // Lucideアイコンを更新
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+
                 // C4 (261.6Hz) を再生
                 console.log('▶️ C4音を再生開始...');
                 await window.pitchShifterInstance.playNote("C4");
                 console.log('✅ 基音C4を再生しました');
+
+                // 2秒後にボタンを元に戻す（PitchShifterの再生時間）
+                setTimeout(() => {
+                    btn.disabled = false;
+                    icon.setAttribute('data-lucide', originalIconName);
+                    text.textContent = originalText;
+
+                    // Lucideアイコンを更新
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                    }
+                    console.log('✅ ボタン状態を復元しました');
+                }, 2000);
+
             } catch (error) {
                 console.error('❌ 基音再生エラー:', error);
                 alert('音声再生に失敗しました: ' + error.message);
+
+                // エラー時もボタンを元に戻す
+                const btn = e.currentTarget;
+                const icon = btn.querySelector('i');
+                const text = btn.querySelector('span');
+                btn.disabled = false;
+                icon.setAttribute('data-lucide', 'volume-2');
+                text.textContent = '基音を試聴';
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
             }
         });
         console.log('✅ 基音試聴ボタンのイベントリスナー設定完了');
