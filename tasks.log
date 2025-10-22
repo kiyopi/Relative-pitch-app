@@ -4025,3 +4025,27 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 20:45:25] コミット: fix: セッション進行をモード別にカウントするよう修正
+
+## 問題
+- sessionIdが全モード共通の通し番号のため、sessionId >= 8で判定していた
+- セッション1でもsessionId=10の場合「総合評価を見る」ボタンが表示された
+- 8セッション完了前にトレーニングを継続できない問題
+
+## 修正内容
+- updateNextSessionButton関数でlocalStorageから現在のモードのセッション数を取得
+- mode='random'でcompletedフラグがtrueのセッション数をカウント
+- 8セッション完了判定をモード別に正確に実施
+
+## 修正箇所
+- PitchPro-SPA/pages/js/result-session-controller.js
+  - updateNextSessionButton関数を修正
+  - モード別セッション進行状況のログ出力を追加
+
+## 動作確認
+- ランダムモード1セッション完了時: "次の基音へ"ボタン表示
+- ランダムモード8セッション完了時: "総合評価を見る"ボタン表示
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

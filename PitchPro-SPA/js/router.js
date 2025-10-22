@@ -132,6 +132,10 @@ class SimpleRouter {
             case 'result-session':
                 await this.setupResultSessionEvents(fullHash);
                 break;
+            case 'results':
+            case 'results-overview':
+                this.setupResultsOverviewEvents();
+                break;
             default:
                 break;
         }
@@ -296,6 +300,30 @@ class SimpleRouter {
         } catch (error) {
             console.error('Error setting up result-session page events:', error);
             throw error;
+        }
+    }
+
+    setupResultsOverviewEvents() {
+        console.log('Setting up results-overview page events...');
+
+        // 新しいトレーニング開始ボタン
+        const newTrainingBtn = document.getElementById('btn-new-training');
+        if (newTrainingBtn) {
+            newTrainingBtn.addEventListener('click', () => {
+                console.log('🆕 新しいトレーニング開始ボタンがクリックされました');
+
+                // ランダムモードのセッションデータをクリア
+                const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+                const otherSessions = allSessions.filter(s => s.mode !== 'random');
+                localStorage.setItem('sessionData', JSON.stringify(otherSessions));
+                console.log('✅ ランダムモードのセッションデータをクリアしました');
+
+                // トレーニングページに遷移
+                window.location.hash = 'training';
+            });
+            console.log('✅ 新しいトレーニング開始ボタンのイベントリスナー設定完了');
+        } else {
+            console.warn('⚠️ btn-new-training が見つかりません');
         }
     }
 
