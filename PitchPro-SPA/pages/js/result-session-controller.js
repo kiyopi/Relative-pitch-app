@@ -344,11 +344,9 @@ function updateNextSessionButton(sessionNumber) {
             button.innerHTML = '<i data-lucide="trophy" style="width: 24px; height: 24px;"></i><span>総合評価を見る</span>';
             console.log('✅ 8セッション完了 - 総合評価ボタン表示');
         } else {
-            // 次のセッションへ
+            // 次のセッションへ（ReloadManager統合）
             button.onclick = () => {
-                // 正常な遷移フラグを設定（リロード誤検出防止）
-                sessionStorage.setItem('normalTransitionToTraining', 'true');
-                window.location.hash = 'training';
+                ReloadManager.navigateToTraining();
             };
             button.innerHTML = '<i data-lucide="arrow-right" style="width: 24px; height: 24px;"></i><span>次の基音へ</span>';
             console.log(`➡️ セッション${completedSessionsInMode + 1}/8 - 次のセッションボタン表示`);

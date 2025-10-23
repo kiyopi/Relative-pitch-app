@@ -2,10 +2,10 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: 2025-10-23-05:15 - リロード検出2回実行防止（ダイアログ1回のみ）
+ * 🔥 VERSION: 2025-10-23-06:00 - ReloadManager統合版
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-23-05:15 LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-23-06:00 LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
@@ -49,106 +49,21 @@ const modeConfig = {
     }
 };
 
-/**
- * リロード検出関数
- * Performance Navigation API を使用してリロードを検出
- *
- * 【重要】SPA内の正常な遷移（preparation → training）を除外
- * sessionStorage のフラグで正常な遷移を識別
- *
- * 【重要】リダイレクト済みフラグで2回目の検出を防止
- */
-function detectReload() {
-    console.log('🔍 [detectReload] リロード検出開始');
-
-    // リダイレクト済みフラグをチェック（2回目の検出を防止）
-    const alreadyRedirected = sessionStorage.getItem('reloadRedirected');
-    if (alreadyRedirected === 'true') {
-        console.log('✅ リダイレクト済み - 2回目の検出をスキップ');
-        sessionStorage.removeItem('reloadRedirected');
-        return false;
-    }
-
-    // 正常な遷移フラグをチェック（preparation からの遷移）
-    const normalTransition = sessionStorage.getItem('normalTransitionToTraining');
-    console.log('🔍 [detectReload] normalTransition フラグ:', normalTransition);
-    if (normalTransition === 'true') {
-        // フラグを削除して正常な遷移として扱う
-        sessionStorage.removeItem('normalTransitionToTraining');
-        console.log('✅ 正常な遷移を検出（preparation → training）');
-        return false;
-    }
-
-    // Performance Navigation API で検出（古いブラウザ対応）
-    console.log('🔍 [detectReload] performance.navigation:', performance.navigation);
-    if (performance.navigation && performance.navigation.type === 1) {
-        console.log('✅ リロード検出（古いAPI）: performance.navigation.type === 1');
-        // リダイレクト済みフラグを設定
-        sessionStorage.setItem('reloadRedirected', 'true');
-        return true; // TYPE_RELOAD
-    }
-
-    // Navigation Timing API v2（新しいブラウザ）
-    const navEntries = performance.getEntriesByType('navigation');
-    console.log('🔍 [detectReload] Navigation Timing API v2:', navEntries);
-    if (navEntries.length > 0) {
-        console.log('🔍 [detectReload] navEntries[0].type:', navEntries[0].type);
-        if (navEntries[0].type === 'reload') {
-            console.log('✅ リロード検出（新しいAPI）: navEntries[0].type === "reload"');
-            // リダイレクト済みフラグを設定
-            sessionStorage.setItem('reloadRedirected', 'true');
-            return true;
-        }
-    }
-
-    console.log('❌ リロード未検出 - 通常のSPA遷移として扱う');
-    return false;
-}
-
-/**
- * preparationページへのリダイレクト（モード情報保持）
- * @param {string} reason - リダイレクトの理由（ログ用）
- */
-function redirectToPreparationWithMode(reason = '') {
-    // 現在のモード・セッション情報を取得
-    const hash = window.location.hash.substring(1);
-    const params = new URLSearchParams(hash.split('?')[1] || '');
-    const mode = params.get('mode') || currentMode || 'random';
-    const session = params.get('session') || '';
-
-    console.log(`🔄 preparationへリダイレクト: ${reason}`);
-
-    // preparationへリダイレクト（モード情報を保持）
-    const redirectParams = new URLSearchParams({
-        redirect: 'training',
-        mode: mode
-    });
-    if (session) redirectParams.set('session', session);
-
-    window.location.hash = `preparation?${redirectParams.toString()}`;
-}
-
 export async function initializeTrainingPage() {
     console.log('TrainingController initializing...');
 
-    // 【新規追加】リロード検出 → preparationへリダイレクト
-    const isReload = detectReload();
-    if (isReload) {
+    // 【ReloadManager統合】リロード検出 → preparationへリダイレクト
+    if (ReloadManager.detectReload()) {
         console.warn('⚠️ リロード検出 - preparationへリダイレクト');
 
         // ユーザーに説明を表示
-        alert('リロードが検出されました。マイク設定のため準備ページに移動します。');
+        ReloadManager.showReloadDialog();
 
-        // リダイレクトを実行
-        window.location.hash = 'preparation';
-
-        // リダイレクト完了まで待機
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // preparationへリダイレクト
+        await ReloadManager.redirectToPreparation('リロード検出');
 
         // リダイレクトエラーをスロー（router.jsで特別扱い）
-        const error = new Error('REDIRECT_TO_PREPARATION');
-        error.isRedirect = true;
-        throw error;
+        throw ReloadManager.createRedirectError();
     }
 
     // Wait for Lucide
@@ -161,7 +76,7 @@ export async function initializeTrainingPage() {
     if (!checkVoiceRangeData()) {
         console.error('❌ 音域データが設定されていません');
         alert('音域テストを先に完了してください。');
-        redirectToPreparationWithMode('音域テスト未完了');
+        await ReloadManager.redirectToPreparation('音域テスト未完了');
         return;
     }
 

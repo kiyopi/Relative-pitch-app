@@ -4049,3 +4049,287 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 20:58:42] コミット: fix: 総合評価ページのボタンをSPAハッシュルーティングに修正
+
+## 問題
+- 「新しいトレーニング開始」ボタンが training.html に直接遷移（404エラー）
+- 「ホームに戻る」ボタンが index.html に直接遷移（404エラー）
+- セッションデータがリセットされず、11セッション目として継続される問題
+
+## 修正内容
+
+### results-overview.html
+- 「新しいトレーニング開始」ボタンにID（btn-new-training）を追加
+- 「ホームに戻る」ボタンをSPAハッシュルーティング（#home）に変更
+
+### router.js
+- setupPageEventsにresults/results-overviewケースを追加
+- setupResultsOverviewEventsメソッドを新規実装
+  - btn-new-trainingクリック時の処理を実装
+  - ランダムモードのセッションデータをlocalStorageからクリア
+  - #trainingに遷移
+
+## 動作確認
+- 総合評価ページ表示時に自動的にイベントリスナーが設定される
+- 「新しいトレーニング開始」ボタンクリックでセッションデータがリセットされる
+- トレーニングページに正しく遷移する
+- 「ホームに戻る」ボタンでホームページに正しく遷移する
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-22 21:43:27] コミット: feat: リロード・ブラウザバック時のクリーンアップ処理実装
+
+フェーズ1（必須実装）完了:
+- router.js: trainingページ離脱時のクリーンアップ処理追加
+  - AudioDetector停止、マイクストリーム解放、PitchShifter停止
+  - セッションデータリセット、初期化フラグリセット
+- trainingController.js: 音域データ前提条件チェック実装
+  - checkVoiceRangeData()関数追加（音域未設定時はpreparationにリダイレクト）
+  - resetTrainingPageFlag()をグローバル公開
+- NAVIGATION_HANDLING_SPECIFICATION.md: 包括的な仕様書作成
+  - リロード・ブラウザバック・ダイレクトアクセスの処理仕様定義
+  - 実装計画（フェーズ1-3）、テストケース一覧
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 09:25:59] コミット: fix: SessionDataRecorderのsessionCounterリセット問題を修正
+
+- localStorage手動消去時にsessionCounterが古い値を保持する問題を解決
+- startNewSession()でlocalStorageと自動同期チェックを追加
+- resetSession()でsessionCounterを完全に再同期する処理を実装
+
+🐛 問題:
+- ページロード時にSessionDataRecorderインスタンスがsessionCounterを初期化
+- ユーザーがlocalStorageを手動で消去した後も古い値を保持
+- 結果: sessionId=12だがlocalStorageには1件のみという不整合
+
+✅ 解決策:
+- セッション開始前にlocalStorageの最大IDをチェック
+- sessionCounterと不整合がある場合は自動的に再同期
+- resetSession()でも同様の再同期処理を実装
+
+📋 修正箇所:
+- startNewSession(): localStorage同期チェック追加 (lines 25-37)
+- resetSession(): sessionCounter再同期処理追加 (lines 171-177)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 10:06:15] コミット: fix: 新しいトレーニング開始ボタンでSessionDataRecorderをリセット
+
+- results-overviewページの「新しいトレーニング開始」ボタン処理を修正
+- localStorageクリア後にSessionDataRecorder.resetSession()を呼び出し
+- sessionCounterが正しく0にリセットされるように改善
+
+🐛 問題:
+- btn-new-trainingクリック時、localStorageは消去されるが
+- SessionDataRecorderインスタンスのsessionCounterが古い値を保持
+- 結果: 次のセッションが1から始まらない
+
+✅ 解決策:
+- localStorage操作後にresetSession()を明示的に呼び出し
+- sessionCounterがlocalStorageと同期されるように修正
+
+📋 修正箇所:
+- router.js setupResultsOverviewEvents() (lines 321-325)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 10:13:32] コミット: perf: トレーニングページ初期化時に基音を事前選択
+
+- initializeTrainingPage()で基音を事前に選択してbaseNoteInfoに保存
+- startTraining()では事前選択済みの基音を使用（即座に再生開始）
+- ボタンクリック時の基音選択遅延を解消
+
+🎯 改善内容:
+- preselectBaseNote()関数を新規実装
+- ページ初期化時に基音を選択（selectBaseNote()実行）
+- startTraining()内の動的基音選択処理を削除
+
+📊 パフォーマンス向上:
+- ボタンクリック → 基音選択 → 再生（遅延あり）
+  ↓
+- ボタンクリック → 即座に再生（遅延なし）
+
+🔄 動作フロー:
+1. トレーニングページ初期化 → 基音を事前選択
+2. 「基音スタート」クリック → 即座に再生開始
+3. セッション完了 → 結果ページへ遷移
+4. 「新しいトレーニング開始」 → 再初期化 → 新しい基音を選択
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 10:27:08] コミット: fix: 新しいトレーニング開始時のセッション番号表示を修正
+
+- sessionCounterを0に直接リセット（他モードのセッションIDを参照しない）
+- resetSession()メソッドは全モードの最大IDを取得するため使用しない
+
+🐛 問題:
+- 「新しいトレーニング開始」でrandomモードのセッションのみ削除
+- resetSession()が全モードのセッションから最大IDを取得
+- 他モード（continuous等）が残っている場合、そのIDが使われる
+- 結果: セッション1のはずがセッション2以上と表示される
+
+✅ 解決策:
+- randomモード専用リセット処理を実装
+- sessionCounter = 0 に直接設定
+- currentSession = null をクリア
+
+📊 修正後の動作:
+- 「新しいトレーニング開始」クリック
+- sessionCounter = 0
+- トレーニングページ表示: 「セッション 1/8」（正しい表示）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 10:40:08] コミット: refactor: トレーニング初期化処理を統合（sessionCounterリセット+基音選択）
+
+- initializeRandomModeTraining()関数を新規実装
+- sessionCounterリセットと基音選択を一箇所に集約
+- どの経路から来ても確実に0からスタート
+
+🎯 統合内容:
+- trainingController.js:
+  - initializeRandomModeTraining()を追加
+    - sessionCounterを0にリセット
+    - preselectBaseNote()を呼び出し
+  - initializeTrainingPage()から自動実行
+
+- router.js:
+  - 「新しいトレーニング開始」ボタン処理を簡素化
+  - localStorageクリアのみ実行
+  - sessionCounterリセットはtrainingController側に移譲
+
+✅ メリット:
+1. 確実性: どの経路でもセッション1から開始
+2. 一貫性: セッションリセット+基音選択がセット
+3. 保守性: トレーニング初期化処理が一箇所に集約
+4. 可読性: 責任範囲が明確
+
+🔄 動作フロー:
+1. 「新しいトレーニング開始」クリック
+2. localStorage内のrandomモードセッションをクリア
+3. trainingページに遷移
+4. initializeTrainingPage()実行
+5. → initializeRandomModeTraining()実行
+   - sessionCounter = 0
+   - 基音を事前選択
+6. 画面表示: 「セッション 1/8」
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 10:54:39] コミット: feat: 音域に応じた適応的基音選択アルゴリズムを実装
+
+- 初級・中級・上級の難易度別基音選択を実装
+- 音域の広さに応じて選択ロジックを自動調整
+
+🎯 実装内容:
+
+1. **初級（ランダム基音モード）**: ゾーン分割による分散選択
+   - 2オクターブ以上: 4ゾーン分割（低音→中低音→中高音→高音）
+   - 1.5-2オクターブ: 3ゾーン分割
+   - 1-1.5オクターブ: 完全ランダム
+   - 効果: 離れた音程で違いが分かりやすい
+
+2. **中級（連続チャレンジモード）**: 距離確保によるランダム選択
+   - 2オクターブ以上: 前回から±5半音以内を除外
+   - 1.5-2オクターブ: 前回から±3半音以内を除外
+   - 1-1.5オクターブ: 完全ランダム
+   - 効果: 近すぎず遠すぎない適度な難易度
+
+3. **上級（12音階モード）**: 既存の順次選択（変更なし）
+
+📊 新規追加関数:
+- getVoiceRangeOctaves(): 音域のオクターブ数を計算
+- selectNoteFromZone(): ゾーン分割選択（初級用）
+- selectNoteWithDistance(): 距離確保選択（中級用）
+
+🔧 変更箇所:
+- previousBaseNote変数追加: 前回の基音を記憶（中級用）
+- selectBaseNote()書き換え: 各モードで適切なアルゴリズム使用
+- initializeRandomModeTraining()にpreviousBaseNoteリセット追加
+
+✅ メリット:
+1. 音域全体をバランスよく活用
+2. 段階的な難易度設定（初級→中級→上級）
+3. 狭い音域でも正しく動作（1-1.5オクターブは完全ランダム）
+4. 1オクターブ未満は既存のチェックでpreparationページへリダイレクト
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 13:28:52] コミット: feat: トレーニングページのリロード・ダイレクトアクセス機能を実装
+
+- trainingページのリロード検出とpreparationへの自動リダイレクト機能
+- Performance Navigation API使用でリロードを正確に検出
+- sessionStorageフラグでSPA内正常遷移とリロードを区別
+- URLパラメータでモード・セッション情報を保持
+- preparation経由での自動復帰機能（モード情報保持）
+- セッションカウンターのリセットタイミング修正
+- リダイレクト時のダイアログ説明表示でUX改善
+
+変更ファイル:
+- trainingController.v2.js: リロード検出・リダイレクト処理（新規作成）
+- preparationController.js: リダイレクト情報処理・メッセージ表示
+- preparation-pitchpro-cycle.js: 自動復帰機能実装
+- router.js: リダイレクトエラー特別処理、normalTransitionフラグ設定
+- preparation.html: リダイレクトメッセージ表示エリア追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 14:24:50] コミット: fix: リロード検出の2回実行を防止（ダイアログ1回のみ表示）
+
+問題:
+- trainingページリロード時にダイアログが2回表示される
+- initializeTrainingPage()が2回実行され、detectReload()も2回呼ばれる
+
+原因:
+- 古いAPI（performance.navigation.type）と新しいAPI（navEntries[0].type）
+  の両方が検出成功し、それぞれでダイアログ表示していた
+
+修正内容:
+- sessionStorage に reloadRedirected フラグを追加
+- 1回目のリロード検出時にフラグを設定
+- 2回目の detectReload() 実行時にフラグをチェックしてスキップ
+- リダイレクト完了後にフラグを削除
+
+期待される動作:
+- trainingページリロード時にダイアログ1回のみ表示
+- その後、preparationへスムーズにリダイレクト
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 14:31:44] コミット: fix: セッション2でのリロード誤検出を修正（normalTransitionフラグ追加）
+
+問題:
+- result-sessionページの「次のセッション」ボタンクリック時
+- results-overviewページの「新しいトレーニング開始」ボタンクリック時
+- trainingページへ遷移するとリロードとして誤検出される
+
+原因:
+- result-session → training への遷移時にnormalTransitionToTrainingフラグが未設定
+- results-overview → training への遷移時にnormalTransitionToTrainingフラグが未設定
+- detectReload()が正常な遷移と認識できず、リロードとして検出
+
+修正内容:
+- result-session-controller.js: 「次のセッション」ボタンクリック時にフラグ設定
+- router.js: 「新しいトレーニング開始」ボタンクリック時にフラグ設定
+
+期待される動作:
+- セッション1完了 → 次のセッション → セッション2開始（リロード検出なし）
+- 8セッション完了 → 新しいトレーニング開始 → セッション1開始（リロード検出なし）
+
+注意:
+- preparation-pitchpro-cycle.jsは既に前回の実装でフラグ設定済み
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

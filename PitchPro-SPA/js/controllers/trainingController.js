@@ -1,7 +1,11 @@
 /**
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
+ *
+ * 🔥 VERSION: 2025-10-23-04:15 - リロード検出機能追加版
  */
+
+console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-23-04:15 LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
@@ -45,8 +49,82 @@ const modeConfig = {
     }
 };
 
+/**
+ * リロード検出関数
+ * Performance Navigation API を使用してリロードを検出
+ *
+ * 【重要】SPA内の正常な遷移（preparation → training）を除外
+ * sessionStorage のフラグで正常な遷移を識別
+ */
+function detectReload() {
+    console.log('🔍 [detectReload] リロード検出開始');
+
+    // 正常な遷移フラグをチェック（preparation からの遷移）
+    const normalTransition = sessionStorage.getItem('normalTransitionToTraining');
+    console.log('🔍 [detectReload] normalTransition フラグ:', normalTransition);
+    if (normalTransition === 'true') {
+        // フラグを削除して正常な遷移として扱う
+        sessionStorage.removeItem('normalTransitionToTraining');
+        console.log('✅ 正常な遷移を検出（preparation → training）');
+        return false;
+    }
+
+    // Performance Navigation API で検出（古いブラウザ対応）
+    console.log('🔍 [detectReload] performance.navigation:', performance.navigation);
+    if (performance.navigation && performance.navigation.type === 1) {
+        console.log('✅ リロード検出（古いAPI）: performance.navigation.type === 1');
+        return true; // TYPE_RELOAD
+    }
+
+    // Navigation Timing API v2（新しいブラウザ）
+    const navEntries = performance.getEntriesByType('navigation');
+    console.log('🔍 [detectReload] Navigation Timing API v2:', navEntries);
+    if (navEntries.length > 0) {
+        console.log('🔍 [detectReload] navEntries[0].type:', navEntries[0].type);
+        if (navEntries[0].type === 'reload') {
+            console.log('✅ リロード検出（新しいAPI）: navEntries[0].type === "reload"');
+            return true;
+        }
+    }
+
+    console.log('❌ リロード未検出 - 通常のSPA遷移として扱う');
+    return false;
+}
+
+/**
+ * preparationページへのリダイレクト（モード情報保持）
+ * @param {string} reason - リダイレクトの理由（ログ用）
+ */
+function redirectToPreparationWithMode(reason = '') {
+    // 現在のモード・セッション情報を取得
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash.split('?')[1] || '');
+    const mode = params.get('mode') || currentMode || 'random';
+    const session = params.get('session') || '';
+
+    console.log(`🔄 preparationへリダイレクト: ${reason}`);
+
+    // preparationへリダイレクト（モード情報を保持）
+    const redirectParams = new URLSearchParams({
+        redirect: 'training',
+        mode: mode
+    });
+    if (session) redirectParams.set('session', session);
+
+    window.location.hash = `preparation?${redirectParams.toString()}`;
+}
+
 export async function initializeTrainingPage() {
     console.log('TrainingController initializing...');
+
+    // 【新規追加】リロード検出 → preparationへリダイレクト
+    const isReload = detectReload();
+    if (isReload) {
+        console.warn('⚠️ リロード検出 - preparationへリダイレクト');
+        alert('リロードが検出されました。マイク設定のため準備ページに移動します。');
+        window.location.hash = 'preparation';
+        return;
+    }
 
     // Wait for Lucide
     await waitForLucide();
@@ -58,11 +136,14 @@ export async function initializeTrainingPage() {
     if (!checkVoiceRangeData()) {
         console.error('❌ 音域データが設定されていません');
         alert('音域テストを先に完了してください。');
-        window.location.hash = 'preparation';
+        redirectToPreparationWithMode('音域テスト未完了');
         return;
     }
 
-    // Initialize mode UI
+    // 【重要】ランダムモード新規開始処理を先に実行（sessionCounterをリセット）
+    initializeRandomModeTraining();
+
+    // Initialize mode UI（リセット後に実行）
     initializeModeUI();
 
     // Update session progress UI
@@ -105,9 +186,6 @@ export async function initializeTrainingPage() {
         });
         console.log('✅ デバッグ用マイク許可ボタン登録完了');
     }
-
-    // ランダムモード新規開始処理（sessionCounterリセット + 基音選択）
-    initializeRandomModeTraining();
 
     isInitialized = true;
     console.log('TrainingController initialized');
@@ -163,6 +241,12 @@ function initializeModeUI() {
  */
 function initializeRandomModeTraining() {
     console.log('🆕 ランダムモード新規開始処理を実行');
+
+    // localStorageのランダムモードセッションデータをクリア
+    const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+    const otherModeSessions = allSessions.filter(s => s.mode !== 'random');
+    localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
+    console.log('🗑️ ランダムモードのセッションデータをクリア');
 
     // sessionCounterを0にリセット（ランダムモード専用）
     if (window.sessionDataRecorder) {

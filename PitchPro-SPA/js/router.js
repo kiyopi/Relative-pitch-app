@@ -157,18 +157,17 @@ class SimpleRouter {
                     this.initializePitchShifterBackground();
                 }
 
-                // 【新規追加】training へ直接遷移する場合、正常な遷移フラグを設定
+                // 【ReloadManager統合】training へ直接遷移する場合
                 if (route === 'training') {
-                    sessionStorage.setItem('normalTransitionToTraining', 'true');
+                    ReloadManager.navigateToTraining(mode, session);
+                } else {
+                    // training以外のルート（preparation等）
+                    let hash = route;
+                    if (mode && session) {
+                        hash += `?mode=${mode}&session=${session}`;
+                    }
+                    window.location.hash = hash;
                 }
-
-                // トレーニングモードのパラメータをハッシュに含める
-                let hash = route;
-                if (mode && session) {
-                    hash += `?mode=${mode}&session=${session}`;
-                }
-
-                window.location.hash = hash;
             });
         });
     }
@@ -328,12 +327,9 @@ class SimpleRouter {
                 localStorage.setItem('sessionData', JSON.stringify(otherSessions));
                 console.log('✅ ランダムモードのセッションデータをクリアしました');
 
-                // 正常な遷移フラグを設定（リロード誤検出防止）
-                sessionStorage.setItem('normalTransitionToTraining', 'true');
-
-                // トレーニングページに遷移
+                // トレーニングページに遷移（ReloadManager統合）
                 // ※sessionCounterリセット・基音選択はtrainingController.jsで自動実行
-                window.location.hash = 'training';
+                ReloadManager.navigateToTraining();
             });
             console.log('✅ 新しいトレーニング開始ボタンのイベントリスナー設定完了');
         } else {
