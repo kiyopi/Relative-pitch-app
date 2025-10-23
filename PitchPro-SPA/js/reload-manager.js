@@ -17,7 +17,7 @@
  *     await ReloadManager.redirectToPreparation('リロード検出');
  * }
  *
- * @version 1.1.0
+ * @version 1.2.0
  * @date 2025-10-23
  */
 
@@ -28,7 +28,8 @@ class ReloadManager {
     static KEYS = {
         NORMAL_TRANSITION: 'normalTransitionToTraining',
         REDIRECT_COMPLETED: 'reloadRedirected',
-        RESUMING_AFTER_RELOAD: 'resumingAfterReload' // リロード後の復帰フラグ
+        RESUMING_AFTER_RELOAD: 'resumingAfterReload', // リロード後の復帰フラグ
+        NEW_TRAINING_START: 'newTrainingStart' // 完全な新規開始フラグ
     };
 
     /**
@@ -168,6 +169,31 @@ class ReloadManager {
         if (resuming === 'true') {
             sessionStorage.removeItem(this.KEYS.RESUMING_AFTER_RELOAD);
             console.log('✅ [ReloadManager] リロード復帰を検出 - sessionCounter保持');
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 新規トレーニング開始フラグを設定
+     *
+     * home ページやresults-overviewからの遷移時に使用
+     */
+    static setNewTrainingStart() {
+        sessionStorage.setItem(this.KEYS.NEW_TRAINING_START, 'true');
+        console.log('✅ [ReloadManager] 新規トレーニング開始フラグを設定');
+    }
+
+    /**
+     * 新規トレーニング開始かどうかを確認
+     *
+     * @returns {boolean} true: 新規開始, false: 継続
+     */
+    static isNewTrainingStart() {
+        const isNew = sessionStorage.getItem(this.KEYS.NEW_TRAINING_START);
+        if (isNew === 'true') {
+            sessionStorage.removeItem(this.KEYS.NEW_TRAINING_START);
+            console.log('✅ [ReloadManager] 新規トレーニング開始を検出 - sessionCounterリセット');
             return true;
         }
         return false;
