@@ -9,6 +9,7 @@ let initializationPromise = null;
 let audioDetector = null;
 let currentIntervalIndex = 0;
 let baseNoteInfo = null;
+let previousBaseNote = null; // 前回の基音（中級モード用）
 
 // セッションデータ記録用
 let sessionRecorder = null;
@@ -157,6 +158,7 @@ function initializeModeUI() {
 /**
  * ランダムモード新規開始処理（統合初期化）
  * - sessionCounterを0にリセット
+ * - 前回の基音をクリア
  * - 基音を事前選択
  */
 function initializeRandomModeTraining() {
@@ -168,6 +170,10 @@ function initializeRandomModeTraining() {
         window.sessionDataRecorder.sessionCounter = 0;
         console.log('🔄 sessionCounterリセット: 0');
     }
+
+    // 前回の基音をクリア（中級モード用）
+    previousBaseNote = null;
+    console.log('🔄 previousBaseNoteリセット');
 
     // 基音を事前に選択（ボタンクリック時の遅延を回避）
     preselectBaseNote();
@@ -821,6 +827,105 @@ function getAvailableNotes() {
 }
 
 /**
+ * 音域のオクターブ数を計算
+ * @returns {number} オクターブ数
+ */
+function getVoiceRangeOctaves() {
+    if (!voiceRangeData || !voiceRangeData.results) {
+        return 0;
+    }
+    const rangeData = voiceRangeData.results.comfortableRange || voiceRangeData.results;
+    return Math.log2(rangeData.highFreq / rangeData.lowFreq);
+}
+
+/**
+ * ゾーン分割選択（初級モード用）
+ * @param {Array} availableNotes - 利用可能な音符リスト
+ * @param {number} sessionIndex - セッション番号（0始まり）
+ * @param {number} totalSessions - 総セッション数
+ * @returns {Object} 選択された音符
+ */
+function selectNoteFromZone(availableNotes, sessionIndex, totalSessions) {
+    const octaves = getVoiceRangeOctaves();
+
+    // 音域に応じたゾーン数を決定
+    let numZones;
+    if (octaves >= 2.0) {
+        numZones = 4; // 理想的: 4ゾーン分割
+    } else if (octaves >= 1.5) {
+        numZones = 3; // 緩和: 3ゾーン分割
+    } else {
+        // 1-1.5オクターブ: 完全ランダム
+        const randomNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
+        console.log(`🎲 完全ランダム選択（音域狭い: ${octaves.toFixed(2)}オクターブ）: ${randomNote.note}`);
+        return randomNote;
+    }
+
+    // セッションをゾーンに割り当て
+    const sessionsPerZone = Math.ceil(totalSessions / numZones);
+    const currentZone = Math.floor(sessionIndex / sessionsPerZone);
+
+    // ゾーン範囲を計算
+    const notesPerZone = Math.ceil(availableNotes.length / numZones);
+    const zoneStart = currentZone * notesPerZone;
+    const zoneEnd = Math.min((currentZone + 1) * notesPerZone, availableNotes.length);
+
+    // ゾーン内からランダム選択
+    const zoneNotes = availableNotes.slice(zoneStart, zoneEnd);
+    const selectedNote = zoneNotes[Math.floor(Math.random() * zoneNotes.length)];
+
+    console.log(`🎯 ゾーン${currentZone + 1}/${numZones}から選択（${octaves.toFixed(2)}オクターブ）: ${selectedNote.note}`);
+    return selectedNote;
+}
+
+/**
+ * 前回から一定距離を確保したランダム選択（中級モード用）
+ * @param {Array} availableNotes - 利用可能な音符リスト
+ * @returns {Object} 選択された音符
+ */
+function selectNoteWithDistance(availableNotes) {
+    // 前回の基音がない場合は完全ランダム
+    if (!previousBaseNote) {
+        const randomNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
+        console.log(`🎲 初回選択: ${randomNote.note}`);
+        return randomNote;
+    }
+
+    const octaves = getVoiceRangeOctaves();
+
+    // 音域に応じた除外半音数を決定
+    let excludeSemitones;
+    if (octaves >= 2.0) {
+        excludeSemitones = 5; // 理想的: ±5半音以内を除外
+    } else if (octaves >= 1.5) {
+        excludeSemitones = 3; // 緩和: ±3半音以内を除外
+    } else {
+        // 1-1.5オクターブ: 完全ランダム（除外なし）
+        const randomNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
+        console.log(`🎲 完全ランダム選択（音域狭い: ${octaves.toFixed(2)}オクターブ）: ${randomNote.note}`);
+        return randomNote;
+    }
+
+    // 前回の周波数から半音数を計算して除外
+    const filteredNotes = availableNotes.filter(note => {
+        const semitoneDistance = Math.abs(Math.round(12 * Math.log2(note.frequency / previousBaseNote.frequency)));
+        return semitoneDistance > excludeSemitones;
+    });
+
+    // 除外後の選択肢がない場合は完全ランダム（フォールバック）
+    if (filteredNotes.length === 0) {
+        console.warn(`⚠️ 除外後の選択肢なし - 完全ランダム選択`);
+        const randomNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
+        return randomNote;
+    }
+
+    const selectedNote = filteredNotes[Math.floor(Math.random() * filteredNotes.length)];
+    const semitoneDistance = Math.round(12 * Math.log2(selectedNote.frequency / previousBaseNote.frequency));
+    console.log(`🎯 距離確保選択（前回から${Math.abs(semitoneDistance)}半音、±${excludeSemitones}半音除外）: ${selectedNote.note}`);
+    return selectedNote;
+}
+
+/**
  * モード別基音選択ロジック
  * @param {string} selectionType - 'random_c3_octave' | 'random_chromatic' | 'sequential_chromatic'
  * @param {number} sessionIndex - セッション番号（0始まり）
@@ -829,29 +934,34 @@ function getAvailableNotes() {
 function selectBaseNote(selectionType, sessionIndex = 0) {
     const availableNotes = getAvailableNotes();
 
+    let selectedNote;
+
     switch (selectionType) {
         case 'random_c3_octave':
-            // ランダム基音モード: 音域内から利用可能な基音をランダム選択
-            // availableNotesは既に「基音+1オクターブが音域内に収まる」条件でフィルタリング済み
-            // 基音の音名（C, D, E...）は相対音感トレーニングでは重要ではない
-            const randomNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
-            console.log(`🎲 ランダム基音モード: ${randomNote.note} (${randomNote.frequency.toFixed(1)}Hz)`);
-            return randomNote;
+            // ランダム基音モード（初級）: ゾーン分割による分散選択
+            const config = modeConfig['random'];
+            selectedNote = selectNoteFromZone(availableNotes, sessionIndex, config.maxSessions);
+            console.log(`🎲 ランダム基音モード（初級）: ${selectedNote.note} (${selectedNote.frequency.toFixed(1)}Hz)`);
+            break;
 
         case 'random_chromatic':
-            // 連続チャレンジモード: 音域内から利用可能な基音をランダム選択
-            const chromaticNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
-            console.log(`🎲 連続チャレンジモード: ${chromaticNote.note} (${chromaticNote.frequency.toFixed(1)}Hz)`);
-            return chromaticNote;
+            // 連続チャレンジモード（中級）: 前回から一定距離を確保したランダム選択
+            selectedNote = selectNoteWithDistance(availableNotes);
+            console.log(`🎯 連続チャレンジモード（中級）: ${selectedNote.note} (${selectedNote.frequency.toFixed(1)}Hz)`);
+            // 次回のために前回の基音を保存
+            previousBaseNote = selectedNote;
+            break;
 
         case 'sequential_chromatic':
-            // 12音階モード: クロマチック12音を順次使用
-            const sequentialNote = availableNotes[sessionIndex % availableNotes.length];
-            console.log(`🎹 12音階モード: セッション${sessionIndex + 1} - ${sequentialNote.note} (${sequentialNote.frequency.toFixed(1)}Hz)`);
-            return sequentialNote;
+            // 12音階モード（上級）: クロマチック12音を順次使用
+            selectedNote = availableNotes[sessionIndex % availableNotes.length];
+            console.log(`🎹 12音階モード（上級）: セッション${sessionIndex + 1} - ${selectedNote.note} (${selectedNote.frequency.toFixed(1)}Hz)`);
+            break;
 
         default:
             console.warn(`⚠️ 未知の選択タイプ: ${selectionType} - ランダム選択`);
-            return availableNotes[Math.floor(Math.random() * availableNotes.length)];
+            selectedNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
     }
+
+    return selectedNote;
 }
