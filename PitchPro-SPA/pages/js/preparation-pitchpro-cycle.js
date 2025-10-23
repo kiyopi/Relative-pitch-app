@@ -1252,9 +1252,21 @@ function setupMicPermissionFlow() {
                 // PitchProリソースのクリーンアップ（統合管理）
                 await pitchProCycleManager.cleanupPitchPro();
 
-                // SPAのtraining画面へ遷移
-                console.log('🚀 SPAのtraining画面に遷移中...');
-                window.location.hash = 'training';
+                // 【新規追加】正常な遷移フラグを設定（リロード誤検出防止）
+                sessionStorage.setItem('normalTransitionToTraining', 'true');
+
+                // 【新規追加】リダイレクト情報がある場合、モード情報を保持して遷移
+                const redirectInfo = window.preparationRedirectInfo;
+                if (redirectInfo && redirectInfo.redirect === 'training') {
+                    console.log(`📍 モード情報を保持して遷移: mode=${redirectInfo.mode}, session=${redirectInfo.session || 'なし'}`);
+                    const params = new URLSearchParams({ mode: redirectInfo.mode });
+                    if (redirectInfo.session) params.set('session', redirectInfo.session);
+                    window.location.hash = `training?${params.toString()}`;
+                } else {
+                    // SPAのtraining画面へ遷移（通常フロー）
+                    console.log('🚀 SPAのtraining画面に遷移中...');
+                    window.location.hash = 'training';
+                }
 
             } catch (error) {
                 console.error('❌ トレーニング開始処理エラー:', error);
@@ -1449,9 +1461,21 @@ function setupMicPermissionFlow() {
             // PitchProリソースのクリーンアップ
             await pitchProCycleManager.cleanupPitchPro();
 
-            // SPAのtraining画面へ遷移
-            console.log('🚀 SPAのtraining画面に遷移中...');
-            window.location.hash = 'training';
+            // 【新規追加】正常な遷移フラグを設定（リロード誤検出防止）
+            sessionStorage.setItem('normalTransitionToTraining', 'true');
+
+            // 【新規追加】リダイレクト情報がある場合、モード情報を保持して遷移
+            const redirectInfo = window.preparationRedirectInfo;
+            if (redirectInfo && redirectInfo.redirect === 'training') {
+                console.log(`📍 モード情報を保持して遷移: mode=${redirectInfo.mode}, session=${redirectInfo.session || 'なし'}`);
+                const params = new URLSearchParams({ mode: redirectInfo.mode });
+                if (redirectInfo.session) params.set('session', redirectInfo.session);
+                window.location.hash = `training?${params.toString()}`;
+            } else {
+                // SPAのtraining画面へ遷移（通常フロー）
+                console.log('🚀 SPAのtraining画面に遷移中...');
+                window.location.hash = 'training';
+            }
         });
     }
 

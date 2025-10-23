@@ -157,6 +157,11 @@ class SimpleRouter {
                     this.initializePitchShifterBackground();
                 }
 
+                // 【新規追加】training へ直接遷移する場合、正常な遷移フラグを設定
+                if (route === 'training') {
+                    sessionStorage.setItem('normalTransitionToTraining', 'true');
+                }
+
                 // トレーニングモードのパラメータをハッシュに含める
                 let hash = route;
                 if (mode && session) {
@@ -256,8 +261,8 @@ class SimpleRouter {
             console.log('Setting up preparation page events with dynamic import...');
             console.log('Full hash:', fullHash);
 
-            // 動的にpreparationControllerをインポート
-            const { initializePreparationPage } = await import('./controllers/preparationController.js');
+            // 動的にpreparationControllerをインポート（キャッシュバスター追加）
+            const { initializePreparationPage } = await import(`./controllers/preparationController.js?v=${Date.now()}`);
 
             // コントローラーの初期化関数を実行
             await initializePreparationPage();
@@ -273,13 +278,18 @@ class SimpleRouter {
             console.log('Setting up training page events with dynamic import...');
             console.log('Full hash:', fullHash);
 
-            // 動的にtrainingControllerをインポート
-            const { initializeTrainingPage } = await import('./controllers/trainingController.js');
+            // 動的にtrainingControllerをインポート（v2ファイル使用）
+            const { initializeTrainingPage } = await import('./controllers/trainingController.v2.js');
 
             // コントローラーの初期化関数を実行
             await initializeTrainingPage();
 
         } catch (error) {
+            // リダイレクトエラーは無視（意図的なリダイレクト）
+            if (error.isRedirect) {
+                console.log('✅ リダイレクト処理完了:', error.message);
+                return;
+            }
             console.error('Error setting up training page events:', error);
             throw error;
         }
