@@ -318,6 +318,12 @@ class SimpleRouter {
                 localStorage.setItem('sessionData', JSON.stringify(otherSessions));
                 console.log('✅ ランダムモードのセッションデータをクリアしました');
 
+                // SessionDataRecorderのカウンターもリセット
+                if (window.sessionDataRecorder) {
+                    window.sessionDataRecorder.resetSession();
+                    console.log('✅ SessionDataRecorderをリセットしました');
+                }
+
                 // トレーニングページに遷移
                 window.location.hash = 'training';
             });
