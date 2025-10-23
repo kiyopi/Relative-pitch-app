@@ -2,10 +2,10 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: 2025-10-23-05:00 - リロード検出機能（ダイアログ説明付き）
+ * 🔥 VERSION: 2025-10-23-05:15 - リロード検出2回実行防止（ダイアログ1回のみ）
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-23-05:00 LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-23-05:15 LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
@@ -55,9 +55,19 @@ const modeConfig = {
  *
  * 【重要】SPA内の正常な遷移（preparation → training）を除外
  * sessionStorage のフラグで正常な遷移を識別
+ *
+ * 【重要】リダイレクト済みフラグで2回目の検出を防止
  */
 function detectReload() {
     console.log('🔍 [detectReload] リロード検出開始');
+
+    // リダイレクト済みフラグをチェック（2回目の検出を防止）
+    const alreadyRedirected = sessionStorage.getItem('reloadRedirected');
+    if (alreadyRedirected === 'true') {
+        console.log('✅ リダイレクト済み - 2回目の検出をスキップ');
+        sessionStorage.removeItem('reloadRedirected');
+        return false;
+    }
 
     // 正常な遷移フラグをチェック（preparation からの遷移）
     const normalTransition = sessionStorage.getItem('normalTransitionToTraining');
@@ -73,6 +83,8 @@ function detectReload() {
     console.log('🔍 [detectReload] performance.navigation:', performance.navigation);
     if (performance.navigation && performance.navigation.type === 1) {
         console.log('✅ リロード検出（古いAPI）: performance.navigation.type === 1');
+        // リダイレクト済みフラグを設定
+        sessionStorage.setItem('reloadRedirected', 'true');
         return true; // TYPE_RELOAD
     }
 
@@ -83,6 +95,8 @@ function detectReload() {
         console.log('🔍 [detectReload] navEntries[0].type:', navEntries[0].type);
         if (navEntries[0].type === 'reload') {
             console.log('✅ リロード検出（新しいAPI）: navEntries[0].type === "reload"');
+            // リダイレクト済みフラグを設定
+            sessionStorage.setItem('reloadRedirected', 'true');
             return true;
         }
     }
