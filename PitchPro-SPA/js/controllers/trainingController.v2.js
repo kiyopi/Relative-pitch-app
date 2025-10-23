@@ -2,10 +2,10 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: 2025-10-23-07:00 - リロード復帰時sessionCounter保持版
+ * 🔥 VERSION: 2025-10-23-08:00 - 新規開始と次セッション継続を区別
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-23-07:00 LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-23-08:00 LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
@@ -80,9 +80,15 @@ export async function initializeTrainingPage() {
         return;
     }
 
-    // 【重要】リロード復帰の場合はsessionCounterをリセットしない
-    if (ReloadManager.isResumingAfterReload()) {
-        console.log('🔄 リロード復帰 - sessionCounterを保持');
+    // 【重要】新規開始か継続かを判定
+    const isResuming = ReloadManager.isResumingAfterReload();
+    const existingSessions = JSON.parse(localStorage.getItem('sessionData') || '[]');
+    const hasExistingSessions = existingSessions.length > 0;
+
+    if (isResuming || hasExistingSessions) {
+        console.log('🔄 セッション継続 - sessionCounterを保持');
+        console.log(`   理由: ${isResuming ? 'リロード復帰' : '次のセッション開始'}`);
+        console.log(`   現在のsessionCounter: ${window.sessionDataRecorder?.sessionCounter || 0}`);
         // 基音を事前に選択（sessionCounterは保持）
         preselectBaseNote();
     } else {

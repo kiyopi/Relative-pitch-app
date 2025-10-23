@@ -4,6 +4,7 @@
  * 【目的】
  * - trainingページへの遷移時のリロード検出を一元管理
  * - normalTransitionフラグの設定漏れを防止
+ * - sessionCounter保持の自動管理
  * - コードの重複を削減し、保守性を向上
  *
  * 【使用方法】
@@ -16,7 +17,7 @@
  *     await ReloadManager.redirectToPreparation('リロード検出');
  * }
  *
- * @version 1.0.0
+ * @version 1.1.0
  * @date 2025-10-23
  */
 
