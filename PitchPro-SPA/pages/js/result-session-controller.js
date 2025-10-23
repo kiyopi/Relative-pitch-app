@@ -1,11 +1,22 @@
 /**
  * セッション結果ページコントローラー
- * @version 1.0.0
+ * @version 1.1.0
+ *
+ * 変更履歴:
+ * - 1.1.0: リロード検出機能を追加（ReloadManager統合）
  */
 
 // グローバル初期化関数（SPA用）
 async function initializeResultSessionPage() {
     console.log('📊 セッション結果ページ初期化開始');
+
+    // 【ReloadManager統合】リロード検出 → preparationへリダイレクト
+    if (ReloadManager.detectReload()) {
+        console.warn('⚠️ result-sessionでリロード検出 - preparationへリダイレクト');
+        ReloadManager.showReloadDialog();
+        await ReloadManager.redirectToPreparation('result-sessionでリロード検出');
+        return; // リダイレクト後は以降の処理を実行しない
+    }
 
     // URLハッシュからセッション番号を取得
     const hash = window.location.hash.substring(1); // '#'を削除
