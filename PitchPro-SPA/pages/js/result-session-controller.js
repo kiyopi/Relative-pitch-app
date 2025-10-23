@@ -345,7 +345,11 @@ function updateNextSessionButton(sessionNumber) {
             console.log('✅ 8セッション完了 - 総合評価ボタン表示');
         } else {
             // 次のセッションへ
-            button.onclick = () => window.location.hash = 'training';
+            button.onclick = () => {
+                // 正常な遷移フラグを設定（リロード誤検出防止）
+                sessionStorage.setItem('normalTransitionToTraining', 'true');
+                window.location.hash = 'training';
+            };
             button.innerHTML = '<i data-lucide="arrow-right" style="width: 24px; height: 24px;"></i><span>次の基音へ</span>';
             console.log(`➡️ セッション${completedSessionsInMode + 1}/8 - 次のセッションボタン表示`);
         }

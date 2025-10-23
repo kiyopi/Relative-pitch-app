@@ -328,6 +328,9 @@ class SimpleRouter {
                 localStorage.setItem('sessionData', JSON.stringify(otherSessions));
                 console.log('✅ ランダムモードのセッションデータをクリアしました');
 
+                // 正常な遷移フラグを設定（リロード誤検出防止）
+                sessionStorage.setItem('normalTransitionToTraining', 'true');
+
                 // トレーニングページに遷移
                 // ※sessionCounterリセット・基音選択はtrainingController.jsで自動実行
                 window.location.hash = 'training';
