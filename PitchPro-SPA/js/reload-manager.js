@@ -23,7 +23,12 @@
  *   リセットしても次のセッション番号は自動的に正しくなる
  * - リロード検出は preparation へのリダイレクトのためだけに使用
  *
- * @version 2.0.0
+ * 【v2.1.0更新】
+ * - Safari での SPA 遷移誤検出を修正
+ * - 古いAPI（performance.navigation）を優先し、新しいAPIをフォールバックに変更
+ * - 古いAPIで type === 0 の場合、新しいAPIをスキップ
+ *
+ * @version 2.1.0
  * @date 2025-10-23
  */
 
@@ -73,21 +78,31 @@ class ReloadManager {
             return false;
         }
 
-        // 3. Performance Navigation API で検出（古いブラウザ対応）
-        console.log('🔍 [ReloadManager] performance.navigation:', performance.navigation);
-        if (performance.navigation && performance.navigation.type === 1) {
-            console.log('✅ [ReloadManager] リロード検出（古いAPI）: performance.navigation.type === 1');
-            sessionStorage.setItem(this.KEYS.REDIRECT_COMPLETED, 'true');
-            return true; // TYPE_RELOAD
+        // 3. Performance Navigation API で検出（Safari では最も信頼できる）
+        if (performance.navigation) {
+            const navType = performance.navigation.type;
+            console.log('🔍 [ReloadManager] performance.navigation.type:', navType);
+
+            if (navType === 1) {
+                // TYPE_RELOAD
+                console.log('✅ [ReloadManager] リロード検出（古いAPI）: type === 1');
+                sessionStorage.setItem(this.KEYS.REDIRECT_COMPLETED, 'true');
+                return true;
+            } else if (navType === 0) {
+                // TYPE_NAVIGATE - SPA遷移として扱い、新しいAPIをスキップ
+                // Safari では新しいAPIが誤って "reload" を返すため、古いAPIを優先
+                console.log('✅ [ReloadManager] 正常な遷移（古いAPI）: type === 0 - 新しいAPIをスキップ');
+                return false;
+            }
         }
 
-        // 4. Navigation Timing API v2（新しいブラウザ）
+        // 4. Navigation Timing API v2（古いAPIが存在しない場合のみ）
         const navEntries = performance.getEntriesByType('navigation');
-        console.log('🔍 [ReloadManager] Navigation Timing API v2:', navEntries);
+        console.log('🔍 [ReloadManager] Navigation Timing API v2（フォールバック）:', navEntries);
         if (navEntries.length > 0) {
             console.log('🔍 [ReloadManager] navEntries[0].type:', navEntries[0].type);
             if (navEntries[0].type === 'reload') {
-                console.log('✅ [ReloadManager] リロード検出（新しいAPI）: navEntries[0].type === "reload"');
+                console.log('✅ [ReloadManager] リロード検出（新しいAPI）: type === "reload"');
                 sessionStorage.setItem(this.KEYS.REDIRECT_COMPLETED, 'true');
                 return true;
             }

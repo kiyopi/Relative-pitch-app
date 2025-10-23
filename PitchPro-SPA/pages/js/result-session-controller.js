@@ -1,22 +1,27 @@
 /**
  * セッション結果ページコントローラー
- * @version 1.2.0
+ * @version 1.3.0
  *
  * 変更履歴:
- * - 1.2.0: リロード検出を削除（表示専用ページのため不要）
- * - 1.1.0: リロード検出機能を追加（ReloadManager統合）← 誤検出のため削除
+ * - 1.3.0: リロード検出を復活（ReloadManager改善により誤検出を解消）
+ * - 1.2.0: リロード検出を削除（表示専用ページのため不要）← 誤検出のため一時削除
+ * - 1.1.0: リロード検出機能を追加（ReloadManager統合）
  */
 
 // グローバル初期化関数（SPA用）
 async function initializeResultSessionPage() {
     console.log('📊 セッション結果ページ初期化開始');
 
-    // 【v1.2.0変更】リロード検出を削除
-    // 理由:
-    // - result-session は表示専用ページ（マイク許可不要）
-    // - localStorage からデータを読み込めば表示可能
-    // - Safari の SPA ハッシュナビゲーションが "reload" として誤検出される
-    // - リロードしても問題ないため、検出の必要性がない
+    // 【v1.3.0変更】リロード検出を復活
+    // ReloadManager が改善され、古いAPI（performance.navigation.type）を優先するため、
+    // Safari での SPA 遷移誤検出が解消された
+    // 手動リロード（F5）の場合は preparation へリダイレクトし、マイク許可を再取得
+    if (ReloadManager.detectReload()) {
+        console.warn('⚠️ result-sessionでリロード検出 - preparationへリダイレクト');
+        ReloadManager.showReloadDialog();
+        await ReloadManager.redirectToPreparation('result-sessionでリロード検出');
+        return; // リダイレクト後は以降の処理を実行しない
+    }
 
     // URLハッシュからセッション番号を取得
     const hash = window.location.hash.substring(1); // '#'を削除
