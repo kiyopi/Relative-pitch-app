@@ -318,10 +318,11 @@ class SimpleRouter {
                 localStorage.setItem('sessionData', JSON.stringify(otherSessions));
                 console.log('✅ ランダムモードのセッションデータをクリアしました');
 
-                // SessionDataRecorderのカウンターもリセット
+                // SessionDataRecorderのカウンターを0にリセット（ランダムモード専用）
                 if (window.sessionDataRecorder) {
-                    window.sessionDataRecorder.resetSession();
-                    console.log('✅ SessionDataRecorderをリセットしました');
+                    window.sessionDataRecorder.currentSession = null;
+                    window.sessionDataRecorder.sessionCounter = 0;
+                    console.log('✅ SessionDataRecorderをリセット: sessionCounter = 0');
                 }
 
                 // トレーニングページに遷移
