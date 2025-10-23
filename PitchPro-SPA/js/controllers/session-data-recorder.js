@@ -23,6 +23,19 @@ class SessionDataRecorder {
      * @param {number} baseFrequency - 基音周波数（Hz）
      */
     startNewSession(baseNote, baseFrequency) {
+        // セッション開始前にlocalStorageと同期（localStorage消去対策）
+        const existingSessions = DataManager.getFromStorage('sessionData') || [];
+        const maxId = existingSessions.length > 0
+            ? Math.max(...existingSessions.map(s => s.sessionId))
+            : 0;
+
+        // sessionCounterが古い場合は再同期
+        if (this.sessionCounter < maxId) {
+            console.warn(`⚠️ sessionCounter不整合検出: 現在値=${this.sessionCounter}, localStorage最大値=${maxId}`);
+            this.sessionCounter = maxId;
+            console.log(`🔄 sessionCounterを再同期: ${this.sessionCounter}`);
+        }
+
         this.sessionCounter++;
 
         this.currentSession = {
@@ -154,6 +167,14 @@ class SessionDataRecorder {
     resetSession() {
         console.warn('⚠️ セッションをリセット');
         this.currentSession = null;
+
+        // sessionCounterもlocalStorageと同期してリセット
+        const existingSessions = DataManager.getFromStorage('sessionData') || [];
+        this.sessionCounter = existingSessions.length > 0
+            ? Math.max(...existingSessions.map(s => s.sessionId))
+            : 0;
+
+        console.log(`🔄 sessionCounterを再同期: ${this.sessionCounter}`);
     }
 }
 
