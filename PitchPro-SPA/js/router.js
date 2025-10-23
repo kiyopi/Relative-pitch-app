@@ -312,20 +312,14 @@ class SimpleRouter {
             newTrainingBtn.addEventListener('click', () => {
                 console.log('🆕 新しいトレーニング開始ボタンがクリックされました');
 
-                // ランダムモードのセッションデータをクリア
+                // ランダムモードのセッションデータをlocalStorageからクリア
                 const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
                 const otherSessions = allSessions.filter(s => s.mode !== 'random');
                 localStorage.setItem('sessionData', JSON.stringify(otherSessions));
                 console.log('✅ ランダムモードのセッションデータをクリアしました');
 
-                // SessionDataRecorderのカウンターを0にリセット（ランダムモード専用）
-                if (window.sessionDataRecorder) {
-                    window.sessionDataRecorder.currentSession = null;
-                    window.sessionDataRecorder.sessionCounter = 0;
-                    console.log('✅ SessionDataRecorderをリセット: sessionCounter = 0');
-                }
-
                 // トレーニングページに遷移
+                // ※sessionCounterリセット・基音選択はtrainingController.jsで自動実行
                 window.location.hash = 'training';
             });
             console.log('✅ 新しいトレーニング開始ボタンのイベントリスナー設定完了');

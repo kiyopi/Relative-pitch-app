@@ -105,8 +105,8 @@ export async function initializeTrainingPage() {
         console.log('✅ デバッグ用マイク許可ボタン登録完了');
     }
 
-    // 基音を事前に選択（ボタンクリック時の遅延を回避）
-    preselectBaseNote();
+    // ランダムモード新規開始処理（sessionCounterリセット + 基音選択）
+    initializeRandomModeTraining();
 
     isInitialized = true;
     console.log('TrainingController initialized');
@@ -152,6 +152,25 @@ function initializeModeUI() {
 
     // アイコンを再描画
     lucide.createIcons();
+}
+
+/**
+ * ランダムモード新規開始処理（統合初期化）
+ * - sessionCounterを0にリセット
+ * - 基音を事前選択
+ */
+function initializeRandomModeTraining() {
+    console.log('🆕 ランダムモード新規開始処理を実行');
+
+    // sessionCounterを0にリセット（ランダムモード専用）
+    if (window.sessionDataRecorder) {
+        window.sessionDataRecorder.currentSession = null;
+        window.sessionDataRecorder.sessionCounter = 0;
+        console.log('🔄 sessionCounterリセット: 0');
+    }
+
+    // 基音を事前に選択（ボタンクリック時の遅延を回避）
+    preselectBaseNote();
 }
 
 /**
