@@ -159,8 +159,6 @@ class SimpleRouter {
 
                 // 【ReloadManager統合】training へ直接遷移する場合
                 if (route === 'training') {
-                    // home からの遷移は新規開始として扱う
-                    ReloadManager.setNewTrainingStart();
                     ReloadManager.navigateToTraining(mode, session);
                 } else {
                     // training以外のルート（preparation等）
@@ -328,9 +326,6 @@ class SimpleRouter {
                 const otherSessions = allSessions.filter(s => s.mode !== 'random');
                 localStorage.setItem('sessionData', JSON.stringify(otherSessions));
                 console.log('✅ ランダムモードのセッションデータをクリアしました');
-
-                // 新規開始フラグを設定
-                ReloadManager.setNewTrainingStart();
 
                 // トレーニングページに遷移（ReloadManager統合）
                 // ※sessionCounterリセット・基音選択はtrainingController.jsで自動実行

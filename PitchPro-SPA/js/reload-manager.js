@@ -3,21 +3,27 @@
  *
  * 【目的】
  * - trainingページへの遷移時のリロード検出を一元管理
+ * - リロード時は preparation へリダイレクトしてマイク許可を再取得
  * - normalTransitionフラグの設定漏れを防止
- * - sessionCounter保持の自動管理
  * - コードの重複を削減し、保守性を向上
  *
  * 【使用方法】
  * // 遷移時（フラグ自動設定）
  * ReloadManager.navigateToTraining();
  *
- * // リロード検出（trainingController内）
+ * // リロード検出（trainingController / result-session-controller 内）
  * if (ReloadManager.detectReload()) {
  *     ReloadManager.showReloadDialog();
  *     await ReloadManager.redirectToPreparation('リロード検出');
  * }
  *
- * @version 1.2.0
+ * 【設計思想】
+ * - training ページへの遷移 = 常に initializeRandomModeTraining() でリセット
+ * - sessionCounter は localStorage の完了済みセッションから自動計算されるため、
+ *   リセットしても次のセッション番号は自動的に正しくなる
+ * - リロード検出は preparation へのリダイレクトのためだけに使用
+ *
+ * @version 2.0.0
  * @date 2025-10-23
  */
 
@@ -27,9 +33,7 @@ class ReloadManager {
      */
     static KEYS = {
         NORMAL_TRANSITION: 'normalTransitionToTraining',
-        REDIRECT_COMPLETED: 'reloadRedirected',
-        RESUMING_AFTER_RELOAD: 'resumingAfterReload', // リロード後の復帰フラグ
-        NEW_TRAINING_START: 'newTrainingStart' // 完全な新規開始フラグ
+        REDIRECT_COMPLETED: 'reloadRedirected'
     };
 
     /**
@@ -118,10 +122,6 @@ class ReloadManager {
             session = params.get('session') || '';
         }
 
-        // リロード後の復帰フラグを設定（sessionCounterリセット防止）
-        sessionStorage.setItem(this.KEYS.RESUMING_AFTER_RELOAD, 'true');
-        console.log('✅ [ReloadManager] リロード復帰フラグを設定（sessionCounter保持）');
-
         // preparationへリダイレクト（モード情報を保持）
         const redirectParams = new URLSearchParams({
             redirect: 'training',
@@ -157,46 +157,6 @@ class ReloadManager {
             window.location.hash = 'training';
             console.log('🚀 [ReloadManager] trainingへ遷移（パラメータなし）');
         }
-    }
-
-    /**
-     * リロード後の復帰かどうかを確認
-     *
-     * @returns {boolean} true: リロード後の復帰, false: 新規開始
-     */
-    static isResumingAfterReload() {
-        const resuming = sessionStorage.getItem(this.KEYS.RESUMING_AFTER_RELOAD);
-        if (resuming === 'true') {
-            sessionStorage.removeItem(this.KEYS.RESUMING_AFTER_RELOAD);
-            console.log('✅ [ReloadManager] リロード復帰を検出 - sessionCounter保持');
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * 新規トレーニング開始フラグを設定
-     *
-     * home ページやresults-overviewからの遷移時に使用
-     */
-    static setNewTrainingStart() {
-        sessionStorage.setItem(this.KEYS.NEW_TRAINING_START, 'true');
-        console.log('✅ [ReloadManager] 新規トレーニング開始フラグを設定');
-    }
-
-    /**
-     * 新規トレーニング開始かどうかを確認
-     *
-     * @returns {boolean} true: 新規開始, false: 継続
-     */
-    static isNewTrainingStart() {
-        const isNew = sessionStorage.getItem(this.KEYS.NEW_TRAINING_START);
-        if (isNew === 'true') {
-            sessionStorage.removeItem(this.KEYS.NEW_TRAINING_START);
-            console.log('✅ [ReloadManager] 新規トレーニング開始を検出 - sessionCounterリセット');
-            return true;
-        }
-        return false;
     }
 
     /**

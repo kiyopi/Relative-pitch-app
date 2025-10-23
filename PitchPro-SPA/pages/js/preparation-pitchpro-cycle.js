@@ -1256,12 +1256,10 @@ function setupMicPermissionFlow() {
                 const redirectInfo = window.preparationRedirectInfo;
                 if (redirectInfo && redirectInfo.redirect === 'training') {
                     console.log(`📍 モード情報を保持して遷移: mode=${redirectInfo.mode}, session=${redirectInfo.session || 'なし'}`);
-                    // リダイレクト情報がある場合は継続（新規開始フラグを設定しない）
                     ReloadManager.navigateToTraining(redirectInfo.mode, redirectInfo.session);
                 } else {
-                    // SPAのtraining画面へ遷移（通常フロー: home → preparation → training）
-                    console.log('🚀 SPAのtraining画面に遷移中...（新規開始）');
-                    ReloadManager.setNewTrainingStart();
+                    // SPAのtraining画面へ遷移（通常フロー）
+                    console.log('🚀 SPAのtraining画面に遷移中...');
                     ReloadManager.navigateToTraining();
                 }
 
@@ -1462,12 +1460,10 @@ function setupMicPermissionFlow() {
             const redirectInfo = window.preparationRedirectInfo;
             if (redirectInfo && redirectInfo.redirect === 'training') {
                 console.log(`📍 モード情報を保持して遷移: mode=${redirectInfo.mode}, session=${redirectInfo.session || 'なし'}`);
-                // リダイレクト情報がある場合は継続（新規開始フラグを設定しない）
                 ReloadManager.navigateToTraining(redirectInfo.mode, redirectInfo.session);
             } else {
-                // SPAのtraining画面へ遷移（通常フロー: home → preparation → training）
-                console.log('🚀 SPAのtraining画面に遷移中...（新規開始）');
-                ReloadManager.setNewTrainingStart();
+                // SPAのtraining画面へ遷移（通常フロー）
+                console.log('🚀 SPAのtraining画面に遷移中...');
                 ReloadManager.navigateToTraining();
             }
         });

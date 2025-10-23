@@ -2,10 +2,10 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: 2025-10-23-09:00 - 新規開始フラグで完全な新規開始を判定
+ * 🔥 VERSION: 2025-10-23-10:00 - シンプル化（常にリセット）
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-23-09:00 LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-23-10:00 LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
@@ -80,29 +80,11 @@ export async function initializeTrainingPage() {
         return;
     }
 
-    // 【重要】新規開始か継続かを判定
-    const isNewStart = ReloadManager.isNewTrainingStart();
-    const isResuming = ReloadManager.isResumingAfterReload();
-    const existingSessions = JSON.parse(localStorage.getItem('sessionData') || '[]');
-    const hasExistingSessions = existingSessions.length > 0;
-
-    if (isNewStart) {
-        console.log('🆕 新規トレーニング開始 - sessionCounterをリセット');
-        console.log('   理由: home または results-overview からの遷移');
-        // ランダムモード新規開始処理を実行（sessionCounterをリセット）
-        initializeRandomModeTraining();
-    } else if (isResuming || hasExistingSessions) {
-        console.log('🔄 セッション継続 - sessionCounterを保持');
-        console.log(`   理由: ${isResuming ? 'リロード復帰' : '次のセッション開始'}`);
-        console.log(`   現在のsessionCounter: ${window.sessionDataRecorder?.sessionCounter || 0}`);
-        // 基音を事前に選択（sessionCounterは保持）
-        preselectBaseNote();
-    } else {
-        console.log('🆕 新規トレーニング開始 - sessionCounterをリセット');
-        console.log('   理由: 不明（フォールバック）');
-        // フォールバック: ランダムモード新規開始処理を実行
-        initializeRandomModeTraining();
-    }
+    // 【シンプル化】training ページへの遷移 = 常にリセット
+    // sessionCounter は localStorage の完了済みセッションから自動計算されるため、
+    // リセットしても次のセッション番号は自動的に正しくなる
+    console.log('🆕 トレーニングページ初期化 - sessionCounterをリセット');
+    initializeRandomModeTraining();
 
     // Initialize mode UI（リセット後に実行）
     initializeModeUI();
