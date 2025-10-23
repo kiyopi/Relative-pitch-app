@@ -26,7 +26,8 @@ class ReloadManager {
      */
     static KEYS = {
         NORMAL_TRANSITION: 'normalTransitionToTraining',
-        REDIRECT_COMPLETED: 'reloadRedirected'
+        REDIRECT_COMPLETED: 'reloadRedirected',
+        RESUMING_AFTER_RELOAD: 'resumingAfterReload' // リロード後の復帰フラグ
     };
 
     /**
@@ -115,6 +116,10 @@ class ReloadManager {
             session = params.get('session') || '';
         }
 
+        // リロード後の復帰フラグを設定（sessionCounterリセット防止）
+        sessionStorage.setItem(this.KEYS.RESUMING_AFTER_RELOAD, 'true');
+        console.log('✅ [ReloadManager] リロード復帰フラグを設定（sessionCounter保持）');
+
         // preparationへリダイレクト（モード情報を保持）
         const redirectParams = new URLSearchParams({
             redirect: 'training',
@@ -150,6 +155,21 @@ class ReloadManager {
             window.location.hash = 'training';
             console.log('🚀 [ReloadManager] trainingへ遷移（パラメータなし）');
         }
+    }
+
+    /**
+     * リロード後の復帰かどうかを確認
+     *
+     * @returns {boolean} true: リロード後の復帰, false: 新規開始
+     */
+    static isResumingAfterReload() {
+        const resuming = sessionStorage.getItem(this.KEYS.RESUMING_AFTER_RELOAD);
+        if (resuming === 'true') {
+            sessionStorage.removeItem(this.KEYS.RESUMING_AFTER_RELOAD);
+            console.log('✅ [ReloadManager] リロード復帰を検出 - sessionCounter保持');
+            return true;
+        }
+        return false;
     }
 
     /**

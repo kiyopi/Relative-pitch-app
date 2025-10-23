@@ -2,10 +2,10 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: 2025-10-23-06:00 - ReloadManager統合版
+ * 🔥 VERSION: 2025-10-23-07:00 - リロード復帰時sessionCounter保持版
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-23-06:00 LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-23-07:00 LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
@@ -80,8 +80,16 @@ export async function initializeTrainingPage() {
         return;
     }
 
-    // 【重要】ランダムモード新規開始処理を先に実行（sessionCounterをリセット）
-    initializeRandomModeTraining();
+    // 【重要】リロード復帰の場合はsessionCounterをリセットしない
+    if (ReloadManager.isResumingAfterReload()) {
+        console.log('🔄 リロード復帰 - sessionCounterを保持');
+        // 基音を事前に選択（sessionCounterは保持）
+        preselectBaseNote();
+    } else {
+        console.log('🆕 新規トレーニング開始 - sessionCounterをリセット');
+        // ランダムモード新規開始処理を実行（sessionCounterをリセット）
+        initializeRandomModeTraining();
+    }
 
     // Initialize mode UI（リセット後に実行）
     initializeModeUI();

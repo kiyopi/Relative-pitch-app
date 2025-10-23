@@ -277,8 +277,8 @@ class SimpleRouter {
             console.log('Setting up training page events with dynamic import...');
             console.log('Full hash:', fullHash);
 
-            // 動的にtrainingControllerをインポート（v2ファイル使用）
-            const { initializeTrainingPage } = await import('./controllers/trainingController.v2.js');
+            // 動的にtrainingControllerをインポート（v2ファイル使用、キャッシュバスター追加）
+            const { initializeTrainingPage } = await import(`./controllers/trainingController.v2.js?v=${Date.now()}`);
 
             // コントローラーの初期化関数を実行
             await initializeTrainingPage();
@@ -383,12 +383,15 @@ class SimpleRouter {
                 }
 
                 // セッションデータ処理
+                // ※リロード後の一時的な離脱の場合はリセットしない
+                // （ReloadManager.isResumingAfterReload()で判定されるため、ここではリセット不要）
                 if (window.sessionDataRecorder) {
                     const currentSession = window.sessionDataRecorder.getCurrentSession();
                     if (currentSession && !currentSession.completed) {
                         console.warn('⚠️ 未完了セッションあり - 途中データは破棄されます');
                     }
-                    window.sessionDataRecorder.resetSession();
+                    // resetSession()は呼ばない（sessionCounterを保持）
+                    // window.sessionDataRecorder.resetSession();
                 }
 
                 // 初期化フラグリセット
