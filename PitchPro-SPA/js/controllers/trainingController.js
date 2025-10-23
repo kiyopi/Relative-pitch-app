@@ -105,6 +105,9 @@ export async function initializeTrainingPage() {
         console.log('✅ デバッグ用マイク許可ボタン登録完了');
     }
 
+    // 基音を事前に選択（ボタンクリック時の遅延を回避）
+    preselectBaseNote();
+
     isInitialized = true;
     console.log('TrainingController initialized');
 }
@@ -149,6 +152,18 @@ function initializeModeUI() {
 
     // アイコンを再描画
     lucide.createIcons();
+}
+
+/**
+ * 基音を事前に選択（ボタンクリック時の遅延を回避）
+ */
+function preselectBaseNote() {
+    const config = modeConfig[currentMode];
+    const sessionCounter = window.sessionDataRecorder ? window.sessionDataRecorder.getSessionNumber() : 0;
+    const selectedNote = selectBaseNote(config.baseNoteSelection, sessionCounter);
+
+    baseNoteInfo = selectedNote;
+    console.log(`🎵 基音を事前選択: ${selectedNote.note} (${selectedNote.frequency.toFixed(1)}Hz)`);
 }
 
 // デバイス検出（PitchPro実装準拠）
@@ -343,14 +358,14 @@ async function startTraining() {
             }
         }
 
-        // モード別基音選択と再生（2秒）
-        const config = modeConfig[currentMode];
-        const sessionCounter = window.sessionDataRecorder ? window.sessionDataRecorder.getSessionNumber() : 0;
-        const selectedNote = selectBaseNote(config.baseNoteSelection, sessionCounter);
+        // 事前選択済みの基音を使用して再生（2秒）
+        if (!baseNoteInfo) {
+            console.error('❌ 基音が選択されていません');
+            throw new Error('基音が選択されていません');
+        }
 
-        console.log(`🎵 基音再生開始: ${selectedNote.note} (${selectedNote.frequency.toFixed(1)}Hz)`);
-        await pitchShifter.playNote(selectedNote.note, 2);
-        baseNoteInfo = selectedNote;
+        console.log(`🎵 基音再生開始: ${baseNoteInfo.note} (${baseNoteInfo.frequency.toFixed(1)}Hz)`);
+        await pitchShifter.playNote(baseNoteInfo.note, 2);
         console.log('🎵 基音再生:', baseNoteInfo);
 
         // セッションデータ記録開始
