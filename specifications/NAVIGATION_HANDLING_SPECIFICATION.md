@@ -1,7 +1,8 @@
 # ナビゲーション・リソース管理仕様書
 
-**バージョン**: 1.0.0
+**バージョン**: 1.1.0
 **作成日**: 2025-10-22
+**最終更新**: 2025-10-23
 **対象**: PitchPro-SPA（8va相対音感トレーニングアプリ）
 
 ---
@@ -13,8 +14,9 @@
 3. [現状分析](#現状分析)
 4. [仕様設計](#仕様設計)
 5. [実装計画](#実装計画)
-6. [テスト仕様](#テスト仕様)
-7. [付録](#付録)
+6. [ReloadManager統合（v1.1.0追加機能）](#reloadmanager統合v110追加機能)
+7. [テスト仕様](#テスト仕様)
+8. [付録](#付録)
 
 ---
 
@@ -769,6 +771,270 @@ saveIncompleteSession() {
 
 ---
 
+## ReloadManager統合（v1.1.0追加機能）
+
+### 概要
+
+**実装日**: 2025-10-23
+**目的**: リロード検出・ナビゲーション制御の一元管理
+
+従来、リロード検出関連のコードが複数ファイルに散在し、`normalTransitionToTraining`フラグの設定漏れリスクがあった。ReloadManagerクラスを導入することで、コードの一元管理・保守性向上・設定漏れ防止を実現。
+
+### アーキテクチャ
+
+```
+ReloadManager (グローバルクラス)
+├── detectReload()              - リロード検出
+├── showReloadDialog()          - ダイアログ表示
+├── redirectToPreparation()     - preparationへリダイレクト
+├── navigateToTraining()        - trainingへ遷移（★フラグ自動設定）
+└── createRedirectError()       - リダイレクトエラー生成
+```
+
+### クラス定義
+
+**ファイル**: `/PitchPro-SPA/js/reload-manager.js`
+
+```javascript
+class ReloadManager {
+    /**
+     * sessionStorage キー定数
+     */
+    static KEYS = {
+        NORMAL_TRANSITION: 'normalTransitionToTraining',
+        REDIRECT_COMPLETED: 'reloadRedirected'
+    };
+
+    /**
+     * trainingページへの正常な遷移フラグを設定
+     *
+     * 【重要】この関数を呼び出さずにtrainingへ遷移すると、リロードとして誤検出される
+     */
+    static setNormalTransition() {
+        sessionStorage.setItem(this.KEYS.NORMAL_TRANSITION, 'true');
+        console.log('✅ [ReloadManager] 正常な遷移フラグを設定');
+    }
+
+    /**
+     * リロード検出
+     *
+     * 【重要】trainingController の initializeTrainingPage() で最初に呼び出す
+     *
+     * @returns {boolean} true: リロード検出, false: 正常な遷移
+     */
+    static detectReload() { /* ... */ }
+
+    /**
+     * リロード検出時のダイアログ表示
+     */
+    static showReloadDialog() {
+        alert('リロードが検出されました。マイク設定のため準備ページに移動します。');
+    }
+
+    /**
+     * preparationページへリダイレクト（モード情報保持）
+     *
+     * @param {string} reason - リダイレクトの理由（ログ用）
+     * @param {string|null} mode - モード（省略時はURLから取得）
+     * @param {string|null} session - セッション番号（省略可）
+     */
+    static async redirectToPreparation(reason = '', mode = null, session = null) { /* ... */ }
+
+    /**
+     * trainingページへ遷移（正常な遷移フラグを自動設定）
+     *
+     * 【推奨】trainingへの遷移は必ずこのメソッドを使用すること
+     *
+     * @param {string|null} mode - モード（省略時はパラメータなし）
+     * @param {string|null} session - セッション番号（省略可）
+     */
+    static navigateToTraining(mode = null, session = null) {
+        // 正常な遷移フラグを自動設定
+        this.setNormalTransition();
+
+        // 遷移
+        if (mode) {
+            const params = new URLSearchParams({ mode });
+            if (session) params.set('session', session);
+            window.location.hash = `training?${params.toString()}`;
+            console.log(`🚀 [ReloadManager] trainingへ遷移: mode=${mode}, session=${session || 'なし'}`);
+        } else {
+            window.location.hash = 'training';
+            console.log('🚀 [ReloadManager] trainingへ遷移（パラメータなし）');
+        }
+    }
+
+    /**
+     * リダイレクトエラーを生成
+     *
+     * router.js で特別処理するためのエラーオブジェクト
+     *
+     * @returns {Error} リダイレクト用エラー
+     */
+    static createRedirectError() {
+        const error = new Error('REDIRECT_TO_PREPARATION');
+        error.isRedirect = true;
+        return error;
+    }
+}
+```
+
+### 統合したファイル
+
+| ファイル | 変更内容 | メリット |
+|---------|---------|---------|
+| **index.html** | `reload-manager.js` 読み込み追加 | グローバルに利用可能 |
+| **trainingController.v2.js** | `detectReload()` 削除、`ReloadManager.detectReload()` 使用 | 78行削減 |
+| **result-session-controller.js** | `ReloadManager.navigateToTraining()` 使用 | フラグ設定自動化 |
+| **router.js** | `ReloadManager.navigateToTraining()` 使用 | フラグ設定自動化 |
+| **preparation-pitchpro-cycle.js** | `ReloadManager.navigateToTraining()` 使用 (2箇所) | 統一性向上 |
+
+### 使用例
+
+#### 1. trainingページへの遷移（フラグ自動設定）
+
+**従来の実装（❌ 設定漏れリスクあり）**:
+```javascript
+// result-session-controller.js
+button.onclick = () => {
+    // ❌ フラグ設定を忘れるとリロード誤検出
+    sessionStorage.setItem('normalTransitionToTraining', 'true');
+    window.location.hash = 'training';
+};
+```
+
+**ReloadManager統合後（✅ 自動設定）**:
+```javascript
+// result-session-controller.js
+button.onclick = () => {
+    // ✅ フラグが自動設定される
+    ReloadManager.navigateToTraining();
+};
+```
+
+#### 2. モード・セッション情報付き遷移
+
+```javascript
+// preparation-pitchpro-cycle.js
+const redirectInfo = window.preparationRedirectInfo;
+if (redirectInfo && redirectInfo.redirect === 'training') {
+    // モード情報を保持して遷移
+    ReloadManager.navigateToTraining(redirectInfo.mode, redirectInfo.session);
+} else {
+    // 通常フロー
+    ReloadManager.navigateToTraining();
+}
+```
+
+#### 3. trainingController でのリロード検出
+
+**従来の実装（❌ 重複コード）**:
+```javascript
+// trainingController.v2.js (78行の重複関数)
+function detectReload() {
+    // リダイレクト済みフラグをチェック
+    const alreadyRedirected = sessionStorage.getItem('reloadRedirected');
+    if (alreadyRedirected === 'true') { /* ... */ }
+
+    // 正常な遷移フラグをチェック
+    const normalTransition = sessionStorage.getItem('normalTransitionToTraining');
+    // ... 55行のコード
+}
+
+function redirectToPreparationWithMode(reason = '') {
+    // ... 18行のコード
+}
+```
+
+**ReloadManager統合後（✅ シンプル）**:
+```javascript
+// trainingController.v2.js
+export async function initializeTrainingPage() {
+    // ✅ 3行でリロード検出・リダイレクト処理完了
+    if (ReloadManager.detectReload()) {
+        ReloadManager.showReloadDialog();
+        await ReloadManager.redirectToPreparation('リロード検出');
+        throw ReloadManager.createRedirectError();
+    }
+    // ...
+}
+```
+
+### メリット
+
+| 項目 | 従来 | ReloadManager統合後 |
+|------|------|-------------------|
+| **コードの一元管理** | 5ファイルに散在 | 1ファイルに集約 |
+| **設定漏れリスク** | 手動設定（5箇所） | 自動設定 |
+| **重複コード** | 73行の重複 | 0行（完全削除） |
+| **保守性** | 低（変更時に5箇所修正必要） | 高（1箇所のみ） |
+| **テスト容易性** | 困難（5ファイル依存） | 容易（単一クラス） |
+
+### sessionStorage フラグ管理
+
+| フラグ名 | 用途 | 設定タイミング | 削除タイミング |
+|---------|------|-------------|-------------|
+| `normalTransitionToTraining` | 正常な遷移を識別 | `navigateToTraining()` 実行時 | `detectReload()` で確認後 |
+| `reloadRedirected` | 2回目の検出を防止 | リロード検出時 | 2回目の `detectReload()` で確認後 |
+
+### フロー図
+
+```
+【セッション1完了 → セッション2開始】
+result-session ページ
+  ↓
+「次のセッション」ボタンクリック
+  ↓
+ReloadManager.navigateToTraining()
+  ├─ sessionStorage.setItem('normalTransitionToTraining', 'true')  ← 自動設定
+  └─ window.location.hash = 'training'
+  ↓
+trainingController.v2.js
+  ↓
+ReloadManager.detectReload()
+  ├─ normalTransition フラグ確認 → 'true' 検出
+  ├─ フラグ削除
+  └─ return false  ← 正常な遷移として扱う
+  ↓
+セッション2開始（✅ リロード検出なし）
+```
+
+```
+【trainingページでリロード（F5）】
+training ページ
+  ↓
+F5キー（リロード）
+  ↓
+trainingController.v2.js
+  ↓
+ReloadManager.detectReload()
+  ├─ normalTransition フラグ確認 → null
+  ├─ performance.navigation.type === 1 → リロード検出
+  ├─ sessionStorage.setItem('reloadRedirected', 'true')
+  └─ return true
+  ↓
+ReloadManager.showReloadDialog()  ← ダイアログ表示
+  ↓
+ReloadManager.redirectToPreparation('リロード検出')
+  ↓
+#preparation へリダイレクト
+```
+
+### 今後の拡張可能性
+
+1. **ダイレクトアクセス検出**:
+   - `ReloadManager.detectDirectAccess()` メソッド追加
+   - URLパラメータの検証・リダイレクト処理
+
+2. **カスタムダイアログ**:
+   - `showReloadDialog()` をカスタムモーダルに置き換え
+
+3. **リダイレクト履歴管理**:
+   - `sessionStorage` でリダイレクト履歴を記録
+   - 無限ループ防止
+
+---
+
 ## テスト仕様
 
 ### テストケース一覧
@@ -880,6 +1146,11 @@ saveIncompleteSession() {
 
 | バージョン | 日付 | 変更内容 | 担当者 |
 |-----------|------|---------|--------|
+| 1.1.0 | 2025-10-23 | ReloadManager統合機能追加 | Claude |
+|  |  | - リロード検出・ナビゲーション制御の一元管理 |  |
+|  |  | - normalTransitionフラグの自動設定 |  |
+|  |  | - コードの重複削減（73行削除） |  |
+|  |  | - 5ファイル統合で保守性向上 |  |
 | 1.0.0 | 2025-10-22 | 初版作成 | Claude |
 
 ---
