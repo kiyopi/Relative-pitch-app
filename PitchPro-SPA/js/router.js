@@ -179,8 +179,12 @@ class SimpleRouter {
                 } else {
                     // training以外のルート（preparation等）
                     let hash = route;
-                    if (mode && session) {
-                        hash += `?mode=${mode}&session=${session}`;
+                    if (mode || session) {
+                        const params = new URLSearchParams();
+                        if (mode) params.set('mode', mode);
+                        if (session) params.set('session', session);
+                        params.set('redirect', 'training'); // リダイレクト先を明示
+                        hash += `?${params.toString()}`;
                     }
                     window.location.hash = hash;
                 }

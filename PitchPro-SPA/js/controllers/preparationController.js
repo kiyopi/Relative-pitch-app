@@ -20,9 +20,14 @@ function getRedirectInfo() {
     const mode = params.get('mode');
     const session = params.get('session');
 
-    if (!redirect) return null;
+    // redirectパラメータがない場合でも、modeパラメータがあればredirectInfoを生成
+    if (!redirect && !mode) return null;
 
-    return { redirect, mode, session };
+    return {
+        redirect: redirect || 'training', // redirectがない場合はtrainingをデフォルトに
+        mode: mode,
+        session: session
+    };
 }
 
 /**
