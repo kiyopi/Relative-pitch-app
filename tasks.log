@@ -4333,3 +4333,567 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 14:37:53] コミット: refactor: ReloadManager導入でリロード検出を一元管理
+
+目的:
+- リロード検出関連のコードが複数ファイルに散在
+- normalTransitionToTrainingフラグの設定漏れリスク
+- コードの重複・保守性の低下
+
+実装内容:
+- ReloadManagerクラスを新規作成（/js/reload-manager.js）
+- 以下のメソッドで一元管理:
+  - detectReload(): リロード検出
+  - showReloadDialog(): ダイアログ表示
+  - redirectToPreparation(): preparationへリダイレクト
+  - navigateToTraining(): trainingへ遷移（フラグ自動設定）
+  - createRedirectError(): リダイレクトエラー生成
+
+統合したファイル:
+1. index.html: reload-manager.js読み込み追加
+2. trainingController.v2.js: ReloadManager.detectReload()使用
+3. result-session-controller.js: ReloadManager.navigateToTraining()使用
+4. router.js: ReloadManager.navigateToTraining()使用
+5. preparation-pitchpro-cycle.js: ReloadManager.navigateToTraining()使用
+
+メリット:
+- コードの一元管理で保守性向上
+- フラグ設定の自動化で設定漏れ防止
+- 再利用性向上・テストが容易
+- 重複コード削減（detectReload関数等を削除）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 14:47:06] コミット: docs: NAVIGATION_HANDLING_SPECIFICATION.mdにReloadManager統合を追記
+
+追加内容:
+- 「6. ReloadManager統合（v1.1.0追加機能）」セクション追加
+- アーキテクチャ・クラス定義の完全ドキュメント化
+- 統合したファイル（5ファイル）と変更内容の記載
+- 使用例（従来実装 vs ReloadManager統合後）
+- メリット比較表（コード一元管理・設定漏れ防止等）
+- sessionStorageフラグ管理の詳細
+- フロー図（セッション遷移・リロード検出）
+- 今後の拡張可能性（ダイレクトアクセス検出等）
+
+バージョン更新:
+- 1.0.0 → 1.1.0
+- 改訂履歴に詳細を追記
+
+目次更新:
+- ReloadManager統合を6番目に追加
+- テスト仕様・付録の番号を更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 15:00:03] コミット: fix: リロード復帰時のsessionCounter保持機能を実装
+
+- ReloadManager に RESUMING_AFTER_RELOAD フラグ追加
+- isResumingAfterReload() メソッドで復帰判定
+- trainingController.v2.js でリロード復帰時は sessionCounter をリセットしない
+- router.js の cleanupCurrentPage() で resetSession() を呼ばないように変更
+- キャッシュバスター追加で常に最新コードを読み込み
+
+これによりリロード後も正しいセッション番号から継続できるようになった
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 19:25:51] コミット: fix: 新規開始と次セッション継続を区別する判定を追加
+
+【問題】
+- 次のセッション開始時もsessionCounterがリセットされていた
+- localStorage にデータがあるのに新規開始として扱われていた
+
+【修正内容】
+- trainingController.v2.js で localStorage の sessionData 存在チェック追加
+- existingSessions.length > 0 なら「継続」として判定
+- これにより以下の3パターンを正しく区別：
+  1. 完全な新規開始（results-overview から）→ リセット
+  2. 次のセッション開始（result-session から）→ 保持
+  3. リロード復帰（preparation から）→ 保持
+
+【バージョン】
+- trainingController.v2.js: 07:00 → 08:00
+- ReloadManager: 1.0.0 → 1.1.0
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 19:32:35] コミット: fix: result-sessionページでのリロード検出を追加
+
+【問題】
+- result-session（セッション評価）ページでリロードした時、そのままのページに戻ってしまう
+- training ページでのみリロード検出が実装されていた
+
+【修正内容】
+- result-session-controller.js の initializeResultSessionPage() にリロード検出を追加
+- リロード検出時は preparation へリダイレクト
+- ReloadManager.detectReload() → showReloadDialog() → redirectToPreparation() の流れ
+
+【動作】
+- セッション評価ページでリロード（F5）
+  → ダイアログ表示
+  → preparation へリダイレクト
+  → マイク許可からやり直し
+
+【バージョン】
+- result-session-controller.js: 1.0.0 → 1.1.0
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 19:41:06] コミット: fix: 新規開始フラグで完全な新規開始を明示的に判定
+
+【問題】
+- home → preparation → training の流れで localStorage にデータが残っていると継続として扱われていた
+- ページを閉じて再度 home から開始しても前回のセッションから継続されてしまう
+
+【修正内容】
+- ReloadManager に NEW_TRAINING_START フラグを追加
+- setNewTrainingStart() / isNewTrainingStart() メソッド追加
+- 新規開始フラグを以下の箇所で設定：
+  1. home → training（router.js setupHomeEvents）
+  2. results-overview → training（router.js setupResultsOverviewEvents）
+  3. preparation → training（通常フロー、preparation-pitchpro-cycle.js 2箇所）
+
+- trainingController.v2.js で判定ロジックを修正：
+  1. 新規開始フラグあり → sessionCounter リセット
+  2. リロード復帰 or localStorage データあり → sessionCounter 保持
+  3. それ以外（フォールバック）→ sessionCounter リセット
+
+【動作】
+- home → training: 新規開始（sessionCounter = 0）
+- result-session → training: 次のセッション（sessionCounter 保持）
+- training でリロード → preparation → training: 継続（sessionCounter 保持）
+
+【バージョン】
+- ReloadManager: 1.1.0 → 1.2.0
+- trainingController.v2.js: 08:00 → 09:00
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 19:53:53] コミット: refactor: trainingページ初期化を常にリセットにシンプル化
+
+【設計思想の見直し】
+ユーザーの指摘により根本的な設計を見直し：
+- training ページへの遷移 = 常に新規セッション開始
+- sessionCounter は localStorage の完了済みセッションから自動計算
+- リセットしても次のセッション番号は自動的に正しくなる
+- リロード検出は preparation へのリダイレクトのためだけに使用
+
+【削除した複雑な判定】
+- 新規開始フラグ（NEW_TRAINING_START）
+- リロード復帰フラグ（RESUMING_AFTER_RELOAD）
+- isNewTrainingStart() / setNewTrainingStart()
+- isResumingAfterReload()
+- localStorage データ存在チェック
+
+【シンプルな実装】
+trainingController.v2.js:
+  // 常にリセット
+  initializeRandomModeTraining();
+
+【動作】
+1. home → training: リセット（sessionCounter=0 → 1）
+2. result-session → training: リセット（sessionCounter=1 → 2）
+3. training リロード → preparation → training: リセット（未完了は保存されないため）
+
+【メリット】
+- コードが圧倒的にシンプル
+- sessionCounter 管理の責任が SessionDataRecorder に完全に集約
+- バグの可能性が大幅に減少
+
+【バージョン】
+- ReloadManager: 1.2.0 → 2.0.0（大幅シンプル化）
+- trainingController.v2.js: 09:00 → 10:00
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 20:16:37] コミット: docs: NAVIGATION_HANDLING_SPECIFICATION.md を v2.0.0 に更新
+
+【更新内容】
+- ReloadManager v2.0.0 の大幅シンプル化を反映
+- 設計思想の根本的見直し内容を追加
+- 削除されたメソッド・フラグを明記
+  - setNewTrainingStart()
+  - isNewTrainingStart()
+  - isResumingAfterReload()
+  - NEW_TRAINING_START フラグ
+  - RESUMING_AFTER_RELOAD フラグ
+
+【追加セクション】
+- v2.0.0での設計思想変更の説明
+- シンプル化されたフロー図
+- v2.0.0での重要な変更点まとめ
+- メリット表の v2.0.0 列追加
+- sessionStorage フラグ管理表の更新
+
+【修正内容】
+- trainingController.v2.js の実装例を v2.0.0 コードに更新
+- router.js の cleanupCurrentPage() コメント追加
+- 改訂履歴に v2.0.0 エントリ追加
+
+【バージョン】
+- 1.1.0 → 2.0.0
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 20:41:03] コミット: fix: result-sessionページのリロード検出を削除（誤検出対策）
+
+【問題】
+- セッション完了後、result-session への遷移時にリロード誤検出
+- Safari の SPA ハッシュナビゲーションが "reload" として報告される
+- preparation へ不要なリダイレクトが発生
+
+【原因】
+- training → result-session への遷移時に normalTransition フラグなし
+- Navigation Timing API v2 が正常な遷移を "reload" と誤判定
+- result-session-controller.js でリロード検出を実行していた
+
+【修正】
+result-session ページからリロード検出を完全削除
+
+【理由】
+1. result-session は表示専用ページ（マイク許可不要）
+2. localStorage からデータを読み込めば表示可能
+3. リロードしても問題ない
+4. 複雑なフラグ管理を追加する必要がない
+5. v2.0.0 のシンプル化思想に沿った設計
+
+【変更内容】
+- result-session-controller.js: リロード検出処理を削除（line 14-19）
+- バージョン: 1.1.0 → 1.2.0
+- 詳細なコメント追加で設計意図を明記
+
+【影響】
+- ✅ セッション完了後の正常フロー復旧
+- ✅ sessionCounter が正しく増加
+- ✅ 不要なリダイレクトを防止
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-23 20:45:22] コミット: fix: Safari での SPA 遷移誤検出を修正（リロード検出改善）
+
+【問題】
+- result-session で手動リロード（F5）した場合、次のセッションでマイク許可ダイアログが表示される
+- Safari の Navigation Timing API v2 が SPA 遷移を "reload" と誤判定
+- 前回の修正でリロード検出を削除したため、手動リロード時の対応ができない
+
+【原因】
+Safari のブラウザ実装により、リロード検出APIの挙動が異なる：
+- 古いAPI（performance.navigation.type）: 正確に判定（0=navigate, 1=reload）
+- 新しいAPI（Navigation Timing API v2）: SPA遷移を "reload" と誤判定
+
+【修正内容】
+1. ReloadManager.detectReload() の改善
+   - 古いAPI（performance.navigation.type）を優先
+   - type === 0（navigate）の場合、新しいAPIをスキップ
+   - type === 1（reload）の場合のみリロードと判定
+   - 新しいAPIはフォールバックとして使用
+
+2. result-session-controller.js のリロード検出復活
+   - v1.2.0 で削除したリロード検出を復活
+   - 手動リロード時は preparation へリダイレクト
+   - マイク許可を再取得
+
+【動作】
+- training → result-session: 古いAPIが type=0 を返すため、リロード検出なし（✅）
+- result-session で F5: 古いAPIが type=1 を返すため、リロード検出（✅）
+- preparation へリダイレクトし、マイク許可を再取得（✅）
+
+【バージョン】
+- ReloadManager: 2.0.0 → 2.1.0
+- result-session-controller.js: 1.2.0 → 1.3.0
+
+【技術的背景】
+performance.navigation は非推奨APIですが、Safari では最も信頼できる方法です。
+新しいAPI（Navigation Timing API v2）は仕様的に正しいですが、Safari の実装が
+SPA のハッシュナビゲーションを正しく扱えていないため、フォールバックとして使用。
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 09:59:08] コミット: fix: セッション継続時のsessionCounter保持ロジックを追加
+
+- v2.0.0の過度なシンプル化を修正（常にリセットは不適切だった）
+- localStorage完了済みセッションをチェックしてリセット判定
+- セッション継続時: initializeRandomModeTraining()をスキップ
+- 新規開始時: 従来通りリセット実行
+
+問題の根本原因:
+v2.0.0で常にinitializeRandomModeTraining()を呼び出すと、
+完了済みセッションがlocalStorageから削除されてしまい、
+SessionDataRecorderが常にsessionCounter=0を算出していた
+
+修正内容:
+- existingSessionsをlocalStorageから取得
+- completedRandomSessions.length > 0 の場合はリセットをスキップ
+- これによりセッション2, 3, 4... と正しく増加する
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 10:51:44] コミット: docs: セッション管理仕様書を新規作成・間違った仕様書を修正
+
+新規作成:
+- SESSION_MANAGEMENT_SPECIFICATION.md
+  - SessionDataRecorderの完全仕様を文書化
+  - sessionCounter自動インクリメントの仕組みを明記
+  - 3モードのフロー仕様を詳細に記述
+  - 現在の実装の問題点を明確化
+  - 正しい設計方針を定義
+
+修正:
+- NAVIGATION_HANDLING_SPECIFICATION.md (v2.0.0 → v2.1.0)
+  - v2.0.0の設計ミスを修正
+  - ReloadManagerの責任範囲を明確化（リロード検出のみ）
+  - sessionCounter管理はSessionDataRecorderの責任と明記
+  - 間違ったコード例・フロー図を削除
+  - SESSION_MANAGEMENT_SPECIFICATION.md参照を追加
+
+主な修正内容:
+❌ 削除した間違った記述:
+  - "training ページへの遷移 = 常にリセット"
+  - "sessionCounter は localStorage から自動計算"
+  - initializeRandomModeTraining() を常に実行
+
+✅ 正しい設計:
+  - sessionCounter は SessionDataRecorder が管理
+  - startNewSession() で自動インクリメント
+  - ReloadManager は sessionCounter に一切関与しない
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 10:57:34] コミット: docs: ブラウザバック防止の仕様を追加
+
+SESSION_MANAGEMENT_SPECIFICATION.md に追加:
+- ブラウザバック防止の基本方針（例外処理扱い）
+- 対象ページ（training, result-session, results-overview）
+- History API を使用した実装方法
+- ページ別の警告メッセージ
+- クリーンアップ処理の詳細
+- 推奨UI（アプリ内ナビゲーションボタンの配置）
+
+基本方針:
+- ブラウザバックは原則として禁止
+- 確認ダイアログで意図的な離脱のみ許可
+- クリーンアップ処理を必ず実行
+- アプリ内ボタンでのナビゲーションを推奨
+
+実装方法:
+- history.pushState() でダミーエントリー追加
+- popstate イベントで confirmation 表示
+- 許可時のみ cleanupCurrentPage() 実行
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 11:03:19] コミット: docs: ホームボタンの仕様を追加
+
+SESSION_MANAGEMENT_SPECIFICATION.md に追加:
+- 6.5 ホームボタンの仕様
+- 現在の実装の問題点（確認ダイアログなし）
+- 修正後の仕様（ページ別の確認要否）
+- 実装方法（HTMLのonclick削除、JS分離）
+- 確認メッセージの詳細
+- クリーンアップ処理の説明
+- ブラウザバックとの一貫性
+
+主な内容:
+✅ training: 確認ダイアログ必須（データ損失防止）
+❌ result-session: ホームボタン非表示
+✅ results-overview: 確認なし（自由に離脱可能）
+
+実装方法:
+- HTMLからonclick削除、id="btn-home-training"追加
+- trainingController.v2.jsにsetupHomeButton()実装
+- router.jsのcleanupCurrentPage()を活用（自動クリーンアップ）
+
+ブラウザバックとの一貫性:
+- 同じレベルの警告メッセージ
+- 同じクリーンアップ処理
+- ユーザー体験の統一
+
+次のステップに追加:
+- 7.2.5: setupHomeButton()関数の実装
+- 7.5: HTMLファイルの修正（onclick削除）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 11:18:53] コミット: fix: セッション管理システムの根本的修正
+
+SessionDataRecorderの自動管理設計に基づく包括的な修正を実施。
+v2.0.1の間違った実装を削除し、正しい責任分担を確立。
+
+## Phase 1: SessionDataRecorder基盤修正
+- startNewSession()にmodeパラメータ追加（'random', 'continuous', '12-tone'対応）
+- ハードコードされた mode: 'random' を動的設定に変更
+
+## Phase 2: trainingController.v2.js 修正
+- v2.0.1のセッション継続判定削除（Line 83-96）
+  → 「基音が選択されていません」エラーの根本原因を解決
+- sessionCounter直接操作削除（Line 206）
+  → SessionDataRecorderのカプセル化を尊重
+- startNewSession()呼び出し時にcurrentModeを渡す（Line 425）
+- ブラウザバック防止実装（popstateイベントハンドラ）
+- ホームボタンに確認ダイアログ追加（setupHomeButton関数）
+
+## Phase 3: training.html 修正
+- ホームボタンのonclick属性削除
+- id="btn-home-training"追加（JavaScriptからの制御に対応）
+
+## Phase 4: localStorage管理の統一
+- preparation-pitchpro-cycle.js: トレーニング開始時のlocalStorageクリア追加（2箇所）
+- trainingController.v2.js: 重複するlocalStorageクリアを削除
+
+## 設計原則の確立
+- ReloadManager: リロード検出のみ担当
+- SessionDataRecorder: sessionCounter + localStorage管理
+- trainingController.v2.js: トレーニングフロー制御
+- preparation: トレーニング開始時の初期化処理
+
+## 参照仕様書
+- SESSION_MANAGEMENT_SPECIFICATION.md
+- NAVIGATION_HANDLING_SPECIFICATION.md v2.1.0
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 11:26:52] コミット: fix: popstateイベントリスナーのメモリリーク修正
+
+トレーニング完了後の自動ブラウザバック検知問題を解決。
+
+## 問題
+1. トレーニング完了後、result-sessionへ遷移時に突然ブラウザバック確認ダイアログが表示される
+2. ユーザーが操作していないのにpopstateイベントが発火
+3. popstateイベントリスナーがページ遷移後も残り続ける（メモリリーク）
+
+## 根本原因
+preventBrowserBack()で登録したpopstateイベントリスナーが、
+ページ遷移後も削除されず、次のページでもイベントを受信していた。
+
+## 修正内容
+1. popStateHandlerをモジュールスコープ変数として保持
+2. removeBrowserBackPrevention()関数を追加
+   - イベントリスナーを確実に削除
+   - popStateHandlerをnullにしてメモリリーク防止
+3. ページ遷移前の3箇所で削除を実行:
+   - handleSessionComplete(): result-session遷移前
+   - setupHomeButton(): home遷移前
+   - resetTrainingPageFlag(): ページクリーンアップ時
+4. preventBrowserBack()で既存ハンドラがあれば削除（冪等性確保）
+
+## 期待される動作
+✅ トレーニング完了後、自動的にresult-sessionへ遷移
+✅ ブラウザバック確認ダイアログは出ない
+✅ トレーニング中の意図的なバック操作のみダイアログ表示
+✅ メモリリーク解消
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 11:43:21] コミット: debug: localStorageクリア問題の調査用ログ追加
+
+セッション番号が1から始まらない問題の原因を特定するため、
+詳細なデバッグログを追加。
+
+## 問題
+- 音域データ保存済みルートからトレーニング開始すると、セッション番号が2から始まる
+- 10セッション完了しても続行できてしまう（10/8表示）
+
+## 調査項目
+1. localStorageのクリア処理が実行されているか
+2. 既存セッションデータのmode値は何か
+3. クリア前後のセッション数の変化
+
+## 追加したログ
+preparation-pitchpro-cycle.js の2箇所に追加:
+- skip-range-test-btn（音域データ保存済みルート）
+- complete-range-test-btn（音域テスト完了後ルート）
+
+出力内容:
+- クリア前のセッション数
+- 対象モード
+- 既存セッションのmode一覧
+- クリア後のセッション数
+
+## 次のステップ
+1. ブラウザで準備ページ → トレーニング開始
+2. コンソールログで上記4項目を確認
+3. mode値の不一致があれば修正実施
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 11:49:45] コミット: chore: キャッシュバスター更新 (v12→v13)
+
+preparation-pitchpro-cycle.jsのキャッシュバスターをインクリメント。
+
+## 目的
+- ブラウザキャッシュを強制的に無効化
+- 最新のlocalStorageデバッグログを確実に読み込む
+
+## 変更内容
+- index.html: preparation-pitchpro-cycle.js?v=12 → ?v=13
+
+## 期待される動作
+ブラウザが最新のJSファイルを読み込み、以下のログが出力される:
+- 🔍 [localStorage] クリア前のセッション数
+- 🔍 [localStorage] 対象モード
+- 🔍 [localStorage] 既存セッションのmode
+- 🔍 [localStorage] クリア後のセッション数
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 11:54:32] コミット: fix: タイムスタンプ方式でキャッシュを完全無効化
+
+preparation-pitchpro-cycle.jsのキャッシュバスターをタイムスタンプ方式に変更。
+
+## 問題
+- v=12 → v=13 に更新してもブラウザが古いファイルをキャッシュ
+- 追加したデバッグログが全く出力されない
+- 手動のキャッシュクリアでも効果なし
+
+## 原因
+静的なバージョン番号ではブラウザが「既知のURL」として判断し、
+積極的にキャッシュから読み込んでしまう。
+
+## 解決策
+Date.now()を使用したタイムスタンプ方式に変更：
+- ページ読み込みごとに必ず異なるURLになる
+- ブラウザは「初めて見るURL」として判断
+- 必ず最新のファイルをダウンロードする
+
+## 変更内容
+```html
+<!-- 変更前 -->
+<script src="pages/js/preparation-pitchpro-cycle.js?v=13"></script>
+
+<!-- 変更後 -->
+<script>
+    const script = document.createElement('script');
+    script.src = `pages/js/preparation-pitchpro-cycle.js?t=${Date.now()}`;
+    document.head.appendChild(script);
+</script>
+```
+
+## 期待される動作
+次回のページ読み込みで、デバッグログが確実に出力される：
+- 🔍 [localStorage] クリア前のセッション数
+- 🔍 [localStorage] 対象モード
+- 🔍 [localStorage] 既存セッションのmode
+- 🔍 [localStorage] クリア後のセッション数
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

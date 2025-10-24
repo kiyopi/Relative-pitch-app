@@ -1267,14 +1267,14 @@ function setupMicPermissionFlow() {
                 console.log(`✅ ${mode}モードのセッションデータをクリアしました`);
                 console.log(`🔍 [localStorage] クリア後のセッション数: ${otherModeSessions.length}`);
 
-                // 【ReloadManager統合】リダイレクト情報がある場合、モード情報を保持して遷移
+                // 【NavigationManager統合】リダイレクト情報がある場合、モード情報を保持して遷移
                 if (redirectInfo && redirectInfo.redirect === 'training') {
                     console.log(`📍 モード情報を保持して遷移: mode=${redirectInfo.mode}, session=${redirectInfo.session || 'なし'}`);
-                    ReloadManager.navigateToTraining(redirectInfo.mode, redirectInfo.session);
+                    NavigationManager.navigateToTraining(redirectInfo.mode, redirectInfo.session);
                 } else {
                     // SPAのtraining画面へ遷移（通常フロー）
                     console.log('🚀 SPAのtraining画面に遷移中...');
-                    ReloadManager.navigateToTraining();
+                    NavigationManager.navigateToTraining();
                 }
 
             } catch (error) {
@@ -1485,14 +1485,14 @@ function setupMicPermissionFlow() {
             console.log(`✅ ${mode}モードのセッションデータをクリアしました`);
             console.log(`🔍 [localStorage] クリア後のセッション数: ${otherModeSessions.length}`);
 
-            // 【ReloadManager統合】リダイレクト情報がある場合、モード情報を保持して遷移
+            // 【NavigationManager統合】リダイレクト情報がある場合、モード情報を保持して遷移
             if (redirectInfo && redirectInfo.redirect === 'training') {
                 console.log(`📍 モード情報を保持して遷移: mode=${redirectInfo.mode}, session=${redirectInfo.session || 'なし'}`);
-                ReloadManager.navigateToTraining(redirectInfo.mode, redirectInfo.session);
+                NavigationManager.navigateToTraining(redirectInfo.mode, redirectInfo.session);
             } else {
                 // SPAのtraining画面へ遷移（通常フロー）
                 console.log('🚀 SPAのtraining画面に遷移中...');
-                ReloadManager.navigateToTraining();
+                NavigationManager.navigateToTraining();
             }
         });
     }

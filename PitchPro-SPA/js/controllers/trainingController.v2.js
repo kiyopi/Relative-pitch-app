@@ -52,18 +52,18 @@ const modeConfig = {
 export async function initializeTrainingPage() {
     console.log('TrainingController initializing...');
 
-    // 【ReloadManager統合】リロード検出 → preparationへリダイレクト
-    if (ReloadManager.detectReload()) {
+    // 【NavigationManager統合】リロード検出 → preparationへリダイレクト
+    if (NavigationManager.detectReload()) {
         console.warn('⚠️ リロード検出 - preparationへリダイレクト');
 
         // ユーザーに説明を表示
-        ReloadManager.showReloadDialog();
+        NavigationManager.showReloadDialog();
 
         // preparationへリダイレクト
-        await ReloadManager.redirectToPreparation('リロード検出');
+        await NavigationManager.redirectToPreparation('リロード検出');
 
         // リダイレクトエラーをスロー（router.jsで特別扱い）
-        throw ReloadManager.createRedirectError();
+        throw NavigationManager.createRedirectError();
     }
 
     // Wait for Lucide
@@ -76,7 +76,7 @@ export async function initializeTrainingPage() {
     if (!checkVoiceRangeData()) {
         console.error('❌ 音域データが設定されていません');
         alert('音域テストを先に完了してください。');
-        await ReloadManager.redirectToPreparation('音域テスト未完了');
+        await NavigationManager.redirectToPreparation('音域テスト未完了');
         return;
     }
 
@@ -132,8 +132,7 @@ export async function initializeTrainingPage() {
     // ホームボタンに確認ダイアログを追加
     setupHomeButton();
 
-    // ブラウザバック防止を有効化
-    preventBrowserBack();
+    // ブラウザバック防止はrouter.jsで自動管理されます
 
     isInitialized = true;
     console.log('TrainingController initialized');
@@ -677,8 +676,7 @@ function handleSessionComplete() {
         const completedSession = sessionRecorder.completeSession();
         console.log('✅ セッションデータ保存完了:', completedSession);
 
-        // ページ遷移前にpopstateイベントリスナーを削除
-        removeBrowserBackPrevention();
+        // ブラウザバック防止はrouter.jsで自動解除されます
 
         // セッション結果ページへ遷移（SPAのハッシュルーティング）
         // ランダムモード: 8セッション完了時に「総合評価を見る」ボタンが表示される
@@ -727,8 +725,7 @@ function handleSessionComplete() {
 export function resetTrainingPageFlag() {
     isInitialized = false;
 
-    // popstateイベントリスナーを削除
-    removeBrowserBackPrevention();
+    // ブラウザバック防止はrouter.jsで自動解除されます
 
     console.log('TrainingController reset');
 }
@@ -1023,8 +1020,7 @@ function setupHomeButton() {
         );
 
         if (confirmed) {
-            // ページ遷移前にpopstateイベントリスナーを削除
-            removeBrowserBackPrevention();
+            // ブラウザバック防止はrouter.jsで自動解除されます
 
             // router.js の cleanupCurrentPage() が自動実行される
             window.location.hash = 'home';
@@ -1038,54 +1034,6 @@ function setupHomeButton() {
 }
 
 /**
- * ブラウザバック防止
- * トレーニング中の誤操作によるデータ損失を防止
+ * ブラウザバック防止はrouter.jsでグローバルに管理されています
+ * （この機能は削除されました - router.jsを参照）
  */
-let popStateHandler = null; // イベントハンドラを保持
-
-function preventBrowserBack() {
-    // 既存のハンドラがあれば削除
-    if (popStateHandler) {
-        window.removeEventListener('popstate', popStateHandler);
-        console.log('🔄 既存のpopstateハンドラを削除');
-    }
-
-    // ダミーのエントリーを追加
-    history.pushState(null, '', location.href);
-    console.log('📍 ブラウザバック防止: ダミーエントリー追加');
-
-    // popstateイベントでconfirmation表示
-    popStateHandler = function(event) {
-        const confirmed = confirm(
-            'トレーニング中です。\n' +
-            '戻ると進行中のデータが失われます。\n' +
-            '本当に戻りますか？'
-        );
-
-        if (confirmed) {
-            // クリーンアップ処理を実行（router.js が自動実行）
-            console.log('🔙 ユーザーがブラウザバックを承認');
-            removeBrowserBackPrevention();
-            history.back();
-        } else {
-            // 戻らない（ダミーエントリーを再追加）
-            history.pushState(null, '', location.href);
-            console.log('🚫 ブラウザバックをキャンセル');
-        }
-    };
-
-    window.addEventListener('popstate', popStateHandler);
-    console.log('✅ ブラウザバック防止イベントリスナー登録完了');
-}
-
-/**
- * ブラウザバック防止を解除
- * ページ遷移前に呼び出して、popstateイベントリスナーを削除
- */
-function removeBrowserBackPrevention() {
-    if (popStateHandler) {
-        window.removeEventListener('popstate', popStateHandler);
-        popStateHandler = null;
-        console.log('✅ popstateイベントリスナーを削除');
-    }
-}

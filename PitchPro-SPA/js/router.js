@@ -15,6 +15,18 @@ class SimpleRouter {
             'results-overview': 'pages/results-overview.html'
         };
 
+        // ページ設定：ブラウザバック防止が必要なページを定義
+        this.pageConfig = {
+            'training': {
+                preventBackNavigation: true,
+                confirmMessage: 'トレーニング中です。\n戻ると進行中のデータが失われます。\n本当に戻りますか？'
+            },
+            'result-session': {
+                preventBackNavigation: true,
+                confirmMessage: 'セッション進行中です。\n戻るとトレーニングが中断されます。\n本当に戻りますか？'
+            }
+        };
+
         this.appRoot = document.getElementById('app-root');
         this.currentPage = null; // 現在のページを追跡
         this.init();
@@ -139,6 +151,9 @@ class SimpleRouter {
             default:
                 break;
         }
+
+        // ブラウザバック防止を自動設定（グローバル管理）
+        this.preventBrowserBack(page);
     }
 
     setupHomeEvents() {
@@ -157,9 +172,9 @@ class SimpleRouter {
                     this.initializePitchShifterBackground();
                 }
 
-                // 【ReloadManager統合】training へ直接遷移する場合
+                // 【NavigationManager統合】training へ直接遷移する場合
                 if (route === 'training') {
-                    ReloadManager.navigateToTraining(mode, session);
+                    NavigationManager.navigateToTraining(mode, session);
                 } else {
                     // training以外のルート（preparation等）
                     let hash = route;
@@ -327,9 +342,9 @@ class SimpleRouter {
                 localStorage.setItem('sessionData', JSON.stringify(otherSessions));
                 console.log('✅ ランダムモードのセッションデータをクリアしました');
 
-                // トレーニングページに遷移（ReloadManager統合）
+                // トレーニングページに遷移（NavigationManager統合）
                 // ※sessionCounterリセット・基音選択はtrainingController.jsで自動実行
-                ReloadManager.navigateToTraining();
+                NavigationManager.navigateToTraining();
             });
             console.log('✅ 新しいトレーニング開始ボタンのイベントリスナー設定完了');
         } else {
@@ -340,6 +355,9 @@ class SimpleRouter {
     // 現在のページのクリーンアップ
     async cleanupCurrentPage() {
         try {
+            // ブラウザバック防止を自動解除（グローバル管理）
+            this.removeBrowserBackPrevention();
+
             // preparationページからの離脱時のクリーンアップ
             if (this.currentPage === 'preparation') {
                 console.log('Cleaning up preparation page resources...');
@@ -384,7 +402,7 @@ class SimpleRouter {
 
                 // セッションデータ処理
                 // ※リロード後の一時的な離脱の場合はリセットしない
-                // （ReloadManager.isResumingAfterReload()で判定されるため、ここではリセット不要）
+                // （NavigationManager.isResumingAfterReload()で判定されるため、ここではリセット不要）
                 if (window.sessionDataRecorder) {
                     const currentSession = window.sessionDataRecorder.getCurrentSession();
                     if (currentSession && !currentSession.completed) {
@@ -406,6 +424,33 @@ class SimpleRouter {
         } catch (error) {
             console.warn('Page cleanup error:', error);
             // クリーンアップエラーは警告レベルで続行
+        }
+    }
+
+    /**
+     * ブラウザバック防止を有効化（NavigationManagerに委譲）
+     * @param {string} page - ページ名
+     */
+    preventBrowserBack(page) {
+        // ページ設定を取得
+        const config = this.pageConfig[page];
+        if (!config || !config.preventBackNavigation) {
+            return;
+        }
+
+        // NavigationManagerに委譲
+        if (window.NavigationManager) {
+            window.NavigationManager.preventBrowserBack(page, config.confirmMessage);
+        }
+    }
+
+    /**
+     * ブラウザバック防止を解除（NavigationManagerに委譲）
+     */
+    removeBrowserBackPrevention() {
+        // NavigationManagerに委譲
+        if (window.NavigationManager) {
+            window.NavigationManager.removeBrowserBackPrevention();
         }
     }
 

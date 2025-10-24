@@ -3,9 +3,9 @@
  * @version 1.3.0
  *
  * 変更履歴:
- * - 1.3.0: リロード検出を復活（ReloadManager改善により誤検出を解消）
+ * - 1.3.0: リロード検出を復活（NavigationManager改善により誤検出を解消）
  * - 1.2.0: リロード検出を削除（表示専用ページのため不要）← 誤検出のため一時削除
- * - 1.1.0: リロード検出機能を追加（ReloadManager統合）
+ * - 1.1.0: リロード検出機能を追加（NavigationManager統合）
  */
 
 // グローバル初期化関数（SPA用）
@@ -13,13 +13,13 @@ async function initializeResultSessionPage() {
     console.log('📊 セッション結果ページ初期化開始');
 
     // 【v1.3.0変更】リロード検出を復活
-    // ReloadManager が改善され、古いAPI（performance.navigation.type）を優先するため、
+    // NavigationManager が改善され、古いAPI（performance.navigation.type）を優先するため、
     // Safari での SPA 遷移誤検出が解消された
     // 手動リロード（F5）の場合は preparation へリダイレクトし、マイク許可を再取得
-    if (ReloadManager.detectReload()) {
+    if (NavigationManager.detectReload()) {
         console.warn('⚠️ result-sessionでリロード検出 - preparationへリダイレクト');
-        ReloadManager.showReloadDialog();
-        await ReloadManager.redirectToPreparation('result-sessionでリロード検出');
+        NavigationManager.showReloadDialog();
+        await NavigationManager.redirectToPreparation('result-sessionでリロード検出');
         return; // リダイレクト後は以降の処理を実行しない
     }
 
@@ -360,9 +360,9 @@ function updateNextSessionButton(sessionNumber) {
             button.innerHTML = '<i data-lucide="trophy" style="width: 24px; height: 24px;"></i><span>総合評価を見る</span>';
             console.log('✅ 8セッション完了 - 総合評価ボタン表示');
         } else {
-            // 次のセッションへ（ReloadManager統合）
+            // 次のセッションへ（NavigationManager統合）
             button.onclick = () => {
-                ReloadManager.navigateToTraining();
+                NavigationManager.navigateToTraining();
             };
             button.innerHTML = '<i data-lucide="arrow-right" style="width: 24px; height: 24px;"></i><span>次の基音へ</span>';
             console.log(`➡️ セッション${completedSessionsInMode + 1}/8 - 次のセッションボタン表示`);
