@@ -1256,9 +1256,16 @@ function setupMicPermissionFlow() {
                 const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
                 const redirectInfo = window.preparationRedirectInfo;
                 const mode = redirectInfo?.mode || 'random';
+
+                console.log(`🔍 [localStorage] クリア前のセッション数: ${allSessions.length}`);
+                console.log(`🔍 [localStorage] 対象モード: ${mode}`);
+                console.log(`🔍 [localStorage] 既存セッションのmode:`, allSessions.map(s => s.mode));
+
                 const otherModeSessions = allSessions.filter(s => s.mode !== mode);
                 localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
+
                 console.log(`✅ ${mode}モードのセッションデータをクリアしました`);
+                console.log(`🔍 [localStorage] クリア後のセッション数: ${otherModeSessions.length}`);
 
                 // 【ReloadManager統合】リダイレクト情報がある場合、モード情報を保持して遷移
                 if (redirectInfo && redirectInfo.redirect === 'training') {
@@ -1467,9 +1474,16 @@ function setupMicPermissionFlow() {
             const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
             const redirectInfo = window.preparationRedirectInfo;
             const mode = redirectInfo?.mode || 'random';
+
+            console.log(`🔍 [localStorage] クリア前のセッション数: ${allSessions.length}`);
+            console.log(`🔍 [localStorage] 対象モード: ${mode}`);
+            console.log(`🔍 [localStorage] 既存セッションのmode:`, allSessions.map(s => s.mode));
+
             const otherModeSessions = allSessions.filter(s => s.mode !== mode);
             localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
+
             console.log(`✅ ${mode}モードのセッションデータをクリアしました`);
+            console.log(`🔍 [localStorage] クリア後のセッション数: ${otherModeSessions.length}`);
 
             // 【ReloadManager統合】リダイレクト情報がある場合、モード情報を保持して遷移
             if (redirectInfo && redirectInfo.redirect === 'training') {

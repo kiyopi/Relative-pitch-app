@@ -681,9 +681,10 @@ function handleSessionComplete() {
         removeBrowserBackPrevention();
 
         // セッション結果ページへ遷移（SPAのハッシュルーティング）
+        // ランダムモード: 8セッション完了時に「総合評価を見る」ボタンが表示される
         const sessionNumber = sessionRecorder.getSessionNumber();
         window.location.hash = `result-session?session=${sessionNumber}`;
-        return; // 以降の処理はスキップ
+        return;
     }
 
     // sessionRecorderがない場合のフォールバック（開発中）
