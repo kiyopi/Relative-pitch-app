@@ -5004,3 +5004,178 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 13:41:01] コミット: refactor: ブラウザバック防止設定をNavigationManagerに統合
+
+【設計改善】
+- router.jsのpageConfigを削除
+- NavigationManager.PAGE_CONFIGに全ページ設定を統合
+- ブラウザバック防止の責任をNavigationManagerに完全集約
+
+【メリット】
+1. 責任の所在が明確化（NavigationManagerが完全管理）
+2. router.jsがシンプルになり保守性向上
+3. ブラウザバック関連のロジックが一箇所に集約
+4. 新しいページ追加時はNavigationManager.PAGE_CONFIGのみ編集
+
+【変更内容】
+- NavigationManager.PAGE_CONFIG追加（4ページ設定）
+- NavigationManager.preventBrowserBack()が自動で設定判定
+- router.jsはNavigationManagerに完全委譲
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 19:49:30] コミット: fix: ブラウザバック防止とTone.js統合の改善
+
+主要な修正内容:
+- ブラウザバック防止処理の順序変更（alert → pushState）により確実なダイアログ表示を実現
+- removeBrowserBackPrevention()をrouter.js・preparation-pitchpro-cycle.jsに統合実装
+- Tone.jsグローバル公開によるリロード後AudioContext問題を解決
+- 基音再生ボタンの無音問題を完全解決
+
+詳細な変更:
+
+1. index.html
+   - Tone.jsをwindow.Toneとしてグローバル公開
+   - AudioContext再開処理に必要な実装
+   - キャッシュバスター v=20251024005に更新
+
+2. navigation-manager.js
+   - popStateHandlerでalert()とpushState()の順序を変更
+   - alert()は同期処理なので、OKを押した後に履歴スタック補充可能
+   - 何度バックしても必ずダイアログが表示される仕組みを実現
+
+3. router.js
+   - setupResultsOverviewEvents()にremoveBrowserBackPrevention()追加
+   - 総合評価からのトレーニング開始時のダイアログ問題を解決
+
+4. preparation-pitchpro-cycle.js
+   - skip-range-test-btn（音域設定済み表示画面用）にremoveBrowserBackPrevention()追加
+   - complete-range-test-btn（音域テスト完了後）にremoveBrowserBackPrevention()追加
+   - preparationからのトレーニング開始時のダイアログ問題を解決
+
+5. TRAINING_SPECIFICATION.md
+   - バージョン 3.1.1 → 3.1.2 に更新
+   - ブラウザバック防止の詳細実装を追加
+   - AudioContext管理セクション（1.4）を新規追加
+   - Tone.jsグローバル公開の必要性を文書化
+
+修正により解決した問題:
+✅ 総合評価での新しいトレーニング開始時のダイアログ出現
+✅ ブラウザバック2回目以降の成功問題
+✅ preparationページからのトレーニング開始時のダイアログ出現
+✅ リロード後の基音再生ボタン無音問題
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 20:06:26] コミット: fix: ドレミガイド中のボタン無効化とブラウザバック防止維持の改善
+
+主要な修正内容:
+- 基音再生ボタンをドレミガイド完了まで無効化
+- タブ切り替え時のブラウザバック防止解除問題を修正
+
+詳細な変更:
+
+1. trainingController.v2.js (line 437-445)
+   - ドレミガイド開始時のボタン有効化処理を削除
+   - ボタンはドレミガイド完了まで無効のままとする
+   - handleSessionComplete()で結果ページへ遷移するため、ここでの有効化は不要
+
+   修正前の問題:
+   - ドレミガイド実行中（16秒間）も基音再生ボタンを押せた
+   - 新しいセッションが開始されて混乱を招く
+
+   修正後の動作:
+   - 基音スタートボタン押下 → ボタン無効化
+   - 基音再生（2秒）
+   - ドレミガイド開始・実行（16秒間）→ ボタンは無効のまま
+   - ドレミガイド完了 → 結果ページへ自動遷移
+
+2. router.js (line 23-34)
+   - pagehideイベントリスナーを削除
+   - タブ切り替えでもpagehideが発火し、ブラウザバック防止が解除される問題を修正
+
+   問題の流れ:
+   - セッション評価画面でブラウザバック防止が有効
+   - タブ切り替え → pagehideイベント発火
+   - → cleanupCurrentPage() → removeBrowserBackPrevention()
+   - → ブラウザバック防止が解除される
+   - タブに戻る → ブラウザバックが動作してしまう
+
+   修正の理由:
+   - SPAではhashchangeイベント（ページ遷移時）でのクリーンアップで十分
+   - pagehideはタブ切り替え・ウィンドウ最小化でも発火するため不適切
+
+   修正後の動作:
+   - タブ切り替え・バックグラウンド復帰でもブラウザバック防止が維持される
+   - ページ遷移時（hashchange）のみクリーンアップが実行される
+
+テスト結果:
+✅ タブ切り替え・バックグラウンド復帰でブラウザバック防止が維持される
+✅ 基音再生ボタンがドレミガイド終了まで無効化されている
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 20:24:12] コミット: fix: PitchPro完全停止処理の実装 - バックグラウンド復帰時の警告アラート問題を解決
+
+- handleSessionComplete()でaudioDetector.destroy()を追加
+- マイクストリームを完全に解放することで、バックグラウンド復帰時の問題を解決
+- stopDetection()だけでは不十分で、destroy()が必須であることを明記
+- バックグラウンド長時間放置時のpopstateイベント誤発火を防止
+
+【問題の詳細】
+- セッション評価画面遷移後、PitchProのマイクストリームが開いたまま
+- バックグラウンドに移行し長時間経過すると、PitchProが警告アラート（div要素）を表示
+- そのDOM操作がpopstateイベントを発火させ、ブラウザバック防止のalertが表示される
+
+【修正内容】
+- trainingController.v2.js: handleSessionComplete()にdestroy()追加
+- TRAINING_SPECIFICATION.md: v3.1.3に更新、セクション7.1に詳細追記
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 20:38:37] コミット: fix: voice-range-test.jsのグローバル初期化エラーを修正
+
+【問題】
+- voice-range-test.jsが全ページで読み込まれ、DOMContentLoadedで初期化を試みる
+- preparationページ以外ではDOM要素が存在せず、エラーが発生
+- "Right side of assignment cannot be destructured" エラーが繰り返し発生
+- ホームページ読み込み時に無限エラーループ
+
+【修正内容】
+- voice-range-test.js: preparationページ専用チェックを追加（Line 418-421）
+- #range-test-section が存在する場合のみ初期化を実行
+- 他のページでは早期リターンして初期化をスキップ
+- index.html: voice-range-test.jsの読み込みを維持（v=20251024006）
+
+【動作】
+- ファイルサイズ: 119KB（全ページで読み込み）
+- 初期化: preparationページでのみ実行
+- エラー: 完全に防止
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 20:43:11] コミット: fix: Lucideアイコン初期化エラーの安全なエラーハンドリング追加
+
+【問題】
+- lucide.createIcons()が複数の場所から呼ばれ、タイミングによってエラーが発生
+- "Right side of assignment cannot be destructured" エラーが頻発
+- DOM要素が未準備の状態でアイコン初期化を試みることが原因
+
+【修正内容】
+- lucide-init.js: try-catchブロックを追加してエラーを抑制
+- router.js: ページ読み込み時のlucide初期化にtry-catch追加
+- index.html: ハンバーガーメニューのアイコン更新にtry-catch追加（2箇所）
+
+【動作】
+- Lucideアイコン初期化エラーは警告として表示
+- エラーが発生してもアプリケーションは正常に動作継続
+- 致命的なクラッシュを防止
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

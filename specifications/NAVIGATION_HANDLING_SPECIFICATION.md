@@ -1,8 +1,8 @@
 # ナビゲーション・リソース管理仕様書
 
-**バージョン**: 2.0.0
+**バージョン**: 3.1.0
 **作成日**: 2025-10-22
-**最終更新**: 2025-10-23
+**最終更新**: 2025-10-24
 **対象**: PitchPro-SPA（8va相対音感トレーニングアプリ）
 
 ---
@@ -14,7 +14,7 @@
 3. [現状分析](#現状分析)
 4. [仕様設計](#仕様設計)
 5. [実装計画](#実装計画)
-6. [ReloadManager統合（v2.0.0 大幅シンプル化）](#reloadmanager統合v200-大幅シンプル化)
+6. [NavigationManager統合（v3.0.0 ブラウザバック防止統合）](#navigationmanager統合v300-ブラウザバック防止統合)
 7. [テスト仕様](#テスト仕様)
 8. [付録](#付録)
 
@@ -776,36 +776,48 @@ saveIncompleteSession() {
 
 ---
 
-## ReloadManager統合（v2.1.0 責任範囲の明確化）
+## NavigationManager統合（v3.0.0 ブラウザバック防止統合）
 
 ### 概要
 
 **実装日**: 2025-10-23
-**最終更新**: 2025-10-24（v2.1.0 責任範囲明確化）
-**目的**: リロード検出・ナビゲーション制御の一元管理
+**最終更新**: 2025-10-24（v3.0.0 ブラウザバック防止統合）
+**目的**: リロード検出・ナビゲーション制御・ブラウザバック防止の一元管理
 
-従来、リロード検出関連のコードが複数ファイルに散在し、`normalTransitionToTraining`フラグの設定漏れリスクがあった。ReloadManagerクラスを導入することで、コードの一元管理・保守性向上・設定漏れ防止を実現。
+従来、リロード検出関連のコードが複数ファイルに散在し、`normalTransitionToTraining`フラグの設定漏れリスクがあった。また、ブラウザバック防止機能がrouter.jsに実装されており、ページ設定もrouter.js内に分散していた。NavigationManagerクラスを導入することで、コードの一元管理・保守性向上・設定漏れ防止を実現。
 
-**v2.1.0での責任範囲明確化**:
-コードレビューにより、ReloadManagerの責任範囲を明確化：
-- **ReloadManagerの唯一の責任: リロード検出とマイク許可再取得**
+**v3.0.0での主要変更**:
+1. **ReloadManager → NavigationManager にリネーム**: ナビゲーション全般を管理する役割に拡張
+2. **ブラウザバック防止機能統合**: router.jsからNavigationManagerへ移動
+3. **PAGE_CONFIG一元化**: ページごとのブラウザバック防止設定を統合管理
+4. **イベントリスナー管理強化**: popstateハンドラーの適切なクリーンアップを実装
+5. **ダブルダミーエントリーパターン**: より確実なブラウザバック防止を実現
+6. **alert()ダイアログ通知**: ユーザーへの明確な通知（OKボタンのみ、ナビゲーション禁止）
+
+**v3.0.0での責任範囲**:
+- **NavigationManagerの責任**:
+  - リロード検出とマイク許可再取得
+  - ブラウザバック防止機能（PAGE_CONFIG管理、popstateハンドラー管理）
+  - normalTransition フラグ管理
 - **sessionCounter管理は SessionDataRecorder の責任**
 - **localStorage管理も SessionDataRecorder の責任**
-- **リロード検出は preparation へのリダイレクトのためだけに使用**
-
-v2.0.0で誤って ReloadManager に sessionCounter 管理の記述があったが、これは設計ミスであり削除。
-SessionDataRecorder が正しく sessionCounter を管理する設計に修正。
 
 ### アーキテクチャ
 
 ```
-ReloadManager (グローバルクラス) v2.0.0
-├── setNormalTransition()       - 正常な遷移フラグを設定
-├── detectReload()              - リロード検出
-├── showReloadDialog()          - ダイアログ表示
-├── redirectToPreparation()     - preparationへリダイレクト
-├── navigateToTraining()        - trainingへ遷移（★フラグ自動設定）
-└── createRedirectError()       - リダイレクトエラー生成
+NavigationManager (グローバルクラス) v3.0.0
+├── 【リロード検出・遷移管理】
+│   ├── setNormalTransition()       - 正常な遷移フラグを設定
+│   ├── detectReload()              - リロード検出
+│   ├── showReloadDialog()          - ダイアログ表示
+│   ├── redirectToPreparation()     - preparationへリダイレクト
+│   ├── navigateToTraining()        - trainingへ遷移（★フラグ自動設定）
+│   └── createRedirectError()       - リダイレクトエラー生成
+│
+└── 【ブラウザバック防止（v3.0.0新規追加）】
+    ├── PAGE_CONFIG                 - ページごとの防止設定
+    ├── preventBrowserBack(page)    - ブラウザバック防止有効化（自動設定）
+    └── removeBrowserBackPrevention() - ブラウザバック防止解除
 
 【v2.0.0で削除されたメソッド】
 ❌ setNewTrainingStart()        - 新規開始フラグ設定（不要）
@@ -815,33 +827,35 @@ ReloadManager (グローバルクラス) v2.0.0
 
 ### クラス定義
 
-**ファイル**: `/PitchPro-SPA/js/reload-manager.js`
-**バージョン**: 2.0.0
+**ファイル**: `/PitchPro-SPA/js/navigation-manager.js`
+**バージョン**: 3.0.0
 
 ```javascript
 /**
- * ReloadManager - リロード検出・遷移管理システム
+ * NavigationManager - ナビゲーション・遷移管理システム
  *
  * 【目的】
- * - trainingページへの遷移時のリロード検出を一元管理
+ * - リロード検出・遷移管理・ブラウザバック防止を一元管理
  * - リロード時は preparation へリダイレクトしてマイク許可を再取得
+ * - ブラウザバック防止ページの設定とハンドラー管理を完全統合
  * - normalTransitionフラグの設定漏れを防止
  * - コードの重複を削減し、保守性を向上
  *
- * 【責任範囲】v2.1.0
+ * 【責任範囲】v3.0.0
  * - リロード検出（detectReload）
  * - マイク許可再取得のための preparation リダイレクト
  * - normalTransition フラグ管理
+ * - ブラウザバック防止機能（PAGE_CONFIG管理、popstateハンドラー管理）
  *
  * 【責任範囲外】
  * - sessionCounter 管理 → SessionDataRecorder の責任
  * - localStorage 管理 → SessionDataRecorder の責任
  * - トレーニングフロー制御 → trainingController.v2.js の責任
  *
- * @version 2.1.0
+ * @version 3.0.0
  * @date 2025-10-24
  */
-class ReloadManager {
+class NavigationManager {
     /**
      * sessionStorage キー定数
      */
@@ -921,6 +935,91 @@ class ReloadManager {
         error.isRedirect = true;
         return error;
     }
+
+    // ==========================================
+    // ブラウザバック防止機能（v3.0.0で追加）
+    // ==========================================
+
+    /**
+     * ブラウザバック防止が必要なページの設定
+     */
+    static PAGE_CONFIG = {
+        'training': {
+            preventBackNavigation: true,
+            backPreventionMessage: 'トレーニング中です。\\n\\nブラウザバックは無効になっています。\\nホームボタンからトップページに戻れます。'
+        },
+        'result-session': {
+            preventBackNavigation: true,
+            backPreventionMessage: 'セッション評価中です。\\n\\nブラウザバックは無効になっています。\\n「次の基音へ」ボタンまたはホームボタンをご利用ください。'
+        },
+        'results': {
+            preventBackNavigation: true,
+            backPreventionMessage: '総合評価画面です。\\n\\nブラウザバックは無効になっています。\\nホームボタンまたは「新しいトレーニングを始める」ボタンをご利用ください。'
+        },
+        'results-overview': {
+            preventBackNavigation: true,
+            backPreventionMessage: '総合評価画面です。\\n\\nブラウザバックは無効になっています。\\nホームボタンまたは「新しいトレーニングを始める」ボタンをご利用ください。'
+        }
+    };
+
+    /**
+     * popstateイベントハンドラー（インスタンス変数）
+     */
+    static popStateHandler = null;
+
+    /**
+     * ブラウザバック防止を有効化（自動設定）
+     * @param {string} page - ページ名
+     */
+    static preventBrowserBack(page) {
+        // ページ設定を取得
+        const config = this.PAGE_CONFIG[page];
+        if (!config || !config.preventBackNavigation) {
+            console.log(`📍 [NavigationManager] ブラウザバック防止不要: ${page}`);
+            return;
+        }
+
+        // 既存のハンドラーをクリーンアップ
+        if (this.popStateHandler) {
+            window.removeEventListener('popstate', this.popStateHandler);
+            console.log('🔄 [NavigationManager] 既存のpopstateハンドラを削除');
+        }
+
+        const message = config.backPreventionMessage;
+
+        // ダミーエントリーを複数追加（より確実な防止）
+        history.pushState(null, '', location.href);
+        history.pushState(null, '', location.href);
+        console.log(`📍 [NavigationManager] ブラウザバック防止: ダミーエントリー追加×2 (${page})`);
+        console.log(`📝 [NavigationManager] 通知メッセージ: ${message}`);
+
+        // popstateハンドラーを定義（ダイアログ通知 + 完全禁止）
+        this.popStateHandler = () => {
+            // ダミーエントリーを複数再追加して履歴スタックを補充
+            history.pushState(null, '', location.href);
+            history.pushState(null, '', location.href);
+
+            // ユーザーに通知（OKを押すしか選択肢なし）
+            alert(message);
+
+            console.log(`🚫 [NavigationManager] ブラウザバックを無効化・通知表示 (${page})`);
+        };
+
+        // イベントリスナーを登録
+        window.addEventListener('popstate', this.popStateHandler);
+        console.log(`✅ [NavigationManager] ブラウザバック防止イベントリスナー登録完了 (${page})`);
+    }
+
+    /**
+     * ブラウザバック防止を解除
+     */
+    static removeBrowserBackPrevention() {
+        if (this.popStateHandler) {
+            window.removeEventListener('popstate', this.popStateHandler);
+            this.popStateHandler = null;
+            console.log('✅ [NavigationManager] popstateイベントリスナーを削除');
+        }
+    }
 }
 ```
 
@@ -928,11 +1027,11 @@ class ReloadManager {
 
 | ファイル | 変更内容 | メリット |
 |---------|---------|---------|
-| **index.html** | `reload-manager.js` 読み込み追加 | グローバルに利用可能 |
-| **trainingController.v2.js** | `detectReload()` 削除、`ReloadManager.detectReload()` 使用 | 78行削減 |
-| **result-session-controller.js** | `ReloadManager.navigateToTraining()` 使用 | フラグ設定自動化 |
-| **router.js** | `ReloadManager.navigateToTraining()` 使用 | フラグ設定自動化 |
-| **preparation-pitchpro-cycle.js** | `ReloadManager.navigateToTraining()` 使用 (2箇所) | 統一性向上 |
+| **index.html** | `navigation-manager.js` 読み込み追加 | グローバルに利用可能 |
+| **trainingController.v2.js** | `detectReload()` 削除、`NavigationManager.detectReload()` 使用 | 78行削減 |
+| **result-session-controller.js** | `NavigationManager.navigateToTraining()` 使用、遷移前に`removeBrowserBackPrevention()` 呼び出し追加 | フラグ設定自動化、popstateメモリリーク防止 |
+| **router.js** | `NavigationManager.navigateToTraining()` 使用、`pageConfig` 削除、ブラウザバック防止をNavigationManagerに完全委譲 | フラグ設定自動化、コード簡素化 |
+| **preparation-pitchpro-cycle.js** | `NavigationManager.navigateToTraining()` 使用 (2箇所) | 統一性向上 |
 
 ### 使用例
 
@@ -948,12 +1047,17 @@ button.onclick = () => {
 };
 ```
 
-**ReloadManager統合後（✅ 自動設定）**:
+**NavigationManager統合後（✅ 自動設定＋イベントリスナークリーンアップ）**:
 ```javascript
 // result-session-controller.js
 button.onclick = () => {
+    // 遷移前にブラウザバック防止を解除（重要！）
+    if (window.NavigationManager) {
+        window.NavigationManager.removeBrowserBackPrevention();
+    }
+
     // ✅ フラグが自動設定される
-    ReloadManager.navigateToTraining();
+    NavigationManager.navigateToTraining();
 };
 ```
 
@@ -964,14 +1068,42 @@ button.onclick = () => {
 const redirectInfo = window.preparationRedirectInfo;
 if (redirectInfo && redirectInfo.redirect === 'training') {
     // モード情報を保持して遷移
-    ReloadManager.navigateToTraining(redirectInfo.mode, redirectInfo.session);
+    NavigationManager.navigateToTraining(redirectInfo.mode, redirectInfo.session);
 } else {
     // 通常フロー
-    ReloadManager.navigateToTraining();
+    NavigationManager.navigateToTraining();
 }
 ```
 
-#### 3. trainingController でのリロード検出・初期化処理
+#### 3. ブラウザバック防止の自動設定（router.js）
+
+```javascript
+// router.js - setupPageEvents()
+async setupPageEvents(page, fullHash) {
+    // ページ固有のイベントリスナー設定
+    switch (page) {
+        case 'home':
+            this.setupHomeEvents();
+            break;
+        case 'training':
+            await this.setupTrainingEvents(fullHash);
+            break;
+        // ... 他のページ
+    }
+
+    // ブラウザバック防止を自動設定（グローバル管理）
+    this.preventBrowserBack(page);
+}
+
+preventBrowserBack(page) {
+    // NavigationManagerに完全委譲（設定もNavigationManagerで管理）
+    if (window.NavigationManager) {
+        window.NavigationManager.preventBrowserBack(page);
+    }
+}
+```
+
+#### 4. trainingController でのリロード検出・初期化処理
 
 **従来の実装（❌ 複雑な判定ロジック）**:
 ```javascript
@@ -980,15 +1112,15 @@ function detectReload() { /* ... 55行のコード ... */ }
 function redirectToPreparationWithMode(reason = '') { /* ... 18行のコード ... */ }
 
 export async function initializeTrainingPage() {
-    if (ReloadManager.detectReload()) {
-        ReloadManager.showReloadDialog();
-        await ReloadManager.redirectToPreparation('リロード検出');
-        throw ReloadManager.createRedirectError();
+    if (NavigationManager.detectReload()) {
+        NavigationManager.showReloadDialog();
+        await NavigationManager.redirectToPreparation('リロード検出');
+        throw NavigationManager.createRedirectError();
     }
 
     // 複雑な判定ロジック（約30行）
-    const isNewStart = ReloadManager.isNewTrainingStart();
-    const isResuming = ReloadManager.isResumingAfterReload();
+    const isNewStart = NavigationManager.isNewTrainingStart();
+    const isResuming = NavigationManager.isResumingAfterReload();
     const hasExistingSessions = /* localStorage チェック */;
 
     if (isNewStart) {
@@ -1001,30 +1133,30 @@ export async function initializeTrainingPage() {
 }
 ```
 
-**ReloadManager v2.1.0（✅ 正しい責任分担）**:
+**NavigationManager v3.0.0（✅ 正しい責任分担）**:
 ```javascript
-// trainingController.v2.js (v2.1.0 - 正しい責任分担)
+// trainingController.v2.js (v3.0.0 - 正しい責任分担)
 export async function initializeTrainingPage() {
-    // 【ReloadManager の責任】リロード検出 → preparationへリダイレクト
-    if (ReloadManager.detectReload()) {
+    // 【NavigationManager の責任】リロード検出 → preparationへリダイレクト
+    if (NavigationManager.detectReload()) {
         console.warn('⚠️ リロード検出 - preparationへリダイレクト');
-        ReloadManager.showReloadDialog();
-        await ReloadManager.redirectToPreparation('リロード検出');
-        throw ReloadManager.createRedirectError();
+        NavigationManager.showReloadDialog();
+        await NavigationManager.redirectToPreparation('リロード検出');
+        throw NavigationManager.createRedirectError();
     }
 
     // 音域データ必須チェック
     if (!checkVoiceRangeData()) {
         console.error('❌ 音域データが設定されていません');
         alert('音域テストを先に完了してください。');
-        await ReloadManager.redirectToPreparation('音域テスト未完了');
+        await NavigationManager.redirectToPreparation('音域テスト未完了');
         return;
     }
 
     // 【重要】sessionCounter 管理は SessionDataRecorder が担当
     // - startNewSession() で自動インクリメント
     // - localStorage と自動同期
-    // - ReloadManager は一切関与しない
+    // - NavigationManager は一切関与しない
 
     // 基音選択（毎回必須）
     preselectBaseNote();
@@ -1037,20 +1169,28 @@ export async function initializeTrainingPage() {
 
 ### メリット
 
-| 項目 | v1.0.0（従来） | v1.1.0（統合） | v2.0.0（シンプル化） |
-|------|-------------|-------------|-------------------|
-| **コードの一元管理** | 5ファイルに散在 | 1ファイルに集約 | 同左（さらに簡素化） |
-| **設定漏れリスク** | 手動設定（5箇所） | 自動設定 | 同左 |
-| **重複コード** | 73行の重複 | 0行（完全削除） | 同左 |
-| **複雑な判定ロジック** | 各所に散在 | 一元管理 | **完全削除（67行削減）** |
-| **保守性** | 低（変更時に5箇所修正必要） | 高（1箇所のみ） | **最高（シンプル設計）** |
-| **テスト容易性** | 困難（5ファイル依存） | 容易（単一クラス） | 同左 |
+| 項目 | v1.0.0（従来） | v1.1.0（統合） | v2.0.0（シンプル化） | v3.0.0（ブラウザバック統合） |
+|------|-------------|-------------|-------------------|------------------------|
+| **コードの一元管理** | 5ファイルに散在 | 1ファイルに集約 | 同左（さらに簡素化） | **NavigationManagerに完全統合** |
+| **設定漏れリスク** | 手動設定（5箇所） | 自動設定 | 同左 | 同左＋ブラウザバック防止自動化 |
+| **重複コード** | 73行の重複 | 0行（完全削除） | 同左 | 同左 |
+| **複雑な判定ロジック** | 各所に散在 | 一元管理 | **完全削除（67行削減）** | 同左 |
+| **ブラウザバック防止** | router.jsに分散 | - | - | **PAGE_CONFIGで一元管理** |
+| **イベントリスナー管理** | 手動クリーンアップ | - | - | **自動クリーンアップ** |
+| **保守性** | 低（変更時に5箇所修正必要） | 高（1箇所のみ） | **最高（シンプル設計）** | **最高（統合設計）** |
+| **テスト容易性** | 困難（5ファイル依存） | 容易（単一クラス） | 同左 | 同左 |
 
 **v2.0.0での追加削減**:
-- ReloadManager: 不要なメソッド3つ削除
+- NavigationManager: 不要なメソッド3つ削除
 - trainingController.v2.js: 複雑な判定ロジック30行削除
 - router.js, preparation-pitchpro-cycle.js: フラグ設定処理削除
 - **合計**: 67行削減（v1.1.0 → v2.0.0）
+
+**v3.0.0での追加改善**:
+- router.js: pageConfig削除、ブラウザバック防止ロジックを完全委譲
+- NavigationManager: PAGE_CONFIG統合、popstateハンドラー管理機能追加
+- result-session-controller.js: 遷移前のイベントリスナークリーンアップ追加
+- **メリット**: ページ設定の一元化、メモリリーク防止、コード簡素化
 
 ### sessionStorage フラグ管理
 
@@ -1063,7 +1203,7 @@ export async function initializeTrainingPage() {
 
 ### フロー図
 
-#### v2.1.0 正しい責任分担フロー
+#### v3.0.0 統合フロー - リロード検出
 
 ```
 【trainingページでリロード（F5）】
@@ -1073,50 +1213,87 @@ F5キー（リロード）
   ↓
 trainingController.v2.js - initializeTrainingPage()
   ↓
-【ReloadManager の責任】
-ReloadManager.detectReload()
+【NavigationManager の責任】
+NavigationManager.detectReload()
   ├─ normalTransition フラグ確認 → null
   ├─ performance.navigation.type === 1 → リロード検出
   ├─ sessionStorage.setItem('reloadRedirected', 'true')
   └─ return true
   ↓
-ReloadManager.showReloadDialog()  ← ダイアログ表示
+NavigationManager.showReloadDialog()  ← ダイアログ表示
   ↓
-ReloadManager.redirectToPreparation('リロード検出')
+NavigationManager.redirectToPreparation('リロード検出')
   ↓
 #preparation へリダイレクト（マイク許可再取得）
 ```
 
+#### v3.0.0 統合フロー - ブラウザバック防止
+
+```
+【trainingページ読み込み】
+router.js - setupPageEvents('training')
+  ↓
+router.preventBrowserBack('training')
+  ↓
+NavigationManager.preventBrowserBack('training')
+  ├─ PAGE_CONFIG['training'] 取得
+  ├─ 既存のpopstateハンドラーを削除（メモリリーク防止）
+  ├─ history.pushState() × 2 （ダミーエントリー追加）
+  ├─ popstateハンドラー定義
+  │   └─ ブラウザバック時:
+  │       ├─ history.pushState() × 2 （履歴スタック補充）
+  │       └─ alert('トレーニング中です...') （通知）
+  └─ window.addEventListener('popstate', handler)
+
+【ページ遷移前のクリーンアップ】
+result-session-controller.js - button.onclick()
+  ↓
+NavigationManager.removeBrowserBackPrevention()
+  ├─ window.removeEventListener('popstate', popStateHandler)
+  ├─ popStateHandler = null
+  └─ console.log('✅ popstateイベントリスナーを削除')
+  ↓
+NavigationManager.navigateToTraining()
+  ↓
+正常な遷移（popstateハンドラーが発火しない）
+```
+
 **セッション管理の詳細フローは `SESSION_MANAGEMENT_SPECIFICATION.md` を参照**
 
-#### v2.1.0での重要な修正点
+#### v3.0.0での重要な実装ポイント
 
 1. **責任範囲の明確化**
-   - ReloadManager: リロード検出とマイク許可再取得のみ
+   - NavigationManager: リロード検出・マイク許可再取得・ブラウザバック防止
    - SessionDataRecorder: sessionCounter 管理と localStorage 管理
    - trainingController.v2.js: トレーニングフロー制御
 
-2. **v2.0.0の設計ミスを修正**
-   - ❌ 削除: "training ページへの遷移 = 常にリセット"
-   - ❌ 削除: "sessionCounter は自動計算"
-   - ✅ 正しい: SessionDataRecorder が startNewSession() で自動++
+2. **ブラウザバック防止の実装**
+   - PAGE_CONFIGでページごとの設定を一元管理
+   - ダブルダミーエントリーパターンで確実な防止
+   - alert()ダイアログで明確な通知（OKボタンのみ、ナビゲーション禁止）
 
-3. **リロード検出の役割**
-   - preparation へのリダイレクトのみ
-   - sessionCounter 管理には一切関与しない（v2.0.0で誤った記述があった）
+3. **イベントリスナー管理**
+   - 遷移前に必ず removeBrowserBackPrevention() を呼び出す
+   - popstateハンドラーの適切なクリーンアップでメモリリーク防止
+   - router.jsの cleanupCurrentPage() で自動解除
 
 ### 今後の拡張可能性
 
 1. **ダイレクトアクセス検出**:
-   - `ReloadManager.detectDirectAccess()` メソッド追加
+   - `NavigationManager.detectDirectAccess()` メソッド追加
    - URLパラメータの検証・リダイレクト処理
 
 2. **カスタムダイアログ**:
    - `showReloadDialog()` をカスタムモーダルに置き換え
+   - ブラウザバック防止のalert()もカスタムUIに置き換え
 
 3. **リダイレクト履歴管理**:
    - `sessionStorage` でリダイレクト履歴を記録
    - 無限ループ防止
+
+4. **ページ遷移アニメーション**:
+   - removeBrowserBackPrevention()後のフェードアウト効果
+   - ユーザー体験の向上
 
 ---
 
@@ -1224,6 +1401,7 @@ ReloadManager.redirectToPreparation('リロード検出')
 | `beforeunload` | router.js | 空関数 | 同期クリーンアップ用（現在未使用） |
 | `pagehide` | router.js | `cleanupCurrentPage()` | 非同期クリーンアップ実行 |
 | `DOMContentLoaded` | router.js | `handleRouteChange()` | 初期ページ表示 |
+| `popstate` | NavigationManager | `popStateHandler` | ブラウザバック防止（v3.0.0） |
 
 ---
 
@@ -1231,6 +1409,19 @@ ReloadManager.redirectToPreparation('リロード検出')
 
 | バージョン | 日付 | 変更内容 | 担当者 |
 |-----------|------|---------|--------|
+| 3.1.0 | 2025-10-24 | SessionDataRecorder同期修正 | Claude |
+|  |  | - ✅ preparation-pitchpro-cycle.jsで`resetSession()`呼び出し追加 |  |
+|  |  | - ✅ router.jsで`resetSession()`呼び出し追加 |  |
+|  |  | - ✅ session-data-recorder.jsで同期ロジック改善 |  |
+| 3.0.0 | 2025-10-24 | NavigationManager統合・ブラウザバック防止統合 | Claude |
+|  |  | - 🔄 ReloadManager → NavigationManager にリネーム |  |
+|  |  | - ✅ ブラウザバック防止機能統合（router.jsから移動） |  |
+|  |  | - ✅ PAGE_CONFIG一元化（ページ設定を統合管理） |  |
+|  |  | - ✅ popstateハンドラー管理機能追加 |  |
+|  |  | - ✅ ダブルダミーエントリーパターン実装 |  |
+|  |  | - ✅ alert()ダイアログ通知実装（OKボタンのみ、ナビゲーション禁止） |  |
+|  |  | - ✅ result-session-controller.jsでイベントリスナークリーンアップ追加 |  |
+|  |  | - ✅ router.jsでブラウザバック防止をNavigationManagerに完全委譲 |  |
 | 2.1.0 | 2025-10-24 | v2.0.0の設計ミスを修正・責任範囲の明確化 | Claude |
 |  |  | - ❌ v2.0.0の間違った記述を削除 |  |
 |  |  | - ✅ ReloadManagerの責任範囲を明確化（リロード検出のみ） |  |

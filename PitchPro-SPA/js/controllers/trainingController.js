@@ -492,10 +492,8 @@ async function startTraining() {
 
         // 2.5秒後（基音2秒 + 0.5秒待機）にドレミガイド開始
         setTimeout(() => {
-            playButton.disabled = false;
-            playButton.classList.remove('btn-disabled');
-            playButton.innerHTML = '<i data-lucide="volume-2" style="width: 24px; height: 24px;"></i><span>基音スタート</span>';
-            lucide.createIcons();
+            // ボタンはドレミガイド完了まで無効のまま（重要！）
+            // handleSessionComplete()で結果ページへ遷移するため、ここでは有効化しない
             if (statusText) {
                 statusText.textContent = 'ドレミガイドに合わせて発声しましょう';
             }
