@@ -134,7 +134,11 @@
                     } else {
                         icon.setAttribute('data-lucide', 'menu');
                     }
-                    lucide.createIcons();
+                    try {
+                        lucide.createIcons();
+                    } catch (error) {
+                        console.warn('⚠️ [Menu] Lucide icon update failed:', error.message);
+                    }
                 }
             });
             
@@ -145,7 +149,11 @@
                     const icon = menuToggle.querySelector('i');
                     if (icon) {
                         icon.setAttribute('data-lucide', 'menu');
-                        lucide.createIcons();
+                        try {
+                            lucide.createIcons();
+                        } catch (error) {
+                            console.warn('⚠️ [Menu] Lucide icon update failed:', error.message);
+                        }
                     }
                 }
             });

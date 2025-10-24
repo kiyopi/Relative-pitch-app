@@ -92,9 +92,14 @@ class SimpleRouter {
                 }
             }
 
-            // 5. Lucideアイコンを再描画
+            // 5. Lucideアイコンを再描画（安全なエラーハンドリング付き）
             if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
+                try {
+                    lucide.createIcons();
+                } catch (error) {
+                    console.warn('⚠️ [Router] Lucide icon initialization failed (non-critical):', error.message);
+                    // Lucideアイコン初期化エラーは致命的ではないため、続行
+                }
             }
 
             // 6. ページ固有のイベントリスナーを設定
