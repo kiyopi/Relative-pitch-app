@@ -677,6 +677,9 @@ function handleSessionComplete() {
         const completedSession = sessionRecorder.completeSession();
         console.log('✅ セッションデータ保存完了:', completedSession);
 
+        // ページ遷移前にpopstateイベントリスナーを削除
+        removeBrowserBackPrevention();
+
         // セッション結果ページへ遷移（SPAのハッシュルーティング）
         const sessionNumber = sessionRecorder.getSessionNumber();
         window.location.hash = `result-session?session=${sessionNumber}`;
@@ -722,6 +725,10 @@ function handleSessionComplete() {
 
 export function resetTrainingPageFlag() {
     isInitialized = false;
+
+    // popstateイベントリスナーを削除
+    removeBrowserBackPrevention();
+
     console.log('TrainingController reset');
 }
 
@@ -1015,6 +1022,9 @@ function setupHomeButton() {
         );
 
         if (confirmed) {
+            // ページ遷移前にpopstateイベントリスナーを削除
+            removeBrowserBackPrevention();
+
             // router.js の cleanupCurrentPage() が自動実行される
             window.location.hash = 'home';
             console.log('🏠 ユーザーがホームへの移動を承認');
@@ -1030,13 +1040,21 @@ function setupHomeButton() {
  * ブラウザバック防止
  * トレーニング中の誤操作によるデータ損失を防止
  */
+let popStateHandler = null; // イベントハンドラを保持
+
 function preventBrowserBack() {
+    // 既存のハンドラがあれば削除
+    if (popStateHandler) {
+        window.removeEventListener('popstate', popStateHandler);
+        console.log('🔄 既存のpopstateハンドラを削除');
+    }
+
     // ダミーのエントリーを追加
     history.pushState(null, '', location.href);
     console.log('📍 ブラウザバック防止: ダミーエントリー追加');
 
     // popstateイベントでconfirmation表示
-    const handlePopState = function(event) {
+    popStateHandler = function(event) {
         const confirmed = confirm(
             'トレーニング中です。\n' +
             '戻ると進行中のデータが失われます。\n' +
@@ -1046,7 +1064,7 @@ function preventBrowserBack() {
         if (confirmed) {
             // クリーンアップ処理を実行（router.js が自動実行）
             console.log('🔙 ユーザーがブラウザバックを承認');
-            window.removeEventListener('popstate', handlePopState);
+            removeBrowserBackPrevention();
             history.back();
         } else {
             // 戻らない（ダミーエントリーを再追加）
@@ -1055,6 +1073,18 @@ function preventBrowserBack() {
         }
     };
 
-    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('popstate', popStateHandler);
     console.log('✅ ブラウザバック防止イベントリスナー登録完了');
+}
+
+/**
+ * ブラウザバック防止を解除
+ * ページ遷移前に呼び出して、popstateイベントリスナーを削除
+ */
+function removeBrowserBackPrevention() {
+    if (popStateHandler) {
+        window.removeEventListener('popstate', popStateHandler);
+        popStateHandler = null;
+        console.log('✅ popstateイベントリスナーを削除');
+    }
 }
