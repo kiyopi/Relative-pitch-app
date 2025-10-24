@@ -24,6 +24,14 @@ class SimpleRouter {
             'result-session': {
                 preventBackNavigation: true,
                 backPreventionMessage: 'セッション評価中です。\n\nブラウザバックは無効になっています。\n「次の基音へ」ボタンまたはホームボタンをご利用ください。'
+            },
+            'results': {
+                preventBackNavigation: true,
+                backPreventionMessage: '総合評価画面です。\n\nブラウザバックは無効になっています。\nホームボタンまたは「新しいトレーニングを始める」ボタンをご利用ください。'
+            },
+            'results-overview': {
+                preventBackNavigation: true,
+                backPreventionMessage: '総合評価画面です。\n\nブラウザバックは無効になっています。\nホームボタンまたは「新しいトレーニングを始める」ボタンをご利用ください。'
             }
         };
 
@@ -341,6 +349,11 @@ class SimpleRouter {
                 const otherSessions = allSessions.filter(s => s.mode !== 'random');
                 localStorage.setItem('sessionData', JSON.stringify(otherSessions));
                 console.log('✅ ランダムモードのセッションデータをクリアしました');
+
+                // SessionDataRecorderをlocalStorageと同期（重要！）
+                if (window.sessionDataRecorder) {
+                    window.sessionDataRecorder.resetSession();
+                }
 
                 // トレーニングページに遷移（NavigationManager統合）
                 // ※sessionCounterリセット・基音選択はtrainingController.jsで自動実行

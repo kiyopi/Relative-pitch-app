@@ -4979,3 +4979,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 13:14:18] コミット: fix: result-sessionからの遷移時にブラウザバック防止を解除
+
+- 「次の基音へ」ボタン押下前に removeBrowserBackPrevention() を呼び出し
+- 「総合評価を見る」ボタン押下前にも同様に解除
+- popstateハンドラーが残ったまま遷移するバグを修正
+- training → result-session → training の遷移が正常に動作
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
