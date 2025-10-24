@@ -1267,6 +1267,11 @@ function setupMicPermissionFlow() {
                 console.log(`✅ ${mode}モードのセッションデータをクリアしました`);
                 console.log(`🔍 [localStorage] クリア後のセッション数: ${otherModeSessions.length}`);
 
+                // SessionDataRecorderをlocalStorageと同期（重要！）
+                if (window.sessionDataRecorder) {
+                    window.sessionDataRecorder.resetSession();
+                }
+
                 // 【NavigationManager統合】リダイレクト情報がある場合、モード情報を保持して遷移
                 if (redirectInfo && redirectInfo.redirect === 'training') {
                     console.log(`📍 モード情報を保持して遷移: mode=${redirectInfo.mode}, session=${redirectInfo.session || 'なし'}`);
@@ -1484,6 +1489,11 @@ function setupMicPermissionFlow() {
 
             console.log(`✅ ${mode}モードのセッションデータをクリアしました`);
             console.log(`🔍 [localStorage] クリア後のセッション数: ${otherModeSessions.length}`);
+
+            // SessionDataRecorderをlocalStorageと同期（重要！）
+            if (window.sessionDataRecorder) {
+                window.sessionDataRecorder.resetSession();
+            }
 
             // 【NavigationManager統合】リダイレクト情報がある場合、モード情報を保持して遷移
             if (redirectInfo && redirectInfo.redirect === 'training') {

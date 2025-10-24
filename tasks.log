@@ -4914,3 +4914,23 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 12:28:19] コミット: fix: 意図しないpopstateイベント発火とセッションカウンター不整合を修正
+
+重大な問題3件を修正:
+
+1. 意図しないpopstateイベント発火
+   - セッション完了時の自動遷移でブラウザバック確認ダイアログが表示される問題
+   - 修正: trainingController.v2.jsで遷移前にNavigationManager.removeBrowserBackPrevention()を呼び出し
+
+2. セッションカウンター不整合
+   - localStorageクリア後もsessionCounterが以前の値を保持し、セッション番号が連続しない問題
+   - 修正: SessionDataRecorderのstartNewSession()で常にlocalStorageと同期
+   - 条件を「this.sessionCounter < maxId」から「this.sessionCounter !== maxId」に変更
+
+3. ブラウザバック動作の混乱
+   - 問題1の副作用で、ユーザーが意図しないブラウザバックを実行してしまう
+   - 修正: 問題1の修正により解決
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
