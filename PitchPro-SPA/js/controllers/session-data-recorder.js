@@ -21,8 +21,9 @@ class SessionDataRecorder {
      * 新しいセッションを開始
      * @param {string} baseNote - 基音（例: "C4"）
      * @param {number} baseFrequency - 基音周波数（Hz）
+     * @param {string} mode - トレーニングモード（'random', 'continuous', '12-tone'）
      */
-    startNewSession(baseNote, baseFrequency) {
+    startNewSession(baseNote, baseFrequency, mode = 'random') {
         // セッション開始前にlocalStorageと同期（localStorage消去対策）
         const existingSessions = DataManager.getFromStorage('sessionData') || [];
         const maxId = existingSessions.length > 0
@@ -40,7 +41,7 @@ class SessionDataRecorder {
 
         this.currentSession = {
             sessionId: this.sessionCounter,
-            mode: 'random', // ランダム基音モード
+            mode: mode, // トレーニングモード（動的に設定）
             baseNote: baseNote,
             baseFrequency: baseFrequency,
             startTime: Date.now(),

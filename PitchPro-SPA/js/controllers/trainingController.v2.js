@@ -80,20 +80,10 @@ export async function initializeTrainingPage() {
         return;
     }
 
-    // 【v2.0.1修正】セッション継続判定を追加
-    // localStorage に完了済みセッションが存在する場合は継続中とみなし、リセットしない
-    const existingSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-    const completedRandomSessions = existingSessions.filter(s => s.mode === 'random' && s.completed);
-
-    if (completedRandomSessions.length > 0) {
-        // セッション継続中（result-session → training の遷移）
-        console.log(`🔄 セッション継続中: ${completedRandomSessions.length}セッション完了済み`);
-        console.log('   → initializeRandomModeTraining() をスキップ（データ保持）');
-    } else {
-        // 新規開始（home / results-overview からの遷移）
-        console.log('🆕 新規トレーニング開始 - セッションデータをリセット');
-        initializeRandomModeTraining();
-    }
+    // 基音選択（毎回必須）
+    // SessionDataRecorderが自動的にsessionCounterを管理するため、
+    // セッション継続判定は不要。基音は毎回選択する。
+    preselectBaseNote();
 
     // Initialize mode UI（リセット後に実行）
     initializeModeUI();
@@ -138,6 +128,12 @@ export async function initializeTrainingPage() {
         });
         console.log('✅ デバッグ用マイク許可ボタン登録完了');
     }
+
+    // ホームボタンに確認ダイアログを追加
+    setupHomeButton();
+
+    // ブラウザバック防止を有効化
+    preventBrowserBack();
 
     isInitialized = true;
     console.log('TrainingController initialized');
@@ -194,17 +190,13 @@ function initializeModeUI() {
 function initializeRandomModeTraining() {
     console.log('🆕 ランダムモード新規開始処理を実行');
 
-    // localStorageのランダムモードセッションデータをクリア
-    const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-    const otherModeSessions = allSessions.filter(s => s.mode !== 'random');
-    localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
-    console.log('🗑️ ランダムモードのセッションデータをクリア');
+    // localStorageクリアは preparation-pitchpro-cycle.js に統一されました
 
-    // sessionCounterを0にリセット（ランダムモード専用）
+    // sessionDataRecorder のリセット（currentSession のみ）
+    // sessionCounterはSessionDataRecorderが自動管理するため、直接操作しない
     if (window.sessionDataRecorder) {
         window.sessionDataRecorder.currentSession = null;
-        window.sessionDataRecorder.sessionCounter = 0;
-        console.log('🔄 sessionCounterリセット: 0');
+        console.log('🔄 currentSession をクリア');
     }
 
     // 前回の基音をクリア（中級モード用）
@@ -432,8 +424,8 @@ async function startTraining() {
         // セッションデータ記録開始
         if (window.sessionDataRecorder) {
             sessionRecorder = window.sessionDataRecorder;
-            sessionRecorder.startNewSession(baseNoteInfo.note, baseNoteInfo.frequency);
-            console.log('📊 セッションデータ記録開始');
+            sessionRecorder.startNewSession(baseNoteInfo.note, baseNoteInfo.frequency, currentMode);
+            console.log('📊 セッションデータ記録開始 (mode:', currentMode, ')');
         } else {
             console.warn('⚠️ SessionDataRecorderが読み込まれていません');
         }
@@ -1000,4 +992,69 @@ function selectBaseNote(selectionType, sessionIndex = 0) {
     }
 
     return selectedNote;
+}
+
+/**
+ * ホームボタンに確認ダイアログを追加
+ * トレーニング中のデータ損失を防止
+ */
+function setupHomeButton() {
+    const homeBtn = document.getElementById('btn-home-training');
+    if (!homeBtn) {
+        console.warn('⚠️ ホームボタンが見つかりません (id: btn-home-training)');
+        return;
+    }
+
+    homeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        const confirmed = confirm(
+            'トレーニング中です。\n' +
+            'ホームに戻ると進行中のデータが失われます。\n' +
+            '本当にホームに戻りますか？'
+        );
+
+        if (confirmed) {
+            // router.js の cleanupCurrentPage() が自動実行される
+            window.location.hash = 'home';
+            console.log('🏠 ユーザーがホームへの移動を承認');
+        } else {
+            console.log('🚫 ホームへの移動をキャンセル');
+        }
+    });
+
+    console.log('✅ ホームボタンに確認ダイアログを設定');
+}
+
+/**
+ * ブラウザバック防止
+ * トレーニング中の誤操作によるデータ損失を防止
+ */
+function preventBrowserBack() {
+    // ダミーのエントリーを追加
+    history.pushState(null, '', location.href);
+    console.log('📍 ブラウザバック防止: ダミーエントリー追加');
+
+    // popstateイベントでconfirmation表示
+    const handlePopState = function(event) {
+        const confirmed = confirm(
+            'トレーニング中です。\n' +
+            '戻ると進行中のデータが失われます。\n' +
+            '本当に戻りますか？'
+        );
+
+        if (confirmed) {
+            // クリーンアップ処理を実行（router.js が自動実行）
+            console.log('🔙 ユーザーがブラウザバックを承認');
+            window.removeEventListener('popstate', handlePopState);
+            history.back();
+        } else {
+            // 戻らない（ダミーエントリーを再追加）
+            history.pushState(null, '', location.href);
+            console.log('🚫 ブラウザバックをキャンセル');
+        }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    console.log('✅ ブラウザバック防止イベントリスナー登録完了');
 }

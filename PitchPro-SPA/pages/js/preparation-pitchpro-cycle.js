@@ -1252,8 +1252,15 @@ function setupMicPermissionFlow() {
                 // PitchProリソースのクリーンアップ（統合管理）
                 await pitchProCycleManager.cleanupPitchPro();
 
-                // 【ReloadManager統合】リダイレクト情報がある場合、モード情報を保持して遷移
+                // 【localStorage統合】トレーニング開始時にセッションデータをクリア
+                const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
                 const redirectInfo = window.preparationRedirectInfo;
+                const mode = redirectInfo?.mode || 'random';
+                const otherModeSessions = allSessions.filter(s => s.mode !== mode);
+                localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
+                console.log(`✅ ${mode}モードのセッションデータをクリアしました`);
+
+                // 【ReloadManager統合】リダイレクト情報がある場合、モード情報を保持して遷移
                 if (redirectInfo && redirectInfo.redirect === 'training') {
                     console.log(`📍 モード情報を保持して遷移: mode=${redirectInfo.mode}, session=${redirectInfo.session || 'なし'}`);
                     ReloadManager.navigateToTraining(redirectInfo.mode, redirectInfo.session);
@@ -1456,8 +1463,15 @@ function setupMicPermissionFlow() {
             // PitchProリソースのクリーンアップ
             await pitchProCycleManager.cleanupPitchPro();
 
-            // 【ReloadManager統合】リダイレクト情報がある場合、モード情報を保持して遷移
+            // 【localStorage統合】トレーニング開始時にセッションデータをクリア
+            const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
             const redirectInfo = window.preparationRedirectInfo;
+            const mode = redirectInfo?.mode || 'random';
+            const otherModeSessions = allSessions.filter(s => s.mode !== mode);
+            localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
+            console.log(`✅ ${mode}モードのセッションデータをクリアしました`);
+
+            // 【ReloadManager統合】リダイレクト情報がある場合、モード情報を保持して遷移
             if (redirectInfo && redirectInfo.redirect === 'training') {
                 console.log(`📍 モード情報を保持して遷移: mode=${redirectInfo.mode}, session=${redirectInfo.session || 'なし'}`);
                 ReloadManager.navigateToTraining(redirectInfo.mode, redirectInfo.session);
