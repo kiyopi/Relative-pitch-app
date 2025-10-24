@@ -92,20 +92,11 @@ class SimpleRouter {
                 }
             }
 
-            // 5. Lucideアイコンを再描画（DOMが完全に準備できてから実行）
-            if (typeof lucide !== 'undefined') {
-                // requestAnimationFrameを2回使用してDOMが完全に準備できるまで待機
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        try {
-                            lucide.createIcons();
-                            console.log('✅ [Router] Lucide icons initialized');
-                        } catch (error) {
-                            console.warn('⚠️ [Router] Lucide icon initialization failed (non-critical):', error.message);
-                            // Lucideアイコン初期化エラーは致命的ではないため、続行
-                        }
-                    });
-                });
+            // 5. Lucideアイコンを再描画（統合初期化関数を使用）
+            if (typeof window.initializeLucideIcons === 'function') {
+                window.initializeLucideIcons();
+            } else {
+                console.warn('⚠️ [Router] initializeLucideIcons function not found');
             }
 
             // 6. ページ固有のイベントリスナーを設定

@@ -134,10 +134,9 @@
                     } else {
                         icon.setAttribute('data-lucide', 'menu');
                     }
-                    try {
-                        lucide.createIcons();
-                    } catch (error) {
-                        console.warn('⚠️ [Menu] Lucide icon update failed:', error.message);
+                    // 統合初期化関数を使用（即座実行モード）
+                    if (typeof window.initializeLucideIcons === 'function') {
+                        window.initializeLucideIcons({ immediate: true });
                     }
                 }
             });
@@ -149,10 +148,9 @@
                     const icon = menuToggle.querySelector('i');
                     if (icon) {
                         icon.setAttribute('data-lucide', 'menu');
-                        try {
-                            lucide.createIcons();
-                        } catch (error) {
-                            console.warn('⚠️ [Menu] Lucide icon update failed:', error.message);
+                        // 統合初期化関数を使用（即座実行モード）
+                        if (typeof window.initializeLucideIcons === 'function') {
+                            window.initializeLucideIcons({ immediate: true });
                         }
                     }
                 }

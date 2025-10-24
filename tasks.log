@@ -5190,3 +5190,21 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 20:54:33] コミット: debug: Lucideアイコン表示問題の詳細診断ログ追加
+
+追加した診断機能:
+- Lucideライブラリ読み込み状態の確認
+- data-lucide属性を持つ要素数のカウント
+- SVG要素生成数の確認
+- 最初のSVG要素の計算済みスタイル出力
+- CDN読み込み失敗時の詳細エラーメッセージ
+
+これにより以下の診断が可能に:
+- Lucide CDNの読み込み成功/失敗
+- createIcons()の実行状態
+- SVG要素が実際に生成されているか
+- 生成されたSVGのdisplay/width/height/color/stroke/fill
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
