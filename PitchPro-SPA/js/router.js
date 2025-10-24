@@ -335,6 +335,15 @@ class SimpleRouter {
                     window.sessionDataRecorder.resetSession();
                 }
 
+                // 遷移前にブラウザバック防止を解除（重要！）
+                console.log('🔧 ブラウザバック防止解除を実行します...');
+                if (window.NavigationManager) {
+                    window.NavigationManager.removeBrowserBackPrevention();
+                    console.log('✅ removeBrowserBackPrevention() 呼び出し完了');
+                } else {
+                    console.error('❌ NavigationManagerが見つかりません');
+                }
+
                 // トレーニングページに遷移（NavigationManager統合）
                 // ※sessionCounterリセット・基音選択はtrainingController.jsで自動実行
                 NavigationManager.navigateToTraining();

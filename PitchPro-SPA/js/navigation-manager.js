@@ -257,12 +257,13 @@ class NavigationManager {
 
         // popstateハンドラーを定義（ダイアログ通知 + 完全禁止）
         this.popStateHandler = () => {
-            // ダミーエントリーを複数再追加して履歴スタックを補充
-            history.pushState(null, '', location.href);
-            history.pushState(null, '', location.href);
-
             // ユーザーに通知（OKを押すしか選択肢なし）
             alert(message);
+
+            // OKを押した後にダミーエントリーを複数再追加して履歴スタックを補充
+            // この順序により、何度バックしても必ずダイアログが表示される
+            history.pushState(null, '', location.href);
+            history.pushState(null, '', location.href);
 
             console.log(`🚫 [NavigationManager] ブラウザバックを無効化・通知表示 (${page})`);
         };

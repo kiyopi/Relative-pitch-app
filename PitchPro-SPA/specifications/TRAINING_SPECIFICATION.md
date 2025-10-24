@@ -1,10 +1,15 @@
 # トレーニング機能仕様書（SPA版）
 
-**バージョン**: 3.1.1
+**バージョン**: 3.1.2
 **作成日**: 2025-10-23
-**最終更新**: 2025-10-23
+**最終更新**: 2025-10-24
 
 **変更履歴**:
+- v3.1.2 (2025-10-24): ブラウザバック防止とTone.js統合の改善
+  - ブラウザバック防止処理の順序変更（alert → pushState）により確実なダイアログ表示を実現
+  - removeBrowserBackPrevention()をrouter.js・preparation-pitchpro-cycle.jsに統合実装
+  - Tone.jsグローバル公開によるリロード後AudioContext問題を解決
+  - 基音再生ボタンの無音問題を完全解決
 - v3.1.1 (2025-10-23): 設計判断の根拠を追加
   - preparationページのリロード挙動を明記
   - training/preparationページの設計判断の根拠を追加
@@ -76,9 +81,63 @@
 ### 1.3 技術スタック
 
 - **音声再生**: PitchShifter (Tone.js)
+  - index.htmlでTone.jsをグローバル公開（`window.Tone`）
+  - リロード後のAudioContext再開処理に必要
 - **音声検出**: AudioDetectionComponent (PitchPro)
 - **音程計算**: セント単位誤差計算
 - **データ保存**: localStorage (DataManager)
+
+### 1.4 AudioContext管理
+
+**問題の背景（v3.1.2で解決）**:
+
+リロード後、基音再生ボタンを押しても音が鳴らない問題が発生していました。
+
+**根本原因**:
+- trainingController.jsは`Tone.context`にアクセスしてAudioContextの状態確認・再開処理を実行
+- しかし、`Tone`がグローバルスコープに公開されていなかった
+- そのため`typeof Tone !== 'undefined'`が常にfalseとなり、AudioContext再開処理がスキップされる
+- リロード後、AudioContextが`suspended`状態のままとなり音が鳴らない
+
+**解決方法**:
+
+```javascript
+// index.html - Tone.jsグローバル公開
+<script type="module">
+    import { PitchShifter } from './js/core/reference-tones.js';
+    import * as Tone from 'tone';
+
+    window.PitchShifter = PitchShifter;
+    window.Tone = Tone;  // グローバル公開（重要！）
+
+    console.log('✅ PitchShifter loaded globally');
+    console.log('✅ Tone.js loaded globally');
+</script>
+```
+
+**AudioContext再開処理**:
+
+```javascript
+// trainingController.js - startTraining()
+if (typeof Tone !== 'undefined' && Tone.context) {
+    console.log('🔊 AudioContext状態確認... (state:', Tone.context.state + ')');
+
+    // Tone.start()を明示的に呼び出し（iOS/iPadOS対応）
+    if (Tone.context.state === 'suspended') {
+        await Tone.start();
+    }
+
+    // resume()で確実に起動
+    if (Tone.context.state !== 'running') {
+        await Tone.context.resume();
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+}
+```
+
+**期待される動作**:
+
+リロード → マイク許可 → 音量テスト → 音域保存済み → トレーニング開始 → 基音再生ボタン押下で、正常に音が鳴る。
 
 ---
 
@@ -745,6 +804,75 @@ async cleanupCurrentPage() {
 ```
 
 ### 6.2 ブラウザバック対応
+
+#### 6.2.1 NavigationManager統合
+
+**実装場所**: `js/navigation-manager.js` (v3.0.0)
+
+NavigationManagerがナビゲーション・遷移管理・ブラウザバック防止を一元管理します。
+
+**主要機能**:
+- リロード検出・遷移管理
+- ブラウザバック防止ページの設定とハンドラー管理
+- normalTransitionフラグの自動設定
+
+#### 6.2.2 ブラウザバック防止実装
+
+**対象ページ**: training, result-session, results, results-overview
+
+**実装方式**: popstateハンドラー + history.pushState()
+
+```javascript
+// navigation-manager.js
+preventBrowserBack(page) {
+    const config = this.PAGE_CONFIG[page];
+    if (!config || !config.preventBackNavigation) return;
+
+    // ダミーエントリーを複数追加（より確実な防止）
+    history.pushState(null, '', location.href);
+    history.pushState(null, '', location.href);
+
+    // popstateハンドラーを定義（重要：alert → pushState の順序）
+    this.popStateHandler = () => {
+        // ユーザーに通知（OKを押すしか選択肢なし）
+        alert(message);
+
+        // OKを押した後にダミーエントリーを複数再追加して履歴スタックを補充
+        // この順序により、何度バックしても必ずダイアログが表示される
+        history.pushState(null, '', location.href);
+        history.pushState(null, '', location.href);
+    };
+
+    window.addEventListener('popstate', this.popStateHandler);
+}
+```
+
+**重要な設計判断（v3.1.2）**:
+- **alert() → pushState() の順序**: alert()は同期処理なので、ユーザーがOKを押した後に履歴スタックを補充できる
+- **修正前の問題**: pushState() → alert() の順序だと、2-4回のバック操作で履歴スタックが枯渇してバックが成功してしまう
+- **修正後の効果**: 何度ブラウザバックを押してもダイアログが必ず表示され、ページ遷移を完全に防止
+
+#### 6.2.3 removeBrowserBackPrevention()の統合実装
+
+**実装場所**: router.js, preparation-pitchpro-cycle.js
+
+ブラウザバック防止を解除してから遷移することで、不要なダイアログ表示を防ぎます。
+
+```javascript
+// router.js - setupResultsOverviewEvents()
+if (window.NavigationManager) {
+    window.NavigationManager.removeBrowserBackPrevention();
+}
+NavigationManager.navigateToTraining();
+
+// preparation-pitchpro-cycle.js - トレーニング開始ボタン（2箇所）
+if (window.NavigationManager) {
+    window.NavigationManager.removeBrowserBackPrevention();
+}
+NavigationManager.navigateToTraining(redirectInfo.mode, redirectInfo.session);
+```
+
+#### 6.2.4 通常のページ遷移
 
 **動作**:
 - ハッシュ変更 → `hashchange` イベント発火

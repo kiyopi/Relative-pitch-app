@@ -1272,6 +1272,15 @@ function setupMicPermissionFlow() {
                     window.sessionDataRecorder.resetSession();
                 }
 
+                // 遷移前にブラウザバック防止を解除（重要！）
+                console.log('🔧 ブラウザバック防止解除を実行します...');
+                if (window.NavigationManager) {
+                    window.NavigationManager.removeBrowserBackPrevention();
+                    console.log('✅ removeBrowserBackPrevention() 呼び出し完了');
+                } else {
+                    console.error('❌ NavigationManagerが見つかりません');
+                }
+
                 // 【NavigationManager統合】リダイレクト情報がある場合、モード情報を保持して遷移
                 if (redirectInfo && redirectInfo.redirect === 'training') {
                     console.log(`📍 モード情報を保持して遷移: mode=${redirectInfo.mode}, session=${redirectInfo.session || 'なし'}`);
@@ -1493,6 +1502,15 @@ function setupMicPermissionFlow() {
             // SessionDataRecorderをlocalStorageと同期（重要！）
             if (window.sessionDataRecorder) {
                 window.sessionDataRecorder.resetSession();
+            }
+
+            // 遷移前にブラウザバック防止を解除（重要！）
+            console.log('🔧 ブラウザバック防止解除を実行します...');
+            if (window.NavigationManager) {
+                window.NavigationManager.removeBrowserBackPrevention();
+                console.log('✅ removeBrowserBackPrevention() 呼び出し完了');
+            } else {
+                console.error('❌ NavigationManagerが見つかりません');
             }
 
             // 【NavigationManager統合】リダイレクト情報がある場合、モード情報を保持して遷移
