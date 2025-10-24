@@ -413,6 +413,15 @@ function resetVoiceStability() {
 
 // メイン初期化処理
 document.addEventListener('DOMContentLoaded', async function() {
+    // 【重要】preparationページ専用チェック
+    // 他のページ（home, training等）では初期化をスキップ
+    if (!document.getElementById('range-test-section')) {
+        console.log('⏭️ voice-range-test.js: preparationページ以外のため初期化スキップ');
+        return;
+    }
+
+    console.log('🎤 voice-range-test.js: preparationページ検出 - 初期化開始');
+
     // まず初期化を実行
     await initializeDemo();
 
@@ -1305,8 +1314,10 @@ function displayVoiceRangeResults(results) {
         lucide.createIcons();
     }
 
-    // 💾 音域データをlocalStorageに保存（完全失敗・部分結果・逆転以外の場合のみ）
-    if (!results.isCompleteFail && !results.isPartialResult && !results.isReversedRange && !results.isInsufficientRange) {
+    // 💾 音域データをlocalStorageに保存
+    // 完全失敗・部分結果・逆転以外の場合は保存する
+    // isInsufficientRangeの場合も保存する（トレーニングで利用可能）
+    if (!results.isCompleteFail && !results.isPartialResult && !results.isReversedRange) {
         const voiceRangeData = {
             results: {
                 range: results.range,
@@ -1326,6 +1337,9 @@ function displayVoiceRangeResults(results) {
         try {
             localStorage.setItem('voiceRangeData', JSON.stringify(voiceRangeData));
             console.log('💾 音域データをlocalStorageに保存完了:', voiceRangeData);
+            if (results.isInsufficientRange) {
+                console.log('⚠️ 音域は不十分ですが、トレーニングで使用可能な範囲として保存しました');
+            }
         } catch (error) {
             console.error('❌ 音域データ保存失敗:', error);
         }
