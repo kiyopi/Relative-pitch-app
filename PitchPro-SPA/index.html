@@ -27,7 +27,12 @@
 
     <!-- 音域テスト正規版（SPA対応） -->
     <script src="pages/js/voice-range-test.js"></script>
-    <script src="pages/js/preparation-pitchpro-cycle.js?v=13"></script>
+    <!-- タイムスタンプ方式でキャッシュを強制無効化 -->
+    <script>
+        const script = document.createElement('script');
+        script.src = `pages/js/preparation-pitchpro-cycle.js?t=${Date.now()}`;
+        document.head.appendChild(script);
+    </script>
 
     <!-- Tone.js Library (Required for PitchShifter) -->
     <script type="importmap">
