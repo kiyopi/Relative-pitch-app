@@ -776,24 +776,25 @@ saveIncompleteSession() {
 
 ---
 
-## ReloadManager統合（v2.0.0 大幅シンプル化）
+## ReloadManager統合（v2.1.0 責任範囲の明確化）
 
 ### 概要
 
 **実装日**: 2025-10-23
-**最終更新**: 2025-10-23（v2.0.0シンプル化）
+**最終更新**: 2025-10-24（v2.1.0 責任範囲明確化）
 **目的**: リロード検出・ナビゲーション制御の一元管理
 
 従来、リロード検出関連のコードが複数ファイルに散在し、`normalTransitionToTraining`フラグの設定漏れリスクがあった。ReloadManagerクラスを導入することで、コードの一元管理・保守性向上・設定漏れ防止を実現。
 
-**v2.0.0での設計思想変更**:
-ユーザーの指摘により根本的な設計を見直し：
-- **training ページへの遷移 = 常に新規セッション開始（リセット）**
-- **sessionCounter は localStorage の完了済みセッションから自動計算**
-- **リセットしても次のセッション番号は自動的に正しくなる**
+**v2.1.0での責任範囲明確化**:
+コードレビューにより、ReloadManagerの責任範囲を明確化：
+- **ReloadManagerの唯一の責任: リロード検出とマイク許可再取得**
+- **sessionCounter管理は SessionDataRecorder の責任**
+- **localStorage管理も SessionDataRecorder の責任**
 - **リロード検出は preparation へのリダイレクトのためだけに使用**
 
-複雑な状態管理（新規開始フラグ、リロード復帰フラグ等）を完全削除し、シンプルで保守しやすい設計に変更。
+v2.0.0で誤って ReloadManager に sessionCounter 管理の記述があったが、これは設計ミスであり削除。
+SessionDataRecorder が正しく sessionCounter を管理する設計に修正。
 
 ### アーキテクチャ
 
@@ -827,14 +828,18 @@ ReloadManager (グローバルクラス) v2.0.0
  * - normalTransitionフラグの設定漏れを防止
  * - コードの重複を削減し、保守性を向上
  *
- * 【設計思想】v2.0.0
- * - training ページへの遷移 = 常に initializeRandomModeTraining() でリセット
- * - sessionCounter は localStorage の完了済みセッションから自動計算されるため、
- *   リセットしても次のセッション番号は自動的に正しくなる
- * - リロード検出は preparation へのリダイレクトのためだけに使用
+ * 【責任範囲】v2.1.0
+ * - リロード検出（detectReload）
+ * - マイク許可再取得のための preparation リダイレクト
+ * - normalTransition フラグ管理
  *
- * @version 2.0.0
- * @date 2025-10-23
+ * 【責任範囲外】
+ * - sessionCounter 管理 → SessionDataRecorder の責任
+ * - localStorage 管理 → SessionDataRecorder の責任
+ * - トレーニングフロー制御 → trainingController.v2.js の責任
+ *
+ * @version 2.1.0
+ * @date 2025-10-24
  */
 class ReloadManager {
     /**
@@ -996,11 +1001,11 @@ export async function initializeTrainingPage() {
 }
 ```
 
-**ReloadManager v2.0.0（✅ シンプル）**:
+**ReloadManager v2.1.0（✅ 正しい責任分担）**:
 ```javascript
-// trainingController.v2.js (v2.0.0 - シンプル化)
+// trainingController.v2.js (v2.1.0 - 正しい責任分担)
 export async function initializeTrainingPage() {
-    // リロード検出 → preparationへリダイレクト
+    // 【ReloadManager の責任】リロード検出 → preparationへリダイレクト
     if (ReloadManager.detectReload()) {
         console.warn('⚠️ リロード検出 - preparationへリダイレクト');
         ReloadManager.showReloadDialog();
@@ -1016,15 +1021,19 @@ export async function initializeTrainingPage() {
         return;
     }
 
-    // 【v2.0.0 シンプル化】training ページへの遷移 = 常にリセット
-    // sessionCounter は localStorage の完了済みセッションから自動計算されるため、
-    // リセットしても次のセッション番号は自動的に正しくなる
-    console.log('🆕 トレーニングページ初期化 - sessionCounterをリセット');
-    initializeRandomModeTraining();
+    // 【重要】sessionCounter 管理は SessionDataRecorder が担当
+    // - startNewSession() で自動インクリメント
+    // - localStorage と自動同期
+    // - ReloadManager は一切関与しない
+
+    // 基音選択（毎回必須）
+    preselectBaseNote();
 
     // 以降の初期化処理...
 }
 ```
+
+**詳細な仕様は `SESSION_MANAGEMENT_SPECIFICATION.md` を参照**
 
 ### メリット
 
@@ -1054,33 +1063,7 @@ export async function initializeTrainingPage() {
 
 ### フロー図
 
-#### v2.0.0 シンプル化フロー
-
-```
-【セッション1完了 → セッション2開始】（正常な遷移）
-result-session ページ
-  ↓
-「次のセッション」ボタンクリック
-  ↓
-ReloadManager.navigateToTraining()
-  ├─ sessionStorage.setItem('normalTransitionToTraining', 'true')  ← 自動設定
-  └─ window.location.hash = 'training'
-  ↓
-trainingController.v2.js - initializeTrainingPage()
-  ↓
-ReloadManager.detectReload()
-  ├─ normalTransition フラグ確認 → 'true' 検出
-  ├─ フラグ削除
-  └─ return false  ← 正常な遷移として扱う
-  ↓
-【v2.0.0 シンプル化】
-initializeRandomModeTraining()  ← 常にリセット
-  ├─ sessionCounter: localStorage の完了済みセッションから自動計算
-  ├─ 完了済み: 1セッション → sessionCounter = 1
-  └─ 次のセッション番号: sessionCounter++ → 2
-  ↓
-セッション2開始（✅ リロード検出なし、自動計算で正しいセッション番号）
-```
+#### v2.1.0 正しい責任分担フロー
 
 ```
 【trainingページでリロード（F5）】
@@ -1090,6 +1073,7 @@ F5キー（リロード）
   ↓
 trainingController.v2.js - initializeTrainingPage()
   ↓
+【ReloadManager の責任】
 ReloadManager.detectReload()
   ├─ normalTransition フラグ確認 → null
   ├─ performance.navigation.type === 1 → リロード検出
@@ -1100,34 +1084,26 @@ ReloadManager.showReloadDialog()  ← ダイアログ表示
   ↓
 ReloadManager.redirectToPreparation('リロード検出')
   ↓
-#preparation へリダイレクト
-  ↓
-【ユーザーが再度トレーニング開始】
-preparation → ReloadManager.navigateToTraining() → training
-  ↓
-【v2.0.0 シンプル化】
-initializeRandomModeTraining()  ← 常にリセット
-  ├─ sessionCounter: localStorage の完了済みセッションから自動計算
-  ├─ 完了済み: 1セッション（セッション2は未完了のため保存されない）
-  └─ 次のセッション番号: sessionCounter++ → 2
-  ↓
-もう一度セッション2をやり直し（✅ 自動計算で正しいセッション番号）
+#preparation へリダイレクト（マイク許可再取得）
 ```
 
-#### v2.0.0での重要な変更点
+**セッション管理の詳細フローは `SESSION_MANAGEMENT_SPECIFICATION.md` を参照**
 
-1. **training ページへの遷移 = 常にリセット**
-   - 複雑な判定ロジック（新規開始フラグ、リロード復帰フラグ等）を完全削除
-   - `initializeRandomModeTraining()` を常に実行
+#### v2.1.0での重要な修正点
 
-2. **sessionCounter は自動計算**
-   - localStorage の完了済みセッションから最大 ID を取得
-   - リセットしても次のセッション番号は自動的に正しくなる
-   - 未完了セッションは保存されないため、リロード後は同じセッション番号からやり直し
+1. **責任範囲の明確化**
+   - ReloadManager: リロード検出とマイク許可再取得のみ
+   - SessionDataRecorder: sessionCounter 管理と localStorage 管理
+   - trainingController.v2.js: トレーニングフロー制御
 
-3. **リロード検出の役割明確化**
-   - preparation へのリダイレクトのためだけに使用
-   - sessionCounter 管理には関与しない
+2. **v2.0.0の設計ミスを修正**
+   - ❌ 削除: "training ページへの遷移 = 常にリセット"
+   - ❌ 削除: "sessionCounter は自動計算"
+   - ✅ 正しい: SessionDataRecorder が startNewSession() で自動++
+
+3. **リロード検出の役割**
+   - preparation へのリダイレクトのみ
+   - sessionCounter 管理には一切関与しない（v2.0.0で誤った記述があった）
 
 ### 今後の拡張可能性
 
@@ -1255,14 +1231,16 @@ initializeRandomModeTraining()  ← 常にリセット
 
 | バージョン | 日付 | 変更内容 | 担当者 |
 |-----------|------|---------|--------|
-| 2.0.0 | 2025-10-23 | ReloadManager大幅シンプル化 | Claude |
-|  |  | - 設計思想の根本的見直し（ユーザー指摘による） |  |
-|  |  | - training ページへの遷移 = 常にリセット |  |
-|  |  | - sessionCounter は localStorage から自動計算 |  |
+| 2.1.0 | 2025-10-24 | v2.0.0の設計ミスを修正・責任範囲の明確化 | Claude |
+|  |  | - ❌ v2.0.0の間違った記述を削除 |  |
+|  |  | - ✅ ReloadManagerの責任範囲を明確化（リロード検出のみ） |  |
+|  |  | - ✅ sessionCounter管理はSessionDataRecorderの責任と明記 |  |
+|  |  | - ✅ SESSION_MANAGEMENT_SPECIFICATION.md参照追加 |  |
+| 2.0.0 | 2025-10-23 | ReloadManager複雑ロジック削除（⚠️設計ミスあり） | Claude |
 |  |  | - 複雑な判定ロジック完全削除（67行削減） |  |
 |  |  | - 不要なメソッド3つ削除（setNewTrainingStart, isNewTrainingStart, isResumingAfterReload） |  |
 |  |  | - 不要なフラグ2つ削除（NEW_TRAINING_START, RESUMING_AFTER_RELOAD） |  |
-|  |  | - コードの保守性が大幅に向上 |  |
+|  |  | - ⚠️ 誤ってsessionCounter管理をReloadManagerの責任と記述（v2.1.0で修正） |  |
 | 1.1.0 | 2025-10-23 | ReloadManager統合機能追加 | Claude |
 |  |  | - リロード検出・ナビゲーション制御の一元管理 |  |
 |  |  | - normalTransitionフラグの自動設定 |  |
