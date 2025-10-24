@@ -2,10 +2,10 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: 2025-10-23-10:00 - シンプル化（常にリセット）
+ * 🔥 VERSION: 2025-10-24-01:00 - セッション継続判定を追加
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-23-10:00 LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-24-01:00 LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
@@ -80,11 +80,20 @@ export async function initializeTrainingPage() {
         return;
     }
 
-    // 【シンプル化】training ページへの遷移 = 常にリセット
-    // sessionCounter は localStorage の完了済みセッションから自動計算されるため、
-    // リセットしても次のセッション番号は自動的に正しくなる
-    console.log('🆕 トレーニングページ初期化 - sessionCounterをリセット');
-    initializeRandomModeTraining();
+    // 【v2.0.1修正】セッション継続判定を追加
+    // localStorage に完了済みセッションが存在する場合は継続中とみなし、リセットしない
+    const existingSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+    const completedRandomSessions = existingSessions.filter(s => s.mode === 'random' && s.completed);
+
+    if (completedRandomSessions.length > 0) {
+        // セッション継続中（result-session → training の遷移）
+        console.log(`🔄 セッション継続中: ${completedRandomSessions.length}セッション完了済み`);
+        console.log('   → initializeRandomModeTraining() をスキップ（データ保持）');
+    } else {
+        // 新規開始（home / results-overview からの遷移）
+        console.log('🆕 新規トレーニング開始 - セッションデータをリセット');
+        initializeRandomModeTraining();
+    }
 
     // Initialize mode UI（リセット後に実行）
     initializeModeUI();
