@@ -25,15 +25,9 @@ class SimpleRouter {
         window.addEventListener('hashchange', () => this.handleRouteChange());
         window.addEventListener('DOMContentLoaded', () => this.handleRouteChange());
 
-        // ページアンロード時のクリーンアップ（同期実行）
-        window.addEventListener('beforeunload', () => {
-            // beforeunloadは同期的に実行される必要があるため、
-            // 非同期クリーンアップは実行しない（代わりにpagehideを使用）
-        });
-        window.addEventListener('pagehide', () => {
-            // pagehideでクリーンアップを実行（非同期で問題ない）
-            this.cleanupCurrentPage().catch(console.error);
-        });
+        // 【重要】pagehideイベントでのクリーンアップは削除
+        // 理由: タブ切り替えでもpagehideが発火し、ブラウザバック防止が解除されてしまう
+        // SPAではhashchangeイベント（ページ遷移時）でのクリーンアップで十分
 
         // 初期表示
         this.handleRouteChange();
