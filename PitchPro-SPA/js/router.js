@@ -15,26 +15,6 @@ class SimpleRouter {
             'results-overview': 'pages/results-overview.html'
         };
 
-        // ページ設定：ブラウザバック防止が必要なページを定義
-        this.pageConfig = {
-            'training': {
-                preventBackNavigation: true,
-                backPreventionMessage: 'トレーニング中です。\n\nブラウザバックは無効になっています。\nホームボタンからトップページに戻れます。'
-            },
-            'result-session': {
-                preventBackNavigation: true,
-                backPreventionMessage: 'セッション評価中です。\n\nブラウザバックは無効になっています。\n「次の基音へ」ボタンまたはホームボタンをご利用ください。'
-            },
-            'results': {
-                preventBackNavigation: true,
-                backPreventionMessage: '総合評価画面です。\n\nブラウザバックは無効になっています。\nホームボタンまたは「新しいトレーニングを始める」ボタンをご利用ください。'
-            },
-            'results-overview': {
-                preventBackNavigation: true,
-                backPreventionMessage: '総合評価画面です。\n\nブラウザバックは無効になっています。\nホームボタンまたは「新しいトレーニングを始める」ボタンをご利用ください。'
-            }
-        };
-
         this.appRoot = document.getElementById('app-root');
         this.currentPage = null; // 現在のページを追跡
         this.init();
@@ -441,19 +421,13 @@ class SimpleRouter {
     }
 
     /**
-     * ブラウザバック防止を有効化（NavigationManagerに委譲）
+     * ブラウザバック防止を有効化（NavigationManagerに完全委譲）
      * @param {string} page - ページ名
      */
     preventBrowserBack(page) {
-        // ページ設定を取得
-        const config = this.pageConfig[page];
-        if (!config || !config.preventBackNavigation) {
-            return;
-        }
-
-        // NavigationManagerに委譲（通知メッセージあり）
+        // NavigationManagerに完全委譲（設定もNavigationManagerで管理）
         if (window.NavigationManager) {
-            window.NavigationManager.preventBrowserBack(page, config.backPreventionMessage);
+            window.NavigationManager.preventBrowserBack(page);
         }
     }
 

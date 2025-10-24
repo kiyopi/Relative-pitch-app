@@ -4989,3 +4989,18 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 13:37:53] コミット: fix: 総合評価からの新規トレーニング開始時の問題を修正
+
+【問題1】セッションカウンターが9から始まる
+- 原因: localStorageクリア後にSessionDataRecorderが同期されていない
+- 修正: sessionDataRecorder.resetSession()を呼び出してカウンターをリセット
+
+【問題2】総合評価ページのブラウザバック防止が未設定
+- results/results-overviewページにブラウザバック防止を追加
+- 理由1: training/result-sessionと動作を統一
+- 理由2: 連続モードで不適切な状態でのトレーニング開始を防止
+- 理由3: 将来のトレーニング記録機能との整合性
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
