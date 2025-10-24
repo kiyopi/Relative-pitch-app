@@ -5230,3 +5230,42 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 21:06:26] コミット: docs: UI設計仕様書を作成（アイコン・コンポーネント・レイアウト統合）
+
+作成内容:
+- Lucideアイコンシステム完全仕様
+  - グローバル初期化関数の使用方法
+  - アイコンサイズ・カラークラス一覧
+  - 実装箇所とタイミング
+
+- UIコンポーネント詳細仕様
+  - Glass Card、プログレスバー、ボタン、バッジ、見出し
+  - 使用例とCSS仕様
+  - 重要な注意事項
+
+- レイアウトシステム
+  - Flexbox/Gridクラス一覧
+  - Gap/Spaceクラス
+  - レスポンシブ対応
+
+- カラーシステム
+  - テキストカラー・アクセントカラー
+  - CSS変数一覧
+  - フォントサイズ・ウェイト
+
+- CSS設計思想
+  - CSS階層構造
+  - インライン禁止原則
+  - テスト専用CSS分離ルール
+
+- UIカタログ活用方法
+  - 作業開始前の必須チェック
+  - 無駄作業防止チェックリスト
+
+- ベストプラクティス・トラブルシューティング
+
+ファイル: /specifications/UI_DESIGN_SPECIFICATION.md (約900行)
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
