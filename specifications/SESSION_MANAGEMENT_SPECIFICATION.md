@@ -273,14 +273,105 @@ results-overview (総合評価)
 2. **モード別クリア**: 該当モードのみクリア（他モードは保持）
 3. **一箇所で実行**: 重複を避ける
 
+### 6.4 ブラウザバック防止の原則
+
+**基本方針**: ブラウザバックは例外処理扱いとし、原則として禁止する。
+
+#### 対象ページ
+
+| ページ | バック防止 | 理由 |
+|--------|----------|------|
+| **training** | ✅ 必須 | トレーニング中断によるデータ損失防止 |
+| **result-session** | ✅ 必須 | セッション評価の意図しない離脱防止 |
+| **results-overview** | ✅ 必須 | 総合評価の意図しない離脱防止 |
+| preparation | ❌ 不要 | 音域テストは中断可能 |
+| home | ❌ 不要 | トップページ |
+
+#### 実装方法
+
+**History API を使用したバック防止**:
+
+```javascript
+// ページ初期化時（training, result-session, results-overview）
+function preventBrowserBack() {
+    // ダミーのエントリーを追加
+    history.pushState(null, '', location.href);
+
+    // popstateイベントでconfirmation表示
+    window.addEventListener('popstate', function(event) {
+        const confirmed = confirm(
+            'トレーニング中です。\n' +
+            '戻ると進行中のデータが失われます。\n' +
+            '本当に戻りますか？'
+        );
+
+        if (confirmed) {
+            // クリーンアップ処理を実行
+            cleanupCurrentPage();
+            // 実際に戻る
+            history.back();
+        } else {
+            // 戻らない（ダミーエントリーを再追加）
+            history.pushState(null, '', location.href);
+        }
+    });
+}
+```
+
+#### 警告メッセージ
+
+| ページ | メッセージ |
+|--------|----------|
+| training | 「トレーニング中です。戻ると進行中のデータが失われます。本当に戻りますか？」 |
+| result-session | 「セッション評価表示中です。戻ると次のセッションに進めません。本当に戻りますか？」 |
+| results-overview | 「総合評価表示中です。戻ると評価データが失われる可能性があります。本当に戻りますか？」 |
+
+#### クリーンアップ処理
+
+バックを許可する場合は、必ずクリーンアップを実行：
+
+1. **AudioDetector停止**: `audioDetector.stopDetection()`, `audioDetector.destroy()`
+2. **MediaStream解放**: `stream.getTracks().forEach(track => track.stop())`
+3. **PitchShifter解放**: `pitchShifter.dispose()`（存在する場合）
+4. **SessionRecorder処理**:
+   - 完了済み: そのまま
+   - 未完了: `resetSession()` でクリア
+
+#### 推奨UI
+
+**戻るボタンの代替**:
+
+- ✅ training: 「トレーニング中断」ボタンを明示的に配置
+- ✅ result-session: 「次のセッションへ」ボタンのみ表示
+- ✅ results-overview: 「ホームに戻る」ボタンを配置
+
+ブラウザの戻るボタンに依存せず、アプリ内のナビゲーションボタンで遷移を促す。
+
 ---
 
 ## 7. 次のステップ
 
-1. SessionDataRecorder にモードパラメータを追加
-2. trainingController.v2.js のセッション継続判定を削除
-3. localStorage クリアを preparation-pitchpro-cycle.js に統一
-4. handleSessionComplete() にモード別処理を実装
+### 7.1 SessionDataRecorder の修正
+
+1. **mode パラメータを追加**: startNewSession(baseNote, baseFrequency, mode)
+2. **mode のハードコードを削除**: 'random' 固定から動的に変更
+
+### 7.2 trainingController.v2.js の修正
+
+1. **セッション継続判定を削除**: v2.0.1の間違った実装を削除
+2. **preselectBaseNote() を常に実行**: 基音選択は毎回必須
+3. **handleSessionComplete() にモード別処理**: hasIndividualResults による分岐
+4. **ブラウザバック防止を実装**: preventBrowserBack() 関数の追加
+
+### 7.3 localStorage クリアの統一
+
+1. **preparation-pitchpro-cycle.js に統一**: 「トレーニング開始」ボタンでクリア
+2. **router.js の重複削除**: results-overview からのクリアは維持
+
+### 7.4 その他のページ
+
+1. **result-session-controller.js**: ブラウザバック防止を実装
+2. **results-overview**: ブラウザバック防止を実装
 
 ---
 
