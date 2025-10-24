@@ -5179,3 +5179,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 20:52:47] コミット: fix: Lucideアイコン初期化タイミングとバージョン安定化
+
+- Lucideバージョンを@latest → @0.263.1に固定（安定版）
+- lucide-init.jsに二重requestAnimationFrameでDOM完全準備を保証
+- router.jsのアイコン初期化にも二重requestAnimationFrame適用
+- 全てのLucide初期化にtry-catch追加（非致命的エラー処理）
+- 包括的なエラーログ追加でデバッグ改善
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
