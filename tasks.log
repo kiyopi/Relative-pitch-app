@@ -5208,3 +5208,25 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 21:02:00] コミット: refactor: Lucideアイコン初期化をグローバル関数に統合
+
+統合内容:
+- lucide-init.jsにwindow.initializeLucideIcons()グローバル関数を実装
+- 3箇所の重複コードを統一（lucide-init.js、router.js、index.html）
+- オプション引数でimmediate/debugモードを切り替え可能
+
+使用方法:
+- ページ遷移: window.initializeLucideIcons()
+- メニュー切り替え: window.initializeLucideIcons({ immediate: true })
+- デバッグ: window.initializeLucideIcons({ debug: true })
+
+メリット:
+- コード重複削減（3箇所 → 1箇所に統合）
+- エラーハンドリング統一
+- デバッグログの一元管理
+- メンテナンス性向上
+- タイミング制御の安定化
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
