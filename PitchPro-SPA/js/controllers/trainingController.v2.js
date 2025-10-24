@@ -651,9 +651,16 @@ function recordStepPitchData(step) {
 function handleSessionComplete() {
     console.log('✅ トレーニング完了');
 
-    // 音声検出停止
+    // 音声検出停止 & リソース完全破棄
     if (audioDetector) {
         audioDetector.stopDetection();
+        console.log('🛑 音声検出停止');
+
+        // マイクストリームを完全に解放（重要！）
+        // destroy()を呼ばないと、バックグラウンドでマイクが開いたままになり、
+        // 長時間経過後にPitchProが警告アラートを表示してpopstateイベントが発火する問題が発生
+        audioDetector.destroy();
+        console.log('🗑️ AudioDetector破棄完了 - マイクストリーム解放');
     }
 
     // マイクバッジを通常状態に戻す

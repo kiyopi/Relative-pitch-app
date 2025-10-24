@@ -1,10 +1,15 @@
 # トレーニング機能仕様書（SPA版）
 
-**バージョン**: 3.1.2
+**バージョン**: 3.1.3
 **作成日**: 2025-10-23
 **最終更新**: 2025-10-24
 
 **変更履歴**:
+- v3.1.3 (2025-10-24): PitchPro完全停止処理の実装
+  - handleSessionComplete()でaudioDetector.destroy()を追加
+  - マイクストリームを完全に解放することで、バックグラウンド復帰時の警告アラート問題を解決
+  - stopDetection()だけでは不十分で、destroy()が必須であることを明記
+  - バックグラウンド長時間放置時のpopstateイベント誤発火を防止
 - v3.1.2 (2025-10-24): ブラウザバック防止とTone.js統合の改善
   - ブラウザバック防止処理の順序変更（alert → pushState）により確実なダイアログ表示を実現
   - removeBrowserBackPrevention()をrouter.js・preparation-pitchpro-cycle.jsに統合実装
@@ -1260,7 +1265,7 @@ preparationへリダイレクト
 ### 7.1 AudioDetector
 
 **初期化**: `startDoremiGuide()` 内
-**解放**: `cleanupCurrentPage()` 内
+**解放**: `handleSessionComplete()` 内（v3.1.3で改善）
 
 ```javascript
 // 初期化
@@ -1271,11 +1276,21 @@ audioDetector = new window.PitchPro.AudioDetectionComponent({
 });
 await audioDetector.initialize();
 
-// 解放
-if (window.audioDetector) {
-    window.audioDetector.stopDetection();
+// 解放（v3.1.3重要改善）
+if (audioDetector) {
+    audioDetector.stopDetection();  // 音声検出を停止
+
+    // 【重要】マイクストリームを完全に解放
+    // destroy()を呼ばないと、バックグラウンドでマイクが開いたままになり、
+    // 長時間経過後にPitchProが警告アラートを表示してpopstateイベントが発火する
+    audioDetector.destroy();
 }
 ```
+
+**重要な注意点（v3.1.3）**:
+- `stopDetection()`だけではマイクストリームが解放されない
+- `destroy()`を必ず呼び出してリソースを完全に解放する
+- これを行わないと、バックグラウンド復帰時にPitchProの警告アラートが表示され、ブラウザバック防止のダイアログが誤発火する問題が発生する
 
 ### 7.2 PitchShifter
 
