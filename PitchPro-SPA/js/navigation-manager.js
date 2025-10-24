@@ -208,11 +208,10 @@ class NavigationManager {
     static popStateHandler = null;
 
     /**
-     * ブラウザバック防止を有効化
+     * ブラウザバック防止を有効化（ダイアログなし）
      * @param {string} page - ページ名
-     * @param {string} confirmMessage - 確認ダイアログメッセージ
      */
-    static preventBrowserBack(page, confirmMessage) {
+    static preventBrowserBack(page) {
         // 既存のハンドラーをクリーンアップ
         if (this.popStateHandler) {
             window.removeEventListener('popstate', this.popStateHandler);
@@ -223,19 +222,11 @@ class NavigationManager {
         history.pushState(null, '', location.href);
         console.log(`📍 [NavigationManager] ブラウザバック防止: ダミーエントリー追加 (${page})`);
 
-        // popstateハンドラーを定義
-        this.popStateHandler = (event) => {
-            const confirmed = confirm(confirmMessage);
-
-            if (confirmed) {
-                console.log('🔙 [NavigationManager] ユーザーがブラウザバックを承認');
-                this.removeBrowserBackPrevention();
-                history.back();
-            } else {
-                // キャンセル時はダミーエントリーを再追加
-                history.pushState(null, '', location.href);
-                console.log('🚫 [NavigationManager] ブラウザバックをキャンセル');
-            }
+        // popstateハンドラーを定義（ダイアログなし、常にダミーエントリー再追加）
+        this.popStateHandler = () => {
+            // ブラウザバックを検出したら即座にダミーエントリーを追加して無効化
+            history.pushState(null, '', location.href);
+            console.log(`🚫 [NavigationManager] ブラウザバックを無効化 (${page})`);
         };
 
         // イベントリスナーを登録

@@ -4934,3 +4934,26 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 12:34:47] コミット: fix: SessionDataRecorderがlocalStorageクリア後に同期されない問題を修正
+
+問題:
+- localStorageクリア後もSessionDataRecorderのsessionCounterが古い値を保持
+- セッション番号が1ではなく2から始まる
+
+原因:
+- SessionDataRecorderはページロード時に1回だけ初期化される
+- その後localStorageをクリアしても、メモリ上のsessionCounterは更新されない
+- startNewSession()の同期ロジックも呼ばれていない（セッション開始前）
+
+修正:
+- preparation-pitchpro-cycle.jsでlocalStorageクリア後に
+  window.sessionDataRecorder.resetSession()を呼び出し
+- resetSession()メソッドは既に実装済みで、localStorageと同期する
+
+影響:
+- 新しいトレーニング開始時にセッション番号が正しく1から始まる
+- SessionDataRecorderとlocalStorageの整合性が保たれる
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
