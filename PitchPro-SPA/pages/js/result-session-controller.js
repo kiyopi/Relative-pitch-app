@@ -217,7 +217,7 @@ function displayEvaluationDistribution(pitchErrors) {
 
         <!-- Practice -->
         <div class="flex items-center gap-3">
-            <i data-lucide="triangle-alert" class="text-red-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+            <i data-lucide="alert-triangle" class="text-red-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
             <div class="progress-bar flex">
                 <div class="progress-fill-custom color-eval-practice" style="width: ${(distribution.practice / total * 100)}%;"></div>
             </div>
@@ -257,7 +257,7 @@ function displayAccuracyBadge(avgError) {
         message.textContent = '合格ライン達成！';
     } else {
         badge.classList.add('accuracy-badge-practice');
-        badge.innerHTML = '<i data-lucide="triangle-alert" class="text-red-300 accuracy-icon"></i>';
+        badge.innerHTML = '<i data-lucide="alert-triangle" class="text-red-300 accuracy-icon"></i>';
         message.textContent = '練習を続けましょう！';
     }
 
@@ -304,7 +304,7 @@ function displayDetailedAnalysis(pitchErrors) {
             evalColor = 'text-blue-300';
             iconTransform = 'transform: translateY(-2px) translateX(2px);';
         } else {
-            evalIcon = 'triangle-alert';
+            evalIcon = 'alert-triangle';
             evalColor = 'text-red-300';
         }
 

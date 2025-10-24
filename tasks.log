@@ -5269,3 +5269,27 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 21:09:53] コミット: fix: Lucide CDN URLをunpkgからjsdelivrに変更
+
+問題:
+- unpkg.com/lucide@0.263.1が404エラーを返す
+- Content-Typeエラーでスクリプト実行が拒否される
+- lucide is undefinedエラーが発生
+
+修正内容:
+- CDNをunpkg.com → cdn.jsdelivr.netに変更
+- より信頼性の高いjsdelivr CDNを使用
+- minified版（lucide.min.js）を使用してパフォーマンス向上
+
+変更URL:
+- 修正前: https://unpkg.com/lucide@0.263.1/dist/umd/lucide.js
+- 修正後: https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js
+
+jsdelivrの利点:
+- より安定したCDN配信
+- 自動フォールバック機能
+- 高速な配信ネットワーク
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

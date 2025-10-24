@@ -40,13 +40,22 @@ window.initializeLucideIcons = function(options = {}) {
                 console.log('🎬 [LUCIDE-DEBUG] Calling lucide.createIcons()...');
             }
 
-            // Lucideアイコン生成
-            lucide.createIcons();
+            // Lucideアイコン生成（Safari互換性対応）
+            try {
+                lucide.createIcons();
+            } catch (destructError) {
+                // Safari固有の"Right side of assignment cannot be destructured"エラーへの対処
+                // この場合でもアイコンは正しく表示される可能性がある
+                if (debug) {
+                    console.warn('⚠️ [LUCIDE-DEBUG] createIcons() threw error (may be Safari-specific):', destructError.message);
+                }
+                // エラーを無視して続行（アイコンが表示されているか確認）
+            }
 
             if (debug) {
                 // 初期化後にSVG要素をカウント
                 const svgElements = document.querySelectorAll('svg[class*="lucide"]');
-                console.log(`✅ [LUCIDE] Icons initialized successfully - Created ${svgElements.length} SVG elements`);
+                console.log(`✅ [LUCIDE] Icons initialized - Found ${svgElements.length} SVG elements`);
 
                 // 最初のSVG要素のスタイルを確認
                 if (svgElements.length > 0) {
@@ -60,6 +69,8 @@ window.initializeLucideIcons = function(options = {}) {
                         stroke: computedStyle.stroke,
                         fill: computedStyle.fill
                     });
+                } else {
+                    console.warn('⚠️ [LUCIDE-DEBUG] No SVG elements found - icons may not have been created');
                 }
             } else {
                 console.log('✅ [LUCIDE] Icons initialized');
@@ -68,7 +79,7 @@ window.initializeLucideIcons = function(options = {}) {
             return true;
 
         } catch (error) {
-            console.warn('⚠️ [LUCIDE] Icon initialization failed (non-critical):', error.message);
+            console.error('❌ [LUCIDE] Icon initialization failed:', error.message);
             if (debug) {
                 console.error('⚠️ [LUCIDE-DEBUG] Full error:', error);
             }

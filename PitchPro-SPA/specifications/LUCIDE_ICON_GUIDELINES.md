@@ -17,6 +17,125 @@ Lucideアイコンは、CSSクラスでのサイズ指定が正しく適用さ�
 
 ---
 
+## 🚨 バージョン管理とSafari互換性（2025-10-24追加）
+
+### 重大な問題: Safari互換性エラーとアイコン名非互換性
+
+#### 問題1: Safari互換性エラー
+
+**症状**:
+```
+TypeError: Right side of assignment cannot be destructured
+```
+
+**原因**:
+- Lucide **@latest版**（最新版）はSafariのstrict modeで動作不安定
+- SafariはJavaScriptモジュールを常にstrict modeで評価
+- strict modeでは`this`がグローバルオブジェクトに変換されず、UMD形式で問題発生
+
+**解決策**:
+```html
+<!-- ❌ Safari互換性問題あり -->
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+
+<!-- ✅ Safari完全対応 -->
+<script src="https://unpkg.com/lucide@0.263.0/dist/umd/lucide.js"></script>
+```
+
+#### 問題2: アイコン名の非互換性
+
+**原因**:
+- 新バージョン（v0.400以降）で追加されたアイコン名はv0.263.0に存在しない
+- UIカタログは最新版を使用しているため、アイコン名の変換が必須
+
+**アイコン名対応表**:
+
+| UIカタログ（最新版） | 本番環境（v0.263.0） | 用途 |
+|---|---|---|
+| `triangle-alert` | `alert-triangle` | 警告・エラー表示 |
+| `circle-check-big` | `check-circle` | 成功・完了表示 |
+| `file-chart-column-increasing` | `bar-chart-2` | 統計・グラフ表示 |
+| `grid-3x3` | `grid` | グリッド・一覧表示 |
+
+### バージョン固定の必須ルール
+
+**本番環境（PitchPro-SPA）**:
+```html
+<!-- ✅ 必ずこのバージョンを使用 -->
+<script src="https://unpkg.com/lucide@0.263.0/dist/umd/lucide.js"></script>
+```
+
+**UIカタログ**:
+```html
+<!-- UIカタログのみ最新版使用可能 -->
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+```
+
+### 実装時の必須手順
+
+#### STEP 1: UIカタログでデザイン確認
+```bash
+# UIカタログで視覚的なデザインを確認
+Read /UI-Catalog/ui-catalog-essentials.html
+```
+
+#### STEP 2: アイコン名の変換チェック
+```bash
+# UIカタログからコピーしたHTMLのアイコン名をチェック
+Grep "data-lucide=" [ファイル名]
+
+# 非互換アイコンを検索
+Grep "triangle-alert|circle-check-big|file-chart-column-increasing|grid-3x3" [ファイル名]
+```
+
+#### STEP 3: 一括置換実行
+```bash
+sed -i '' \
+  -e 's/file-chart-column-increasing/bar-chart-2/g' \
+  -e 's/triangle-alert/alert-triangle/g' \
+  -e 's/grid-3x3/grid/g' \
+  -e 's/circle-check-big/check-circle/g' \
+  [ファイル名]
+```
+
+#### STEP 4: 動作確認
+```bash
+# コンソールで警告がないか確認
+# "[Warning] icon name was not found" が出たら修正漏れ
+```
+
+### よくあるエラーと対処法
+
+#### エラー1: アイコンが表示されない
+```
+[Warning] <i data-lucide="triangle-alert"></i> icon name was not found
+```
+**対処**: `triangle-alert` → `alert-triangle` に変更
+
+#### エラー2: Safari互換性エラー
+```
+TypeError: Right side of assignment cannot be destructured
+```
+**対処**: Lucideバージョンを`@latest` → `@0.263.0`に変更
+
+#### エラー3: アイコンの一部のみ表示される
+- **原因**: 新旧アイコン名が混在している
+- **対処**: 全ファイルで非互換アイコンを検索して置換
+
+### 禁止事項
+
+- ❌ **本番環境で`@latest`使用禁止** - Safari互換性問題発生
+- ❌ **UIカタログのアイコン名をそのまま使用禁止** - バージョン非互換
+- ❌ **アイコン名変換の確認を省略禁止** - 実装後に警告大量発生
+
+### 推奨事項
+
+- ✅ **UIカタログ確認時にアイコン名をメモ** - 実装時の変換漏れ防止
+- ✅ **新規ページ実装後は必ず全アイコン検証** - 警告ログを確認
+- ✅ **v0.263.0互換アイコンのリスト作成** - チーム全体で共有
+
+---
+
 ## ✅ 実装ルール
 
 ### 1. UIカタログ準拠の絶対原則
@@ -155,17 +274,22 @@ function createResponsiveIcon(iconName) {
 
 ## 📊 検証済みアイコンリスト
 
-UIカタログで検証済みの主要アイコン：
+UIカタログで検証済みの主要アイコン（**v0.263.0互換名を使用**）：
 - `crown` - グレードS/A級（64px）
 - `medal` - グレードB級（64px）
 - `award` - 達成表示（28px）
 - `trophy` - 評価Excellent（24px）
 - `star` - 評価Good（24px）
 - `thumbs-up` - 評価Pass（24px）
-- `triangle-alert` - 評価Practice（24px）
+- `alert-triangle` - 評価Practice・警告（24px） ※UIカタログでは`triangle-alert`
+- `check-circle` - 成功・完了（24px） ※UIカタログでは`circle-check-big`
+- `bar-chart-2` - 統計・グラフ（36px） ※UIカタログでは`file-chart-column-increasing`
+- `grid` - グリッド・一覧（24px） ※UIカタログでは`grid-3x3`
 - `play-circle` - 再生ボタン（32px）
 - `home` - ホームボタン（16px）
 - `arrow-right` - ナビゲーション（16px）
+- `chevron-left` - 前へ（24px）
+- `chevron-right` - 次へ（24px）
 
 ---
 
@@ -179,3 +303,4 @@ UIカタログで検証済みの主要アイコン：
 
 更新履歴：
 - 2025-08-23: 初版作成（UIカタログ準拠の重要性を明記）
+- 2025-10-24: バージョン管理セクション追加（Safari互換性・アイコン名非互換性対応）

@@ -340,7 +340,7 @@ iPad: 感度 5.0x, 音量バー 7.0x
 
 ### **📋 VolumeBarController統合完了（2025年1月7日追加）**
 - **VolumeBarController実装**: 統一音量制御システム完成（`/js/volume-bar-controller.js`）
-- **音量バー統合仕様書**: 完全なドキュメント作成（`/specifications/VOLUME_BAR_INTEGRATION_SPECIFICATION.md`）
+- **音量バー統合仕様書**: 完全なドキュメント作成（`/PitchPro-SPA/specifications/VOLUME_BAR_INTEGRATION_SPECIFICATION.md`）
 - **重要な教訓**: PitchProからの音量値取得は必ずコールバック方式`result.volume`を使用
 - **実機テスト済み設定**: PC(4.0x)・iPhone(4.5x)・iPad(7.0x)の音量バー感度設定確定
 
@@ -512,6 +512,141 @@ voice-range-test-v4/
 ボタン作成前 → 「ui-catalog-essentials.htmlのボタンセクションを確認しましたか？」
 レイアウト変更前 → 「UIカタログで同じパターンはありませんか？」
 system.css確認 → 「UIカタログとbase.cssを先に確認しましたか？」
+```
+
+---
+
+## 🎨 Lucideアイコン運用ガイドライン（重要）
+
+### **🚨 重要な問題: Safari互換性とバージョン管理**
+
+#### **バージョン固定の必須事項**
+
+**本番環境（PitchPro-SPA）**:
+```html
+<!-- ✅ 必ずこのバージョンを使用 -->
+<script src="https://unpkg.com/lucide@0.263.0/dist/umd/lucide.js"></script>
+```
+
+**UIカタログ**:
+```html
+<!-- UIカタログのみ最新版使用可能 -->
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+```
+
+#### **なぜバージョン固定が必要か**
+
+**問題1: Safari互換性エラー**
+- Lucide **@latest版**はSafariのstrict modeで動作不安定
+- エラー: `TypeError: Right side of assignment cannot be destructured`
+- SafariはJavaScriptモジュールを常にstrict modeで評価
+- strict modeでは`this`がグローバルオブジェクトに変換されず、UMD形式で問題発生
+
+**問題2: アイコン名の非互換性**
+- 新バージョン（v0.400以降）で追加されたアイコン名はv0.263.0に存在しない
+- UIカタログから実装時にアイコン名の変換が必須
+
+#### **アイコン名対応表（最重要）**
+
+UIカタログから本番実装時に必ず変換すること:
+
+| UIカタログ（最新版） | 本番環境（v0.263.0） | 用途 |
+|---|---|---|
+| `triangle-alert` | `alert-triangle` | 警告・エラー表示 |
+| `circle-check-big` | `check-circle` | 成功・完了表示 |
+| `file-chart-column-increasing` | `bar-chart-2` | 統計・グラフ表示 |
+| `grid-3x3` | `grid` | グリッド・一覧表示 |
+
+#### **実装時の必須手順**
+
+**STEP 1: UIカタログでデザイン確認**
+```bash
+# UIカタログで視覚的なデザインを確認
+Read /UI-Catalog/ui-catalog-essentials.html
+```
+
+**STEP 2: アイコン名の変換**
+```bash
+# UIカタログからコピーしたHTMLのアイコン名をチェック
+Grep "data-lucide=" [ファイル名]
+
+# 非互換アイコンを検索
+Grep "triangle-alert|circle-check-big|file-chart-column-increasing|grid-3x3" [ファイル名]
+```
+
+**STEP 3: 一括置換実行**
+```bash
+sed -i '' \
+  -e 's/file-chart-column-increasing/bar-chart-2/g' \
+  -e 's/triangle-alert/alert-triangle/g' \
+  -e 's/grid-3x3/grid/g' \
+  -e 's/circle-check-big/check-circle/g' \
+  [ファイル名]
+```
+
+**STEP 4: 動作確認**
+```bash
+# コンソールで警告がないか確認
+# "[Warning] icon name was not found" が出たら修正漏れ
+```
+
+#### **よくあるエラーと対処法**
+
+**エラー1: アイコンが表示されない**
+```
+[Warning] <i data-lucide="triangle-alert"></i> icon name was not found
+```
+**対処**: `triangle-alert` → `alert-triangle` に変更
+
+**エラー2: Safari互換性エラー**
+```
+TypeError: Right side of assignment cannot be destructured
+```
+**対処**: Lucideバージョンを`@latest` → `@0.263.0`に変更
+
+**エラー3: アイコンの一部のみ表示される**
+- **原因**: 新旧アイコン名が混在している
+- **対処**: 全ファイルで非互換アイコンを検索して置換
+
+#### **禁止事項**
+
+- ❌ **本番環境で`@latest`使用禁止** - Safari互換性問題発生
+- ❌ **UIカタログのアイコン名をそのまま使用禁止** - バージョン非互換
+- ❌ **アイコン名変換の確認を省略禁止** - 実装後に警告大量発生
+
+#### **推奨事項**
+
+- ✅ **UIカタログ確認時にアイコン名をメモ** - 実装時の変換漏れ防止
+- ✅ **新規ページ実装後は必ず全アイコン検証** - 警告ログを確認
+- ✅ **v0.263.0互換アイコンのリスト作成** - チーム全体で共有
+
+#### **参考: v0.263.0で使用可能な主要アイコン**
+
+よく使うアイコンの正しい名前:
+
+```
+✅ alert-triangle (警告)
+✅ check-circle (成功)
+✅ bar-chart-2 (グラフ)
+✅ grid (グリッド)
+✅ trophy (優秀)
+✅ award (良好)
+✅ target (合格)
+✅ music (音楽)
+✅ chevron-left (前へ)
+✅ chevron-right (次へ)
+```
+
+### **統合初期化関数の使用**
+
+すべてのLucideアイコン初期化は統合関数を使用:
+
+```javascript
+// ✅ 正しい使い方
+window.initializeLucideIcons({ immediate: true });
+
+// ❌ 直接呼び出し禁止（Safari互換性問題）
+lucide.createIcons();
 ```
 
 ---
@@ -914,7 +1049,7 @@ pitchDetector.setCallbacks({
 - **VolumeBarController**: `/js/volume-bar-controller.js`
 - **実装例**: `/test-volume-controller.html`（シンプル実装例）
 - **統合テスト**: `/test-ui-integration.html`（完全統合テスト）
-- **仕様書**: `/specifications/VOLUME_BAR_INTEGRATION_SPECIFICATION.md`
+- **仕様書**: `/PitchPro-SPA/specifications/VOLUME_BAR_INTEGRATION_SPECIFICATION.md`
 
 ### **🎯 次期実装フェーズ**
 - preparation.html・training.htmlへのVolumeBarController統合

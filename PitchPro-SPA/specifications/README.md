@@ -1,7 +1,7 @@
 # PitchPro-SPA 仕様書ディレクトリ
 
-**最終更新日**: 2025-10-23
-**バージョン**: 1.0.0
+**最終更新日**: 2025-10-24
+**バージョン**: 2.0.0
 
 ## 📋 概要
 
@@ -27,12 +27,83 @@
 - `/PitchPro-SPA/js/controllers/session-data-recorder.js`
 - `/PitchPro-SPA/js/router.js`
 
+### 2. データ管理仕様書
+**ファイル**: `DATA_MANAGEMENT_SPECIFICATION.md`
+**最終更新**: 2025-10-24（移動）
+
+**内容**:
+- localStorage統一管理
+- データキー構造
+- データ保存・取得API
+- セッションデータ管理
+
+**対象実装**:
+- `/PitchPro-SPA/js/data-manager.js`
+
+### 3. 評価システム仕様書
+**ファイル**: `EVALUATION_SYSTEM_SPECIFICATION.md`
+**最終更新**: 2025-10-24（移動）
+
+**内容**:
+- 評価基準定義
+- グレード判定ロジック
+- モード別評価システム
+- デバイス品質判定
+
+**対象実装**:
+- `/PitchPro-SPA/js/evaluation-calculator.js`
+
+### 4. 動的グレード計算ロジック仕様書
+**ファイル**: `DYNAMIC_GRADE_LOGIC_SPECIFICATION.md`
+**最終更新**: 2025-10-24（移動）
+
+**内容**:
+- 完全な計算フロー定義
+- 詳細実装仕様
+- エラーハンドリング戦略
+- モード別差別化
+
+**対象実装**:
+- `/PitchPro-SPA/pages/results-overview.html`
+- `/PitchPro-SPA/js/evaluation-calculator.js`
+
+### 5. 音量バー統合仕様書
+**ファイル**: `VOLUME_BAR_INTEGRATION_SPECIFICATION.md`
+**最終更新**: 2025-10-24（移動）
+
+**内容**:
+- VolumeBarController統合
+- 実機テスト済み設定
+- 音量値取得方法（コールバック方式）
+- デバイス別最適化設定
+
+**対象実装**:
+- `/PitchPro-SPA/js/volume-bar-controller.js`
+- `/PitchPro-SPA/pages/js/voice-range-test.js`
+
+### 6. Lucideアイコン運用ガイドライン
+**ファイル**: `LUCIDE_ICON_GUIDELINES.md`
+**最終更新**: 2025-10-24（作成・移動）
+
+**内容**:
+- Safari互換性対応
+- バージョン管理（v0.263.0固定）
+- アイコン名対応表
+- 実装時の必須手順
+- UIカタログとの違い
+
+**対象実装**:
+- `/PitchPro-SPA/index.html`（Lucide CDN）
+- `/PitchPro-SPA/js/lucide-init.js`
+- 全HTMLファイルのアイコン実装
+
 ## 📚 参照情報
 
 ### 関連ドキュメント
-- **プロジェクトルート仕様書**: `/specifications/` (レガシー仕様書)
+- **プロジェクトルート仕様書**: `/specifications/` (共通仕様書)
 - **ナビゲーション仕様**: `/specifications/NAVIGATION_HANDLING_SPECIFICATION.md`
-- **音量バー統合仕様**: `/specifications/VOLUME_BAR_INTEGRATION_SPECIFICATION.md`
+- **開発ガイドライン**: `/CLAUDE.md`
+- **UIカタログ**: `/UI-Catalog/ui-catalog-essentials.html`
 
 ### 実装ファイル構成
 ```
@@ -77,6 +148,19 @@ PitchPro-SPA/
 - クエリパラメータ → ハッシュルーティングへの移行を反映
 
 ### 今後の追加予定
-- [ ] 結果表示機能仕様書
-- [ ] 音域テスト機能仕様書（SPA版）
-- [ ] データ管理仕様書
+- [ ] 結果表示機能仕様書（results-overview詳細仕様）
+- [ ] 音域テスト機能仕様書（SPA版v4.0）
+- [x] データ管理仕様書（完了・移動済み）
+- [x] 評価システム仕様書（完了・移動済み）
+- [x] 音量バー統合仕様書（完了・移動済み）
+- [x] Lucideアイコン運用ガイドライン（完了・新規作成）
+
+### 2025-10-24 更新履歴
+- 5つの仕様書を`/specifications/`から移動
+  1. `DATA_MANAGEMENT_SPECIFICATION.md`
+  2. `EVALUATION_SYSTEM_SPECIFICATION.md`
+  3. `DYNAMIC_GRADE_LOGIC_SPECIFICATION.md`
+  4. `VOLUME_BAR_INTEGRATION_SPECIFICATION.md`
+  5. `LUCIDE_ICON_GUIDELINES.md`（新規作成・移動）
+- README.mdを v2.0.0 にアップデート
+- SPA関連仕様書の一元管理開始

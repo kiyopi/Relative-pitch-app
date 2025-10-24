@@ -15,17 +15,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    
-    <!-- アイコンライブラリ -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    
+
+    <!-- アイコンライブラリ（index.html でロード済み） -->
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
-    
-    <!-- JavaScript モジュール -->
-    <script src="../js/data-manager.js"></script>
-    <script src="../js/evaluation-calculator.js"></script>
+
+    <!-- JavaScript モジュール（data-manager.js と evaluation-calculator.js は index.html でロード済み） -->
 </head>
 <body>
     <div class="container">
@@ -34,7 +31,7 @@
                 <div class="page-header-content">
                     <div class="page-header-icon-wrapper">
                         <div class="page-header-icon gradient-catalog-purple">
-                            <i data-lucide="file-chart-column-increasing" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;"></i>
+                            <i data-lucide="bar-chart-2" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;"></i>
                         </div>
                     </div>
                     <div class="page-header-text">
@@ -153,7 +150,7 @@
                 <!-- セッショングリッド -->
                 <section class="glass-card">
                     <h2 class="heading-md">
-                        <i data-lucide="grid-3x3" style="width: 24px; height: 24px;"></i>
+                        <i data-lucide="grid" style="width: 24px; height: 24px;"></i>
                         <span>セッション一覧</span>
                     </h2>
                     <div id="session-grid-container">
@@ -166,7 +163,7 @@
                     <!-- ナビゲーションヘッダー -->
                     <div class="section-header mb-4">
                         <div class="flex items-center justify-between w-full">
-                            <button class="glass-card-sm">
+                            <button id="prev-session-btn" class="glass-card-sm">
                                 <i data-lucide="chevron-left" class="text-white icon-md"></i>
                             </button>
                             <div class="text-center flex-1 px-2">
@@ -176,7 +173,7 @@
                                     <span>セッション1</span>
                                 </h3>
                             </div>
-                            <button class="glass-card-sm">
+                            <button id="next-session-btn" class="glass-card-sm">
                                 <i data-lucide="chevron-right" class="text-white icon-md"></i>
                             </button>
                         </div>
@@ -268,10 +265,10 @@
                                 <span>ランダム基音モード</span>
                             </div>
                             <div class="comparison-cell comparison-value">
-                                <i data-lucide="circle-check-big" class="icon-sm text-green-400"></i>
+                                <i data-lucide="check-circle" class="icon-sm text-green-400"></i>
                             </div>
                             <div class="comparison-cell comparison-value">
-                                <i data-lucide="circle-check-big" class="icon-sm text-green-400"></i>
+                                <i data-lucide="check-circle" class="icon-sm text-green-400"></i>
                             </div>
                         </div>
                         
@@ -284,7 +281,7 @@
                                 <i data-lucide="minus" class="icon-sm text-gray-500"></i>
                             </div>
                             <div class="comparison-cell comparison-value">
-                                <i data-lucide="circle-check-big" class="icon-sm text-green-400"></i>
+                                <i data-lucide="check-circle" class="icon-sm text-green-400"></i>
                             </div>
                         </div>
                         
@@ -310,7 +307,7 @@
                                 <i data-lucide="minus" class="icon-sm text-gray-500"></i>
                             </div>
                             <div class="comparison-cell comparison-value">
-                                <i data-lucide="circle-check-big" class="icon-sm text-green-400"></i>
+                                <i data-lucide="check-circle" class="icon-sm text-green-400"></i>
                             </div>
                         </div>
                         
@@ -323,7 +320,7 @@
                                 <i data-lucide="minus" class="icon-sm text-gray-500"></i>
                             </div>
                             <div class="comparison-cell comparison-value">
-                                <i data-lucide="circle-check-big" class="icon-sm text-green-400"></i>
+                                <i data-lucide="check-circle" class="icon-sm text-green-400"></i>
                             </div>
                         </div>
                         
@@ -336,7 +333,7 @@
                                 <i data-lucide="minus" class="icon-sm text-gray-500"></i>
                             </div>
                             <div class="comparison-cell comparison-value">
-                                <i data-lucide="circle-check-big" class="icon-sm text-green-400"></i>
+                                <i data-lucide="check-circle" class="icon-sm text-green-400"></i>
                             </div>
                         </div>
                     </div>
@@ -372,21 +369,11 @@
     </div>
 
     <!-- JavaScript -->
-    <script type="module">
-        // Lucideアイコン初期化
-        document.addEventListener('DOMContentLoaded', async function() {
-            if (typeof lucide !== 'undefined' && lucide.createIcons) {
-                lucide.createIcons();
-            }
-
-            // 総合評価ページ初期化
-            await initResultsOverview();
-        });
-
+    <script>
         /**
-         * 総合評価ページの初期化
+         * 総合評価ページの初期化（即座にグローバル定義）
          */
-        async function initResultsOverview() {
+        window.initResultsOverview = async function() {
             console.log('📊 総合評価ページ初期化開始');
 
             // DataManagerから全セッションデータを取得
@@ -412,9 +399,26 @@
                 initializeCharts(sessionData);
             }
 
-            // Lucideアイコン再初期化
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
+            // Lucideアイコン再初期化（統合初期化関数を使用）
+            if (typeof window.initializeLucideIcons === 'function') {
+                window.initializeLucideIcons({ immediate: true });
+            }
+
+            // ナビゲーションボタンのイベントリスナーを追加
+            const prevBtn = document.getElementById('prev-session-btn');
+            const nextBtn = document.getElementById('next-session-btn');
+
+            if (prevBtn) {
+                prevBtn.addEventListener('click', window.navigateToPrevSession);
+            }
+
+            if (nextBtn) {
+                nextBtn.addEventListener('click', window.navigateToNextSession);
+            }
+
+            // 初回表示時は最初のセッションを表示
+            if (sessionData && sessionData.length > 0) {
+                window.showSessionDetail(0);
             }
         }
 
@@ -603,7 +607,7 @@
 
                 <!-- Practice -->
                 <div class="flex items-center gap-3">
-                    <i data-lucide="triangle-alert" class="text-red-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+                    <i data-lucide="alert-triangle" class="text-red-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
                     <div class="progress-bar flex">
                         <div class="progress-fill-custom color-eval-practice" style="width: ${(distribution.practice / total * 100).toFixed(1)}%;"></div>
                     </div>
@@ -611,46 +615,291 @@
                 </div>
             `;
 
-            // Lucideアイコン再初期化
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
+            // Lucideアイコン再初期化（統合初期化関数を使用）
+            if (typeof window.initializeLucideIcons === 'function') {
+                window.initializeLucideIcons({ immediate: true });
             }
         }
 
         /**
-         * セッショングリッドを表示
+         * セッショングリッドを表示（UIカタログパターン準拠）
          */
         function displaySessionGrid(sessionData) {
             const container = document.getElementById('session-grid-container');
             if (!container) return;
 
-            container.innerHTML = sessionData.map((session, index) => {
+            // セッション数に応じたグリッドクラスを決定
+            const sessionCount = sessionData.length;
+            let gridClass = 'sessions-grid-8';
+            if (sessionCount === 12) gridClass = 'sessions-grid-12';
+            else if (sessionCount === 24) gridClass = 'sessions-grid-24';
+
+            const sessionBoxes = sessionData.map((session, index) => {
                 const avgError = session.pitchErrors
                     ? session.pitchErrors.reduce((sum, e) => sum + Math.abs(e.errorInCents), 0) / session.pitchErrors.length
                     : 0;
 
-                let badgeClass = '';
-                if (avgError <= 15) badgeClass = 'session-excellent';
-                else if (avgError <= 25) badgeClass = 'session-good';
-                else if (avgError <= 40) badgeClass = 'session-pass';
-                else badgeClass = 'session-practice';
+                // 評価クラスとアイコンを決定（UIカタログ準拠）
+                let badgeClass, iconName, iconColor;
+                if (avgError <= 15) {
+                    badgeClass = 'session-excellent';
+                    iconName = 'trophy';
+                    iconColor = 'text-yellow-300';
+                } else if (avgError <= 25) {
+                    badgeClass = 'session-good';
+                    iconName = 'star';
+                    iconColor = 'text-green-300';
+                } else if (avgError <= 40) {
+                    badgeClass = 'session-pass';
+                    iconName = 'thumbs-up';
+                    iconColor = 'text-blue-300';
+                } else {
+                    badgeClass = 'session-practice';
+                    iconName = 'alert-triangle';
+                    iconColor = 'text-red-300';
+                }
 
                 return `
-                    <div class="glass-card session-card ${badgeClass}">
-                        <div class="session-number">セッション ${index + 1}</div>
-                        <div class="session-base-note">${session.baseNote || 'C4'}</div>
-                        <div class="session-avg-error">±${avgError.toFixed(1)}¢</div>
+                    <div class="session-box ${badgeClass}"
+                         data-session-index="${index}"
+                         onclick="window.showSessionDetail(${index})">
+                        <div class="session-number">${index + 1}</div>
+                        <div class="session-icon">
+                            <i data-lucide="${iconName}" class="${iconColor}"></i>
+                        </div>
                     </div>
                 `;
             }).join('');
+
+            container.innerHTML = `
+                <div class="${gridClass}">
+                    ${sessionBoxes}
+                </div>
+            `;
+
+            // Lucideアイコンを初期化
+            if (typeof window.initializeLucideIcons === 'function') {
+                window.initializeLucideIcons({ immediate: true });
+            }
+        }
+
+        /**
+         * セッション詳細を表示（UIカタログパターン準拠）
+         */
+        // グローバル変数として定義（SPA再実行時の重複エラー回避）
+        if (typeof window.currentSessionIndex === 'undefined') {
+            window.currentSessionIndex = 0;
+        }
+
+        window.showSessionDetail = function(sessionIndex) {
+            // ストレージからセッションデータを取得
+            const sessionData = DataManager.getFromStorage('sessionData') || [];
+
+            console.log('📊 [showSessionDetail] 取得したセッションデータ:', sessionData);
+            console.log('📊 [showSessionDetail] セッション数:', sessionData.length);
+            console.log('📊 [showSessionDetail] 要求されたインデックス:', sessionIndex);
+
+            if (!sessionData || sessionData.length === 0) {
+                console.warn('⚠️ トレーニング履歴が見つかりません');
+                return;
+            }
+
+            if (!sessionData[sessionIndex]) {
+                console.warn(`⚠️ セッション${sessionIndex + 1}のデータが見つかりません`);
+                return;
+            }
+
+            window.currentSessionIndex = sessionIndex;
+            const session = sessionData[sessionIndex];
+
+            console.log('📊 [showSessionDetail] 選択されたセッション:', session);
+
+            // 1. .selectedクラスを更新
+            document.querySelectorAll('.session-box').forEach((box, idx) => {
+                if (idx === sessionIndex) {
+                    box.classList.add('selected');
+                } else {
+                    box.classList.remove('selected');
+                }
+            });
+
+            // 2. 平均誤差を計算
+            const avgError = session.pitchErrors
+                ? session.pitchErrors.reduce((sum, e) => sum + Math.abs(e.errorInCents), 0) / session.pitchErrors.length
+                : 0;
+
+            // 3. タイトルを更新
+            const titleSpan = document.querySelector('.detail-analysis-title span:last-child');
+            if (titleSpan) titleSpan.textContent = `セッション${sessionIndex + 1}`;
+
+            // 4. 基音を更新
+            const baseNoteEl = document.querySelector('.score-base-note');
+            if (baseNoteEl) baseNoteEl.textContent = session.baseNote || 'C4';
+
+            // 5. 精度バッジを更新
+            const badge = document.querySelector('.accuracy-badge');
+            const message = document.querySelector('.rank-grid-center p');
+            if (badge && message) {
+                badge.className = 'accuracy-badge accuracy-badge-container';
+
+                let iconName, iconColor, messageText, badgeClass;
+                if (avgError <= 15) {
+                    badgeClass = 'accuracy-badge-excellent';
+                    iconName = 'trophy';
+                    iconColor = 'text-yellow-300';
+                    messageText = '素晴らしい精度！';
+                } else if (avgError <= 25) {
+                    badgeClass = 'accuracy-badge-good';
+                    iconName = 'star';
+                    iconColor = 'text-green-300';
+                    messageText = '良好な精度！';
+                } else if (avgError <= 40) {
+                    badgeClass = 'accuracy-badge-pass';
+                    iconName = 'thumbs-up';
+                    iconColor = 'text-blue-300';
+                    messageText = '合格ライン達成！';
+                } else {
+                    badgeClass = 'accuracy-badge-practice';
+                    iconName = 'alert-triangle';
+                    iconColor = 'text-red-300';
+                    messageText = '練習を続けましょう！';
+                }
+
+                badge.classList.add(badgeClass);
+                badge.innerHTML = `
+                    <i data-lucide="${iconName}" class="${iconColor} accuracy-icon"></i>
+                    <button class="help-icon-btn help-icon-btn-positioned">
+                        <i data-lucide="help-circle" style="width: 20px !important; height: 20px !important; min-width: 20px !important; min-height: 20px !important; max-width: 20px !important; max-height: 20px !important; font-size: 20px !important;"></i>
+                    </button>
+                `;
+                message.textContent = messageText;
+            }
+
+            // 6. 平均誤差を更新
+            const avgErrorEl = document.querySelector('.score-average');
+            if (avgErrorEl) avgErrorEl.textContent = `±${avgError.toFixed(1)}¢`;
+
+            // 7. 音別詳細結果を表示
+            const container = document.getElementById('detail-note-results');
+            if (container && session.pitchErrors) {
+                const noteNames = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド'];
+                container.innerHTML = '';
+
+                session.pitchErrors.forEach((error, index) => {
+                    const absError = Math.abs(error.errorInCents);
+                    let evalIcon, evalColor;
+
+                    if (absError <= 15) {
+                        evalIcon = 'trophy';
+                        evalColor = 'text-yellow-300';
+                    } else if (absError <= 25) {
+                        evalIcon = 'star';
+                        evalColor = 'text-green-300';
+                    } else if (absError <= 40) {
+                        evalIcon = 'thumbs-up';
+                        evalColor = 'text-blue-300';
+                    } else {
+                        evalIcon = 'alert-triangle';
+                        evalColor = 'text-red-300';
+                    }
+
+                    const deviationClass = error.errorInCents >= 0 ? 'text-pitch-deviation-plus' : 'text-pitch-deviation-minus';
+
+                    const noteElement = document.createElement('div');
+                    noteElement.className = 'note-result-item';
+                    noteElement.innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div>
+                                    <div class="text-sub-title">${noteNames[index]}</div>
+                                </div>
+                                <div>
+                                    <div class="text-body">目標 ${error.expectedFrequency.toFixed(0)}Hz</div>
+                                    <div class="text-body">実音 ${error.detectedFrequency.toFixed(0)}Hz</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="${deviationClass}">${error.errorInCents >= 0 ? '+' : ''}${error.errorInCents.toFixed(1)}¢</div>
+                                <div class="flex items-center justify-center">
+                                    <i data-lucide="${evalIcon}" class="${evalColor}" style="width: 28px; height: 28px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(noteElement);
+                });
+            }
+
+            // 8. Lucideアイコンを再初期化
+            if (typeof window.initializeLucideIcons === 'function') {
+                window.initializeLucideIcons({ immediate: true });
+            }
+
+            // 9. ナビゲーションボタンの状態を更新
+            updateNavigationButtons();
+        }
+
+        /**
+         * 前のセッションに移動
+         */
+        window.navigateToPrevSession = function() {
+            if (window.currentSessionIndex > 0) {
+                window.showSessionDetail(window.currentSessionIndex - 1);
+            }
+        }
+
+        /**
+         * 次のセッションに移動
+         */
+        window.navigateToNextSession = function() {
+            const sessionData = DataManager.getFromStorage('sessionData') || [];
+
+            if (window.currentSessionIndex < sessionData.length - 1) {
+                window.showSessionDetail(window.currentSessionIndex + 1);
+            }
+        }
+
+        /**
+         * ナビゲーションボタンの有効/無効を更新
+         */
+        function updateNavigationButtons() {
+            const sessionData = DataManager.getFromStorage('sessionData') || [];
+
+            if (!sessionData || sessionData.length === 0) return;
+
+            const prevBtn = document.getElementById('prev-session-btn');
+            const nextBtn = document.getElementById('next-session-btn');
+
+            if (prevBtn) {
+                prevBtn.disabled = window.currentSessionIndex === 0;
+                prevBtn.style.opacity = window.currentSessionIndex === 0 ? '0.5' : '1';
+                prevBtn.style.cursor = window.currentSessionIndex === 0 ? 'not-allowed' : 'pointer';
+            }
+
+            if (nextBtn) {
+                nextBtn.disabled = window.currentSessionIndex >= sessionData.length - 1;
+                nextBtn.style.opacity = window.currentSessionIndex >= sessionData.length - 1 ? '0.5' : '1';
+                nextBtn.style.cursor = window.currentSessionIndex >= sessionData.length - 1 ? 'not-allowed' : 'pointer';
+            }
         }
 
         /**
          * Chart.js初期化
          */
+        // Chartインスタンスをグローバルに保存（SPA再実行時に破棄するため）
+        if (typeof window.resultsOverviewChart === 'undefined') {
+            window.resultsOverviewChart = null;
+        }
+
         function initializeCharts(sessionData) {
             const canvas = document.getElementById('error-trend-chart');
             if (!canvas) return;
+
+            // 既存のChartインスタンスがあれば破棄
+            if (window.resultsOverviewChart) {
+                window.resultsOverviewChart.destroy();
+                window.resultsOverviewChart = null;
+            }
 
             const ctx = canvas.getContext('2d');
 
@@ -662,7 +911,7 @@
                 return (sum / session.pitchErrors.length).toFixed(1);
             });
 
-            new Chart(ctx, {
+            window.resultsOverviewChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
@@ -752,13 +1001,29 @@
         window.copyShareText = function(event) {
             event.preventDefault();
             const text = getShareText() + '\n' + window.location.href;
-            
+
             navigator.clipboard.writeText(text).then(() => {
                 const btn = event.currentTarget;
                 btn.classList.add('copied');
                 setTimeout(() => btn.classList.remove('copied'), 2000);
             });
         }
+
+        // DOMContentLoaded時の初期化（直接ページアクセス時用）
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('📊 [DOMContentLoaded] results-overview初期化');
+
+            // Lucideアイコン初期化（統合初期化関数を使用）
+            if (typeof window.initializeLucideIcons === 'function') {
+                window.initializeLucideIcons({ immediate: true });
+            }
+
+            // 総合評価ページ初期化（DOMContentLoaded経由）
+            await window.initResultsOverview();
+        });
+
+        // グローバル関数が定義されたことを通知
+        console.log('✅ [results-overview] window.initResultsOverview defined');
     </script>
 </body>
 </html>

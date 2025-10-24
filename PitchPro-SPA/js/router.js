@@ -79,6 +79,23 @@ class SimpleRouter {
             // 2. アプリルートにHTMLを挿入
             this.appRoot.innerHTML = html;
 
+            // 2.5. HTMLに含まれるスクリプトを手動で実行（SPAでinnerHTMLはスクリプトを実行しないため）
+            const scriptTags = this.appRoot.querySelectorAll('script');
+            scriptTags.forEach(oldScript => {
+                const newScript = document.createElement('script');
+
+                // 属性をコピー
+                Array.from(oldScript.attributes).forEach(attr => {
+                    newScript.setAttribute(attr.name, attr.value);
+                });
+
+                // スクリプト内容をコピー
+                newScript.textContent = oldScript.textContent;
+
+                // 古いスクリプトを新しいスクリプトに置き換え（これで実行される）
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+
             // 3. DOMの更新が完了するまで待機（次のフレームまで）
             await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
@@ -313,6 +330,18 @@ class SimpleRouter {
 
     setupResultsOverviewEvents() {
         console.log('Setting up results-overview page events...');
+
+        // ページ初期化関数を実行（スクリプトロードを待つ）
+        setTimeout(() => {
+            console.log('🔍 [Router] Checking for initResultsOverview...');
+            if (typeof window.initResultsOverview === 'function') {
+                console.log('✅ [Router] initResultsOverview found, calling...');
+                window.initResultsOverview();
+            } else {
+                console.error('❌ [Router] initResultsOverview function not found');
+                console.log('🔍 [Router] window keys:', Object.keys(window).filter(k => k.includes('init')));
+            }
+        }, 300);
 
         // 新しいトレーニング開始ボタン
         const newTrainingBtn = document.getElementById('btn-new-training');
