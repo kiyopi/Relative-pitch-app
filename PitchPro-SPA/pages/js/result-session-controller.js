@@ -356,12 +356,22 @@ function updateNextSessionButton(sessionNumber) {
     buttons.forEach(button => {
         if (completedSessionsInMode >= 8) {
             // 8セッション完了時は総合評価へ
-            button.onclick = () => window.location.hash = 'results-overview';
+            button.onclick = () => {
+                // 遷移前にブラウザバック防止を解除（重要！）
+                if (window.NavigationManager) {
+                    window.NavigationManager.removeBrowserBackPrevention();
+                }
+                window.location.hash = 'results-overview';
+            };
             button.innerHTML = '<i data-lucide="trophy" style="width: 24px; height: 24px;"></i><span>総合評価を見る</span>';
             console.log('✅ 8セッション完了 - 総合評価ボタン表示');
         } else {
             // 次のセッションへ（NavigationManager統合）
             button.onclick = () => {
+                // 遷移前にブラウザバック防止を解除（重要！）
+                if (window.NavigationManager) {
+                    window.NavigationManager.removeBrowserBackPrevention();
+                }
                 NavigationManager.navigateToTraining();
             };
             button.innerHTML = '<i data-lucide="arrow-right" style="width: 24px; height: 24px;"></i><span>次の基音へ</span>';

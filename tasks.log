@@ -4967,3 +4967,15 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 13:08:53] コミット: feat: ブラウザバック防止にalert通知を追加
+
+- ブラウザバックボタンを押すとalertダイアログが表示される
+- OKを押すしか選択肢がない
+- OKを押しても戻れない（履歴スタック補充で完全無効化）
+- ページ別のメッセージ設定:
+  - training: 「トレーニング中です。ホームボタンから戻れます」
+  - result-session: 「セッション評価中です。次の基音へボタンをご利用ください」
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
