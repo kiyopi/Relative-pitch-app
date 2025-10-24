@@ -4897,3 +4897,20 @@ Date.now()を使用したタイムスタンプ方式に変更：
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 12:20:28] コミット: refactor: ReloadManagerをNavigationManagerにリネーム＆ブラウザバック防止機能統合
+
+- ReloadManager → NavigationManager にリネーム（v3.0.0）
+- ブラウザバック防止機能をNavigationManagerに統合
+- router.jsのブラウザバック防止コードを削除し、NavigationManagerに委譲
+- training/result-sessionページで自動的にブラウザバック防止が有効化
+- 全参照を更新（router.js, trainingController.v2.js, preparation-pitchpro-cycle.js, result-session-controller.js）
+- reload-manager.js削除、navigation-manager.js新規作成
+
+設計改善:
+- ナビゲーション制御を一元化（リロード検出・遷移管理・ブラウザバック防止）
+- コードの重複を削減し、保守性向上
+- ページ設定に基づく自動管理で実装漏れを防止
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

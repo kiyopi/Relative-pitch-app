@@ -30,8 +30,8 @@ class SessionDataRecorder {
             ? Math.max(...existingSessions.map(s => s.sessionId))
             : 0;
 
-        // sessionCounterが古い場合は再同期
-        if (this.sessionCounter < maxId) {
+        // sessionCounterを常にlocalStorageと同期（クリア時も対応）
+        if (this.sessionCounter !== maxId) {
             console.warn(`⚠️ sessionCounter不整合検出: 現在値=${this.sessionCounter}, localStorage最大値=${maxId}`);
             this.sessionCounter = maxId;
             console.log(`🔄 sessionCounterを再同期: ${this.sessionCounter}`);

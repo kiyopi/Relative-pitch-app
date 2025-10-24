@@ -676,7 +676,10 @@ function handleSessionComplete() {
         const completedSession = sessionRecorder.completeSession();
         console.log('✅ セッションデータ保存完了:', completedSession);
 
-        // ブラウザバック防止はrouter.jsで自動解除されます
+        // 遷移前にブラウザバック防止を解除（重要！）
+        if (window.NavigationManager) {
+            window.NavigationManager.removeBrowserBackPrevention();
+        }
 
         // セッション結果ページへ遷移（SPAのハッシュルーティング）
         // ランダムモード: 8セッション完了時に「総合評価を見る」ボタンが表示される
