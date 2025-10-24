@@ -347,6 +347,110 @@ function preventBrowserBack() {
 
 ブラウザの戻るボタンに依存せず、アプリ内のナビゲーションボタンで遷移を促す。
 
+### 6.5 ホームボタンの仕様
+
+**基本方針**: トレーニング中のホームボタンも、ブラウザバックと同様に確認ダイアログを表示する。
+
+#### 現在の実装（問題あり）
+
+**training.html (Line 146)**:
+```html
+<button class="btn btn-outline" onclick="window.location.hash='home'">
+    <i data-lucide="home"></i>
+    <span>ホームに戻る</span>
+</button>
+```
+
+**問題点**:
+- ❌ 確認ダイアログなし（トレーニング中のデータが失われる）
+- ❌ HTMLに onclick 記述（JS分離原則違反）
+- ❌ ブラウザバック防止と一貫性がない
+
+#### 修正後の仕様
+
+**対象ページ**:
+
+| ページ | ホームボタン | 確認ダイアログ | 理由 |
+|--------|----------|------------|------|
+| **training** | ✅ あり | ✅ 必須 | トレーニング中断によるデータ損失防止 |
+| **result-session** | ❌ なし | - | 「次のセッションへ」のみ表示 |
+| **results-overview** | ✅ あり | ❌ 不要 | 総合評価表示完了後は自由に離脱可能 |
+| preparation | ✅ あり | ❌ 不要 | 音域テストは中断可能 |
+
+#### 実装方法
+
+**HTML修正**（onclick削除）:
+```html
+<!-- training.html -->
+<button class="btn btn-outline" id="btn-home-training">
+    <i data-lucide="home"></i>
+    <span>ホームに戻る</span>
+</button>
+```
+
+**JavaScript実装**（trainingController.v2.js）:
+```javascript
+// ホームボタンのイベントハンドラー
+function setupHomeButton() {
+    const homeBtn = document.getElementById('btn-home-training');
+    if (!homeBtn) return;
+
+    homeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        const confirmed = confirm(
+            'トレーニング中です。\n' +
+            'ホームに戻ると進行中のデータが失われます。\n' +
+            '本当にホームに戻りますか？'
+        );
+
+        if (confirmed) {
+            // router.js の cleanupCurrentPage() が自動実行される
+            window.location.hash = 'home';
+        }
+    });
+}
+
+// initializeTrainingPage() 内で呼び出し
+export async function initializeTrainingPage() {
+    // ... 既存の初期化処理 ...
+
+    setupHomeButton();  // ホームボタン初期化
+    preventBrowserBack();  // ブラウザバック防止
+}
+```
+
+#### 確認メッセージ
+
+| ボタン | メッセージ |
+|--------|----------|
+| training ホームボタン | 「トレーニング中です。ホームに戻ると進行中のデータが失われます。本当にホームに戻りますか？」 |
+| result-session ホームボタン | （ボタン非表示） |
+| results-overview ホームボタン | （確認なし、そのまま遷移） |
+
+#### クリーンアップ処理
+
+ホームボタンクリック時は、`router.js` の `cleanupCurrentPage()` が自動実行される：
+
+1. **hashchange イベント発火**: `window.location.hash = 'home'`
+2. **router.handleRouteChange() 呼び出し**
+3. **cleanupCurrentPage() 自動実行**:
+   - AudioDetector 停止
+   - MediaStream 解放
+   - PitchShifter 解放
+   - SessionRecorder 処理（未完了セッションの警告）
+
+**重要**: ホームボタンでは追加のクリーンアップ処理は不要。router.js が自動的に処理する。
+
+#### ブラウザバックとの一貫性
+
+| 操作 | 確認ダイアログ | クリーンアップ | メッセージ内容 |
+|------|------------|------------|------------|
+| ブラウザバック | ✅ あり | ✅ あり | 「戻ると進行中のデータが失われます」 |
+| ホームボタン | ✅ あり | ✅ あり | 「ホームに戻ると進行中のデータが失われます」 |
+
+両方とも同じレベルの警告で、ユーザー体験の一貫性を保つ。
+
 ---
 
 ## 7. 次のステップ
@@ -362,6 +466,7 @@ function preventBrowserBack() {
 2. **preselectBaseNote() を常に実行**: 基音選択は毎回必須
 3. **handleSessionComplete() にモード別処理**: hasIndividualResults による分岐
 4. **ブラウザバック防止を実装**: preventBrowserBack() 関数の追加
+5. **ホームボタンに確認ダイアログを追加**: setupHomeButton() 関数の実装
 
 ### 7.3 localStorage クリアの統一
 
@@ -372,6 +477,12 @@ function preventBrowserBack() {
 
 1. **result-session-controller.js**: ブラウザバック防止を実装
 2. **results-overview**: ブラウザバック防止を実装
+
+### 7.5 HTMLファイルの修正
+
+1. **training.html**: ホームボタンの onclick 削除、id="btn-home-training" 追加
+2. **result-session.html**: ホームボタンを非表示（または削除）
+3. **results-overview.html**: ホームボタンは onclick のまま（確認不要）
 
 ---
 
