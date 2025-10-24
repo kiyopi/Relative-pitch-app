@@ -77,18 +77,24 @@ class EvaluationCalculator {
         level: '中級',
         target: '実用的相対音感レベル'
       },
-      24: {
-        mode: 'chromatic',
+      '12tone': {
+        mode: '12tone',
         name: '12音階モード',
         level: '上級',
         target: 'プロフェッショナルレベル'
       }
     };
 
-    // 最も近いモードを選択
+    // セッションデータからモード情報を取得して優先判定
+    const firstSession = sessionData[0];
+    if (firstSession && firstSession.mode === '12tone') {
+      return { ...modeMap['12tone'], actualSessions: sessionCount };
+    }
+
+    // 最も近いモードを選択（フォールバック）
     if (sessionCount <= 8) return { ...modeMap[8], actualSessions: sessionCount };
     if (sessionCount <= 12) return { ...modeMap[12], actualSessions: sessionCount };
-    return { ...modeMap[24], actualSessions: sessionCount };
+    return { ...modeMap['12tone'], actualSessions: sessionCount };
   }
 
   /**

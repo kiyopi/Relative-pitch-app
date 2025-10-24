@@ -33,7 +33,7 @@ function showRedirectMessage(info) {
     const modeNames = {
         'random': 'ランダム基音トレーニング',
         'continuous': '連続チャレンジモード',
-        'chromatic': '12音階モード'
+        '12tone': '12音階モード'
     };
     const modeName = modeNames[info.mode] || 'トレーニング';
 

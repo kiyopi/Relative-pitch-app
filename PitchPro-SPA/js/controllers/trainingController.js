@@ -35,7 +35,7 @@ const modeConfig = {
         baseNoteSelection: 'random_c3_octave'
     },
     continuous: {
-        maxSessions: 8,
+        maxSessions: 12,
         title: '連続チャレンジモード',
         hasIndividualResults: false,
         baseNoteSelection: 'random_chromatic'

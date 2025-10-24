@@ -5293,3 +5293,22 @@ jsdelivrの利点:
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 22:59:56] コミット: fix: Lucideアイコン表示問題を完全解決（Safari互換性・バージョン管理）
+
+- Lucideバージョンをv0.263.0に固定（Safari strict mode互換性確保）
+- アイコン名をv0.263.0互換に一括置換（triangle-alert→alert-triangle等）
+- Safari互換性エラーハンドリング強化（lucide-init.js）
+- CLAUDE.mdに完全なLucideアイコン運用ガイドライン追加
+- LUCIDE_ICON_GUIDELINES.mdにバージョン管理セクション追加
+- SPA関連仕様書5件をPitchPro-SPA/specifications/へ移動・集約
+- PitchPro-SPA/specifications/README.mdをv2.0.0に更新
+
+修正内容:
+- index.html: unpkg v0.263.0 CDN固定
+- 全HTMLファイル: アイコン名置換（4パターン）
+- lucide-init.js: Safari互換性エラー捕捉・継続処理
+- 仕様書整理: SPA専用仕様書の一元管理開始
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
