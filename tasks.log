@@ -4957,3 +4957,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 13:01:05] コミット: fix: ブラウザバック防止を確認ダイアログなしの完全無効化に変更
+
+- NavigationManager: confirm()ダイアログを削除
+- popstateハンドラーで常にhistory.pushState()を実行
+- ブラウザバックボタンを押しても何も起こらなくなる
+- training/result-sessionページで適用
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

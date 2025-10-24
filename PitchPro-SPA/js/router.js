@@ -18,10 +18,12 @@ class SimpleRouter {
         // ページ設定：ブラウザバック防止が必要なページを定義
         this.pageConfig = {
             'training': {
-                preventBackNavigation: true
+                preventBackNavigation: true,
+                backPreventionMessage: 'トレーニング中です。\n\nブラウザバックは無効になっています。\nホームボタンからトップページに戻れます。'
             },
             'result-session': {
-                preventBackNavigation: true
+                preventBackNavigation: true,
+                backPreventionMessage: 'セッション評価中です。\n\nブラウザバックは無効になっています。\n「次の基音へ」ボタンまたはホームボタンをご利用ください。'
             }
         };
 
@@ -436,9 +438,9 @@ class SimpleRouter {
             return;
         }
 
-        // NavigationManagerに委譲（ダイアログなし）
+        // NavigationManagerに委譲（通知メッセージあり）
         if (window.NavigationManager) {
-            window.NavigationManager.preventBrowserBack(page);
+            window.NavigationManager.preventBrowserBack(page, config.backPreventionMessage);
         }
     }
 
