@@ -68,13 +68,26 @@ function showRedirectMessage(info) {
 export async function initializePreparationPage() {
     console.log('🚀 PreparationController initializing (SPA version)...');
 
+    // 【デバッグ】現在のURL確認
+    console.log('🔍 [DEBUG] hash:', window.location.hash);
+
     // 【新規追加】リダイレクト情報を取得
     const redirectInfo = getRedirectInfo();
-    if (redirectInfo) {
+    console.log('🔍 [DEBUG] redirectInfo:', redirectInfo);
+
+    if (redirectInfo && redirectInfo.mode) {
         console.log(`📍 リダイレクト先: ${redirectInfo.redirect}?mode=${redirectInfo.mode}&session=${redirectInfo.session || 'なし'}`);
         showRedirectMessage(redirectInfo);
         // グローバル変数に保存（音域テスト完了時に使用）
         window.preparationRedirectInfo = redirectInfo;
+        console.log('✅ [DEBUG] モード情報を保存:', window.preparationRedirectInfo);
+    } else {
+        console.warn('⚠️ [DEBUG] モード情報なし - URLパラメータを確認してください');
+        console.warn('⚠️ [DEBUG] URLにmode=continuous等のパラメータが必要です');
+        // モード情報がない場合はエラー（デフォルト設定しない）
+        alert('モード選択エラー：ホームページからモードを選択してください。');
+        window.location.hash = 'home';
+        return;
     }
 
     // 正規版の初期化関数を呼び出す

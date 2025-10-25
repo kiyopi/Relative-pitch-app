@@ -35,7 +35,7 @@ const modeConfig = {
         baseNoteSelection: 'random_c3_octave'
     },
     continuous: {
-        maxSessions: 8,
+        maxSessions: 12,
         title: '連続チャレンジモード',
         hasIndividualResults: false,
         baseNoteSelection: 'random_chromatic'
@@ -51,6 +51,25 @@ const modeConfig = {
 
 export async function initializeTrainingPage() {
     console.log('TrainingController initializing...');
+
+    // 【デバッグ】現在のURL確認
+    console.log('🔍 [DEBUG] hash:', window.location.hash);
+
+    // 【新規追加】URLパラメータからモード情報を取得
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash.split('?')[1] || '');
+    const modeParam = params.get('mode');
+
+    console.log('🔍 [DEBUG] modeパラメータ:', modeParam);
+
+    if (modeParam && modeConfig[modeParam]) {
+        currentMode = modeParam;
+        console.log(`✅ モード設定: ${currentMode} (${modeConfig[currentMode].title})`);
+    } else {
+        console.warn(`⚠️ モードパラメータ不正: ${modeParam} - デフォルト(random)を使用`);
+        console.warn(`🔍 [DEBUG] 利用可能なモード:`, Object.keys(modeConfig));
+        currentMode = 'random';
+    }
 
     // 【NavigationManager統合】リロード検出 → preparationへリダイレクト
     if (NavigationManager.detectReload()) {
@@ -80,16 +99,20 @@ export async function initializeTrainingPage() {
         return;
     }
 
-    // 基音選択（毎回必須）
-    // SessionDataRecorderが自動的にsessionCounterを管理するため、
-    // セッション継続判定は不要。基音は毎回選択する。
-    preselectBaseNote();
+    // 【重要】モード別初期化処理を先に実行
+    initializeModeTraining();
 
-    // Initialize mode UI（リセット後に実行）
+    // Initialize mode UI（初期化後に実行）
     initializeModeUI();
 
     // Update session progress UI
     updateSessionProgressUI();
+
+    // 【ハイブリッド方式】ページ離脱警告を有効化（タブを閉じる・リロード対策）
+    if (window.NavigationManager) {
+        window.NavigationManager.enableNavigationWarning();
+        console.log('✅ ページ離脱警告を有効化（タブを閉じる・リロード対策）');
+    }
 
     // Setup button (常に再登録)
     const playButton = document.getElementById('play-base-note');
@@ -171,7 +194,10 @@ function initializeModeUI() {
     // ページサブタイトルを更新
     const pageSubtitle = document.querySelector('.page-subtitle');
     if (pageSubtitle) {
-        const sessionCounter = window.sessionDataRecorder ? window.sessionDataRecorder.getSessionNumber() : 0;
+        // 【修正】現在のモードのセッション数を正しく計算
+        const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+        const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
+        const sessionCounter = currentModeSessions.length;
         const currentSession = sessionCounter + 1;
         pageSubtitle.textContent = `セッション ${currentSession}/${config.maxSessions} 実施中`;
     }
@@ -181,26 +207,48 @@ function initializeModeUI() {
 }
 
 /**
- * ランダムモード新規開始処理（統合初期化）
- * - sessionCounterを0にリセット
- * - 前回の基音をクリア
- * - 基音を事前選択
+ * モード別初期化処理
+ * - ランダムモード：セッションデータをクリアして0から開始
+ * - 連続モード・12音階モード：既存セッションデータを保持して継続
  */
-function initializeRandomModeTraining() {
-    console.log('🆕 ランダムモード新規開始処理を実行');
+function initializeModeTraining() {
+    const config = modeConfig[currentMode];
+    console.log(`🆕 ${config.title}の初期化処理を実行`);
 
-    // localStorageクリアは preparation-pitchpro-cycle.js に統一されました
+    if (currentMode === 'random') {
+        // ランダムモード：毎回リセット（個別セッション評価のため）
+        const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+        const otherModeSessions = allSessions.filter(s => s.mode !== 'random');
+        localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
+        console.log('🗑️ ランダムモードのセッションデータをクリア');
 
-    // sessionDataRecorder のリセット（currentSession のみ）
-    // sessionCounterはSessionDataRecorderが自動管理するため、直接操作しない
-    if (window.sessionDataRecorder) {
-        window.sessionDataRecorder.currentSession = null;
-        console.log('🔄 currentSession をクリア');
+        // sessionCounterを0にリセット
+        if (window.sessionDataRecorder) {
+            window.sessionDataRecorder.currentSession = null;
+            window.sessionDataRecorder.sessionCounter = 0;
+            console.log('🔄 sessionCounterリセット: 0');
+        }
+
+        // 前回の基音をクリア
+        previousBaseNote = null;
+        console.log('🔄 previousBaseNoteリセット');
+    } else {
+        // 連続チャレンジモード・12音階モード：常にセッションデータをクリアして最初から開始
+        console.log('🔄 連続/12音階モード：セッションデータをクリアして最初から開始');
+
+        // 現在のモードのセッションデータを削除
+        const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+        const otherModeSessions = allSessions.filter(s => s.mode !== currentMode);
+        localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
+
+        // sessionCounterを0にリセット
+        if (window.sessionDataRecorder) {
+            window.sessionDataRecorder.currentSession = null;
+            window.sessionDataRecorder.sessionCounter = 0;
+        }
+        previousBaseNote = null;
+        console.log('✅ sessionCounter・previousBaseNoteリセット完了');
     }
-
-    // 前回の基音をクリア（中級モード用）
-    previousBaseNote = null;
-    console.log('🔄 previousBaseNoteリセット');
 
     // 基音を事前に選択（ボタンクリック時の遅延を回避）
     preselectBaseNote();
@@ -211,7 +259,12 @@ function initializeRandomModeTraining() {
  */
 function preselectBaseNote() {
     const config = modeConfig[currentMode];
-    const sessionCounter = window.sessionDataRecorder ? window.sessionDataRecorder.getSessionNumber() : 0;
+
+    // 【修正】現在のモードのセッション数を正しく計算
+    const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+    const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
+    const sessionCounter = currentModeSessions.length;
+
     const selectedNote = selectBaseNote(config.baseNoteSelection, sessionCounter);
 
     baseNoteInfo = selectedNote;
@@ -681,16 +734,80 @@ function handleSessionComplete() {
         const completedSession = sessionRecorder.completeSession();
         console.log('✅ セッションデータ保存完了:', completedSession);
 
-        // 遷移前にブラウザバック防止を解除（重要！）
-        if (window.NavigationManager) {
-            window.NavigationManager.removeBrowserBackPrevention();
-        }
+        // 【修正】現在のモードのセッション数を正しく計算
+        const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+        const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
+        const sessionNumber = currentModeSessions.length;
+        console.log(`🔍 [DEBUG] モード別セッション数: ${currentMode}モード=${sessionNumber}セッション (全体=${allSessions.length}セッション)`);
 
-        // セッション結果ページへ遷移（SPAのハッシュルーティング）
-        // ランダムモード: 8セッション完了時に「総合評価を見る」ボタンが表示される
-        const sessionNumber = sessionRecorder.getSessionNumber();
-        window.location.hash = `result-session?session=${sessionNumber}`;
-        return;
+        const config = modeConfig[currentMode];
+
+        // モード別の処理分岐
+        if (config.hasIndividualResults) {
+            // ランダムモード：個別セッション結果ページへ遷移
+            console.log(`📊 ランダムモード：セッション${sessionNumber}の結果ページへ遷移`);
+
+            // 【ハイブリッド方式】安全な遷移を使用
+            if (window.NavigationManager) {
+                window.NavigationManager.safeNavigate(`result-session?session=${sessionNumber}`);
+            } else {
+                window.location.hash = `result-session?session=${sessionNumber}`;
+            }
+            return;
+        } else {
+            // 連続チャレンジモード・12音階モード：自動継続または総合評価へ
+            if (sessionNumber < config.maxSessions) {
+                // 次のセッションへ自動継続
+                console.log(`🔄 セッション${sessionNumber}完了 → セッション${sessionNumber + 1}へ自動継続（2秒後）`);
+
+                const statusText = document.getElementById('training-status');
+                const playButton = document.getElementById('play-base-note');
+
+                if (statusText) {
+                    statusText.textContent = `セッション${sessionNumber}完了！次のセッションを準備中...`;
+                }
+
+                if (playButton) {
+                    playButton.innerHTML = '<i data-lucide="loader" style="width: 24px; height: 24px;"></i><span>準備中...</span>';
+                    playButton.disabled = true;
+                    playButton.classList.add('btn-disabled');
+                    lucide.createIcons();
+                }
+
+                // UIをリセット
+                const circles = document.querySelectorAll('.note-circle');
+                circles.forEach(circle => {
+                    circle.classList.remove('current', 'completed');
+                });
+
+                // セッション進行状況UIを更新
+                updateSessionProgressUI();
+
+                // 2秒後に次のセッションを自動開始
+                setTimeout(() => {
+                    console.log(`🎵 セッション${sessionNumber + 1}開始`);
+
+                    // 次のセッションのために基音を事前選択
+                    preselectBaseNote();
+
+                    // トレーニング開始
+                    startTraining();
+                }, 2000);
+
+                return;
+            } else {
+                // 全セッション完了：総合評価ページへ遷移
+                console.log(`✅ 全${config.maxSessions}セッション完了！総合評価ページへ遷移`);
+
+                // 【ハイブリッド方式】安全な遷移を使用
+                if (window.NavigationManager) {
+                    window.NavigationManager.safeNavigate(`results-overview?mode=${currentMode}`);
+                } else {
+                    window.location.hash = `results-overview?mode=${currentMode}`;
+                }
+                return;
+            }
+        }
     }
 
     // sessionRecorderがない場合のフォールバック（開発中）
@@ -745,8 +862,10 @@ window.resetTrainingPageFlag = resetTrainingPageFlag;
  * セッション進行状況UIを更新
  */
 function updateSessionProgressUI() {
-    // セッションカウンターを取得
-    const sessionCounter = window.sessionDataRecorder ? window.sessionDataRecorder.getSessionNumber() : 0;
+    // 【修正】現在のモードのセッション数を正しく計算
+    const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+    const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
+    const sessionCounter = currentModeSessions.length;
     const currentSession = sessionCounter + 1; // 次のセッション番号
     const config = modeConfig[currentMode];
     const totalSessions = config.maxSessions;
@@ -764,6 +883,13 @@ function updateSessionProgressUI() {
     const sessionBadge = document.querySelector('.session-badge');
     if (sessionBadge) {
         sessionBadge.textContent = `セッション ${currentSession}/${totalSessions}`;
+    }
+
+    // 【追加】ページサブタイトルを更新
+    const pageSubtitle = document.querySelector('.page-subtitle');
+    if (pageSubtitle) {
+        pageSubtitle.textContent = `セッション ${currentSession}/${totalSessions} 実施中`;
+        console.log(`✅ サブタイトル更新: セッション ${currentSession}/${totalSessions} 実施中`);
     }
 }
 

@@ -377,15 +377,29 @@
             console.log('📊 総合評価ページ初期化開始');
 
             // DataManagerから全セッションデータを取得
-            const sessionData = loadAllSessionData();
+            const allSessionData = loadAllSessionData();
 
-            if (!sessionData || sessionData.length === 0) {
+            if (!allSessionData || allSessionData.length === 0) {
                 console.warn('⚠️ セッションデータが見つかりません。ダミーデータを表示します。');
                 showDummyOverview();
                 return;
             }
 
-            console.log('✅ セッションデータ取得:', sessionData);
+            // 【修正】URLパラメータからモードを取得
+            const hash = window.location.hash.substring(1);
+            const params = new URLSearchParams(hash.split('?')[1] || '');
+            const currentMode = params.get('mode') || 'random';
+            console.log(`🔍 [DEBUG] 現在のモード: ${currentMode}`);
+
+            // 【修正】現在のモードのセッションのみフィルタリング
+            const sessionData = allSessionData.filter(s => s.mode === currentMode);
+            console.log(`✅ セッションデータ取得: ${currentMode}モード=${sessionData.length}セッション (全体=${allSessionData.length}セッション)`);
+
+            if (sessionData.length === 0) {
+                console.warn(`⚠️ ${currentMode}モードのセッションデータが見つかりません。`);
+                showDummyOverview();
+                return;
+            }
 
             // 動的グレード計算
             const evaluation = window.EvaluationCalculator.calculateDynamicGrade(sessionData);

@@ -1252,24 +1252,29 @@ function setupMicPermissionFlow() {
                 // PitchProリソースのクリーンアップ（統合管理）
                 await pitchProCycleManager.cleanupPitchPro();
 
-                // 【localStorage統合】トレーニング開始時にセッションデータをクリア
-                const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+                // 【localStorage統合】トレーニング開始時にセッションデータをクリア（ランダムモードのみ）
                 const redirectInfo = window.preparationRedirectInfo;
                 const mode = redirectInfo?.mode || 'random';
 
-                console.log(`🔍 [localStorage] クリア前のセッション数: ${allSessions.length}`);
-                console.log(`🔍 [localStorage] 対象モード: ${mode}`);
-                console.log(`🔍 [localStorage] 既存セッションのmode:`, allSessions.map(s => s.mode));
+                if (mode === 'random') {
+                    // ランダムモード：毎回セッションデータをクリア
+                    const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+                    console.log(`🔍 [localStorage] クリア前のセッション数: ${allSessions.length}`);
+                    console.log(`🔍 [localStorage] 対象モード: ${mode}`);
 
-                const otherModeSessions = allSessions.filter(s => s.mode !== mode);
-                localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
+                    const otherModeSessions = allSessions.filter(s => s.mode !== mode);
+                    localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
 
-                console.log(`✅ ${mode}モードのセッションデータをクリアしました`);
-                console.log(`🔍 [localStorage] クリア後のセッション数: ${otherModeSessions.length}`);
+                    console.log(`✅ ${mode}モードのセッションデータをクリアしました`);
+                    console.log(`🔍 [localStorage] クリア後のセッション数: ${otherModeSessions.length}`);
 
-                // SessionDataRecorderをlocalStorageと同期（重要！）
-                if (window.sessionDataRecorder) {
-                    window.sessionDataRecorder.resetSession();
+                    // SessionDataRecorderをlocalStorageと同期（重要！）
+                    if (window.sessionDataRecorder) {
+                        window.sessionDataRecorder.resetSession();
+                    }
+                } else {
+                    // 連続チャレンジモード・12音階モード：セッションデータを保持
+                    console.log(`✅ ${mode}モード：セッションデータを保持（クリアしない）`);
                 }
 
                 // 遷移前にブラウザバック防止を解除（重要！）
@@ -1281,15 +1286,16 @@ function setupMicPermissionFlow() {
                     console.error('❌ NavigationManagerが見つかりません');
                 }
 
-                // 【NavigationManager統合】リダイレクト情報がある場合、モード情報を保持して遷移
-                if (redirectInfo && redirectInfo.redirect === 'training') {
-                    console.log(`📍 モード情報を保持して遷移: mode=${redirectInfo.mode}, session=${redirectInfo.session || 'なし'}`);
-                    NavigationManager.navigateToTraining(redirectInfo.mode, redirectInfo.session);
-                } else {
-                    // SPAのtraining画面へ遷移（通常フロー）
-                    console.log('🚀 SPAのtraining画面に遷移中...');
-                    NavigationManager.navigateToTraining();
-                }
+                // 【NavigationManager統合】モード情報を保持して遷移
+                console.log('🔍 [DEBUG] window.preparationRedirectInfo:', window.preparationRedirectInfo);
+                console.log('🔍 [DEBUG] redirectInfo:', redirectInfo);
+
+                // モード情報を確実に取得（優先順位: redirectInfo > window.preparationRedirectInfo）
+                const finalMode = redirectInfo?.mode || window.preparationRedirectInfo?.mode || 'random';
+                const finalSession = redirectInfo?.session || window.preparationRedirectInfo?.session || null;
+
+                console.log(`📍 モード情報を保持して遷移: mode=${finalMode}, session=${finalSession || 'なし'}`);
+                NavigationManager.navigateToTraining(finalMode, finalSession);
 
             } catch (error) {
                 console.error('❌ トレーニング開始処理エラー:', error);
@@ -1484,24 +1490,29 @@ function setupMicPermissionFlow() {
             // PitchProリソースのクリーンアップ
             await pitchProCycleManager.cleanupPitchPro();
 
-            // 【localStorage統合】トレーニング開始時にセッションデータをクリア
-            const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+            // 【localStorage統合】トレーニング開始時にセッションデータをクリア（ランダムモードのみ）
             const redirectInfo = window.preparationRedirectInfo;
             const mode = redirectInfo?.mode || 'random';
 
-            console.log(`🔍 [localStorage] クリア前のセッション数: ${allSessions.length}`);
-            console.log(`🔍 [localStorage] 対象モード: ${mode}`);
-            console.log(`🔍 [localStorage] 既存セッションのmode:`, allSessions.map(s => s.mode));
+            if (mode === 'random') {
+                // ランダムモード：毎回セッションデータをクリア
+                const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+                console.log(`🔍 [localStorage] クリア前のセッション数: ${allSessions.length}`);
+                console.log(`🔍 [localStorage] 対象モード: ${mode}`);
 
-            const otherModeSessions = allSessions.filter(s => s.mode !== mode);
-            localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
+                const otherModeSessions = allSessions.filter(s => s.mode !== mode);
+                localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
 
-            console.log(`✅ ${mode}モードのセッションデータをクリアしました`);
-            console.log(`🔍 [localStorage] クリア後のセッション数: ${otherModeSessions.length}`);
+                console.log(`✅ ${mode}モードのセッションデータをクリアしました`);
+                console.log(`🔍 [localStorage] クリア後のセッション数: ${otherModeSessions.length}`);
 
-            // SessionDataRecorderをlocalStorageと同期（重要！）
-            if (window.sessionDataRecorder) {
-                window.sessionDataRecorder.resetSession();
+                // SessionDataRecorderをlocalStorageと同期（重要！）
+                if (window.sessionDataRecorder) {
+                    window.sessionDataRecorder.resetSession();
+                }
+            } else {
+                // 連続チャレンジモード・12音階モード：セッションデータを保持
+                console.log(`✅ ${mode}モード：セッションデータを保持（クリアしない）`);
             }
 
             // 遷移前にブラウザバック防止を解除（重要！）
@@ -1513,15 +1524,16 @@ function setupMicPermissionFlow() {
                 console.error('❌ NavigationManagerが見つかりません');
             }
 
-            // 【NavigationManager統合】リダイレクト情報がある場合、モード情報を保持して遷移
-            if (redirectInfo && redirectInfo.redirect === 'training') {
-                console.log(`📍 モード情報を保持して遷移: mode=${redirectInfo.mode}, session=${redirectInfo.session || 'なし'}`);
-                NavigationManager.navigateToTraining(redirectInfo.mode, redirectInfo.session);
-            } else {
-                // SPAのtraining画面へ遷移（通常フロー）
-                console.log('🚀 SPAのtraining画面に遷移中...');
-                NavigationManager.navigateToTraining();
-            }
+            // 【NavigationManager統合】モード情報を保持して遷移
+            console.log('🔍 [DEBUG] window.preparationRedirectInfo:', window.preparationRedirectInfo);
+            console.log('🔍 [DEBUG] redirectInfo:', redirectInfo);
+
+            // モード情報を確実に取得（優先順位: redirectInfo > window.preparationRedirectInfo）
+            const finalMode = redirectInfo?.mode || window.preparationRedirectInfo?.mode || 'random';
+            const finalSession = redirectInfo?.session || window.preparationRedirectInfo?.session || null;
+
+            console.log(`📍 モード情報を保持して遷移: mode=${finalMode}, session=${finalSession || 'なし'}`);
+            NavigationManager.navigateToTraining(finalMode, finalSession);
         });
     }
 

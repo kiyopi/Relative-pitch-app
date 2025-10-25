@@ -170,6 +170,8 @@ class NavigationManager {
      * @param {string|null} session - セッション番号（省略可）
      */
     static navigateToTraining(mode = null, session = null) {
+        console.log(`🚀 [NavigationManager] trainingへ遷移: mode=${mode || 'なし'}, session=${session || 'なし'}`);
+
         // 正常な遷移フラグを自動設定
         this.setNormalTransition();
 
@@ -177,11 +179,11 @@ class NavigationManager {
         if (mode) {
             const params = new URLSearchParams({ mode });
             if (session) params.set('session', session);
-            window.location.hash = `training?${params.toString()}`;
-            console.log(`🚀 [NavigationManager] trainingへ遷移: mode=${mode}, session=${session || 'なし'}`);
+            const targetHash = `training?${params.toString()}`;
+            console.log('🔍 [DEBUG] targetHash:', targetHash);
+            window.location.hash = targetHash;
         } else {
             window.location.hash = 'training';
-            console.log('🚀 [NavigationManager] trainingへ遷移（パラメータなし）');
         }
     }
 
@@ -199,8 +201,71 @@ class NavigationManager {
     }
 
     // ==========================================
-    // ブラウザバック防止機能（v3.0.0で追加）
+    // ページ離脱警告（beforeunload）
     // ==========================================
+
+    /**
+     * beforeunloadハンドラー
+     */
+    static beforeUnloadHandler = null;
+
+    /**
+     * ページ離脱警告を有効化（タブを閉じる・リロード対策）
+     */
+    static enableNavigationWarning() {
+        this.beforeUnloadHandler = (e) => {
+            e.preventDefault();
+            e.returnValue = ''; // ブラウザ標準の警告メッセージ
+            return '';
+        };
+        window.addEventListener('beforeunload', this.beforeUnloadHandler);
+        console.log('✅ [NavigationManager] ページ離脱警告を有効化');
+    }
+
+    /**
+     * ページ離脱警告を無効化
+     */
+    static disableNavigationWarning() {
+        if (this.beforeUnloadHandler) {
+            window.removeEventListener('beforeunload', this.beforeUnloadHandler);
+            this.beforeUnloadHandler = null;
+            console.log('✅ [NavigationManager] ページ離脱警告を無効化');
+        }
+    }
+
+    /**
+     * 安全な遷移メソッド
+     * beforeunloadとpopstateの両方を無効化してから遷移
+     *
+     * @param {string} hash - 遷移先のハッシュ
+     */
+    static safeNavigate(hash) {
+        console.log(`🔒 [NavigationManager] 安全な遷移開始: ${hash}`);
+
+        // 1. beforeunloadを無効化
+        this.disableNavigationWarning();
+
+        // 2. popstateハンドラーを削除
+        this.removeBrowserBackPrevention();
+
+        // 3. 遷移（ダイアログが出ない）
+        window.location.hash = hash;
+        console.log(`✅ [NavigationManager] 遷移完了: ${hash}`);
+    }
+
+    // ==========================================
+    // ブラウザバック防止機能（v3.0.0で追加、v4.0.0で改善）
+    // ==========================================
+
+    /**
+     * 許可された遷移先のマップ（ダイアログを表示しない遷移）
+     */
+    static allowedTransitions = new Map([
+        ['training', ['result-session', 'results-overview', 'home']],
+        ['result-session', ['training', 'results', 'results-overview', 'home']],
+        ['results', ['home', 'preparation']],
+        ['results-overview', ['home', 'preparation']]
+    ]);
 
     /**
      * ブラウザバック防止が必要なページの設定
@@ -255,9 +320,19 @@ class NavigationManager {
         console.log(`📍 [NavigationManager] ブラウザバック防止: ダミーエントリー追加×2 (${page})`);
         console.log(`📝 [NavigationManager] 通知メッセージ: ${message}`);
 
-        // popstateハンドラーを定義（ダイアログ通知 + 完全禁止）
+        // popstateハンドラーを定義（許可リスト対応 + ダイアログ通知）
         this.popStateHandler = () => {
-            // ユーザーに通知（OKを押すしか選択肢なし）
+            const newHash = window.location.hash.substring(1);
+            const newPage = newHash.split('?')[0];
+
+            // 許可された遷移先ならダイアログを表示しない
+            const allowedPages = this.allowedTransitions.get(page) || [];
+            if (allowedPages.includes(newPage)) {
+                console.log(`✅ [NavigationManager] 許可された遷移: ${page} → ${newPage}`);
+                return; // ダイアログを表示せずに遷移を許可
+            }
+
+            // 意図しないブラウザバックのみダイアログ表示
             alert(message);
 
             // OKを押した後にダミーエントリーを複数再追加して履歴スタックを補充
