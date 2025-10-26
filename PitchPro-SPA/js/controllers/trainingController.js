@@ -494,6 +494,18 @@ async function startTraining() {
         console.log(`   基音: ${baseNoteInfo.note} (${baseNoteInfo.frequency.toFixed(1)}Hz)`);
         console.log('');
 
+        // 【追加】基音再生前にマイクを停止（もし動作していれば）
+        if (audioDetector) {
+            console.log('🎤 基音再生前にマイク停止');
+            try {
+                audioDetector.stopDetection();
+                audioDetector.destroy();
+                audioDetector = null;
+            } catch (error) {
+                console.warn('⚠️ マイク停止エラー（無視して続行）:', error);
+            }
+        }
+
         await pitchShifter.playNote(baseNoteInfo.note, 2);
 
         // セッションデータ記録開始
@@ -568,6 +580,7 @@ async function startDoremiGuide() {
     }
 
     console.log('🎵 ドレミガイド開始');
+    console.log('🎤 マイクをオンにします');
 
     // AudioDetectionComponent初期化（ブラウザが許可を記憶しているため2回目以降はダイアログ不要）
     try {
@@ -601,7 +614,7 @@ async function startDoremiGuide() {
 
         // 音声検出開始
         await audioDetector.startDetection();
-        console.log('✅ 音声検出開始');
+        console.log('✅ マイクオン完了 - 音声検出開始');
 
     } catch (error) {
         console.error('❌ AudioDetectionComponent初期化失敗:', error);
