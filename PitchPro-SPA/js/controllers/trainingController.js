@@ -778,7 +778,7 @@ function handleSessionComplete() {
             // 連続チャレンジモード・12音階モード：自動継続または総合評価へ
             if (sessionNumber < config.maxSessions) {
                 // 次のセッションへ自動継続
-                console.log(`🔄 セッション${sessionNumber}完了 → セッション${sessionNumber + 1}へ自動継続（2秒後）`);
+                console.log(`🔄 セッション${sessionNumber}完了 → セッション${sessionNumber + 1}へ自動継続（1秒後）`);
 
                 const statusText = document.getElementById('training-status');
                 const playButton = document.getElementById('play-base-note');
@@ -803,7 +803,7 @@ function handleSessionComplete() {
                 // セッション進行状況UIを更新
                 updateSessionProgressUI();
 
-                // 2秒後に次のセッションを自動開始
+                // 1秒後に次のセッションを自動開始
                 setTimeout(() => {
                     console.log(`🎵 セッション${sessionNumber + 1}開始`);
 
@@ -812,7 +812,7 @@ function handleSessionComplete() {
 
                     // トレーニング開始
                     startTraining();
-                }, 2000);
+                }, 1000);
 
                 return;
             } else {
