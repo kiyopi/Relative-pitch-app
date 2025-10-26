@@ -5531,3 +5531,28 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-26 22:28:04] コミット: refactor: trainingController.v2.jsをtrainingController.jsに統合・NavigationManager改善
+
+【ファイル統合】
+- trainingController.v2.js（最新版）→ trainingController.jsにリネーム
+- 旧trainingController.js → trainingController.old.jsに保存
+- router.jsの読み込みパスを修正（trainingController.v2.js → trainingController.js）
+
+【NavigationManager改善】
+- navigateToTraining()でsafeNavigate()使用に変更
+- popstate/beforeunloadハンドラーを自動的に無効化してから遷移
+- preparationからtrainingへの遷移時のダイアログ表示問題を解決
+
+【問題解決】
+- 突然のページ遷移ダイアログ表示問題を修正
+- リロード誤判定によるマイク許可ページへの誤リダイレクトを防止
+- NavigationManager統合版が正式に標準となる
+
+【理由】
+- v2は開発時の一時的な名前であり、正式版としてはtrainingController.jsが適切
+- ファイル構成のシンプル化と保守性向上
+- 最新版（VERSION 2025-10-26-007）が正式に使用される
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

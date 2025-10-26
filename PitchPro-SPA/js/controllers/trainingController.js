@@ -75,6 +75,9 @@ export async function initializeTrainingPage() {
     if (NavigationManager.detectReload()) {
         console.warn('⚠️ リロード検出 - preparationへリダイレクト');
 
+        // beforeunloadを無効化（Safariダイアログを防止）
+        NavigationManager.disableNavigationWarning();
+
         // ユーザーに説明を表示
         NavigationManager.showReloadDialog();
 
@@ -94,6 +97,10 @@ export async function initializeTrainingPage() {
     // 【新規追加】音域データ必須チェック
     if (!checkVoiceRangeData()) {
         console.error('❌ 音域データが設定されていません');
+
+        // beforeunloadを無効化（Safariダイアログを防止）
+        NavigationManager.disableNavigationWarning();
+
         alert('音域テストを先に完了してください。');
         await NavigationManager.redirectToPreparation('音域テスト未完了');
         return;
