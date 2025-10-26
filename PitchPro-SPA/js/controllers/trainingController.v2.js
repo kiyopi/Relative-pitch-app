@@ -14,6 +14,7 @@ let audioDetector = null;
 let currentIntervalIndex = 0;
 let baseNoteInfo = null;
 let previousBaseNote = null; // 前回の基音（中級モード用）
+let usedBaseNotes = []; // 使用済み基音リスト（ランダムモード用：1トレーニング内で重複防止）
 
 // セッションデータ記録用
 let sessionRecorder = null;
@@ -155,6 +156,9 @@ export async function initializeTrainingPage() {
     // ホームボタンに確認ダイアログを追加
     setupHomeButton();
 
+    // 【Page Visibility対応】デスクトップ切り替え時のマイクリソース復元
+    setupPageVisibilityHandler();
+
     // ブラウザバック防止はrouter.jsで自動管理されます
 
     isInitialized = true;
@@ -229,6 +233,10 @@ function initializeModeTraining() {
             console.log('🔄 sessionCounterリセット: 0');
         }
 
+        // 【修正】使用済み基音リストをクリア（ランダムモード用）
+        usedBaseNotes = [];
+        console.log('🔄 usedBaseNotesリセット（ランダムモード）');
+
         // 前回の基音をクリア
         previousBaseNote = null;
         console.log('🔄 previousBaseNoteリセット');
@@ -246,8 +254,13 @@ function initializeModeTraining() {
             window.sessionDataRecorder.currentSession = null;
             window.sessionDataRecorder.sessionCounter = 0;
         }
+
+        // 【修正】連続/12音階モードでは使用済みリスト不要だがリセット
+        usedBaseNotes = [];
+
+        // 【修正】連続モードの前回基音をクリア
         previousBaseNote = null;
-        console.log('✅ sessionCounter・previousBaseNoteリセット完了');
+        console.log('✅ sessionCounter・previousBaseNote・usedBaseNotesリセット完了');
     }
 
     // 基音を事前に選択（ボタンクリック時の遅延を回避）
@@ -859,6 +872,64 @@ export function resetTrainingPageFlag() {
 window.resetTrainingPageFlag = resetTrainingPageFlag;
 
 /**
+ * Page Visibility対応：デスクトップ切り替え時のマイクリソース復元
+ */
+let visibilityHandler = null;
+let wasHidden = false;
+
+function setupPageVisibilityHandler() {
+    // 既存のハンドラーがあれば削除
+    if (visibilityHandler) {
+        document.removeEventListener('visibilitychange', visibilityHandler);
+    }
+
+    visibilityHandler = () => {
+        if (document.hidden) {
+            // ページが非表示になった
+            wasHidden = true;
+            console.warn('⚠️ [PageVisibility] ページが非表示になりました（デスクトップ切り替え等）');
+            console.warn('⚠️ [PageVisibility] PitchProがマイクリソースをクリーンアップします');
+        } else if (wasHidden) {
+            // ページが再表示された
+            console.log('👁️ [PageVisibility] ページが再表示されました');
+
+            // マイクリソースが破棄されている可能性を警告
+            console.warn('⚠️ [PageVisibility] マイクリソースが破棄されている可能性があります');
+            console.warn('⚠️ [PageVisibility] トレーニング中の場合は、preparationから再開してください');
+
+            // トレーニング中の場合、警告ダイアログを表示
+            if (audioDetector) {
+                setTimeout(() => {
+                    alert('デスクトップを切り替えたため、マイクリソースが解放されました。\n\n準備ページに戻って、マイクテストを再度実行してください。');
+
+                    // preparationページに戻す
+                    if (window.NavigationManager) {
+                        window.NavigationManager.safeNavigate(`preparation?mode=${currentMode}&redirect=training`);
+                    } else {
+                        window.location.hash = `preparation?mode=${currentMode}&redirect=training`;
+                    }
+                }, 500);
+            }
+
+            wasHidden = false;
+        }
+    };
+
+    document.addEventListener('visibilitychange', visibilityHandler);
+    console.log('✅ [PageVisibility] visibilitychangeハンドラー登録完了');
+}
+
+// クリーンアップ用にグローバルに公開
+window.removePageVisibilityHandler = function() {
+    if (visibilityHandler) {
+        document.removeEventListener('visibilitychange', visibilityHandler);
+        visibilityHandler = null;
+        wasHidden = false;
+        console.log('✅ [PageVisibility] visibilitychangeハンドラー削除完了');
+    }
+};
+
+/**
  * セッション進行状況UIを更新
  */
 function updateSessionProgressUI() {
@@ -1015,6 +1086,25 @@ function getVoiceRangeOctaves() {
  * @returns {Object} 選択された音符
  */
 function selectNoteFromZone(availableNotes, sessionIndex, totalSessions) {
+    // 【修正1】半音(#)を除外 - ランダムモードは白鍵のみ
+    let filteredNotes = availableNotes.filter(note => !note.note.includes('#'));
+    console.log(`🎹 白鍵のみフィルタリング: ${availableNotes.length}音 → ${filteredNotes.length}音`);
+
+    // 【修正2】使用済み基音を除外 - 1トレーニング内で重複防止
+    const unusedNotes = filteredNotes.filter(note =>
+        !usedBaseNotes.some(used => used.note === note.note)
+    );
+
+    if (unusedNotes.length === 0) {
+        console.warn(`⚠️ 未使用の音がありません。使用済みリストをリセットします。`);
+        console.warn(`   使用済み: ${usedBaseNotes.map(n => n.note).join(', ')}`);
+        usedBaseNotes = []; // リセット
+        filteredNotes = availableNotes.filter(note => !note.note.includes('#')); // 再フィルタリング
+    } else {
+        filteredNotes = unusedNotes;
+        console.log(`🚫 使用済み除外: ${unusedNotes.length}音が選択可能`);
+    }
+
     const octaves = getVoiceRangeOctaves();
 
     // 音域に応じたゾーン数を決定
@@ -1025,7 +1115,8 @@ function selectNoteFromZone(availableNotes, sessionIndex, totalSessions) {
         numZones = 3; // 緩和: 3ゾーン分割
     } else {
         // 1-1.5オクターブ: 完全ランダム
-        const randomNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
+        const randomNote = filteredNotes[Math.floor(Math.random() * filteredNotes.length)];
+        usedBaseNotes.push(randomNote); // 使用済みリストに追加
         console.log(`🎲 完全ランダム選択（音域狭い: ${octaves.toFixed(2)}オクターブ）: ${randomNote.note}`);
         return randomNote;
     }
@@ -1035,15 +1126,17 @@ function selectNoteFromZone(availableNotes, sessionIndex, totalSessions) {
     const currentZone = Math.floor(sessionIndex / sessionsPerZone);
 
     // ゾーン範囲を計算
-    const notesPerZone = Math.ceil(availableNotes.length / numZones);
+    const notesPerZone = Math.ceil(filteredNotes.length / numZones);
     const zoneStart = currentZone * notesPerZone;
-    const zoneEnd = Math.min((currentZone + 1) * notesPerZone, availableNotes.length);
+    const zoneEnd = Math.min((currentZone + 1) * notesPerZone, filteredNotes.length);
 
     // ゾーン内からランダム選択
-    const zoneNotes = availableNotes.slice(zoneStart, zoneEnd);
+    const zoneNotes = filteredNotes.slice(zoneStart, zoneEnd);
     const selectedNote = zoneNotes[Math.floor(Math.random() * zoneNotes.length)];
 
+    usedBaseNotes.push(selectedNote); // 使用済みリストに追加
     console.log(`🎯 ゾーン${currentZone + 1}/${numZones}から選択（${octaves.toFixed(2)}オクターブ）: ${selectedNote.note}`);
+    console.log(`📝 使用済み基音: ${usedBaseNotes.map(n => n.note).join(', ')}`);
     return selectedNote;
 }
 
@@ -1060,6 +1153,8 @@ function selectNoteWithDistance(availableNotes) {
         return randomNote;
     }
 
+    console.log(`🔍 [連続モード] 前回の基音: ${previousBaseNote.note} (${previousBaseNote.frequency.toFixed(1)}Hz)`);
+
     const octaves = getVoiceRangeOctaves();
 
     // 音域に応じた除外半音数を決定
@@ -1069,28 +1164,51 @@ function selectNoteWithDistance(availableNotes) {
     } else if (octaves >= 1.5) {
         excludeSemitones = 3; // 緩和: ±3半音以内を除外
     } else {
-        // 1-1.5オクターブ: 完全ランダム（除外なし）
-        const randomNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
-        console.log(`🎲 完全ランダム選択（音域狭い: ${octaves.toFixed(2)}オクターブ）: ${randomNote.note}`);
+        // 【修正】音域狭い場合でも前回と同じ音は除外
+        const filteredNotes = availableNotes.filter(note => note.note !== previousBaseNote.note);
+        if (filteredNotes.length === 0) {
+            console.warn(`⚠️ 選択肢が1音のみ - 同じ音を選択`);
+            return availableNotes[0];
+        }
+        const randomNote = filteredNotes[Math.floor(Math.random() * filteredNotes.length)];
+        console.log(`🎲 ランダム選択（音域狭い: ${octaves.toFixed(2)}オクターブ、前回除外）: ${randomNote.note}`);
         return randomNote;
     }
 
-    // 前回の周波数から半音数を計算して除外
+    // 【修正】前回の周波数から半音数を計算して除外 + 同じ音も必ず除外
     const filteredNotes = availableNotes.filter(note => {
+        // 完全に同じ音を除外（最優先）
+        if (note.note === previousBaseNote.note) {
+            console.log(`  🚫 除外: ${note.note} (前回と同じ)`);
+            return false;
+        }
+
         const semitoneDistance = Math.abs(Math.round(12 * Math.log2(note.frequency / previousBaseNote.frequency)));
-        return semitoneDistance > excludeSemitones;
+        const excluded = semitoneDistance <= excludeSemitones;
+        if (excluded) {
+            console.log(`  🚫 除外: ${note.note} (距離${semitoneDistance}半音 ≤ ${excludeSemitones}半音)`);
+        }
+        return !excluded;
     });
 
-    // 除外後の選択肢がない場合は完全ランダム（フォールバック）
+    console.log(`📊 フィルタリング結果: ${availableNotes.length}音 → ${filteredNotes.length}音が選択可能`);
+
+    // 除外後の選択肢がない場合は前回を除いた完全ランダム（フォールバック）
     if (filteredNotes.length === 0) {
-        console.warn(`⚠️ 除外後の選択肢なし - 完全ランダム選択`);
-        const randomNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
+        console.warn(`⚠️ 除外後の選択肢なし - 前回を除いてランダム選択`);
+        const fallbackNotes = availableNotes.filter(note => note.note !== previousBaseNote.note);
+        if (fallbackNotes.length === 0) {
+            console.warn(`⚠️ 前回を除いた選択肢もなし - 同じ音を選択`);
+            return previousBaseNote;
+        }
+        const randomNote = fallbackNotes[Math.floor(Math.random() * fallbackNotes.length)];
+        console.log(`🎲 フォールバック選択: ${randomNote.note}`);
         return randomNote;
     }
 
     const selectedNote = filteredNotes[Math.floor(Math.random() * filteredNotes.length)];
     const semitoneDistance = Math.round(12 * Math.log2(selectedNote.frequency / previousBaseNote.frequency));
-    console.log(`🎯 距離確保選択（前回から${Math.abs(semitoneDistance)}半音、±${excludeSemitones}半音除外）: ${selectedNote.note}`);
+    console.log(`🎯 距離確保選択: ${selectedNote.note} (前回から${Math.abs(semitoneDistance)}半音、±${excludeSemitones}半音除外）`);
     return selectedNote;
 }
 
