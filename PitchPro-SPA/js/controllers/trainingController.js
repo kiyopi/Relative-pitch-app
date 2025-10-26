@@ -494,13 +494,12 @@ async function startTraining() {
         console.log(`   基音: ${baseNoteInfo.note} (${baseNoteInfo.frequency.toFixed(1)}Hz)`);
         console.log('');
 
-        // 【追加】基音再生前にマイクを停止（もし動作していれば）
+        // 【追加】基音再生前にマイク検出を一時停止（MediaStreamは保持）
         if (audioDetector) {
-            console.log('🎤 基音再生前にマイク停止');
+            console.log('🎤 基音再生前にマイク検出を一時停止');
             try {
                 audioDetector.stopDetection();
-                audioDetector.destroy();
-                audioDetector = null;
+                console.log('✅ マイク検出停止完了（MediaStreamは保持）');
             } catch (error) {
                 console.warn('⚠️ マイク停止エラー（無視して続行）:', error);
             }
@@ -582,37 +581,43 @@ async function startDoremiGuide() {
     console.log('🎵 ドレミガイド開始');
     console.log('🎤 マイクをオンにします');
 
-    // AudioDetectionComponent初期化（ブラウザが許可を記憶しているため2回目以降はダイアログ不要）
+    // AudioDetectionComponent初期化または再開
     try {
-        console.log('🎤 AudioDetectionComponent初期化中...');
-        audioDetector = new window.PitchPro.AudioDetectionComponent({
-            volumeBarSelector: '.mic-recognition-section .progress-fill',
-            volumeTextSelector: null,
-            frequencySelector: null,
-            noteSelector: null,
-            autoUpdateUI: true,
-            debug: false
-        });
+        if (!audioDetector) {
+            // 初回セッション: 新規作成
+            console.log('🎤 AudioDetectionComponent初期化中...');
+            audioDetector = new window.PitchPro.AudioDetectionComponent({
+                volumeBarSelector: '.mic-recognition-section .progress-fill',
+                volumeTextSelector: null,
+                frequencySelector: null,
+                noteSelector: null,
+                autoUpdateUI: true,
+                debug: false
+            });
 
-        await audioDetector.initialize();
-        console.log('✅ AudioDetectionComponent初期化完了');
+            await audioDetector.initialize();
+            console.log('✅ AudioDetectionComponent初期化完了');
 
-        // NavigationManagerに登録（遷移時の自動破棄のため）
-        if (window.NavigationManager) {
-            window.NavigationManager.registerAudioDetector(audioDetector);
+            // NavigationManagerに登録（遷移時の自動破棄のため）
+            if (window.NavigationManager) {
+                window.NavigationManager.registerAudioDetector(audioDetector);
+            }
+
+            // コールバック設定
+            audioDetector.setCallbacks({
+                onPitchUpdate: (result) => {
+                    handlePitchUpdate(result);
+                },
+                onError: (context, error) => {
+                    console.error(`❌ AudioDetection Error [${context}]:`, error);
+                }
+            });
+        } else {
+            // 2回目以降: 既存のAudioDetectorを再開
+            console.log('🎤 既存のAudioDetectorを再開');
         }
 
-        // コールバック設定
-        audioDetector.setCallbacks({
-            onPitchUpdate: (result) => {
-                handlePitchUpdate(result);
-            },
-            onError: (context, error) => {
-                console.error(`❌ AudioDetection Error [${context}]:`, error);
-            }
-        });
-
-        // 音声検出開始
+        // 音声検出開始（初回も2回目以降も実行）
         await audioDetector.startDetection();
         console.log('✅ マイクオン完了 - 音声検出開始');
 
