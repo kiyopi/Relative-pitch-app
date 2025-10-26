@@ -584,6 +584,11 @@ async function startDoremiGuide() {
         await audioDetector.initialize();
         console.log('✅ AudioDetectionComponent初期化完了');
 
+        // NavigationManagerに登録（遷移時の自動破棄のため）
+        if (window.NavigationManager) {
+            window.NavigationManager.registerAudioDetector(audioDetector);
+        }
+
         // コールバック設定
         audioDetector.setCallbacks({
             onPitchUpdate: (result) => {
@@ -727,17 +732,9 @@ function recordStepPitchData(step) {
 function handleSessionComplete() {
     console.log('✅ トレーニング完了');
 
-    // 音声検出停止 & リソース完全破棄
-    if (audioDetector) {
-        audioDetector.stopDetection();
-        console.log('🛑 音声検出停止');
-
-        // マイクストリームを完全に解放（重要！）
-        // destroy()を呼ばないと、バックグラウンドでマイクが開いたままになり、
-        // 長時間経過後にPitchProが警告アラートを表示してpopstateイベントが発火する問題が発生
-        audioDetector.destroy();
-        console.log('🗑️ AudioDetector破棄完了 - マイクストリーム解放');
-    }
+    // 【変更】audioDetectorのクリーンアップはNavigationManagerが自動実行
+    // NavigationManager.navigate()で遷移時に自動的にstopDetection() + destroy()が呼ばれる
+    // これにより、PitchPro警告アラート発火とpopstateイベント問題を根本解決
 
     // マイクバッジを通常状態に戻す
     const micBadge = document.getElementById('mic-badge');
@@ -770,9 +767,9 @@ function handleSessionComplete() {
             // ランダムモード：個別セッション結果ページへ遷移
             console.log(`📊 ランダムモード：セッション${sessionNumber}の結果ページへ遷移`);
 
-            // 【ハイブリッド方式】安全な遷移を使用
+            // 【統一ナビゲーション】NavigationManager.navigate()を使用
             if (window.NavigationManager) {
-                window.NavigationManager.safeNavigate(`result-session?session=${sessionNumber}`);
+                window.NavigationManager.navigate('result-session', { session: sessionNumber });
             } else {
                 window.location.hash = `result-session?session=${sessionNumber}`;
             }
@@ -822,9 +819,9 @@ function handleSessionComplete() {
                 // 全セッション完了：総合評価ページへ遷移
                 console.log(`✅ 全${config.maxSessions}セッション完了！総合評価ページへ遷移`);
 
-                // 【ハイブリッド方式】安全な遷移を使用
+                // 【統一ナビゲーション】NavigationManager.navigate()を使用
                 if (window.NavigationManager) {
-                    window.NavigationManager.safeNavigate(`results-overview?mode=${currentMode}`);
+                    window.NavigationManager.navigate('results-overview', { mode: currentMode });
                 } else {
                     window.location.hash = `results-overview?mode=${currentMode}`;
                 }
@@ -1370,10 +1367,13 @@ function setupHomeButton() {
         );
 
         if (confirmed) {
-            // ブラウザバック防止はrouter.jsで自動解除されます
-
-            // router.js の cleanupCurrentPage() が自動実行される
-            window.location.hash = 'home';
+            // 【統一ナビゲーション】NavigationManager.navigate()を使用
+            // NavigationManagerが自動的にaudioDetector破棄、beforeunload/popstate無効化を実行
+            if (window.NavigationManager) {
+                window.NavigationManager.navigate('home');
+            } else {
+                window.location.hash = 'home';
+            }
             console.log('🏠 ユーザーがホームへの移動を承認');
         } else {
             console.log('🚫 ホームへの移動をキャンセル');

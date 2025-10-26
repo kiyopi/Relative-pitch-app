@@ -746,7 +746,11 @@ class PitchProCycleManager {
 
             // Step2ページに遷移（SPA対応 - 実際には使用されない）
             console.log('🔄 preparation-step2へ遷移中...');
-            window.location.hash = 'preparation-step2';
+            if (window.NavigationManager) {
+                window.NavigationManager.navigate('preparation-step2');
+            } else {
+                window.location.hash = 'preparation-step2';
+            }
 
         } catch (error) {
             console.error('❌ Step2遷移処理エラー:', error);
@@ -1277,14 +1281,8 @@ function setupMicPermissionFlow() {
                     console.log(`✅ ${mode}モード：セッションデータを保持（クリアしない）`);
                 }
 
-                // 遷移前にブラウザバック防止を解除（重要！）
-                console.log('🔧 ブラウザバック防止解除を実行します...');
-                if (window.NavigationManager) {
-                    window.NavigationManager.removeBrowserBackPrevention();
-                    console.log('✅ removeBrowserBackPrevention() 呼び出し完了');
-                } else {
-                    console.error('❌ NavigationManagerが見つかりません');
-                }
+                // 【変更】ブラウザバック防止解除はNavigationManagerが自動実行
+                // NavigationManager.navigateToTraining()内でremoveBrowserBackPrevention()が自動的に呼ばれる
 
                 // 【NavigationManager統合】モード情報を保持して遷移
                 console.log('🔍 [DEBUG] window.preparationRedirectInfo:', window.preparationRedirectInfo);
@@ -1515,14 +1513,8 @@ function setupMicPermissionFlow() {
                 console.log(`✅ ${mode}モード：セッションデータを保持（クリアしない）`);
             }
 
-            // 遷移前にブラウザバック防止を解除（重要！）
-            console.log('🔧 ブラウザバック防止解除を実行します...');
-            if (window.NavigationManager) {
-                window.NavigationManager.removeBrowserBackPrevention();
-                console.log('✅ removeBrowserBackPrevention() 呼び出し完了');
-            } else {
-                console.error('❌ NavigationManagerが見つかりません');
-            }
+            // 【変更】ブラウザバック防止解除はNavigationManagerが自動実行
+            // NavigationManager.navigateToTraining()内でremoveBrowserBackPrevention()が自動的に呼ばれる
 
             // 【NavigationManager統合】モード情報を保持して遷移
             console.log('🔍 [DEBUG] window.preparationRedirectInfo:', window.preparationRedirectInfo);

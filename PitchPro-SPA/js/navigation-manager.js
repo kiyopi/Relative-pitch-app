@@ -134,6 +134,7 @@ class NavigationManager {
      * preparationページへリダイレクト（モード情報保持）
      *
      * 【自動処理】
+     * - PitchProリソース自動破棄（警告アラート防止）
      * - beforeunloadハンドラーを自動的に無効化
      * - popstateハンドラーを自動的に削除
      * - ダイアログなしで安全にリダイレクト
@@ -145,7 +146,14 @@ class NavigationManager {
     static async redirectToPreparation(reason = '', mode = null, session = null) {
         console.log(`🔄 [NavigationManager] preparationへリダイレクト: ${reason}`);
 
-        // 【自動処理】beforeunload/popstateを無効化（ダイアログ防止）
+        // 【自動処理1】PitchProリソース破棄
+        if (this.currentAudioDetector) {
+            console.log('🧹 [NavigationManager] PitchProクリーンアップ開始');
+            this._destroyAudioDetector(this.currentAudioDetector);
+            this.currentAudioDetector = null;
+        }
+
+        // 【自動処理2】beforeunload/popstateを無効化（ダイアログ防止）
         this.disableNavigationWarning();
         this.removeBrowserBackPrevention();
         console.log('✅ [NavigationManager] ナビゲーション制約を自動解除');
@@ -212,6 +220,114 @@ class NavigationManager {
         const error = new Error('REDIRECT_TO_PREPARATION');
         error.isRedirect = true;
         return error;
+    }
+
+    // ==========================================
+    // 統一ナビゲーションシステム（v4.0.0）
+    // ==========================================
+
+    /**
+     * 現在のAudioDetectorインスタンス
+     * PitchProマイク状態監視対応のため、遷移前に自動破棄
+     */
+    static currentAudioDetector = null;
+
+    /**
+     * AudioDetectorを登録
+     * ページ側でaudioDetectorを初期化した際に呼び出す
+     *
+     * @param {Object} audioDetector - AudioDetectionComponentインスタンス
+     */
+    static registerAudioDetector(audioDetector) {
+        // 既存インスタンスがある場合は先に破棄
+        if (this.currentAudioDetector) {
+            console.warn('⚠️ [NavigationManager] 既存AudioDetectorを破棄');
+            this._destroyAudioDetector(this.currentAudioDetector);
+        }
+
+        this.currentAudioDetector = audioDetector;
+        console.log('✅ [NavigationManager] AudioDetector登録完了');
+    }
+
+    /**
+     * AudioDetectorの破棄（内部メソッド）
+     * PitchPro警告アラート発火を防止し、popstateイベント問題を根本解決
+     *
+     * @param {Object} audioDetector - AudioDetectionComponentインスタンス
+     * @private
+     */
+    static _destroyAudioDetector(audioDetector) {
+        if (!audioDetector) return;
+
+        try {
+            // PitchProの推奨手順
+            audioDetector.stopDetection();
+            console.log('🛑 [NavigationManager] 音声検出停止');
+
+            // 【重要】MediaStream完全解放
+            // destroy()を呼ばないと、バックグラウンドでマイクが開いたままになり、
+            // 長時間経過後にPitchProが警告アラートを表示してpopstateイベントが発火する問題が発生
+            audioDetector.destroy();
+            console.log('🗑️ [NavigationManager] AudioDetector破棄完了 - マイクストリーム解放');
+
+        } catch (error) {
+            console.error('❌ [NavigationManager] AudioDetector破棄エラー:', error);
+        }
+    }
+
+    /**
+     * 統一ナビゲーションメソッド
+     * すべてのページ遷移はこのメソッドを使用することを推奨
+     *
+     * 【自動処理】
+     * - PitchProリソース自動破棄（警告アラート防止）
+     * - beforeunload/popstate自動無効化
+     * - 正常な遷移フラグ自動設定
+     *
+     * @param {string} page - 遷移先ページ ('home', 'training', 'result-session', 'results', 'results-overview'等)
+     * @param {Object} params - URLパラメータ (mode, session等)
+     *
+     * @example
+     * // ホームへ遷移
+     * NavigationManager.navigate('home');
+     *
+     * // トレーニングへ遷移（モード指定）
+     * NavigationManager.navigate('training', { mode: 'random', session: 1 });
+     *
+     * // 結果ページへ遷移
+     * NavigationManager.navigate('results-overview');
+     */
+    static navigate(page, params = {}) {
+        console.log(`🚀 [NavigationManager] 統一ナビゲーション: ${page}`, params);
+
+        // 1. 【最優先】PitchProリソース破棄
+        //    → 警告アラート発火を防止
+        //    → popstateイベント発火の根本原因排除
+        if (this.currentAudioDetector) {
+            console.log('🧹 [NavigationManager] PitchProクリーンアップ開始');
+            this._destroyAudioDetector(this.currentAudioDetector);
+            this.currentAudioDetector = null;
+        }
+
+        // 2. beforeunload/popstateを無効化
+        this.disableNavigationWarning();
+        this.removeBrowserBackPrevention();
+
+        // 3. 正常な遷移フラグを設定（training への遷移のみ）
+        if (page === 'training') {
+            this.setNormalTransition();
+        }
+
+        // 4. ハッシュ構築
+        let targetHash = page;
+        if (Object.keys(params).length > 0) {
+            const urlParams = new URLSearchParams(params);
+            targetHash = `${page}?${urlParams.toString()}`;
+        }
+
+        // 5. 遷移実行
+        window.location.hash = targetHash;
+        console.log(`✅ [NavigationManager] 遷移完了: ${targetHash}`);
     }
 
     // ==========================================
