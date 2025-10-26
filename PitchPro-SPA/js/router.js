@@ -183,7 +183,9 @@ class SimpleRouter {
                         const params = new URLSearchParams();
                         if (mode) params.set('mode', mode);
                         if (session) params.set('session', session);
-                        params.set('redirect', 'training'); // リダイレクト先を明示
+                        // 【削除】ホームからの通常遷移では redirect パラメータ不要
+                        // redirect パラメータは総合評価ページからの遷移や
+                        // リロード時のリダイレクトなど特別なケースでのみ使用
                         hash += `?${params.toString()}`;
                     }
                     window.location.hash = hash;

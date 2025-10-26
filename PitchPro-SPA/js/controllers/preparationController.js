@@ -20,11 +20,12 @@ function getRedirectInfo() {
     const mode = params.get('mode');
     const session = params.get('session');
 
-    // redirectパラメータがない場合でも、modeパラメータがあればredirectInfoを生成
-    if (!redirect && !mode) return null;
+    // redirectパラメータがある場合のみredirectInfoを生成
+    // ホームページからの通常遷移ではメッセージを表示しない
+    if (!redirect) return null;
 
     return {
-        redirect: redirect || 'training', // redirectがない場合はtrainingをデフォルトに
+        redirect: redirect,
         mode: mode,
         session: session
     };
