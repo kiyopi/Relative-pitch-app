@@ -2,10 +2,10 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: 2025-10-26-001 - 基音選択ロジック改善（白鍵のみ・重複防止・連続モード修正）
+ * 🔥 VERSION: 2025-10-26-002 - 全セッション分の基音を事前一括選定
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-26-001 LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-26-002 LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
@@ -13,8 +13,7 @@ let initializationPromise = null;
 let audioDetector = null;
 let currentIntervalIndex = 0;
 let baseNoteInfo = null;
-let previousBaseNote = null; // 前回の基音（中級モード用）
-let usedBaseNotes = []; // 使用済み基音リスト（ランダムモード用：1トレーニング内で重複防止）
+let selectedBaseNotes = []; // 全セッション分の基音リスト（トレーニング開始時に一括選定）
 
 // セッションデータ記録用
 let sessionRecorder = null;
@@ -229,14 +228,6 @@ function initializeModeTraining() {
             window.sessionDataRecorder.sessionCounter = 0;
             console.log('🔄 sessionCounterリセット: 0');
         }
-
-        // 【修正】使用済み基音リストをクリア（ランダムモード用）
-        usedBaseNotes = [];
-        console.log('🔄 usedBaseNotesリセット（ランダムモード）');
-
-        // 前回の基音をクリア
-        previousBaseNote = null;
-        console.log('🔄 previousBaseNoteリセット');
     } else {
         // 連続チャレンジモード・12音階モード：常にセッションデータをクリアして最初から開始
         console.log('🔄 連続/12音階モード：セッションデータをクリアして最初から開始');
@@ -251,34 +242,37 @@ function initializeModeTraining() {
             window.sessionDataRecorder.currentSession = null;
             window.sessionDataRecorder.sessionCounter = 0;
         }
-
-        // 【修正】連続/12音階モードでは使用済みリスト不要だがリセット
-        usedBaseNotes = [];
-
-        // 【修正】連続モードの前回基音をクリア
-        previousBaseNote = null;
-        console.log('✅ sessionCounter・previousBaseNote・usedBaseNotesリセット完了');
+        console.log('✅ sessionCounterリセット完了');
     }
 
-    // 基音を事前に選択（ボタンクリック時の遅延を回避）
+    // 【新規】全セッション分の基音を事前に一括選定
+    selectedBaseNotes = selectAllBaseNotesForMode(config);
+
+    // 最初のセッションの基音を事前に選択（ボタンクリック時の遅延を回避）
     preselectBaseNote();
 }
 
 /**
  * 基音を事前に選択（ボタンクリック時の遅延を回避）
+ * 【新規】事前選定済みの配列から取得
  */
 function preselectBaseNote() {
-    const config = modeConfig[currentMode];
-
-    // 【修正】現在のモードのセッション数を正しく計算
+    // 現在のモードのセッション数を計算
     const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
     const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
-    const sessionCounter = currentModeSessions.length;
+    const sessionIndex = currentModeSessions.length;
 
-    const selectedNote = selectBaseNote(config.baseNoteSelection, sessionCounter);
-
-    baseNoteInfo = selectedNote;
-    console.log(`🎵 基音を事前選択: ${selectedNote.note} (${selectedNote.frequency.toFixed(1)}Hz)`);
+    // 事前選定済みの配列から取得
+    if (selectedBaseNotes && selectedBaseNotes.length > sessionIndex) {
+        baseNoteInfo = selectedBaseNotes[sessionIndex];
+        console.log(`🎵 基音を事前選択 [セッション${sessionIndex + 1}]: ${baseNoteInfo.note} (${baseNoteInfo.frequency.toFixed(1)}Hz)`);
+    } else {
+        console.error(`❌ 基音配列が不足しています（必要: ${sessionIndex + 1}, 実際: ${selectedBaseNotes.length}）`);
+        // フォールバック: 緊急用に即座に選定
+        const availableNotes = getAvailableNotes();
+        baseNoteInfo = availableNotes[Math.floor(Math.random() * availableNotes.length)];
+        console.warn(`⚠️ フォールバック基音選択: ${baseNoteInfo.note}`);
+    }
 }
 
 // デバイス検出（PitchPro実装準拠）
@@ -1018,6 +1012,118 @@ function getVoiceRangeOctaves() {
     }
     const rangeData = voiceRangeData.results.comfortableRange || voiceRangeData.results;
     return Math.log2(rangeData.highFreq / rangeData.lowFreq);
+}
+
+/**
+ * 全セッション分の基音を事前選定（トレーニング開始時に一括実行）
+ * @param {Object} config - モード設定
+ * @returns {Array} 全セッション分の基音配列
+ */
+function selectAllBaseNotesForMode(config) {
+    const availableNotes = getAvailableNotes();
+    const maxSessions = config.maxSessions;
+    const selectionType = config.baseNoteSelection;
+    const selectedNotes = [];
+
+    console.log(`📋 全${maxSessions}セッション分の基音を事前選定開始 (${selectionType})`);
+
+    if (selectionType === 'random_c3_octave') {
+        // ランダムモード: 白鍵のみ、ゾーン分割、重複なし（8セッション）
+        const whiteKeys = availableNotes.filter(note => !note.note.includes('#'));
+        console.log(`🎹 白鍵のみフィルタリング: ${availableNotes.length}音 → ${whiteKeys.length}音`);
+
+        const octaves = getVoiceRangeOctaves();
+        let numZones = octaves >= 2.0 ? 4 : octaves >= 1.5 ? 3 : 1;
+
+        if (numZones === 1) {
+            // 音域狭い: 完全ランダム（重複なし）
+            const shuffled = [...whiteKeys].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < maxSessions && i < shuffled.length; i++) {
+                selectedNotes.push(shuffled[i]);
+            }
+        } else {
+            // ゾーン分割選択（重複なし）
+            const sessionsPerZone = Math.ceil(maxSessions / numZones);
+            const notesPerZone = Math.ceil(whiteKeys.length / numZones);
+
+            for (let session = 0; session < maxSessions; session++) {
+                const currentZone = Math.floor(session / sessionsPerZone);
+                const zoneStart = currentZone * notesPerZone;
+                const zoneEnd = Math.min((currentZone + 1) * notesPerZone, whiteKeys.length);
+                const zoneNotes = whiteKeys.slice(zoneStart, zoneEnd);
+
+                // ゾーン内で未使用の音を選択
+                const unusedInZone = zoneNotes.filter(note =>
+                    !selectedNotes.some(selected => selected.note === note.note)
+                );
+
+                if (unusedInZone.length > 0) {
+                    const randomNote = unusedInZone[Math.floor(Math.random() * unusedInZone.length)];
+                    selectedNotes.push(randomNote);
+                } else {
+                    // ゾーン内に未使用がない場合は全体から選択
+                    const unusedAll = whiteKeys.filter(note =>
+                        !selectedNotes.some(selected => selected.note === note.note)
+                    );
+                    if (unusedAll.length > 0) {
+                        selectedNotes.push(unusedAll[Math.floor(Math.random() * unusedAll.length)]);
+                    }
+                }
+            }
+        }
+
+    } else if (selectionType === 'random_chromatic') {
+        // 連続チャレンジモード: 全音、距離確保、重複なし（12セッション）
+        const octaves = getVoiceRangeOctaves();
+        const excludeSemitones = octaves >= 2.0 ? 5 : octaves >= 1.5 ? 3 : 0;
+
+        // 初回はランダム
+        selectedNotes.push(availableNotes[Math.floor(Math.random() * availableNotes.length)]);
+
+        // 2回目以降は距離確保 + 重複なし
+        for (let session = 1; session < maxSessions; session++) {
+            const previousNote = selectedNotes[selectedNotes.length - 1];
+
+            let candidates = availableNotes.filter(note => {
+                // 既に選ばれた音を除外
+                if (selectedNotes.some(selected => selected.note === note.note)) {
+                    return false;
+                }
+
+                // 音域狭い場合は距離チェックなし
+                if (excludeSemitones === 0) {
+                    return true;
+                }
+
+                // 距離チェック
+                const semitoneDistance = Math.abs(Math.round(12 * Math.log2(note.frequency / previousNote.frequency)));
+                return semitoneDistance > excludeSemitones;
+            });
+
+            // 候補がない場合は重複のみ除外
+            if (candidates.length === 0) {
+                candidates = availableNotes.filter(note =>
+                    !selectedNotes.some(selected => selected.note === note.note)
+                );
+            }
+
+            // それでも候補がない場合は完全ランダム
+            if (candidates.length === 0) {
+                candidates = availableNotes;
+            }
+
+            selectedNotes.push(candidates[Math.floor(Math.random() * candidates.length)]);
+        }
+
+    } else if (selectionType === 'sequential_chromatic') {
+        // 12音階モード: クロマチック12音を順次使用
+        for (let session = 0; session < maxSessions; session++) {
+            selectedNotes.push(availableNotes[session % availableNotes.length]);
+        }
+    }
+
+    console.log(`✅ 全${selectedNotes.length}セッション分の基音選定完了: ${selectedNotes.map(n => n.note).join(' → ')}`);
+    return selectedNotes;
 }
 
 /**
