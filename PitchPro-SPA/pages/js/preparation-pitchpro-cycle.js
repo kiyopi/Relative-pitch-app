@@ -1253,8 +1253,9 @@ function setupMicPermissionFlow() {
                 localStorage.setItem('rangeDataConfirmed', 'true');
                 localStorage.setItem('step1CompletedViaExistingData', 'true');
 
-                // PitchProリソースのクリーンアップ（統合管理）
-                await pitchProCycleManager.cleanupPitchPro();
+                // 【変更】PitchProリソースは破棄せずMediaStreamを保持
+                // trainingページで同じMediaStreamを再利用し、マイク許可を再要求しない
+                console.log('📌 PitchProリソースを保持（MediaStream再利用のため）');
 
                 // 【localStorage統合】トレーニング開始時にセッションデータをクリア（ランダムモードのみ）
                 const redirectInfo = window.preparationRedirectInfo;
@@ -1485,8 +1486,9 @@ function setupMicPermissionFlow() {
         completeRangeTestBtn.addEventListener('click', async () => {
             console.log('🚀 トレーニング開始ボタン（音域テスト完了後）がクリックされました');
 
-            // PitchProリソースのクリーンアップ
-            await pitchProCycleManager.cleanupPitchPro();
+            // 【変更】PitchProリソースは破棄せずMediaStreamを保持
+            // trainingページで同じMediaStreamを再利用し、マイク許可を再要求しない
+            console.log('📌 PitchProリソースを保持（MediaStream再利用のため）');
 
             // 【localStorage統合】トレーニング開始時にセッションデータをクリア（ランダムモードのみ）
             const redirectInfo = window.preparationRedirectInfo;
