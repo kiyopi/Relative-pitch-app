@@ -2,10 +2,10 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: 2025-10-24-01:00 - セッション継続判定を追加
+ * 🔥 VERSION: 2025-10-26-001 - 基音選択ロジック改善（白鍵のみ・重複防止・連続モード修正）
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-24-01:00 LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-26-001 LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
