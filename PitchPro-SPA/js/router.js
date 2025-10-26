@@ -353,11 +353,17 @@ class SimpleRouter {
             newTrainingBtn.addEventListener('click', () => {
                 console.log('🆕 新しいトレーニング開始ボタンがクリックされました');
 
-                // ランダムモードのセッションデータをlocalStorageからクリア
+                // 【修正】URLパラメータから現在のモードを取得
+                const hash = window.location.hash.substring(1);
+                const params = new URLSearchParams(hash.split('?')[1] || '');
+                const currentMode = params.get('mode') || 'random';
+                console.log(`🔍 [DEBUG] 現在のモード: ${currentMode}`);
+
+                // 【修正】現在のモードのセッションデータをlocalStorageからクリア
                 const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-                const otherSessions = allSessions.filter(s => s.mode !== 'random');
+                const otherSessions = allSessions.filter(s => s.mode !== currentMode);
                 localStorage.setItem('sessionData', JSON.stringify(otherSessions));
-                console.log('✅ ランダムモードのセッションデータをクリアしました');
+                console.log(`✅ ${currentMode}モードのセッションデータをクリアしました`);
 
                 // SessionDataRecorderをlocalStorageと同期（重要！）
                 if (window.sessionDataRecorder) {
@@ -373,9 +379,9 @@ class SimpleRouter {
                     console.error('❌ NavigationManagerが見つかりません');
                 }
 
-                // トレーニングページに遷移（NavigationManager統合）
-                // ※sessionCounterリセット・基音選択はtrainingController.jsで自動実行
-                NavigationManager.navigateToTraining();
+                // 【修正】同じモードでtrainingページに直接遷移
+                console.log(`📍 ${currentMode}モードでtrainingへ直接遷移`);
+                NavigationManager.navigateToTraining(currentMode, null);
             });
             console.log('✅ 新しいトレーニング開始ボタンのイベントリスナー設定完了');
         } else {

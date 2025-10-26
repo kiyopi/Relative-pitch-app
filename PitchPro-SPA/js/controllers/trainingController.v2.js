@@ -156,9 +156,6 @@ export async function initializeTrainingPage() {
     // ホームボタンに確認ダイアログを追加
     setupHomeButton();
 
-    // 【Page Visibility対応】デスクトップ切り替え時のマイクリソース復元
-    setupPageVisibilityHandler();
-
     // ブラウザバック防止はrouter.jsで自動管理されます
 
     isInitialized = true;
@@ -871,63 +868,8 @@ export function resetTrainingPageFlag() {
 // グローバルに公開（router.jsから呼び出し可能にする）
 window.resetTrainingPageFlag = resetTrainingPageFlag;
 
-/**
- * Page Visibility対応：デスクトップ切り替え時のマイクリソース復元
- */
-let visibilityHandler = null;
-let wasHidden = false;
-
-function setupPageVisibilityHandler() {
-    // 既存のハンドラーがあれば削除
-    if (visibilityHandler) {
-        document.removeEventListener('visibilitychange', visibilityHandler);
-    }
-
-    visibilityHandler = () => {
-        if (document.hidden) {
-            // ページが非表示になった
-            wasHidden = true;
-            console.warn('⚠️ [PageVisibility] ページが非表示になりました（デスクトップ切り替え等）');
-            console.warn('⚠️ [PageVisibility] PitchProがマイクリソースをクリーンアップします');
-        } else if (wasHidden) {
-            // ページが再表示された
-            console.log('👁️ [PageVisibility] ページが再表示されました');
-
-            // マイクリソースが破棄されている可能性を警告
-            console.warn('⚠️ [PageVisibility] マイクリソースが破棄されている可能性があります');
-            console.warn('⚠️ [PageVisibility] トレーニング中の場合は、preparationから再開してください');
-
-            // トレーニング中の場合、警告ダイアログを表示
-            if (audioDetector) {
-                setTimeout(() => {
-                    alert('デスクトップを切り替えたため、マイクリソースが解放されました。\n\n準備ページに戻って、マイクテストを再度実行してください。');
-
-                    // preparationページに戻す
-                    if (window.NavigationManager) {
-                        window.NavigationManager.safeNavigate(`preparation?mode=${currentMode}&redirect=training`);
-                    } else {
-                        window.location.hash = `preparation?mode=${currentMode}&redirect=training`;
-                    }
-                }, 500);
-            }
-
-            wasHidden = false;
-        }
-    };
-
-    document.addEventListener('visibilitychange', visibilityHandler);
-    console.log('✅ [PageVisibility] visibilitychangeハンドラー登録完了');
-}
-
-// クリーンアップ用にグローバルに公開
-window.removePageVisibilityHandler = function() {
-    if (visibilityHandler) {
-        document.removeEventListener('visibilitychange', visibilityHandler);
-        visibilityHandler = null;
-        wasHidden = false;
-        console.log('✅ [PageVisibility] visibilitychangeハンドラー削除完了');
-    }
-};
+// Page Visibilityハンドラーは削除
+// PitchProの独自エラーダイアログに任せる仕様に変更
 
 /**
  * セッション進行状況UIを更新
