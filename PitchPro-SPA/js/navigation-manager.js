@@ -175,16 +175,20 @@ class NavigationManager {
         // 正常な遷移フラグを自動設定
         this.setNormalTransition();
 
-        // 遷移
+        // 遷移先を構築
+        let targetHash;
         if (mode) {
             const params = new URLSearchParams({ mode });
             if (session) params.set('session', session);
-            const targetHash = `training?${params.toString()}`;
-            console.log('🔍 [DEBUG] targetHash:', targetHash);
-            window.location.hash = targetHash;
+            targetHash = `training?${params.toString()}`;
         } else {
-            window.location.hash = 'training';
+            targetHash = 'training';
         }
+
+        console.log('🔍 [DEBUG] targetHash:', targetHash);
+
+        // safeNavigateを使用してpopstate/beforeunloadを回避
+        this.safeNavigate(targetHash);
     }
 
     /**

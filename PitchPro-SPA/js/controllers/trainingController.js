@@ -2,10 +2,10 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: 2025-10-23-04:15 - リロード検出機能追加版
+ * 🔥 VERSION: 2025-10-26-007 - 連続モード12音強制確保（音域不足時は高音側から追加）
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-23-04:15 LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-26-007 LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
@@ -13,7 +13,7 @@ let initializationPromise = null;
 let audioDetector = null;
 let currentIntervalIndex = 0;
 let baseNoteInfo = null;
-let previousBaseNote = null; // 前回の基音（中級モード用）
+let selectedBaseNotes = []; // 全セッション分の基音リスト（トレーニング開始時に一括選定）
 
 // セッションデータ記録用
 let sessionRecorder = null;
@@ -49,94 +49,40 @@ const modeConfig = {
     }
 };
 
-/**
- * リロード検出関数
- * Performance Navigation API を使用してリロードを検出
- *
- * 【重要】SPA内の正常な遷移（preparation → training）を除外
- * sessionStorage のフラグで正常な遷移を識別
- */
-function detectReload() {
-    console.log('🔍 [detectReload] リロード検出開始');
-
-    // 正常な遷移フラグをチェック（preparation からの遷移）
-    const normalTransition = sessionStorage.getItem('normalTransitionToTraining');
-    console.log('🔍 [detectReload] normalTransition フラグ:', normalTransition);
-    if (normalTransition === 'true') {
-        // フラグを削除して正常な遷移として扱う
-        sessionStorage.removeItem('normalTransitionToTraining');
-        console.log('✅ 正常な遷移を検出（preparation → training）');
-        return false;
-    }
-
-    // Performance Navigation API で検出（古いブラウザ対応）
-    console.log('🔍 [detectReload] performance.navigation:', performance.navigation);
-    if (performance.navigation && performance.navigation.type === 1) {
-        console.log('✅ リロード検出（古いAPI）: performance.navigation.type === 1');
-        return true; // TYPE_RELOAD
-    }
-
-    // Navigation Timing API v2（新しいブラウザ）
-    const navEntries = performance.getEntriesByType('navigation');
-    console.log('🔍 [detectReload] Navigation Timing API v2:', navEntries);
-    if (navEntries.length > 0) {
-        console.log('🔍 [detectReload] navEntries[0].type:', navEntries[0].type);
-        if (navEntries[0].type === 'reload') {
-            console.log('✅ リロード検出（新しいAPI）: navEntries[0].type === "reload"');
-            return true;
-        }
-    }
-
-    console.log('❌ リロード未検出 - 通常のSPA遷移として扱う');
-    return false;
-}
-
-/**
- * preparationページへのリダイレクト（モード情報保持）
- * @param {string} reason - リダイレクトの理由（ログ用）
- */
-function redirectToPreparationWithMode(reason = '') {
-    // 現在のモード・セッション情報を取得
-    const hash = window.location.hash.substring(1);
-    const params = new URLSearchParams(hash.split('?')[1] || '');
-    const mode = params.get('mode') || currentMode || 'random';
-    const session = params.get('session') || '';
-
-    console.log(`🔄 preparationへリダイレクト: ${reason}`);
-
-    // preparationへリダイレクト（モード情報を保持）
-    const redirectParams = new URLSearchParams({
-        redirect: 'training',
-        mode: mode
-    });
-    if (session) redirectParams.set('session', session);
-
-    window.location.hash = `preparation?${redirectParams.toString()}`;
-}
-
 export async function initializeTrainingPage() {
     console.log('TrainingController initializing...');
+
+    // 【デバッグ】現在のURL確認
+    console.log('🔍 [DEBUG] hash:', window.location.hash);
 
     // 【新規追加】URLパラメータからモード情報を取得
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash.split('?')[1] || '');
     const modeParam = params.get('mode');
 
+    console.log('🔍 [DEBUG] modeパラメータ:', modeParam);
+
     if (modeParam && modeConfig[modeParam]) {
         currentMode = modeParam;
         console.log(`✅ モード設定: ${currentMode} (${modeConfig[currentMode].title})`);
     } else {
         console.warn(`⚠️ モードパラメータ不正: ${modeParam} - デフォルト(random)を使用`);
+        console.warn(`🔍 [DEBUG] 利用可能なモード:`, Object.keys(modeConfig));
         currentMode = 'random';
     }
 
-    // 【新規追加】リロード検出 → preparationへリダイレクト
-    const isReload = detectReload();
-    if (isReload) {
+    // 【NavigationManager統合】リロード検出 → preparationへリダイレクト
+    if (NavigationManager.detectReload()) {
         console.warn('⚠️ リロード検出 - preparationへリダイレクト');
-        alert('リロードが検出されました。マイク設定のため準備ページに移動します。');
-        window.location.hash = 'preparation';
-        return;
+
+        // ユーザーに説明を表示
+        NavigationManager.showReloadDialog();
+
+        // preparationへリダイレクト
+        await NavigationManager.redirectToPreparation('リロード検出');
+
+        // リダイレクトエラーをスロー（router.jsで特別扱い）
+        throw NavigationManager.createRedirectError();
     }
 
     // Wait for Lucide
@@ -149,7 +95,7 @@ export async function initializeTrainingPage() {
     if (!checkVoiceRangeData()) {
         console.error('❌ 音域データが設定されていません');
         alert('音域テストを先に完了してください。');
-        redirectToPreparationWithMode('音域テスト未完了');
+        await NavigationManager.redirectToPreparation('音域テスト未完了');
         return;
     }
 
@@ -161,6 +107,12 @@ export async function initializeTrainingPage() {
 
     // Update session progress UI
     updateSessionProgressUI();
+
+    // 【ハイブリッド方式】ページ離脱警告を有効化（タブを閉じる・リロード対策）
+    if (window.NavigationManager) {
+        window.NavigationManager.enableNavigationWarning();
+        console.log('✅ ページ離脱警告を有効化（タブを閉じる・リロード対策）');
+    }
 
     // Setup button (常に再登録)
     const playButton = document.getElementById('play-base-note');
@@ -200,6 +152,11 @@ export async function initializeTrainingPage() {
         console.log('✅ デバッグ用マイク許可ボタン登録完了');
     }
 
+    // ホームボタンに確認ダイアログを追加
+    setupHomeButton();
+
+    // ブラウザバック防止はrouter.jsで自動管理されます
+
     isInitialized = true;
     console.log('TrainingController initialized');
 }
@@ -237,7 +194,10 @@ function initializeModeUI() {
     // ページサブタイトルを更新
     const pageSubtitle = document.querySelector('.page-subtitle');
     if (pageSubtitle) {
-        const sessionCounter = window.sessionDataRecorder ? window.sessionDataRecorder.getSessionNumber() : 0;
+        // 【修正】現在のモードのセッション数を正しく計算
+        const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+        const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
+        const sessionCounter = currentModeSessions.length;
         const currentSession = sessionCounter + 1;
         pageSubtitle.textContent = `セッション ${currentSession}/${config.maxSessions} 実施中`;
     }
@@ -268,68 +228,59 @@ function initializeModeTraining() {
             window.sessionDataRecorder.sessionCounter = 0;
             console.log('🔄 sessionCounterリセット: 0');
         }
-
-        // 前回の基音をクリア
-        previousBaseNote = null;
-        console.log('🔄 previousBaseNoteリセット');
     } else {
-        // 連続チャレンジモード・12音階モード：セッションデータを保持（継続）
-        console.log('✅ セッションデータを継続使用（クリアしない）');
+        // 連続チャレンジモード・12音階モード：常にセッションデータをクリアして最初から開始
+        console.log('🔄 連続/12音階モード：セッションデータをクリアして最初から開始');
 
-        // 現在のモードのセッションカウントを確認
+        // 現在のモードのセッションデータを削除
         const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-        const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
+        const otherModeSessions = allSessions.filter(s => s.mode !== currentMode);
+        localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
 
-        if (currentModeSessions.length === 0) {
-            // 初回開始：sessionCounterを0にリセット
-            console.log('🆕 初回開始：sessionCounterを0にリセット');
-            if (window.sessionDataRecorder) {
-                window.sessionDataRecorder.currentSession = null;
-                window.sessionDataRecorder.sessionCounter = 0;
-            }
-            previousBaseNote = null;
-        } else if (currentModeSessions.length >= config.maxSessions) {
-            // 既に完了済み：リセットして最初から
-            console.log('🔄 既に完了済み：セッションデータをクリアして最初から');
-            const otherModeSessions = allSessions.filter(s => s.mode !== currentMode);
-            localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
-
-            if (window.sessionDataRecorder) {
-                window.sessionDataRecorder.currentSession = null;
-                window.sessionDataRecorder.sessionCounter = 0;
-            }
-            previousBaseNote = null;
-        } else {
-            // 途中から継続：sessionCounterを現在の進行状況に設定
-            console.log(`✅ 途中から継続：セッション${currentModeSessions.length + 1}/${config.maxSessions}から開始`);
-            if (window.sessionDataRecorder) {
-                window.sessionDataRecorder.sessionCounter = currentModeSessions.length;
-            }
-
-            // 前回の基音を取得（中級モード用）
-            if (currentMode === 'continuous' && currentModeSessions.length > 0) {
-                const lastSession = currentModeSessions[currentModeSessions.length - 1];
-                const allNotes = window.PitchShifter.AVAILABLE_NOTES;
-                previousBaseNote = allNotes.find(n => n.note === lastSession.baseNote);
-                console.log(`🎵 前回の基音: ${previousBaseNote ? previousBaseNote.note : 'なし'}`);
-            }
+        // sessionCounterを0にリセット
+        if (window.sessionDataRecorder) {
+            window.sessionDataRecorder.currentSession = null;
+            window.sessionDataRecorder.sessionCounter = 0;
         }
+        console.log('✅ sessionCounterリセット完了');
     }
 
-    // 基音を事前に選択（ボタンクリック時の遅延を回避）
+    // 【新規】全セッション分の基音を事前に一括選定
+    selectedBaseNotes = selectAllBaseNotesForMode(config);
+
+    // 最初のセッションの基音を事前に選択（ボタンクリック時の遅延を回避）
     preselectBaseNote();
 }
 
 /**
  * 基音を事前に選択（ボタンクリック時の遅延を回避）
+ * 【新規】事前選定済みの配列から取得
  */
 function preselectBaseNote() {
-    const config = modeConfig[currentMode];
-    const sessionCounter = window.sessionDataRecorder ? window.sessionDataRecorder.getSessionNumber() : 0;
-    const selectedNote = selectBaseNote(config.baseNoteSelection, sessionCounter);
+    // 現在のモードのセッション数を計算
+    const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+    const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
+    const sessionIndex = currentModeSessions.length;
 
-    baseNoteInfo = selectedNote;
-    console.log(`🎵 基音を事前選択: ${selectedNote.note} (${selectedNote.frequency.toFixed(1)}Hz)`);
+    // 事前選定済みの配列から取得
+    if (selectedBaseNotes && selectedBaseNotes.length > sessionIndex) {
+        baseNoteInfo = selectedBaseNotes[sessionIndex];
+
+        // 【追加】基音セット時のログを目立つように出力
+        console.log('');
+        console.log('═══════════════════════════════════════════════════');
+        console.log(`🎼 [セッション ${sessionIndex + 1}/${selectedBaseNotes.length}] 基音セット完了`);
+        console.log(`   基音: ${baseNoteInfo.note} (${baseNoteInfo.frequency.toFixed(1)}Hz)`);
+        console.log(`   全基音: ${selectedBaseNotes.map(n => n.note).join(' → ')}`);
+        console.log('═══════════════════════════════════════════════════');
+        console.log('');
+    } else {
+        console.error(`❌ 基音配列が不足しています（必要: ${sessionIndex + 1}, 実際: ${selectedBaseNotes.length}）`);
+        // フォールバック: 緊急用に即座に選定
+        const availableNotes = getAvailableNotes();
+        baseNoteInfo = availableNotes[Math.floor(Math.random() * availableNotes.length)];
+        console.warn(`⚠️ フォールバック基音選択: ${baseNoteInfo.note}`);
+    }
 }
 
 // デバイス検出（PitchPro実装準拠）
@@ -530,15 +481,24 @@ async function startTraining() {
             throw new Error('基音が選択されていません');
         }
 
-        console.log(`🎵 基音再生開始: ${baseNoteInfo.note} (${baseNoteInfo.frequency.toFixed(1)}Hz)`);
+        // 【追加】基音再生時のログを強化
+        const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+        const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
+        const sessionIndex = currentModeSessions.length;
+
+        console.log('');
+        console.log('🔊🔊🔊 基音再生開始 🔊🔊🔊');
+        console.log(`   セッション: ${sessionIndex + 1}/${modeConfig[currentMode].maxSessions}`);
+        console.log(`   基音: ${baseNoteInfo.note} (${baseNoteInfo.frequency.toFixed(1)}Hz)`);
+        console.log('');
+
         await pitchShifter.playNote(baseNoteInfo.note, 2);
-        console.log('🎵 基音再生:', baseNoteInfo);
 
         // セッションデータ記録開始
         if (window.sessionDataRecorder) {
             sessionRecorder = window.sessionDataRecorder;
-            sessionRecorder.startNewSession(baseNoteInfo.note, baseNoteInfo.frequency);
-            console.log('📊 セッションデータ記録開始');
+            sessionRecorder.startNewSession(baseNoteInfo.note, baseNoteInfo.frequency, currentMode);
+            console.log('📊 セッションデータ記録開始 (mode:', currentMode, ')');
         } else {
             console.warn('⚠️ SessionDataRecorderが読み込まれていません');
         }
@@ -765,9 +725,16 @@ function recordStepPitchData(step) {
 function handleSessionComplete() {
     console.log('✅ トレーニング完了');
 
-    // 音声検出停止
+    // 音声検出停止 & リソース完全破棄
     if (audioDetector) {
         audioDetector.stopDetection();
+        console.log('🛑 音声検出停止');
+
+        // マイクストリームを完全に解放（重要！）
+        // destroy()を呼ばないと、バックグラウンドでマイクが開いたままになり、
+        // 長時間経過後にPitchProが警告アラートを表示してpopstateイベントが発火する問題が発生
+        audioDetector.destroy();
+        console.log('🗑️ AudioDetector破棄完了 - マイクストリーム解放');
     }
 
     // マイクバッジを通常状態に戻す
@@ -788,14 +755,25 @@ function handleSessionComplete() {
         const completedSession = sessionRecorder.completeSession();
         console.log('✅ セッションデータ保存完了:', completedSession);
 
-        const sessionNumber = sessionRecorder.getSessionNumber();
+        // 【修正】現在のモードのセッション数を正しく計算
+        const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+        const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
+        const sessionNumber = currentModeSessions.length;
+        console.log(`🔍 [DEBUG] モード別セッション数: ${currentMode}モード=${sessionNumber}セッション (全体=${allSessions.length}セッション)`);
+
         const config = modeConfig[currentMode];
 
         // モード別の処理分岐
         if (config.hasIndividualResults) {
             // ランダムモード：個別セッション結果ページへ遷移
             console.log(`📊 ランダムモード：セッション${sessionNumber}の結果ページへ遷移`);
-            window.location.hash = `result-session?session=${sessionNumber}`;
+
+            // 【ハイブリッド方式】安全な遷移を使用
+            if (window.NavigationManager) {
+                window.NavigationManager.safeNavigate(`result-session?session=${sessionNumber}`);
+            } else {
+                window.location.hash = `result-session?session=${sessionNumber}`;
+            }
             return;
         } else {
             // 連続チャレンジモード・12音階モード：自動継続または総合評価へ
@@ -841,7 +819,13 @@ function handleSessionComplete() {
             } else {
                 // 全セッション完了：総合評価ページへ遷移
                 console.log(`✅ 全${config.maxSessions}セッション完了！総合評価ページへ遷移`);
-                window.location.hash = `results-overview?mode=${currentMode}`;
+
+                // 【ハイブリッド方式】安全な遷移を使用
+                if (window.NavigationManager) {
+                    window.NavigationManager.safeNavigate(`results-overview?mode=${currentMode}`);
+                } else {
+                    window.location.hash = `results-overview?mode=${currentMode}`;
+                }
                 return;
             }
         }
@@ -886,18 +870,26 @@ function handleSessionComplete() {
 
 export function resetTrainingPageFlag() {
     isInitialized = false;
+
+    // ブラウザバック防止はrouter.jsで自動解除されます
+
     console.log('TrainingController reset');
 }
 
 // グローバルに公開（router.jsから呼び出し可能にする）
 window.resetTrainingPageFlag = resetTrainingPageFlag;
 
+// Page Visibilityハンドラーは削除
+// PitchProの独自エラーダイアログに任せる仕様に変更
+
 /**
  * セッション進行状況UIを更新
  */
 function updateSessionProgressUI() {
-    // セッションカウンターを取得
-    const sessionCounter = window.sessionDataRecorder ? window.sessionDataRecorder.getSessionNumber() : 0;
+    // 【修正】現在のモードのセッション数を正しく計算
+    const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+    const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
+    const sessionCounter = currentModeSessions.length;
     const currentSession = sessionCounter + 1; // 次のセッション番号
     const config = modeConfig[currentMode];
     const totalSessions = config.maxSessions;
@@ -916,6 +908,13 @@ function updateSessionProgressUI() {
     if (sessionBadge) {
         sessionBadge.textContent = `セッション ${currentSession}/${totalSessions}`;
     }
+
+    // 【追加】ページサブタイトルを更新
+    const pageSubtitle = document.querySelector('.page-subtitle');
+    if (pageSubtitle) {
+        pageSubtitle.textContent = `セッション ${currentSession}/${totalSessions} 実施中`;
+        console.log(`✅ サブタイトル更新: セッション ${currentSession}/${totalSessions} 実施中`);
+    }
 }
 
 /**
@@ -926,7 +925,9 @@ function loadVoiceRangeData() {
         const localData = localStorage.getItem('voiceRangeData');
         if (localData) {
             voiceRangeData = JSON.parse(localData);
-            console.log('✅ 音域データ読み込み完了:', voiceRangeData.results);
+            console.log('✅ 音域データ読み込み完了:', voiceRangeData);
+            console.log('📋 voiceRangeData.results:', voiceRangeData.results);
+            console.log('📋 voiceRangeData keys:', Object.keys(voiceRangeData));
         } else {
             console.warn('⚠️ 音域データが見つかりません - デフォルト範囲を使用します');
             voiceRangeData = null;
@@ -975,28 +976,57 @@ function getAvailableNotes() {
         return allNotes;
     }
 
-    // 快適範囲（comfortableRange）を優先使用、なければ全音域を使用
-    const rangeData = voiceRangeData.results.comfortableRange || voiceRangeData.results;
+    // 全音域を使用（快適範囲ではなく全範囲を使用）
+    // 理由: 基音+1オクターブの範囲が必要なため、全音域から基音範囲を計算
+    const rangeData = voiceRangeData.results;
     const { lowFreq, highFreq } = rangeData;
 
     console.log(`🎤 使用する音域: ${lowFreq.toFixed(1)}Hz - ${highFreq.toFixed(1)}Hz (${(Math.log2(highFreq / lowFreq)).toFixed(2)}オクターブ)`);
     console.log(`🎵 PitchShifter音符範囲: ${allNotes[0].note} (${allNotes[0].frequency.toFixed(1)}Hz) - ${allNotes[allNotes.length - 1].note} (${allNotes[allNotes.length - 1].frequency.toFixed(1)}Hz)`);
+    console.log(`📐 基音として使える範囲: ${lowFreq.toFixed(1)}Hz - ${(highFreq / 2).toFixed(1)}Hz (基音+1オクターブが${highFreq.toFixed(1)}Hzに収まる)`);
+    console.log(`📐 基音範囲のオクターブ数: ${(Math.log2((highFreq / 2) / lowFreq)).toFixed(2)}オクターブ`);
 
     // 音域内の音符のみをフィルタリング（基音+1オクターブが収まる範囲）
-    const availableNotes = allNotes.filter(note => {
+    let availableNotes = allNotes.filter(note => {
         const topFreq = note.frequency * 2; // 基音+1オクターブ
         const isInRange = note.frequency >= lowFreq && topFreq <= highFreq;
         return isInRange;
     });
 
-    console.log(`🎵 利用可能な基音: ${availableNotes.length}音`);
+    console.log(`🎵 理想的な基音（基音+1オクターブが完全に音域内）: ${availableNotes.length}音`);
     if (availableNotes.length > 0) {
         console.log(`   範囲: ${availableNotes[0].note} (${availableNotes[0].frequency.toFixed(1)}Hz) - ${availableNotes[availableNotes.length - 1].note} (${availableNotes[availableNotes.length - 1].frequency.toFixed(1)}Hz)`);
-    } else {
-        console.warn(`⚠️ 音域内に利用可能な基音がありません`);
-        console.warn(`   必要範囲: ${lowFreq.toFixed(1)}Hz - ${(highFreq / 2).toFixed(1)}Hz (基音+1オクターブが${highFreq.toFixed(1)}Hzに収まる範囲)`);
-        console.warn(`   PitchShifter最低音: ${allNotes[0].frequency.toFixed(1)}Hz`);
     }
+
+    // 【連続チャレンジモード専用】12音に満たない場合は、音域下限から追加
+    // オクターブ相対音感トレーニングとして12音は必須
+    if (availableNotes.length < 12 && currentMode === 'continuous') {
+        const neededNotes = 12 - availableNotes.length;
+        console.warn(`⚠️ 音域不足: ${availableNotes.length}音 → 12音に拡張（${neededNotes}音追加）`);
+        console.warn(`   推奨: 2.0オクターブ以上の音域（現在: ${(Math.log2(highFreq / lowFreq)).toFixed(2)}オクターブ）`);
+
+        // 音域内の基音のうち、最高音を見つける
+        const highestAvailableNote = availableNotes[availableNotes.length - 1];
+
+        // 全音符リストから、最高基音より上の音を取得
+        // 基音自体は音域内に収めるが、基音+1オクターブは音域外にはみ出すことを許容
+        const higherNotes = allNotes.filter(note =>
+            note.frequency > highestAvailableNote.frequency &&
+            note.frequency <= highFreq // 基音自体は音域内に収める
+        );
+
+        console.log(`   候補: ${higherNotes.length}音 (${higherNotes.map(n => n.note).join(', ')})`);
+
+        // 必要な分だけ追加
+        const notesToAdd = higherNotes.slice(0, neededNotes);
+        availableNotes = [...availableNotes, ...notesToAdd];
+
+        console.log(`✅ 12音確保完了: ${availableNotes.map(n => n.note).join(', ')}`);
+        console.log(`   ※ 追加された${neededNotes}音は基音+1オクターブが音域上限を若干超えますが、`);
+        console.log(`     オクターブ相対音感トレーニングとして12音使用を優先します`);
+    }
+
+    console.log(`🎵 最終的な利用可能基音: ${availableNotes.length}音`);
 
     // 利用可能な基音がない場合、音域の中央付近の音を使用（フォールバック）
     if (availableNotes.length === 0) {
@@ -1031,6 +1061,118 @@ function getVoiceRangeOctaves() {
 }
 
 /**
+ * 全セッション分の基音を事前選定（トレーニング開始時に一括実行）
+ * @param {Object} config - モード設定
+ * @returns {Array} 全セッション分の基音配列
+ */
+function selectAllBaseNotesForMode(config) {
+    const availableNotes = getAvailableNotes();
+    const maxSessions = config.maxSessions;
+    const selectionType = config.baseNoteSelection;
+    const selectedNotes = [];
+
+    console.log(`📋 全${maxSessions}セッション分の基音を事前選定開始 (${selectionType})`);
+
+    if (selectionType === 'random_c3_octave') {
+        // ランダムモード: 白鍵のみ、ゾーン分割、重複なし（8セッション）
+        const whiteKeys = availableNotes.filter(note => !note.note.includes('#'));
+        console.log(`🎹 白鍵のみフィルタリング: ${availableNotes.length}音 → ${whiteKeys.length}音`);
+
+        const octaves = getVoiceRangeOctaves();
+        let numZones = octaves >= 2.0 ? 4 : octaves >= 1.5 ? 3 : 1;
+
+        if (numZones === 1) {
+            // 音域狭い: 完全ランダム（重複なし）
+            const shuffled = [...whiteKeys].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < maxSessions && i < shuffled.length; i++) {
+                selectedNotes.push(shuffled[i]);
+            }
+        } else {
+            // ゾーン分割選択（重複なし）
+            const sessionsPerZone = Math.ceil(maxSessions / numZones);
+            const notesPerZone = Math.ceil(whiteKeys.length / numZones);
+
+            for (let session = 0; session < maxSessions; session++) {
+                const currentZone = Math.floor(session / sessionsPerZone);
+                const zoneStart = currentZone * notesPerZone;
+                const zoneEnd = Math.min((currentZone + 1) * notesPerZone, whiteKeys.length);
+                const zoneNotes = whiteKeys.slice(zoneStart, zoneEnd);
+
+                // ゾーン内で未使用の音を選択
+                const unusedInZone = zoneNotes.filter(note =>
+                    !selectedNotes.some(selected => selected.note === note.note)
+                );
+
+                if (unusedInZone.length > 0) {
+                    const randomNote = unusedInZone[Math.floor(Math.random() * unusedInZone.length)];
+                    selectedNotes.push(randomNote);
+                } else {
+                    // ゾーン内に未使用がない場合は全体から選択
+                    const unusedAll = whiteKeys.filter(note =>
+                        !selectedNotes.some(selected => selected.note === note.note)
+                    );
+                    if (unusedAll.length > 0) {
+                        selectedNotes.push(unusedAll[Math.floor(Math.random() * unusedAll.length)]);
+                    }
+                }
+            }
+        }
+
+    } else if (selectionType === 'random_chromatic') {
+        // 連続チャレンジモード: 全音、距離確保、重複なし（12セッション）
+        const octaves = getVoiceRangeOctaves();
+
+        // 距離制約の設定: 12音確保済みなので距離制約なし（重複回避のみ）
+        const excludeSemitones = 0;
+        console.log(`📊 利用可能音数: ${availableNotes.length}音 → 距離制約なし（重複回避のみ）`);
+
+        // 初回はランダム
+        selectedNotes.push(availableNotes[Math.floor(Math.random() * availableNotes.length)]);
+
+        // 2回目以降は距離確保 + 重複なし
+        for (let session = 1; session < maxSessions; session++) {
+            const previousNote = selectedNotes[selectedNotes.length - 1];
+
+            let candidates = availableNotes.filter(note => {
+                // 既に選ばれた音を除外
+                if (selectedNotes.some(selected => selected.note === note.note)) {
+                    return false;
+                }
+
+                // 音域狭い場合は距離チェックなし
+                if (excludeSemitones === 0) {
+                    return true;
+                }
+
+                // 距離チェック
+                const semitoneDistance = Math.abs(Math.round(12 * Math.log2(note.frequency / previousNote.frequency)));
+                return semitoneDistance > excludeSemitones;
+            });
+
+            // 候補がない場合はエラー（12音確保済みなので起きないはず）
+            if (candidates.length === 0) {
+                console.error(`❌ セッション${session + 1}: 候補なし（${selectedNotes.length}音選択済）`);
+                console.error(`   利用可能: ${availableNotes.length}音, 必要: ${maxSessions}セッション`);
+                console.error(`   これは12音確保ロジックのバグです`);
+                // フォールバック: 全音符から選択
+                candidates = availableNotes;
+            }
+
+            selectedNotes.push(candidates[Math.floor(Math.random() * candidates.length)]);
+        }
+
+    } else if (selectionType === 'sequential_chromatic') {
+        // 12音階モード: クロマチック12音を順次使用
+        for (let session = 0; session < maxSessions; session++) {
+            selectedNotes.push(availableNotes[session % availableNotes.length]);
+        }
+    }
+
+    console.log(`✅ 全${selectedNotes.length}セッション分の基音選定完了: ${selectedNotes.map(n => n.note).join(' → ')}`);
+    return selectedNotes;
+}
+
+/**
  * ゾーン分割選択（初級モード用）
  * @param {Array} availableNotes - 利用可能な音符リスト
  * @param {number} sessionIndex - セッション番号（0始まり）
@@ -1038,6 +1180,25 @@ function getVoiceRangeOctaves() {
  * @returns {Object} 選択された音符
  */
 function selectNoteFromZone(availableNotes, sessionIndex, totalSessions) {
+    // 【修正1】半音(#)を除外 - ランダムモードは白鍵のみ
+    let filteredNotes = availableNotes.filter(note => !note.note.includes('#'));
+    console.log(`🎹 白鍵のみフィルタリング: ${availableNotes.length}音 → ${filteredNotes.length}音`);
+
+    // 【修正2】使用済み基音を除外 - 1トレーニング内で重複防止
+    const unusedNotes = filteredNotes.filter(note =>
+        !usedBaseNotes.some(used => used.note === note.note)
+    );
+
+    if (unusedNotes.length === 0) {
+        console.warn(`⚠️ 未使用の音がありません。使用済みリストをリセットします。`);
+        console.warn(`   使用済み: ${usedBaseNotes.map(n => n.note).join(', ')}`);
+        usedBaseNotes = []; // リセット
+        filteredNotes = availableNotes.filter(note => !note.note.includes('#')); // 再フィルタリング
+    } else {
+        filteredNotes = unusedNotes;
+        console.log(`🚫 使用済み除外: ${unusedNotes.length}音が選択可能`);
+    }
+
     const octaves = getVoiceRangeOctaves();
 
     // 音域に応じたゾーン数を決定
@@ -1048,7 +1209,8 @@ function selectNoteFromZone(availableNotes, sessionIndex, totalSessions) {
         numZones = 3; // 緩和: 3ゾーン分割
     } else {
         // 1-1.5オクターブ: 完全ランダム
-        const randomNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
+        const randomNote = filteredNotes[Math.floor(Math.random() * filteredNotes.length)];
+        usedBaseNotes.push(randomNote); // 使用済みリストに追加
         console.log(`🎲 完全ランダム選択（音域狭い: ${octaves.toFixed(2)}オクターブ）: ${randomNote.note}`);
         return randomNote;
     }
@@ -1058,15 +1220,17 @@ function selectNoteFromZone(availableNotes, sessionIndex, totalSessions) {
     const currentZone = Math.floor(sessionIndex / sessionsPerZone);
 
     // ゾーン範囲を計算
-    const notesPerZone = Math.ceil(availableNotes.length / numZones);
+    const notesPerZone = Math.ceil(filteredNotes.length / numZones);
     const zoneStart = currentZone * notesPerZone;
-    const zoneEnd = Math.min((currentZone + 1) * notesPerZone, availableNotes.length);
+    const zoneEnd = Math.min((currentZone + 1) * notesPerZone, filteredNotes.length);
 
     // ゾーン内からランダム選択
-    const zoneNotes = availableNotes.slice(zoneStart, zoneEnd);
+    const zoneNotes = filteredNotes.slice(zoneStart, zoneEnd);
     const selectedNote = zoneNotes[Math.floor(Math.random() * zoneNotes.length)];
 
+    usedBaseNotes.push(selectedNote); // 使用済みリストに追加
     console.log(`🎯 ゾーン${currentZone + 1}/${numZones}から選択（${octaves.toFixed(2)}オクターブ）: ${selectedNote.note}`);
+    console.log(`📝 使用済み基音: ${usedBaseNotes.map(n => n.note).join(', ')}`);
     return selectedNote;
 }
 
@@ -1083,6 +1247,8 @@ function selectNoteWithDistance(availableNotes) {
         return randomNote;
     }
 
+    console.log(`🔍 [連続モード] 前回の基音: ${previousBaseNote.note} (${previousBaseNote.frequency.toFixed(1)}Hz)`);
+
     const octaves = getVoiceRangeOctaves();
 
     // 音域に応じた除外半音数を決定
@@ -1092,28 +1258,51 @@ function selectNoteWithDistance(availableNotes) {
     } else if (octaves >= 1.5) {
         excludeSemitones = 3; // 緩和: ±3半音以内を除外
     } else {
-        // 1-1.5オクターブ: 完全ランダム（除外なし）
-        const randomNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
-        console.log(`🎲 完全ランダム選択（音域狭い: ${octaves.toFixed(2)}オクターブ）: ${randomNote.note}`);
+        // 【修正】音域狭い場合でも前回と同じ音は除外
+        const filteredNotes = availableNotes.filter(note => note.note !== previousBaseNote.note);
+        if (filteredNotes.length === 0) {
+            console.warn(`⚠️ 選択肢が1音のみ - 同じ音を選択`);
+            return availableNotes[0];
+        }
+        const randomNote = filteredNotes[Math.floor(Math.random() * filteredNotes.length)];
+        console.log(`🎲 ランダム選択（音域狭い: ${octaves.toFixed(2)}オクターブ、前回除外）: ${randomNote.note}`);
         return randomNote;
     }
 
-    // 前回の周波数から半音数を計算して除外
+    // 【修正】前回の周波数から半音数を計算して除外 + 同じ音も必ず除外
     const filteredNotes = availableNotes.filter(note => {
+        // 完全に同じ音を除外（最優先）
+        if (note.note === previousBaseNote.note) {
+            console.log(`  🚫 除外: ${note.note} (前回と同じ)`);
+            return false;
+        }
+
         const semitoneDistance = Math.abs(Math.round(12 * Math.log2(note.frequency / previousBaseNote.frequency)));
-        return semitoneDistance > excludeSemitones;
+        const excluded = semitoneDistance <= excludeSemitones;
+        if (excluded) {
+            console.log(`  🚫 除外: ${note.note} (距離${semitoneDistance}半音 ≤ ${excludeSemitones}半音)`);
+        }
+        return !excluded;
     });
 
-    // 除外後の選択肢がない場合は完全ランダム（フォールバック）
+    console.log(`📊 フィルタリング結果: ${availableNotes.length}音 → ${filteredNotes.length}音が選択可能`);
+
+    // 除外後の選択肢がない場合は前回を除いた完全ランダム（フォールバック）
     if (filteredNotes.length === 0) {
-        console.warn(`⚠️ 除外後の選択肢なし - 完全ランダム選択`);
-        const randomNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
+        console.warn(`⚠️ 除外後の選択肢なし - 前回を除いてランダム選択`);
+        const fallbackNotes = availableNotes.filter(note => note.note !== previousBaseNote.note);
+        if (fallbackNotes.length === 0) {
+            console.warn(`⚠️ 前回を除いた選択肢もなし - 同じ音を選択`);
+            return previousBaseNote;
+        }
+        const randomNote = fallbackNotes[Math.floor(Math.random() * fallbackNotes.length)];
+        console.log(`🎲 フォールバック選択: ${randomNote.note}`);
         return randomNote;
     }
 
     const selectedNote = filteredNotes[Math.floor(Math.random() * filteredNotes.length)];
     const semitoneDistance = Math.round(12 * Math.log2(selectedNote.frequency / previousBaseNote.frequency));
-    console.log(`🎯 距離確保選択（前回から${Math.abs(semitoneDistance)}半音、±${excludeSemitones}半音除外）: ${selectedNote.note}`);
+    console.log(`🎯 距離確保選択: ${selectedNote.note} (前回から${Math.abs(semitoneDistance)}半音、±${excludeSemitones}半音除外）`);
     return selectedNote;
 }
 
@@ -1157,3 +1346,42 @@ function selectBaseNote(selectionType, sessionIndex = 0) {
 
     return selectedNote;
 }
+
+/**
+ * ホームボタンに確認ダイアログを追加
+ * トレーニング中のデータ損失を防止
+ */
+function setupHomeButton() {
+    const homeBtn = document.getElementById('btn-home-training');
+    if (!homeBtn) {
+        console.warn('⚠️ ホームボタンが見つかりません (id: btn-home-training)');
+        return;
+    }
+
+    homeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        const confirmed = confirm(
+            'トレーニング中です。\n' +
+            'ホームに戻ると進行中のデータが失われます。\n' +
+            '本当にホームに戻りますか？'
+        );
+
+        if (confirmed) {
+            // ブラウザバック防止はrouter.jsで自動解除されます
+
+            // router.js の cleanupCurrentPage() が自動実行される
+            window.location.hash = 'home';
+            console.log('🏠 ユーザーがホームへの移動を承認');
+        } else {
+            console.log('🚫 ホームへの移動をキャンセル');
+        }
+    });
+
+    console.log('✅ ホームボタンに確認ダイアログを設定');
+}
+
+/**
+ * ブラウザバック防止はrouter.jsでグローバルに管理されています
+ * （この機能は削除されました - router.jsを参照）
+ */

@@ -72,8 +72,8 @@
                                 <div class="stat-label-rank">平均誤差（セント）</div>
                             </div>
                             <div class="rank-stat-item">
-                                <div class="stat-value-rank max-error">+25.8¢</div>
-                                <div class="stat-label-rank">最大誤差（セント）</div>
+                                <div class="stat-value-rank excellence-rate" id="excellence-rate">50%</div>
+                                <div class="stat-label-rank">優秀率（±20¢以内）</div>
                             </div>
                             <div class="rank-stat-item">
                                 <div class="stat-value-rank stat-value-session-count session-count">8</div>
@@ -478,7 +478,34 @@
             // 達成メッセージ更新
             const messageEl = document.getElementById('share-message');
             if (messageEl) {
-                messageEl.textContent = evaluation.displayInfo.achievements;
+                let message = evaluation.displayInfo.achievements;
+
+                // グレード未達成の場合、詳細情報を追加
+                if (!evaluation.gradeResult.achievedBy.avgError || !evaluation.gradeResult.achievedBy.excellence) {
+                    const grade = evaluation.grade;
+                    const threshold = evaluation.gradeResult.thresholds;
+                    const actual = evaluation.metrics.adjusted;
+
+                    message = `${grade}級基準未達成\n`;
+
+                    // 平均誤差の達成状況
+                    if (!evaluation.gradeResult.achievedBy.avgError) {
+                        const diff = (actual.avgError - threshold.avgError).toFixed(1);
+                        message += `平均誤差: ${actual.avgError.toFixed(1)}¢（目標${threshold.avgError}¢以下、あと${diff}¢改善必要）\n`;
+                    } else {
+                        message += `平均誤差: ${actual.avgError.toFixed(1)}¢（目標${threshold.avgError}¢以下 ✓）\n`;
+                    }
+
+                    // 優秀率の達成状況
+                    if (!evaluation.gradeResult.achievedBy.excellence) {
+                        const diff = ((threshold.excellence - actual.excellenceRate) * 100).toFixed(1);
+                        message += `優秀率: ${(actual.excellenceRate * 100).toFixed(1)}%（目標${(threshold.excellence * 100).toFixed(0)}%以上、あと${diff}%改善必要）`;
+                    } else {
+                        message += `優秀率: ${(actual.excellenceRate * 100).toFixed(1)}%（目標${(threshold.excellence * 100).toFixed(0)}%以上 ✓）`;
+                    }
+                }
+
+                messageEl.textContent = message;
             }
 
             // 評価分布表示
@@ -534,6 +561,13 @@
             if (avgErrorEl) {
                 const avgError = evaluation.metrics.adjusted.avgError;
                 avgErrorEl.textContent = `±${avgError.toFixed(1)}¢`;
+            }
+
+            // 優秀率
+            const excellenceRateEl = document.getElementById('excellence-rate');
+            if (excellenceRateEl) {
+                const excellenceRate = evaluation.metrics.adjusted.excellenceRate;
+                excellenceRateEl.textContent = `${(excellenceRate * 100).toFixed(1)}%`;
             }
 
             // 最大誤差計算

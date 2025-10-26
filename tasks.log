@@ -5312,3 +5312,222 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 23:18:54] コミット: feat: 連続チャレンジモード（12回）と12音階モード実装完了
+
+3つのトレーニングモードを完全実装：
+- ランダム基音モード（初級・8回）
+- 連続チャレンジモード（中級・12回）✨ NEW
+- 12音階モード（上級・12-24回）✨ NEW
+
+主な変更:
+- continuous maxSessions: 8→12に変更
+- モード名を12toneに統一（twelve/chromatic→12tone）
+- 全モードで音域テスト（preparation）を必須化
+- evaluation-calculatorでセッションデータからモード直接判定
+
+修正ファイル:
+- trainingController.js: continuousセッション数変更
+- home.html: モード名統一、preparation経由に修正
+- preparationController.js: モード名マッピング更新
+- evaluation-calculator.js: 12tone判定ロジック実装
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 23:28:57] コミット: feat: 連続モード・12音階モードの自動継続実装
+
+連続チャレンジモードと12音階モードで、最初の基音再生ボタンクリック後、
+全セッションを自動継続し、最後に総合評価ページへ遷移する機能を実装。
+
+主な変更内容:
+- URLパラメータからモード情報を取得してcurrentMode変数に設定
+- initializeModeTraining(): モード別初期化処理を実装
+  - ランダムモード: 毎回セッションデータをクリア
+  - 連続・12音階モード: セッションデータを保持して継続可能
+- handleSessionComplete(): モード別の完了処理を実装
+  - ランダムモード: 個別セッション結果ページへ遷移
+  - 連続・12音階モード:
+    - 最終セッションでない場合: 2秒後に次のセッションを自動開始
+    - 最終セッションの場合: 総合評価ページ(results-overview)へ遷移
+- preselectBaseNote()を自動継続時にも呼び出して遅延を回避
+- セッション間に2秒のインターバルを設けてユーザーが準備できるように配慮
+
+動作フロー:
+1. ユーザーが「基音スタート」ボタンをクリック
+2. 基音再生 → ドレミガイド → セッション完了
+3. 連続・12音階モードでは自動的に次のセッションへ
+4. 全セッション完了後、総合評価画面へ自動遷移
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 23:36:59] コミット: fix: 連続モード・12音階モードのモード情報がpreparationで失われる問題を修正
+
+preparationページからtrainingページへの遷移時に、モード情報が正しく
+引き継がれないバグを修正。
+
+根本原因:
+1. router.jsで、preparationへの遷移時にmodeとsessionの両方が必要な
+   条件（`if (mode && session)`）になっていた
+2. preparationController.jsのgetRedirectInfo()が、redirectパラメータが
+   ない場合にnullを返していた
+
+修正内容:
+- router.js (lines 182-189):
+  - 条件を `if (mode || session)` に変更
+  - URLSearchParamsを使用してパラメータを構築
+  - 常に `redirect=training` パラメータを追加
+
+- preparationController.js (lines 23-30):
+  - redirectパラメータがなくてもmodeパラメータがあればredirectInfoを生成
+  - redirectのデフォルト値を'training'に設定
+
+動作フロー:
+1. ホームで「連続チャレンジモード」ボタンをクリック
+2. router.jsが `#preparation?mode=continuous&session=1&redirect=training` に遷移
+3. preparationController.jsがredirectInfoを正しく取得してwindow.preparationRedirectInfoに保存
+4. 音域テスト完了後、preparation-pitchpro-cycle.jsが
+   `NavigationManager.navigateToTraining('continuous', '1')` を呼び出し
+5. trainingページで正しく連続モードとして初期化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-24 23:41:13] コミット: chore: キャッシュバスターをv20251024006に更新
+
+連続モード・12音階モード関連の修正（router.js、preparationController.js、
+trainingController.js）を確実にブラウザに反映させるため、
+すべてのJavaScriptファイルとCSSファイルのキャッシュバスターを更新。
+
+変更内容:
+- すべてのCSSファイル: v=20251024005 → v=20251024006
+- すべてのJavaScriptファイル: v=20251024005 → v=20251024006
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-25 18:01:11] コミット: fix: 連続チャレンジモードのセッション管理とUI表示を完全修正
+
+- 連続チャレンジモードのセッション数を12に修正（trainingController.v2.js）
+- セッション数計算ロジックをモード別に正しく実装
+  - 全モード合計ではなく現在のモードのみをカウント
+  - handleSessionComplete(), preselectBaseNote(), updateSessionProgressUI()を修正
+- preparationページでモード情報を必須に変更
+  - デフォルトrandomモード設定を削除
+  - モード指定なしの場合はホームに戻す
+- 連続/12音階モードで常に1から開始するように変更
+  - 「途中から継続」ロジックを削除
+  - 毎回セッションデータをクリアして最初から開始
+- updateSessionProgressUI()にサブタイトル更新を追加
+  - セッション進行時にページサブタイトルも更新
+- results-overviewでモード別セッションフィルタリング追加
+  - URLパラメータからモードを取得
+  - 現在のモードのセッションのみを評価対象に
+- ブラウザバック防止のハイブリッド方式実装（NavigationManager）
+  - beforeunload + popstate + 許可リスト方式
+  - safeNavigate()メソッド追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-26 19:54:26] コミット: fix: 基音選択ロジックの改善（ランダムモード・連続モード対応）
+
+- ランダムモード：半音(#)を除外し白鍵のみ選択
+- ランダムモード：1トレーニング内(8セッション)で同じ基音を使わない
+- 連続チャレンジモード：前回と完全に同じ音を優先除外
+- usedBaseNotesリスト追加：使用済み基音を追跡
+- トレーニング開始時のリセットロジック強化
+- 詳細ログ追加：基音選択過程を可視化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-26 20:04:45] コミット: fix: Page Visibilityハンドラーを削除（PitchPro独自エラーダイアログに統一）
+
+- setupPageVisibilityHandler()関数を完全削除
+- デスクトップ切り替え時のalert重複問題を解決
+- PitchProのMicrophoneLifecycleManager独自ダイアログに任せる仕様に変更
+- router.jsのクリーンアップコードも削除
+
+理由:
+- PitchProはバックグラウンド/アイドル検出時に独自ダイアログを表示する仕様
+- Page Visibilityハンドラーが先にalertを表示し、PitchProと干渉していた
+- NavigationManagerとPitchProの独自エラーハンドリングのみで対応
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-26 20:19:47] コミット: chore: キャッシュバスターを20251026001に更新
+
+- trainingController.v2.js: VERSION 2025-10-26-001 に更新
+- index.html: 全JavaScriptファイルのキャッシュバスターを20251026001に統一
+- ブラウザキャッシュ問題を解決し、基音選択ロジック修正を確実に反映
+
+更新対象:
+- data-manager.js
+- navigation-manager.js
+- evaluation-calculator.js
+- session-data-recorder.js
+- result-session-controller.js
+- pitchpro-v1.3.1.umd.js
+- voice-range-test.js
+- lucide-init.js
+- router.js
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-26 20:32:06] コミット: refactor: 全セッション分の基音を事前一括選定に変更
+
+【主要変更】
+- トレーニング開始時に全セッション分の基音を一括選定
+- selectedBaseNotes配列に保存し、セッションごとに取得
+- previousBaseNote/usedBaseNotes管理を削除
+
+【実装内容】
+- selectAllBaseNotesForMode()関数を新規作成
+  - ランダムモード: 白鍵のみ、ゾーン分割、重複なし（8セッション）
+  - 連続チャレンジモード: 全音、距離確保、重複なし（12セッション）
+  - 12音階モード: クロマチック順次（12セッション）
+- initializeModeTraining()で全基音を事前選定
+- preselectBaseNote()を配列参照のみに簡素化
+- ログで全基音を一度に確認可能
+
+【メリット】
+✅ 重複が絶対に起きない
+✅ デバッグが容易（全基音をログで一覧表示）
+✅ ロジックがシンプル
+✅ previousBaseNote管理が不要
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-26 20:40:35] コミット: feat: 基音セット時のログ出力を強化
+
+【追加機能】
+- preselectBaseNote()で基音セット時に目立つログを出力
+  - セッション番号と全基音一覧を表示
+  - 区切り線で見やすく整形
+- startTraining()で基音再生時のログを強化
+  - セッション情報と基音を明確に表示
+
+【ログ例】
+```
+═══════════════════════════════════════════════════
+🎼 [セッション 1/12] 基音セット完了
+   基音: C3 (130.8Hz)
+   全基音: C3 → D#3 → G#2 → C#3 → F3 → A2 → D3 → G3 → B2 → E3 → A#2 → F#3
+═══════════════════════════════════════════════════
+
+🔊🔊🔊 基音再生開始 🔊🔊🔊
+   セッション: 1/12
+   基音: C3 (130.8Hz)
+```
+
+【バージョン】
+- trainingController.v2.js: VERSION 2025-10-26-003
+- キャッシュバスター: 20251026003
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

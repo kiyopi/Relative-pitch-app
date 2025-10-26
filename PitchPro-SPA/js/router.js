@@ -297,8 +297,8 @@ class SimpleRouter {
             console.log('Setting up training page events with dynamic import...');
             console.log('Full hash:', fullHash);
 
-            // 動的にtrainingControllerをインポート（v2ファイル使用、キャッシュバスター追加）
-            const { initializeTrainingPage } = await import(`./controllers/trainingController.v2.js?v=${Date.now()}`);
+            // 動的にtrainingControllerをインポート（キャッシュバスター追加）
+            const { initializeTrainingPage } = await import(`./controllers/trainingController.js?v=${Date.now()}`);
 
             // コントローラーの初期化関数を実行
             await initializeTrainingPage();

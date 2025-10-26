@@ -297,12 +297,12 @@ class EvaluationCalculator {
       }
     }
 
-    // すべての基準を満たさない場合
+    // すべての基準を満たさない場合（個別達成状況を判定）
     return {
       grade: 'E',
       achievedBy: {
-        avgError: false,
-        excellence: false
+        avgError: adjustedMetrics.avgError <= thresholds.E.avgError,
+        excellence: adjustedMetrics.excellenceRate >= thresholds.E.excellence
       },
       thresholds: thresholds.E
     };
