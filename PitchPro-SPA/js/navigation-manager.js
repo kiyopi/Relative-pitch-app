@@ -133,12 +133,22 @@ class NavigationManager {
     /**
      * preparationページへリダイレクト（モード情報保持）
      *
+     * 【自動処理】
+     * - beforeunloadハンドラーを自動的に無効化
+     * - popstateハンドラーを自動的に削除
+     * - ダイアログなしで安全にリダイレクト
+     *
      * @param {string} reason - リダイレクトの理由（ログ用）
      * @param {string|null} mode - モード（省略時はURLから取得）
      * @param {string|null} session - セッション番号（省略可）
      */
     static async redirectToPreparation(reason = '', mode = null, session = null) {
         console.log(`🔄 [NavigationManager] preparationへリダイレクト: ${reason}`);
+
+        // 【自動処理】beforeunload/popstateを無効化（ダイアログ防止）
+        this.disableNavigationWarning();
+        this.removeBrowserBackPrevention();
+        console.log('✅ [NavigationManager] ナビゲーション制約を自動解除');
 
         // モード情報が指定されていない場合、URLから取得
         if (!mode) {

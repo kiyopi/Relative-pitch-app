@@ -5556,3 +5556,27 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-26 22:44:31] コミット: fix: リロード検出時のSafariダイアログ重複問題を修正
+
+【問題】
+- trainingページでリロードボタン押下時に2つのダイアログが表示される
+  1. Safari: "このページから移動してもよろしいですか？"
+  2. アプリ: "リロードが検出されました。マイク設定のため準備ページに移動します。"
+
+【原因】
+- リロード検出時にbeforeunloadハンドラーが無効化されていなかった
+- Line 113でenableNavigationWarning()が呼ばれるが、
+  リロード検出時（Line 75-88）にdisableNavigationWarning()が呼ばれていなかった
+
+【修正内容】
+- リロード検出時にNavigationManager.disableNavigationWarning()を追加
+- 音域テスト未完了時も同様にdisableNavigationWarning()を追加
+- Safariダイアログを防止し、アプリのalertのみを表示
+
+【影響】
+- リロード時のユーザー体験が改善
+- ダイアログが1つだけになり、混乱を防止
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
