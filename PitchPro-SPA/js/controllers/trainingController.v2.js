@@ -2,10 +2,10 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: 2025-10-26-002 - 全セッション分の基音を事前一括選定
+ * 🔥 VERSION: 2025-10-26-003 - 基音セット時のログ強化
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-26-002 LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-26-003 LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
@@ -265,7 +265,15 @@ function preselectBaseNote() {
     // 事前選定済みの配列から取得
     if (selectedBaseNotes && selectedBaseNotes.length > sessionIndex) {
         baseNoteInfo = selectedBaseNotes[sessionIndex];
-        console.log(`🎵 基音を事前選択 [セッション${sessionIndex + 1}]: ${baseNoteInfo.note} (${baseNoteInfo.frequency.toFixed(1)}Hz)`);
+
+        // 【追加】基音セット時のログを目立つように出力
+        console.log('');
+        console.log('═══════════════════════════════════════════════════');
+        console.log(`🎼 [セッション ${sessionIndex + 1}/${selectedBaseNotes.length}] 基音セット完了`);
+        console.log(`   基音: ${baseNoteInfo.note} (${baseNoteInfo.frequency.toFixed(1)}Hz)`);
+        console.log(`   全基音: ${selectedBaseNotes.map(n => n.note).join(' → ')}`);
+        console.log('═══════════════════════════════════════════════════');
+        console.log('');
     } else {
         console.error(`❌ 基音配列が不足しています（必要: ${sessionIndex + 1}, 実際: ${selectedBaseNotes.length}）`);
         // フォールバック: 緊急用に即座に選定
@@ -473,9 +481,18 @@ async function startTraining() {
             throw new Error('基音が選択されていません');
         }
 
-        console.log(`🎵 基音再生開始: ${baseNoteInfo.note} (${baseNoteInfo.frequency.toFixed(1)}Hz)`);
+        // 【追加】基音再生時のログを強化
+        const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+        const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
+        const sessionIndex = currentModeSessions.length;
+
+        console.log('');
+        console.log('🔊🔊🔊 基音再生開始 🔊🔊🔊');
+        console.log(`   セッション: ${sessionIndex + 1}/${modeConfig[currentMode].maxSessions}`);
+        console.log(`   基音: ${baseNoteInfo.note} (${baseNoteInfo.frequency.toFixed(1)}Hz)`);
+        console.log('');
+
         await pitchShifter.playNote(baseNoteInfo.note, 2);
-        console.log('🎵 基音再生:', baseNoteInfo);
 
         // セッションデータ記録開始
         if (window.sessionDataRecorder) {
