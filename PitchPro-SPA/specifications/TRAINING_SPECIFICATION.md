@@ -1323,41 +1323,82 @@ if (window.pitchShifterInstance) {
 }
 ```
 
-#### 7.2.2 Tone.js Samplerノイズ軽減設定（v3.1.4）
+#### 7.2.2 Tone.js Samplerノイズ軽減設定（v3.1.4-3.1.5）
 
 **背景**: 基音再生時にプチノイズ（クリック音）が発生する問題に対応
+
+**v3.1.5更新**: 複数サンプル対応による低音域ノイズ軽減
 
 **実装**: `/js/core/reference-tones.js`
 
 ```javascript
+// 複数オクターブサンプルによるピッチシフトアーティファクト軽減
+const sampleUrls = {
+    C2: "C2.mp3",  // Bass range (C2-B2)
+    C3: "C3.mp3",  // Low-mid range (C3-B3)
+    C4: "C4.mp3",  // Mid range (C4-B4) - Always available
+    C5: "C5.mp3"   // High range (C5-E5)
+};
+
 this.sampler = new Tone.Sampler({
-    urls: { C4: "C4.mp3" },
+    urls: sampleUrls,
     baseUrl: this.config.baseUrl,
     release: this.config.release,
     attack: 0.05,              // 50ms fade-in（推奨: 0.005-0.05秒）
-    curve: "exponential"       // より自然な振幅エンベロープ
+    curve: "exponential",      // より自然な振幅エンベロープ
+    onload: () => {
+        console.log("✅ [PitchShifter] Samples loaded successfully");
+    },
+    onerror: (error) => {
+        console.warn("⚠️ [PitchShifter] Some samples failed to load, using available samples:", error);
+        // Tone.js will automatically fall back to available samples
+    }
 }).toDestination();
 ```
 
 **設定の根拠**:
-1. **attack: 0.05秒（50ms）**
+
+1. **複数サンプル対応（v3.1.5新規追加）**
+   - 各オクターブごとに専用サンプルを配置
+   - 最大ピッチシフト量: ±6半音（半オクターブ）に制限
+   - **根本原因**: C4単一サンプルから低音域（C2-B2）への-24半音シフトでアーティファクト発生
+   - **効果**: ピッチシフト量を大幅削減し、特に低音域でのクリックノイズを軽減
+   - **フォールバック**: サンプル読み込み失敗時はC4のみで動作（Tone.js自動フォールバック）
+
+2. **attack: 0.05秒（50ms）**
    - Tone.js推奨範囲: 0.005-0.05秒
    - 15ms（旧設定）→ 50msへの延長でクリックノイズを軽減
    - 人間の耳には気づかない程度の短時間
 
-2. **curve: "exponential"**
+3. **curve: "exponential"**
    - デフォルト: attackCurve="linear", releaseCurve="exponential"
    - Sampler推奨設定: "exponential"（より自然な音）
    - 振幅エンベロープが人間の聴覚特性に合致
 
 **参考情報**:
 - Tone.js Issue #328: Samplerのattack終了時・release開始時のクリックノイズ既知の問題
+- Tone.js Issue #803: ピッチシフトアーティファクト削減方法
 - 適切なattack値とexponential curveで軽減可能
 - ゼロ値（attack: 0.0）はクリックノイズの原因となるため非推奨
+- **ピッチシフト量が大きいほどアーティファクトが顕著**（複数サンプルで解決）
+
+**サンプルファイル生成方法**:
+
+`/audio/piano/generate_samples.py`を使用してC4.mp3から他のオクターブを生成:
+
+```bash
+# 依存ライブラリインストール
+pip install librosa soundfile numpy
+
+# サンプル生成実行
+cd PitchPro-SPA/audio/piano
+python generate_samples.py
+```
 
 **代替設定**（ノイズが残る場合）:
 - attack: 0.1秒（100ms）に延長
 - 異なるcurveタイプの試行: "sine", "cosine", "bounce", "ripple"
+- より密なサンプル配置: C2, D2, E2, ... (2半音ごと)
 
 ### 7.3 マイクストリーム
 

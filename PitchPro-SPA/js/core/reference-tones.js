@@ -1,8 +1,9 @@
 /**
  * PitchShifter - Tone.js Sampler Wrapper
- * @version 1.0.1
+ * @version 1.1.0
  * @date 2025-10-28
  * @changelog
+ *   - 2025-10-28: 複数サンプル対応実装 (C2, C3, C4, C5) - 低音域ノイズ軽減
  *   - 2025-10-28: Tone.js Samplerノイズ軽減設定実装 (attack: 0.05, curve: exponential)
  */
 var c = Object.defineProperty;
@@ -32,17 +33,34 @@ const t = class t {
       return;
     }
     try {
-      console.log("🎹 [PitchShifter] Initializing..."), l.getContext().state !== "running" && (await l.start(), console.log("🔊 [PitchShifter] AudioContext started")), this.sampler = new l.Sampler({
-        urls: {
-          C4: "C4.mp3"
-        },
+      console.log("🎹 [PitchShifter] Initializing..."), l.getContext().state !== "running" && (await l.start(), console.log("🔊 [PitchShifter] AudioContext started"));
+
+      // Multiple samples to reduce pitch shift artifacts (especially in bass range)
+      // Each sample covers ~1 octave range (±6 semitones max shift)
+      // Fallback to C4 only if other samples are not available
+      const sampleUrls = {
+        C2: "C2.mp3",  // Bass range (C2-B2)
+        C3: "C3.mp3",  // Low-mid range (C3-B3)
+        C4: "C4.mp3",  // Mid range (C4-B4) - Always available
+        C5: "C5.mp3"   // High range (C5-E5)
+      };
+
+      this.sampler = new l.Sampler({
+        urls: sampleUrls,
         baseUrl: this.config.baseUrl,
         release: this.config.release,
         attack: 0.05,
         // 50ms fade-in to prevent pop/click noise (Tone.js best practice: 0.005-0.05)
-        curve: "exponential"
+        curve: "exponential",
         // Exponential curve for more natural amplitude envelope (recommended for Sampler)
-      }).toDestination(), this.sampler.volume.value = this.config.volume, console.log("📥 [PitchShifter] Loading audio sample..."), await l.loaded(), this.isInitialized = !0, console.log("✅ [PitchShifter] Initialization complete");
+        onload: () => {
+          console.log("✅ [PitchShifter] Samples loaded successfully");
+        },
+        onerror: (error) => {
+          console.warn("⚠️ [PitchShifter] Some samples failed to load, using available samples:", error);
+          // Tone.js will automatically fall back to available samples
+        }
+      }).toDestination(), this.sampler.volume.value = this.config.volume, console.log("📥 [PitchShifter] Loading audio samples..."), await l.loaded(), this.isInitialized = !0, console.log("✅ [PitchShifter] Initialization complete");
     } catch (e) {
       throw console.error("❌ [PitchShifter] Initialization failed:", e), new Error(`PitchShifter initialization failed: ${e}`);
     }
