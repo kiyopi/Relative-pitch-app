@@ -6231,3 +6231,29 @@ A3(C4-3) → C4 → Eb4(C4+3) → Gb4(C4+6) → A4(C5-3) → C5
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-28 17:01:00] コミット: refactor: シンプル戦略に回帰 - C3単一サンプルで安定性重視（v2.0.0）
+
+問題:
+- 複数サンプル戦略が複雑化し、Tone.jsの自動選択が期待通り動作せず
+- 中間サンプル（F#2, Eb2等）が認識されず、ブチ音が継続
+- 過度な最適化により逆に不安定化
+
+解決策:
+- 元のシンプルな単一サンプル方式に回帰
+- C4 → C3に変更（低音域に最適化）
+- 既存の改良（attack: 0.15秒、音量調整、安定化待機）は維持
+
+利点:
+- シンプルで確実な動作
+- Tone.jsの標準動作に依存
+- デバッグ・保守が容易
+- C3ベースで低音域のピッチシフト量を削減
+
+音域カバー範囲:
+- C2-B2: C3から-12〜-1半音（下方向）
+- C3-B3: C3から0〜+11半音（最小）
+- C4-E5: C3から+12〜+24半音（上方向）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
