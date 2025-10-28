@@ -1,11 +1,13 @@
 /**
  * PitchShifter - Tone.js Sampler Wrapper
- * @version 1.1.0
+ * @version 1.1.1
  * @date 2025-10-28
  * @changelog
+ *   - 2025-10-28: キャッシュバスター実装（クエリパラメータでバージョン管理）
  *   - 2025-10-28: 複数サンプル対応実装 (C2, C3, C4, C5) - 低音域ノイズ軽減
  *   - 2025-10-28: Tone.js Samplerノイズ軽減設定実装 (attack: 0.05, curve: exponential)
  */
+const SAMPLE_VERSION = "1.1.1";
 var c = Object.defineProperty;
 var f = (s, e, i) => e in s ? c(s, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : s[e] = i;
 var n = (s, e, i) => f(s, typeof e != "symbol" ? e + "" : e, i);
@@ -38,12 +40,15 @@ const t = class t {
       // Multiple samples to reduce pitch shift artifacts (especially in bass range)
       // Each sample covers ~1 octave range (±6 semitones max shift)
       // Fallback to C4 only if other samples are not available
+      // Cache buster: version parameter appended to URLs
       const sampleUrls = {
-        C2: "C2.mp3",  // Bass range (C2-B2)
-        C3: "C3.mp3",  // Low-mid range (C3-B3)
-        C4: "C4.mp3",  // Mid range (C4-B4) - Always available
-        C5: "C5.mp3"   // High range (C5-E5)
+        C2: `C2.mp3?v=${SAMPLE_VERSION}`,  // Bass range (C2-B2)
+        C3: `C3.mp3?v=${SAMPLE_VERSION}`,  // Low-mid range (C3-B3)
+        C4: `C4.mp3?v=${SAMPLE_VERSION}`,  // Mid range (C4-B4) - Always available
+        C5: `C5.mp3?v=${SAMPLE_VERSION}`   // High range (C5-E5)
       };
+
+      console.log(`📦 [PitchShifter] Sample version: ${SAMPLE_VERSION}`);
 
       this.sampler = new l.Sampler({
         urls: sampleUrls,
