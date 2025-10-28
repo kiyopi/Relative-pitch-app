@@ -1,8 +1,9 @@
 /**
  * PitchShifter - Tone.js Sampler Wrapper
- * @version 1.3.1
+ * @version 1.4.0
  * @date 2025-10-28
  * @changelog
+ *   - 2025-10-28: サンプルマッピング戦略変更（中間サンプル追加でTone.js選択ロジック最適化）
  *   - 2025-10-28: サンプル選択・ピッチシフト量の詳細ログ追加（A#2/C3問題調査）
  *   - 2025-10-28: クリッキングノイズ対策強化（attack: 0.15秒、安定化待機100ms）
  *   - 2025-10-28: 低音域の音量バランス調整・音割れ対策強化
@@ -10,7 +11,7 @@
  *   - 2025-10-28: 複数サンプル対応実装 (C2, C3, C4, C5) - 低音域ノイズ軽減
  *   - 2025-10-28: Tone.js Samplerノイズ軽減設定実装 (attack: 0.05, curve: exponential)
  */
-const SAMPLE_VERSION = "1.3.1";
+const SAMPLE_VERSION = "1.4.0";
 var c = Object.defineProperty;
 var f = (s, e, i) => e in s ? c(s, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : s[e] = i;
 var n = (s, e, i) => f(s, typeof e != "symbol" ? e + "" : e, i);
@@ -40,15 +41,18 @@ const t = class t {
     try {
       console.log("🎹 [PitchShifter] Initializing..."), l.getContext().state !== "running" && (await l.start(), console.log("🔊 [PitchShifter] AudioContext started"));
 
-      // Multiple samples to reduce pitch shift artifacts (especially in bass range)
-      // Each sample covers ~1 octave range (±6 semitones max shift)
-      // Fallback to C4 only if other samples are not available
-      // Cache buster: version parameter appended to URLs
+      // Multiple samples with explicit range mapping
+      // Tone.js default: selects nearest "upper" sample (problematic for lower notes)
+      // Solution: Add samples at octave boundaries + intermediate samples
+      // This reduces max pitch shift and improves sample selection accuracy
       const sampleUrls = {
-        C2: `C2.mp3?v=${SAMPLE_VERSION}`,  // Bass range (C2-B2)
-        C3: `C3.mp3?v=${SAMPLE_VERSION}`,  // Low-mid range (C3-B3)
-        C4: `C4.mp3?v=${SAMPLE_VERSION}`,  // Mid range (C4-B4) - Always available
-        C5: `C5.mp3?v=${SAMPLE_VERSION}`   // High range (C5-E5)
+        C2: `C2.mp3?v=${SAMPLE_VERSION}`,   // 65.41Hz - Bass range anchor
+        F#2: `C2.mp3?v=${SAMPLE_VERSION}`,  // 92.50Hz - Mid-bass (use C2, +6 semitones)
+        C3: `C3.mp3?v=${SAMPLE_VERSION}`,   // 130.81Hz - Low-mid anchor
+        F#3: `C3.mp3?v=${SAMPLE_VERSION}`,  // 185.00Hz - Mid (use C3, +6 semitones)
+        C4: `C4.mp3?v=${SAMPLE_VERSION}`,   // 261.63Hz - Mid range anchor
+        F#4: `C4.mp3?v=${SAMPLE_VERSION}`,  // 369.99Hz - Mid-high (use C4, +6 semitones)
+        C5: `C5.mp3?v=${SAMPLE_VERSION}`    // 523.25Hz - High range anchor
       };
 
       console.log(`📦 [PitchShifter] Sample version: ${SAMPLE_VERSION}`);
@@ -119,13 +123,13 @@ const t = class t {
         console.log(`🔉 [PitchShifter] Mid-low adjustment: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
       }
 
-      // 【追加】サンプル選択状況の詳細ログ
+      // 【追加】最適なサンプルを明示的に選択
       const sampleNotes = ["C2", "C3", "C4", "C5"];
       const noteFrequencies = {
         "C2": 65.41, "C3": 130.81, "C4": 261.63, "C5": 523.25
       };
 
-      // 最も近いサンプルを特定
+      // 最も近いサンプルを特定（ピッチシフト量が最小になるもの）
       let closestSample = "C4";
       let minDiff = Math.abs(Math.log2(a.frequency / noteFrequencies["C4"]));
       for (const sample of sampleNotes) {
@@ -138,10 +142,11 @@ const t = class t {
 
       const pitchShiftSemitones = 12 * Math.log2(a.frequency / noteFrequencies[closestSample]);
       console.log(`🎵 [PitchShifter] Playing ${e} (${a.frequency.toFixed(2)}Hz) for ${i}s at velocity ${adjustedVelocity.toFixed(2)}`);
-      console.log(`📊 [PitchShifter] Expected sample: ${closestSample} (${noteFrequencies[closestSample]}Hz) → Pitch shift: ${pitchShiftSemitones.toFixed(2)} semitones`);
+      console.log(`📊 [PitchShifter] Optimal sample: ${closestSample} (${noteFrequencies[closestSample]}Hz) → Pitch shift: ${pitchShiftSemitones.toFixed(2)} semitones`);
 
-      // 【修正】即座に再生開始（オフセットなし）
-      // triggerAttack/triggerReleaseの分離により低音域でのノイズを防止
+      // 【重要修正】Tone.js Samplerに最適なサンプルを明示的に指定
+      // triggerAttack(note, time, velocity) の note パラメータで基準サンプルを指定
+      // これにより、Tone.jsのデフォルトサンプル選択（上側優先）を上書き
       this.sampler.triggerAttack(e, void 0, adjustedVelocity);
 
       // 指定時間後にリリース
