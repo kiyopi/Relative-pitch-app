@@ -11,7 +11,7 @@
  *   - 2025-10-28: 複数サンプル対応実装 (C2, C3, C4, C5) - 低音域ノイズ軽減
  *   - 2025-10-28: Tone.js Samplerノイズ軽減設定実装 (attack: 0.05, curve: exponential)
  */
-const SAMPLE_VERSION = "1.4.0";
+const SAMPLE_VERSION = "1.4.1";
 var c = Object.defineProperty;
 var f = (s, e, i) => e in s ? c(s, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : s[e] = i;
 var n = (s, e, i) => f(s, typeof e != "symbol" ? e + "" : e, i);
@@ -46,13 +46,13 @@ const t = class t {
       // Solution: Add samples at octave boundaries + intermediate samples
       // This reduces max pitch shift and improves sample selection accuracy
       const sampleUrls = {
-        C2: `C2.mp3?v=${SAMPLE_VERSION}`,   // 65.41Hz - Bass range anchor
-        F#2: `C2.mp3?v=${SAMPLE_VERSION}`,  // 92.50Hz - Mid-bass (use C2, +6 semitones)
-        C3: `C3.mp3?v=${SAMPLE_VERSION}`,   // 130.81Hz - Low-mid anchor
-        F#3: `C3.mp3?v=${SAMPLE_VERSION}`,  // 185.00Hz - Mid (use C3, +6 semitones)
-        C4: `C4.mp3?v=${SAMPLE_VERSION}`,   // 261.63Hz - Mid range anchor
-        F#4: `C4.mp3?v=${SAMPLE_VERSION}`,  // 369.99Hz - Mid-high (use C4, +6 semitones)
-        C5: `C5.mp3?v=${SAMPLE_VERSION}`    // 523.25Hz - High range anchor
+        "C2": `C2.mp3?v=${SAMPLE_VERSION}`,    // 65.41Hz - Bass range anchor
+        "F#2": `C2.mp3?v=${SAMPLE_VERSION}`,   // 92.50Hz - Mid-bass (use C2, +6 semitones)
+        "C3": `C3.mp3?v=${SAMPLE_VERSION}`,    // 130.81Hz - Low-mid anchor
+        "F#3": `C3.mp3?v=${SAMPLE_VERSION}`,   // 185.00Hz - Mid (use C3, +6 semitones)
+        "C4": `C4.mp3?v=${SAMPLE_VERSION}`,    // 261.63Hz - Mid range anchor
+        "F#4": `C4.mp3?v=${SAMPLE_VERSION}`,   // 369.99Hz - Mid-high (use C4, +6 semitones)
+        "C5": `C5.mp3?v=${SAMPLE_VERSION}`     // 523.25Hz - High range anchor
       };
 
       console.log(`📦 [PitchShifter] Sample version: ${SAMPLE_VERSION}`);

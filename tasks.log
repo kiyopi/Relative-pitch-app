@@ -6173,3 +6173,24 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-28 16:45:29] コミット: fix: Tone.jsサンプル選択ロジックを中間サンプルで最適化（v1.4.0）
+
+問題:
+- A#2 (116.54Hz)が誤ってC3サンプルから-2半音シフト
+- 期待: C2サンプルから+6.8半音シフト
+- 原因: Tone.jsが最も近い「上側」のサンプルを優先選択
+
+解決策:
+- 中間サンプルポイント追加（F#2, F#3, F#4）
+- C2, F#2(=C2), C3, F#3(=C3), C4, F#4(=C4), C5
+- これによりTone.jsの選択ロジックで最適なサンプルが選ばれる
+- ピッチシフト範囲: 最大±3半音に削減
+
+期待される改善:
+- A#2: C2サンプル使用（+6半音以内）
+- C3: C3サンプル使用（ピッチシフトなし）
+- クリッキングノイズ・音割れの大幅軽減
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
