@@ -59,8 +59,10 @@ export async function initializeTrainingPage() {
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash.split('?')[1] || '');
     const modeParam = params.get('mode');
+    const directionParam = params.get('direction'); // 12音階モード方向パラメータ
 
     console.log('🔍 [DEBUG] modeパラメータ:', modeParam);
+    console.log('🔍 [DEBUG] directionパラメータ:', directionParam);
 
     if (modeParam && modeConfig[modeParam]) {
         currentMode = modeParam;
@@ -69,6 +71,12 @@ export async function initializeTrainingPage() {
         console.warn(`⚠️ モードパラメータ不正: ${modeParam} - デフォルト(random)を使用`);
         console.warn(`🔍 [DEBUG] 利用可能なモード:`, Object.keys(modeConfig));
         currentMode = 'random';
+    }
+
+    // 12音階モード方向をグローバル変数に保存
+    if (currentMode === '12tone' && directionParam) {
+        window.currentTrainingDirection = directionParam;
+        console.log(`✅ 12音階モード方向: ${directionParam}`);
     }
 
     // 【NavigationManager統合】リロード検出 → preparationへリダイレクト
@@ -187,10 +195,38 @@ function initializeModeUI() {
     const config = modeConfig[currentMode];
     console.log(`📋 現在のモード: ${config.title}`);
 
+    // モード別アイコン設定
+    const modeIcons = {
+        'random': 'shuffle',
+        'continuous': 'zap',
+        '12tone': 'music'
+    };
+
+    // アイコンを更新
+    const modeIcon = document.getElementById('training-mode-icon');
+    if (modeIcon) {
+        const iconName = modeIcons[currentMode] || 'shuffle';
+        modeIcon.setAttribute('data-lucide', iconName);
+        console.log(`✅ アイコン更新: ${iconName}`);
+    }
+
     // ページタイトルを更新
-    const pageTitle = document.querySelector('.page-title');
+    const pageTitle = document.getElementById('training-mode-title');
     if (pageTitle) {
-        pageTitle.textContent = config.title;
+        let titleText = config.title;
+
+        // 12音階モードの場合、方向を追加
+        if (currentMode === '12tone' && window.currentTrainingDirection) {
+            const directionLabels = {
+                'ascending': '（上昇）',
+                'descending': '（下降）',
+                'both': '（両方向）'
+            };
+            titleText += ` ${directionLabels[window.currentTrainingDirection] || ''}`;
+        }
+
+        pageTitle.textContent = titleText;
+        console.log(`✅ タイトル更新: ${titleText}`);
     }
 
     // ページサブタイトルを更新

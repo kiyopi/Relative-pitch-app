@@ -9,26 +9,67 @@
  */
 
 /**
- * リダイレクト情報を取得
- * @returns {Object|null} リダイレクト情報 { redirect, mode, session }
+ * URLパラメータを取得
+ * @returns {Object} URLパラメータ { redirect, mode, session, direction }
  */
-function getRedirectInfo() {
+function getUrlParams() {
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash.split('?')[1] || '');
 
-    const redirect = params.get('redirect');
-    const mode = params.get('mode');
-    const session = params.get('session');
+    return {
+        redirect: params.get('redirect'),
+        mode: params.get('mode'),
+        session: params.get('session'),
+        direction: params.get('direction') // 12音階モード方向パラメータ
+    };
+}
 
+/**
+ * リダイレクト情報を取得（メッセージ表示用）
+ * @param {Object} urlParams - URLパラメータ
+ * @returns {Object|null} リダイレクト情報 { redirect, mode, session }
+ */
+function getRedirectInfo(urlParams) {
     // redirectパラメータがある場合のみredirectInfoを生成
     // ホームページからの通常遷移ではメッセージを表示しない
-    if (!redirect) return null;
+    if (!urlParams.redirect) return null;
 
     return {
-        redirect: redirect,
-        mode: mode,
-        session: session
+        redirect: urlParams.redirect,
+        mode: urlParams.mode,
+        session: urlParams.session
     };
+}
+
+/**
+ * モード別サブタイトルを更新
+ * @param {string} mode - トレーニングモード
+ * @param {string|null} direction - 12音階モード方向
+ */
+function updateModeSubtitle(mode, direction = null) {
+    const subtitleElement = document.getElementById('preparation-mode-subtitle');
+    if (!subtitleElement) return;
+
+    const modeSubtitles = {
+        'random': 'ランダム基音モード',
+        'continuous': '連続チャレンジモード',
+        '12tone': '12音階モード'
+    };
+
+    let subtitle = modeSubtitles[mode] || 'トレーニングモード';
+
+    // 12音階モードの場合、方向を追加
+    if (mode === '12tone' && direction) {
+        const directionLabels = {
+            'ascending': '（上昇）',
+            'descending': '（下降）',
+            'both': '（両方向）'
+        };
+        subtitle += ` ${directionLabels[direction] || ''}`;
+    }
+
+    subtitleElement.textContent = subtitle;
+    console.log(`✅ [PreparationController] サブタイトル更新: ${subtitle}`);
 }
 
 /**
@@ -72,23 +113,38 @@ export async function initializePreparationPage() {
     // 【デバッグ】現在のURL確認
     console.log('🔍 [DEBUG] hash:', window.location.hash);
 
-    // 【新規追加】リダイレクト情報を取得
-    const redirectInfo = getRedirectInfo();
-    console.log('🔍 [DEBUG] redirectInfo:', redirectInfo);
+    // URLパラメータを取得
+    const urlParams = getUrlParams();
+    console.log('🔍 [DEBUG] urlParams:', urlParams);
 
-    if (redirectInfo && redirectInfo.mode) {
-        console.log(`📍 リダイレクト先: ${redirectInfo.redirect}?mode=${redirectInfo.mode}&session=${redirectInfo.session || 'なし'}`);
-        showRedirectMessage(redirectInfo);
-        // グローバル変数に保存（音域テスト完了時に使用）
-        window.preparationRedirectInfo = redirectInfo;
-        console.log('✅ [DEBUG] モード情報を保存:', window.preparationRedirectInfo);
-    } else {
+    // モード情報が必須（mode パラメータがない場合はエラー）
+    if (!urlParams.mode) {
         console.warn('⚠️ [DEBUG] モード情報なし - URLパラメータを確認してください');
         console.warn('⚠️ [DEBUG] URLにmode=continuous等のパラメータが必要です');
-        // モード情報がない場合はエラー（デフォルト設定しない）
         alert('モード選択エラー：ホームページからモードを選択してください。');
         window.location.hash = 'home';
         return;
+    }
+
+    // 【重要】モード情報を常に保存（音域テスト完了時に使用）
+    window.preparationRedirectInfo = {
+        mode: urlParams.mode,
+        session: urlParams.session,
+        direction: urlParams.direction // 12音階モード方向パラメータ
+    };
+    console.log('✅ [DEBUG] モード情報を保存:', window.preparationRedirectInfo);
+
+    // サブタイトルをモード別に更新
+    updateModeSubtitle(urlParams.mode, urlParams.direction);
+
+    // リダイレクト情報を取得（メッセージ表示用）
+    const redirectInfo = getRedirectInfo(urlParams);
+    console.log('🔍 [DEBUG] redirectInfo:', redirectInfo);
+
+    // redirectパラメータがある場合のみメッセージを表示
+    if (redirectInfo) {
+        console.log(`📍 リダイレクト先: ${redirectInfo.redirect}?mode=${redirectInfo.mode}&session=${redirectInfo.session || 'なし'}`);
+        showRedirectMessage(redirectInfo);
     }
 
     // 正規版の初期化関数を呼び出す
