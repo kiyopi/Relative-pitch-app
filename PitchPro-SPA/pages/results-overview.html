@@ -403,6 +403,11 @@
             const sessionData = allSessionData.filter(s => s.mode === currentMode);
             console.log(`✅ セッションデータ取得: ${currentMode}モード=${sessionData.length}セッション (全体=${allSessionData.length}セッション)`);
 
+            // 【重要】フィルタリング済みセッションデータをグローバル変数に保存
+            // showSessionDetail関数で参照するため
+            window.filteredSessionData = sessionData;
+            window.currentMode = currentMode;
+
             // 【デバッグ】フィルタリング後のセッションIDリストを表示
             if (sessionData.length > 0) {
                 const sessionIds = sessionData.map(s => `#${s.sessionId}(${s.mode})`).join(', ');
@@ -754,12 +759,13 @@
         }
 
         window.showSessionDetail = function(sessionIndex) {
-            // ストレージからセッションデータを取得
-            const sessionData = DataManager.getFromStorage('sessionData') || [];
+            // 【修正】フィルタリング済みセッションデータを使用（グローバル変数から取得）
+            const sessionData = window.filteredSessionData || [];
 
             console.log('📊 [showSessionDetail] 取得したセッションデータ:', sessionData);
             console.log('📊 [showSessionDetail] セッション数:', sessionData.length);
             console.log('📊 [showSessionDetail] 要求されたインデックス:', sessionIndex);
+            console.log('📊 [showSessionDetail] 現在のモード:', window.currentMode);
 
             if (!sessionData || sessionData.length === 0) {
                 console.warn('⚠️ トレーニング履歴が見つかりません');
@@ -775,6 +781,7 @@
             const session = sessionData[sessionIndex];
 
             console.log('📊 [showSessionDetail] 選択されたセッション:', session);
+            console.log('🔍 [DEBUG] セッションモード:', session.mode);
 
             // 1. .selectedクラスを更新
             document.querySelectorAll('.session-box').forEach((box, idx) => {
@@ -914,7 +921,8 @@
          * 次のセッションに移動
          */
         window.navigateToNextSession = function() {
-            const sessionData = DataManager.getFromStorage('sessionData') || [];
+            // 【修正】フィルタリング済みセッションデータを使用
+            const sessionData = window.filteredSessionData || [];
 
             if (window.currentSessionIndex < sessionData.length - 1) {
                 window.showSessionDetail(window.currentSessionIndex + 1);
@@ -925,7 +933,8 @@
          * ナビゲーションボタンの有効/無効を更新
          */
         function updateNavigationButtons() {
-            const sessionData = DataManager.getFromStorage('sessionData') || [];
+            // 【修正】フィルタリング済みセッションデータを使用
+            const sessionData = window.filteredSessionData || [];
 
             if (!sessionData || sessionData.length === 0) return;
 
