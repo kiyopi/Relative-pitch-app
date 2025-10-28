@@ -1,14 +1,15 @@
 /**
  * PitchShifter - Tone.js Sampler Wrapper
- * @version 1.2.0
+ * @version 1.3.0
  * @date 2025-10-28
  * @changelog
+ *   - 2025-10-28: クリッキングノイズ対策強化（attack: 0.15秒、安定化待機100ms）
  *   - 2025-10-28: 低音域の音量バランス調整・音割れ対策強化
  *   - 2025-10-28: キャッシュバスター実装（クエリパラメータでバージョン管理）
  *   - 2025-10-28: 複数サンプル対応実装 (C2, C3, C4, C5) - 低音域ノイズ軽減
  *   - 2025-10-28: Tone.js Samplerノイズ軽減設定実装 (attack: 0.05, curve: exponential)
  */
-const SAMPLE_VERSION = "1.2.0";
+const SAMPLE_VERSION = "1.3.0";
 var c = Object.defineProperty;
 var f = (s, e, i) => e in s ? c(s, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : s[e] = i;
 var n = (s, e, i) => f(s, typeof e != "symbol" ? e + "" : e, i);
@@ -55,8 +56,8 @@ const t = class t {
         urls: sampleUrls,
         baseUrl: this.config.baseUrl,
         release: this.config.release,
-        attack: 0.1,
-        // 100ms fade-in to prevent clipping/distortion (extended from 50ms)
+        attack: 0.15,
+        // 150ms fade-in to prevent clicking noise (extended from 100ms)
         curve: "exponential",
         // Exponential curve for more natural amplitude envelope (recommended for Sampler)
         onload: () => {
@@ -97,9 +98,12 @@ const t = class t {
         console.warn("⚠️ [PitchShifter] AudioContext suspended, resuming...");
         await l.start();
         await audioContext.resume();
-        // 安定化のため短時間待機
-        await new Promise(resolve => setTimeout(resolve, 50));
+        // 安定化のため待機時間延長（50ms → 100ms）
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
+
+      // 【追加】Tone.js内部準備のための短時間待機（クリッキングノイズ対策）
+      await new Promise(resolve => setTimeout(resolve, 10));
 
       // 【追加】低音域の音量バランス調整
       // C2-B2 (65-123Hz): 0.5x velocity (低音の響きを抑制)

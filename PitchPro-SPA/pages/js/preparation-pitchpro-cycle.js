@@ -69,11 +69,24 @@ class PitchProCycleManager {
 
             // PitchPro AudioDetectionComponent作成（v1.3.1統合管理システム）
             this.audioDetector = new window.PitchPro.AudioDetectionComponent({
+                // UI要素セレクター
                 volumeBarSelector: '#volume-progress',
                 volumeTextSelector: '#volume-value',
                 frequencySelector: '#frequency-value',
                 noteSelector: null, // 音程表示は使用しない
-                autoUpdateUI: true, // PitchProに自動更新を任せる
+
+                // 【追加】PitchPro推奨設定（外れ値対策）
+                clarityThreshold: 0.4,        // 40% - 実用的な信頼性閾値
+                minVolumeAbsolute: 0.003,     // 0.3% - 適切な最小音量
+                fftSize: 4096,                // 高精度FFT
+                smoothing: 0.1,               // 最小限の平滑化
+                minFrequency: 80,             // 最低周波数（F2 = 87.3Hz以下をカバー）
+                maxFrequency: 800,            // 最高周波数（E5 = 659.3Hz以上をカバー）
+                enableHarmonicCorrection: true, // 倍音補正有効化（C3倍音誤検出対策）
+
+                // システム設定
+                deviceOptimization: true,     // 自動デバイス最適化
+                autoUpdateUI: true,           // PitchProに自動更新を任せる
                 debug: true
             });
 
@@ -1292,9 +1305,10 @@ function setupMicPermissionFlow() {
                 // モード情報を確実に取得（優先順位: redirectInfo > window.preparationRedirectInfo）
                 const finalMode = redirectInfo?.mode || window.preparationRedirectInfo?.mode || 'random';
                 const finalSession = redirectInfo?.session || window.preparationRedirectInfo?.session || null;
+                const finalDirection = redirectInfo?.direction || window.preparationRedirectInfo?.direction || null;
 
-                console.log(`📍 モード情報を保持して遷移: mode=${finalMode}, session=${finalSession || 'なし'}`);
-                NavigationManager.navigateToTraining(finalMode, finalSession);
+                console.log(`📍 モード情報を保持して遷移: mode=${finalMode}, session=${finalSession || 'なし'}, direction=${finalDirection || 'なし'}`);
+                NavigationManager.navigateToTraining(finalMode, finalSession, finalDirection);
 
             } catch (error) {
                 console.error('❌ トレーニング開始処理エラー:', error);
@@ -1525,9 +1539,10 @@ function setupMicPermissionFlow() {
             // モード情報を確実に取得（優先順位: redirectInfo > window.preparationRedirectInfo）
             const finalMode = redirectInfo?.mode || window.preparationRedirectInfo?.mode || 'random';
             const finalSession = redirectInfo?.session || window.preparationRedirectInfo?.session || null;
+            const finalDirection = redirectInfo?.direction || window.preparationRedirectInfo?.direction || null;
 
-            console.log(`📍 モード情報を保持して遷移: mode=${finalMode}, session=${finalSession || 'なし'}`);
-            NavigationManager.navigateToTraining(finalMode, finalSession);
+            console.log(`📍 モード情報を保持して遷移: mode=${finalMode}, session=${finalSession || 'なし'}, direction=${finalDirection || 'なし'}`);
+            NavigationManager.navigateToTraining(finalMode, finalSession, finalDirection);
         });
     }
 

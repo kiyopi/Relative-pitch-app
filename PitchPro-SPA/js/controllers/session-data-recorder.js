@@ -1,7 +1,12 @@
 /**
  * セッションデータ記録モジュール
- * @version 1.0.0
+ * @version 2.0.0 - プレミアムデータ管理統合
  * @description トレーニングセッションの音程誤差データを記録
+ *
+ * v2.0.0変更点:
+ * - プレミアムプラン判定統合
+ * - 無料プランではランダムモードのみデータ保存なし
+ * - 自動クリーンアップ実装（保存時）
  */
 
 class SessionDataRecorder {
@@ -104,6 +109,7 @@ class SessionDataRecorder {
 
     /**
      * セッションを完了してlocalStorageに保存
+     * v2.0.0: プレミアムプラン判定を追加
      */
     completeSession() {
         if (!this.currentSession) {
@@ -117,7 +123,25 @@ class SessionDataRecorder {
 
         console.log('✅ セッション完了:', this.currentSession);
 
-        // localStorageに保存
+        // 【v2.0.0】プレミアムプラン判定
+        const subscriptionData = DataManager.getSubscriptionData();
+        const isPremium = subscriptionData.premiumAccess.status === 'active';
+        const mode = this.currentSession.mode;
+
+        console.log(`📊 データ保存判定: モード=${mode}, プレミアム=${isPremium}`);
+
+        // 無料プラン & ランダムモード → データ保存なし
+        if (!isPremium && mode === 'random') {
+            console.log('ℹ️ 無料プラン（ランダムモード）: データ保存スキップ');
+            console.log('📋 セッション結果は評価表示用に返すが、localStorageには保存しない');
+
+            const completedSession = { ...this.currentSession };
+            this.currentSession = null;
+            return completedSession; // 評価表示用に返すが保存はしない
+        }
+
+        // プレミアムプラン または 連続・12音階モード → データ保存
+        console.log('💾 データ保存実行: localStorageに保存します');
         this.saveToStorage(this.currentSession);
 
         const completedSession = { ...this.currentSession };
@@ -128,20 +152,16 @@ class SessionDataRecorder {
 
     /**
      * localStorageにセッションデータを保存
+     * v2.0.0: DataManager.saveSessionResultWithCleanup()を使用
      */
     saveToStorage(session) {
         try {
-            // 既存のセッションデータを取得
-            const existingSessions = DataManager.getFromStorage('sessionData') || [];
+            // 【v2.0.0】自動クリーンアップ付きで保存
+            DataManager.saveSessionResultWithCleanup(session);
 
-            // 新しいセッションを追加
-            existingSessions.push(session);
-
-            // 保存（最大100セッションまで保持）
-            const recentSessions = existingSessions.slice(-100);
-            DataManager.saveToStorage('sessionData', recentSessions);
-
-            console.log(`✅ セッションデータ保存完了 (総セッション数: ${recentSessions.length})`);
+            const allSessions = DataManager.getFromStorage('sessionData') || [];
+            console.log(`✅ セッションデータ保存完了 (総セッション数: ${allSessions.length})`);
+            console.log(`🧹 自動クリーンアップ実行済み`);
 
         } catch (error) {
             console.error('❌ セッションデータ保存エラー:', error);

@@ -186,9 +186,10 @@ class NavigationManager {
      *
      * @param {string|null} mode - モード（省略時はパラメータなし）
      * @param {string|null} session - セッション番号（省略可）
+     * @param {string|null} direction - 12音階モード方向（'ascending' | 'descending'）
      */
-    static navigateToTraining(mode = null, session = null) {
-        console.log(`🚀 [NavigationManager] trainingへ遷移: mode=${mode || 'なし'}, session=${session || 'なし'}`);
+    static navigateToTraining(mode = null, session = null, direction = null) {
+        console.log(`🚀 [NavigationManager] trainingへ遷移: mode=${mode || 'なし'}, session=${session || 'なし'}, direction=${direction || 'なし'}`);
 
         // 正常な遷移フラグを自動設定
         this.setNormalTransition();
@@ -198,6 +199,7 @@ class NavigationManager {
         if (mode) {
             const params = new URLSearchParams({ mode });
             if (session) params.set('session', session);
+            if (direction) params.set('direction', direction); // 12音階モード方向パラメータ追加
             targetHash = `training?${params.toString()}`;
         } else {
             targetHash = 'training';

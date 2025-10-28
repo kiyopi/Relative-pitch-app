@@ -5580,3 +5580,562 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-26 22:47:51] コミット: refactor: NavigationManagerにリダイレクト時の制約解除を統合
+
+【設計改善】
+- redirectToPreparation()内でbeforeunload/popstate自動無効化
+- 呼び出し側は内部実装を気にする必要がなくなった
+- NavigationManagerが完全に責任を持つ設計に改善
+
+【変更内容】
+navigation-manager.js:
+- redirectToPreparation()に自動制約解除機能を追加
+  - disableNavigationWarning()を自動実行
+  - removeBrowserBackPrevention()を自動実行
+  - ログ出力で動作を可視化
+
+trainingController.js:
+- 手動のdisableNavigationWarning()呼び出しを削除
+- コメントを更新（自動処理を明記）
+- よりシンプルで保守しやすいコードに
+
+【メリット】
+✅ 単一責任の原則に従った設計
+✅ 呼び出し側のコードがシンプルに
+✅ NavigationManagerの使用方法が明確化
+✅ バグの混入リスク低減（手動呼び出し忘れ防止）
+
+【影響】
+- 既存の動作に変更なし
+- リダイレクト時のダイアログ防止は引き続き機能
+- より保守しやすいコードベースに改善
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-26 23:18:19] コミット: feat: NavigationManager統一ナビゲーションシステム実装（v4.0.0）
+
+## 主要な変更内容
+
+### NavigationManager v4.0.0 実装
+- 統一navigate()メソッド追加：すべてのページ遷移を一元管理
+- PitchProクリーンアップシステム統合：遷移時に自動的にaudioDetector破棄
+- registerAudioDetector()メソッド追加：ページ側からaudioDetectorを登録
+- redirectToPreparation()にもPitchPro自動破棄機能を追加
+
+### PitchPro警告アラート問題の根本解決
+- 遷移前に必ずaudioDetector.stopDetection() + destroy()を自動実行
+- マイクストリーム開きっぱなし問題を完全防止
+- 長時間経過後のpopstateイベント発火問題を根本解決
+
+### 全ページのナビゲーション統一化
+- **trainingController.js**:
+  - audioDetector初期化後にNavigationManager登録
+  - window.location.hash直接変更をNavigationManager.navigate()に変更
+  - 手動audioDetector.destroy()呼び出しを削除（自動化）
+  - Line 772, 824, 1373の遷移処理を統一
+
+- **preparation-pitchpro-cycle.js**:
+  - Line 749のwindow.location.hash変更を統一
+  - Line 1287, 1519の手動removeBrowserBackPrevention()削除（自動化）
+
+- **result-session-controller.js**:
+  - Line 362, 373の手動removeBrowserBackPrevention()削除（自動化）
+  - Line 364のwindow.location.hash変更を統一
+
+## 技術的詳細
+
+### 設計原則
+1. 単一責任の原則：NavigationManagerがすべてのナビゲーションを管理
+2. 自動クリーンアップ：ページは手動でクリーンアップを呼び出さない
+3. PitchPro統合：audioDetector.destroy()をNavigationManagerが管理
+4. 直接ハッシュ変更の禁止：すべての遷移はNavigationManager経由
+
+### 修正前後の比較
+| 項目 | 修正前 | 修正後 |
+|---|---|---|
+| destroy()呼び出し | 各ページで手動（7箇所） | NavigationManager自動（1箇所） |
+| removeBrowserBackPrevention() | 手動（4箇所） | 自動実行 |
+| window.location.hash変更 | 直接変更（7箇所） | navigate()経由 |
+| PitchPro警告アラート | 発火可能 | 発火しない |
+
+## 再発防止効果
+- 何度もバグが発生していた原因「分散した制御」を完全解決
+- 手動呼び出し忘れによるバグを根本的に防止
+- コードの保守性・可読性の大幅向上
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-26 23:25:41] コミット: fix: Lucide v0.263.0互換性対応 - pianoアイコンをmusicに変更
+
+## 問題
+- 12音階モードカードの`data-lucide="piano"`アイコンが表示されない
+- Lucide v0.263.0に`piano`アイコンが存在しない
+
+## 修正内容
+- `piano` → `music` アイコンに変更
+- home.html: Line 125
+- index-original.html: Line 187
+
+## 理由
+- CLAUDE.mdのLucideアイコン運用ガイドラインに準拠
+- Safari互換性のためv0.263.0を使用
+- v0.263.0で使用可能なアイコンのみ使用
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-26 23:33:11] コミット: fix: step-indicator Lucideアイコン互換性対応
+
+## 問題
+- preparation.html: `audio-lines` アイコンが表示されない
+- preparation-step1.html: `speech` アイコンが表示されない
+- Lucide v0.263.0に存在しないアイコン名を使用
+
+## 修正内容
+- `audio-lines` → `volume-2` (preparation.html:38)
+- `speech` → `volume-2` (preparation-step1.html:50)
+
+## 選択理由
+- `volume-2`: 音量・音声を表現する適切なアイコン
+- Lucide v0.263.0で確実に使用可能
+- ステップインジケーターの役割に適合
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-26 23:44:12] コミット: feat: 次のセッション開始までのインターバルを2秒から1秒に短縮
+
+- 連続チャレンジモード・12音階モードの自動継続タイミングを改善
+- setTimeout値を2000ms → 1000msに変更（Line 815）
+- ログメッセージも「2秒後」→「1秒後」に更新（Line 781, 806）
+- ユーザー体験向上: セッション間の待機時間を削減
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-26 23:47:51] コミット: feat: 基音再生中はマイクオフ、ドレミガイド開始時にマイクオン
+
+- 基音再生前にマイクを停止（Line 497-507）
+  - audioDetector.stopDetection() + destroy()で確実にマイクオフ
+  - エラーハンドリングで安全に処理継続
+
+- ドレミガイド開始時のログ強化（Line 583, 617）
+  - 「🎤 マイクをオンにします」ログ追加
+  - 「✅ マイクオン完了 - 音声検出開始」に変更
+
+- 効果:
+  - 基音再生中にユーザーの声を誤検出しない
+  - ドレミガイド開始タイミングで確実にマイクオン
+  - ユーザー体験の向上
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-26 23:55:17] コミット: fix: セッション間でマイク許可を再取得する問題を修正
+
+【問題】
+- 総合評価から新しいトレーニング開始時、セッション2でマイク許可ダイアログが再度出現
+- セッション2で基音再生後に処理が停止
+
+【原因】
+- 基音再生前にaudioDetector.destroy()を呼び、MediaStreamを完全破棄
+- セッション2開始時に新しいAudioDetectorを作成、再度マイク許可が必要に
+
+【修正内容】
+1. 基音再生前の処理変更（Line 497-506）
+   - destroy()を削除、stopDetection()のみ実行
+   - MediaStreamを保持し、検出のみ一時停止
+   - audioDetector変数をnullにしない
+
+2. ドレミガイド開始時の処理改善（Line 584-626）
+   - 初回セッション: 新規AudioDetector作成 + initialize
+   - 2回目以降: 既存AudioDetectorを再開（startDetection()のみ）
+   - マイク許可は初回のみ、MediaStream再利用で高速化
+
+【効果】
+- セッション2以降はマイク許可ダイアログ不要
+- MediaStream再利用で処理高速化
+- 連続チャレンジモード・12音階モードのUX向上
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-27 00:00:52] コミット: fix: 12音階モードで最後の2音がオクターブ下がる問題を修正
+
+【問題】
+- 12音階モードで11番目・12番目のセッションが最初の2音（F#2, G2）に戻る
+- 例: F#2 → G2 → ... → D#3 → F#2 → G2（最後2音が繰り返し）
+
+【原因】
+1. getAvailableNotes()の12音確保ロジックがcontinuousモードのみ適用
+   - 12toneモードでは10音しか確保されていなかった
+
+2. selectAllBaseNotesForMode()のsequential_chromaticロジック
+   - availableNotes[session % availableNotes.length]で剰余計算
+   - 10音しかない場合、11番目=0、12番目=1となり最初の2音を繰り返す
+
+【修正内容】
+1. 12音確保ロジックの条件拡張（Line 1020）
+   - currentMode === 'continuous'
+     → (currentMode === 'continuous' || currentMode === '12tone')
+   - 12音階モードでも確実に12音を確保
+
+2. sequential_chromatic選択ロジック改善（Line 1181-1195）
+   - 12音未満の場合: エラーログ + フォールバック（繰り返し）
+   - 12音以上の場合: availableNotes[session]で連続12音を直接使用
+   - 剰余計算を削除し、連続性を保証
+
+【効果】
+- 12音階モードで必ず連続したクロマチック12音を使用
+  例: F#2 → G2 → G#2 → A2 → A#2 → B2 → C3 → C#3 → D3 → D#3 → E3 → F3
+- 音域が狭い場合でも自動拡張で12音を確保
+- 12音階トレーニングの完全性を保証
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-27 00:04:13] コミット: fix: preparationからtrainingへの遷移時マイク許可再要求問題を修正
+
+【問題1】12音階モードで最後の2音がオクターブ下がる
+- 修正内容: trainingController.jsで12音確保ロジックと連続12音選択を実装
+
+【問題2】総合評価から新規トレーニング開始時にマイク許可ダイアログ出現
+- preparationページでcleanupPitchPro()を呼び、MediaStreamを完全破棄
+- trainingページで新しいAudioDetector作成時に再度マイク許可が必要
+
+【修正内容】
+preparation-pitchpro-cycle.js（Line 1256-1258, 1489-1491）:
+- cleanupPitchPro()呼び出しを削除
+- MediaStreamを保持したままtrainingページに遷移
+- 「PitchProリソースを保持（MediaStream再利用のため）」ログ追加
+
+【効果】
+- preparationページで取得したマイク許可をtrainingページで再利用
+- セッション2以降もマイク許可ダイアログ不要（前回修正と統合）
+- ユーザー体験の大幅改善
+
+【注意】
+- preparationページのAudioDetectorはページ遷移時も保持
+- trainingページは新しいAudioDetectorを作成するが、
+  ブラウザが既存MediaStreamを再利用するため許可不要
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-27 00:10:58] コミット: fix: ホームページからpreparation遷移時のリダイレクトメッセージ誤表示を修正
+
+【問題】
+ホームページから12音階モードの「始める」ボタンでpreparation遷移時、
+「準備完了後、自動的にトレーニングに移動します」メッセージが誤表示される
+
+【原因】
+1. router.js Line 186: ホームからの遷移時に必ず redirect=training を付与
+2. preparationController.js Line 23-24: modeパラメータ存在時に
+   redirectパラメータなしでもredirectInfoを生成
+
+結果: ホームからの通常遷移が「リダイレクト」と誤判定され、
+      不要なメッセージが表示される
+
+【修正内容】
+1. router.js (Line 186-188):
+   - ホームからpreparation遷移時のredirectパラメータ削除
+   - 通常遷移では mode と session のみ付与
+   - コメント追加: redirectパラメータは特別なケースでのみ使用
+
+2. preparationController.js (Line 23-25):
+   - redirectパラメータがある場合のみredirectInfoを生成
+   - modeパラメータのみの場合は通常遷移と判定
+   - コメント追加: ホームからの通常遷移ではメッセージ非表示
+
+【redirect=trainingが必要なケース】
+✅ NavigationManager.redirectToPreparation() - リロード検出時
+✅ エラー時のリダイレクト
+❌ ホームページからの通常遷移 - 不要（今回修正）
+
+【効果】
+- ホームページからの遷移: メッセージ非表示（正常）
+- リロード検出時のリダイレクト: メッセージ表示（正常）
+- ユーザー体験の改善
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-27 14:18:57] コミット: feat: 有料プラン機能仕様書を新規作成・日付プロトコル追加
+
+- PREMIUM_FEATURES_SPECIFICATION.md新規作成
+  - 有料プラン価値検証サマリー（外れ値率8.3%達成の検証）
+  - 収益化戦略（¥480/月、無料版との差別化）
+  - Phase 1: データ活用基盤（音程別・基音別集計、長期履歴）
+  - Phase 2: 弱点克服モード（自動検出、集中練習、改善効果可視化）
+  - Phase 3: プレミアム分析ページ（4タブ構成）
+  - 実装ロードマップ（7週間）、KPI設定、競合比較
+
+- specifications/README.md更新
+  - 有料プラン機能仕様書を追加（v2.1.0）
+  - 基音選択仕様書を追加
+  - 更新履歴を追加（2025-10-27）
+
+- CLAUDE.md更新
+  - 日付記載プロトコルを追加（項目10）
+  - システム日付コマンド必須実行を明記
+  - YYYY-MM-DD形式の統一
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-28 12:40:57] コミット: fix: trainingController.jsを安定版に復元 + 評価基準の緩和実装
+
+## 主な変更内容
+
+### 1. trainingController.js復元（コミット3c0304fに戻す）
+- 問題のあった初回ドの音誤差対策修正を削除
+- タイミング調整の複雑な修正を削除
+- セッション間マイク許可再取得問題修正済みの安定版に復元
+
+### 2. 評価基準の科学的緩和実装（v2.0.0）
+
+**evaluation-calculator.js**:
+- 優秀音判定: ±20¢ → ±30¢に緩和
+- 外れ値フィルタリング追加: ±150¢超のデータを除外
+- 安定性計算を外れ値除外後のデータで実施
+
+**EVALUATION_SYSTEM_SPECIFICATION.md v2.0.0**:
+- 科学的根拠の追加: デバイス測定誤差（±10〜15¢）を明記
+- 新基準: Excellent ±20¢、Good ±35¢、Pass ±50¢
+- 学術的根拠の追加: 音楽教育研究・プロ歌手の実測データ
+- セッション総合バッジ基準の統一
+
+**result-session-controller.js**:
+- 外れ値除外ログ表示の追加
+- 評価基準v2.0.0に対応した表示
+
+### 3. キャッシュバスター更新
+- v20251028009に更新（trainingController.js復元 + 評価基準緩和）
+
+## 修正理由
+- trainingController.jsの初回ドの音対策が基音再生タイミングに問題を発生させた
+- 安定版（3c0304f）に戻して正常動作を確保
+- 評価基準の緩和は科学的根拠に基づく正当な改善のため残す
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-28 13:44:41] コミット: fix: モード別タイトル・サブタイトル・アイコン動的更新機能を実装
+
+- preparation-step1.html: サブタイトルにid追加、ハードコード削除
+- templates/preparation.html: サブタイトルにid追加、ハードコード削除
+- preparationController.js: updateModeSubtitle()関数実装、12音階方向対応
+- training.html: タイトル・アイコンにid追加
+- trainingController.js: initializeModeUI()更新、モード別アイコン実装、12音階方向表示対応
+
+モード別表示:
+- random: ランダム基音モード / shuffleアイコン
+- continuous: 連続チャレンジモード / zapアイコン
+- 12tone: 12音階モード（上昇/下降/両方向） / musicアイコン
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-28 14:16:32] コミット: fix: Tone.js Samplerノイズ軽減設定を実装
+
+- attack時間を15ms→50msに延長（Tone.js推奨範囲内）
+- curve: "exponential"を追加（より自然な振幅エンベロープ）
+- クリック/ポップノイズを軽減
+
+技術的根拠:
+- Tone.js Issue #328: Samplerのクリックノイズ既知の問題
+- attack値ゼロはノイズの原因、0.005-0.05秒が推奨
+- exponentialカーブは人間の聴覚特性に合致
+
+変更ファイル:
+- PitchPro-SPA/js/core/reference-tones.js: PitchShifter設定更新
+- PitchPro-SPA/specifications/TRAINING_SPECIFICATION.md: セクション7.2.2追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-28 14:19:01] コミット: chore: reference-tones.jsにバージョン情報追加
+
+- バージョン: 1.0.1
+- 日付: 2025-10-28
+- 変更履歴: Tone.js Samplerノイズ軽減設定実装を記録
+
+ブラウザキャッシュ対策として日付インクリメント実施
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-28 14:35:30] コミット: feat: 複数オクターブサンプル対応で低音域ノイズを軽減
+
+根本原因:
+- C4単一サンプルから低音域（C2-B2）への-24半音シフトでアーティファクト発生
+- ピッチシフト量が大きいほどクリックノイズが顕著（Tone.js Issue #803）
+
+実装内容:
+- 4オクターブサンプル対応（C2, C3, C4, C5）
+- 最大ピッチシフト量を±6半音に制限
+- エラーハンドリング追加（onerror callback）
+- サンプル生成スクリプト追加（generate_samples.py）
+
+技術的根拠:
+- Tone.js Sampler: 複数サンプルで最近接選択＋最小ピッチシフト
+- 各オクターブ専用サンプルで自然な音質を実現
+- フォールバック機能: サンプル読み込み失敗時はC4のみで動作
+
+変更ファイル:
+- PitchPro-SPA/js/core/reference-tones.js: v1.1.0に更新、複数サンプル対応
+- PitchPro-SPA/audio/piano/generate_samples.py: サンプル生成スクリプト追加
+- PitchPro-SPA/specifications/TRAINING_SPECIFICATION.md: v3.1.5仕様追記
+
+次のステップ:
+1. pip install librosa soundfile numpy
+2. cd PitchPro-SPA/audio/piano && python generate_samples.py
+3. C2.mp3, C3.mp3, C5.mp3が生成されることを確認
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-28 14:43:59] コミット: feat: キャッシュバスター実装 + 音源ファイル追加
+
+実装内容:
+- SAMPLE_VERSION定数追加（v1.1.1）
+- サンプルURLにクエリパラメータ ?v=1.1.1 を追加
+- ブラウザキャッシュ強制更新を実現
+
+追加音源ファイル:
+- C2.mp3 (419KB) - 低音域用サンプル
+- C3.mp3 (256KB) - 中低音域用サンプル
+- C5.mp3 (173KB) - 高音域用サンプル
+
+仕組み:
+- 各サンプルファイルに ?v=1.1.1 パラメータが付与
+- バージョン更新時に自動的にキャッシュをバイパス
+- ブラウザは新しいURLとして認識し、最新ファイルを取得
+
+期待効果:
+- 複数オクターブサンプルにより低音域ノイズが大幅軽減
+- 最大ピッチシフト量: ±6半音（半オクターブ）に制限
+- より自然なピアノサウンドを実現
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-28 15:08:03] コミット: docs: TRAINING_SPECIFICATION.mdに音質改善の詳細を追記
+
+追記内容:
+- v3.1.6更新: キャッシュバスター実装の説明
+- キャッシュバスターの仕組みと効果を詳述
+- 音源ファイル情報テーブル追加（4ファイル、合計1.07MB）
+- 音質改善効果の定量的データ追加
+
+キャッシュバスター実装:
+- クエリパラメータ ?v=1.1.1 でバージョン管理
+- SAMPLE_VERSION定数で一元管理
+- ブラウザキャッシュを確実にバイパス
+
+音源ファイル詳細:
+- C2.mp3 (419KB): 低音域（C2-B2）専用
+- C3.mp3 (256KB): 中低音域（C3-B3）専用
+- C4.mp3 (214KB): 中音域（C4-B4）基準サンプル
+- C5.mp3 (173KB): 高音域（C5-E5）専用
+
+音質改善効果:
+- ピッチシフト量: 最大±24半音 → ±6半音（75%削減）
+- 低音域クリックノイズ大幅軽減
+- より自然で高品質なピアノサウンドを実現
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-28 15:18:16] コミット: debug: 総合評価ページのデバッグログを強化
+
+問題:
+- 連続基音モードで24セッション（12音階モード）が表示される
+- モード別フィルタリングが正しく動作していない可能性
+
+実装内容:
+- URLハッシュの詳細ログ追加
+- モード別セッション数の分布表示
+- フィルタリング後のセッションIDリスト表示
+
+デバッグログ追加:
+- URL hash: 実際のURLパラメータを表示
+- モード別セッション数: 各モードのセッション数を集計表示
+- フィルタリング済みセッション: セッションID+モード表示
+
+これにより問題の原因特定が可能になる
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-28 15:24:45] コミット: fix: 総合評価ページのセッション詳細表示でモード別フィルタリングを修正
+
+問題:
+- 連続基音モードで24セッション（12音階モード含む）が表示される
+- showSessionDetail関数が全セッションを参照していた
+
+根本原因:
+- showSessionDetail関数がDataManager.getFromStorage('sessionData')で全セッション取得
+- モード別フィルタリングが適用されていなかった
+
+修正内容:
+1. window.filteredSessionData: フィルタリング済みセッションをグローバル変数に保存
+2. window.currentMode: 現在のモードをグローバル変数に保存
+3. showSessionDetail関数: window.filteredSessionDataを参照に変更
+4. navigateToNextSession関数: window.filteredSessionDataを参照に変更
+5. updateNavigationButtons関数: window.filteredSessionDataを参照に変更
+
+影響範囲:
+- 総合評価ページのセッション詳細表示
+- セッション間のナビゲーション（前へ/次へボタン）
+- ナビゲーションボタンの有効/無効状態
+
+期待される動作:
+- 連続基音モード: 12セッションのみ表示
+- 12音階モード: 12-24セッションのみ表示
+- ランダム基音モード: 8セッションのみ表示
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-28 15:39:28] コミット: fix: 基音の音割れ対策強化・低音域の音量バランス調整
+
+問題:
+- 基音再生時にまだ音割れが発生している
+- 低音域（C2-B2）の響きが大きすぎる
+
+根本原因:
+- attack時間が50msでは不十分（クリッピング防止に不足）
+- 低音域サンプルの倍音が強く、velocity 0.8では音割れの原因
+- 全音域で同一velocityを使用していた
+
+実装内容:
+
+1. attack時間の延長
+   - 50ms → 100ms（音割れ・クリッピング防止）
+   - Tone.js推奨範囲を超えるが、音質優先で延長
+
+2. 低音域の音量バランス自動調整
+   - C2-B2 (65-123Hz): velocity × 0.5（低音の響きを抑制）
+   - C3-B3 (130-246Hz): velocity × 0.7（中低音を控えめに）
+   - C4以上 (260Hz~): velocity × 1.0（通常音量）
+
+3. キャッシュバスターバージョン更新
+   - SAMPLE_VERSION: 1.1.1 → 1.2.0
+   - 全ユーザーに確実に新バージョン配信
+
+期待効果:
+- 音割れの大幅軽減
+- 全音域で均一な音量感を実現
+- より自然で高品質なピアノサウンド
+
+仕様書更新:
+- v3.1.7更新として記載
+- 低音域音量バランス調整の詳細追加
+- attack時間変更履歴の追記
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

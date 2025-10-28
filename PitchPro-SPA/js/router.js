@@ -166,6 +166,7 @@ class SimpleRouter {
                 const route = e.currentTarget.getAttribute('data-route');
                 const mode = e.currentTarget.getAttribute('data-mode');
                 const session = e.currentTarget.getAttribute('data-session');
+                const direction = e.currentTarget.getAttribute('data-direction'); // 12音階モード用
 
                 // トレーニング/準備ページへの遷移時、PitchShifter初期化を開始
                 if (route === 'training' || route === 'preparation') {
@@ -179,10 +180,11 @@ class SimpleRouter {
                 } else {
                     // training以外のルート（preparation等）
                     let hash = route;
-                    if (mode || session) {
+                    if (mode || session || direction) {
                         const params = new URLSearchParams();
                         if (mode) params.set('mode', mode);
                         if (session) params.set('session', session);
+                        if (direction) params.set('direction', direction); // 12音階モード方向パラメータ追加
                         // 【削除】ホームからの通常遷移では redirect パラメータ不要
                         // redirect パラメータは総合評価ページからの遷移や
                         // リロード時のリダイレクトなど特別なケースでのみ使用
