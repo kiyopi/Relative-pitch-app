@@ -1,15 +1,16 @@
 /**
  * PitchShifter - Tone.js Sampler Wrapper
- * @version 1.3.0
+ * @version 1.3.1
  * @date 2025-10-28
  * @changelog
+ *   - 2025-10-28: サンプル選択・ピッチシフト量の詳細ログ追加（A#2/C3問題調査）
  *   - 2025-10-28: クリッキングノイズ対策強化（attack: 0.15秒、安定化待機100ms）
  *   - 2025-10-28: 低音域の音量バランス調整・音割れ対策強化
  *   - 2025-10-28: キャッシュバスター実装（クエリパラメータでバージョン管理）
  *   - 2025-10-28: 複数サンプル対応実装 (C2, C3, C4, C5) - 低音域ノイズ軽減
  *   - 2025-10-28: Tone.js Samplerノイズ軽減設定実装 (attack: 0.05, curve: exponential)
  */
-const SAMPLE_VERSION = "1.3.0";
+const SAMPLE_VERSION = "1.3.1";
 var c = Object.defineProperty;
 var f = (s, e, i) => e in s ? c(s, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : s[e] = i;
 var n = (s, e, i) => f(s, typeof e != "symbol" ? e + "" : e, i);
@@ -118,7 +119,26 @@ const t = class t {
         console.log(`🔉 [PitchShifter] Mid-low adjustment: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
       }
 
+      // 【追加】サンプル選択状況の詳細ログ
+      const sampleNotes = ["C2", "C3", "C4", "C5"];
+      const noteFrequencies = {
+        "C2": 65.41, "C3": 130.81, "C4": 261.63, "C5": 523.25
+      };
+
+      // 最も近いサンプルを特定
+      let closestSample = "C4";
+      let minDiff = Math.abs(Math.log2(a.frequency / noteFrequencies["C4"]));
+      for (const sample of sampleNotes) {
+        const diff = Math.abs(Math.log2(a.frequency / noteFrequencies[sample]));
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestSample = sample;
+        }
+      }
+
+      const pitchShiftSemitones = 12 * Math.log2(a.frequency / noteFrequencies[closestSample]);
       console.log(`🎵 [PitchShifter] Playing ${e} (${a.frequency.toFixed(2)}Hz) for ${i}s at velocity ${adjustedVelocity.toFixed(2)}`);
+      console.log(`📊 [PitchShifter] Expected sample: ${closestSample} (${noteFrequencies[closestSample]}Hz) → Pitch shift: ${pitchShiftSemitones.toFixed(2)} semitones`);
 
       // 【修正】即座に再生開始（オフセットなし）
       // triggerAttack/triggerReleaseの分離により低音域でのノイズを防止

@@ -6139,3 +6139,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-28 15:49:41] コミット: fix: クリッキングノイズ対策強化（attack: 150ms、待機時間延長）
+
+- attack時間を100ms → 150msに延長
+- AudioContext安定化待機時間を50ms → 100msに延長
+- Tone.js内部準備のための10ms待機追加
+- 「一度だけブチっ」という稀なクリッキングノイズに対応
+- SAMPLE_VERSION: 1.2.0 → 1.3.0
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
