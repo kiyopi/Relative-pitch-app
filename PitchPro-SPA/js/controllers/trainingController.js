@@ -1015,9 +1015,9 @@ function getAvailableNotes() {
         console.log(`   範囲: ${availableNotes[0].note} (${availableNotes[0].frequency.toFixed(1)}Hz) - ${availableNotes[availableNotes.length - 1].note} (${availableNotes[availableNotes.length - 1].frequency.toFixed(1)}Hz)`);
     }
 
-    // 【連続チャレンジモード・12音階モード専用】12音に満たない場合は、音域下限から追加
+    // 【連続チャレンジモード専用】12音に満たない場合は、音域下限から追加
     // オクターブ相対音感トレーニングとして12音は必須
-    if (availableNotes.length < 12 && (currentMode === 'continuous' || currentMode === '12tone')) {
+    if (availableNotes.length < 12 && currentMode === 'continuous') {
         const neededNotes = 12 - availableNotes.length;
         console.warn(`⚠️ 音域不足: ${availableNotes.length}音 → 12音に拡張（${neededNotes}音追加）`);
         console.warn(`   推奨: 2.0オクターブ以上の音域（現在: ${(Math.log2(highFreq / lowFreq)).toFixed(2)}オクターブ）`);
@@ -1179,18 +1179,9 @@ function selectAllBaseNotesForMode(config) {
         }
 
     } else if (selectionType === 'sequential_chromatic') {
-        // 12音階モード: 連続したクロマチック12音を順次使用
-        if (availableNotes.length < 12) {
-            console.error(`❌ 12音階モードには最低12音が必要です（現在: ${availableNotes.length}音）`);
-            // フォールバック: 利用可能な音を繰り返し使用
-            for (let session = 0; session < maxSessions; session++) {
-                selectedNotes.push(availableNotes[session % availableNotes.length]);
-            }
-        } else {
-            // 最初の連続12音を使用
-            for (let session = 0; session < maxSessions; session++) {
-                selectedNotes.push(availableNotes[session]);
-            }
+        // 12音階モード: クロマチック12音を順次使用
+        for (let session = 0; session < maxSessions; session++) {
+            selectedNotes.push(availableNotes[session % availableNotes.length]);
         }
     }
 

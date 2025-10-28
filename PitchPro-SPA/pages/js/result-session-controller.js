@@ -1,8 +1,11 @@
 /**
  * セッション結果ページコントローラー
- * @version 1.3.0
+ * @version 2.0.0
  *
  * 変更履歴:
+ * - 2.0.0: 評価基準をv2.0.0に更新（科学的バランス型・デバイス誤差考慮）
+ *   - 個別音符評価: ±15¢→±20¢, ±25¢→±35¢, ±40¢→±50¢
+ *   - セッション総合バッジ: 同じ閾値に統一
  * - 1.3.0: リロード検出を復活（NavigationManager改善により誤検出を解消）
  * - 1.2.0: リロード検出を削除（表示専用ページのため不要）← 誤検出のため一時削除
  * - 1.1.0: リロード検出機能を追加（NavigationManager統合）
@@ -176,9 +179,9 @@ function displayEvaluationDistribution(pitchErrors) {
 
     pitchErrors.forEach(error => {
         const absError = Math.abs(error.errorInCents);
-        if (absError <= 15) distribution.excellent++;
-        else if (absError <= 25) distribution.good++;
-        else if (absError <= 40) distribution.pass++;
+        if (absError <= 20) distribution.excellent++;      // v2.0.0: ±20¢（旧: ±15¢）
+        else if (absError <= 35) distribution.good++;       // v2.0.0: ±35¢（旧: ±25¢）
+        else if (absError <= 50) distribution.pass++;       // v2.0.0: ±50¢（旧: ±40¢）
         else distribution.practice++;
     });
 
@@ -243,15 +246,16 @@ function displayAccuracyBadge(avgError) {
     // 既存のクラスを削除
     badge.className = 'accuracy-badge relative';
 
-    if (avgError <= 15) {
+    // v2.0.0: 科学的バランス型評価基準（デバイス誤差考慮）
+    if (avgError <= 20) {  // 旧: ≤15¢
         badge.classList.add('accuracy-badge-excellent');
         badge.innerHTML = '<i data-lucide="trophy" class="text-yellow-300 accuracy-icon"></i>';
         message.textContent = '素晴らしい精度！';
-    } else if (avgError <= 25) {
+    } else if (avgError <= 35) {  // 旧: ≤25¢
         badge.classList.add('accuracy-badge-good');
         badge.innerHTML = '<i data-lucide="star" class="text-green-300 accuracy-icon"></i>';
         message.textContent = '良好な精度！';
-    } else if (avgError <= 40) {
+    } else if (avgError <= 50) {  // 旧: ≤40¢
         badge.classList.add('accuracy-badge-pass');
         badge.innerHTML = '<i data-lucide="thumbs-up" class="text-blue-300 accuracy-icon"></i>';
         message.textContent = '合格ライン達成！';
@@ -293,13 +297,14 @@ function displayDetailedAnalysis(pitchErrors) {
         let evalColor = '';
         let iconTransform = '';
 
-        if (absError <= 15) {
+        // v2.0.0: 科学的バランス型評価基準（デバイス誤差考慮）
+        if (absError <= 20) {  // 旧: ≤15¢
             evalIcon = 'trophy';
             evalColor = 'text-yellow-300';
-        } else if (absError <= 25) {
+        } else if (absError <= 35) {  // 旧: ≤25¢
             evalIcon = 'star';
             evalColor = 'text-green-300';
-        } else if (absError <= 40) {
+        } else if (absError <= 50) {  // 旧: ≤40¢
             evalIcon = 'thumbs-up';
             evalColor = 'text-blue-300';
             iconTransform = 'transform: translateY(-2px) translateX(2px);';

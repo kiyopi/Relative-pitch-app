@@ -169,8 +169,8 @@ class EvaluationCalculator {
         totalNotes++;
         errors.push(absError);
 
-        // 優秀音判定（±20¢以内）
-        if (absError <= 20) {
+        // 【修正】優秀音判定を±30¢以内に緩和（±20¢はプロレベルすぎる）
+        if (absError <= 30) {
           excellentNotes++;
         }
       });
@@ -184,19 +184,36 @@ class EvaluationCalculator {
         excellenceRate: 0.5,
         stability: 15.0,
         totalNotes: 0,
-        excellentNotes: 0
+        excellentNotes: 0,
+        outlierFiltered: false
       };
     }
 
-    // 平均誤差計算
-    const avgError = totalError / totalNotes;
+    // 【追加】外れ値フィルタリング（±150¢を超える測定エラーを除外）
+    // 【根拠】実データ分析により±200¢超が10.4%発生、これは明らかな測定エラー
+    // ±150¢は半音1.5個分の誤差で、学術研究の許容範囲（±44¢）を大きく超える
+    const validErrors = errors.filter(e => e <= 150);
+    const outlierCount = errors.length - validErrors.length;
+    const outlierFiltered = outlierCount > 0;
+
+    // 外れ値除外後の平均誤差計算
+    let avgError;
+    if (validErrors.length > 0) {
+      avgError = validErrors.reduce((a, b) => a + b, 0) / validErrors.length;
+      console.log(`📊 外れ値除外: ${outlierCount}音除外（150¢超）、有効音: ${validErrors.length}/${errors.length}`);
+    } else {
+      // すべて外れ値の場合は元の値を使用
+      avgError = totalError / totalNotes;
+      console.warn('⚠️ すべての音が外れ値と判定されました。元の値を使用します。');
+    }
 
     // 優秀音割合計算
     const excellenceRate = excellentNotes / totalNotes;
 
-    // 安定性計算（標準偏差）
-    const mean = errors.reduce((a, b) => a + b, 0) / errors.length;
-    const variance = errors.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / errors.length;
+    // 安定性計算（標準偏差）- 外れ値除外後のデータで計算
+    const targetErrors = validErrors.length > 0 ? validErrors : errors;
+    const mean = targetErrors.reduce((a, b) => a + b, 0) / targetErrors.length;
+    const variance = targetErrors.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / targetErrors.length;
     const stability = Math.sqrt(variance);
 
     return {
@@ -204,7 +221,9 @@ class EvaluationCalculator {
       excellenceRate: Math.round(excellenceRate * 1000) / 1000,
       stability: Math.round(stability * 10) / 10,
       totalNotes,
-      excellentNotes
+      excellentNotes,
+      outlierFiltered,
+      outlierCount
     };
   }
 
@@ -233,6 +252,8 @@ class EvaluationCalculator {
 
   /**
    * 5. モード別基準定義
+   * 【修正】優秀音基準を±30¢に変更したため、全体的に基準を緩和
+   * 【修正】外れ値除外により平均誤差が改善されるため、基準を適正化
    */
   static getModeSpecificThresholds(actualSessions) {
     let sessionCount;
@@ -242,28 +263,28 @@ class EvaluationCalculator {
 
     const thresholds = {
       8: {  // ランダム基音（初級）- 技術制約考慮の寛容基準
-        S: { avgError: 30, excellence: 0.75 },
-        A: { avgError: 40, excellence: 0.65 },
-        B: { avgError: 50, excellence: 0.55 },
-        C: { avgError: 60, excellence: 0.45 },
-        D: { avgError: 70, excellence: 0.35 },
-        E: { avgError: 80, excellence: 0.25 }
+        S: { avgError: 25, excellence: 0.70 },  // 修正前: 30, 0.75
+        A: { avgError: 35, excellence: 0.60 },  // 修正前: 40, 0.65
+        B: { avgError: 45, excellence: 0.50 },  // 修正前: 50, 0.55
+        C: { avgError: 55, excellence: 0.40 },  // 修正前: 60, 0.45
+        D: { avgError: 65, excellence: 0.30 },  // 修正前: 70, 0.35
+        E: { avgError: 80, excellence: 0.20 }   // 修正前: 80, 0.25
       },
       12: { // 連続チャレンジ（中級）- 標準基準
-        S: { avgError: 25, excellence: 0.80 },
-        A: { avgError: 35, excellence: 0.70 },
-        B: { avgError: 45, excellence: 0.60 },
-        C: { avgError: 55, excellence: 0.50 },
-        D: { avgError: 65, excellence: 0.40 },
-        E: { avgError: 75, excellence: 0.30 }
+        S: { avgError: 20, excellence: 0.75 },  // 修正前: 25, 0.80
+        A: { avgError: 30, excellence: 0.65 },  // 修正前: 35, 0.70
+        B: { avgError: 40, excellence: 0.55 },  // 修正前: 45, 0.60
+        C: { avgError: 50, excellence: 0.45 },  // 修正前: 55, 0.50
+        D: { avgError: 60, excellence: 0.35 },  // 修正前: 65, 0.40
+        E: { avgError: 75, excellence: 0.25 }   // 修正前: 75, 0.30
       },
       24: { // 12音階（上級）- より厳格基準
-        S: { avgError: 20, excellence: 0.85 },
-        A: { avgError: 30, excellence: 0.75 },
-        B: { avgError: 40, excellence: 0.65 },
-        C: { avgError: 50, excellence: 0.55 },
-        D: { avgError: 60, excellence: 0.45 },
-        E: { avgError: 70, excellence: 0.35 }
+        S: { avgError: 15, excellence: 0.80 },  // 修正前: 20, 0.85
+        A: { avgError: 25, excellence: 0.70 },  // 修正前: 30, 0.75
+        B: { avgError: 35, excellence: 0.60 },  // 修正前: 40, 0.65
+        C: { avgError: 45, excellence: 0.50 },  // 修正前: 50, 0.55
+        D: { avgError: 55, excellence: 0.40 },  // 修正前: 60, 0.45
+        E: { avgError: 70, excellence: 0.30 }   // 修正前: 70, 0.35
       }
     };
 
