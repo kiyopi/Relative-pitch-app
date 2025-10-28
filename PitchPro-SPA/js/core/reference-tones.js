@@ -1,13 +1,14 @@
 /**
  * PitchShifter - Tone.js Sampler Wrapper
- * @version 1.1.1
+ * @version 1.2.0
  * @date 2025-10-28
  * @changelog
+ *   - 2025-10-28: 低音域の音量バランス調整・音割れ対策強化
  *   - 2025-10-28: キャッシュバスター実装（クエリパラメータでバージョン管理）
  *   - 2025-10-28: 複数サンプル対応実装 (C2, C3, C4, C5) - 低音域ノイズ軽減
  *   - 2025-10-28: Tone.js Samplerノイズ軽減設定実装 (attack: 0.05, curve: exponential)
  */
-const SAMPLE_VERSION = "1.1.1";
+const SAMPLE_VERSION = "1.2.0";
 var c = Object.defineProperty;
 var f = (s, e, i) => e in s ? c(s, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : s[e] = i;
 var n = (s, e, i) => f(s, typeof e != "symbol" ? e + "" : e, i);
@@ -54,8 +55,8 @@ const t = class t {
         urls: sampleUrls,
         baseUrl: this.config.baseUrl,
         release: this.config.release,
-        attack: 0.05,
-        // 50ms fade-in to prevent pop/click noise (Tone.js best practice: 0.005-0.05)
+        attack: 0.1,
+        // 100ms fade-in to prevent clipping/distortion (extended from 50ms)
         curve: "exponential",
         // Exponential curve for more natural amplitude envelope (recommended for Sampler)
         onload: () => {
@@ -100,11 +101,24 @@ const t = class t {
         await new Promise(resolve => setTimeout(resolve, 50));
       }
 
-      console.log(`🎵 [PitchShifter] Playing ${e} (${a.frequency.toFixed(2)}Hz) for ${i}s`);
+      // 【追加】低音域の音量バランス調整
+      // C2-B2 (65-123Hz): 0.5x velocity (低音の響きを抑制)
+      // C3-B3 (130-246Hz): 0.7x velocity (中低音を控えめに)
+      // C4以上: 1.0x velocity (通常音量)
+      let adjustedVelocity = o;
+      if (a.frequency < 130) {
+        adjustedVelocity = o * 0.5;  // 低音域は半分
+        console.log(`🔉 [PitchShifter] Low bass adjustment: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
+      } else if (a.frequency < 260) {
+        adjustedVelocity = o * 0.7;  // 中低音域は70%
+        console.log(`🔉 [PitchShifter] Mid-low adjustment: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
+      }
+
+      console.log(`🎵 [PitchShifter] Playing ${e} (${a.frequency.toFixed(2)}Hz) for ${i}s at velocity ${adjustedVelocity.toFixed(2)}`);
 
       // 【修正】即座に再生開始（オフセットなし）
       // triggerAttack/triggerReleaseの分離により低音域でのノイズを防止
-      this.sampler.triggerAttack(e, void 0, o);
+      this.sampler.triggerAttack(e, void 0, adjustedVelocity);
 
       // 指定時間後にリリース
       setTimeout(() => {
