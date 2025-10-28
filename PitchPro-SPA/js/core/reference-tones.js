@@ -31,8 +31,10 @@ const t = class t {
         },
         baseUrl: this.config.baseUrl,
         release: this.config.release,
-        attack: 5e-3
-        // 5ms fade-in to prevent pop noise
+        attack: 0.05,
+        // 50ms fade-in to prevent pop/click noise (Tone.js best practice: 0.005-0.05)
+        curve: "exponential"
+        // Exponential curve for more natural amplitude envelope (recommended for Sampler)
       }).toDestination(), this.sampler.volume.value = this.config.volume, console.log("📥 [PitchShifter] Loading audio sample..."), await l.loaded(), this.isInitialized = !0, console.log("✅ [PitchShifter] Initialization complete");
     } catch (e) {
       throw console.error("❌ [PitchShifter] Initialization failed:", e), new Error(`PitchShifter initialization failed: ${e}`);
@@ -57,8 +59,28 @@ const t = class t {
       const a = t.AVAILABLE_NOTES.find((r) => r.note === e);
       if (!a)
         throw new Error(`Invalid note: ${e}`);
-      console.log(`🎵 [PitchShifter] Playing ${e} (${a.frequency.toFixed(2)}Hz) for ${i}s`), this.sampler.triggerAttack(e, void 0, o), setTimeout(() => {
-        this.sampler && (this.sampler.triggerRelease(e), console.log(`🔇 [PitchShifter] Released ${e}`)), this.isPlaying = !1;
+
+      // 【追加】AudioContext状態を再確認（稀な音切れ対策）
+      const audioContext = l.getContext();
+      if (audioContext.state !== "running") {
+        console.warn("⚠️ [PitchShifter] AudioContext suspended, resuming...");
+        await l.start();
+        await audioContext.resume();
+        // 安定化のため短時間待機
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+
+      console.log(`🎵 [PitchShifter] Playing ${e} (${a.frequency.toFixed(2)}Hz) for ${i}s`);
+
+      // 【修正】即座に再生開始（オフセットなし）
+      // triggerAttack/triggerReleaseの分離により低音域でのノイズを防止
+      this.sampler.triggerAttack(e, void 0, o);
+
+      // 指定時間後にリリース
+      setTimeout(() => {
+        this.sampler && (this.sampler.triggerRelease(e), console.log(`🔇 [PitchShifter] Released ${e}`));
+        this.isPlaying = !1;
+        console.log(`✅ [PitchShifter] Playback completed ${e}`);
       }, i * 1e3);
     } catch (a) {
       throw this.isPlaying = !1, console.error("❌ [PitchShifter] Play note failed:", a), a;

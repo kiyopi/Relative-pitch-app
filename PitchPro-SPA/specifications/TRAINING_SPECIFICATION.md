@@ -1292,10 +1292,12 @@ if (audioDetector) {
 - `destroy()`を必ず呼び出してリソースを完全に解放する
 - これを行わないと、バックグラウンド復帰時にPitchProの警告アラートが表示され、ブラウザバック防止のダイアログが誤発火する問題が発生する
 
-### 7.2 PitchShifter
+### 7.2 PitchShifter（Tone.js Sampler）
 
 **初期化**: `initializePitchShifter()` 内（初回のみ）
 **解放**: `cleanupCurrentPage()` 内
+
+#### 7.2.1 基本設定
 
 ```javascript
 // 初期化（グローバルインスタンス活用）
@@ -1320,6 +1322,42 @@ if (window.pitchShifterInstance) {
     window.pitchShifterInstance = null;
 }
 ```
+
+#### 7.2.2 Tone.js Samplerノイズ軽減設定（v3.1.4）
+
+**背景**: 基音再生時にプチノイズ（クリック音）が発生する問題に対応
+
+**実装**: `/js/core/reference-tones.js`
+
+```javascript
+this.sampler = new Tone.Sampler({
+    urls: { C4: "C4.mp3" },
+    baseUrl: this.config.baseUrl,
+    release: this.config.release,
+    attack: 0.05,              // 50ms fade-in（推奨: 0.005-0.05秒）
+    curve: "exponential"       // より自然な振幅エンベロープ
+}).toDestination();
+```
+
+**設定の根拠**:
+1. **attack: 0.05秒（50ms）**
+   - Tone.js推奨範囲: 0.005-0.05秒
+   - 15ms（旧設定）→ 50msへの延長でクリックノイズを軽減
+   - 人間の耳には気づかない程度の短時間
+
+2. **curve: "exponential"**
+   - デフォルト: attackCurve="linear", releaseCurve="exponential"
+   - Sampler推奨設定: "exponential"（より自然な音）
+   - 振幅エンベロープが人間の聴覚特性に合致
+
+**参考情報**:
+- Tone.js Issue #328: Samplerのattack終了時・release開始時のクリックノイズ既知の問題
+- 適切なattack値とexponential curveで軽減可能
+- ゼロ値（attack: 0.0）はクリックノイズの原因となるため非推奨
+
+**代替設定**（ノイズが残る場合）:
+- attack: 0.1秒（100ms）に延長
+- 異なるcurveタイプの試行: "sine", "cosine", "bounce", "ripple"
 
 ### 7.3 マイクストリーム
 
