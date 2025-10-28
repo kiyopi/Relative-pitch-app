@@ -1323,22 +1323,32 @@ if (window.pitchShifterInstance) {
 }
 ```
 
-#### 7.2.2 Tone.js Samplerノイズ軽減設定（v3.1.4-3.1.5）
+#### 7.2.2 Tone.js Samplerノイズ軽減設定（v3.1.4-3.1.6）
 
 **背景**: 基音再生時にプチノイズ（クリック音）が発生する問題に対応
 
 **v3.1.5更新**: 複数サンプル対応による低音域ノイズ軽減
+**v3.1.6更新**: キャッシュバスター実装による確実な更新配信
 
-**実装**: `/js/core/reference-tones.js`
+**実装**: `/js/core/reference-tones.js` (v1.1.1)
 
 ```javascript
+/**
+ * PitchShifter - Tone.js Sampler Wrapper
+ * @version 1.1.1
+ */
+const SAMPLE_VERSION = "1.1.1";
+
 // 複数オクターブサンプルによるピッチシフトアーティファクト軽減
+// キャッシュバスター: クエリパラメータでバージョン管理
 const sampleUrls = {
-    C2: "C2.mp3",  // Bass range (C2-B2)
-    C3: "C3.mp3",  // Low-mid range (C3-B3)
-    C4: "C4.mp3",  // Mid range (C4-B4) - Always available
-    C5: "C5.mp3"   // High range (C5-E5)
+    C2: `C2.mp3?v=${SAMPLE_VERSION}`,  // Bass range (C2-B2)
+    C3: `C3.mp3?v=${SAMPLE_VERSION}`,  // Low-mid range (C3-B3)
+    C4: `C4.mp3?v=${SAMPLE_VERSION}`,  // Mid range (C4-B4) - Always available
+    C5: `C5.mp3?v=${SAMPLE_VERSION}`   // High range (C5-E5)
 };
+
+console.log(`📦 [PitchShifter] Sample version: ${SAMPLE_VERSION}`);
 
 this.sampler = new Tone.Sampler({
     urls: sampleUrls,
@@ -1358,24 +1368,49 @@ this.sampler = new Tone.Sampler({
 
 **設定の根拠**:
 
-1. **複数サンプル対応（v3.1.5新規追加）**
+1. **キャッシュバスター（v3.1.6新規追加）**
+   - **実装方法**: クエリパラメータ `?v=1.1.1` をサンプルURLに付与
+   - **仕組み**: ブラウザは異なるURLとして認識し、キャッシュをバイパス
+   - **更新方法**: `SAMPLE_VERSION` を変更するだけで全ユーザーに最新ファイル配信
+   - **実際のURL例**: `/audio/piano/C2.mp3?v=1.1.1`
+   - **効果**: サンプルファイル更新時に確実に新しいファイルが読み込まれる
+
+2. **複数サンプル対応（v3.1.5新規追加）**
    - 各オクターブごとに専用サンプルを配置
    - 最大ピッチシフト量: ±6半音（半オクターブ）に制限
    - **根本原因**: C4単一サンプルから低音域（C2-B2）への-24半音シフトでアーティファクト発生
-   - **効果**: ピッチシフト量を大幅削減し、特に低音域でのクリックノイズを軽減
+   - **効果**: ピッチシフト量を75%削減し、特に低音域でのクリックノイズを軽減
    - **フォールバック**: サンプル読み込み失敗時はC4のみで動作（Tone.js自動フォールバック）
+   - **音質改善**: 各音域で最適なサンプルを使用することで、より自然で高品質なピアノサウンドを実現
 
-2. **attack: 0.05秒（50ms）**
+3. **attack: 0.05秒（50ms）**
    - Tone.js推奨範囲: 0.005-0.05秒
    - 15ms（旧設定）→ 50msへの延長でクリックノイズを軽減
    - 人間の耳には気づかない程度の短時間
 
-3. **curve: "exponential"**
+4. **curve: "exponential"**
    - デフォルト: attackCurve="linear", releaseCurve="exponential"
    - Sampler推奨設定: "exponential"（より自然な音）
    - 振幅エンベロープが人間の聴覚特性に合致
 
+**音源ファイル情報**:
+
+配置場所: `/PitchPro-SPA/audio/piano/`
+
+| ファイル名 | サイズ | 対応音域 | 用途 |
+|-----------|--------|---------|------|
+| C2.mp3 | 419KB | C2-B2 | 低音域専用サンプル |
+| C3.mp3 | 256KB | C3-B3 | 中低音域専用サンプル |
+| C4.mp3 | 214KB | C4-B4 | 中音域専用サンプル（基準） |
+| C5.mp3 | 173KB | C5-E5 | 高音域専用サンプル |
+
+**音質改善効果**:
+- **ピッチシフト量削減**: 最大±24半音 → ±6半音（75%削減）
+- **クリックノイズ軽減**: 低音域での顕著なノイズが大幅に改善
+- **自然な音質**: 各音域で最適なサンプルを使用し、高品質なピアノサウンドを実現
+
 **参考情報**:
+
 - Tone.js Issue #328: Samplerのattack終了時・release開始時のクリックノイズ既知の問題
 - Tone.js Issue #803: ピッチシフトアーティファクト削減方法
 - 適切なattack値とexponential curveで軽減可能
