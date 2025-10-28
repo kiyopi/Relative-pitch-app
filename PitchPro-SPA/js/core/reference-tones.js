@@ -1,18 +1,15 @@
 /**
  * PitchShifter - Tone.js Sampler Wrapper
- * @version 1.5.0
+ * @version 2.0.0
  * @date 2025-10-28
  * @changelog
- *   - 2025-10-28: サンプルマッピング大幅強化（3半音間隔・フラット表記で±3半音シフトに削減）
- *   - 2025-10-28: サンプルマッピング戦略変更（中間サンプル追加でTone.js選択ロジック最適化）
- *   - 2025-10-28: サンプル選択・ピッチシフト量の詳細ログ追加（A#2/C3問題調査）
+ *   - 2025-10-28: シンプル戦略に回帰（C3単一サンプルで安定性重視）
+ *   - 2025-10-28: 複雑なサンプルマッピングを廃止し、シンプルで確実な実装に
  *   - 2025-10-28: クリッキングノイズ対策強化（attack: 0.15秒、安定化待機100ms）
  *   - 2025-10-28: 低音域の音量バランス調整・音割れ対策強化
  *   - 2025-10-28: キャッシュバスター実装（クエリパラメータでバージョン管理）
- *   - 2025-10-28: 複数サンプル対応実装 (C2, C3, C4, C5) - 低音域ノイズ軽減
- *   - 2025-10-28: Tone.js Samplerノイズ軽減設定実装 (attack: 0.05, curve: exponential)
  */
-const SAMPLE_VERSION = "1.5.0";
+const SAMPLE_VERSION = "2.0.0";
 var c = Object.defineProperty;
 var f = (s, e, i) => e in s ? c(s, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : s[e] = i;
 var n = (s, e, i) => f(s, typeof e != "symbol" ? e + "" : e, i);
@@ -42,24 +39,13 @@ const t = class t {
     try {
       console.log("🎹 [PitchShifter] Initializing..."), l.getContext().state !== "running" && (await l.start(), console.log("🔊 [PitchShifter] AudioContext started"));
 
-      // Multiple samples with explicit range mapping
-      // Tone.js Sampler automatically selects nearest sample, but problematic with sparse samples
-      // Strategy: Add intermediate samples every 3 semitones (tritone) for ±3 semitone max shift
-      // Using Gb notation (flat) for better Tone.js compatibility
+      // Single sample strategy: C3 as base (optimized for low-mid range)
+      // C3 (130.81Hz) provides better balance for typical vocal range
+      // Low notes (C2-B2): -12 to -1 semitones (downward shift)
+      // Mid notes (C3-B3): 0 to +11 semitones (minimal shift)
+      // High notes (C4-E5): +12 to +24 semitones (upward shift)
       const sampleUrls = {
-        "C2": `C2.mp3?v=${SAMPLE_VERSION}`,     // 65.41Hz - Bass anchor
-        "Eb2": `C2.mp3?v=${SAMPLE_VERSION}`,    // 77.78Hz - C2 +3 semitones
-        "Gb2": `C2.mp3?v=${SAMPLE_VERSION}`,    // 92.50Hz - C2 +6 semitones
-        "A2": `C3.mp3?v=${SAMPLE_VERSION}`,     // 110.00Hz - C3 -3 semitones
-        "C3": `C3.mp3?v=${SAMPLE_VERSION}`,     // 130.81Hz - Low-mid anchor
-        "Eb3": `C3.mp3?v=${SAMPLE_VERSION}`,    // 155.56Hz - C3 +3 semitones
-        "Gb3": `C3.mp3?v=${SAMPLE_VERSION}`,    // 185.00Hz - C3 +6 semitones
-        "A3": `C4.mp3?v=${SAMPLE_VERSION}`,     // 220.00Hz - C4 -3 semitones
-        "C4": `C4.mp3?v=${SAMPLE_VERSION}`,     // 261.63Hz - Mid anchor
-        "Eb4": `C4.mp3?v=${SAMPLE_VERSION}`,    // 311.13Hz - C4 +3 semitones
-        "Gb4": `C4.mp3?v=${SAMPLE_VERSION}`,    // 369.99Hz - C4 +6 semitones
-        "A4": `C5.mp3?v=${SAMPLE_VERSION}`,     // 440.00Hz - C5 -3 semitones
-        "C5": `C5.mp3?v=${SAMPLE_VERSION}`      // 523.25Hz - High anchor
+        "C3": `C3.mp3?v=${SAMPLE_VERSION}`
       };
 
       console.log(`📦 [PitchShifter] Sample version: ${SAMPLE_VERSION}`);
@@ -130,30 +116,10 @@ const t = class t {
         console.log(`🔉 [PitchShifter] Mid-low adjustment: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
       }
 
-      // 【追加】最適なサンプルを明示的に選択
-      const sampleNotes = ["C2", "C3", "C4", "C5"];
-      const noteFrequencies = {
-        "C2": 65.41, "C3": 130.81, "C4": 261.63, "C5": 523.25
-      };
-
-      // 最も近いサンプルを特定（ピッチシフト量が最小になるもの）
-      let closestSample = "C4";
-      let minDiff = Math.abs(Math.log2(a.frequency / noteFrequencies["C4"]));
-      for (const sample of sampleNotes) {
-        const diff = Math.abs(Math.log2(a.frequency / noteFrequencies[sample]));
-        if (diff < minDiff) {
-          minDiff = diff;
-          closestSample = sample;
-        }
-      }
-
-      const pitchShiftSemitones = 12 * Math.log2(a.frequency / noteFrequencies[closestSample]);
       console.log(`🎵 [PitchShifter] Playing ${e} (${a.frequency.toFixed(2)}Hz) for ${i}s at velocity ${adjustedVelocity.toFixed(2)}`);
-      console.log(`📊 [PitchShifter] Optimal sample: ${closestSample} (${noteFrequencies[closestSample]}Hz) → Pitch shift: ${pitchShiftSemitones.toFixed(2)} semitones`);
 
-      // 【重要修正】Tone.js Samplerに最適なサンプルを明示的に指定
-      // triggerAttack(note, time, velocity) の note パラメータで基準サンプルを指定
-      // これにより、Tone.jsのデフォルトサンプル選択（上側優先）を上書き
+      // 【修正】即座に再生開始（オフセットなし）
+      // triggerAttack/triggerReleaseの分離により低音域でのノイズを防止
       this.sampler.triggerAttack(e, void 0, adjustedVelocity);
 
       // 指定時間後にリリース

@@ -6207,3 +6207,27 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-28 16:55:06] コミット: fix: サンプルマッピングを3半音間隔で大幅強化（v1.5.0）
+
+問題継続:
+- A2 (110Hz)がまだC3から-3半音シフト
+- F#表記が機能せず、中間サンプルが無効化
+
+新戦略:
+- 3半音（短3度）間隔で密なサンプル配置
+- フラット表記（Eb, Gb, A）使用でTone.js互換性向上
+- 13サンプルポイント配置で最大±3半音に制限
+
+サンプルマップ:
+C2 → Eb2(C2+3) → Gb2(C2+6) → A2(C3-3) → C3 → Eb3(C3+3) → Gb3(C3+6) →
+A3(C4-3) → C4 → Eb4(C4+3) → Gb4(C4+6) → A4(C5-3) → C5
+
+期待効果:
+- A2: A2サンプル（ピッチシフトなし）
+- A#2: A2サンプル（+1半音のみ）
+- C3: C3サンプル（ピッチシフトなし）
+- クリッキングノイズ・音割れの劇的改善
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
