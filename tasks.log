@@ -6257,3 +6257,17 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-28 17:06:33] コミット: fix: タイムスタンプベースのキャッシュバスター追加（強制更新）
+
+問題:
+- v=2.0.0だけではブラウザキャッシュが更新されない
+- スーパーリロードでも古いバージョンが読み込まれ続ける
+
+解決:
+- タイムスタンプパラメータ &t=1761638761 を追加
+- ?v=2.0.0&t=1761638761 で確実に新しいファイルを読み込む
+- コンソールログに「v2.0.0-1761638761」を表示
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
