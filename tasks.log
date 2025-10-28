@@ -6194,3 +6194,16 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-28 16:49:17] コミット: fix: オブジェクトキーをクォートで囲んで構文エラー解決（v1.4.1）
+
+問題:
+- F#2, F#3, F#4のキーが構文エラーを引き起こしていた
+- TypeError: undefined is not an object (evaluating 'window.PitchShifter.AVAILABLE_NOTES')
+
+解決:
+- すべてのオブジェクトキーを文字列リテラルで囲む
+- "C2", "F#2", "C3", "F#3", "C4", "F#4", "C5"
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

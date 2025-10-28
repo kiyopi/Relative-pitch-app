@@ -1,8 +1,9 @@
 /**
  * PitchShifter - Tone.js Sampler Wrapper
- * @version 1.4.0
+ * @version 1.5.0
  * @date 2025-10-28
  * @changelog
+ *   - 2025-10-28: サンプルマッピング大幅強化（3半音間隔・フラット表記で±3半音シフトに削減）
  *   - 2025-10-28: サンプルマッピング戦略変更（中間サンプル追加でTone.js選択ロジック最適化）
  *   - 2025-10-28: サンプル選択・ピッチシフト量の詳細ログ追加（A#2/C3問題調査）
  *   - 2025-10-28: クリッキングノイズ対策強化（attack: 0.15秒、安定化待機100ms）
@@ -11,7 +12,7 @@
  *   - 2025-10-28: 複数サンプル対応実装 (C2, C3, C4, C5) - 低音域ノイズ軽減
  *   - 2025-10-28: Tone.js Samplerノイズ軽減設定実装 (attack: 0.05, curve: exponential)
  */
-const SAMPLE_VERSION = "1.4.1";
+const SAMPLE_VERSION = "1.5.0";
 var c = Object.defineProperty;
 var f = (s, e, i) => e in s ? c(s, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : s[e] = i;
 var n = (s, e, i) => f(s, typeof e != "symbol" ? e + "" : e, i);
@@ -42,17 +43,23 @@ const t = class t {
       console.log("🎹 [PitchShifter] Initializing..."), l.getContext().state !== "running" && (await l.start(), console.log("🔊 [PitchShifter] AudioContext started"));
 
       // Multiple samples with explicit range mapping
-      // Tone.js default: selects nearest "upper" sample (problematic for lower notes)
-      // Solution: Add samples at octave boundaries + intermediate samples
-      // This reduces max pitch shift and improves sample selection accuracy
+      // Tone.js Sampler automatically selects nearest sample, but problematic with sparse samples
+      // Strategy: Add intermediate samples every 3 semitones (tritone) for ±3 semitone max shift
+      // Using Gb notation (flat) for better Tone.js compatibility
       const sampleUrls = {
-        "C2": `C2.mp3?v=${SAMPLE_VERSION}`,    // 65.41Hz - Bass range anchor
-        "F#2": `C2.mp3?v=${SAMPLE_VERSION}`,   // 92.50Hz - Mid-bass (use C2, +6 semitones)
-        "C3": `C3.mp3?v=${SAMPLE_VERSION}`,    // 130.81Hz - Low-mid anchor
-        "F#3": `C3.mp3?v=${SAMPLE_VERSION}`,   // 185.00Hz - Mid (use C3, +6 semitones)
-        "C4": `C4.mp3?v=${SAMPLE_VERSION}`,    // 261.63Hz - Mid range anchor
-        "F#4": `C4.mp3?v=${SAMPLE_VERSION}`,   // 369.99Hz - Mid-high (use C4, +6 semitones)
-        "C5": `C5.mp3?v=${SAMPLE_VERSION}`     // 523.25Hz - High range anchor
+        "C2": `C2.mp3?v=${SAMPLE_VERSION}`,     // 65.41Hz - Bass anchor
+        "Eb2": `C2.mp3?v=${SAMPLE_VERSION}`,    // 77.78Hz - C2 +3 semitones
+        "Gb2": `C2.mp3?v=${SAMPLE_VERSION}`,    // 92.50Hz - C2 +6 semitones
+        "A2": `C3.mp3?v=${SAMPLE_VERSION}`,     // 110.00Hz - C3 -3 semitones
+        "C3": `C3.mp3?v=${SAMPLE_VERSION}`,     // 130.81Hz - Low-mid anchor
+        "Eb3": `C3.mp3?v=${SAMPLE_VERSION}`,    // 155.56Hz - C3 +3 semitones
+        "Gb3": `C3.mp3?v=${SAMPLE_VERSION}`,    // 185.00Hz - C3 +6 semitones
+        "A3": `C4.mp3?v=${SAMPLE_VERSION}`,     // 220.00Hz - C4 -3 semitones
+        "C4": `C4.mp3?v=${SAMPLE_VERSION}`,     // 261.63Hz - Mid anchor
+        "Eb4": `C4.mp3?v=${SAMPLE_VERSION}`,    // 311.13Hz - C4 +3 semitones
+        "Gb4": `C4.mp3?v=${SAMPLE_VERSION}`,    // 369.99Hz - C4 +6 semitones
+        "A4": `C5.mp3?v=${SAMPLE_VERSION}`,     // 440.00Hz - C5 -3 semitones
+        "C5": `C5.mp3?v=${SAMPLE_VERSION}`      // 523.25Hz - High anchor
       };
 
       console.log(`📦 [PitchShifter] Sample version: ${SAMPLE_VERSION}`);
