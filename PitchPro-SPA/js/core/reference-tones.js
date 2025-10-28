@@ -1,3 +1,10 @@
+/**
+ * PitchShifter - Tone.js Sampler Wrapper
+ * @version 1.0.1
+ * @date 2025-10-28
+ * @changelog
+ *   - 2025-10-28: Tone.js Samplerノイズ軽減設定実装 (attack: 0.05, curve: exponential)
+ */
 var c = Object.defineProperty;
 var f = (s, e, i) => e in s ? c(s, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : s[e] = i;
 var n = (s, e, i) => f(s, typeof e != "symbol" ? e + "" : e, i);
