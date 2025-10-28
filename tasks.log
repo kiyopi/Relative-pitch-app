@@ -6150,3 +6150,17 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-28 16:00:54] コミット: debug: サンプル選択・ピッチシフト量の詳細ログ追加
+
+A#2クリッキングノイズとC3波打ち問題の原因調査のため以下を実装:
+- 期待されるサンプル選択の計算ロジック追加
+- 実際のピッチシフト量（半音単位）のログ出力
+- 各音程でどのサンプルが使用されているか明示
+
+調査対象:
+- A#2 (116.54Hz): C2サンプルから+6.8半音シフト時のノイズ
+- C3 (130.81Hz): 波打ち現象（期待: C3サンプル、ピッチシフトなし）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
