@@ -836,7 +836,8 @@ class PitchProCycleManager {
             // 新規作成または再作成
             window.pitchShifterInstance = new window.PitchShifter({
                 baseUrl: 'audio/piano/',
-                release: 2.5,
+                attack: 0.02,
+                release: 1.5,
                 volume: deviceVolume
             });
 
@@ -1755,7 +1756,7 @@ function setupVolumeAdjustmentControls() {
                 if (!icon || !text) {
                     console.warn('⚠️ ボタン内の要素が見つかりません');
                     // 要素が見つからない場合は音声だけ再生
-                    await window.pitchShifterInstance.playNote("C4");
+                    await window.pitchShifterInstance.playNote("C4", 1.0);
                     return;
                 }
 
@@ -1773,10 +1774,10 @@ function setupVolumeAdjustmentControls() {
 
                 // C4 (261.6Hz) を再生
                 console.log('▶️ C4音を再生開始...');
-                await window.pitchShifterInstance.playNote("C4");
+                await window.pitchShifterInstance.playNote("C4", 1.0);
                 console.log('✅ 基音C4を再生しました');
 
-                // 2秒後にボタンを元に戻す（PitchShifterの再生時間）
+                // 2.52秒後にボタンを元に戻す（attack:0.02s + sustain:1.0s + release:1.5s = 2.52s）
                 setTimeout(() => {
                     // アイコン要素を再取得（Lucideで置き換わっている可能性があるため）
                     const currentIcon = btn.querySelector('[data-lucide]') || btn.querySelector('svg');
@@ -1802,7 +1803,7 @@ function setupVolumeAdjustmentControls() {
                     isPlayingBaseNote = false;
 
                     console.log('✅ ボタン状態を復元しました');
-                }, 2000);
+                }, 2520); // 2.52秒 = 2520ms
 
             } catch (error) {
                 console.error('❌ 基音再生エラー:', error);

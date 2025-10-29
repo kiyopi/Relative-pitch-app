@@ -261,7 +261,8 @@ class SimpleRouter {
             // 新規作成
             window.pitchShifterInstance = new window.PitchShifter({
                 baseUrl: 'audio/piano/',
-                release: 2.5,
+                attack: 0.02,
+                release: 1.5,
                 volume: deviceVolume
             });
 

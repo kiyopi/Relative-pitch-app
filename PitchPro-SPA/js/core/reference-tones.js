@@ -1,15 +1,54 @@
 /**
  * PitchShifter - Tone.js Sampler Wrapper
- * @version 2.0.0
- * @date 2025-10-28
+ * @version 2.9.0
+ * @date 2025-10-29
  * @changelog
- *   - 2025-10-28: シンプル戦略に回帰（C3単一サンプルで安定性重視）
+ *   - 2025-10-29 v2.9.0: エンベロープ調整（attack:0.02s + release:1.5s）
+ *     - アタック時間0.02s（高速応答）
+ *     - サステイン1.0s（適度な長さ）
+ *     - リリース1.5s（自然な減衰）
+ *     - 合計2.52s
+ *   - 2025-10-29 v2.8.0: エンベロープ微調整（attack:0.03s + release:2.0s）
+ *     - アタック時間を0.03sに調整（ノイズ軽減）
+ *     - 短いサステイン（0.5s）で簡潔に
+ *     - 長いリリース（2.0s）で自然な減衰
+ *     - 合計2.53s
+ *   - 2025-10-29 v2.7.0: エンベロープ最終調整（attack:0.01s + release:2.0s）
+ *     - 超高速アタック（0.01s）で即座の応答
+ *     - 短いサステイン（0.5s）で簡潔に
+ *     - 長いリリース（2.0s）で自然な減衰
+ *     - 合計2.51s
+ *   - 2025-10-29 v2.6.0: エンベロープ最適化（attack:0.02s + release:1.5s）
+ *     - 高速アタック（0.02s）で即座の応答
+ *     - 適度なリリース（1.5s）で自然な減衰
+ *     - 再生時間1.0s、合計2.52s
+ *   - 2025-10-29 v2.5.0: 2秒完結設計（attack:0.05s + release:0.5s）
+ *     - リリース時間を0.5sに短縮（2秒以内完結）
+ *     - アタック時間は0.05sを維持（ノイズ軽減）
+ *     - カーブをlinearに変更してレイテンシ削減
+ *   - 2025-10-29 v2.4.0: エンベロープ微調整（attack:0.05s + release:2.0s）
+ *     - アタック時間を0.05sに調整（ノイズ軽減とレスポンスのバランス）
+ *     - リリース時間は2.0sを維持（安定性重視）
+ *     - カーブをlinearに変更してレイテンシ削減
+ *   - 2025-10-29 v2.3.0: クリッキングノイズ対策（attack:0.1s + release:2.0s）
+ *     - アタック時間を0.1sに延長（ブチ音対策）
+ *     - リリース時間は2.0sを維持（安定性重視）
+ *     - カーブをlinearに変更してレイテンシ削減
+ *   - 2025-10-28 v2.2.0: エンベロープ再調整（attack:0.01s + release:2.0s）
+ *     - 高速アタック（0.01s）で即座の応答
+ *     - リリース時間を2.0sに延長（安定性重視）
+ *     - カーブをlinearに変更してレイテンシ削減
+ *   - 2025-10-28 v2.1.0: エンベロープ最適化（attack:0.01s + release:1.0s）
+ *     - 高速アタック（0.01s）で即座の応答
+ *     - 適度なリリース（1.0s）で音の分離を改善
+ *     - カーブをlinearに変更してレイテンシ削減
+ *   - 2025-10-28 v2.0.0: シンプル戦略に回帰（C3単一サンプルで安定性重視）
  *   - 2025-10-28: 複雑なサンプルマッピングを廃止し、シンプルで確実な実装に
  *   - 2025-10-28: クリッキングノイズ対策強化（attack: 0.15秒、安定化待機100ms）
  *   - 2025-10-28: 低音域の音量バランス調整・音割れ対策強化
  *   - 2025-10-28: キャッシュバスター実装（クエリパラメータでバージョン管理）
  */
-const SAMPLE_VERSION = "2.0.0";
+const SAMPLE_VERSION = "2.9.0";
 var c = Object.defineProperty;
 var f = (s, e, i) => e in s ? c(s, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : s[e] = i;
 var n = (s, e, i) => f(s, typeof e != "symbol" ? e + "" : e, i);
@@ -22,8 +61,10 @@ const t = class t {
     n(this, "isPlaying", !1);
     this.config = {
       baseUrl: e.baseUrl || "/audio/piano/",
-      release: e.release ?? 2.5,
-      // Longer release for natural piano decay
+      release: e.release ?? 1.5,
+      // Natural release (1.5s) for smooth decay
+      attack: e.attack ?? 0.02,
+      // Fast attack (0.02s) for immediate response
       volume: e.volume ?? -6,
       noteRange: e.noteRange || t.AVAILABLE_NOTES.map((i) => i.note)
     };
@@ -54,10 +95,10 @@ const t = class t {
         urls: sampleUrls,
         baseUrl: this.config.baseUrl,
         release: this.config.release,
-        attack: 0.15,
-        // 150ms fade-in to prevent clicking noise (extended from 100ms)
-        curve: "exponential",
-        // Exponential curve for more natural amplitude envelope (recommended for Sampler)
+        attack: this.config.attack,
+        // Using config values for optimal envelope
+        curve: "linear",
+        // Linear curve for minimal latency and clicking noise reduction
         onload: () => {
           console.log("✅ [PitchShifter] Samples loaded successfully");
         },
@@ -65,7 +106,7 @@ const t = class t {
           console.warn("⚠️ [PitchShifter] Some samples failed to load, using available samples:", error);
           // Tone.js will automatically fall back to available samples
         }
-      }).toDestination(), this.sampler.volume.value = this.config.volume, console.log("📥 [PitchShifter] Loading audio samples..."), await l.loaded(), this.isInitialized = !0, console.log("✅ [PitchShifter] Initialization complete");
+      }).toDestination(), this.sampler.volume.value = this.config.volume, console.log("📥 [PitchShifter] Loading audio samples..."), await l.loaded(), this.isInitialized = !0, console.log("✅ [PitchShifter] Initialization complete - attack:0.02s + sustain:1.0s + release:1.5s (2.52s total)");
     } catch (e) {
       throw console.error("❌ [PitchShifter] Initialization failed:", e), new Error(`PitchShifter initialization failed: ${e}`);
     }

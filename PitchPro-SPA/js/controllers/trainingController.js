@@ -541,7 +541,7 @@ async function startTraining() {
             }
         }
 
-        await pitchShifter.playNote(baseNoteInfo.note, 2);
+        await pitchShifter.playNote(baseNoteInfo.note, 1.0);
 
         // セッションデータ記録開始
         if (window.sessionDataRecorder) {
