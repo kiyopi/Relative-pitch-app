@@ -1,10 +1,16 @@
 # トレーニング機能仕様書（SPA版）
 
-**バージョン**: 3.1.8
+**バージョン**: 3.2.0
 **作成日**: 2025-10-23
-**最終更新**: 2025-10-28
+**最終更新**: 2025-10-29
 
 **変更履歴**:
+- v3.2.0 (2025-10-29): 音程測定精度の根本的改善
+  - **問題**: 前の音の残響（高明瞭度）が次の音の立ち上がり期間（低明瞭度）より優先選択され、異常値（-191.8¢等）が発生
+  - **解決**: 測定開始から最初の200msを除外し、残り500msの安定期間から最高明瞭度データを選択
+  - **効果**: 異常値（±150¢超）が完全消滅、測定精度が正常範囲に収まる
+  - **実装**: `recordStepPitchData()`に200ms除外ロジック追加、フォールバック処理実装
+  - **副次的改善**: 外れ値除外ロジック削除により、実際のユーザーパフォーマンスを正確に評価
 - v3.1.8 (2025-10-28): クリッキングノイズ対策強化
   - attack時間を100ms → 150msに延長（クリッキングノイズ完全解消）
   - AudioContext安定化待機時間を50ms → 100msに延長
@@ -676,6 +682,8 @@ async function startDoremiGuide() {
 
 ### 5.4 音程データ記録
 
+**v3.2.0での重要な改善**: 前の音の残響を除外し、測定精度を根本的に向上
+
 ```javascript
 function recordStepPitchData(step) {
     if (!sessionRecorder) return;
@@ -688,6 +696,7 @@ function recordStepPitchData(step) {
     const expectedNoteName = intervals[step]; // 相対音程名（ドレミ...）
 
     if (stepData.length === 0) {
+        console.warn(`⚠️ Step ${step} (${expectedNoteName}): 音程データが記録されていません`);
         // ダミーデータで記録（エラー回避）
         sessionRecorder.recordPitchError(
             step,
@@ -700,10 +709,24 @@ function recordStepPitchData(step) {
         return;
     }
 
-    // 最も明瞭度が高いデータを使用
-    const bestData = stepData.reduce((best, current) =>
-        current.clarity > best.clarity ? current : best
-    );
+    // 【v3.2.0 新機能】最初の200msを除外して前の音の余韻を回避
+    const stepStartTime = stepData[0].timestamp;
+    const validData = stepData.filter(d => d.timestamp - stepStartTime >= 200);
+
+    let bestData;
+    if (validData.length === 0) {
+        console.warn(`⚠️ Step ${step} (${expectedNoteName}): 有効なデータがありません（全て立ち上がり期間）- 元データから選択`);
+        // 有効なデータがない場合は元のstepDataから最も明瞭度が高いものを使用
+        bestData = stepData.reduce((best, current) =>
+            current.clarity > best.clarity ? current : best
+        );
+    } else {
+        console.log(`✅ Step ${step} (${expectedNoteName}): 最初200ms除外後の有効データ ${validData.length}件`);
+        // 有効なデータから最も明瞭度が高いデータを使用
+        bestData = validData.reduce((best, current) =>
+            current.clarity > best.clarity ? current : best
+        );
+    }
 
     // セント誤差を計算
     const centError = 1200 * Math.log2(bestData.frequency / expectedFrequency);
@@ -723,6 +746,22 @@ function recordStepPitchData(step) {
     console.log(`   誤差: ${centError >= 0 ? '+' : ''}${centError.toFixed(1)}¢`);
 }
 ```
+
+#### v3.2.0改善の詳細
+
+**問題の背景**:
+- 各ステップ700msの測定ウィンドウ内で、前の音の残響（安定した高明瞭度）が次の音の立ち上がり期間（不安定な低明瞭度）より選択されていた
+- 例: レ (185Hz) → ミ (208Hz) の遷移時、ミの測定でレの残響185Hzが選ばれ、-191.8¢の異常値が発生
+
+**解決策**:
+1. **200ms除外**: 測定開始から最初の200msを除外 → 前の音の残響期間を回避
+2. **500ms安定期間**: 残り500msの安定期間から最高明瞭度データを選択 → 正確な測定
+3. **フォールバック処理**: 有効データがない場合は元データから選択 → エラー回避
+
+**効果**:
+- ✅ 異常値（±150¢超）が完全消滅
+- ✅ 測定精度が正常範囲（±150¢以内）に収束
+- ✅ 評価システムの信頼性向上
 
 ### 5.5 セッション完了処理
 

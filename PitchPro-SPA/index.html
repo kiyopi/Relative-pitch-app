@@ -10,10 +10,10 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>8va相対音感トレーニング - ホーム</title>
-    <link rel="stylesheet" href="styles/base.css?v=20251029005">
-    <link rel="stylesheet" href="styles/results.css?v=20251029005">
-    <link rel="stylesheet" href="styles/training.css?v=20251029005">
-    <link rel="stylesheet" href="styles/voice-range.css?v=20251029005">
+    <link rel="stylesheet" href="styles/base.css?v=20251029012">
+    <link rel="stylesheet" href="styles/results.css?v=20251029012">
+    <link rel="stylesheet" href="styles/training.css?v=20251029012">
+    <link rel="stylesheet" href="styles/voice-range.css?v=20251029012">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -22,15 +22,16 @@
     <script src="https://unpkg.com/lucide@0.263.0/dist/umd/lucide.js"></script>
 
     <!-- JavaScript モジュール -->
-    <script src="js/data-manager.js?v=20251029005"></script>
-    <script src="js/navigation-manager.js?v=20251029005"></script>
-    <script src="js/evaluation-calculator.js?v=20251029005"></script>
-    <script src="js/controllers/session-data-recorder.js?v=20251029005"></script>
-    <script src="pages/js/result-session-controller.js?v=20251029005"></script>
-    <script src="js/core/pitchpro-v1.3.1.umd.js?v=20251029005"></script>
+    <script src="js/data-manager.js?v=20251029012"></script>
+    <script src="js/navigation-manager.js?v=20251029012"></script>
+    <script src="js/evaluation-calculator.js?v=20251029012"></script>
+    <script src="js/controllers/session-data-recorder.js?v=20251029012"></script>
+    <script src="pages/js/result-session-controller.js?v=20251029012"></script>
+    <script src="pages/js/results-overview-controller.js?v=20251029012"></script>
+    <script src="js/core/pitchpro-v1.3.1.umd.js?v=20251029012"></script>
 
     <!-- 音域テスト正規版（SPA対応・条件付き初期化） -->
-    <script src="pages/js/voice-range-test.js?v=20251029005"></script>
+    <script src="pages/js/voice-range-test.js?v=20251029012"></script>
     <!-- タイムスタンプ方式でキャッシュを強制無効化 -->
     <script>
         const script = document.createElement('script');
@@ -49,14 +50,14 @@
 
     <!-- PitchShifter Library -->
     <script type="module">
-        import { PitchShifter } from './js/core/reference-tones.js?v=2.9.0&t=1128536049&nocache=1';
+        import { PitchShifter } from './js/core/reference-tones.js?v=2.9.0&t=1761735209&nocache=1';
         import * as Tone from 'tone';
 
         window.PitchShifter = PitchShifter;
         window.Tone = Tone;
 
-        console.log('✅ PitchShifter loaded globally (v2.9.0 - Balanced Envelope)');
-        console.log('📦 [CACHE BUSTER] Timestamp: 1128536049');
+        console.log('✅ PitchShifter loaded globally (v2.9.0 - Optimized Envelope)');
+        console.log('📦 [CACHE BUSTER] Timestamp: 1761735209');
         console.log('⚙️ [ENVELOPE] attack: 0.02s, sustain: 1.0s, release: 1.5s (2.52s total), curve: linear');
         console.log('✅ Tone.js v15.1.22 (stable latest) loaded globally');
     </script>
@@ -115,10 +116,10 @@
     </div>
 
     <!-- Lucide初期化 -->
-    <script src="js/lucide-init.js?v=20251028009"></script>
+    <script src="js/lucide-init.js?v=20251029012"></script>
 
     <!-- SPA Router -->
-    <script src="js/router.js?v=20251028009"></script>
+    <script src="js/router.js?v=20251029012"></script>
 
     <!-- メニュー開閉スクリプト -->
     <script>

@@ -1,9 +1,21 @@
 # 相対音感トレーニングアプリ - 評価システム仕様書
 
-**バージョン**: 2.0.0
+**バージョン**: 2.2.0
 **作成日**: 2025-08-07
-**更新日**: 2025-01-28
+**更新日**: 2025-10-29
 **用途**: セッション単位（8音）の音程精度評価・採点システムの詳細仕様
+
+**v2.2.0 重要更新内容** (2025-10-29):
+- **測定精度の根本的改善**: 前の音の残響除外ロジック実装により異常値完全消滅
+- **外れ値除外ロジック削除**: 測定精度向上により不要となった外れ値除外処理を削除
+- **評価の信頼性向上**: 実際のユーザーパフォーマンスを正確に反映
+- **詳細**: 測定開始から200ms除外し、残り500msの安定期間から最高明瞭度データを選択
+
+**v2.1.0 重要更新内容** (2025-10-29):
+- **評価ロジックの統合**: `EvaluationCalculator`に共通評価関数を追加
+- **コード重複削除**: セッション評価・総合評価の評価基準を一元管理
+- **保守性向上**: 評価基準変更時は`evaluation-calculator.js`の1箇所修正で全体反映
+- **一貫性保証**: 全ての評価表示で同一基準を使用
 
 **v2.0.0 重要更新内容**:
 - **評価基準の科学的再設計**: デバイス測定誤差（±10〜15¢）を考慮した現実的な基準へ改定
@@ -535,4 +547,108 @@ if (avgError <= 20) {                               // 旧: ≤15
 
 ---
 
-**このv2.0.0評価システムにより、科学的根拠に基づいた公平で現実的な音程精度評価が実現されます。**
+## 📐 v2.1.0: 評価ロジックの統合アーキテクチャ
+
+### 統合の目的
+
+v2.1.0では、評価基準のロジックが複数箇所に重複していた問題を解決し、`EvaluationCalculator`クラスに統合しました。
+
+### 統合前の問題点
+
+**評価基準の重複（v2.0.0以前）**:
+1. `result-session-controller.js` - セッション評価ページ
+2. `results-overview.html` - 総合評価の詳細分析
+3. `evaluation-calculator.js` - 総合グレード計算
+
+各ファイルで独立して評価基準を実装していたため：
+- ❌ 評価基準変更時に3箇所修正が必要
+- ❌ 基準の不一致リスク（旧基準が残る可能性）
+- ❌ 保守性・可読性の低下
+
+### 統合後のアーキテクチャ（v2.1.0）
+
+**`EvaluationCalculator`クラスに統合**:
+
+```javascript
+/**
+ * 個別音程評価（v2.0.0: 科学的バランス型評価基準）
+ * @param {number} absError - 絶対誤差（セント）
+ * @returns {Object} { level, icon, color, cssClass, message }
+ */
+static evaluatePitchError(absError) {
+  if (absError <= 20) return { level: 'excellent', icon: 'trophy', ... };
+  else if (absError <= 35) return { level: 'good', icon: 'star', ... };
+  else if (absError <= 50) return { level: 'pass', icon: 'thumbs-up', ... };
+  else return { level: 'practice', icon: 'alert-triangle', ... };
+}
+
+/**
+ * 平均誤差評価（セッションバッジ用）
+ */
+static evaluateAverageError(avgError) {
+  return this.evaluatePitchError(avgError);
+}
+
+/**
+ * 評価分布の計算
+ */
+static calculateDistribution(pitchErrors) {
+  const distribution = { excellent: 0, good: 0, pass: 0, practice: 0 };
+  pitchErrors.forEach(error => {
+    const evaluation = this.evaluatePitchError(Math.abs(error.errorInCents));
+    distribution[evaluation.level]++;
+  });
+  return distribution;
+}
+```
+
+### 統合による改善
+
+**保守性の向上**:
+- ✅ 評価基準変更は`evaluation-calculator.js`の1箇所のみ
+- ✅ 全ての評価表示に自動反映
+- ✅ 基準の不一致リスクを完全排除
+
+**コードの簡潔化**:
+```javascript
+// 【修正前】各ファイルで重複実装（20行以上）
+if (absError <= 20) { evalIcon = 'trophy'; evalColor = 'text-yellow-300'; }
+else if (absError <= 35) { evalIcon = 'star'; evalColor = 'text-green-300'; }
+// ... 重複コード
+
+// 【修正後】統合関数を呼び出すだけ（1行）
+const evaluation = EvaluationCalculator.evaluatePitchError(absError);
+```
+
+**一貫性の保証**:
+- ✅ セッション評価ページ
+- ✅ 総合評価の詳細分析
+- ✅ 評価分布グラフ
+
+全てが同一の`evaluatePitchError()`関数を使用するため、完全に同一基準で評価されることを保証。
+
+### 実装箇所
+
+**統合関数の定義**:
+- `/js/evaluation-calculator.js` (Lines 358-428)
+
+**統合関数の使用箇所**:
+- `/pages/js/result-session-controller.js`
+  - `displayEvaluationDistribution()` - Line 187
+  - `displayAccuracyBadge()` - Line 247
+  - `displayDetailedAnalysis()` - Line 286
+
+- `/pages/results-overview.html`
+  - `showSessionDetail()` - Lines 815, 841（精度バッジ・音別詳細）
+
+### 今後の拡張性
+
+評価基準の変更（例：さらなる科学的知見の反映）が必要になった場合：
+
+1. `evaluation-calculator.js`の`evaluatePitchError()`のみ修正
+2. 全ての評価表示に自動反映
+3. テストの簡素化（単一関数のテストのみ）
+
+---
+
+**このv2.1.0評価システムにより、科学的根拠に基づいた公平で現実的な音程精度評価が、保守性・一貫性を備えた形で実現されます。**

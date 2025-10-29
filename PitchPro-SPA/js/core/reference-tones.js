@@ -109,7 +109,13 @@ const t = class t {
           console.warn("⚠️ [PitchShifter] Some samples failed to load, using available samples:", error);
           // Tone.js will automatically fall back to available samples
         }
-      }).toDestination(), this.sampler.volume.value = this.config.volume, console.log("📥 [PitchShifter] Loading audio samples..."), await l.loaded(), this.isInitialized = !0, console.log("✅ [PitchShifter] Initialization complete - attack:0.02s + sustain:1.0s + release:1.5s (2.52s total)");
+      }).toDestination();
+
+      this.sampler.volume.value = this.config.volume;
+      console.log("📥 [PitchShifter] Loading audio samples...");
+      await l.loaded();
+
+      this.isInitialized = !0, console.log("✅ [PitchShifter] Initialization complete - attack:0.02s + sustain:1.0s + release:1.5s (2.52s total)");
     } catch (e) {
       throw console.error("❌ [PitchShifter] Initialization failed:", e), new Error(`PitchShifter initialization failed: ${e}`);
     }

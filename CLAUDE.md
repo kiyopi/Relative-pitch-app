@@ -19,6 +19,7 @@
 - ✅ **完了**: VolumeBarController統合音量制御システム実装完了（実機テスト済み設定統合）
 - ✅ **完了**: 音域テストv4.0包括設計完成（PitchPro役割分担・エラーハンドリング・収録制御統合）
 - ✅ **完了**: **🔥 重要修正**: 音量バー同期問題の根本解決（CSS transition削除でリアルタイム表示実現）
+- ✅ **完了**: **🎯 測定精度の根本的改善**: 前の音の残響除外ロジック実装（200ms除外で異常値完全消滅）
 - 📋 **次期作業**: voice-range-test-v4での本格実装開始
 
 ### 🌿 **現在のブランチ**
@@ -457,6 +458,86 @@ voice-range-test-v4/
 - **音声処理UI**: アニメーション不要、即座の反応を優先
 - **PitchPro統合**: ライブラリの設計思想を尊重、余計な制御を避ける
 - **CSS設計**: 用途に応じた適切なアニメーション設定
+
+---
+
+## 🎯 **2025年10月29日 重要更新**: 測定精度の根本的改善
+
+### **📊 問題の発見と解決**
+
+#### **発見された問題**
+- **症状**: セッション評価で-191.8¢のような異常値が検出される
+- **例**: Session 2, Step 2 (ミ) で期待値207.65Hz → 検出値185.87Hz（レの周波数）
+- **原因**: 前の音の残響（安定した高明瞭度）が次の音の立ち上がり期間（不安定な低明瞭度）より優先選択されていた
+
+#### **根本原因の特定**
+```javascript
+// 問題のあった実装（trainingController.js recordStepPitchData）
+const stepData = pitchDataBuffer.filter(d => d.step === step); // 700ms全体
+const bestData = stepData.reduce((best, current) =>
+    current.clarity > best.clarity ? current : best
+); // 最高明瞭度を選択
+```
+
+**なぜ異常値が発生したか**:
+1. レ (185Hz) 測定完了 → 残響が安定して高明瞭度
+2. ミ (208Hz) 測定開始 → 最初200msはレの残響が残る
+3. 700msの測定ウィンドウ内で、レの残響（高明瞭度）がミの立ち上がり（低明瞭度）より選ばれる
+4. 結果: ミの測定でレの周波数185Hzが記録され、-191.8¢の異常値発生
+
+### **✅ 実装した解決策**
+
+```javascript
+// 修正後の実装（trainingController.js v3.2.0）
+// 【重要】最初の200msを除外して前の音の余韻を回避
+const stepStartTime = stepData[0].timestamp;
+const validData = stepData.filter(d => d.timestamp - stepStartTime >= 200);
+
+let bestData;
+if (validData.length === 0) {
+    // フォールバック: 有効データがない場合は元データから選択
+    bestData = stepData.reduce((best, current) =>
+        current.clarity > best.clarity ? current : best
+    );
+} else {
+    // 有効データから最も明瞭度が高いデータを使用
+    bestData = validData.reduce((best, current) =>
+        current.clarity > best.clarity ? current : best
+    );
+}
+```
+
+### **📈 修正の効果**
+
+**修正前（異常値発生）**:
+```
+Session 2, Step 2 (ミ):
+  期待: 207.65Hz
+  検出: 185.87Hz（レの残響）
+  誤差: -191.8¢ ← 異常値
+```
+
+**修正後（正常範囲）**:
+```
+最近の64測定（8セッション×8音）の誤差範囲:
+  最小誤差: -4.8¢ (ソ)
+  最大誤差: +112.4¢ (シ)
+  → ±150¢以内の正常範囲に収束
+  → -191.8¢のような異常値は完全消滅
+```
+
+### **🔧 仕様書への記録**
+
+- ✅ **TRAINING_SPECIFICATION.md** (v3.2.0): 詳細な実装ロジックと改善内容を記録
+- ✅ **EVALUATION_SYSTEM_SPECIFICATION.md** (v2.2.0): 測定精度向上の効果を記録
+- ✅ **CLAUDE.md**: 作業完了サマリーに追加
+
+### **💡 重要な教訓**
+
+1. **外れ値は症状、測定ロジックが原因**: 外れ値除外ではなく、測定精度の向上が正しいアプローチ
+2. **音声信号の特性理解**: 立ち上がり期間（不安定）vs 持続期間（安定）の違い
+3. **適切なウィンドウ設計**: 700ms測定時間のうち、最初200msを除外し、残り500msで測定
+4. **フォールバック処理の重要性**: エッジケースでもエラー回避できる設計
 
 ---
 

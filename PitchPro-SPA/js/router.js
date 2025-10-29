@@ -168,8 +168,9 @@ class SimpleRouter {
                 const session = e.currentTarget.getAttribute('data-session');
                 const direction = e.currentTarget.getAttribute('data-direction'); // 12音階モード用
 
-                // トレーニング/準備ページへの遷移時、PitchShifter初期化を開始
-                if (route === 'training' || route === 'preparation') {
+                // トレーニングページへの遷移時のみ、PitchShifter初期化を開始
+                // 準備ページは ensurePitchShifterInitialized() で必要時に初期化するため除外
+                if (route === 'training') {
                     console.log('🎹 トレーニング開始 - PitchShifter初期化開始...');
                     this.initializePitchShifterBackground();
                 }

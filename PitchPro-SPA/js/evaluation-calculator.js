@@ -354,6 +354,78 @@ class EvaluationCalculator {
 
     return `${level}レベルで${grade}級達成！${modeInfo.target}に向けて順調に成長中です。`;
   }
+
+  /**
+   * 個別音程評価（v2.0.0: 科学的バランス型評価基準）
+   * @param {number} absError - 絶対誤差（セント）
+   * @returns {Object} { level: 'excellent'|'good'|'pass'|'practice', icon, color, cssClass }
+   */
+  static evaluatePitchError(absError) {
+    if (absError <= 20) {
+      return {
+        level: 'excellent',
+        icon: 'trophy',
+        color: 'text-yellow-300',
+        cssClass: 'color-eval-gold',
+        message: '素晴らしい精度！'
+      };
+    } else if (absError <= 35) {
+      return {
+        level: 'good',
+        icon: 'star',
+        color: 'text-green-300',
+        cssClass: 'color-eval-good',
+        message: '良好な精度！'
+      };
+    } else if (absError <= 50) {
+      return {
+        level: 'pass',
+        icon: 'thumbs-up',
+        color: 'text-blue-300',
+        cssClass: 'color-eval-pass',
+        message: '合格ライン達成！'
+      };
+    } else {
+      return {
+        level: 'practice',
+        icon: 'alert-triangle',
+        color: 'text-red-300',
+        cssClass: 'color-eval-practice',
+        message: '練習を続けましょう！'
+      };
+    }
+  }
+
+  /**
+   * 平均誤差評価（セッションバッジ用）
+   * @param {number} avgError - 平均誤差（セント）
+   * @returns {Object} { level, icon, color, cssClass, message }
+   */
+  static evaluateAverageError(avgError) {
+    return this.evaluatePitchError(avgError);
+  }
+
+  /**
+   * 評価分布の計算
+   * @param {Array} pitchErrors - 音程誤差配列
+   * @returns {Object} { excellent, good, pass, practice }
+   */
+  static calculateDistribution(pitchErrors) {
+    const distribution = {
+      excellent: 0,
+      good: 0,
+      pass: 0,
+      practice: 0
+    };
+
+    pitchErrors.forEach(error => {
+      const absError = Math.abs(error.errorInCents);
+      const evaluation = this.evaluatePitchError(absError);
+      distribution[evaluation.level]++;
+    });
+
+    return distribution;
+  }
 }
 
 // グローバル公開

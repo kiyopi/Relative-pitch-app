@@ -733,10 +733,24 @@ function recordStepPitchData(step) {
         return;
     }
 
-    // 最も明瞭度が高いデータを使用
-    const bestData = stepData.reduce((best, current) =>
-        current.clarity > best.clarity ? current : best
-    );
+    // 【修正】最初の200msを除外して前の音の余韻を回避
+    const stepStartTime = stepData[0].timestamp;
+    const validData = stepData.filter(d => d.timestamp - stepStartTime >= 200);
+
+    let bestData;
+    if (validData.length === 0) {
+        console.warn(`⚠️ Step ${step} (${expectedNoteName}): 有効なデータがありません（全て立ち上がり期間）- 元データから選択`);
+        // 有効なデータがない場合は元のstepDataから最も明瞭度が高いものを使用
+        bestData = stepData.reduce((best, current) =>
+            current.clarity > best.clarity ? current : best
+        );
+    } else {
+        console.log(`✅ Step ${step} (${expectedNoteName}): 最初200ms除外後の有効データ ${validData.length}件`);
+        // 有効なデータから最も明瞭度が高いデータを使用
+        bestData = validData.reduce((best, current) =>
+            current.clarity > best.clarity ? current : best
+        );
+    }
 
     // セント誤差を計算（デバッグ用）
     const centError = 1200 * Math.log2(bestData.frequency / expectedFrequency);

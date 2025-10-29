@@ -77,24 +77,28 @@ async function loadSessionData(sessionNumber) {
             return null;
         }
 
-        // 指定されたセッション番号のデータを取得（重複IDがある場合は最新のものを使用）
-        const matchingSessions = allSessions.filter(s => s.sessionId === sessionNumber);
+        // 【修正】現在のモードを取得（最新セッションのモード）
+        const latestSession = allSessions[allSessions.length - 1];
+        const currentMode = latestSession.mode;
+        console.log(`🔍 [DEBUG] 現在のモード: ${currentMode}`);
 
-        if (matchingSessions.length === 0) {
-            console.warn(`⚠️ セッションID ${sessionNumber} が見つかりません。最新セッションを使用します。`);
-            const latestSession = allSessions[allSessions.length - 1];
-            console.log(`📊 最新セッション使用: ID ${latestSession.sessionId}, 基音 ${latestSession.baseNote}`);
-            return latestSession;
+        // 現在のモードのセッションのみをフィルタリング
+        const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
+        console.log(`🔍 [DEBUG] ${currentMode}モードのセッション数: ${currentModeSessions.length}`);
+
+        // sessionNumberは1から始まるので、配列インデックスに変換（-1）
+        const sessionIndex = sessionNumber - 1;
+
+        if (sessionIndex < 0 || sessionIndex >= currentModeSessions.length) {
+            console.warn(`⚠️ セッション番号 ${sessionNumber} が範囲外です（1-${currentModeSessions.length}）。最新セッションを使用します。`);
+            const session = currentModeSessions[currentModeSessions.length - 1];
+            console.log(`📊 最新セッション使用: ID ${session.sessionId}, 基音 ${session.baseNote}`);
+            return session;
         }
 
-        // 重複IDがある場合は最新のものを取得（配列の最後）
-        const session = matchingSessions[matchingSessions.length - 1];
-
-        if (matchingSessions.length > 1) {
-            console.warn(`⚠️ セッションID ${sessionNumber} が${matchingSessions.length}件見つかりました。最新のものを使用します。`);
-        }
-
-        console.log(`📊 セッションデータ読み込み: ID ${session.sessionId}, 基音 ${session.baseNote} (${session.baseFrequency.toFixed(1)}Hz)`);
+        // 指定された番号のセッションを取得
+        const session = currentModeSessions[sessionIndex];
+        console.log(`📊 セッションデータ読み込み: 番号 ${sessionNumber}, ID ${session.sessionId}, 基音 ${session.baseNote} (${session.baseFrequency.toFixed(1)}Hz)`);
         return session;
 
     } catch (error) {
@@ -176,24 +180,11 @@ function updateSessionUI(sessionData, sessionNumber) {
 }
 
 /**
- * 評価分布を表示
+ * 評価分布を表示（v2.0.0: EvaluationCalculator統合）
  */
 function displayEvaluationDistribution(pitchErrors) {
-    const distribution = {
-        excellent: 0,
-        good: 0,
-        pass: 0,
-        practice: 0
-    };
-
-    pitchErrors.forEach(error => {
-        const absError = Math.abs(error.errorInCents);
-        if (absError <= 20) distribution.excellent++;      // v2.0.0: ±20¢（旧: ±15¢）
-        else if (absError <= 35) distribution.good++;       // v2.0.0: ±35¢（旧: ±25¢）
-        else if (absError <= 50) distribution.pass++;       // v2.0.0: ±50¢（旧: ±40¢）
-        else distribution.practice++;
-    });
-
+    // 統合評価関数を使用
+    const distribution = EvaluationCalculator.calculateDistribution(pitchErrors);
     const total = pitchErrors.length;
     const container = document.querySelector('.flex.flex-col.gap-3.px-4');
 
@@ -244,7 +235,7 @@ function displayEvaluationDistribution(pitchErrors) {
 }
 
 /**
- * 精度バッジを表示
+ * 精度バッジを表示（v2.0.0: EvaluationCalculator統合）
  */
 function displayAccuracyBadge(avgError) {
     const badge = document.querySelector('.accuracy-badge');
@@ -252,27 +243,15 @@ function displayAccuracyBadge(avgError) {
 
     if (!badge || !message) return;
 
+    // 統合評価関数を使用
+    const evaluation = EvaluationCalculator.evaluateAverageError(avgError);
+
     // 既存のクラスを削除
     badge.className = 'accuracy-badge relative';
 
-    // v2.0.0: 科学的バランス型評価基準（デバイス誤差考慮）
-    if (avgError <= 20) {  // 旧: ≤15¢
-        badge.classList.add('accuracy-badge-excellent');
-        badge.innerHTML = '<i data-lucide="trophy" class="text-yellow-300 accuracy-icon"></i>';
-        message.textContent = '素晴らしい精度！';
-    } else if (avgError <= 35) {  // 旧: ≤25¢
-        badge.classList.add('accuracy-badge-good');
-        badge.innerHTML = '<i data-lucide="star" class="text-green-300 accuracy-icon"></i>';
-        message.textContent = '良好な精度！';
-    } else if (avgError <= 50) {  // 旧: ≤40¢
-        badge.classList.add('accuracy-badge-pass');
-        badge.innerHTML = '<i data-lucide="thumbs-up" class="text-blue-300 accuracy-icon"></i>';
-        message.textContent = '合格ライン達成！';
-    } else {
-        badge.classList.add('accuracy-badge-practice');
-        badge.innerHTML = '<i data-lucide="alert-triangle" class="text-red-300 accuracy-icon"></i>';
-        message.textContent = '練習を続けましょう！';
-    }
+    badge.classList.add(`accuracy-badge-${evaluation.level}`);
+    badge.innerHTML = `<i data-lucide="${evaluation.icon}" class="${evaluation.color} accuracy-icon"></i>`;
+    message.textContent = evaluation.message;
 
     // ヘルプボタンを再追加
     badge.innerHTML += `
@@ -288,7 +267,7 @@ function displayAccuracyBadge(avgError) {
 }
 
 /**
- * 詳細分析を表示
+ * 詳細分析を表示（v2.0.0: EvaluationCalculator統合）
  */
 function displayDetailedAnalysis(pitchErrors) {
     const container = document.getElementById('note-results');
@@ -302,26 +281,11 @@ function displayDetailedAnalysis(pitchErrors) {
 
     pitchErrors.forEach((error, index) => {
         const absError = Math.abs(error.errorInCents);
-        let evalIcon = '';
-        let evalColor = '';
-        let iconTransform = '';
 
-        // v2.0.0: 科学的バランス型評価基準（デバイス誤差考慮）
-        if (absError <= 20) {  // 旧: ≤15¢
-            evalIcon = 'trophy';
-            evalColor = 'text-yellow-300';
-        } else if (absError <= 35) {  // 旧: ≤25¢
-            evalIcon = 'star';
-            evalColor = 'text-green-300';
-        } else if (absError <= 50) {  // 旧: ≤40¢
-            evalIcon = 'thumbs-up';
-            evalColor = 'text-blue-300';
-            iconTransform = 'transform: translateY(-2px) translateX(2px);';
-        } else {
-            evalIcon = 'alert-triangle';
-            evalColor = 'text-red-300';
-        }
+        // 統合評価関数を使用
+        const evaluation = EvaluationCalculator.evaluatePitchError(absError);
 
+        const iconTransform = evaluation.icon === 'thumbs-up' ? 'transform: translateY(-2px) translateX(2px);' : '';
         const deviationClass = error.errorInCents >= 0 ? 'text-pitch-deviation-plus' : 'text-pitch-deviation-minus';
 
         const noteElement = document.createElement('div');
@@ -340,7 +304,7 @@ function displayDetailedAnalysis(pitchErrors) {
                 <div class="flex items-center gap-3">
                     <div class="${deviationClass}">${error.errorInCents >= 0 ? '+' : ''}${error.errorInCents}¢</div>
                     <div class="flex items-center justify-center">
-                        <i data-lucide="${evalIcon}" class="${evalColor}" style="width: 28px; height: 28px; ${iconTransform}"></i>
+                        <i data-lucide="${evaluation.icon}" class="${evaluation.color}" style="width: 28px; height: 28px; ${iconTransform}"></i>
                     </div>
                 </div>
             </div>
