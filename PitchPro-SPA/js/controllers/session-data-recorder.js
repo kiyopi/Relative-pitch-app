@@ -109,7 +109,7 @@ class SessionDataRecorder {
 
     /**
      * セッションを完了してlocalStorageに保存
-     * v2.0.0: プレミアムプラン判定を追加
+     * v2.1.0: 無料プランでも全データ保存（表示制限のみ）
      */
     completeSession() {
         if (!this.currentSession) {
@@ -123,26 +123,21 @@ class SessionDataRecorder {
 
         console.log('✅ セッション完了:', this.currentSession);
 
-        // 【v2.0.0】プレミアムプラン判定
+        // 【v2.1.0】全モードでデータ保存（無料プランも含む）
         const subscriptionData = DataManager.getSubscriptionData();
         const isPremium = subscriptionData.premiumAccess.status === 'active';
         const mode = this.currentSession.mode;
 
-        console.log(`📊 データ保存判定: モード=${mode}, プレミアム=${isPremium}`);
+        console.log(`📊 データ保存実行: モード=${mode}, プレミアム=${isPremium}`);
 
-        // 無料プラン & ランダムモード → データ保存なし
-        if (!isPremium && mode === 'random') {
-            console.log('ℹ️ 無料プラン（ランダムモード）: データ保存スキップ');
-            console.log('📋 セッション結果は評価表示用に返すが、localStorageには保存しない');
-
-            const completedSession = { ...this.currentSession };
-            this.currentSession = null;
-            return completedSession; // 評価表示用に返すが保存はしない
-        }
-
-        // プレミアムプラン または 連続・12音階モード → データ保存
-        console.log('💾 データ保存実行: localStorageに保存します');
+        // 無料プラン・プレミアム問わず全データ保存
+        console.log('💾 localStorageに保存します');
         this.saveToStorage(this.currentSession);
+
+        // 無料プランの場合は表示制限あり（DataManagerが管理）
+        if (!isPremium) {
+            console.log('ℹ️ 無料プラン: 7日以内のデータのみ表示（プレミアムで全データ閲覧可能）');
+        }
 
         const completedSession = { ...this.currentSession };
         this.currentSession = null;
