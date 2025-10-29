@@ -6271,3 +6271,216 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-28 17:15:38] コミット: fix: 最強キャッシュバスター実装（複数パラメータ+ログ強化）
+
+問題:
+- タイムスタンプだけでは不十分
+- ページリロードしても古いバージョンが読み込まれ続ける
+
+解決:
+- 3つのキャッシュバスターパラメータ追加
+  ?v=2.0.0&t=2782419081&nocache=1
+- コンソールログを強化
+  - 'v2.0.0-FINAL-UPDATE' で識別
+  - タイムスタンプを明示表示
+
+確認方法:
+コンソールで以下が表示されれば成功:
+✅ PitchShifter loaded globally (v2.0.0-FINAL-UPDATE)
+📦 [CACHE BUSTER] Timestamp: 2782419081
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-29 12:08:18] コミット: upgrade: Tone.jsを最新安定版v15.1.22に更新
+
+変更内容:
+- Tone.js: v15.0.4 → v15.1.22（最新安定版）
+- CDN: Skypack → jsDelivr（より高速で安定）
+- コンソールログにバージョン番号を明記
+
+期待される効果:
+- v15.0.4から15.1.22の間のバグ修正を適用
+- Samplerのパフォーマンス改善
+- クリッキングノイズの軽減（可能性あり）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-29 14:03:37] コミット: feat: PitchShifter エンベロープ最適化（v2.9.0）
+
+- attack: 0.02s（高速応答とノイズ軽減のバランス）
+- sustain: 1.0s（適度な再生時間）
+- release: 1.5s（自然な減衰）
+- 合計: 2.52秒で完結
+
+主な変更:
+- reference-tones.js: デフォルト値をattack: 0.02s, release: 1.5sに設定
+- router.js: PitchShifter初期化時の設定を統一
+- preparation-pitchpro-cycle.js: 再生時間1.0s、タイムアウト2520msに調整
+- trainingController.js: 再生時間1.0sに統一
+- ブチ音（クリッキングノイズ）の大幅な改善
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-29 14:06:40] コミット: docs: PitchShifter初期化の3箇所同期コメント追加
+
+3箇所で同じattack/release値を設定している箇所に、
+他の2箇所も同時に変更する必要があることを示す警告コメントを追加。
+
+変更箇所:
+- /js/core/reference-tones.js (デフォルト値定義)
+- /js/router.js (アプリ起動時の初期化)
+- /pages/js/preparation-pitchpro-cycle.js (preparation画面の初期化)
+
+目的:
+1箇所だけを修正してしまい、設定が不一致になるミスを防ぐ。
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-29 15:00:15] コミット: fix: ランダム基音モードのセッションループ問題を修正
+
+問題:
+- 無料プランでランダムモードのセッションデータがlocalStorageに保存されず、
+  セッション番号が常に1のままループする問題
+
+原因:
+- SessionDataRecorder.completeSession()で無料プラン+ランダムモード時に
+  データ保存をスキップしていた
+- これにより、プレミアムアップグレード時に過去データが存在しない
+  という設計思想との矛盾が発生
+
+修正内容:
+- 無料プラン・プレミアム問わず全データをlocalStorageに保存
+- 無料プランは表示制限のみ（7日以内のデータのみ表示）
+- プレミアムアップグレード時に過去データが閲覧可能になる
+
+変更ファイル:
+- PitchPro-SPA/js/controllers/session-data-recorder.js
+  - completeSession()メソッドを v2.0.0 → v2.1.0 に更新
+  - 無料プラン+ランダムモード時のデータ保存スキップ処理を削除
+  - 全モードで常にlocalStorageに保存するよう修正
+
+影響:
+- ランダムモードでセッション2、3...と正しく進行
+- 8セッション完了後に総合評価ページへ遷移
+- 無料プランでも過去データが保持され、プレミアムアップグレード時に閲覧可能
+
+関連:
+- DataManager.cleanupSessionData()の設計思想と整合
+- RELEASE_AND_MONETIZATION_PLAN.mdの収益化戦略に準拠
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-29 15:49:05] コミット: chore: キャッシュバスターバージョン更新（v20251029001）
+
+目的:
+- session-data-recorder.js v2.1.0の修正を反映
+- ブラウザキャッシュを強制更新し、最新版を確実に読み込む
+
+変更内容:
+- すべてのCSS・JavaScriptファイルのキャッシュバスターを更新
+  - 20251028009 → 20251029001
+
+対象ファイル:
+- CSS: base.css, results.css, training.css, voice-range.css
+- JS: data-manager.js, navigation-manager.js, evaluation-calculator.js,
+      session-data-recorder.js, result-session-controller.js,
+      pitchpro-v1.3.1.umd.js, voice-range-test.js
+
+関連コミット:
+- 4fa501a: fix: ランダム基音モードのセッションループ問題を修正
+
+動作確認:
+- ブラウザで強制リロード（Cmd+Shift+R / Ctrl+Shift+R）実行
+- 開発者ツールのコンソールで最新版の読み込みを確認
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-29 15:52:54] コミット: fix: result-session.htmlのSPAテンプレート化（重複スクリプト削除）
+
+問題:
+- result-session.htmlが独立したHTMLファイルとして存在
+- index.htmlとは別にdata-manager.js等を読み込んでいた
+- router.jsがこのHTMLを読み込む際にスクリプトが再実行される
+- DataManagerが重複定義され、エラーが発生
+
+エラーメッセージ:
+- [Error] SyntaxError: Can't create duplicate variable: 'DataManager'
+- [Error] Refused to execute as script because "X-Content-Type-Options: nosniff"
+
+原因:
+- SPAアーキテクチャでは、ページテンプレートはコンテンツのみであるべき
+- スクリプトタグはindex.htmlで一度だけ読み込むべき
+- result-session.htmlが完全なHTMLファイルとして実装されていた
+
+修正内容:
+1. result-session.htmlをSPA用テンプレートに変更
+   - DOCTYPE、head、body タグを削除
+   - スクリプトタグを完全削除（重複防止）
+   - コンテンツ部分（container div）のみを残す
+
+2. index.htmlのキャッシュバスター更新
+   - v20251029001 → v20251029002
+
+影響:
+- DataManager重複定義エラーが解消
+- MIMEタイプエラーが解消
+- SPAアーキテクチャとして正常に動作
+
+関連:
+- router.jsによる動的ページ読み込み
+- index.htmlでのグローバルスクリプト管理
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-29 16:01:24] コミット: fix: records.htmlとpreparation-step1.htmlの重複スクリプト削除
+
+問題:
+- records.html と preparation-step1.html が index.html で既に読み込んだ
+  スクリプトを重複して読み込んでいた
+- DataManager等のグローバル変数が重複定義される可能性があった
+
+修正内容:
+
+1. records.html (236行目)
+   - data-manager.js の重複読み込みを削除
+   - コメントで「index.htmlで読み込み済み」と明記
+
+2. preparation-step1.html (299-311行目)
+   - data-manager.js の重複読み込みを削除
+   - pitchpro-v1.3.1.umd.js の重複読み込みを削除
+   - Lucide Icons の重複読み込みを削除
+   - voice-range-test.js の重複読み込みを削除
+   - preparation-pitchpro-cycle.js は index.html で動的読み込み済み
+   - 各削除箇所にコメントで説明を追記
+
+3. index.html
+   - キャッシュバスター更新: v20251029002 → v20251029003
+
+設計方針の確認:
+- router.js は各ページの独自スクリプト実行を許可する設計
+- ただし index.html で既に読み込んだスクリプトの重複は禁止
+- Chart.js 等のページ固有ライブラリは各ページで読み込み可能
+
+修正後の状態:
+✅ result-session.html - 重複なし（修正済み）
+✅ training.html - 重複なし
+✅ records.html - 重複削除完了
+✅ preparation-step1.html - 重複削除完了
+✅ results-overview.html - Chart.jsのみ（重複なし）
+✅ results-premium-analysis.html - Chart.jsのみ（重複なし）
+
+影響:
+- DataManager等の重複定義エラーが完全に解消
+- SPAアーキテクチャとして正常に動作
+- 全ページで統一されたスクリプト管理
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

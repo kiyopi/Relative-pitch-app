@@ -60,6 +60,15 @@ if (!window.location.pathname.includes('index.html')) {
  */
 async function loadSessionData(sessionNumber) {
     try {
+        // 【追加】ランダムモード用の一時保持データを優先的に使用
+        if (window.currentSessionResult) {
+            console.log('📦 一時保持されたセッション結果を使用:', window.currentSessionResult);
+            const result = window.currentSessionResult;
+            // 使用後は削除
+            delete window.currentSessionResult;
+            return result;
+        }
+
         // localStorageから最新のセッションデータを取得
         const allSessions = DataManager.getFromStorage('sessionData') || [];
 
@@ -397,15 +406,16 @@ function showDummyData(sessionNumber) {
     const dummySession = {
         sessionId: sessionNumber,
         baseNote: 'C4',
+        baseFrequency: 261.63,
         pitchErrors: [
-            { step: 0, expectedNote: 'C4', errorInCents: 2.5 },
-            { step: 1, expectedNote: 'D4', errorInCents: -5.3 },
-            { step: 2, expectedNote: 'E4', errorInCents: 8.7 },
-            { step: 3, expectedNote: 'F4', errorInCents: -3.2 },
-            { step: 4, expectedNote: 'G4', errorInCents: 12.1 },
-            { step: 5, expectedNote: 'A4', errorInCents: -7.8 },
-            { step: 6, expectedNote: 'B4', errorInCents: 4.9 },
-            { step: 7, expectedNote: 'C5', errorInCents: -1.6 }
+            { step: 0, expectedNote: 'C4', expectedFrequency: 261.63, detectedFrequency: 262.15, errorInCents: 2.5 },
+            { step: 1, expectedNote: 'D4', expectedFrequency: 293.66, detectedFrequency: 292.74, errorInCents: -5.3 },
+            { step: 2, expectedNote: 'E4', expectedFrequency: 329.63, detectedFrequency: 331.47, errorInCents: 8.7 },
+            { step: 3, expectedNote: 'F4', expectedFrequency: 349.23, detectedFrequency: 348.54, errorInCents: -3.2 },
+            { step: 4, expectedNote: 'G4', expectedFrequency: 392.00, detectedFrequency: 394.71, errorInCents: 12.1 },
+            { step: 5, expectedNote: 'A4', expectedFrequency: 440.00, detectedFrequency: 437.62, errorInCents: -7.8 },
+            { step: 6, expectedNote: 'B4', expectedFrequency: 493.88, detectedFrequency: 495.64, errorInCents: 4.9 },
+            { step: 7, expectedNote: 'C5', expectedFrequency: 523.25, detectedFrequency: 522.39, errorInCents: -1.6 }
         ]
     };
 
