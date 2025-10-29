@@ -253,29 +253,9 @@ function initializeModeTraining() {
     const config = modeConfig[currentMode];
     console.log(`🆕 ${config.title}の初期化処理を実行`);
 
-    if (currentMode === 'random') {
-        // ランダムモード：毎回リセット（個別セッション評価のため）
-        const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-        const otherModeSessions = allSessions.filter(s => s.mode !== 'random');
-        localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
-        console.log('🗑️ ランダムモードのセッションデータをクリア');
-
-        // sessionCounterは自動同期されるのでリセット不要
-        // session-data-recorder.jsがstartNewSession()時に自動的にlocalStorage最大IDと同期
-        console.log('ℹ️ sessionCounterはsession-data-recorder.jsが自動管理');
-    } else {
-        // 連続チャレンジモード・12音階モード：常にセッションデータをクリアして最初から開始
-        console.log('🔄 連続/12音階モード：セッションデータをクリアして最初から開始');
-
-        // 現在のモードのセッションデータを削除
-        const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-        const otherModeSessions = allSessions.filter(s => s.mode !== currentMode);
-        localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
-
-        // sessionCounterは自動同期されるのでリセット不要
-        // session-data-recorder.jsがstartNewSession()時に自動的にlocalStorage最大IDと同期
-        console.log('ℹ️ sessionCounterはsession-data-recorder.jsが自動管理');
-    }
+    // localStorageクリア処理は preparation-pitchpro-cycle.js が実行済み
+    // ここではモード別の基音選定のみ実行
+    console.log('ℹ️ sessionCounterはsession-data-recorder.jsが自動管理（localStorage最大IDと同期）');
 
     // 【新規】全セッション分の基音を事前に一括選定
     selectedBaseNotes = selectAllBaseNotesForMode(config);

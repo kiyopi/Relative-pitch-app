@@ -6512,3 +6512,33 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-29 16:40:21] コミット: fix: セッションループ問題の根本修正（sessionCounterリセット削除）
+
+問題:
+- trainingController.jsがinitializeModeTraining()で毎回sessionCounterを0にリセット
+- session-data-recorder.jsが保存したsessionIdと不整合が発生
+- セッション1が無限ループする
+
+修正内容:
+- initializeModeTraining()のsessionCounterリセット処理を削除
+- session-data-recorder.jsの自動同期機能に完全依存
+- startNewSession()がlocalStorage最大IDと自動同期する仕組みを活用
+
+動作フロー（修正後）:
+1. セッション1完了 → sessionId: 1をlocalStorageに保存
+2. 「次の基音へ」クリック → trainingページへ遷移
+3. initializeModeTraining()実行 → sessionCounterリセットなし
+4. startNewSession()実行 → localStorage最大ID(1)を検出 → sessionCounter=1に同期
+5. sessionCounter++ → 2
+6. セッション2として正しく記録
+
+影響範囲:
+- ランダム基音モード: 正常にセッション1→2→3と進行
+- 連続チャレンジモード: 同様に修正
+- 12音階モード: 同様に修正
+
+キャッシュバスター: v20251029003 → v20251029004
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
