@@ -295,19 +295,20 @@
 
 
     <!-- 必要なJavaScript（PitchProサイクル専用構成） -->
-    <!-- 1. 基盤システム -->
-    <script src="../js/data-manager.js"></script>
+    <!-- 1. 基盤システム（index.htmlで読み込み済み・重複削除） -->
+    <!-- data-manager.js は index.html で読み込み済み -->
 
-    <!-- 2. 音声処理ライブラリ（v1.3.1版） -->
-    <script src="../js/core/pitchpro-v1.3.1.umd.js"></script>
+    <!-- 2. 音声処理ライブラリ（index.htmlで読み込み済み・重複削除） -->
+    <!-- pitchpro-v1.3.1.umd.js は index.html で読み込み済み -->
 
-    <!-- 3. UIライブラリ -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <!-- 3. UIライブラリ（index.htmlで読み込み済み・重複削除） -->
+    <!-- Lucide Icons は index.html で読み込み済み -->
 
-    <!-- 4. 音域テスト機能 -->
-    <script src="js/voice-range-test.js?v=3.1.27"></script>
+    <!-- 4. 音域テスト機能（index.htmlで読み込み済み・重複削除） -->
+    <!-- voice-range-test.js は index.html で読み込み済み -->
 
     <!-- 5. メインアプリケーション（PitchProサイクル実装） -->
-    <script src="js/preparation-pitchpro-cycle.js?v=1.1.5"></script>
+    <!-- preparation-pitchpro-cycle.js は index.html で動的読み込み済み -->
+    <!-- このスクリプトは Date.now() によるキャッシュバスターで読み込まれています -->
 </body>
 </html>
