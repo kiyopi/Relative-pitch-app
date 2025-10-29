@@ -260,12 +260,9 @@ function initializeModeTraining() {
         localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
         console.log('🗑️ ランダムモードのセッションデータをクリア');
 
-        // sessionCounterを0にリセット
-        if (window.sessionDataRecorder) {
-            window.sessionDataRecorder.currentSession = null;
-            window.sessionDataRecorder.sessionCounter = 0;
-            console.log('🔄 sessionCounterリセット: 0');
-        }
+        // sessionCounterは自動同期されるのでリセット不要
+        // session-data-recorder.jsがstartNewSession()時に自動的にlocalStorage最大IDと同期
+        console.log('ℹ️ sessionCounterはsession-data-recorder.jsが自動管理');
     } else {
         // 連続チャレンジモード・12音階モード：常にセッションデータをクリアして最初から開始
         console.log('🔄 連続/12音階モード：セッションデータをクリアして最初から開始');
@@ -275,12 +272,9 @@ function initializeModeTraining() {
         const otherModeSessions = allSessions.filter(s => s.mode !== currentMode);
         localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
 
-        // sessionCounterを0にリセット
-        if (window.sessionDataRecorder) {
-            window.sessionDataRecorder.currentSession = null;
-            window.sessionDataRecorder.sessionCounter = 0;
-        }
-        console.log('✅ sessionCounterリセット完了');
+        // sessionCounterは自動同期されるのでリセット不要
+        // session-data-recorder.jsがstartNewSession()時に自動的にlocalStorage最大IDと同期
+        console.log('ℹ️ sessionCounterはsession-data-recorder.jsが自動管理');
     }
 
     // 【新規】全セッション分の基音を事前に一括選定

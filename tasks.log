@@ -6484,3 +6484,31 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-29 16:03:13] コミット: fix: 重複スクリプトタグ削除（records.html, preparation-step1.html）
+
+- records.htmlからdata-manager.js重複削除
+- preparation-step1.htmlから5つの重複スクリプト削除
+  - data-manager.js（index.htmlで読み込み済み）
+  - pitchpro-v1.3.1.umd.js（index.htmlで読み込み済み）
+  - Lucide Icons（index.htmlで読み込み済み）
+  - voice-range-test.js（index.htmlで読み込み済み）
+  - preparation-pitchpro-cycle.js（index.htmlで動的読み込み済み）
+- キャッシュバスター更新: v20251029003
+- DataManager重複定義エラー完全解決
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-29 16:11:54] コミット: docs: SPAアーキテクチャ仕様書を作成
+
+- 実際の技術スタック文書化（Vanilla JS + Hybrid SPA）
+- router.jsの動作仕様を詳細記載
+- ファイル構成と役割を明確化
+- スクリプト管理ルール（重複防止）を規定
+- ページ追加ガイドライン（5ステップ）を提供
+- キャッシュバスター管理方法を文書化
+- よくあるエラーと解決方法を記載
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
