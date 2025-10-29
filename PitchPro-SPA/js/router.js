@@ -259,6 +259,9 @@ class SimpleRouter {
             console.log(`📱 デバイス: ${deviceType}, 音量: ${deviceVolume}dB`);
 
             // 新規作成
+            // ⚠️ IMPORTANT: attack/release値を変更する場合は、以下の2箇所も同時に変更すること
+            // 1. /js/core/reference-tones.js (line 67, 69)
+            // 2. /pages/js/preparation-pitchpro-cycle.js (line 839-840)
             window.pitchShifterInstance = new window.PitchShifter({
                 baseUrl: 'audio/piano/',
                 attack: 0.02,

@@ -61,6 +61,9 @@ const t = class t {
     n(this, "isPlaying", !1);
     this.config = {
       baseUrl: e.baseUrl || "/audio/piano/",
+      // ⚠️ IMPORTANT: この値を変更する場合は、以下の2箇所も同時に変更すること
+      // 1. /js/router.js (line 264-265)
+      // 2. /pages/js/preparation-pitchpro-cycle.js (line 839-840)
       release: e.release ?? 1.5,
       // Natural release (1.5s) for smooth decay
       attack: e.attack ?? 0.02,

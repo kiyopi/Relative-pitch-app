@@ -834,6 +834,9 @@ class PitchProCycleManager {
             console.log(`📱 デバイス: ${deviceType}, 音量: ${deviceVolume}dB`);
 
             // 新規作成または再作成
+            // ⚠️ IMPORTANT: attack/release値を変更する場合は、以下の2箇所も同時に変更すること
+            // 1. /js/core/reference-tones.js (line 67, 69)
+            // 2. /js/router.js (line 267-268)
             window.pitchShifterInstance = new window.PitchShifter({
                 baseUrl: 'audio/piano/',
                 attack: 0.02,
