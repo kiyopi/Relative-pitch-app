@@ -166,6 +166,17 @@ body::before {
   }
 }
 
+/* セッション評価ページ専用（モバイルのみパディングなし） */
+.container-result-session {
+  padding: 0 var(--space-6);  /* PC: 通常のパディング */
+}
+
+@media (max-width: 768px) {
+  .container-result-session {
+    padding: 0;  /* モバイル: マージン削除 */
+  }
+}
+
 /* メインコンテンツ */
 .main-content {
   padding: 0 1rem;
