@@ -157,23 +157,44 @@ function updateSessionUI(sessionData, sessionNumber) {
         console.log('✅ ダミーデータを生成:', sessionData.pitchErrors);
     }
 
-    // 平均誤差計算（絶対値の平均 - 音程のズレの大きさを測定）
-    const errors = sessionData.pitchErrors.map(e => e.errorInCents);
-    const avgError = errors.reduce((sum, e) => sum + Math.abs(e), 0) / errors.length;
+    // 【追加】外れ値情報を計算（固定閾値180¢）
+    const errors = sessionData.pitchErrors.map(e => Math.abs(e.errorInCents));
+    const outlierThreshold = 180; // 全デバイス共通の固定閾値
+
+    const validErrors = errors.filter(e => e <= outlierThreshold);
+    const outlierCount = errors.length - validErrors.length;
+    const outlierFiltered = outlierCount > 0;
+
+    // 平均誤差計算（外れ値除外後）
+    let avgError;
+    if (validErrors.length > 0) {
+        avgError = validErrors.reduce((sum, e) => sum + e, 0) / validErrors.length;
+        console.log(`📊 外れ値除外: ${outlierCount}音除外（${outlierThreshold}¢超）、有効音: ${validErrors.length}/${errors.length}`);
+    } else {
+        avgError = errors.reduce((sum, e) => sum + e, 0) / errors.length;
+        console.warn('⚠️ すべての音が外れ値と判定されました。元の値を使用します。');
+    }
 
     const avgErrorEl = document.getElementById('average-error');
     if (avgErrorEl) {
         avgErrorEl.textContent = `±${avgError.toFixed(1)}¢`;
     }
 
-    // 評価分布計算・表示
-    displayEvaluationDistribution(sessionData.pitchErrors);
+    // 【追加】外れ値情報を表示（平均誤差の下）
+    displayOutlierNotice(outlierFiltered, outlierCount);
+
+    // 評価分布計算・表示（外れ値除外）
+    const validPitchErrors = sessionData.pitchErrors.filter(e => Math.abs(e.errorInCents) <= outlierThreshold);
+    displayEvaluationDistribution(validPitchErrors, outlierCount);
 
     // 精度ランク表示
     displayAccuracyBadge(Math.abs(avgError));
 
-    // 詳細分析表示
-    displayDetailedAnalysis(sessionData.pitchErrors);
+    // 詳細分析表示（外れ値アイコン表示）
+    displayDetailedAnalysis(sessionData.pitchErrors, outlierThreshold);
+
+    // 【追加】外れ値説明セクション表示（詳細分析の下）
+    displayOutlierExplanation(outlierFiltered, outlierCount, outlierThreshold);
 
     // 次のセッションボタン更新
     updateNextSessionButton(sessionNumber);
@@ -181,8 +202,10 @@ function updateSessionUI(sessionData, sessionNumber) {
 
 /**
  * 評価分布を表示（v2.0.0: EvaluationCalculator統合）
+ * @param {Array} pitchErrors - 音程誤差データ（外れ値除外済み）
+ * @param {number} outlierCount - 除外された外れ値の数
  */
-function displayEvaluationDistribution(pitchErrors) {
+function displayEvaluationDistribution(pitchErrors, outlierCount = 0) {
     // 統合評価関数を使用
     const distribution = EvaluationCalculator.calculateDistribution(pitchErrors);
     const total = pitchErrors.length;
@@ -269,7 +292,7 @@ function displayAccuracyBadge(avgError) {
 /**
  * 詳細分析を表示（v2.0.0: EvaluationCalculator統合）
  */
-function displayDetailedAnalysis(pitchErrors) {
+function displayDetailedAnalysis(pitchErrors, outlierThreshold) {
     const container = document.getElementById('note-results');
     if (!container) {
         console.warn('⚠️ #note-resultsコンテナが見つかりません');
@@ -282,8 +305,20 @@ function displayDetailedAnalysis(pitchErrors) {
     pitchErrors.forEach((error, index) => {
         const absError = Math.abs(error.errorInCents);
 
-        // 統合評価関数を使用
-        const evaluation = EvaluationCalculator.evaluatePitchError(absError);
+        // 【追加】外れ値判定
+        const isOutlier = absError > outlierThreshold;
+
+        // 統合評価関数を使用（外れ値でない場合）
+        let evaluation;
+        if (isOutlier) {
+            evaluation = {
+                icon: 'alert-circle',
+                color: 'text-amber-400',
+                label: '外れ値'
+            };
+        } else {
+            evaluation = EvaluationCalculator.evaluatePitchError(absError);
+        }
 
         const iconTransform = evaluation.icon === 'thumbs-up' ? 'transform: translateY(-2px) translateX(2px);' : '';
         const deviationClass = error.errorInCents >= 0 ? 'text-pitch-deviation-plus' : 'text-pitch-deviation-minus';
@@ -405,6 +440,90 @@ document.addEventListener('click', function(event) {
         popover.classList.remove('show');
     }
 });
+
+/**
+ * 外れ値情報を表示（平均誤差の下に簡潔な通知）
+ */
+function displayOutlierNotice(outlierFiltered, outlierCount) {
+    // 既存の外れ値通知を探す
+    let existingNotice = document.getElementById('outlier-notice');
+
+    // 外れ値がない場合は削除
+    if (!outlierFiltered) {
+        if (existingNotice) {
+            existingNotice.remove();
+        }
+        return;
+    }
+
+    // 外れ値がある場合は表示
+    if (!existingNotice) {
+        // 新規作成
+        existingNotice = document.createElement('div');
+        existingNotice.id = 'outlier-notice';
+        existingNotice.className = 'warning-alert';
+
+        // score-gridの後に挿入
+        const scoreGrid = document.querySelector('.score-grid');
+        if (scoreGrid && scoreGrid.parentNode) {
+            scoreGrid.parentNode.insertBefore(existingNotice, scoreGrid.nextSibling);
+        }
+    }
+
+    // 内容を更新
+    existingNotice.innerHTML = `
+        <i data-lucide="alert-circle" class="text-amber-400"></i>
+        <p>${outlierCount}音が目標の音程よりも大幅にずれています。外れ値として評価から除外しています。</p>
+    `;
+
+    // Lucideアイコン再初期化
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+/**
+ * 外れ値説明セクションを表示（詳細分析の下）
+ */
+function displayOutlierExplanation(outlierFiltered, outlierCount, outlierThreshold) {
+    // 外れ値説明用のコンテナを探す
+    let explanationContainer = document.getElementById('outlier-explanation-container');
+
+    // コンテナがなければ作成
+    if (!explanationContainer) {
+        explanationContainer = document.createElement('div');
+        explanationContainer.id = 'outlier-explanation-container';
+        // warning-alertスタイルはコンテナではなく内部要素に適用
+
+        // 詳細分析セクションの後に挿入
+        const detailedAnalysis = document.querySelector('.glass-card:has(#note-results)');
+        if (detailedAnalysis && detailedAnalysis.nextSibling) {
+            detailedAnalysis.parentNode.insertBefore(explanationContainer, detailedAnalysis.nextSibling);
+        } else if (detailedAnalysis) {
+            detailedAnalysis.parentNode.appendChild(explanationContainer);
+        }
+    }
+
+    // 外れ値がある場合のみ表示
+    if (outlierFiltered) {
+        explanationContainer.innerHTML = `
+            <div class="warning-alert">
+                <i data-lucide="alert-circle" class="text-amber-400"></i>
+                <div>
+                    <p><strong>外れ値について</strong></p>
+                    <p>このセッションで<strong>${outlierCount}音</strong>が外れ値として除外されました。外れ値とは<strong>${outlierThreshold}¢（約${(outlierThreshold / 100).toFixed(1)}半音）を超える大きな誤差</strong>のことです。これは測定エラーの可能性もありますが、特定の音程が本当に苦手な場合もあります。平均誤差の計算精度を保つため、これらの値は除外されていますが、詳細分析で確認することをおすすめします。</p>
+                </div>
+            </div>
+        `;
+
+        // Lucideアイコン再初期化
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    } else {
+        explanationContainer.innerHTML = '';
+    }
+}
 
 // グローバルに公開
 window.toggleRankPopover = toggleRankPopover;

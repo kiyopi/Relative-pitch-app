@@ -652,3 +652,163 @@ const evaluation = EvaluationCalculator.evaluatePitchError(absError);
 ---
 
 **このv2.1.0評価システムにより、科学的根拠に基づいた公平で現実的な音程精度評価が、保守性・一貫性を備えた形で実現されます。**
+
+---
+
+## 🔍 v2.3.0: 外れ値処理の検討事項（2025-10-30追加）
+
+### 背景
+
+**v2.2.0での外れ値除外ロジック復活**:
+- 測定精度向上により異常値は減少したが、完全には消滅していない
+- 固定閾値180¢（約1.8半音）で外れ値を判定し、平均誤差計算・評価分布から除外
+- 外れ値は詳細分析に`alert-circle`アイコンで表示
+
+### 根本的な問題
+
+**180¢超の音には2つの異なるケースが混在**:
+
+#### ケース1: 測定エラー（除外すべき）
+- マイクの音拾いミス、環境ノイズ、誤検出
+- 1000¢のような極端な値
+- **特徴**: ランダムに発生、再現性なし
+
+#### ケース2: 実力としての苦手音程（除外すべきでない）
+- 本当に苦手な音程での大きなズレ
+- 高音域・低音域での継続的な課題
+- **特徴**: 特定の音で繰り返し発生、再現性あり
+
+### 現在の課題
+
+**一律180¢カットの問題点**:
+- ユーザーが実際に200¢ずれている場合でも「外れ値」として除外
+- 本当の弱点が評価から消え、改善の機会を失う
+- 詳細分析レポートで苦手音程の特定が困難
+
+### 検討すべき解決策
+
+#### オプション1: 外れ値分類ロジックの実装
+
+**提案内容**:
+```javascript
+/**
+ * 外れ値を「測定エラー」と「苦手音程」に分類
+ *
+ * 判定基準:
+ * 1. 極端な値（500¢超）→ 測定エラー
+ * 2. セッション内で同じ音程が複数回180¢超 → 苦手音程
+ * 3. 1回だけの180¢超 → 測定エラー
+ */
+function classifyOutliers(pitchErrors, outlierThreshold = 180) {
+  const extremeThreshold = 500;
+  const measurementErrors = [];  // 測定エラー
+  const weakNotes = [];           // 苦手音程
+  const validErrors = [];         // 正常範囲
+
+  // 目標音程ごとにグループ化
+  const groupedByTarget = {};
+  pitchErrors.forEach(error => {
+    const target = error.targetNote;
+    if (!groupedByTarget[target]) groupedByTarget[target] = [];
+    groupedByTarget[target].push(error);
+  });
+
+  // 各音程ごとに判定
+  pitchErrors.forEach(error => {
+    const absError = Math.abs(error.errorInCents);
+
+    if (absError <= outlierThreshold) {
+      validErrors.push(error);
+    } else if (absError > extremeThreshold) {
+      measurementErrors.push(error);  // 極端な値
+    } else {
+      // 180¢～500¢の範囲 → 再現性で判定
+      const sameTargetErrors = groupedByTarget[error.targetNote];
+      const outlierCount = sameTargetErrors.filter(e =>
+        Math.abs(e.errorInCents) > outlierThreshold
+      ).length;
+
+      if (outlierCount >= 2 || sameTargetErrors.length === 1) {
+        weakNotes.push(error);  // 苦手音程
+      } else {
+        measurementErrors.push(error);  // 1回だけの外れ値
+      }
+    }
+  });
+
+  return { measurementErrors, weakNotes, validErrors };
+}
+```
+
+**評価への反映（検討中）**:
+- **測定エラー**: 完全に除外（平均誤差・評価分布から除外）
+- **苦手音程**:
+  - オプションA: 平均誤差には含めるが、特別にマーク
+  - オプションB: 除外するが、別途「要注意音程」として表示
+  - オプションC: Practiceカテゴリとして評価分布に含める
+
+**UI表示案**:
+```
+評価から除外された音: 2音
+
+📊 測定エラー: 1音
+  • D5 (誤差: 1200¢) - マイクの誤検出の可能性
+
+⚠️ 苦手な音程: 1音
+  • G5 (誤差: 220¢) - この音程は継続的な練習が推奨されます
+```
+
+#### オプション2: 閾値の引き上げ
+
+**提案内容**:
+```javascript
+const outlierThreshold = 300; // または400¢
+```
+
+**メリット**:
+- 180¢～300¢のズレは「実力」として評価に含める
+- 実装がシンプル
+
+**デメリット**:
+- 測定エラーも含まれる可能性
+
+#### オプション3: 詳細分析レポートでの包括的対応
+
+**提案内容**:
+- セッション評価では現状維持（180¢で一律除外）
+- 詳細分析レポート（未実装）で以下を実装：
+  - 外れ値の分類ロジック
+  - 苦手音程の特定と可視化
+  - 音程ごとの誤差傾向分析
+  - 練習推奨度の表示
+
+**メリット**:
+- セッション評価はシンプルに保つ
+- 詳細分析で深い洞察を提供
+- 段階的な実装が可能
+
+**デメリット**:
+- 詳細分析レポートの実装が前提
+
+### 実装優先度
+
+**推奨アプローチ**: オプション3（詳細分析レポートでの包括的対応）
+
+**理由**:
+1. セッション評価の複雑化を避ける
+2. 詳細分析レポートで包括的な分析を提供
+3. ユーザー体験の段階的な向上
+4. 実装の優先順位付けが容易
+
+### 次期実装フェーズ
+
+**詳細分析レポートページ実装時に決定すべき事項**:
+1. 外れ値分類ロジックの採用可否
+2. 苦手音程の定義と判定基準
+3. UI表示方法（グラフ・テキスト・推奨練習メニュー）
+4. 評価への反映方法（除外 vs 別表示 vs 含める）
+5. 長期的なデータ蓄積による精度向上の可能性
+
+---
+
+**この検討事項は、詳細分析レポート実装時に最終決定されます。**

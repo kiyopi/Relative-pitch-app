@@ -6542,3 +6542,121 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-29 16:45:35] コミット: fix: localStorageクリア処理の重複削除
+
+問題:
+- preparation-pitchpro-cycle.jsとtrainingController.jsの両方がlocalStorageをクリア
+- 重複処理によりsessionCounterの同期が不正確になっていた
+- セッション1が無限ループする問題が未解決のまま
+
+根本原因:
+1. preparation-pitchpro-cycle.js: トレーニング開始時にlocalStorageクリア
+2. trainingController.js: initializeModeTraining()で再度クリア ← ❌ 重複！
+3. 2回のクリア処理により、sessionCounterの同期が混乱
+
+修正内容:
+- trainingController.jsのlocalStorageクリア処理を完全削除
+- preparation-pitchpro-cycle.jsが既に実行済みなので不要
+- sessionCounterの同期はsession-data-recorder.jsに完全依存
+- startNewSession()がlocalStorage最大IDと自動同期する仕組みを活用
+
+動作フロー（修正後）:
+1. preparation画面: localStorageクリア実行
+2. trainingページ遷移: クリア処理なし（基音選定のみ）
+3. セッション開始: sessionCounter自動同期（localStorage最大ID）
+4. セッション完了: 正しいsessionIdで保存
+
+影響範囲:
+- ランダム基音モード: 重複クリア削除
+- 連続チャレンジモード: 重複クリア削除
+- 12音階モード: 重複クリア削除
+
+キャッシュバスター: v20251029004 → v20251029005
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-29 19:58:56] コミット: fix: 測定精度改善と初回再生音の最適化
+
+主な変更:
+- 測定精度の根本的改善: 最初200ms除外ロジック実装で異常値(-191.8¢)を完全解消
+- PitchShifter初期化フロー最適化: preparationページではrouter.jsでの事前初期化をスキップ
+- reference-tones.js v2.9.0: バッファプリロード実装を一旦削除（初回再生時のプツ音は許容）
+- 仕様書更新: TRAINING_SPECIFICATION.md v3.2.0、EVALUATION_SYSTEM_SPECIFICATION.md v2.2.0
+- CLAUDE.md更新: 測定精度改善の詳細を追記
+
+技術詳細:
+- trainingController.js: 200ms除外ロジック実装（前の音の余韻を回避）
+- router.js: preparationページ遷移時のPitchShifter初期化を除外
+- reference-tones.js: シンプルな初期化フローに戻す（v2.9.0）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-30 09:32:26] コミット: style: セッション評価ページの幅を拡張
+
+変更内容:
+- result-session.htmlのメインコンテンツを.narrow-mainから.wide-mainに変更
+- 各セクション（進行バー、セッション概要、詳細分析）がより広いスペースで表示されるように改善
+- 700px制限を解除し、ページ幅を最大限に活用
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-30 09:49:56] コミット: style: セッション評価ページのレイアウト最適化
+
+- wide-mainクラス採用でページ幅を最大化
+- モバイル専用マージン削除でコンテンツ表示領域を拡大
+- PC表示は通常パディング維持でレイアウト崩れ防止
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-30 09:54:28] コミット: fix: セッション評価ページのレスポンシブ表示を修正
+
+- PC表示: narrow-mainで700px制限を維持
+- モバイル表示: 横幅100%で画面いっぱいに表示
+- container-result-sessionでモバイルのみパディング削除
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-30 10:01:06] コミット: improve: セッション評価ページの誤差表示を視認性向上
+
+- 誤差表示色を明るく変更（プラス: #60A5FA 青300、マイナス: #F87171 赤400）
+- モバイルでは文字サイズを縮小（1.5rem → 1.125rem）
+- ダークテーマでの視認性を大幅改善
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-30 10:04:45] コミット: improve: 誤差表示色をさらに明るく調整
+
+- プラス偏差: #93C5FD（青200 - より明るく）
+- マイナス偏差: #FCA5A5（赤300 - より明るく）
+- ダークテーマでの視認性をさらに改善
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-30 10:10:41] コミット: fix: 総合評価ページのレイアウトとフッター修正
+
+- PC表示: narrow-mainで700px制限を維持
+- モバイル表示: 横幅100%で画面いっぱいに表示
+- 重複フッターを削除（index.htmlのフッターのみ表示）
+- CSSキャッシュバスターを更新（v=20251030001）
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-30 10:26:48] コミット: fix: セッション平均誤差の計算ロジックを修正
+
+- 単純平均から絶対値平均に変更（相対音感の精度測定として正しい計算）
+- 表示形式を±に統一（ズレの大きさを表示）
+- 総合評価ページのPC表示をwide-mainに戻す（グラフ表示のため）
+
+例: [+10¢, -10¢] → 0¢ではなく 10¢（正しい精度評価）
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

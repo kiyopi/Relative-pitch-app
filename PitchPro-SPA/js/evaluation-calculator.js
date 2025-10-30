@@ -25,8 +25,8 @@ class EvaluationCalculator {
     const deviceInfo = this.detectDeviceQuality();
     console.log('✅ デバイス品質:', deviceInfo);
 
-    // 3. 基本メトリクス計算
-    const basicMetrics = this.calculateBasicMetrics(sessionData);
+    // 3. 基本メトリクス計算（デバイス品質を渡す）
+    const basicMetrics = this.calculateBasicMetrics(sessionData, deviceInfo);
     console.log('✅ 基本メトリクス:', basicMetrics);
 
     // 4. 技術制約調整
@@ -148,8 +148,10 @@ class EvaluationCalculator {
 
   /**
    * 3. 基本メトリクス計算ロジック
+   * @param {Array} sessionData - セッションデータ配列
+   * @param {Object} deviceInfo - デバイス品質情報
    */
-  static calculateBasicMetrics(sessionData) {
+  static calculateBasicMetrics(sessionData, deviceInfo = null) {
     let totalError = 0;
     let totalNotes = 0;
     let excellentNotes = 0;
@@ -189,10 +191,14 @@ class EvaluationCalculator {
       };
     }
 
-    // 【追加】外れ値フィルタリング（±150¢を超える測定エラーを除外）
-    // 【根拠】実データ分析により±200¢超が10.4%発生、これは明らかな測定エラー
-    // ±150¢は半音1.5個分の誤差で、学術研究の許容範囲（±44¢）を大きく超える
-    const validErrors = errors.filter(e => e <= 150);
+    // 【追加】外れ値フィルタリング（デバイス品質に応じた閾値）
+    // 基準値150¢ + デバイス誤差を外れ値閾値とする
+    const deviceErrorMargin = deviceInfo ? this.getDeviceErrorMargin(deviceInfo.quality) : 10;
+    const outlierThreshold = 150 + deviceErrorMargin;
+
+    console.log(`📊 外れ値閾値: ${outlierThreshold}¢（基準150¢ + デバイス誤差${deviceErrorMargin}¢）`);
+
+    const validErrors = errors.filter(e => e <= outlierThreshold);
     const outlierCount = errors.length - validErrors.length;
     const outlierFiltered = outlierCount > 0;
 
@@ -200,7 +206,7 @@ class EvaluationCalculator {
     let avgError;
     if (validErrors.length > 0) {
       avgError = validErrors.reduce((a, b) => a + b, 0) / validErrors.length;
-      console.log(`📊 外れ値除外: ${outlierCount}音除外（150¢超）、有効音: ${validErrors.length}/${errors.length}`);
+      console.log(`📊 外れ値除外: ${outlierCount}音除外（${outlierThreshold}¢超）、有効音: ${validErrors.length}/${errors.length}`);
     } else {
       // すべて外れ値の場合は元の値を使用
       avgError = totalError / totalNotes;
@@ -223,8 +229,21 @@ class EvaluationCalculator {
       totalNotes,
       excellentNotes,
       outlierFiltered,
-      outlierCount
+      outlierCount,
+      outlierThreshold // 外れ値閾値を返す
     };
+  }
+
+  /**
+   * デバイス品質に応じた誤差マージンを取得
+   */
+  static getDeviceErrorMargin(quality) {
+    const margins = {
+      high: 10,   // ±10¢
+      medium: 15, // ±15¢
+      low: 25     // ±25¢
+    };
+    return margins[quality] || 10;
   }
 
   /**

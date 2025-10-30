@@ -360,10 +360,19 @@ function displaySessionGrid(sessionData) {
     else if (sessionCount === 24) gridClass = 'sessions-grid-24';
 
     const sessionBoxes = sessionData.map((session, index) => {
-        // 平均誤差を計算（測定精度向上により外れ値除外は不要）
-        const avgError = session.pitchErrors
-            ? session.pitchErrors.reduce((sum, e) => sum + Math.abs(e.errorInCents), 0) / session.pitchErrors.length
-            : 0;
+        // 【追加】外れ値を除外した平均誤差を計算（固定閾値180¢）
+        const errors = session.pitchErrors
+            ? session.pitchErrors.map(e => Math.abs(e.errorInCents))
+            : [];
+
+        const outlierThreshold = 180; // 全デバイス共通の固定閾値
+
+        const validErrors = errors.filter(e => e <= outlierThreshold);
+        const outlierCount = errors.length - validErrors.length;
+
+        const avgError = validErrors.length > 0
+            ? validErrors.reduce((sum, e) => sum + e, 0) / validErrors.length
+            : errors.reduce((sum, e) => sum + e, 0) / errors.length;
 
         // 統合評価関数を使用（v2.1.0: EvaluationCalculator統合）
         const evaluation = window.EvaluationCalculator.evaluateAverageError(avgError);
@@ -372,6 +381,7 @@ function displaySessionGrid(sessionData) {
         return `
             <div class="session-box ${badgeClass}"
                  data-session-index="${index}"
+                 data-outlier-count="${outlierCount}"
                  onclick="window.showSessionDetail(${index})">
                 <div class="session-number">${index + 1}</div>
                 <div class="session-icon">
@@ -439,10 +449,24 @@ window.showSessionDetail = function(sessionIndex) {
         }
     });
 
-    // 2. 平均誤差を計算（測定精度向上により外れ値除外は不要）
-    let avgError = 0;
-    if (session.pitchErrors) {
-        avgError = session.pitchErrors.reduce((sum, e) => sum + Math.abs(e.errorInCents), 0) / session.pitchErrors.length;
+    // 2. 【追加】外れ値を除外した平均誤差を計算（固定閾値180¢）
+    const errors = session.pitchErrors
+        ? session.pitchErrors.map(e => Math.abs(e.errorInCents))
+        : [];
+
+    const outlierThreshold = 180; // 全デバイス共通の固定閾値
+
+    const validErrors = errors.filter(e => e <= outlierThreshold);
+    const outlierCount = errors.length - validErrors.length;
+    const outlierFiltered = outlierCount > 0;
+
+    let avgError;
+    if (validErrors.length > 0) {
+        avgError = validErrors.reduce((sum, e) => sum + e, 0) / validErrors.length;
+        console.log(`📊 外れ値除外: ${outlierCount}音除外（${outlierThreshold}¢超）、有効音: ${validErrors.length}/${errors.length}`);
+    } else {
+        avgError = errors.reduce((sum, e) => sum + e, 0) / errors.length;
+        console.warn('⚠️ すべての音が外れ値と判定されました。元の値を使用します。');
     }
 
     // 3. タイトルを更新
@@ -476,7 +500,7 @@ window.showSessionDetail = function(sessionIndex) {
     const avgErrorEl = document.querySelector('.score-average');
     if (avgErrorEl) avgErrorEl.textContent = `±${avgError.toFixed(1)}¢`;
 
-    // 7. 音別詳細結果を表示（v2.0.0: EvaluationCalculator統合）
+    // 7. 音別詳細結果を表示（v2.0.0: EvaluationCalculator統合 + 外れ値アイコン）
     const container = document.getElementById('detail-note-results');
     if (container && session.pitchErrors) {
         const noteNames = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド'];
@@ -485,8 +509,20 @@ window.showSessionDetail = function(sessionIndex) {
         session.pitchErrors.forEach((error, index) => {
             const absError = Math.abs(error.errorInCents);
 
-            // 統合評価関数を使用
-            const evaluation = window.EvaluationCalculator.evaluatePitchError(absError);
+            // 【追加】外れ値判定
+            const isOutlier = absError > outlierThreshold;
+
+            // 統合評価関数を使用（外れ値でない場合）
+            let evaluation;
+            if (isOutlier) {
+                evaluation = {
+                    icon: 'alert-circle',
+                    color: 'text-amber-400',
+                    label: '外れ値'
+                };
+            } else {
+                evaluation = window.EvaluationCalculator.evaluatePitchError(absError);
+            }
 
             const deviationClass = error.errorInCents >= 0 ? 'text-pitch-deviation-plus' : 'text-pitch-deviation-minus';
 
@@ -514,6 +550,9 @@ window.showSessionDetail = function(sessionIndex) {
             container.appendChild(noteElement);
         });
     }
+
+    // 【追加】外れ値説明セクション表示
+    displayOutlierExplanationOverview(outlierFiltered, outlierCount, outlierThreshold);
 
     // 8. Lucideアイコンを再初期化
     if (typeof window.initializeLucideIcons === 'function') {
@@ -719,6 +758,49 @@ document.addEventListener('DOMContentLoaded', async function() {
     // 総合評価ページ初期化（DOMContentLoaded経由）
     await window.initResultsOverview();
 });
+
+/**
+ * 外れ値説明セクションを表示（総合評価ページ用）
+ */
+function displayOutlierExplanationOverview(outlierFiltered, outlierCount, outlierThreshold) {
+    // 外れ値説明用のコンテナを探す
+    let explanationContainer = document.getElementById('outlier-explanation-overview-container');
+
+    // コンテナがなければ作成
+    if (!explanationContainer) {
+        explanationContainer = document.createElement('div');
+        explanationContainer.id = 'outlier-explanation-overview-container';
+        // warning-alertスタイルはコンテナではなく内部要素に適用
+
+        // 詳細分析セクションの後に挿入
+        const detailedAnalysis = document.querySelector('.glass-card:has(#detail-note-results)');
+        if (detailedAnalysis && detailedAnalysis.nextSibling) {
+            detailedAnalysis.parentNode.insertBefore(explanationContainer, detailedAnalysis.nextSibling);
+        } else if (detailedAnalysis) {
+            detailedAnalysis.parentNode.appendChild(explanationContainer);
+        }
+    }
+
+    // 外れ値がある場合のみ表示
+    if (outlierFiltered) {
+        explanationContainer.innerHTML = `
+            <div class="warning-alert">
+                <i data-lucide="alert-circle" class="text-amber-400"></i>
+                <div>
+                    <p><strong>外れ値について</strong></p>
+                    <p>このセッションで<strong>${outlierCount}音</strong>が外れ値として除外されました。外れ値とは<strong>${outlierThreshold}¢（約${(outlierThreshold / 100).toFixed(1)}半音）を超える大きな誤差</strong>で、測定エラーの可能性が高い値です。平均誤差の計算精度を保つため、これらの値は除外されています。</p>
+                </div>
+            </div>
+        `;
+
+        // Lucideアイコン再初期化
+        if (typeof window.initializeLucideIcons === 'function') {
+            window.initializeLucideIcons({ immediate: true });
+        }
+    } else {
+        explanationContainer.innerHTML = '';
+    }
+}
 
 // グローバル関数が定義されたことを通知
 console.log('✅ [results-overview-controller] window.initResultsOverview defined');

@@ -1228,3 +1228,31 @@
     background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.2));
     border-color: rgba(239, 68, 68, 0.4);
 }
+
+/* ==================================================
+   外れ値通知UI（セッション結果・総合評価共通）
+   ================================================== */
+
+/* 外れ値通知（score-gridの下） */
+#outlier-notice {
+    margin-top: 1.5rem;
+    margin-bottom: 0;
+}
+
+/* 外れ値説明セクション - warning-alertスタイル使用 */
+#outlier-explanation-container .warning-alert,
+#outlier-explanation-overview-container .warning-alert {
+    /* warning-alertの基本スタイルを継承 */
+}
+
+/* 外れ値説明セクション内のテキストスタイル調整 */
+#outlier-explanation-container .warning-alert p,
+#outlier-explanation-overview-container .warning-alert p {
+    line-height: 1.6;
+}
+
+#outlier-explanation-container .warning-alert strong,
+#outlier-explanation-overview-container .warning-alert strong {
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 600;
+}
