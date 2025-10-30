@@ -629,12 +629,16 @@ function initializeCharts(sessionData) {
 
     const ctx = canvas.getContext('2d');
 
-    // セッション別平均誤差データ
+    // セッション別平均誤差データ（符号付き: + = シャープ, - = フラット）
     const labels = sessionData.map((_, i) => `S${i + 1}`);
     const data = sessionData.map(session => {
         if (!session.pitchErrors || session.pitchErrors.length === 0) return 0;
-        const sum = session.pitchErrors.reduce((s, e) => s + Math.abs(e.errorInCents), 0);
-        return (sum / session.pitchErrors.length).toFixed(1);
+        // 外れ値除外（180¢超）
+        const validErrors = session.pitchErrors.filter(e => Math.abs(e.errorInCents) <= 180);
+        if (validErrors.length === 0) return 0;
+        // 符号付き平均（Math.abs()を使わない）
+        const sum = validErrors.reduce((s, e) => s + e.errorInCents, 0);
+        return parseFloat((sum / validErrors.length).toFixed(1));
     });
 
     window.resultsOverviewChart = new Chart(ctx, {
@@ -642,11 +646,16 @@ function initializeCharts(sessionData) {
         data: {
             labels: labels,
             datasets: [{
-                label: '平均誤差 (セント)',
+                label: '平均誤差（+ シャープ傾向 / - フラット傾向）',
                 data: data,
-                borderColor: 'rgb(59, 130, 246)',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                tension: 0.4
+                borderColor: 'rgba(255, 255, 255, 0.9)',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                borderWidth: 2,
+                tension: 0.3,
+                pointRadius: 5,
+                pointBackgroundColor: 'rgba(255, 255, 255, 0.9)',
+                pointBorderColor: 'rgba(59, 130, 246, 1)',
+                pointBorderWidth: 2
             }]
         },
         options: {
@@ -654,15 +663,117 @@ function initializeCharts(sessionData) {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
+                    display: false
+                },
+                title: {
                     display: true,
-                    labels: { color: '#fff' }
+                    text: '平均誤差の推移（+ シャープ傾向 / - フラット傾向）',
+                    color: '#fff',
+                    font: {
+                        size: 14,
+                        weight: 'normal'
+                    },
+                    padding: {
+                        bottom: 20
+                    }
+                },
+                annotation: {
+                    annotations: {
+                        zeroLine: {
+                            type: 'line',
+                            yMin: 0,
+                            yMax: 0,
+                            borderColor: 'rgba(34, 197, 94, 0.8)',
+                            borderWidth: 3,
+                            label: {
+                                display: true,
+                                content: '目標 (0¢)',
+                                position: 'end',
+                                backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                                color: '#fff',
+                                font: { size: 11 }
+                            }
+                        },
+                        excellentTop: {
+                            type: 'line',
+                            yMin: 20,
+                            yMax: 20,
+                            borderColor: 'rgba(251, 191, 36, 0.3)',
+                            borderWidth: 1,
+                            borderDash: [5, 5]
+                        },
+                        excellentBottom: {
+                            type: 'line',
+                            yMin: -20,
+                            yMax: -20,
+                            borderColor: 'rgba(251, 191, 36, 0.3)',
+                            borderWidth: 1,
+                            borderDash: [5, 5]
+                        },
+                        goodTop: {
+                            type: 'line',
+                            yMin: 35,
+                            yMax: 35,
+                            borderColor: 'rgba(34, 197, 94, 0.3)',
+                            borderWidth: 1,
+                            borderDash: [5, 5]
+                        },
+                        goodBottom: {
+                            type: 'line',
+                            yMin: -35,
+                            yMax: -35,
+                            borderColor: 'rgba(34, 197, 94, 0.3)',
+                            borderWidth: 1,
+                            borderDash: [5, 5]
+                        },
+                        sharpZone: {
+                            type: 'box',
+                            yMin: 0,
+                            yMax: 60,
+                            backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                            borderWidth: 0
+                        },
+                        flatZone: {
+                            type: 'box',
+                            yMin: -60,
+                            yMax: 0,
+                            backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                            borderWidth: 0
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed.y;
+                            const sign = value >= 0 ? '+' : '';
+                            const tendency = value > 0 ? 'シャープ傾向' : value < 0 ? 'フラット傾向' : '目標通り';
+                            return `${sign}${value}¢ (${tendency})`;
+                        }
+                    }
                 }
             },
             scales: {
                 y: {
-                    beginAtZero: true,
-                    ticks: { color: '#fff' },
-                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    min: -70,
+                    max: 70,
+                    ticks: {
+                        color: '#fff',
+                        callback: function(value) {
+                            return value >= 0 ? `+${value}¢` : `${value}¢`;
+                        }
+                    },
+                    grid: {
+                        color: function(context) {
+                            if (context.tick.value === 0) {
+                                return 'rgba(34, 197, 94, 0.3)';
+                            }
+                            return 'rgba(255, 255, 255, 0.1)';
+                        },
+                        lineWidth: function(context) {
+                            return context.tick.value === 0 ? 2 : 1;
+                        }
+                    }
                 },
                 x: {
                     ticks: { color: '#fff' },
@@ -788,7 +899,7 @@ function displayOutlierExplanationOverview(outlierFiltered, outlierCount, outlie
                 <i data-lucide="alert-circle" class="text-amber-400"></i>
                 <div>
                     <p><strong>外れ値について</strong></p>
-                    <p>このセッションで<strong>${outlierCount}音</strong>が外れ値として除外されました。外れ値とは<strong>${outlierThreshold}¢（約${(outlierThreshold / 100).toFixed(1)}半音）を超える大きな誤差</strong>で、測定エラーの可能性が高い値です。平均誤差の計算精度を保つため、これらの値は除外されています。</p>
+                    <p>このセッションで<strong>${outlierCount}音</strong>が外れ値として除外されました。外れ値とは<strong>${outlierThreshold}¢（約${(outlierThreshold / 100).toFixed(1)}半音）を超える大きな誤差</strong>のことです。これは測定エラーの可能性もありますが、特定の音程が本当に苦手な場合もあります。平均誤差の計算精度を保つため、これらの値は除外されていますが、詳細分析で確認することをおすすめします。</p>
                 </div>
             </div>
         `;

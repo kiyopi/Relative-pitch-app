@@ -6660,3 +6660,25 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-30 13:18:14] コミット: feat: 外れ値処理システム完全実装（固定閾値180¢）
+
+- 外れ値判定を固定閾値180¢に統一（デバイス別判定を削除）
+- 評価分布から外れ値を除外（平均誤差計算と一貫性確保）
+- 外れ値通知をscore-grid直下に配置
+- warning-alertスタイルとalert-circleアイコンに統一
+- 外れ値説明文を改善（測定エラーと苦手音程の両方の可能性を明記）
+- インラインスタイル完全削除（CSS管理に統一）
+- 基音選定ログを強化（選定モード・全基音リスト表示）
+- 外れ値分類ロジックの検討事項を仕様書に追加（v2.3.0）
+
+変更ファイル:
+- result-session-controller.js: 外れ値除外ロジック・UI表示実装
+- results-overview-controller.js: 同様の外れ値処理実装
+- evaluation-calculator.js: 評価分布計算の外れ値対応
+- results.css: #outlier-noticeマージン調整
+- trainingController.js: 基音選定ログ強化
+- EVALUATION_SYSTEM_SPECIFICATION.md: v2.3.0検討事項追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
