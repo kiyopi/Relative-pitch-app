@@ -6682,3 +6682,26 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-30 13:46:35] コミット: feat: 誤差推移グラフをゼロベースライン方式に改善
+
+- 符号付き平均誤差の可視化（+ シャープ傾向 / - フラット傾向）
+- ゼロライン（目標音程）を緑色の太線で強調表示
+- プラス領域（シャープ）とマイナス領域（フラット）を背景色で区別
+- 評価基準の補助線追加（±20¢, ±35¢の破線）
+- Y軸範囲を±70¢に拡張（プロット点の視認性向上）
+- 凡例を非表示にしてタイトルで説明（紛らわしいアイコン削除）
+- ツールチップでシャープ/フラット傾向を表示
+- 外れ値（180¢超）を除外した平均誤差計算
+- 総合評価ページの外れ値説明文を修正（苦手音程の可能性も明記）
+
+変更ファイル:
+- results-overview-controller.js: 誤差推移グラフの完全リニューアル
+
+教育的効果:
+- ユーザーのピッチのクセ（常にシャープ/フラット）を一目で把握可能
+- 目標音程（0¢）からの上下の偏りを視覚的に理解
+- セッション間のトレンド分析が容易
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
