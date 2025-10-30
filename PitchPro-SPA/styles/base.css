@@ -393,8 +393,17 @@ body::before {
 .text-section-title-purple { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #c4b5fd; margin-top: 0; margin-bottom: 4px; }
 
 /* 音程偏差表示専用クラス (1.5rem, 700) */
-.text-pitch-deviation-plus { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: rgba(59, 130, 246, 0.8); margin-top: 0; margin-bottom: 4px; } /* 青色80% - プラス偏差 */
-.text-pitch-deviation-minus { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: rgba(239, 68, 68, 0.8); margin-top: 0; margin-bottom: 4px; } /* 赤色80% - マイナス偏差 */
+.text-pitch-deviation-plus { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #60A5FA; margin-top: 0; margin-bottom: 4px; } /* 青300 - プラス偏差（明るく改善） */
+.text-pitch-deviation-minus { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #F87171; margin-top: 0; margin-bottom: 4px; } /* 赤400 - マイナス偏差（明るく改善） */
+
+/* モバイルでは誤差表示を小さく */
+@media (max-width: 768px) {
+  .text-pitch-deviation-plus,
+  .text-pitch-deviation-minus {
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.5rem; /* 24px */
+  }
+}
 
 /* text-sub-title バリエーション (1.25rem, 500) */
 .text-sub-title-yellow { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; color: #fde047; margin-top: 0; margin-bottom: 4px; }
