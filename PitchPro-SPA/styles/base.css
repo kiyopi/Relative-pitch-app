@@ -393,8 +393,8 @@ body::before {
 .text-section-title-purple { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #c4b5fd; margin-top: 0; margin-bottom: 4px; }
 
 /* 音程偏差表示専用クラス (1.5rem, 700) */
-.text-pitch-deviation-plus { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #60A5FA; margin-top: 0; margin-bottom: 4px; } /* 青300 - プラス偏差（明るく改善） */
-.text-pitch-deviation-minus { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #F87171; margin-top: 0; margin-bottom: 4px; } /* 赤400 - マイナス偏差（明るく改善） */
+.text-pitch-deviation-plus { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #93C5FD; margin-top: 0; margin-bottom: 4px; } /* 青200 - プラス偏差（さらに明るく） */
+.text-pitch-deviation-minus { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #FCA5A5; margin-top: 0; margin-bottom: 4px; } /* 赤300 - マイナス偏差（さらに明るく） */
 
 /* モバイルでは誤差表示を小さく */
 @media (max-width: 768px) {
