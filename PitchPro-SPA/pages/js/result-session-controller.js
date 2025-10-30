@@ -157,13 +157,13 @@ function updateSessionUI(sessionData, sessionNumber) {
         console.log('✅ ダミーデータを生成:', sessionData.pitchErrors);
     }
 
-    // 平均誤差計算
+    // 平均誤差計算（絶対値の平均 - 音程のズレの大きさを測定）
     const errors = sessionData.pitchErrors.map(e => e.errorInCents);
-    const avgError = errors.reduce((a, b) => a + b, 0) / errors.length;
+    const avgError = errors.reduce((sum, e) => sum + Math.abs(e), 0) / errors.length;
 
     const avgErrorEl = document.getElementById('average-error');
     if (avgErrorEl) {
-        avgErrorEl.textContent = `${avgError >= 0 ? '+' : ''}${avgError.toFixed(1)}¢`;
+        avgErrorEl.textContent = `±${avgError.toFixed(1)}¢`;
     }
 
     // 評価分布計算・表示
