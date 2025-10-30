@@ -982,6 +982,13 @@ body::before {
   margin: 0 auto;
 }
 
+/* モバイルでは横幅制限を解除 */
+@media (max-width: 768px) {
+  .narrow-main {
+    max-width: 100%;
+  }
+}
+
 /* --- フッター --- */
 .footer-base {
   text-align: center;
