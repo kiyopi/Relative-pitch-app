@@ -46,6 +46,12 @@
    - **永続化メモリ**: `PERM-[内容]-YYYYMMDD-HHMM`（例: `PERM-training-core-pitch-error-detection-20250112-1430`）
    - **作業用メモ**: `TEMP-[内容]-YYYYMMDD-HHMM`（例: `TEMP-direct-access-mic-permission-issue-20250112-1445`）
    - 永続化メモリは仕様・設計思想など長期保存が必要な情報、作業用メモは一時的な問題・タスク管理用
+12. **🔍 CSS編集時の混乱防止（2025-11-06追加）**:
+   - **ファイル重複確認必須**: `find . -name "[ファイル名].css"` で編集対象を明確化
+   - **本番環境優先**: `/PitchPro-SPA/styles/` 配下のCSSのみ編集
+   - **開発環境は参照のみ**: `/Bolt/v2/styles/` は編集禁止・デモページ用
+   - **URLパス確認**: 開発者ツールでどのCSSが読み込まれているか確認
+   - **GitHub Pages確認**: `https://kiyopi.github.io/Relative-pitch-app/` はmainブランチから配信
 
 ### 🎯 **作業のポイント**
 - **データ管理モジュール完了**: `/js/data-manager.js`実装済み（pitchpro-audio統合、課金制御対応）
