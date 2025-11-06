@@ -115,23 +115,11 @@
     color: #ffffff;
 }
 
-/* ？アイコン - グラススタイル */
+/* ？アイコン - 透明スタイル */
 .rank-info-btn {
-    background: rgba(255, 255, 255, 0.1) !important;
+    background: transparent !important;
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     transition: all 0.2s ease;
-}
-
-.rank-info-btn i {
-    width: 20px !important;
-    height: 20px !important;
-    min-width: 20px !important;
-    min-height: 20px !important;
-    max-width: 20px !important;
-    max-height: 20px !important;
-    font-size: 20px !important;
 }
 
 .rank-info-btn:hover {
