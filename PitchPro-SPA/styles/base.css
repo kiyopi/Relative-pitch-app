@@ -645,7 +645,7 @@ body::before {
 
 .glass-card-sm {
   background: var(--glass-bg);
-  backdrop-filter: blur(8px);
+  /* backdrop-filter削除: 親.glass-cardと重複してiPadで白化するため */
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
   padding: var(--space-4);
