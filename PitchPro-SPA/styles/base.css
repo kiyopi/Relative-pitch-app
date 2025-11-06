@@ -1131,21 +1131,11 @@ body::before {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background: rgba(0, 0, 0, 0.3);
+  background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
   transition: all 0.3s ease;
   z-index: 10;
-}
-
-.help-icon-btn i {
-  width: 20px !important;
-  height: 20px !important;
-  min-width: 20px !important;
-  min-height: 20px !important;
-  max-width: 20px !important;
-  max-height: 20px !important;
-  font-size: 20px !important;
 }
 
 .help-icon-btn:hover {
