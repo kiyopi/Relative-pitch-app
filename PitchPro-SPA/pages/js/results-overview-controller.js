@@ -234,7 +234,7 @@ function updateGradeIcon(grade) {
 
     // グレード別アイコン・色設定
     const gradeConfig = {
-        'S': { icon: 'crown', class: 'rank-circle-s', color: 'gold' },
+        'S': { icon: 'crown', class: 'rank-circle-s', color: 'gold', customSvg: true },
         'A': { icon: 'medal', class: 'rank-circle-a', color: 'silver' },
         'B': { icon: 'award', class: 'rank-circle-b', color: 'orange' },
         'C': { icon: 'smile', class: 'rank-circle-c', color: 'green' },
@@ -247,9 +247,22 @@ function updateGradeIcon(grade) {
     // クラスをリセット
     iconContainer.className = `rank-circle rank-md ${config.class}`;
 
-    // アイコン更新
+    // アイコン更新（S級のみカスタムSVG使用）
+    let iconHtml = '';
+    if (config.customSvg && grade === 'S') {
+        // 最新版crownのSVGを直接埋め込み
+        iconHtml = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="text-white rank-circle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
+                <path d="M5 21h14"></path>
+            </svg>
+        `;
+    } else {
+        iconHtml = `<i data-lucide="${config.icon}" class="text-white rank-circle-icon"></i>`;
+    }
+
     iconContainer.innerHTML = `
-        <i data-lucide="${config.icon}" class="text-white rank-circle-icon"></i>
+        ${iconHtml}
         <button class="help-icon-btn text-white">
             <i data-lucide="help-circle" class="icon-help"></i>
         </button>
