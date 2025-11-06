@@ -522,7 +522,7 @@ window.showSessionDetail = function(sessionIndex) {
         badge.innerHTML = `
             <i data-lucide="${evaluation.icon}" class="${evaluation.color} accuracy-icon"></i>
             <button class="help-icon-btn help-icon-btn-positioned">
-                <i data-lucide="help-circle" style="width: 20px !important; height: 20px !important; min-width: 20px !important; min-height: 20px !important; max-width: 20px !important; max-height: 20px !important; font-size: 20px !important;"></i>
+                <i data-lucide="help-circle" class="icon-help"></i>
             </button>
         `;
         message.textContent = evaluation.message;
