@@ -82,7 +82,7 @@
     font-weight: 600;
     margin-bottom: 16px;
     text-align: center;
-    padding-left: 32px;
+    padding: 0;
 }
 
 /* ランク項目のテキスト */
@@ -224,13 +224,6 @@
 .rank-range {
     color: rgba(255, 255, 255, 0.7);
     font-size: 0.75rem;
-}
-
-.popover-title {
-    color: white;
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 12px;
 }
 
 /* 音別結果アイテム */
