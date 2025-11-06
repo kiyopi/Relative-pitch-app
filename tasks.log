@@ -6927,3 +6927,27 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-06 20:32:41] コミット: feat: ポップオーバーUI改善（背景色バランス調整・閉じるボタン左配置）
+
+- 背景色をバランス型に変更: rgba(30, 41, 59, 0.90) - 明るさ向上・視認性改善
+- 閉じるボタンを左上に移動: iPhone操作性向上のため左配置
+- タイトル中央揃え修正: padding-left: 32px で閉じるボタン分の余白確保
+
+影響範囲:
+- 総合グレード説明ポップオーバー (grade-popover)
+- セッション精度ランク説明ポップオーバー (session-rank-popover)
+- 精度ランク説明ポップオーバー (rank-popover)
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-06 21:01:48] コミット: fix: ポップオーバータイトル中央揃え修正
+
+- .popover-titleの重複定義を削除（229行目）
+- padding: 0 に変更（左右のパディング削除）
+- 閉じるボタンがabsoluteで配置されているため、パディング不要
+- text-align: center のみで完全中央配置を実現
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
