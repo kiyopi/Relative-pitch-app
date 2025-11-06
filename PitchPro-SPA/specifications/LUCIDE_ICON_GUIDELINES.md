@@ -293,6 +293,75 @@ UIカタログで検証済みの主要アイコン（**v0.263.0互換名を使�
 
 ---
 
+## 🎨 カスタムSVGアイコン仕様（2025-11-06追加）
+
+### S級crownアイコンのカスタムSVG実装
+
+#### 問題の背景
+- **Lucide v0.263.0のcrownアイコン**: 違和感のある形状（旧デザイン）
+- **Lucide @latest版のcrownアイコン**: 洗練されたデザイン
+- **制約**: Safari互換性のためv0.263.0を使用する必要がある
+
+#### 解決方法
+@latest版crownのSVGパスを直接埋め込むことで、v0.263.0環境でも最新デザインを使用。
+
+#### 実装仕様
+
+**SVGパスの違い:**
+
+```xml
+<!-- v0.263.0版（旧・違和感あり） -->
+<path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path>
+
+<!-- @latest版（新・洗練されたデザイン） -->
+<path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
+<path d="M5 21h14"></path>
+```
+
+**実装箇所:**
+
+1. **JavaScript動的生成（results-overview-controller.js）**
+```javascript
+// S級のみカスタムSVG使用
+if (config.customSvg && grade === 'S') {
+    iconHtml = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="text-white rank-circle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
+            <path d="M5 21h14"></path>
+        </svg>
+    `;
+} else {
+    iconHtml = `<i data-lucide="${config.icon}" class="text-white rank-circle-icon"></i>`;
+}
+```
+
+2. **HTML静的記述（results-overview.html）**
+```html
+<!-- S級ポップオーバー内 -->
+<svg xmlns="http://www.w3.org/2000/svg" class="text-yellow-300 icon-md shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
+    <path d="M5 21h14"></path>
+</svg>
+
+<!-- プレミアム版crown -->
+<svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
+    <path d="M5 21h14"></path>
+</svg>
+```
+
+#### 適用範囲
+- **S級グレードアイコン**: 総合評価ページのメイングレード表示
+- **S級ポップオーバー**: グレード説明ポップオーバー内
+- **プレミアム版crown**: プレミアム機能比較表のヘッダー
+
+#### 注意事項
+- **他のグレード（A-E級）**: 通常のLucideアイコンを使用（`data-lucide`属性）
+- **CSSクラス適用**: SVGにもLucideと同じクラス（`.rank-circle-icon`、`.icon-md`等）を適用
+- **色指定**: `stroke="currentColor"`でCSSの`color`プロパティを継承
+
+---
+
 ## ⚠️ 最重要事項
 
 **UIカタログに記載されている実装が絶対的な基準です。**
@@ -304,3 +373,4 @@ UIカタログで検証済みの主要アイコン（**v0.263.0互換名を使�
 更新履歴：
 - 2025-08-23: 初版作成（UIカタログ準拠の重要性を明記）
 - 2025-10-24: バージョン管理セクション追加（Safari互換性・アイコン名非互換性対応）
+- 2025-11-06: カスタムSVGアイコン仕様追加（S級crown最新デザイン実装）

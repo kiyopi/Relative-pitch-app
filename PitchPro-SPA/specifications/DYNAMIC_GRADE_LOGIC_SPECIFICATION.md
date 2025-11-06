@@ -320,14 +320,15 @@ function calculateDynamicGrade(sessionData) {
 // グレード説明の生成
 function getGradeDescription(grade) {
   const descriptions = {
-    'S': { message: 'プロレベル！レコーディング品質の精度です', icon: 'crown', color: 'gold' },
+    // 注意: S級crownはカスタムSVG使用（詳細はLUCIDE_ICON_GUIDELINES.md参照）
+    'S': { message: 'プロレベル！レコーディング品質の精度です', icon: 'crown', color: 'gold', customSvg: true },
     'A': { message: '素晴らしい！楽器アンサンブルに対応できます', icon: 'medal', color: 'gray' },
     'B': { message: '実用レベル！合唱や弾き語りに最適です', icon: 'award', color: 'orange' },
     'C': { message: '基礎習得！カラオケや趣味演奏を楽しめます', icon: 'smile', color: 'green' },
     'D': { message: '練習中！基礎をしっかり身につけましょう', icon: 'meh', color: 'blue' },
     'E': { message: '基礎から！一歩ずつ確実に向上していきます', icon: 'frown', color: 'red' }
   };
-  
+
   return descriptions[grade] || descriptions['E'];
 }
 
@@ -563,3 +564,10 @@ if (outlierCount > 0) {
 ---
 
 **このロジック仕様により、4つの核心洞察に完全対応した科学的で公平な動的グレード計算システムが実現されます。**
+
+---
+
+## 📝 更新履歴
+
+- **2025-08-14**: 初版作成
+- **2025-11-06**: S級crownアイコンのカスタムSVG仕様を追記（`customSvg: true`フラグ追加）
