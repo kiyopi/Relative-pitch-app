@@ -216,7 +216,7 @@ function displayEvaluationDistribution(pitchErrors, outlierCount = 0) {
     container.innerHTML = `
         <!-- Excellent -->
         <div class="flex items-center gap-3">
-            <i data-lucide="trophy" class="text-yellow-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+            <i data-lucide="trophy" class="text-yellow-300 icon-help shrink-0"></i>
             <div class="progress-bar flex">
                 <div class="progress-fill-custom color-eval-gold" style="width: ${(distribution.excellent / total * 100)}%;"></div>
             </div>
@@ -225,7 +225,7 @@ function displayEvaluationDistribution(pitchErrors, outlierCount = 0) {
 
         <!-- Good -->
         <div class="flex items-center gap-3">
-            <i data-lucide="star" class="text-green-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+            <i data-lucide="star" class="text-green-300 icon-help shrink-0"></i>
             <div class="progress-bar flex">
                 <div class="progress-fill-custom color-eval-good" style="width: ${(distribution.good / total * 100)}%;"></div>
             </div>
@@ -234,7 +234,7 @@ function displayEvaluationDistribution(pitchErrors, outlierCount = 0) {
 
         <!-- Pass -->
         <div class="flex items-center gap-3">
-            <i data-lucide="thumbs-up" class="text-blue-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+            <i data-lucide="thumbs-up" class="text-blue-300 icon-help shrink-0"></i>
             <div class="progress-bar flex">
                 <div class="progress-fill-custom color-eval-pass" style="width: ${(distribution.pass / total * 100)}%;"></div>
             </div>
@@ -243,7 +243,7 @@ function displayEvaluationDistribution(pitchErrors, outlierCount = 0) {
 
         <!-- Practice -->
         <div class="flex items-center gap-3">
-            <i data-lucide="alert-triangle" class="text-red-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
+            <i data-lucide="alert-triangle" class="text-red-300 icon-help shrink-0"></i>
             <div class="progress-bar flex">
                 <div class="progress-fill-custom color-eval-practice" style="width: ${(distribution.practice / total * 100)}%;"></div>
             </div>
@@ -273,15 +273,46 @@ function displayAccuracyBadge(avgError) {
     badge.className = 'accuracy-badge relative';
 
     badge.classList.add(`accuracy-badge-${evaluation.level}`);
-    badge.innerHTML = `<i data-lucide="${evaluation.icon}" class="${evaluation.color} accuracy-icon"></i>`;
-    message.textContent = evaluation.message;
-
-    // ヘルプボタンを再追加
-    badge.innerHTML += `
+    badge.innerHTML = `
+        <i data-lucide="${evaluation.icon}" class="${evaluation.color} accuracy-icon"></i>
+        <!-- ヘルプボタン -->
         <button class="rank-info-btn help-btn-position" onclick="toggleRankPopover()">
-            <i data-lucide="help-circle" class="text-white" style="width: 20px !important; height: 20px !important;"></i>
+            <i data-lucide="help-circle" class="text-white icon-help"></i>
         </button>
+        <!-- 精度ランク説明ポップオーバー -->
+        <div id="rank-popover" class="rank-popover">
+            <h4 class="popover-title">精度ランク</h4>
+            <div class="rank-item">
+                <i data-lucide="trophy" class="text-yellow-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-excellent">Excellent</div>
+                    <div class="rank-range">±15セント以内</div>
+                </div>
+            </div>
+            <div class="rank-item">
+                <i data-lucide="star" class="text-green-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-good">Good</div>
+                    <div class="rank-range">15～25セント</div>
+                </div>
+            </div>
+            <div class="rank-item">
+                <i data-lucide="thumbs-up" class="text-blue-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-pass">Pass</div>
+                    <div class="rank-range">25～40セント</div>
+                </div>
+            </div>
+            <div class="rank-item">
+                <i data-lucide="alert-triangle" class="text-red-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-practice">Practice</div>
+                    <div class="rank-range">40セント以上</div>
+                </div>
+            </div>
+        </div>
     `;
+    message.textContent = evaluation.message;
 
     // Lucideアイコン再初期化
     if (typeof lucide !== 'undefined') {
@@ -377,7 +408,7 @@ function updateNextSessionButton(sessionNumber) {
                     window.location.hash = 'results-overview';
                 }
             };
-            button.innerHTML = '<i data-lucide="trophy" style="width: 24px; height: 24px;"></i><span>総合評価を見る</span>';
+            button.innerHTML = '<i data-lucide="trophy" class="icon-md"></i><span>総合評価を見る</span>';
             console.log('✅ 8セッション完了 - 総合評価ボタン表示');
         } else {
             // 次のセッションへ（NavigationManager統合）
@@ -434,9 +465,11 @@ function toggleRankPopover() {
 // ポップオーバー外クリックで閉じる
 document.addEventListener('click', function(event) {
     const popover = document.getElementById('rank-popover');
-    const helpBtn = event.target.closest('.rank-info-btn');
+    const helpBtn = event.target.closest('.rank-info-btn, .help-icon-btn');
+    const popoverContent = event.target.closest('.rank-popover');
 
-    if (popover && !helpBtn && popover.classList.contains('show')) {
+    // ヘルプボタンまたはポップオーバー内クリックは無視
+    if (popover && !helpBtn && !popoverContent && popover.classList.contains('show')) {
         popover.classList.remove('show');
     }
 });

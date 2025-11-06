@@ -15,16 +15,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-
-    <!-- アイコンライブラリ（index.html でロード済み） -->
-
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
-
-    <!-- JavaScript モジュール（data-manager.js と evaluation-calculator.js は index.html でロード済み） -->
-    <!-- 総合評価コントローラー（外部ファイル化） -->
-    <script src="js/results-overview-controller.js"></script>
 </head>
 <body>
     <div class="container container-results-overview">
@@ -55,10 +45,10 @@
                         <!-- グレードアイコン -->
                         <div class="rank-icon">
                             <div class="rank-circle rank-md rank-circle-b" style="position: relative;">
-                                <i data-lucide="circle-star" class="text-white" style="width: 64px; height: 64px;"></i>
+                                <i data-lucide="award" class="text-white rank-circle-icon"></i>
                                 <!-- ヘルプボタン -->
-                                <button class="help-icon-btn" style="color: white;">
-                                    <i data-lucide="help-circle" style="width: 20px !important; height: 20px !important; min-width: 20px !important; min-height: 20px !important; max-width: 20px !important; max-height: 20px !important; font-size: 20px !important;"></i>
+                                <button class="help-icon-btn text-white">
+                                    <i data-lucide="help-circle" class="icon-help"></i>
                                 </button>
                             </div>
                         </div>
@@ -200,7 +190,7 @@
                                         <i data-lucide="trophy" class="text-yellow-300 accuracy-icon"></i>
                                         <!-- ヘルプボタン -->
                                         <button class="help-icon-btn help-icon-btn-positioned">
-                                            <i data-lucide="help-circle" style="width: 20px !important; height: 20px !important; min-width: 20px !important; min-height: 20px !important; max-width: 20px !important; max-height: 20px !important; font-size: 20px !important;"></i>
+                                            <i data-lucide="help-circle" class="icon-help"></i>
                                         </button>
                                     </div>
                                     <p class="text-sub-title mt-4 mb-0">素晴らしい精度！</p>
@@ -364,9 +354,99 @@
                     </button>
                 </section>
         </main>
+
+        <!-- 総合グレード説明ポップオーバー -->
+        <div id="grade-popover" class="rank-popover">
+            <h4 class="popover-title">総合グレード</h4>
+
+            <div class="rank-item">
+                <i data-lucide="crown" class="text-yellow-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name">S級</div>
+                    <div class="rank-range">8回モード: ±25¢ / 12回: ±20¢ / 24回: ±15¢</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <i data-lucide="medal" class="text-gray-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name">A級</div>
+                    <div class="rank-range">8回モード: ±35¢ / 12回: ±30¢ / 24回: ±25¢</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <i data-lucide="award" class="text-orange-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name">B級</div>
+                    <div class="rank-range">8回モード: ±45¢ / 12回: ±40¢ / 24回: ±35¢</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <i data-lucide="smile" class="text-green-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name">C級</div>
+                    <div class="rank-range">8回モード: ±55¢ / 12回: ±50¢ / 24回: ±45¢</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <i data-lucide="meh" class="text-blue-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name">D級</div>
+                    <div class="rank-range">8回モード: ±65¢ / 12回: ±60¢ / 24回: ±55¢</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <i data-lucide="frown" class="text-red-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name">E級</div>
+                    <div class="rank-range">8回モード: ±80¢ / 12回: ±75¢ / 24回: ±70¢</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- セッション精度ランク説明ポップオーバー -->
+        <div id="session-rank-popover" class="rank-popover">
+            <h4 class="popover-title">精度ランク</h4>
+
+            <div class="rank-item">
+                <i data-lucide="trophy" class="text-yellow-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-excellent">Excellent</div>
+                    <div class="rank-range">±20セント以内</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <i data-lucide="star" class="text-green-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-good">Good</div>
+                    <div class="rank-range">±35セント以内</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <i data-lucide="thumbs-up" class="text-blue-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-pass">Pass</div>
+                    <div class="rank-range">±50セント以内</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <i data-lucide="alert-triangle" class="text-red-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-practice">Practice</div>
+                    <div class="rank-range">50セント以上</div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- JavaScript: 外部コントローラーファイルで管理 -->
-    <!-- js/results-overview-controller.js で全ロジックを実装 -->
+    <!-- JavaScript: 全てのスクリプトはindex.htmlで読み込み済み（SPAアーキテクチャ） -->
+    <!-- Chart.js、データマネージャー、評価計算機、コントローラーはindex.htmlで管理 -->
 </body>
 </html>

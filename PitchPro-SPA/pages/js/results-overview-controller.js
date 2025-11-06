@@ -1,3 +1,5 @@
+console.log('🚀 [results-overview-controller] Script loaded - START');
+
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
@@ -112,6 +114,36 @@ window.initResultsOverview = async function() {
         }
         window.showSessionDetail(latestIndex);
     }
+
+    // ヘルプボタンのイベントリスナーを設定（SPAのinnerHTML挿入後に実行）
+    console.log('🔧 [initResultsOverview] Setting up help button event listeners');
+    const helpButtons = document.querySelectorAll('.help-icon-btn');
+    console.log('🔧 [initResultsOverview] Found help buttons:', helpButtons.length);
+
+    helpButtons.forEach((btn, index) => {
+        // 既存のリスナーを削除してから追加（重複防止）
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+
+        // ボタンの位置で判別（最初のボタンは総合グレード用）
+        if (index === 0) {
+            newBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🔵 Grade help button clicked');
+                toggleGradePopover();
+            });
+            console.log('✅ Grade help button listener added');
+        } else {
+            newBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🟢 Session rank help button clicked');
+                toggleSessionRankPopover();
+            });
+            console.log('✅ Session rank help button listener added');
+        }
+    });
 }
 
 /**
@@ -203,8 +235,8 @@ function updateGradeIcon(grade) {
     // グレード別アイコン・色設定
     const gradeConfig = {
         'S': { icon: 'crown', class: 'rank-circle-s', color: 'gold' },
-        'A': { icon: 'award', class: 'rank-circle-a', color: 'silver' },
-        'B': { icon: 'star', class: 'rank-circle-b', color: 'orange' },
+        'A': { icon: 'medal', class: 'rank-circle-a', color: 'silver' },
+        'B': { icon: 'award', class: 'rank-circle-b', color: 'orange' },
         'C': { icon: 'smile', class: 'rank-circle-c', color: 'green' },
         'D': { icon: 'meh', class: 'rank-circle-d', color: 'blue' },
         'E': { icon: 'frown', class: 'rank-circle-e', color: 'red' }
@@ -217,9 +249,9 @@ function updateGradeIcon(grade) {
 
     // アイコン更新
     iconContainer.innerHTML = `
-        <i data-lucide="${config.icon}" class="text-white" style="width: 64px; height: 64px;"></i>
-        <button class="help-icon-btn" style="color: white;">
-            <i data-lucide="help-circle" style="width: 20px !important; height: 20px !important;"></i>
+        <i data-lucide="${config.icon}" class="text-white rank-circle-icon"></i>
+        <button class="help-icon-btn text-white">
+            <i data-lucide="help-circle" class="icon-help"></i>
         </button>
     `;
 }
@@ -913,5 +945,61 @@ function displayOutlierExplanationOverview(outlierFiltered, outlierCount, outlie
     }
 }
 
+/**
+ * 総合グレード説明ポップオーバーの切り替え
+ */
+function toggleGradePopover() {
+    console.log('🔵 toggleGradePopover called');
+    const popover = document.getElementById('grade-popover');
+    console.log('🔵 grade-popover element:', popover);
+    if (popover) {
+        popover.classList.toggle('show');
+        console.log('🔵 Toggled show class, current classes:', popover.className);
+    } else {
+        console.error('❌ grade-popover element not found');
+    }
+}
+
+/**
+ * セッション精度ランク説明ポップオーバーの切り替え
+ */
+function toggleSessionRankPopover() {
+    console.log('🟢 toggleSessionRankPopover called');
+    const popover = document.getElementById('session-rank-popover');
+    console.log('🟢 session-rank-popover element:', popover);
+    if (popover) {
+        popover.classList.toggle('show');
+        console.log('🟢 Toggled show class, current classes:', popover.className);
+    } else {
+        console.error('❌ session-rank-popover element not found');
+    }
+}
+
+// ポップオーバー外クリックで閉じる（DOMContentLoaded後に登録）
+document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('click', function(event) {
+        const gradePopover = document.getElementById('grade-popover');
+        const sessionRankPopover = document.getElementById('session-rank-popover');
+        const helpBtn = event.target.closest('.help-icon-btn, .rank-info-btn');
+        const popoverContent = event.target.closest('.rank-popover');
+
+        // ヘルプボタンまたはポップオーバー内クリックは無視
+        if (!helpBtn && !popoverContent) {
+            if (gradePopover && gradePopover.classList.contains('show')) {
+                gradePopover.classList.remove('show');
+            }
+            if (sessionRankPopover && sessionRankPopover.classList.contains('show')) {
+                sessionRankPopover.classList.remove('show');
+            }
+        }
+    });
+});
+
+// グローバルに公開
+window.toggleGradePopover = toggleGradePopover;
+window.toggleSessionRankPopover = toggleSessionRankPopover;
+
 // グローバル関数が定義されたことを通知
 console.log('✅ [results-overview-controller] window.initResultsOverview defined');
+console.log('✅ [results-overview-controller] window.toggleGradePopover:', typeof window.toggleGradePopover);
+console.log('✅ [results-overview-controller] window.toggleSessionRankPopover:', typeof window.toggleSessionRankPopover);

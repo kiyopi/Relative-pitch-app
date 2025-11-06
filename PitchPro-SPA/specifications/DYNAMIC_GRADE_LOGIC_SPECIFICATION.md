@@ -322,7 +322,7 @@ function getGradeDescription(grade) {
   const descriptions = {
     'S': { message: 'プロレベル！レコーディング品質の精度です', icon: 'crown', color: 'gold' },
     'A': { message: '素晴らしい！楽器アンサンブルに対応できます', icon: 'medal', color: 'gray' },
-    'B': { message: '実用レベル！合唱や弾き語りに最適です', icon: 'circle-star', color: 'orange' },
+    'B': { message: '実用レベル！合唱や弾き語りに最適です', icon: 'award', color: 'orange' },
     'C': { message: '基礎習得！カラオケや趣味演奏を楽しめます', icon: 'smile', color: 'green' },
     'D': { message: '練習中！基礎をしっかり身につけましょう', icon: 'meh', color: 'blue' },
     'E': { message: '基礎から！一歩ずつ確実に向上していきます', icon: 'frown', color: 'red' }
