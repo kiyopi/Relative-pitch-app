@@ -281,6 +281,9 @@ function displayAccuracyBadge(avgError) {
         </button>
         <!-- 精度ランク説明ポップオーバー -->
         <div id="rank-popover" class="rank-popover">
+            <button class="popover-close-btn" onclick="toggleRankPopover()">
+                <i data-lucide="x" class="icon-help"></i>
+            </button>
             <h4 class="popover-title">精度ランク</h4>
             <div class="rank-item">
                 <i data-lucide="trophy" class="text-yellow-300 icon-md shrink-0"></i>

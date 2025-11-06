@@ -49,6 +49,32 @@
     margin-bottom: 0;
 }
 
+/* ポップオーバー閉じるボタン */
+.popover-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 1;
+}
+
+.popover-close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 1);
+    transform: scale(1.1);
+}
+
 /* ポップオーバータイトル */
 .popover-title {
     color: rgba(255, 255, 255, 0.95);
@@ -56,6 +82,7 @@
     font-weight: 600;
     margin-bottom: 16px;
     text-align: center;
+    padding-right: 32px;
 }
 
 /* ランク項目のテキスト */
