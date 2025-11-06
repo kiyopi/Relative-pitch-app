@@ -98,37 +98,31 @@ class EvaluationCalculator {
   }
 
   /**
-   * 2. デバイス品質検出ロジック
+   * 2. デバイス品質検出ロジック（v2.1.0簡素化版）
+   * 【変更内容】高性能デバイスカテゴリ除外（PC専用で制約が厳しいため）
+   * 【新基準】標準(factor 1.0, ±15¢) / 低性能(factor 1.2, ±20¢)
+   * 【根拠】仕様書「デバイス測定誤差 ±10〜15¢」に準拠
    */
   static detectDeviceQuality() {
     try {
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       const sampleRate = audioContext.sampleRate;
-      const userAgent = navigator.userAgent.toLowerCase();
-      const isMobile = /mobile|android|iphone|ipad/.test(userAgent);
 
       let quality, factor, accuracy, message;
 
-      // 高性能デバイス判定
-      if (sampleRate >= 48000 && !isMobile) {
-        quality = 'high';
+      // 標準デバイス判定（44.1kHz以上 - ほぼ全てのデバイス）
+      if (sampleRate >= 44100) {
+        quality = 'standard';
         factor = 1.0;
-        accuracy = '±10¢';
-        message = '高精度での測定が可能です';
-      }
-      // 一般的デバイス判定
-      else if (sampleRate >= 44100) {
-        quality = 'medium';
-        factor = 1.15;
         accuracy = '±15¢';
-        message = '一般的な精度で測定中（約±15¢の誤差を含む可能性）';
+        message = '標準精度で測定中（約±15¢のデバイス誤差を含む）';
       }
-      // 低性能デバイス判定
+      // 低性能デバイス判定（44.1kHz未満 - レアケース）
       else {
         quality = 'low';
-        factor = 1.3;
-        accuracy = '±25¢';
-        message = '限定的精度での測定（約±25¢の誤差を含む可能性）。相対的な改善傾向に注目してください';
+        factor = 1.2;
+        accuracy = '±20¢';
+        message = '限定的精度での測定（約±20¢の誤差を含む可能性）。相対的な改善傾向に注目してください';
       }
 
       audioContext.close();
@@ -137,8 +131,8 @@ class EvaluationCalculator {
     } catch (error) {
       console.warn('AudioContext detection failed:', error);
       return {
-        quality: 'medium',
-        factor: 1.15,
+        quality: 'standard',
+        factor: 1.0,
         accuracy: '±15¢',
         message: '標準精度で測定中',
         sampleRate: 'unknown'
@@ -247,7 +241,9 @@ class EvaluationCalculator {
   }
 
   /**
-   * 4. 技術制約調整ロジック
+   * 4. 技術制約調整ロジック（v2.1.0更新）
+   * 【変更内容】標準デバイス(factor 1.0)で調整なし、低性能のみ1.2倍緩和
+   * 【効果】ほとんどのユーザーが公平な評価を受けられる
    */
   static applyTechnicalAdjustment(basicMetrics, deviceInfo) {
     const adjustedMetrics = {
@@ -264,7 +260,9 @@ class EvaluationCalculator {
       adjustmentInfo: {
         factor: deviceInfo.factor,
         quality: deviceInfo.quality,
-        explanation: `${deviceInfo.quality}デバイスのため、${deviceInfo.factor}倍の調整を適用`
+        explanation: deviceInfo.factor === 1.0
+          ? '標準精度で測定（デバイス誤差 ±15¢を含む）'
+          : `${deviceInfo.quality}デバイスのため、${deviceInfo.factor}倍の調整を適用`
       }
     };
   }

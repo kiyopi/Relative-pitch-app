@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 グレードアイコン v0.263.0 互換性テスト</title>
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/results.css">
+    <style>
+        body {
+            padding: 40px;
+            background: var(--bg-primary, #0f1729);
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        .test-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+        .test-item.success {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .test-item.error {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+        .test-result {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: white;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+        .icon-wrapper {
+            margin-bottom: 16px;
+        }
+        .grade-label {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+        }
+        .icon-name {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 4px;
+        }
+        .description {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1 class="text-4xl font-bold text-white mb-4">🧪 グレードアイコン v0.263.0 テスト</h1>
+            <p class="text-white-70">本番環境（Lucide v0.263.0）での表示確認</p>
+        </div>
+
+        <div class="test-grid" id="test-grid"></div>
+
+        <div class="test-result" id="result"></div>
+    </div>
+
+    <!-- ✅ 本番環境と同じバージョン -->
+    <script src="https://unpkg.com/lucide@0.263.0/dist/umd/lucide.js"></script>
+
+    <script>
+        const gradeIcons = [
+            { grade: 'S級', icon: 'crown', color: 'text-yellow-300', description: 'プロレベル', circleClass: 'rank-circle-s' },
+            { grade: 'A級', icon: 'medal', color: 'text-gray-300', description: '楽器アンサンブル', circleClass: 'rank-circle-a' },
+            { grade: 'B級（旧）', icon: 'circle-star', color: 'text-orange-300', description: '合唱・弾き語り', circleClass: 'rank-circle-b' },
+            { grade: 'B級（新）', icon: 'award', color: 'text-orange-300', description: '合唱・弾き語り', circleClass: 'rank-circle-b' },
+            { grade: 'C級', icon: 'smile', color: 'text-green-300', description: 'カラオケ・趣味', circleClass: 'rank-circle-c' },
+            { grade: 'D級', icon: 'meh', color: 'text-blue-300', description: '練習中', circleClass: 'rank-circle-d' },
+            { grade: 'E級', icon: 'frown', color: 'text-red-300', description: '基礎から', circleClass: 'rank-circle-e' }
+        ];
+
+        const grid = document.getElementById('test-grid');
+        let resultText = '🔍 Lucide v0.263.0 互換性テスト結果\n\n';
+        const issues = [];
+
+        // テスト項目を生成
+        gradeIcons.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'test-item';
+            div.innerHTML = `
+                <div class="icon-wrapper">
+                    <div class="rank-circle rank-md ${item.circleClass}">
+                        <i data-lucide="${item.icon}" class="text-white" style="width: 64px; height: 64px;"></i>
+                    </div>
+                </div>
+                <div class="grade-label">${item.grade}</div>
+                <div class="icon-name">${item.icon}</div>
+                <div class="description">${item.description}</div>
+            `;
+            grid.appendChild(div);
+        });
+
+        // Lucideアイコン初期化
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+            resultText += '✅ lucide.createIcons() 実行完了\n\n';
+        } else {
+            resultText += '❌ Lucide ライブラリが読み込まれていません\n\n';
+        }
+
+        // アイコン検証
+        setTimeout(() => {
+            const items = grid.querySelectorAll('.test-item');
+
+            gradeIcons.forEach((item, index) => {
+                const div = items[index];
+                const svg = div.querySelector('svg');
+
+                if (svg && svg.querySelector('path, circle, rect, line, polyline, polygon')) {
+                    div.classList.add('success');
+                    resultText += `✅ ${item.grade} (${item.icon}): 表示成功\n`;
+                } else {
+                    div.classList.add('error');
+                    resultText += `❌ ${item.grade} (${item.icon}): 表示失敗 → v0.263.0で存在しない\n`;
+                    issues.push(item);
+                }
+            });
+
+            // サマリー
+            resultText += `\n${'='.repeat(50)}\n`;
+            resultText += `📊 テスト完了: ${gradeIcons.length - issues.length}/${gradeIcons.length} 成功\n`;
+
+            if (issues.length > 0) {
+                resultText += `\n⚠️ 代替が必要なアイコン:\n`;
+                issues.forEach(item => {
+                    resultText += `   • ${item.grade} (${item.icon})\n`;
+                });
+                resultText += `\n💡 推奨対応:\n`;
+                issues.forEach(item => {
+                    if (item.icon === 'circle-star') {
+                        resultText += `   • ${item.grade}: "star" または "award" に変更\n`;
+                    } else if (item.icon === 'medal') {
+                        resultText += `   • ${item.grade}: "award" または "badge" に変更\n`;
+                    } else {
+                        resultText += `   • ${item.grade}: 代替アイコンを検討\n`;
+                    }
+                });
+            } else {
+                resultText += `\n✨ すべてのアイコンがv0.263.0で使用可能です！\n`;
+            }
+
+            resultText += `\n🔍 コンソールで警告メッセージも確認してください。`;
+
+            document.getElementById('result').textContent = resultText;
+        }, 500);
+
+        // コンソール警告をキャプチャ
+        const originalWarn = console.warn;
+        console.warn = function(...args) {
+            const message = args.join(' ');
+            if (message.includes('icon') || message.includes('not found')) {
+                resultText += `\n⚠️ Console: ${message}`;
+                document.getElementById('result').textContent = resultText;
+            }
+            originalWarn.apply(console, args);
+        };
+    </script>
+</body>
+</html>

@@ -6705,3 +6705,225 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-10-30 15:41:26] コミット: fix: iPadグラス効果重複による背景白化問題を完全修正
+
+- SNSシェアボタンのbackdrop-filter削除（.share-btn）
+- ドレミガイド完了状態のbackdrop-filter削除（.note-circle.completed）
+- ヘルプボタン背景を黒半透明に変更（視認性向上）
+- 総合評価ページに評価分布の説明文追加
+- 評価分布見出しのマージン調整
+
+問題の原因:
+- 親要素（.glass-card）のbackdrop-filter: blur(8px)
+- 子要素の追加backdrop-filterまたは白半透明背景
+- 2重のグラス効果で背景が過度に明るく表示
+
+修正内容:
+1. results.css: .share-btnからbackdrop-filter削除（830行・1035行）
+2. training.css: .note-circle.completedからbackdrop-filter削除（780-785行）
+3. base.css: .help-icon-btn背景をrgba(0,0,0,0.3)に変更（1133行）
+4. results-overview.html: 評価分布説明文追加・見出しマージン調整
+
+影響範囲:
+- 総合評価ページのSNSボタン
+- トレーニングページのドレミガイド
+- 全ページのヘルプボタン
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-06 18:46:39] コミット: fix: ポップオーバーヘルプボタン動作修正とアイコンCSS統一完了
+
+- セッション評価・総合評価のヘルプボタンポップオーバー動作修正
+- Lucide v0.263.0互換性確保（B級: circle-star → award）
+- グレードアイコン重複解消（A級=medal, B級=award）
+- 全アイコンをインラインスタイルからCSS統一（.icon-help, .icon-md, .rank-circle-icon）
+- 総合グレードポップオーバー（S-E級）をテキストバッジからアイコン表示に変更
+- UIカタログ準拠の完全CSS設計実現
+
+変更ファイル:
+- PitchPro-SPA/pages/result-session.html: 静的ヘルプボタン削除
+- PitchPro-SPA/pages/js/result-session-controller.js: 動的ポップオーバー生成、アイコンCSS化
+- PitchPro-SPA/pages/results-overview.html: グレードポップオーバーアイコン化、ヘルプボタンCSS化
+- PitchPro-SPA/pages/js/results-overview-controller.js: グレード設定修正、インライン削除
+- PitchPro-SPA/styles/base.css: .icon-help追加
+- PitchPro-SPA/specifications/DYNAMIC_GRADE_LOGIC_SPECIFICATION.md: B級アイコン更新
+- UI-Catalog/ui-catalog-essentials.html: B級アイコン統一
+- UI-Catalog/ui-catalog-results-overall.html: アイコンCSS統一、B級修正
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-06 18:55:38] コミット: refactor: アイコン重複処理の完全排除とインラインスタイル削減
+
+HTMLに静的記述されたアイコンがJavaScriptで上書きされる重複処理を解消:
+- 総合評価ページ: グレードアイコン・ヘルプボタンの静的HTML削除
+- 総合評価ページ: セッション評価アイコン・ヘルプボタンの静的HTML削除
+- セッション評価ページ: 精度アイコン・ヘルプボタンの静的HTML削除
+- ヘルプアイコンの過剰な!important指定を.icon-helpクラスに統一
+
+変更内容:
+- PitchPro-SPA/pages/results-overview.html: 2箇所の重複アイコン削除
+- PitchPro-SPA/pages/result-session.html: 1箇所の重複アイコン削除
+- PitchPro-SPA/pages/js/results-overview-controller.js: インラインスタイル削減
+
+効果:
+- HTML初期表示のちらつき防止
+- JavaScriptのみでアイコン管理（単一責任）
+- CSSクラス統一によるコード簡潔化
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-06 19:21:25] コミット: fix: iPad/iPhoneでヘルプアイコンに黒背景が表示される問題を修正
+
+問題:
+- .help-icon-btnのbackground: rgba(0, 0, 0, 0.3)が原因でiPad/iPhoneで黒背景表示
+- .help-icon-btn iの過剰な!important指定が.icon-helpと重複
+
+修正内容:
+- base.css: .help-icon-btnの背景をtransparentに変更
+- base.css: .help-icon-btn iの重複した!important指定を削除（.icon-helpで管理）
+- results.css: 重複した.help-icon-btn i指定を削除
+
+効果:
+- ヘルプアイコンが透明背景で表示される
+- .icon-helpクラスでアイコンサイズを一元管理
+- CSS重複削除でコード簡潔化
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-06 19:24:12] コミット: fix: rank-info-btnヘルプボタンも透明背景に統一
+
+問題:
+- .rank-info-btnがグラス効果の白背景rgba(255, 255, 255, 0.1)を持っていた
+- セッション評価ページのヘルプボタンに適用され、背景が表示されていた
+
+修正内容:
+- results.css: .rank-info-btnの背景をtransparentに変更
+- backdrop-filterのブラー効果も削除（不要）
+- .rank-info-btn iの過剰な!important指定を削除（.icon-helpで管理）
+
+効果:
+- 全てのヘルプボタンが透明背景で統一
+- hover時のみ白背景が表示される一貫した動作
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-06 19:48:40] コミット: fix: S級crownアイコンを最新デザインに変更（SVG直接埋め込み）
+
+問題:
+- Lucide v0.263.0のcrownアイコンが違和感のある形状
+- UIカタログ(@latest版)のcrownは洗練されたデザイン
+- Safari互換性のためv0.263.0を使用する必要がある
+
+解決方法:
+- @latest版crownのSVGパスを直接埋め込み
+- S級のみカスタムSVGを使用、他のグレードはLucideアイコン
+
+変更内容:
+- results-overview-controller.js: S級の場合のみSVG直接埋め込み
+- results-overview.html: ポップオーバー内S級crownをSVGに変更
+- results-overview.html: プレミアム版crownもSVGに変更
+
+SVGパス:
+- v0.263.0: m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14
+- @latest: M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87...（洗練されたデザイン）
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-06 19:54:57] コミット: docs: S級crownカスタムSVG仕様を仕様書に追記
+
+追記内容:
+- LUCIDE_ICON_GUIDELINES.md: カスタムSVGアイコン仕様セクション追加
+  - 問題の背景（v0.263.0 vs @latest版のデザイン差異）
+  - 解決方法（SVG直接埋め込み）
+  - 実装仕様（JavaScriptとHTML両方のコード例）
+  - 適用範囲と注意事項
+
+- DYNAMIC_GRADE_LOGIC_SPECIFICATION.md: S級にcustomSvgフラグ追記
+  - getGradeDescription関数のS級定義にcustomSvg: true追加
+  - LUCIDE_ICON_GUIDELINES.md参照コメント追加
+  - 更新履歴に2025-11-06の変更を記録
+
+目的:
+- 今後の開発者がS級crownの特殊実装を理解できるよう文書化
+- v0.263.0とUIカタログのデザイン差異を明確化
+- カスタムSVG実装の保守性確保
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-06 19:59:25] コミット: feat: ポップオーバーに閉じるボタンを追加
+
+変更内容:
+- results.css: .popover-close-btnスタイル追加
+  - 右上配置の円形ボタン
+  - 透明背景、hover時に白背景
+  - スケールアニメーション効果
+
+- results-overview.html: 2つのポップオーバーに閉じるボタン追加
+  - 総合グレード説明ポップオーバー（grade-popover）
+  - セッション精度ランク説明ポップオーバー（session-rank-popover）
+
+- result-session-controller.js: 動的生成ポップオーバーに閉じるボタン追加
+  - 精度ランク説明ポップオーバー（rank-popover）
+
+デザイン:
+- アイコン: Lucide "x"
+- サイズ: 32px × 32px
+- 位置: 右上（top: 12px, right: 12px）
+- hover効果: 背景色変化 + スケール1.1倍
+
+背景色について:
+- 現在のrgba(15, 23, 42, 0.95)（濃い青黒）は適切
+- ポップオーバーの視認性とコントラストを確保
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-06 20:07:16] コミット: feat: グレードポップオーバーに説明文を追加
+
+追加内容:
+- results.css: .rank-descriptionスタイル追加
+  - 色: rgba(255, 255, 255, 0.75)
+  - サイズ: 0.8rem
+  - マージン: margin-top 4px
+  - 行間: line-height 1.4
+
+- results-overview.html: S-E級の各グレードに説明文追加
+
+説明文一覧（よりシンプルなバージョン）:
+- S級: レコーディング品質の精度
+- A級: 楽器アンサンブルに対応できる精度
+- B級: 合唱や弾き語りに適した精度
+- C級: カラオケや趣味演奏を楽しめる精度
+- D級: 基礎を身につけている段階
+- E級: 基礎から学んでいる段階
+
+構成:
+1. ランク名（S級、A級...）
+2. 説明文（新規追加）
+3. 基準範囲（8回/12回/24回モード）
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-06 20:15:59] コミット: fix: 説明文のフォントサイズをランク名と同じ0.9remに変更
+
+変更内容:
+- .rank-descriptionのfont-sizeを0.8rem → 0.9remに変更
+- ランク名（A級等）と同じサイズで統一
+- font-weightは指定なし（通常の太さのまま）
+
+表示:
+- ランク名: 0.9rem, font-weight: 600（太字）
+- 説明文: 0.9rem, font-weight: normal（通常）
+- 範囲: 0.8rem, font-weight: normal（通常）
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

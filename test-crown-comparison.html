@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crownアイコン比較</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px;
+            display: flex;
+            gap: 50px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .icon-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        h3 {
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .rank-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.4);
+        }
+
+        .rank-circle svg,
+        .rank-circle i {
+            width: 64px !important;
+            height: 64px !important;
+            color: white;
+            stroke: white;
+        }
+
+        .version-info {
+            color: white;
+            margin-top: 20px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 10px;
+            text-align: left;
+            margin-top: 20px;
+            overflow-x: auto;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div class="icon-container">
+        <h3>v0.263.0 (安定版)</h3>
+        <div class="rank-circle">
+            <i data-lucide="crown" id="crown-stable"></i>
+        </div>
+        <div class="version-info">Lucide v0.263.0</div>
+        <pre id="svg-stable"></pre>
+    </div>
+
+    <div class="icon-container">
+        <h3>@latest (最新版)</h3>
+        <div class="rank-circle">
+            <i data-lucide="crown" id="crown-latest"></i>
+        </div>
+        <div class="version-info">Lucide @latest</div>
+        <pre id="svg-latest"></pre>
+    </div>
+
+    <!-- v0.263.0 -->
+    <script src="https://unpkg.com/lucide@0.263.0/dist/umd/lucide.js"></script>
+    <script>
+        // v0.263.0のcrownを初期化
+        lucide.createIcons();
+
+        // SVGコードを取得して表示
+        const crownStable = document.getElementById('crown-stable');
+        setTimeout(() => {
+            const svg = crownStable.outerHTML;
+            document.getElementById('svg-stable').textContent = svg.substring(0, 300) + '...';
+        }, 100);
+    </script>
+
+    <!-- @latest -->
+    <script>
+        // 別のスクリプトでlatestバージョンを読み込み
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js';
+        script.onload = function() {
+            // latestバージョンで再初期化（crown-latestのみ）
+            const crownLatest = document.getElementById('crown-latest');
+
+            // 既存のSVGをクリア
+            crownLatest.innerHTML = '';
+
+            // 最新版のLucideで初期化
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+
+                setTimeout(() => {
+                    const svg = crownLatest.outerHTML;
+                    document.getElementById('svg-latest').textContent = svg.substring(0, 300) + '...';
+                }, 100);
+            }
+        };
+        document.body.appendChild(script);
+    </script>
+</body>
+</html>
