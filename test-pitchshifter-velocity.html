@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PitchShifter Velocity Test - クリッキングノイズ調査</title>
+
+    <!-- UIカタログのスタイルシート -->
+    <link rel="stylesheet" href="PitchPro-SPA/styles/base.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@0.263.0/dist/umd/lucide.js"></script>
+
+    <style>
+        /* テストページ専用スタイル */
+        body {
+            padding: 2rem;
+        }
+
+        .test-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .test-section {
+            margin-bottom: 2rem;
+        }
+
+        .control-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .control-group label {
+            display: block;
+            color: var(--text-white-90);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .value-display {
+            min-width: 70px;
+            text-align: right;
+            font-weight: 700;
+            color: var(--text-white);
+            font-size: 1.2rem;
+        }
+
+        .info-box {
+            background: rgba(33, 150, 243, 0.15);
+            border-left: 4px solid #2196f3;
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            color: var(--text-white-90);
+            line-height: 1.6;
+        }
+
+        .log-container {
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-white-80);
+            padding: 1rem;
+            border-radius: var(--radius-lg);
+            max-height: 350px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .log-entry {
+            margin-bottom: 0.5rem;
+        }
+
+        .log-entry.success { color: #10b981; }
+        .log-entry.warning { color: #f59e0b; }
+        .log-entry.error { color: #ef4444; }
+        .log-entry.info { color: #3b82f6; }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 640px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <!-- ヘッダー -->
+        <header style="text-align: center; margin-bottom: 3rem;">
+            <h1 class="text-4xl font-bold text-white mb-2">🎹 PitchShifter Velocity Test</h1>
+            <p class="text-white-70 text-lg">クリッキングノイズ調査 - Velocity値の最適化テスト</p>
+        </header>
+
+        <div class="info-box">
+            <i data-lucide="info" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 0.5rem;"></i>
+            <strong>使い方:</strong> スライダーでvelocity値を調整し、「C4を再生」ボタンを連続クリックしてクリッキングノイズを確認してください。
+        </div>
+
+        <div class="test-section glass-card">
+            <h2 class="text-2xl font-bold text-white mb-6">
+                <i data-lucide="sliders" class="icon-md" style="display: inline-block; vertical-align: middle; margin-right: 0.5rem;"></i>
+                Velocity設定
+            </h2>
+
+            <div class="control-group">
+                <label for="velocitySlider">Velocity（叩く強さ）</label>
+                <div class="slider-container">
+                    <input type="range" id="velocitySlider" min="0.1" max="1.0" step="0.05" value="0.4">
+                    <span class="value-display" id="velocityValue">0.40</span>
+                </div>
+            </div>
+
+            <button id="playBtn" class="btn-primary" style="width: 100%; margin-top: 1rem;">
+                <i data-lucide="music" class="icon-sm" style="display: inline-block; vertical-align: middle; margin-right: 0.5rem;"></i>
+                C4を再生 - サンプル音源（PitchShifter）
+            </button>
+
+            <button id="playSynthBtn" class="btn-secondary" style="width: 100%; margin-top: 0.75rem;">
+                <i data-lucide="piano" class="icon-sm" style="display: inline-block; vertical-align: middle; margin-right: 0.5rem;"></i>
+                C4を再生 - 内蔵シンセサイザー（ノイズなし）
+            </button>
+        </div>
+
+        <div class="test-section glass-card">
+            <h2 class="text-2xl font-bold text-white mb-6">
+                <i data-lucide="bar-chart-3" class="icon-md" style="display: inline-block; vertical-align: middle; margin-right: 0.5rem;"></i>
+                テスト統計
+            </h2>
+            <div class="stats">
+                <div class="glass-card" style="text-align: center; padding: 1.5rem;">
+                    <div class="text-4xl font-bold text-white mb-2" id="clickCount">0</div>
+                    <div class="text-white-70 text-sm">クリック回数</div>
+                </div>
+                <div class="glass-card" style="text-align: center; padding: 1.5rem;">
+                    <div class="text-4xl font-bold text-white mb-2" id="successCount">0</div>
+                    <div class="text-white-70 text-sm">再生成功</div>
+                </div>
+                <div class="glass-card" style="text-align: center; padding: 1.5rem;">
+                    <div class="text-4xl font-bold text-white mb-2" id="currentVelocity">0.40</div>
+                    <div class="text-white-70 text-sm">現在のVelocity</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section glass-card">
+            <h2 class="text-2xl font-bold text-white mb-4">
+                <i data-lucide="file-text" class="icon-md" style="display: inline-block; vertical-align: middle; margin-right: 0.5rem;"></i>
+                ログ
+            </h2>
+            <button onclick="clearLog()" class="btn-secondary" style="margin-bottom: 1rem;">
+                <i data-lucide="trash-2" class="icon-sm" style="display: inline-block; vertical-align: middle; margin-right: 0.5rem;"></i>
+                ログをクリア
+            </button>
+            <div class="log-container" id="logContainer"></div>
+        </div>
+    </div>
+
+    <!-- Tone.js Library (Testing latest version 15.3.5) -->
+    <script type="importmap">
+    {
+        "imports": {
+            "tone": "https://cdn.jsdelivr.net/npm/tone@15.3.5/+esm"
+        }
+    }
+    </script>
+
+    <!-- PitchShifter Library -->
+    <script type="module">
+        import { PitchShifter } from './PitchPro-SPA/js/core/reference-tones.js?v=3.2.0&t=1761705186&force=reload';
+        import * as Tone from 'tone';
+
+        // グローバルに公開
+        window.PitchShifter = PitchShifter;
+        window.Tone = Tone;
+
+        console.log('✅ PitchShifter class loaded:', typeof PitchShifter);
+        console.log('✅ Tone.js loaded:', typeof Tone);
+
+        // 統計変数
+        let clickCount = 0;
+        let successCount = 0;
+        let pitchShifter = null;
+
+        // 初期化処理をモジュール内で実行
+        async function initPitchShifter() {
+            try {
+                console.log('🎹 [INIT] ========== PitchShifter初期化開始 ==========');
+                console.log('🎹 [INIT] PitchShifterクラス型:', typeof PitchShifter);
+                console.log('🎹 [INIT] Toneオブジェクト型:', typeof Tone);
+
+                // テストページはルートディレクトリにあるため、baseUrlを明示的に指定
+                pitchShifter = new PitchShifter({
+                    baseUrl: './PitchPro-SPA/audio/piano/'
+                });
+                console.log('🎹 [INIT] インスタンス作成完了（baseUrl: ./PitchPro-SPA/audio/piano/）:', pitchShifter);
+                console.log('🎹 [INIT] インスタンス null確認:', pitchShifter === null);
+                console.log('🎹 [INIT] インスタンス undefined確認:', pitchShifter === undefined);
+
+                console.log('🎹 [INIT] initialize()メソッド呼び出し中...');
+
+                // タイムアウト付きで初期化を実行
+                const initTimeout = new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error('初期化タイムアウト（30秒）')), 30000);
+                });
+
+                try {
+                    await Promise.race([pitchShifter.initialize(), initTimeout]);
+                    console.log('✅ [INIT] initialize()メソッド完了');
+                } catch (timeoutError) {
+                    console.error('❌ [INIT] タイムアウトエラー:', timeoutError);
+                    throw timeoutError;
+                }
+
+                // グローバルに公開して外部から使えるようにする
+                console.log('🎹 [INIT] グローバル公開実行中...');
+                window.pitchShifterInstance = pitchShifter;
+                window.pitchShifterReady = true;
+
+                console.log('✅ [INIT] グローバル公開完了');
+                console.log('✅ [INIT] window.pitchShifterInstance:', window.pitchShifterInstance);
+                console.log('✅ [INIT] window.pitchShifterInstance型:', typeof window.pitchShifterInstance);
+                console.log('✅ [INIT] window.pitchShifterReady:', window.pitchShifterReady);
+                console.log('✅ [INIT] ========== 初期化処理完了 ==========');
+
+                // UIログにも表示
+                if (typeof addLog === 'function') {
+                    addLog('✅ PitchShifter初期化完了（v3.2.0: attack:0.01s + release:0.1s + Tone.js v15.3.5）', 'success');
+                }
+            } catch (error) {
+                console.error('❌ [INIT] ========== PitchShifter初期化エラー ==========');
+                console.error('❌ [INIT] エラー詳細:', error);
+                console.error('❌ [INIT] エラースタック:', error.stack);
+                window.pitchShifterReady = false;
+                window.pitchShifterError = error.message;
+
+                if (typeof addLog === 'function') {
+                    addLog(`❌ 初期化エラー: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        // 初期化実行（DOMContentLoaded後に実行するように変更）
+        console.log('🚀 [MODULE] モジュールロード完了 - DOMContentLoaded待機中');
+
+        // ログ関数
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('logContainer');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            const timestamp = new Date().toLocaleTimeString('ja-JP');
+            entry.textContent = `[${timestamp}] ${message}`;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        window.clearLog = function() {
+            document.getElementById('logContainer').innerHTML = '';
+            addLog('ログをクリアしました', 'info');
+        };
+
+        // 統計更新
+        function updateStats() {
+            document.getElementById('clickCount').textContent = clickCount;
+            document.getElementById('successCount').textContent = successCount;
+            const velocity = document.getElementById('velocitySlider').value;
+            document.getElementById('currentVelocity').textContent = parseFloat(velocity).toFixed(2);
+        }
+
+        // 不要な関数を削除（initPitchShifter関数を直接使用）
+
+        // DOMContentLoaded後に初期化するため、イベントリスナーもDOMContentLoaded内に移動
+        // （モジュールスコープでDOM要素にアクセスするとnullエラーになる）
+
+        // ページ読み込み時に初期化（重複呼び出し防止）
+        window.addEventListener('DOMContentLoaded', async () => {
+            console.log('🔍 [DOM] DOMContentLoaded発火');
+
+            // Lucideアイコン初期化
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+
+            addLog('=== PitchShifter Velocity Test v3.1.0 (8 Samplers) ===', 'info');
+            addLog('テストページ起動', 'info');
+            addLog('ℹ️ 再生ボタンをクリックすると初期化が開始されます', 'info');
+            updateStats();
+
+            // 初期化はユーザーインタラクション後に実行
+            console.log('🔍 [DOM] DOMContentLoaded完了 - ユーザーインタラクション待機中');
+
+            // Velocityスライダーイベント
+            const velocitySlider = document.getElementById('velocitySlider');
+            const velocityValue = document.getElementById('velocityValue');
+
+            velocitySlider.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                velocityValue.textContent = value.toFixed(2);
+                updateStats();
+                addLog(`Velocity変更: ${value.toFixed(2)}`, 'info');
+            });
+
+            // 再生ボタンイベント
+            document.getElementById('playBtn').addEventListener('click', async () => {
+                console.log('🎵 [PLAY] 再生ボタンクリック');
+
+                // 初回クリック時に初期化を実行
+                if (!window.pitchShifterReady) {
+                    console.log('🎵 [PLAY] 初回クリック - 初期化開始');
+                    addLog('🎹 PitchShifter初期化中...', 'info');
+
+                    // ボタンを一時的に無効化
+                    document.getElementById('playBtn').disabled = true;
+
+                    try {
+                        await initPitchShifter();
+                        console.log('🎵 [PLAY] 初期化完了');
+                        addLog('✅ 初期化完了！もう一度クリックして再生してください', 'success');
+                    } catch (error) {
+                        console.error('🎵 [PLAY] 初期化失敗:', error);
+                        addLog(`❌ 初期化エラー: ${error.message}`, 'error');
+                    } finally {
+                        // ボタンを再度有効化
+                        document.getElementById('playBtn').disabled = false;
+                    }
+                    return;
+                }
+
+                // 2回目以降は通常の再生処理
+                clickCount++;
+                updateStats();
+
+                const velocity = parseFloat(velocitySlider.value);
+
+                console.log('🎵 [PLAY] window.pitchShifterReady:', window.pitchShifterReady);
+                console.log('🎵 [PLAY] window.pitchShifterInstance:', typeof window.pitchShifterInstance);
+
+                try {
+                    if (!window.pitchShifterInstance) {
+                        console.error('🎵 [PLAY] エラー: インスタンスがnullまたはundefined');
+                        console.error('🎵 [PLAY] window.pitchShifterError:', window.pitchShifterError);
+                        throw new Error('PitchShifterがまだ初期化されていません');
+                    }
+
+                    console.log('🎵 [PLAY] playNote呼び出し - velocity:', velocity);
+                    addLog(`🎵 C4再生開始（velocity: ${velocity.toFixed(2)}）`, 'info');
+
+                    await window.pitchShifterInstance.playNote('C4', 2, velocity);
+
+                    successCount++;
+                    updateStats();
+                    addLog(`✅ 再生成功（${successCount}/${clickCount}）`, 'success');
+                } catch (error) {
+                    addLog(`❌ 再生エラー: ${error.message}`, 'error');
+                    console.error('🎵 [PLAY] 再生エラー詳細:', error);
+                }
+            });
+
+            // 再生ボタンを有効化
+            document.getElementById('playBtn').disabled = false;
+
+            // ========== シンセサイザー再生ボタン ==========
+            let synth = null;
+
+            document.getElementById('playSynthBtn').addEventListener('click', async () => {
+                console.log('🎹 [SYNTH] シンセサイザー再生ボタンクリック');
+
+                // 初回クリック時にシンセサイザーを初期化
+                if (!synth) {
+                    console.log('🎹 [SYNTH] シンセサイザー初期化中...');
+                    addLog('🎹 シンセサイザー初期化中...', 'info');
+
+                    try {
+                        // AudioContextを起動
+                        await Tone.start();
+                        console.log('✅ [SYNTH] AudioContext started');
+
+                        // MonoSynthを作成（単音専用・干渉なし）
+                        synth = new Tone.Synth({
+                            oscillator: {
+                                type: "triangle"  // 三角波でピアノに近い音色
+                            },
+                            envelope: {
+                                attack: 0.005,    // 速いアタック（ピアノの打鍵）
+                                decay: 0.1,       // 減衰
+                                sustain: 0.3,     // サステイン
+                                release: 1.0      // 自然なリリース
+                            }
+                        }).toDestination();
+
+                        synth.volume.value = -6; // 音量調整（PitchShifterと同じ）
+
+                        console.log('✅ [SYNTH] シンセサイザー初期化完了');
+                        addLog('✅ シンセサイザー初期化完了！', 'success');
+                    } catch (error) {
+                        console.error('❌ [SYNTH] 初期化エラー:', error);
+                        addLog(`❌ シンセサイザー初期化エラー: ${error.message}`, 'error');
+                        return;
+                    }
+                }
+
+                // 統計更新
+                clickCount++;
+                updateStats();
+
+                const velocity = parseFloat(velocitySlider.value);
+
+                try {
+                    console.log('🎹 [SYNTH] C4再生開始 - velocity:', velocity);
+                    addLog(`🎹 シンセC4再生開始（velocity: ${velocity.toFixed(2)}）`, 'info');
+
+                    // 【重要】前の音を完全に停止してから再生（MonoSynthはtriggerReleaseで停止）
+                    try {
+                        synth.triggerRelease();
+                    } catch (e) {
+                        // 最初の再生時は停止する音がないのでエラーを無視
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 30)); // 30ms待機
+
+                    // C4を2秒間再生（velocityも反映）
+                    synth.triggerAttackRelease("C4", 2, undefined, velocity);
+
+                    successCount++;
+                    updateStats();
+                    addLog(`✅ シンセ再生成功（${successCount}/${clickCount}）- MonoSynth`, 'success');
+                } catch (error) {
+                    addLog(`❌ シンセ再生エラー: ${error.message}`, 'error');
+                    console.error('🎹 [SYNTH] 再生エラー詳細:', error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ゲイン検証テスト</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #fff; }
+        .result { margin: 10px 0; padding: 10px; background: #333; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 ゲイン検証テスト</h1>
+    <p>このテストで、GainNodeの増幅がAnalyserNodeの音声データに実際に反映されているか確認します。</p>
+    
+    <button id="startTest">テスト開始</button>
+    <button id="setGain1" disabled>ゲイン 1.0x</button>
+    <button id="setGain2" disabled>ゲイン 2.0x</button>
+    <button id="setGain5" disabled>ゲイン 5.0x</button>
+    
+    <div id="results"></div>
+
+    <script type="module">
+        import { AudioManager } from './dist/index.esm.js';
+        
+        let audioManager = null;
+        let analyser = null;
+        let isMonitoring = false;
+        
+        const resultsDiv = document.getElementById('results');
+        
+        function addResult(message) {
+            const div = document.createElement('div');
+            div.className = 'result';
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            resultsDiv.appendChild(div);
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+        
+        function measureRMS() {
+            if (!analyser || !isMonitoring) return;
+            
+            const bufferLength = analyser.fftSize;
+            const buffer = new Float32Array(bufferLength);
+            analyser.getFloatTimeDomainData(buffer);
+            
+            // RMS計算
+            let sum = 0;
+            for (let i = 0; i < bufferLength; i++) {
+                sum += buffer[i] * buffer[i];
+            }
+            const rms = Math.sqrt(sum / bufferLength);
+            
+            // 最大サンプル値
+            const maxSample = Math.max(...buffer.map(v => Math.abs(v)));
+            
+            const currentGain = audioManager.getSensitivity();
+            
+            // PitchDetectorの音量計算をシミュレート
+            const platformSpecs = {
+                gainCompensation: 1.0,  // PC default
+                divisor: 6.0,           // PC default  
+                noiseThreshold: 0.5     // PC fixed value
+            };
+            
+            const adjustedRms = rms * platformSpecs.gainCompensation;
+            const volumePercent = Math.max(0, Math.min(100, 
+                (adjustedRms * 100) / platformSpecs.divisor * 67 - platformSpecs.noiseThreshold
+            ));
+            
+            // Math.min制限を外した計算
+            const volumePercentUnlimited = Math.max(0, 
+                (adjustedRms * 100) / platformSpecs.divisor * 67 - platformSpecs.noiseThreshold
+            );
+            
+            addResult(`🎚️ ゲイン: ${currentGain.toFixed(1)}x | RMS: ${rms.toFixed(6)} | 音量: ${volumePercent.toFixed(1)}% | 制限なし: ${volumePercentUnlimited.toFixed(1)}%`);
+            
+            setTimeout(measureRMS, 500); // 0.5秒間隔で測定
+        }
+        
+        document.getElementById('startTest').addEventListener('click', async () => {
+            try {
+                addResult('🎤 AudioManager初期化中...');
+                
+                audioManager = new AudioManager({
+                    sampleRate: 44100,
+                    channelCount: 1,
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: false
+                });
+                
+                await audioManager.initialize();
+                
+                analyser = audioManager.createAnalyser('gain-test', {
+                    fftSize: 2048,
+                    smoothingTimeConstant: 0.8,
+                    useFilters: false // 直接接続でテスト
+                });
+                
+                addResult('✅ 初期化完了 - マイクに向かって音を出してください');
+                
+                document.getElementById('startTest').disabled = true;
+                document.getElementById('setGain1').disabled = false;
+                document.getElementById('setGain2').disabled = false;
+                document.getElementById('setGain5').disabled = false;
+                
+                isMonitoring = true;
+                measureRMS();
+                
+            } catch (error) {
+                addResult(`❌ エラー: ${error.message}`);
+            }
+        });
+        
+        document.getElementById('setGain1').addEventListener('click', () => {
+            audioManager.setSensitivity(1.0);
+            addResult('🔧 ゲイン 1.0x に設定');
+        });
+        
+        document.getElementById('setGain2').addEventListener('click', () => {
+            audioManager.setSensitivity(2.0);
+            addResult('🔧 ゲイン 2.0x に設定');
+        });
+        
+        document.getElementById('setGain5').addEventListener('click', () => {
+            audioManager.setSensitivity(5.0);
+            addResult('🔧 ゲイン 5.0x に設定');
+        });
+    </script>
+</body>
+</html>

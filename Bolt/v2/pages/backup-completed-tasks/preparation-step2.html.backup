@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音域テストコントローラー デモ - ワンメソッド呼び出し</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/results.css">
+    <link rel="stylesheet" href="../styles/training.css">
+    <link rel="stylesheet" href="css/voice-range-test.css">
+</head>
+<body>
+    <div class="container">
+        <!-- ヘッダー -->
+        <header class="page-header">
+            <div class="page-header-content">
+                <div class="page-header-icon-wrapper">
+                    <div class="page-header-icon gradient-catalog-purple">
+                        <i data-lucide="package" class="text-white" data-stroke-width="2" class="icon-xl"></i>
+                    </div>
+                </div>
+                <div class="page-header-text">
+                    <h1 class="page-title">VoiceRangeTestController デモ</h1>
+                    <p class="page-subtitle text-purple-200">PitchPro v1.3.1統合版 - ワンメソッド呼び出しで完全な音域テスト</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main class="narrow-main">
+            <!-- マイク許可セクション -->
+            <div style="text-align: center; padding: 20px 0;">
+                <button class="btn btn-primary mic-button mic-idle system-control-btn" id="request-mic-permission">
+                    <i data-lucide="mic" class="icon-md"></i>
+                    <span>マイク許可を要求</span>
+                </button>
+
+                <div id="mic-permission-status" class="mt-4" aria-live="polite">
+                    <p class="text-sm" id="mic-status-text">マイクの許可を待っています...</p>
+                </div>
+            </div>
+            
+            <!-- 音域テスト実行エリア -->
+            <div class="glass-card">
+                <div class="section-header">
+                    <div>
+                        <h3 class="text-section-title">音域テスト</h3>
+                        <p class="section-description">あなたの快適な音域を測定します</p>
+                        <!-- マイクステータスアイコン -->
+                        <div class="text-center">
+                            <div class="mic-status-container standby" id="mic-status-container" style="margin: 12px auto 0 auto;">
+                                <i data-lucide="mic" id="mic-status-icon" style="width: 40px; height: 40px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- メインステータス -->
+                <div class="text-center mb-6">
+                    <h4 class="voice-range-main-text" id="main-status-text">「音域テスト開始」ボタンでテストを開始してください</h4>
+                </div>
+                
+                <!-- 音域テストバッジ -->
+                <div class="range-test-layout-flex">
+                    <div class="range-test-item">
+                        <div class="voice-range-display-container">
+                            <svg class="voice-stability-svg" width="160" height="160" id="stability-ring">
+                                <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="16"/>
+                                <circle cx="80" cy="80" r="72" fill="none" stroke="#3b82f6" stroke-width="16" 
+                                        stroke-dasharray="452" stroke-dashoffset="452" 
+                                        transform="rotate(-90 80 80)" class="voice-progress-circle"/>
+                            </svg>
+                            <div class="voice-note-badge">
+                                <div id="range-icon" class="icon-4xl text-white" style="display: block;">
+                                    <img src="./icons/arrow-down.png" alt="下向き矢印" style="width: 80px; height: 80px; display: block;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- サブ情報 -->
+                <div class="text-center mt-4">
+                    <p class="text-sm voice-range-sub-text" id="sub-info-text">待機中...</p>
+                </div>
+
+                <!-- 検出状況表示 -->
+                <div class="detection-meters" style="margin-top: 24px;">
+                    <!-- 音量レベル -->
+                    <div class="meter-group" id="range-volume-container">
+                        <div class="meter-label">
+                            <span>音量レベル</span>
+                            <span class="volume-text meter-value" id="range-test-volume-text">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill gradient-catalog-green" 
+                                 id="range-test-volume-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- 検出周波数 -->
+                    <div class="meter-group">
+                        <div class="meter-label">
+                            <span>検出周波数</span>
+                            <span class="meter-value" id="range-test-frequency-value">0 Hz</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- コントロールボタン（実用機能のみ） -->
+                <div class="text-center mt-6">
+                    <button class="btn btn-primary voice-range-btn" id="begin-range-test-btn" disabled>
+                        <i data-lucide="play" class="icon-sm"></i>
+                        <span>音域テスト開始</span>
+                    </button>
+
+                    <button class="btn btn-outline ml-3 voice-range-btn btn-hidden" id="retry-measurement-btn">
+                        <i data-lucide="refresh-cw" class="icon-sm"></i>
+                        <span>再測定</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 結果表示エリア -->
+            <div class="glass-card mt-6 hidden" id="results-section">
+                <h3 class="heading-md">
+                    <i data-lucide="bar-chart-3" class="text-green-300"></i>
+                    <span>音域テスト結果</span>
+                </h3>
+
+                <!-- 基本結果 -->
+                <div class="result-info-container">
+                    <div class="result-info-row">
+                        <span>🎵 音域範囲</span>
+                        <span class="result-info-value" id="result-range">-</span>
+                    </div>
+                    <div class="result-info-row">
+                        <span>🎹 オクターブ数</span>
+                        <span class="result-info-value" id="result-octaves">-</span>
+                    </div>
+                    <div class="result-info-row">
+                        <span>🔽 最低音</span>
+                        <span class="result-info-value" id="result-low-freq">-</span>
+                    </div>
+                    <div class="result-info-row">
+                        <span>🔼 最高音</span>
+                        <span class="result-info-value" id="result-high-freq">-</span>
+                    </div>
+                </div>
+
+                <!-- 詳細統計 -->
+                <div class="mt-5">
+                    <h4 class="heading-sm">
+                        <i data-lucide="activity" class="text-blue-300"></i>
+                        <span>測定統計</span>
+                    </h4>
+                    <div class="result-info-container" id="result-details">
+                        <!-- JavaScript で動的に追加される -->
+                    </div>
+                </div>
+
+                <!-- アクションボタン -->
+                <div class="text-center mt-5">
+                    <button class="btn btn-primary voice-range-btn" id="remeasure-btn">
+                        <i data-lucide="refresh-cw" class="icon-sm"></i>
+                        <span>再測定</span>
+                    </button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- 🎵 PitchPro v1.3.1 音声処理エンジン -->
+    <script src="../../../js/pitchpro-audio/pitchpro-v1.3.1.umd.js"></script>
+
+    <!-- 📊 データ管理システム -->
+    <script src="js/data-manager.js"></script>
+
+    <!-- 🌍 グローバル音声管理システム -->
+    <script src="js/global-audio-manager.js"></script>
+
+    <!-- 🎵 既存音域テスト機能 -->
+    <script src="js/voice-range-test-demo.js"></script>
+
+    <!-- 🔒 Step2シンプル初期化システム（成功パターン適用） -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('📄 Step2 DOM読み込み完了');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            try {
+                // === 簡易状態検証フェーズ ===
+                console.log('🔍 Step1完了状態を確認');
+
+                // 1. DataManagerからの状態確認
+                const progressData = DataManager?.getFromStorage('preparationProgress');
+                console.log('📊 DataManager状態:', progressData);
+
+                if (!progressData || !progressData.step1Completed) {
+                    console.warn('⚠️ Step1が完了していません');
+                    // Step1へリダイレクト
+                    setTimeout(() => {
+                        window.location.href = 'preparation-step1.html';
+                    }, 2000);
+
+                    const mainStatus = document.getElementById('main-status-text');
+                    if (mainStatus) {
+                        mainStatus.textContent = 'Step1から開始してください';
+                    }
+                    return;
+                }
+
+                console.log('✅ Step1完了確認 - Step2初期化開始');
+
+                // === Step2シンプル初期化フェーズ ===
+                initializeStep2Simple();
+
+            } catch (error) {
+                console.error('❌ Step2初期化失敗:', error.message);
+                await handleStep2InitializationError(error);
+            }
+        });
+
+        // Step2シンプル初期化関数（ユーザー操作起点版）
+        function initializeStep2Simple() {
+            console.log('🚀 Step2シンプル初期化処理開始');
+
+            // UI状態を準備完了に設定（PitchPro初期化はしない）
+            const mainStatus = document.getElementById('main-status-text');
+            const subInfo = document.getElementById('sub-info-text');
+            const beginBtn = document.getElementById('begin-range-test-btn');
+
+            if (mainStatus) mainStatus.textContent = '「音域テスト開始」ボタンで測定を開始します';
+            if (subInfo) subInfo.textContent = '準備完了';
+
+            // 音域テスト開始ボタンを有効化
+            if (beginBtn) {
+                beginBtn.disabled = false;
+                console.log('✅ 音域テスト開始ボタンを有効化');
+
+                beginBtn.addEventListener('click', handleStartTestClick);
+            }
+
+            console.log('✅ Step2シンプル初期化完了（PitchPro初期化は待機中）');
+        }
+
+        // ユーザークリックを起点とした音域テスト開始処理
+        async function handleStartTestClick() {
+            console.log('🎯 音域テスト開始ボタンクリック');
+            const beginBtn = document.getElementById('begin-range-test-btn');
+
+            if (beginBtn) {
+                beginBtn.disabled = true;
+                beginBtn.innerHTML = '<span>初期化中...</span>';
+            }
+
+            try {
+                // 【重要】ユーザークリックを起点にPitchProインスタンス取得・初期化
+                console.log('🔍 ユーザー操作起点でglobalAudioManagerからインスタンス取得...');
+                const audioDetector = await window.globalAudioManager.getInstance();
+                console.log('🎵 PitchProインスタンス取得・初期化完了（ダイアログは表示されないはず）');
+
+                // 既存の音域テストロジック（voice-range-test-demo.js）を呼び出す
+                if (typeof window.startVoiceRangeTest === 'function') {
+                    await window.startVoiceRangeTest(audioDetector); // インスタンスを引数で渡す
+                } else {
+                    console.error('❌ startVoiceRangeTest関数が見つかりません');
+                }
+
+            } catch (error) {
+                console.error('❌ 音域テストの開始に失敗:', error);
+                handleStep2InitializationError(error);
+            }
+        }
+
+        // 旧初期化関数（使用しない）
+        async function initializeStep2(progressData, audioDetector) {
+            console.log('🚀 Step2初期化処理開始', { progressData, audioDetector });
+
+            // Step2用UIセレクター設定（Step1確立パターン）
+            if (audioDetector.updateSelectors) {
+                // 1. まず表示要素をリセット（v1.3.1推奨）
+                if (audioDetector.resetDisplayElements) {
+                    await audioDetector.resetDisplayElements();
+                    console.log('🔄 UI表示要素をリセット');
+                }
+
+                // 2. Step2用のセレクターを設定
+                audioDetector.updateSelectors({
+                    volumeBarSelector: '#range-test-volume-bar',
+                    volumeTextSelector: '#range-test-volume-text',
+                    frequencySelector: '#range-test-frequency-value'
+                });
+                console.log('🎛️ Step2用UIセレクター設定完了');
+
+                // 3. 音声検出のコールバックを設定（v1.3.1必須）
+                if (audioDetector.setCallbacks) {
+                    audioDetector.setCallbacks({
+                        onPitchUpdate: (result) => {
+                            // 音域テスト中の処理は voice-range-test-demo.js が担当
+                            console.log('🎵 音声検出コールバック受信:', result.frequency);
+                        }
+                    });
+                    console.log('📞 音声検出コールバック設定完了');
+                }
+            } else {
+                console.warn('⚠️ audioDetector.updateSelectors メソッドが見つかりません');
+            }
+
+            // 音域テスト開始ボタンを有効化
+            const beginBtn = document.getElementById('begin-range-test-btn');
+            console.log('🔍 ボタン要素確認:', {
+                element: beginBtn,
+                disabled: beginBtn?.disabled,
+                className: beginBtn?.className
+            });
+
+            if (beginBtn) {
+                beginBtn.disabled = false;
+                console.log('✅ ボタンのdisabled属性を解除');
+
+                beginBtn.addEventListener('click', async () => {
+                    console.log('🎵 音域テスト開始ボタンクリック');
+
+                    // PitchPro v1.3.1準拠: 音声検出を開始
+                    if (audioDetector.startDetection) {
+                        try {
+                            console.log('🎤 音声検出を開始します...');
+                            await audioDetector.startDetection();
+                            console.log('✅ 音声検出開始成功');
+                        } catch (error) {
+                            console.error('❌ 音声検出開始エラー:', error);
+                        }
+                    }
+
+                    // startVoiceRangeTest関数の存在確認
+                    console.log('🔍 startVoiceRangeTest関数確認:', {
+                        exists: typeof window.startVoiceRangeTest === 'function',
+                        type: typeof window.startVoiceRangeTest
+                    });
+
+                    // 既存の音域テスト機能を活用
+                    if (typeof window.startVoiceRangeTest === 'function') {
+                        try {
+                            await window.startVoiceRangeTest();
+                        } catch (error) {
+                            console.error('❌ startVoiceRangeTest実行エラー:', error);
+                        }
+                    } else {
+                        console.error('❌ startVoiceRangeTest関数が見つかりません');
+                    }
+                });
+                console.log('🎯 音域テスト開始ボタンイベントリスナー設定完了');
+            } else {
+                console.error('❌ begin-range-test-btn要素が見つかりません');
+            }
+
+            // グローバルインスタンスとして公開（voice-range-test-demo.jsから使用）
+            window.globalAudioDetector = audioDetector;
+            console.log('🌍 AudioDetectorをグローバルスコープに公開');
+
+            // Step2状態表示更新
+            updateStep2UI('ready', progressData);
+            console.log('✅ Step2初期化完了');
+        }
+
+        // Step2初期化エラー処理
+        async function handleStep2InitializationError(error) {
+            console.error('🚨 Step2初期化エラー詳細:', error);
+
+            // 状態をクリアしてStep1に戻る
+            if (typeof DataManager !== 'undefined') {
+                DataManager.saveToStorage('preparationProgress', null);
+                console.log('🧹 状態データクリア完了');
+            }
+
+            // エラー表示とリダイレクト
+            const mainStatusText = document.getElementById('main-status-text');
+            const subInfoText = document.getElementById('sub-info-text');
+
+            if (mainStatusText) {
+                mainStatusText.textContent = '準備が完了していません';
+            }
+            if (subInfoText) {
+                subInfoText.innerHTML = `
+                    エラー: ${error.message}<br>
+                    <a href="preparation-step1.html" class="text-blue-300 hover:underline">
+                        準備ページに戻る（3秒後自動遷移）
+                    </a>
+                `;
+            }
+
+            // 3秒後に自動でStep1にリダイレクト
+            setTimeout(() => {
+                window.location.href = 'preparation-step1.html';
+            }, 3000);
+        }
+
+        // Step2 UI状態更新
+        function updateStep2UI(state, progressData) {
+            const mainStatusText = document.getElementById('main-status-text');
+            const subInfoText = document.getElementById('sub-info-text');
+
+            switch (state) {
+                case 'ready':
+                    if (mainStatusText) {
+                        mainStatusText.textContent = 'Step1完了！音域テストを開始してください';
+                    }
+                    if (subInfoText) {
+                        const completedTime = new Date(progressData.completedAt).toLocaleTimeString();
+                        subInfoText.textContent = `Step1完了時刻: ${completedTime}`;
+                    }
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>

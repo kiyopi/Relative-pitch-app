@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プレミアムデータ保存期間管理 - テスト</title>
+    <link rel="stylesheet" href="styles/base.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .test-section {
+            margin-bottom: 2rem;
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .test-result {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-free {
+            background: rgba(156, 163, 175, 0.2);
+            color: #9ca3af;
+        }
+
+        .status-premium {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .alert-normal {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+
+        .alert-warning {
+            background: rgba(251, 191, 36, 0.1);
+            color: #fbbf24;
+        }
+
+        .alert-critical {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <header>
+            <h1 class="text-3xl font-bold text-white mb-2">プレミアムデータ保存期間管理 - テスト</h1>
+            <p class="text-white-60">data-manager.js v2.1.0 の動作確認</p>
+        </header>
+
+        <!-- ステータス表示 -->
+        <div class="test-section">
+            <div class="glass-card">
+                <h2 class="heading-md mb-4">現在のステータス</h2>
+                <div id="current-status"></div>
+            </div>
+        </div>
+
+        <!-- テストデータ生成 -->
+        <div class="test-section">
+            <div class="glass-card">
+                <h2 class="heading-md mb-4">テストデータ生成</h2>
+                <div class="test-controls">
+                    <button class="btn btn-primary" onclick="generateTestSessions(10, 1)">
+                        10件生成（1日前）
+                    </button>
+                    <button class="btn btn-primary" onclick="generateTestSessions(10, 5)">
+                        10件生成（5日前）
+                    </button>
+                    <button class="btn btn-primary" onclick="generateTestSessions(20, 10)">
+                        20件生成（10日前）
+                    </button>
+                    <button class="btn btn-primary" onclick="generateTestSessions(50, 30)">
+                        50件生成（30日前）
+                    </button>
+                    <button class="btn btn-danger" onclick="clearAllSessions()">
+                        全削除
+                    </button>
+                </div>
+                <div id="generate-result" class="test-result"></div>
+            </div>
+        </div>
+
+        <!-- プラン切り替え -->
+        <div class="test-section">
+            <div class="glass-card">
+                <h2 class="heading-md mb-4">プラン切り替え</h2>
+                <div class="test-controls">
+                    <button class="btn btn-secondary" onclick="switchToFree()">
+                        無料プランに切り替え
+                    </button>
+                    <button class="btn btn-primary" onclick="switchToPremium()">
+                        プレミアムに切り替え
+                    </button>
+                </div>
+                <div id="plan-result" class="test-result"></div>
+            </div>
+        </div>
+
+        <!-- クリーンアップテスト -->
+        <div class="test-section">
+            <div class="glass-card">
+                <h2 class="heading-md mb-4">クリーンアップテスト</h2>
+                <div class="test-controls">
+                    <button class="btn btn-primary" onclick="testCleanup()">
+                        クリーンアップ実行
+                    </button>
+                    <button class="btn btn-secondary" onclick="testSaveWithCleanup()">
+                        保存+クリーンアップ実行
+                    </button>
+                </div>
+                <div id="cleanup-result" class="test-result"></div>
+            </div>
+        </div>
+
+        <!-- データ保存状況 -->
+        <div class="test-section">
+            <div class="glass-card">
+                <h2 class="heading-md mb-4">データ保存状況</h2>
+                <button class="btn btn-primary" onclick="showRetentionInfo()">
+                    保存状況を確認
+                </button>
+                <div id="retention-info" class="test-result"></div>
+            </div>
+        </div>
+
+        <!-- 容量警告チェック -->
+        <div class="test-section">
+            <div class="glass-card">
+                <h2 class="heading-md mb-4">容量警告チェック</h2>
+                <button class="btn btn-primary" onclick="checkWarning()">
+                    容量警告を確認
+                </button>
+                <div id="warning-result"></div>
+            </div>
+        </div>
+
+        <!-- コンソールログ -->
+        <div class="test-section">
+            <div class="glass-card">
+                <h2 class="heading-md mb-4">コンソールログ</h2>
+                <button class="btn btn-secondary" onclick="clearLog()">
+                    ログクリア
+                </button>
+                <div id="console-log" class="test-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- データ管理モジュール読み込み -->
+    <script src="js/data-manager.js"></script>
+
+    <script>
+        // コンソールログのキャプチャ
+        const logMessages = [];
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+
+        console.log = function(...args) {
+            logMessages.push({ type: 'log', message: args.join(' '), time: new Date().toLocaleTimeString() });
+            updateLogDisplay();
+            originalLog.apply(console, args);
+        };
+
+        console.warn = function(...args) {
+            logMessages.push({ type: 'warn', message: args.join(' '), time: new Date().toLocaleTimeString() });
+            updateLogDisplay();
+            originalWarn.apply(console, args);
+        };
+
+        console.error = function(...args) {
+            logMessages.push({ type: 'error', message: args.join(' '), time: new Date().toLocaleTimeString() });
+            updateLogDisplay();
+            originalError.apply(console, args);
+        };
+
+        function updateLogDisplay() {
+            const logDiv = document.getElementById('console-log');
+            logDiv.innerHTML = logMessages.slice(-20).reverse().map(log => {
+                const color = log.type === 'error' ? '#ef4444' : log.type === 'warn' ? '#fbbf24' : '#22c55e';
+                return `<div style="color: ${color}">[${log.time}] ${log.message}</div>`;
+            }).join('\n');
+        }
+
+        function clearLog() {
+            logMessages.length = 0;
+            updateLogDisplay();
+        }
+
+        // ステータス更新
+        function updateStatus() {
+            const statusDiv = document.getElementById('current-status');
+            const subscriptionData = DataManager.getSubscriptionData();
+            const isPremium = subscriptionData.premiumAccess.status === 'active';
+            const sessions = DataManager.getFromStorage('sessionData') || [];
+            const storageUsage = DataManager.getStorageUsage();
+
+            const statusBadge = isPremium
+                ? '<span class="status-badge status-premium">プレミアム会員</span>'
+                : '<span class="status-badge status-free">無料会員</span>';
+
+            statusDiv.innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${sessions.length}</div>
+                        <div class="stat-label">保存セッション数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${storageUsage.totalMB.toFixed(2)}MB</div>
+                        <div class="stat-label">使用容量 / 5MB</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${storageUsage.usage}%</div>
+                        <div class="stat-label">使用率</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="font-size: 1.5rem; font-weight: bold; color: ${isPremium ? '#fbbf24' : '#9ca3af'}">
+                            ${statusBadge}
+                        </div>
+                        <div class="stat-label">会員ステータス</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // テストセッション生成
+        function generateTestSessions(count, daysAgo) {
+            const sessions = DataManager.getFromStorage('sessionData') || [];
+            const baseTime = Date.now() - (daysAgo * 24 * 60 * 60 * 1000);
+
+            for (let i = 0; i < count; i++) {
+                const session = {
+                    sessionId: sessions.length + i + 1,
+                    mode: 'random',
+                    baseNote: 'C4',
+                    baseFrequency: 261.63,
+                    startTime: baseTime + (i * 60000), // 1分間隔
+                    endTime: baseTime + (i * 60000) + 180000,
+                    duration: 180000,
+                    completed: true,
+                    pitchErrors: generatePitchErrors()
+                };
+                sessions.push(session);
+            }
+
+            DataManager.saveToStorage('sessionData', sessions);
+            console.log(`✅ ${count}件のテストセッションを生成しました（${daysAgo}日前）`);
+
+            const resultDiv = document.getElementById('generate-result');
+            resultDiv.textContent = `${count}件のセッションを生成しました（${daysAgo}日前）\n総セッション数: ${sessions.length}件`;
+
+            updateStatus();
+        }
+
+        function generatePitchErrors() {
+            const errors = [];
+            for (let i = 0; i < 8; i++) {
+                errors.push({
+                    step: i,
+                    expectedNote: 'C4',
+                    expectedFrequency: 261.63,
+                    detectedFrequency: 261.63 + (Math.random() * 10 - 5),
+                    errorInCents: Math.random() * 50 - 25,
+                    clarity: 0.9 + Math.random() * 0.1,
+                    volume: 0.7 + Math.random() * 0.3,
+                    timestamp: Date.now()
+                });
+            }
+            return errors;
+        }
+
+        function clearAllSessions() {
+            DataManager.saveToStorage('sessionData', []);
+            console.log('🗑️ 全セッションを削除しました');
+
+            const resultDiv = document.getElementById('generate-result');
+            resultDiv.textContent = '全セッションを削除しました';
+
+            updateStatus();
+        }
+
+        // プラン切り替え
+        function switchToFree() {
+            const subscriptionData = DataManager.getSubscriptionData();
+            subscriptionData.premiumAccess.status = 'expired';
+            DataManager.saveToStorage('subscriptionData', subscriptionData);
+
+            console.log('📊 無料プランに切り替えました');
+
+            const resultDiv = document.getElementById('plan-result');
+            resultDiv.textContent = '無料プランに切り替えました\n保存期間: 7日分のみ';
+
+            updateStatus();
+        }
+
+        function switchToPremium() {
+            const subscriptionData = DataManager.getSubscriptionData();
+            subscriptionData.premiumAccess.status = 'active';
+            subscriptionData.premiumAccess.subscriptionEnd = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
+            DataManager.saveToStorage('subscriptionData', subscriptionData);
+
+            console.log('✨ プレミアムプランに切り替えました');
+
+            const resultDiv = document.getElementById('plan-result');
+            resultDiv.textContent = 'プレミアムプランに切り替えました\n保存期間: 無制限';
+
+            updateStatus();
+        }
+
+        // クリーンアップテスト
+        function testCleanup() {
+            console.log('🧪 クリーンアップテスト開始...');
+
+            const beforeCount = (DataManager.getFromStorage('sessionData') || []).length;
+            const afterCount = DataManager.cleanupSessionData();
+
+            const resultDiv = document.getElementById('cleanup-result');
+            resultDiv.textContent = `クリーンアップ実行結果:\n削除前: ${beforeCount}件\n削除後: ${afterCount}件\n削除数: ${beforeCount - afterCount}件`;
+
+            updateStatus();
+        }
+
+        function testSaveWithCleanup() {
+            console.log('🧪 保存+クリーンアップテスト開始...');
+
+            const testSession = {
+                sessionId: Date.now(),
+                mode: 'random',
+                baseNote: 'C4',
+                baseFrequency: 261.63,
+                startTime: Date.now(),
+                endTime: Date.now() + 180000,
+                duration: 180000,
+                completed: true,
+                pitchErrors: generatePitchErrors()
+            };
+
+            DataManager.saveSessionResultWithCleanup(testSession);
+
+            const sessions = DataManager.getFromStorage('sessionData') || [];
+            const resultDiv = document.getElementById('cleanup-result');
+            resultDiv.textContent = `保存+クリーンアップ実行完了\n現在のセッション数: ${sessions.length}件`;
+
+            updateStatus();
+        }
+
+        // データ保存状況
+        function showRetentionInfo() {
+            const info = DataManager.getDataRetentionInfo();
+
+            const resultDiv = document.getElementById('retention-info');
+            resultDiv.textContent = JSON.stringify(info, null, 2);
+
+            updateStatus();
+        }
+
+        // 容量警告チェック
+        function checkWarning() {
+            const warning = DataManager.checkStorageWarning();
+
+            let alertClass = 'alert-normal';
+            if (warning.level === 'warning') alertClass = 'alert-warning';
+            if (warning.level === 'critical') alertClass = 'alert-critical';
+
+            const resultDiv = document.getElementById('warning-result');
+            resultDiv.innerHTML = `
+                <div class="alert ${alertClass}">
+                    <span>${warning.message}</span>
+                </div>
+                <div class="test-result">${JSON.stringify(warning, null, 2)}</div>
+            `;
+
+            updateStatus();
+        }
+
+        // 初期表示
+        updateStatus();
+        console.log('✅ プレミアムデータ保存期間管理テストページ起動');
+    </script>
+</body>
+</html>

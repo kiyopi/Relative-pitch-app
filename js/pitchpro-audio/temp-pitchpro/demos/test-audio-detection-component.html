@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AudioDetectionComponent 単体テスト</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.1em;
+            opacity: 0.8;
+            margin-bottom: 40px;
+        }
+
+        .control-panel {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            color: white;
+        }
+        .btn-warning {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-panel {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: bold;
+            opacity: 0.8;
+        }
+
+        .status-value {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px 8px;
+            border-radius: 5px;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .ui-demo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .ui-demo {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .ui-section {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .ui-section h3 {
+            margin: 0 0 20px 0;
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        .volume-container {
+            margin: 20px 0;
+        }
+
+        .volume-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .volume-bar-container {
+            background: rgba(0, 0, 0, 0.3);
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .volume-bar {
+            background: linear-gradient(90deg, #4CAF50, #8BC34A, #FFEB3B);
+            height: 100%;
+            width: 0%;
+            transition: width 0.1s ease;
+            border-radius: 10px;
+        }
+
+        .display-value {
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .frequency-display {
+            color: #4CAF50;
+        }
+
+        .note-display {
+            color: #2196F3;
+            font-size: 3em;
+        }
+
+        .log-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .log-entry.error {
+            background: rgba(244, 67, 54, 0.3);
+        }
+
+        .log-entry.success {
+            background: rgba(76, 175, 80, 0.3);
+        }
+
+        .log-entry.info {
+            background: rgba(33, 150, 243, 0.3);
+        }
+
+        .device-info {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .device-info h4 {
+            margin: 0 0 10px 0;
+            color: #FFD700;
+        }
+
+        .config-panel {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .config-row {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            gap: 15px;
+        }
+
+        .config-row label {
+            min-width: 150px;
+            font-weight: bold;
+        }
+
+        .config-row input, .config-row select {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 AudioDetectionComponent</h1>
+        <p class="subtitle">単体テスト・デモ - PitchPro v1.1.9統合</p>
+        
+        <div style="background: #e8f4fd; padding: 15px; border-radius: 10px; margin: 20px 0; font-size: 14px;">
+            <h4 style="margin: 0 0 10px 0; color: #0056b3;">🎯 シンプル4ボタン操作</h4>
+            <p style="margin: 5px 0; color: #0056b3;">
+                <strong>🎤 initialize()</strong>: システム初期化・マイク許可<br>
+                <strong>🔄 reset()</strong>: 検出停止 + UI初期化 + ミュート<br>
+                <strong>🚀 start()</strong>: ミュート解除 + 検出開始（完全復帰）<br>
+                <strong>🗑️ destroy()</strong>: 全リソース解放・終了
+            </p>
+            <div style="margin-top: 10px; padding: 10px; background: rgba(40, 167, 69, 0.1); border-radius: 5px;">
+                <strong>推奨フロー</strong>: initialize() → start() → reset() → start() → destroy()
+            </div>
+        </div>
+
+        <!-- デバイス情報 -->
+        <div class="device-info">
+            <h4>🖥️ デバイス情報</h4>
+            <div id="device-info">検出中...</div>
+        </div>
+
+        <!-- 設定パネル -->
+        <div class="config-panel">
+            <h4>⚙️ 設定 (v1.1.9最適化値)</h4>
+            <div class="config-row">
+                <label>Clarity Threshold:</label>
+                <input type="range" id="clarity-threshold" min="0.1" max="0.9" step="0.1" value="0.4">
+                <span id="clarity-value">0.4</span>
+                <small style="margin-left: 10px; opacity: 0.7;">(v1.1.9推奨: 0.4)</small>
+            </div>
+            <div class="config-row">
+                <label>Min Volume:</label>
+                <input type="range" id="min-volume" min="0.001" max="0.020" step="0.001" value="0.015">
+                <span id="min-volume-value">0.015</span>
+                <small style="margin-left: 10px; opacity: 0.7;">(感度高: 0.005, 標準: 0.008, 雑音多: 0.012)</small>
+            </div>
+            <div class="config-row">
+                <label>UI Update Rate:</label>
+                <select id="update-rate">
+                    <option value="100">10fps (省電力)</option>
+                    <option value="50" selected>20fps (標準)</option>
+                    <option value="33">30fps (高精度)</option>
+                </select>
+            </div>
+            <div class="config-row">
+                <label>Debug Mode:</label>
+                <input type="checkbox" id="debug-mode" checked>
+            </div>
+            <div class="config-row">
+                <label>雑音対策プリセット:</label>
+                <button id="noise-preset-low" class="btn-secondary" style="padding: 5px 15px; margin: 2px;">低</button>
+                <button id="noise-preset-medium" class="btn-secondary" style="padding: 5px 15px; margin: 2px;">中</button>
+                <button id="noise-preset-high" class="btn-secondary" style="padding: 5px 15px; margin: 2px;">高</button>
+                <button id="noise-preset-default" class="btn-warning" style="padding: 5px 15px; margin: 2px;">デフォルト</button>
+            </div>
+        </div>
+
+        <!-- コントロールパネル -->
+        <div class="control-panel">
+            <button id="init-btn" class="btn-primary">🎤 initialize()</button>
+            <button id="reset-btn" class="btn-warning" disabled>🔄 reset()</button>
+            <button id="start-system-btn" class="btn-success" disabled>🚀 start() - システム復帰</button>
+            <button id="destroy-btn" class="btn-danger" disabled>🗑️ destroy()</button>
+        </div>
+
+        <!-- ステータスパネル -->
+        <div class="status-panel">
+            <h4>📊 ステータス</h4>
+            <div class="status-item">
+                <span class="status-label">状態:</span>
+                <span id="status-state" class="status-value">uninitialized</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">初期化:</span>
+                <span id="status-initialized" class="status-value">❌</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">マイク許可:</span>
+                <span id="status-permission" class="status-value">❓</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">最終エラー:</span>
+                <span id="status-error" class="status-value">なし</span>
+            </div>
+        </div>
+
+        <!-- パフォーマンスメトリクス -->
+        <div class="performance-metrics">
+            <div class="metric">
+                <div id="fps-value" class="metric-value">--</div>
+                <div class="metric-label">FPS</div>
+            </div>
+            <div class="metric">
+                <div id="update-count" class="metric-value">0</div>
+                <div class="metric-label">UI更新回数</div>
+            </div>
+            <div class="metric">
+                <div id="pitch-updates" class="metric-value">0</div>
+                <div class="metric-label">ピッチ更新</div>
+            </div>
+            <div class="metric">
+                <div id="error-count" class="metric-value">0</div>
+                <div class="metric-label">エラー回数</div>
+            </div>
+        </div>
+
+        <!-- UI デモ -->
+        <div class="ui-demo">
+            <!-- 音量表示 -->
+            <div class="ui-section">
+                <h3>🔊 音量表示</h3>
+                <div class="volume-container">
+                    <div class="volume-label">
+                        <span>音量レベル</span>
+                        <span id="volume-text">0.0%</span>
+                    </div>
+                    <div class="volume-bar-container">
+                        <div id="volume-bar" class="volume-bar"></div>
+                    </div>
+                </div>
+                <div class="display-value">
+                    <div id="raw-volume">Raw: 0.0%</div>
+                </div>
+            </div>
+
+            <!-- 周波数・音程表示 -->
+            <div class="ui-section">
+                <h3>🎵 音程表示</h3>
+                <div class="display-value frequency-display" id="frequency-display">-- Hz</div>
+                <div class="display-value note-display" id="note-display">--</div>
+                <div style="text-align: center; margin-top: 10px;">
+                    <span>Clarity: </span>
+                    <span id="clarity-display">--</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ログパネル -->
+        <div class="log-panel">
+            <h4>📝 ログ</h4>
+            <div id="log-container"></div>
+        </div>
+    </div>
+
+    <!-- PitchPro v1.1.9 UMDモジュール読み込み -->
+    <script src="dist/pitchpro.umd.js"></script>
+    <script>
+
+        // グローバル変数
+        let audioDetector = null;
+        let updateCount = 0;
+        let pitchUpdateCount = 0;
+        let errorCount = 0;
+        let lastFpsTime = Date.now();
+        let fpsCounter = 0;
+
+        // DOM要素
+        const elements = {
+            initBtn: document.getElementById('init-btn'),
+            resetBtn: document.getElementById('reset-btn'),
+            startSystemBtn: document.getElementById('start-system-btn'),
+            destroyBtn: document.getElementById('destroy-btn'),
+            
+            clarityThreshold: document.getElementById('clarity-threshold'),
+            clarityValue: document.getElementById('clarity-value'),
+            minVolume: document.getElementById('min-volume'),
+            minVolumeValue: document.getElementById('min-volume-value'),
+            updateRate: document.getElementById('update-rate'),
+            debugMode: document.getElementById('debug-mode'),
+            
+            statusState: document.getElementById('status-state'),
+            statusInitialized: document.getElementById('status-initialized'),
+            statusPermission: document.getElementById('status-permission'),
+            statusError: document.getElementById('status-error'),
+            
+            deviceInfo: document.getElementById('device-info'),
+            logContainer: document.getElementById('log-container'),
+            
+            volumeBar: document.getElementById('volume-bar'),
+            volumeText: document.getElementById('volume-text'),
+            rawVolume: document.getElementById('raw-volume'),
+            frequencyDisplay: document.getElementById('frequency-display'),
+            noteDisplay: document.getElementById('note-display'),
+            clarityDisplay: document.getElementById('clarity-display'),
+            
+            fpsValue: document.getElementById('fps-value'),
+            updateCountEl: document.getElementById('update-count'),
+            pitchUpdatesEl: document.getElementById('pitch-updates'),
+            errorCountEl: document.getElementById('error-count')
+        };
+
+        // ログ機能
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            elements.logContainer.appendChild(logEntry);
+            elements.logContainer.scrollTop = elements.logContainer.scrollHeight;
+        }
+
+        // デバイス情報表示
+        function updateDeviceInfo(specs) {
+            if (specs) {
+                elements.deviceInfo.innerHTML = `
+                    <strong>デバイス:</strong> ${specs.deviceType}<br>
+                    <strong>推奨感度:</strong> ${specs.sensitivity}x<br>
+                    <strong>User Agent:</strong> ${navigator.userAgent.substring(0, 50)}...
+                `;
+            }
+        }
+
+        // ステータス更新
+        function updateStatus() {
+            if (!audioDetector) return;
+            
+            const status = audioDetector.getStatus();
+            
+            elements.statusState.textContent = status.state;
+            elements.statusInitialized.textContent = status.isInitialized ? '✅' : '❌';
+            elements.statusError.textContent = status.lastError ? 
+                status.lastError.message.substring(0, 30) + '...' : 'なし';
+        }
+
+        // パフォーマンスメトリクス更新
+        function updateMetrics() {
+            elements.updateCountEl.textContent = updateCount;
+            elements.pitchUpdatesEl.textContent = pitchUpdateCount;
+            elements.errorCountEl.textContent = errorCount;
+            
+            // FPS計算
+            fpsCounter++;
+            const now = Date.now();
+            if (now - lastFpsTime >= 1000) {
+                elements.fpsValue.textContent = Math.round(fpsCounter * 1000 / (now - lastFpsTime));
+                fpsCounter = 0;
+                lastFpsTime = now;
+            }
+        }
+
+        // 設定変更ハンドラー
+        elements.clarityThreshold.addEventListener('input', (e) => {
+            elements.clarityValue.textContent = e.target.value;
+        });
+
+        elements.minVolume.addEventListener('input', (e) => {
+            elements.minVolumeValue.textContent = e.target.value;
+        });
+
+        // 雑音対策プリセットボタン
+        function applyNoisePreset(clarityThreshold, minVolume, label) {
+            elements.clarityThreshold.value = clarityThreshold;
+            elements.clarityValue.textContent = clarityThreshold;
+            elements.minVolume.value = minVolume;
+            elements.minVolumeValue.textContent = minVolume;
+            addLog(`🔧 雑音対策プリセット「${label}」を適用`, 'info');
+        }
+
+        document.getElementById('noise-preset-default').addEventListener('click', () => {
+            applyNoisePreset('0.4', '0.010', '標準設定（バランス重視）');
+        });
+
+        document.getElementById('noise-preset-low').addEventListener('click', () => {
+            applyNoisePreset('0.5', '0.008', '標準感度設定');
+        });
+
+        document.getElementById('noise-preset-medium').addEventListener('click', () => {
+            applyNoisePreset('0.6', '0.010', '中レベル雑音対策');
+        });
+
+        document.getElementById('noise-preset-high').addEventListener('click', () => {
+            applyNoisePreset('0.7', '0.012', '高レベル雑音対策');
+        });
+
+        // ボタンイベント
+        elements.initBtn.addEventListener('click', async () => {
+            try {
+                addLog('🎤 AudioDetectionComponent.initialize() 実行中...', 'info');
+                
+                const config = {
+                    // volumeBarSelector: '#volume-bar',     // 音量バー自動更新を無効化
+                    // volumeTextSelector: '#volume-text',   // 音量テキスト自動更新を無効化
+                    frequencySelector: '#frequency-display',
+                    noteSelector: '#note-display',
+                    clarityThreshold: parseFloat(elements.clarityThreshold.value),
+                    minVolumeAbsolute: parseFloat(elements.minVolume.value), // UI値を明示使用
+                    uiUpdateInterval: parseInt(elements.updateRate.value),
+                    debug: elements.debugMode.checked,
+                    deviceOptimization: false, // デバイス最適化を明示的に無効化
+                    volumeMultiplier: 1.0,     // 音量倍率を1.0に固定
+                    sensitivityMultiplier: 1.0, // 感度倍率も1.0に固定
+                    autoUpdateUI: true        // v1.1.9 UI自動更新
+                };
+                
+                addLog(`🔧 設定値: deviceOptimization=${config.deviceOptimization}, volumeMultiplier=${config.volumeMultiplier}, minVolumeAbsolute=${config.minVolumeAbsolute}`, 'info');
+
+                // PitchPro v1.1.9 統合インターフェース使用
+                audioDetector = new PitchPro.AudioDetectionComponent(config);
+                
+                // デバッグ: 実際に適用された設定を確認
+                setTimeout(() => {
+                    const status = audioDetector.getStatus();
+                    addLog(`📊 実際の設定確認:`, 'info');
+                    addLog(`  minVolumeAbsolute: ${status.config.minVolumeAbsolute}`, 'info');
+                    addLog(`  deviceOptimization: ${status.config.deviceOptimization}`, 'info');
+                    if (status.deviceSettings) {
+                        addLog(`  volumeMultiplier: ${status.deviceSettings.volumeMultiplier}`, 'info');
+                        addLog(`  sensitivityMultiplier: ${status.deviceSettings.sensitivityMultiplier}`, 'info');
+                    }
+                }, 1000);
+
+                // コールバック設定
+                audioDetector.setCallbacks({
+                    onPitchUpdate: (result) => {
+                        pitchUpdateCount++;
+                        updateCount++;
+                        updateMetrics();
+                        
+                        // 雑音閾値チェック
+                        const noiseThreshold = parseFloat(elements.minVolume.value); // 0.012
+                        
+                        let displayVolumePercent;
+                        
+                        if (result.volume < noiseThreshold) {
+                            // 雑音レベル以下は完全に0%固定
+                            displayVolumePercent = 0.0;
+                        } else {
+                            // ライブラリが既にスケーリング済み（SCALING_FACTOR=10）なので追加倍率は不要
+                            displayVolumePercent = Math.min(100, result.volume); // 直接使用
+                        }
+                        
+                        // 音量バー更新
+                        if (elements.volumeBar) {
+                            elements.volumeBar.style.width = displayVolumePercent + '%';
+                        }
+                        
+                        // 音量テキスト更新
+                        if (elements.volumeText) {
+                            elements.volumeText.textContent = displayVolumePercent.toFixed(1) + '%';
+                        }
+                        
+                        // Raw値も表示（ライブラリ値をそのまま表示）
+                        if (elements.rawVolume) {
+                            elements.rawVolume.textContent = `Raw: ${result.volume.toFixed(2)}%`;
+                        }
+                        
+                        // 初回の音量値をログ出力
+                        if (pitchUpdateCount <= 5) {
+                            const statusText = result.volume < noiseThreshold ? 'NOISE' : 'VALID';
+                            addLog(`🔍 Update #${pitchUpdateCount}: raw=${result.volume.toFixed(6)}, display=${displayVolumePercent.toFixed(1)}% [${statusText}]`, 'info');
+                            
+                            // さらに詳細な音量分析
+                            if (pitchUpdateCount === 1) {
+                                addLog(`🔍 音量分析: threshold=${noiseThreshold.toFixed(6)}, raw=${result.volume.toFixed(6)}`, 'info');
+                            }
+                        }
+                    },
+                    // v1.1.9ではonVolumeUpdateは廃止、onPitchUpdateで統合処理
+                    onStateChange: (state) => {
+                        addLog(`状態変更: ${state}`, 'info');
+                        updateStatus();
+                        
+                        // ボタン状態更新
+                        elements.initBtn.disabled = state !== 'uninitialized';
+                        elements.resetBtn.disabled = state === 'uninitialized';
+                        elements.startSystemBtn.disabled = state === 'uninitialized';
+                        elements.destroyBtn.disabled = state === 'uninitialized';
+                    },
+                    onError: (error) => {
+                        errorCount++;
+                        addLog(`エラー: ${error.message}`, 'error');
+                        updateStatus();
+                        updateMetrics();
+                    },
+                    onDeviceDetected: (specs) => {
+                        updateDeviceInfo(specs);
+                        addLog(`デバイス検出: ${specs.deviceType} (感度: ${specs.sensitivity}x)`, 'success');
+                    }
+                });
+
+                await audioDetector.initialize();
+                addLog('✅ initialize() 完了!', 'success');
+                
+                elements.statusPermission.textContent = '✅';
+                updateStatus();
+
+            } catch (error) {
+                addLog(`❌ initialize() エラー: ${error.message}`, 'error');
+                elements.statusPermission.textContent = '❌';
+                errorCount++;
+                updateMetrics();
+            }
+        });
+
+        elements.resetBtn.addEventListener('click', () => {
+            try {
+                if (audioDetector) {
+                    // v1.1.9+ MicrophoneController統合リセット機能テスト
+                    addLog('🔄 MicrophoneController.reset() 統合リセット実行中...', 'info');
+                    
+                    // 新しいmicrophoneControllerゲッターでMicrophoneControllerにアクセス
+                    const micController = audioDetector.microphoneController;
+                    
+                    if (micController && micController.reset) {
+                        // ⭐ 統合reset()メソッドが利用可能 - これが新機能!
+                        micController.reset();
+                        addLog('✅ MicrophoneController統合リセット完了', 'success');
+                        addLog('  → PitchDetector停止・リセット', 'success');
+                        addLog('  → UI表示クリア', 'success');
+                        addLog('  → マイクミュート', 'success');
+                        addLog('  → リカバリー試行リセット', 'success');
+                        addLog('🎉 統合管理機能が正常に動作しています!', 'success');
+                        
+                        // 🔧 UIボタン状態を実際のミュート状態と同期
+                        setTimeout(() => {
+                            const actualMuteState = micController.isMuted();
+                            addLog(`🔍 [SYNC] リセット後の実際ミュート状態: ${actualMuteState ? 'ミュート中' : 'アクティブ'}`, 'info');
+                            addLog('✅ リセット状態確認完了', 'info');
+                        }, 100); // リセット操作の完了を待つ
+                    } else {
+                        // フォールバック: 従来の個別リセット
+                        addLog('⚠️ 統合リセット未対応 - 個別リセット実行', 'info');
+                        
+                        // 手動でUIをリセット
+                        if (audioDetector.updateUI) {
+                            audioDetector.updateUI({
+                                frequency: 0,
+                                note: '',
+                                octave: 0,
+                                volume: 0,
+                                clarity: 0
+                            });
+                            addLog('✅ 手動UIリセット完了', 'success');
+                        }
+                        
+                        // リカバリー試行リセット（既存機能）
+                        if (audioDetector.resetRecoveryAttempts) {
+                            audioDetector.resetRecoveryAttempts();
+                            addLog('✅ リカバリー試行回数リセット', 'success');
+                        }
+                        
+                        // マイクミュート
+                        if (audioDetector.audioManager && !audioDetector.audioManager.getIsMuted()) {
+                            audioDetector.audioManager.mute();
+                            addLog('🔇 AudioManager.mute() 実行', 'info');
+                        }
+                    }
+                } else {
+                    addLog('AudioDetectionComponentが初期化されていません', 'error');
+                }
+            } catch (error) {
+                addLog(`リセットエラー: ${error.message}`, 'error');
+            }
+        });
+
+        // start()システム復帰ボタン
+        elements.startSystemBtn.addEventListener('click', () => {
+            try {
+                if (audioDetector && audioDetector.microphoneController) {
+                    addLog('🚀 MicrophoneController.start() システム復帰実行中...', 'info');
+                    
+                    const micController = audioDetector.microphoneController;
+                    const success = micController.start();
+                    
+                    if (success) {
+                        addLog('✅ start() 成功 - ミュート解除・検出再開完了', 'success');
+                    } else {
+                        addLog('❌ start() 失敗 - PitchDetectorが登録されていない可能性があります', 'error');
+                    }
+                } else {
+                    addLog('❌ MicrophoneControllerが利用できません', 'error');
+                }
+            } catch (error) {
+                addLog(`❌ start() エラー: ${error.message}`, 'error');
+            }
+        });
+
+        elements.destroyBtn.addEventListener('click', () => {
+            try {
+                if (audioDetector) {
+                    audioDetector.destroy();
+                    audioDetector = null;
+                    addLog('🗑️ destroy() 完了', 'info');
+                    
+                    // UI リセット
+                    elements.statusState.textContent = 'uninitialized';
+                    elements.statusInitialized.textContent = '❌';
+                    elements.statusPermission.textContent = '❓';
+                    elements.statusError.textContent = 'なし';
+                    
+                    elements.volumeBar.style.width = '0%';
+                    elements.volumeText.textContent = '0.0%';
+                    elements.rawVolume.textContent = 'Raw: 0.0%';
+                    elements.frequencyDisplay.textContent = '-- Hz';
+                    elements.noteDisplay.textContent = '--';
+                    elements.clarityDisplay.textContent = '--';
+                    
+                    // ボタンリセット
+                    elements.initBtn.disabled = false;
+                    elements.resetBtn.disabled = true;
+                    elements.startSystemBtn.disabled = true;
+                    elements.destroyBtn.disabled = true;
+                }
+            } catch (error) {
+                addLog(`❌ destroy() エラー: ${error.message}`, 'error');
+            }
+        });
+
+        // 初期化時のログ
+        addLog('AudioDetectionComponent v1.1.9 テストページ準備完了', 'success');
+        addLog('🆕 v1.1.9新機能: クロスモードUI干渉防止, 自動noteSelector管理', 'info');
+        addLog('🎯 NEW: MicrophoneController統合管理機能テスト対応', 'info');
+        addLog('🔄 NEW: シンプル4ボタン操作 - initialize()→start()→reset()→destroy()', 'info');
+        addLog('🔧 雑音対策: デフォルト設定で開始、雑音が多い場合はプリセットボタンを使用', 'info');
+        addLog('「🎤 initialize()」ボタンをクリックしてマイクアクセスを許可してください', 'info');
+
+        // パフォーマンス監視
+        setInterval(updateMetrics, 1000);
+    </script>
+</body>
+</html>

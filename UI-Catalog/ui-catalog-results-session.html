@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 UIカタログ セッション評価</title>
+    
+    <!-- favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
+    
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="../PitchPro-SPA/styles/base.css">
+    <link rel="stylesheet" href="../PitchPro-SPA/styles/results.css">
+    <link rel="stylesheet" href="ui-catalog.css">
+    
+    <!-- フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- アイコンライブラリ -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <div class="ui-catalog min-h-screen p-6">
+        <div class="container max-w-7xl mx-auto">
+            <!-- ヘッダー -->
+            <header class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-white mb-4">UIカタログ セッション評価</h1>
+                <p class="text-purple-200 text-xl">ランダムモード単体セッション結果表示</p>
+            </header>
+
+            <!-- カタログナビゲーション：JavaScript自動生成 -->
+            <nav id="catalog-nav">
+                <div id="catalog-nav-links">
+                    <!-- JavaScriptで自動生成されます -->
+                </div>
+            </nav>
+
+            <!-- メインコンテンツエリア -->
+            <main id="catalog-content">
+                
+                <!-- ヘルプアイコンボタン -->
+                <section id="help-icon-button" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">❓ ヘルプアイコンボタン</h2>
+                    <p class="text-white-70 mb-6">精度評価バッジに配置される説明ボタン（30px × 30px）</p>
+                    <p class="text-orange-200 mb-6"><strong>⚠️ 注意:</strong> アイコンサイズは.accuracy-icon（64px）の影響により、インライン指定が必須です</p>
+                    
+                    <div class="component-grid grid-cols-1 md:grid-cols-2">
+                        <!-- 基本ヘルプボタン -->
+                        <div class="component-item text-center">
+                            <div class="mb-4">
+                                <div class="accuracy-badge accuracy-badge-excellent relative" style="margin: 0 auto;">
+                                    <i data-lucide="trophy" class="text-yellow-300 accuracy-icon"></i>
+                                    <button class="help-icon-btn text-white">
+                                        <i data-lucide="help-circle" style="width: 20px !important; height: 20px !important; min-width: 20px !important; min-height: 20px !important; max-width: 20px !important; max-height: 20px !important; font-size: 20px !important;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <h3 class="text-white font-medium">基本ヘルプボタン</h3>
+                            <p class="text-caption">30px円形ボタン</p>
+                            <p class="text-caption">20pxアイコン</p>
+                        </div>
+                        
+                        <!-- 単体ヘルプボタン -->
+                        <div class="component-item text-center">
+                            <div class="mb-4">
+                                <div style="position: relative; width: 100px; height: 100px; margin: 0 auto;">
+                                    <button class="help-icon-btn text-white">
+                                        <i data-lucide="help-circle" style="width: 20px !important; height: 20px !important; min-width: 20px !important; min-height: 20px !important; max-width: 20px !important; max-height: 20px !important; font-size: 20px !important;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <h3 class="text-white font-medium">単体ヘルプボタン</h3>
+                            <p class="text-caption">グラス効果</p>
+                            <p class="text-caption">ホバー拡大</p>
+                        </div>
+                    </div>
+                    
+                    <div class="code-sample">
+&lt;!-- ヘルプアイコンボタン使用例 --&gt;
+&lt;!-- 注意: .accuracy-icon（64px）上書きのためインライン必須 --&gt;
+&lt;div class="accuracy-badge accuracy-badge-excellent relative"&gt;
+    &lt;i data-lucide="trophy" class="text-yellow-300 accuracy-icon"&gt;&lt;/i&gt;
+    &lt;button class="help-icon-btn text-white"&gt;
+        &lt;i data-lucide="help-circle" style="width: 20px !important; height: 20px !important; min-width: 20px !important; min-height: 20px !important; max-width: 20px !important; max-height: 20px !important; font-size: 20px !important;"&gt;&lt;/i&gt;
+    &lt;/button&gt;
+&lt;/div&gt;</div>
+                    <div class="catalog-back-to-top">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+                <!-- 音感精度評価アイコンバッジ -->
+                <section id="accuracy-evaluation-icons" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">🎯 音感精度評価アイコンバッジ</h2>
+                    <p class="text-white-70 mb-6">セッション結果ページで使用する円形バッジスタイル（100px × 100px）</p>
+                    
+                    <div class="component-grid grid-cols-2 md:grid-cols-4">
+                        <!-- Excellent バッジ -->
+                        <div class="component-item text-center">
+                            <div class="mb-4">
+                                <div class="accuracy-badge accuracy-badge-excellent">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="trophy" class="lucide lucide-trophy text-yellow-300 accuracy-icon"><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978"></path><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978"></path><path d="M18 9h1.5a1 1 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"></path><path d="M6 9H4.5a1 1 0 0 1 0-5H6"></path></svg>
+                                </div>
+                            </div>
+                            <h3 class="text-yellow-300 font-bold">Excellent</h3>
+                            <p class="text-caption">±15セント以内</p>
+                            <p class="text-caption">黄色バッジ</p>
+                        </div>
+                        
+                        <!-- Good バッジ -->
+                        <div class="component-item text-center">
+                            <div class="mb-4">
+                                <div class="accuracy-badge accuracy-badge-good">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" class="lucide lucide-star text-green-300 accuracy-icon"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>
+                                </div>
+                            </div>
+                            <h3 class="text-green-300 font-bold">Good</h3>
+                            <p class="text-caption">15～25セント</p>
+                            <p class="text-caption">緑色バッジ</p>
+                        </div>
+                        
+                        <!-- Pass バッジ -->
+                        <div class="component-item text-center">
+                            <div class="mb-4">
+                                <div class="accuracy-badge accuracy-badge-pass">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="thumbs-up" class="lucide lucide-thumbs-up text-blue-300 accuracy-icon accuracy-icon-thumbsup"><path d="M7 10v12"></path><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"></path></svg>
+                                </div>
+                            </div>
+                            <h3 class="text-blue-300 font-bold">Pass</h3>
+                            <p class="text-caption">25～40セント</p>
+                            <p class="text-caption">青色バッジ</p>
+                        </div>
+                        
+                        <!-- Practice バッジ -->
+                        <div class="component-item text-center">
+                            <div class="mb-4">
+                                <div class="accuracy-badge accuracy-badge-practice">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-triangle" class="lucide lucide-alert-triangle text-red-300 accuracy-icon accuracy-icon-triangle"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+                                </div>
+                            </div>
+                            <h3 class="text-red-300 font-bold">Practice</h3>
+                            <p class="text-caption">40セント以上</p>
+                            <p class="text-caption">赤色バッジ</p>
+                        </div>
+                    </div>
+                    
+                    <div class="code-sample">
+&lt;!-- 音感精度評価アイコンバッジ使用例 --&gt;
+&lt;div class="accuracy-badge accuracy-badge-excellent"&gt;
+    &lt;i data-lucide="trophy" class="text-yellow-300 accuracy-icon"&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+&lt;div class="accuracy-badge accuracy-badge-good"&gt;
+    &lt;i data-lucide="star" class="text-green-300 accuracy-icon"&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+&lt;div class="accuracy-badge accuracy-badge-pass"&gt;
+    &lt;i data-lucide="thumbs-up" class="text-blue-300 accuracy-icon accuracy-icon-thumbsup"&gt;&lt;/i&gt;
+&lt;/div&gt;
+
+&lt;div class="accuracy-badge accuracy-badge-practice"&gt;
+    &lt;i data-lucide="alert-triangle" class="text-red-300 accuracy-icon accuracy-icon-triangle"&gt;&lt;/i&gt;
+&lt;/div&gt;</div>
+                    <div class="catalog-back-to-top">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+                <!-- セッション概要表示 -->
+                <section id="session-overview" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">📊 セッション概要表示</h2>
+                    <p class="text-white-70 mb-6">単体セッション完了時の評価レイアウト</p>
+                    
+                    <h3 class="text-white font-medium mb-4">3列グリッドレイアウト（PC）</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            
+                            <!-- セッション概要 -->
+                            <div class="glass-card mb-4">
+                                <div class="score-section">
+                                    <div class="score-grid">
+                                        <!-- 基音表示（左） -->
+                                        <div class="base-note-section">
+                                            <div class="score-base-note text-white">C4</div>
+                                            <p class="text-body-green">基音</p>
+                                        </div>
+                                        
+                                        <!-- トロフィーアイコン（中央） -->
+                                        <div class="trophy-section flex flex-col items-center text-center justify-end">
+                                            <div class="accuracy-badge accuracy-badge-excellent relative">
+                                                <i data-lucide="trophy" class="text-yellow-300 accuracy-icon"></i>
+                                                <!-- ヘルプボタン -->
+                                                <button class="help-icon-btn text-white">
+                                                    <i data-lucide="help-circle" style="width: 20px !important; height: 20px !important; min-width: 20px !important; min-height: 20px !important; max-width: 20px !important; max-height: 20px !important; font-size: 20px !important;"></i>
+                                                </button>
+                                            </div>
+                                            <p class="text-sub-title mt-4">素晴らしい精度！</p>
+                                        </div>
+                                        
+                                        
+                                        <!-- 平均誤差（右） -->
+                                        <div class="error-section">
+                                            <div class="score-average text-white">±12.1¢</div>
+                                            <p class="text-body-green">セッション平均誤差</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;!-- セッション概要 3列レイアウト --&gt;
+&lt;div class="glass-card score-section"&gt;
+    &lt;div class="score-grid-pc"&gt;
+        &lt;div class="base-note-section"&gt;
+            &lt;div class="score-base-note text-white"&gt;C4&lt;/div&gt;
+            &lt;p class="text-body-green"&gt;基音&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class="trophy-section"&gt;
+            &lt;div class="accuracy-badge accuracy-badge-excellent relative"&gt;
+                &lt;i data-lucide="trophy" class="text-yellow-300 accuracy-icon"&gt;&lt;/i&gt;
+                &lt;!-- ヘルプアイコンボタン --&gt;
+                &lt;button class="help-icon-btn text-white"&gt;
+                    &lt;i data-lucide="help-circle" style="width: 20px !important; height: 20px !important;"&gt;&lt;/i&gt;
+                &lt;/button&gt;
+            &lt;/div&gt;
+            &lt;p class="text-sub-title mt-4"&gt;素晴らしい精度！&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class="error-section"&gt;
+            &lt;div class="score-average text-white"&gt;±12.1¢&lt;/div&gt;
+            &lt;p class="text-body-green"&gt;セッション平均誤差&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </div>
+                    <div class="catalog-back-to-top">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+                <!-- 評価分布バー -->
+                <section id="evaluation-bars" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">📊 評価分布バー</h2>
+                    <p class="text-white-70 mb-6">8音の精度評価内訳表示</p>
+                    
+                    <h3 class="text-white font-medium mb-4">4段階評価バー</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            
+                            <div class="glass-card">
+                                <h4 class="heading-md">
+                                    <i data-lucide="bar-chart-3" class="text-blue-300"></i>
+                                    <span>評価分布</span>
+                                </h4>
+                                
+                                <!-- 評価分布バー -->
+                                <div class="flex flex-col gap-3 px-4">
+                                    <!-- Excellent -->
+                                    <div class="flex items-center gap-3">
+                                        <i data-lucide="trophy" class="text-yellow-300 icon-md shrink-0"></i>
+                                        <div class="flex-1 flex items-center gap-2">
+                                            <div class="progress-bar flex">
+                                                <div class="progress-fill-custom color-eval-gold" style="width: 37.5%;"></div>
+                                            </div>
+                                            <span class="text-sm text-white-60 count-text">3</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Good -->
+                                    <div class="flex items-center gap-3">
+                                        <i data-lucide="star" class="text-green-300 icon-md shrink-0"></i>
+                                        <div class="flex-1 flex items-center gap-2">
+                                            <div class="progress-bar flex">
+                                                <div class="progress-fill-custom color-eval-good" style="width: 25%;"></div>
+                                            </div>
+                                            <span class="text-sm text-white-60 count-text">2</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Pass -->
+                                    <div class="flex items-center gap-3">
+                                        <i data-lucide="thumbs-up" class="text-blue-300 icon-md shrink-0"></i>
+                                        <div class="flex-1 flex items-center gap-2">
+                                            <div class="progress-bar flex">
+                                                <div class="progress-fill-custom color-eval-pass" style="width: 37.5%;"></div>
+                                            </div>
+                                            <span class="text-sm text-white-60 count-text">3</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Practice -->
+                                    <div class="flex items-center gap-3">
+                                        <i data-lucide="alert-triangle" class="text-red-300 icon-md shrink-0"></i>
+                                        <div class="flex-1 flex items-center gap-2">
+                                            <div class="progress-bar flex">
+                                                <div class="progress-fill-custom color-eval-practice" style="width: 0%;"></div>
+                                            </div>
+                                            <span class="text-sm text-white-60 count-text">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;!-- 評価分布セクション（見出し + バー） --&gt;
+&lt;div class="glass-card"&gt;
+    &lt;!-- 見出し --&gt;
+    &lt;h4 class="heading-md"&gt;
+        &lt;i data-lucide="bar-chart-3" class="text-blue-300"&gt;&lt;/i&gt;
+        &lt;span&gt;評価分布&lt;/span&gt;
+    &lt;/h4&gt;
+    
+    &lt;!-- Excellent --&gt;
+    &lt;div class="flex items-center gap-3"&gt;
+        &lt;i data-lucide="trophy" class="text-yellow-300 shrink-0" style="width: 20px; height: 20px;"&gt;&lt;/i&gt;
+        &lt;div class="progress-bar flex"&gt;
+            &lt;div class="progress-fill-custom color-eval-gold" style="width: 37.5%;"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;span class="text-sm text-white-60 count-text-right"&gt;3&lt;/span&gt;
+    &lt;/div&gt;
+    
+    &lt;!-- Good --&gt;
+    &lt;div class="flex items-center gap-3"&gt;
+        &lt;i data-lucide="star" class="text-green-300 shrink-0" style="width: 20px; height: 20px;"&gt;&lt;/i&gt;
+        &lt;div class="progress-bar flex"&gt;
+            &lt;div class="progress-fill-custom color-eval-good" style="width: 25%;"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;span class="text-sm text-white-60 count-text-right"&gt;2&lt;/span&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </div>
+                    <div class="catalog-back-to-top">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+                <!-- 詳細分析 -->
+                <section id="detailed-analysis" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">🔍 詳細分析</h2>
+                    <p class="text-white-70 mb-6">音別精度分析表示</p>
+                    
+                    <h3 class="text-white font-medium mb-4">音別結果アイテム</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            
+                            <div class="space-y-2">
+                                <!-- Excellent例 -->
+                                <div class="note-result-item">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-4">
+                                            <div>
+                                                <div class="text-sub-title">ファ</div>
+                                            </div>
+                                            <div>
+                                                <div class="text-body">目標 349Hz</div>
+                                                <div class="text-body">実音 348Hz</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <div class="text-pitch-deviation-minus">-6¢</div>
+                                            <div class="flex items-center justify-center ">
+                                                <i data-lucide="trophy" class="text-yellow-300" style="width: 28px; height: 28px;"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Good例 -->
+                                <div class="note-result-item">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-4">
+                                            <div>
+                                                <div class="text-sub-title">ラ</div>
+                                            </div>
+                                            <div>
+                                                <div class="text-body">目標 440Hz</div>
+                                                <div class="text-body">実音 445Hz</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <div class="text-pitch-deviation-plus">+20¢</div>
+                                            <div class="flex items-center justify-center ">
+                                                <i data-lucide="star" class="text-green-300" style="width: 28px; height: 28px;"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Pass例 -->
+                                <div class="note-result-item">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-4">
+                                            <div>
+                                                <div class="text-sub-title">ミ</div>
+                                            </div>
+                                            <div>
+                                                <div class="text-body">目標 330Hz</div>
+                                                <div class="text-body">実音 336Hz</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <div class="text-pitch-deviation-plus">+32¢</div>
+                                            <div class="flex items-center justify-center ">
+                                                <i data-lucide="thumbs-up" class="text-blue-300" style="width: 28px; height: 28px; transform: translateY(-2px) translateX(2px);"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;!-- 音別結果アイテム --&gt;
+&lt;div class="note-result-item"&gt;
+    &lt;div class="flex items-center justify-between"&gt;
+        &lt;div class="flex items-center gap-4"&gt;
+            &lt;div class="text-sub-title"&gt;ファ&lt;/div&gt;
+            &lt;div&gt;
+                &lt;div class="text-body"&gt;目標 349Hz&lt;/div&gt;
+                &lt;div class="text-body"&gt;実音 348Hz&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="flex items-center gap-3"&gt;
+            &lt;!-- マイナス偏差: 赤色 --&gt;
+            &lt;div class="text-pitch-deviation-minus"&gt;-6¢&lt;/div&gt;
+            &lt;!-- プラス偏差: 青色 --&gt;
+            &lt;!-- &lt;div class="text-pitch-deviation-plus"&gt;+20¢&lt;/div&gt; --&gt;
+            &lt;div class="flex items-center justify-center" style="width: 48px; height: 48px;"&gt;
+                &lt;i data-lucide="trophy" class="text-yellow-300" style="width: 28px; height: 28px;"&gt;&lt;/i&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </div>
+                    <div class="catalog-back-to-top">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+                <!-- ランク説明ポップオーバー -->
+                <section id="rank-popover" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">❓ ランク説明ポップオーバー</h2>
+                    <p class="text-white-70 mb-6">精度評価基準の説明表示</p>
+                    
+                    <h3 class="text-white font-medium mb-4">4段階評価説明</h3>
+                    
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            
+                            <!-- ポップオーバー（常時表示版） -->
+                            <div class="rank-popover-demo">
+                                <h4 class="popover-title">精度ランク</h4>
+                                
+                                <div class="rank-item">
+                                    <i data-lucide="trophy" class="text-yellow-300 icon-md shrink-0"></i>
+                                    <div>
+                                        <div class="rank-name rank-name-excellent">Excellent</div>
+                                        <div class="rank-range">±15セント以内</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="rank-item">
+                                    <i data-lucide="star" class="text-green-300 icon-md shrink-0"></i>
+                                    <div>
+                                        <div class="rank-name rank-name-good">Good</div>
+                                        <div class="rank-range">15～25セント</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="rank-item">
+                                    <i data-lucide="thumbs-up" class="text-blue-300 icon-md shrink-0"></i>
+                                    <div>
+                                        <div class="rank-name rank-name-pass">Pass</div>
+                                        <div class="rank-range">25～40セント</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="rank-item">
+                                    <i data-lucide="alert-triangle" class="text-red-300 icon-md shrink-0"></i>
+                                    <div>
+                                        <div class="rank-name rank-name-practice">Practice</div>
+                                        <div class="rank-range">40セント以上</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="code-sample">
+&lt;!-- ランク説明ポップオーバー --&gt;
+&lt;div class="rank-popover show"&gt;
+    &lt;h4 class="popover-title"&gt;精度ランク&lt;/h4&gt;
+    &lt;div class="rank-item"&gt;
+        &lt;i data-lucide="trophy" class="text-yellow-300"&gt;&lt;/i&gt;
+        &lt;div&gt;
+            &lt;div class="rank-name excellent"&gt;Excellent&lt;/div&gt;
+            &lt;div class="rank-range"&gt;±15セント以内&lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;!-- 他のランク... --&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </div>
+                    <div class="catalog-back-to-top">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+            </main>
+
+            <!-- フッター -->
+            <footer class="catalog-section">
+                <div class="text-center">
+                    <p class="text-white-60 text-sm">© 2024 8va相対音感トレーニングアプリ v2</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+
+    <!-- JavaScript -->
+    <script src="ui-catalog.js"></script>
+</body>
+</html>

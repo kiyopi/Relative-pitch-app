@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PitchPro v1.1.1 - ワンクリック音程検出デモ</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            text-align: center;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .version {
+            background: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            display: inline-block;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .download-section {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px dashed rgba(255,255,255,0.3);
+        }
+        .download-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .download-link {
+            background: #2196F3;
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-radius: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .download-link:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        .start-demo {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 1.2em;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 20px 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .start-demo:hover {
+            background: #45a049;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+        .demo-area {
+            display: none;
+            margin-top: 30px;
+            padding: 30px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+        }
+        .pitch-display {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .frequency {
+            font-size: 1.5em;
+            margin: 10px 0;
+            opacity: 0.9;
+        }
+        .volume-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .volume-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #FFC107, #f44336);
+            width: 0%;
+            transition: width 0.1s ease;
+            border-radius: 15px;
+        }
+        .status {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .features {
+            text-align: left;
+            margin: 30px 0;
+        }
+        .features h3 {
+            color: #FFC107;
+            margin-bottom: 15px;
+        }
+        .features ul {
+            list-style: none;
+            padding: 0;
+        }
+        .features li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .features li:before {
+            content: "✅ ";
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 PitchPro</h1>
+        <div class="version">v1.1.1 - Issue #1修正版</div>
+        
+        <div class="download-section">
+            <h3>📥 すぐにダウンロード</h3>
+            <p>ワンクリックで最新版をダウンロード</p>
+            
+            <div class="download-links">
+                <a href="https://github.com/kiyopi/pitchpro-audio-processing/releases/download/v1.1.1/pitchpro.umd.js" 
+                   class="download-link" download="pitchpro-v1.1.1.umd.js">
+                    📦 UMD版ダウンロード<br>
+                    <small>ブラウザ直接利用</small>
+                </a>
+                
+                <a href="https://github.com/kiyopi/pitchpro-audio-processing/releases/latest" 
+                   class="download-link" target="_blank">
+                    🔗 GitHub Releases<br>
+                    <small>全ファイル・変更履歴</small>
+                </a>
+                
+                <a href="https://www.npmjs.com/package/@pitchpro/audio-processing" 
+                   class="download-link" target="_blank">
+                    📦 NPMページ<br>
+                   <small>npm install用</small>
+                </a>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px;">
+                <strong>CDN利用（即座に開始）:</strong><br>
+                <code style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 5px; display: block; margin: 10px 0; font-size: 0.9em;">
+                    &lt;script src="https://cdn.jsdelivr.net/npm/@pitchpro/audio-processing@1.1.1/dist/pitchpro.umd.js"&gt;&lt;/script&gt;
+                </code>
+            </div>
+        </div>
+
+        <div class="features">
+            <h3>🚀 v1.1.1 新機能</h3>
+            <ul>
+                <li>Issue #1修正: MicrophoneController統合エラー解決</li>
+                <li>消音検出タイマー: バッテリー節約機能</li>
+                <li>Safari macOS対応: TypeError完全修正</li>
+                <li>統合テスト復旧: 安定性向上</li>
+                <li>5セント精度音程検出（McLeod Pitch Method）</li>
+                <li>クロスプラットフォーム対応（iOS/Android/PC）</li>
+            </ul>
+        </div>
+
+        <button class="start-demo" onclick="startDemo()">
+            🎤 音程検出デモを開始
+        </button>
+
+        <div id="demoArea" class="demo-area">
+            <div id="status" class="status">🔄 マイク初期化中...</div>
+            <div class="pitch-display" id="noteDisplay">--</div>
+            <div class="frequency" id="freqDisplay">-- Hz</div>
+            
+            <div class="volume-bar">
+                <div class="volume-fill" id="volumeFill"></div>
+            </div>
+            <div id="volumeDisplay">音量: 0%</div>
+            
+            <button class="start-demo" onclick="stopDemo()" style="background: #f44336;">
+                ⏹️ 停止
+            </button>
+        </div>
+    </div>
+
+    <!-- PitchPro Library CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@pitchpro/audio-processing@latest/dist/pitchpro.umd.js"></script>
+    <script>
+        let micController = null;
+        let pitchDetector = null;
+
+        async function startDemo() {
+            const demoArea = document.getElementById('demoArea');
+            const statusDiv = document.getElementById('status');
+            
+            demoArea.style.display = 'block';
+            
+            try {
+                statusDiv.textContent = '🔄 マイク許可を求めています...';
+                
+                // MicrophoneController + PitchDetector 統合（Issue #1修正版）
+                micController = new PitchPro.MicrophoneController();
+                await micController.initialize();
+                
+                statusDiv.textContent = '🎵 音程検出器を初期化中...';
+                
+                pitchDetector = new PitchPro.PitchDetector(micController.audioManager);
+                await pitchDetector.initialize();
+                
+                // 消音検出機能も有効化
+                pitchDetector.setSilenceDetectionConfig({
+                    enabled: true,
+                    warningThreshold: 10000,
+                    onSilenceWarning: (duration) => {
+                        statusDiv.textContent = `🔇 ${Math.round(duration/1000)}秒間無音です`;
+                    }
+                });
+                
+                pitchDetector.setCallbacks({
+                    onPitchUpdate: (result) => {
+                        const noteDisplay = document.getElementById('noteDisplay');
+                        const freqDisplay = document.getElementById('freqDisplay');
+                        const volumeFill = document.getElementById('volumeFill');
+                        const volumeDisplay = document.getElementById('volumeDisplay');
+                        
+                        if (result.frequency > 0) {
+                            noteDisplay.textContent = `${result.note}${result.octave || ''}`;
+                            freqDisplay.textContent = `${result.frequency.toFixed(1)} Hz`;
+                            statusDiv.textContent = '✅ 音程検出中 - v1.1.1で正常動作';
+                        } else {
+                            noteDisplay.textContent = '--';
+                            freqDisplay.textContent = '-- Hz';
+                        }
+                        
+                        const volume = Math.min(100, Math.max(0, result.volume));
+                        volumeFill.style.width = `${volume}%`;
+                        volumeDisplay.textContent = `音量: ${volume.toFixed(1)}%`;
+                    }
+                });
+                
+                pitchDetector.startDetection();
+                statusDiv.textContent = '🎤 音程検出実行中 - マイクに向かって歌ってください';
+                
+            } catch (error) {
+                console.error('Demo Error:', error);
+                statusDiv.textContent = `❌ エラー: ${error.message}`;
+            }
+        }
+
+        function stopDemo() {
+            if (pitchDetector) {
+                pitchDetector.stopDetection();
+            }
+            if (micController) {
+                micController.forceStop();
+            }
+            
+            document.getElementById('demoArea').style.display = 'none';
+            document.getElementById('noteDisplay').textContent = '--';
+            document.getElementById('freqDisplay').textContent = '-- Hz';
+            document.getElementById('volumeFill').style.width = '0%';
+            document.getElementById('volumeDisplay').textContent = '音量: 0%';
+        }
+    </script>
+</body>
+</html>

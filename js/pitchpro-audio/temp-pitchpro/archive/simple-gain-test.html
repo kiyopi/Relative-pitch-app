@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Gain Test</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 5px; font-size: 16px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .info { background: #e3f2fd; }
+        .success { background: #e8f5e8; }
+        .error { background: #ffebee; }
+    </style>
+</head>
+<body>
+    <h1>🎚️ Simple Gain Test</h1>
+    
+    <button id="initBtn">Initialize Microphone</button>
+    <button id="testGainBtn" disabled>Test Gain Control</button>
+    
+    <div id="status" class="status info">Ready</div>
+    <div id="log"></div>
+
+    <script type="module">
+        let micController = null;
+        
+        const initBtn = document.getElementById('initBtn');
+        const testGainBtn = document.getElementById('testGainBtn');
+        const status = document.getElementById('status');
+        const log = document.getElementById('log');
+
+        function addLog(message) {
+            const div = document.createElement('div');
+            div.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            log.appendChild(div);
+        }
+
+        // Test with ESM build 
+        async function testWithESM() {
+            try {
+                addLog('Testing with ESM module...');
+                
+                // Try dynamic import
+                const { MicrophoneController } = await import('./dist/index.esm.js');
+                
+                addLog('ESM module loaded successfully');
+                setupController(MicrophoneController);
+                
+            } catch (error) {
+                addLog(`ESM import error: ${error.message}`);
+                console.error('Import error details:', error);
+                
+                // Try alternative script approach
+                addLog('Trying alternative script approach...');
+                testWithScript();
+            }
+        }
+
+        async function testWithScript() {
+            try {
+                addLog('Loading module as script...');
+                
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.innerHTML = `
+                    import { MicrophoneController } from './dist/index.esm.js';
+                    window.PitchProTest = { MicrophoneController };
+                    window.dispatchEvent(new CustomEvent('pitchpro-loaded'));
+                `;
+                
+                window.addEventListener('pitchpro-loaded', () => {
+                    addLog('Module loaded via script');
+                    if (window.PitchProTest && window.PitchProTest.MicrophoneController) {
+                        setupController(window.PitchProTest.MicrophoneController);
+                    } else {
+                        addLog('MicrophoneController not found in script approach');
+                    }
+                });
+                
+                document.head.appendChild(script);
+                
+            } catch (error) {
+                addLog(`Script approach error: ${error.message}`);
+                status.textContent = `All loading methods failed`;
+                status.className = 'status error';
+            }
+        }
+
+        function setupController(MicrophoneController) {
+            initBtn.onclick = async () => {
+                try {
+                    addLog('Initializing MicrophoneController...');
+                    micController = new MicrophoneController();
+                    
+                    await micController.initialize();
+                    
+                    addLog('Initialization successful');
+                    status.textContent = 'Microphone initialized';
+                    status.className = 'status success';
+                    
+                    initBtn.disabled = true;
+                    testGainBtn.disabled = false;
+                    
+                } catch (error) {
+                    addLog(`Initialization error: ${error.message}`);
+                    status.textContent = `Error: ${error.message}`;
+                    status.className = 'status error';
+                }
+            };
+
+            testGainBtn.onclick = () => {
+                if (micController) {
+                    try {
+                        const originalGain = micController.getGain();
+                        addLog(`Original gain: ${originalGain}x`);
+                        
+                        // Test different gain levels
+                        const testGains = [2.0, 5.0, 10.0, 1.0];
+                        let index = 0;
+                        
+                        const testNext = () => {
+                            if (index < testGains.length) {
+                                const gain = testGains[index];
+                                const originalGain = micController.getGain();
+                                addLog(`Setting gain from ${originalGain.toFixed(1)}x to ${gain}x...`);
+                                
+                                micController.setGain(gain);
+                                
+                                // Wait a moment for the gain to be applied, then check
+                                setTimeout(() => {
+                                    const actualGain = micController.getGain();
+                                    addLog(`✅ Gain applied: ${actualGain.toFixed(2)}x (target: ${gain}x)`);
+                                    
+                                    if (Math.abs(actualGain - gain) > 0.1) {
+                                        addLog(`⚠️ Gain mismatch detected! Expected: ${gain}x, Got: ${actualGain.toFixed(2)}x`);
+                                    }
+                                    
+                                    index++;
+                                    setTimeout(testNext, 1500);
+                                }, 100);
+                            } else {
+                                addLog('🎉 Gain test completed');
+                            }
+                        };
+                        
+                        testNext();
+                        
+                    } catch (error) {
+                        addLog(`Gain test error: ${error.message}`);
+                    }
+                }
+            };
+        }
+
+        // Start test
+        addLog('Starting gain control test...');
+        testWithESM();
+    </script>
+</body>
+</html>

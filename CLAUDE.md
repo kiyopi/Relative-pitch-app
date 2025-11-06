@@ -17,21 +17,35 @@
 - ✅ **完了**: デバイス検出システム完全修正（iPadOS 13+バグ対策）
 - ✅ **完了**: 安定版マイクロフォンシステム復活（audio-manager-stable.js + microphone-manager-stable.js）
 - ✅ **完了**: VolumeBarController統合音量制御システム実装完了（実機テスト済み設定統合）
-- 🔄 **進行中**: preparation.html/training.html本番実装統合
-- 📋 **次期作業**: トレーニング機能完全統合・リリース準備
+- ✅ **完了**: 音域テストv4.0包括設計完成（PitchPro役割分担・エラーハンドリング・収録制御統合）
+- ✅ **完了**: **🔥 重要修正**: 音量バー同期問題の根本解決（CSS transition削除でリアルタイム表示実現）
+- ✅ **完了**: **🎯 測定精度の根本的改善**: 前の音の残響除外ロジック実装（200ms除外で異常値完全消滅）
+- 📋 **次期作業**: voice-range-test-v4での本格実装開始
 
 ### 🌿 **現在のブランチ**
-- **作業ブランチ**: `feature/data-manager-implementation`
-- **実装内容**: データ管理モジュール・pitchpro-audio統合・デバイス最適化・VolumeBarController完了
-- **次期フェーズ**: 本番ページ統合実装フェーズ
+- **作業ブランチ**: `feature/preparation-test-system`
+- **実装内容**: 音域テストv4.0包括設計・PitchPro統合・エラーハンドリング完成
+- **次期フェーズ**: voice-range-test-v4での段階的実装フェーズ
 
 ### ⚠️ **注意すべきこと（最重要）**
 1. **🚨 インライン記述禁止**: HTMLのstyle属性、JavaScriptでのインラインCSS絶対禁止（例外: Lucideアイコンサイズ、プログレスバー幅のみ）
 2. **📋 作業開始前必須チェック**: UIカタログ→base.css→類似実装の順で確認（新規CSS作成前）
-3. **📝 データ管理統合**: `/js/data-manager.js`活用でlocalStorage統一管理
-4. **🎚️ 音量バー制御**: `VolumeBarController`統一使用・**必ずコールバック方式**で`result.volume`取得
-5. **📝 トレーニングJS**: 開発段階ではページ内記述許可、本番実装時に外部ファイル化
-6. **🌿 Git自動化**: 作業完了時のみコミット・プッシュ実行（修正中は禁止）
+3. **🎨 UIカタログ準拠**: `/UI-Catalog/ui-catalog-essentials.html`で既存コンポーネント確認必須
+4. **🚫 絵文字使用禁止**: アプリ全体でLucideアイコンを使用・絵文字は一切使用しない
+5. **🧪 テスト専用CSS分離**: すべてのテストページは`[機能名]-test.css`で管理・本番CSS混入禁止
+6. **📝 データ管理統合**: `/js/data-manager.js`活用でlocalStorage統一管理
+7. **🎚️ 音量バー制御**: `VolumeBarController`統一使用・**必ずコールバック方式**で`result.volume`取得
+8. **📝 トレーニングJS**: 開発段階ではページ内記述許可、本番実装時に外部ファイル化
+9. **🌿 Git自動化**: 作業完了時のみコミット・プッシュ実行（修正中は禁止）
+10. **📅 日付記載プロトコル（仕様書・ドキュメント作成時）**:
+   - **必須実行**: システム日付コマンド `date '+%Y-%m-%d'` を実行して確認
+   - **形式**: YYYY-MM-DD（例: 2025-10-27）
+   - **参照順**: ①システム日付コマンド → ②既存仕様書の日付パターン → ③不明時はユーザーに確認
+   - **記載箇所**: 仕様書ヘッダーの作成日・最終更新日、README.mdの更新履歴
+11. **🗂️ Serenaメモリ命名規則**:
+   - **永続化メモリ**: `PERM-[内容]-YYYYMMDD-HHMM`（例: `PERM-training-core-pitch-error-detection-20250112-1430`）
+   - **作業用メモ**: `TEMP-[内容]-YYYYMMDD-HHMM`（例: `TEMP-direct-access-mic-permission-issue-20250112-1445`）
+   - 永続化メモリは仕様・設計思想など長期保存が必要な情報、作業用メモは一時的な問題・タスク管理用
 
 ### 🎯 **作業のポイント**
 - **データ管理モジュール完了**: `/js/data-manager.js`実装済み（pitchpro-audio統合、課金制御対応）
@@ -156,6 +170,55 @@ pitchDetector.setCallbacks({
 - `RELEASE_AND_MONETIZATION_PLAN.md`: リリース計画・収益化戦略書（v1.0.0）
 - `GLOSSARY.md`: プロジェクト用語集（v1.0.0）
 - `CLAUDE.md`: 開発ガイドライン（本ファイル）
+- `README.md`: プロジェクト概要・構造ドキュメント
+
+## 📁 **プロジェクト構造（重要）**
+
+### **メインアプリケーション（本番環境）**
+```
+PitchPro-SPA/          ★ 正式なアプリケーション
+├── index.html         ← エントリーポイント（SPAルーター）
+├── styles/
+│   ├── base.css       ← 共通スタイル
+│   ├── results.css    ← 結果表示スタイル
+│   └── training.css   ← トレーニングスタイル
+├── js/
+│   ├── router.js      ← SPAルーティングシステム
+│   └── controllers/
+│       ├── preparationController.js  ← 準備画面
+│       └── trainingController.js     ← トレーニング画面
+└── pages/             ← HTMLテンプレート
+```
+
+### **UI開発リファレンス**
+```
+UI-Catalog/            ★ UI開発時の参照用カタログ
+├── ui-catalog-index.html         ← カタログトップページ
+├── ui-catalog-essentials.html    ← 必須UIコンポーネント集
+├── ui-catalog-components.html    ← 詳細コンポーネント
+├── ui-catalog-results-*.html     ← 結果表示UI
+├── ui-catalog.css                ← カタログ表示専用CSS
+└── ui-catalog.js                 ← カタログ機能スクリプト
+```
+
+### **開発時デモページ（参照用・本番非使用）**
+```
+Bolt/                  ⚠️ 開発時デモページ（使用禁止）
+└── v2/
+    └── pages/
+        └── index.html  ← 旧デモページ（編集禁止）
+```
+
+### **⚠️ 重要な注意事項**
+1. **正しいindex.html**: `/PitchPro-SPA/index.html`が本番アプリケーション
+2. **ルートindex.html**: 自動的に`PitchPro-SPA/index.html`にリダイレクト
+3. **UIカタログパス**: `/UI-Catalog/ui-catalog-essentials.html`で確認
+4. **Boltフォルダ**: 開発時デモページ、編集・使用禁止
+
+### **作業時の確認順序**
+1. **UIカタログ確認**: `/UI-Catalog/ui-catalog-essentials.html`
+2. **base.css確認**: `/PitchPro-SPA/styles/base.css`
+3. **類似実装確認**: `/PitchPro-SPA/js/controllers/`
 
 ## 🎨 **CSS・UI設計方針**
 
@@ -163,6 +226,7 @@ pitchDetector.setCallbacks({
 - **基本方針**: `ui-catalog-essentials.html`で既存コンポーネント確認後に実装
 - **分離設計**: ui-catalog.css（表示専用）と base.css（実装用）完全分離
 - **統一コンポーネント**: Glass Card・プログレスバー・ボタン等の既存活用
+- **アイコン統一**: Lucideアイコンのみ使用・絵文字は一切使用しない
 
 ### **base.css活用状況（v2.0.0）**
 - **サイズ**: 1,108行（7カテゴリの機能統合完了）
@@ -282,9 +346,198 @@ iPad: 感度 5.0x, 音量バー 7.0x
 
 ### **📋 VolumeBarController統合完了（2025年1月7日追加）**
 - **VolumeBarController実装**: 統一音量制御システム完成（`/js/volume-bar-controller.js`）
-- **音量バー統合仕様書**: 完全なドキュメント作成（`/specifications/VOLUME_BAR_INTEGRATION_SPECIFICATION.md`）
+- **音量バー統合仕様書**: 完全なドキュメント作成（`/PitchPro-SPA/specifications/VOLUME_BAR_INTEGRATION_SPECIFICATION.md`）
 - **重要な教訓**: PitchProからの音量値取得は必ずコールバック方式`result.volume`を使用
 - **実機テスト済み設定**: PC(4.0x)・iPhone(4.5x)・iPad(7.0x)の音量バー感度設定確定
+
+---
+
+## 🎯 **2025年1月9日 重要更新**: 音域テストv4.0包括設計完成
+
+### **🏗️ 4回目チャレンジのための完全準備**
+- **専用フォルダ構築**: `/voice-range-test-v4/`で完全分離管理
+- **PitchPro仕様理解**: AudioDetectionComponentの適切な活用方法確立
+- **役割分担明確化**: PitchPro・VoiceRangeTesterV113・収録制御メソッドの責任範囲統一
+- **エラーハンドリング包括設計**: 測定失敗6パターンの完全対応設計
+
+### **📁 voice-range-test-v4フォルダ構成**
+```
+voice-range-test-v4/
+├── docs/                              # 設計ドキュメント統合管理
+│   ├── PITCHPRO_ROLE_ASSIGNMENT.md    # PitchPro役割分担明確化  
+│   ├── RECORDING_CONTROL_METHODS.md   # 収録制御メソッド設計
+│   ├── IMPLEMENTATION_PLAN_V4.md      # v4.0実装計画（Phase1-3）
+│   ├── FLOW_GAP_ANALYSIS.md          # ユーザーフロー実装ギャップ分析
+│   └── MEASUREMENT_FAILURE_HANDLING.md # 測定失敗時エラーハンドリング
+├── src/{css,js}/                     # 構造化実装ファイル
+├── test/                             # 単体・統合・アニメーションテスト
+└── backup/original-files/            # 安全なバックアップ管理
+```
+
+### **🎯 確立された設計原則**
+1. **AudioDetectionComponent単一責任**: PitchPro統合音声処理専門
+2. **収録制御メソッド統合**: UI状態・アニメーション・フロー制御の一元化
+3. **段階的エラーハンドリング**: 即座対応→警告強化→代替手段の3段階
+4. **測定失敗パターン対応**: 音量不足・明瞭度不足・雑音干渉・システムエラー等
+5. **ユーザービリティ最優先**: 具体的メッセージ・視覚フィードバック・進捗保持
+
+### **🚀 実装フェーズ戦略**
+- **Phase 1**: HTMLベースファイル作成・CSS基本アニメーション（低リスク）
+- **Phase 2**: 収録制御メソッドJavaScript実装・PitchPro統合（中リスク）
+- **Phase 3**: アニメーション統合・エラーハンドリング実装（高リスク）
+
+### **⚠️ 重要な教訓（4回目成功のために）**
+- **PitchPro推奨値使用**: `clarityThreshold: 0.4`, `minVolumeAbsolute: 0.003`
+- **単一インスタンス運用**: AudioDetectionComponentの使い回し、セレクター変更で対応
+- **測定失敗への備え**: 音量不足・音程不明瞭・雑音干渉の包括的対応
+- **段階的実装**: 各Phase完了時の確実な動作確認で安全性確保
+
+---
+
+## 🔥 **2025年1月12日 重要修正**: 音量バー同期問題の根本解決
+
+### **🚨 発見された重大な問題**
+- **症状**: 音量バーとパーセント表示が同期しない（例：50%表示でもバーは17%幅）
+- **根本原因**: `base.css`の`transition: width 0.5s ease`がPitchProのリアルタイム更新を阻害
+- **影響範囲**: 全ての音量バー表示（マイクテスト・音域テスト・練習モード）
+
+### **📊 問題分析ログ**
+```
+📊 音量詳細 | result.volume: 59.7% | 設定width: 59.711578%
+📐 サイズ分析 | 期待width: 333.82px | 実際width: 94.45px | 比率: 28.3%
+```
+- **期待値**: 59.7% × 559px = 333.82px
+- **実際値**: 94.45px（約28%）
+- **原因**: CSS遷移アニメーションがPitchProの30-60FPS更新に追いつかない
+
+### **✅ 実装した解決策**
+
+#### **base.css修正**（根本的解決）
+```css
+/* 修正前（問題あり） */
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease; /* ← 削除 */
+}
+
+/* 修正後（問題解決） */
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  /* transitionプロパティを完全削除 */
+}
+```
+
+#### **修正対象ファイル**
+- **`/Bolt/v2/styles/base.css`**: `.progress-fill` `.progress-fill-custom`のtransition削除
+- **テストページ更新**: 不要な`realtime`クラスや`!important`指定を削除
+
+### **🎯 重要な教訓**
+
+#### **PitchProの特性理解**
+- **PitchPro**: リアルタイム音声処理（30-60FPS）で音量値を高速更新
+- **CSS遷移**: 0.5秒かけてアニメーション → 高速更新に追いつかない
+- **結果**: 音量バーが実際の値より小さく表示される
+
+#### **適切な解決アプローチ**
+1. **❌ 不適切**: `!important`や複雑なクラス設計 → PitchPro制御を妨害
+2. **✅ 適切**: シンプルにtransition削除 → PitchProの動作を尊重
+3. **✅ 結果**: 比率100.0%の完全同期を実現
+
+### **📈 解決後の検証結果**
+```
+📊 音量詳細 | result.volume: 45.6% | 設定width: 45.60619%
+📐 サイズ分析 | 期待width: 254.9px | 実際width: 254.9375px | 比率: 100.0%
+```
+- **完全同期**: 期待値と実際値が一致
+- **リアルタイム表示**: PitchProの更新に即座に追従
+- **パフォーマンス向上**: CSS遷移計算のオーバーヘッド削除
+
+### **🔧 今後の設計指針**
+- **音声処理UI**: アニメーション不要、即座の反応を優先
+- **PitchPro統合**: ライブラリの設計思想を尊重、余計な制御を避ける
+- **CSS設計**: 用途に応じた適切なアニメーション設定
+
+---
+
+## 🎯 **2025年10月29日 重要更新**: 測定精度の根本的改善
+
+### **📊 問題の発見と解決**
+
+#### **発見された問題**
+- **症状**: セッション評価で-191.8¢のような異常値が検出される
+- **例**: Session 2, Step 2 (ミ) で期待値207.65Hz → 検出値185.87Hz（レの周波数）
+- **原因**: 前の音の残響（安定した高明瞭度）が次の音の立ち上がり期間（不安定な低明瞭度）より優先選択されていた
+
+#### **根本原因の特定**
+```javascript
+// 問題のあった実装（trainingController.js recordStepPitchData）
+const stepData = pitchDataBuffer.filter(d => d.step === step); // 700ms全体
+const bestData = stepData.reduce((best, current) =>
+    current.clarity > best.clarity ? current : best
+); // 最高明瞭度を選択
+```
+
+**なぜ異常値が発生したか**:
+1. レ (185Hz) 測定完了 → 残響が安定して高明瞭度
+2. ミ (208Hz) 測定開始 → 最初200msはレの残響が残る
+3. 700msの測定ウィンドウ内で、レの残響（高明瞭度）がミの立ち上がり（低明瞭度）より選ばれる
+4. 結果: ミの測定でレの周波数185Hzが記録され、-191.8¢の異常値発生
+
+### **✅ 実装した解決策**
+
+```javascript
+// 修正後の実装（trainingController.js v3.2.0）
+// 【重要】最初の200msを除外して前の音の余韻を回避
+const stepStartTime = stepData[0].timestamp;
+const validData = stepData.filter(d => d.timestamp - stepStartTime >= 200);
+
+let bestData;
+if (validData.length === 0) {
+    // フォールバック: 有効データがない場合は元データから選択
+    bestData = stepData.reduce((best, current) =>
+        current.clarity > best.clarity ? current : best
+    );
+} else {
+    // 有効データから最も明瞭度が高いデータを使用
+    bestData = validData.reduce((best, current) =>
+        current.clarity > best.clarity ? current : best
+    );
+}
+```
+
+### **📈 修正の効果**
+
+**修正前（異常値発生）**:
+```
+Session 2, Step 2 (ミ):
+  期待: 207.65Hz
+  検出: 185.87Hz（レの残響）
+  誤差: -191.8¢ ← 異常値
+```
+
+**修正後（正常範囲）**:
+```
+最近の64測定（8セッション×8音）の誤差範囲:
+  最小誤差: -4.8¢ (ソ)
+  最大誤差: +112.4¢ (シ)
+  → ±150¢以内の正常範囲に収束
+  → -191.8¢のような異常値は完全消滅
+```
+
+### **🔧 仕様書への記録**
+
+- ✅ **TRAINING_SPECIFICATION.md** (v3.2.0): 詳細な実装ロジックと改善内容を記録
+- ✅ **EVALUATION_SYSTEM_SPECIFICATION.md** (v2.2.0): 測定精度向上の効果を記録
+- ✅ **CLAUDE.md**: 作業完了サマリーに追加
+
+### **💡 重要な教訓**
+
+1. **外れ値は症状、測定ロジックが原因**: 外れ値除外ではなく、測定精度の向上が正しいアプローチ
+2. **音声信号の特性理解**: 立ち上がり期間（不安定）vs 持続期間（安定）の違い
+3. **適切なウィンドウ設計**: 700ms測定時間のうち、最初200msを除外し、残り500msで測定
+4. **フォールバック処理の重要性**: エッジケースでもエラー回避できる設計
 
 ---
 
@@ -349,6 +602,141 @@ system.css確認 → 「UIカタログとbase.cssを先に確認しましたか�
 
 ---
 
+## 🎨 Lucideアイコン運用ガイドライン（重要）
+
+### **🚨 重要な問題: Safari互換性とバージョン管理**
+
+#### **バージョン固定の必須事項**
+
+**本番環境（PitchPro-SPA）**:
+```html
+<!-- ✅ 必ずこのバージョンを使用 -->
+<script src="https://unpkg.com/lucide@0.263.0/dist/umd/lucide.js"></script>
+```
+
+**UIカタログ**:
+```html
+<!-- UIカタログのみ最新版使用可能 -->
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+```
+
+#### **なぜバージョン固定が必要か**
+
+**問題1: Safari互換性エラー**
+- Lucide **@latest版**はSafariのstrict modeで動作不安定
+- エラー: `TypeError: Right side of assignment cannot be destructured`
+- SafariはJavaScriptモジュールを常にstrict modeで評価
+- strict modeでは`this`がグローバルオブジェクトに変換されず、UMD形式で問題発生
+
+**問題2: アイコン名の非互換性**
+- 新バージョン（v0.400以降）で追加されたアイコン名はv0.263.0に存在しない
+- UIカタログから実装時にアイコン名の変換が必須
+
+#### **アイコン名対応表（最重要）**
+
+UIカタログから本番実装時に必ず変換すること:
+
+| UIカタログ（最新版） | 本番環境（v0.263.0） | 用途 |
+|---|---|---|
+| `triangle-alert` | `alert-triangle` | 警告・エラー表示 |
+| `circle-check-big` | `check-circle` | 成功・完了表示 |
+| `file-chart-column-increasing` | `bar-chart-2` | 統計・グラフ表示 |
+| `grid-3x3` | `grid` | グリッド・一覧表示 |
+
+#### **実装時の必須手順**
+
+**STEP 1: UIカタログでデザイン確認**
+```bash
+# UIカタログで視覚的なデザインを確認
+Read /UI-Catalog/ui-catalog-essentials.html
+```
+
+**STEP 2: アイコン名の変換**
+```bash
+# UIカタログからコピーしたHTMLのアイコン名をチェック
+Grep "data-lucide=" [ファイル名]
+
+# 非互換アイコンを検索
+Grep "triangle-alert|circle-check-big|file-chart-column-increasing|grid-3x3" [ファイル名]
+```
+
+**STEP 3: 一括置換実行**
+```bash
+sed -i '' \
+  -e 's/file-chart-column-increasing/bar-chart-2/g' \
+  -e 's/triangle-alert/alert-triangle/g' \
+  -e 's/grid-3x3/grid/g' \
+  -e 's/circle-check-big/check-circle/g' \
+  [ファイル名]
+```
+
+**STEP 4: 動作確認**
+```bash
+# コンソールで警告がないか確認
+# "[Warning] icon name was not found" が出たら修正漏れ
+```
+
+#### **よくあるエラーと対処法**
+
+**エラー1: アイコンが表示されない**
+```
+[Warning] <i data-lucide="triangle-alert"></i> icon name was not found
+```
+**対処**: `triangle-alert` → `alert-triangle` に変更
+
+**エラー2: Safari互換性エラー**
+```
+TypeError: Right side of assignment cannot be destructured
+```
+**対処**: Lucideバージョンを`@latest` → `@0.263.0`に変更
+
+**エラー3: アイコンの一部のみ表示される**
+- **原因**: 新旧アイコン名が混在している
+- **対処**: 全ファイルで非互換アイコンを検索して置換
+
+#### **禁止事項**
+
+- ❌ **本番環境で`@latest`使用禁止** - Safari互換性問題発生
+- ❌ **UIカタログのアイコン名をそのまま使用禁止** - バージョン非互換
+- ❌ **アイコン名変換の確認を省略禁止** - 実装後に警告大量発生
+
+#### **推奨事項**
+
+- ✅ **UIカタログ確認時にアイコン名をメモ** - 実装時の変換漏れ防止
+- ✅ **新規ページ実装後は必ず全アイコン検証** - 警告ログを確認
+- ✅ **v0.263.0互換アイコンのリスト作成** - チーム全体で共有
+
+#### **参考: v0.263.0で使用可能な主要アイコン**
+
+よく使うアイコンの正しい名前:
+
+```
+✅ alert-triangle (警告)
+✅ check-circle (成功)
+✅ bar-chart-2 (グラフ)
+✅ grid (グリッド)
+✅ trophy (優秀)
+✅ award (良好)
+✅ target (合格)
+✅ music (音楽)
+✅ chevron-left (前へ)
+✅ chevron-right (次へ)
+```
+
+### **統合初期化関数の使用**
+
+すべてのLucideアイコン初期化は統合関数を使用:
+
+```javascript
+// ✅ 正しい使い方
+window.initializeLucideIcons({ immediate: true });
+
+// ❌ 直接呼び出し禁止（Safari互換性問題）
+lucide.createIcons();
+```
+
+---
+
 ## 🎨 CSS設計アーキテクチャ（重要）
 
 ### **CSS階層構造**
@@ -367,6 +755,10 @@ base.css (アプリ基本)
 results.css (結果表示専用)
 ├── system.cssから必要な要素のみ
 └── 結果表示に特化したスタイル
+
+[機能名]-test.css (テストページ専用)
+├── 各テスト機能に特化したスタイル
+└── 本番環境から完全分離
 ```
 
 ### **UIカタログ独立設計**
@@ -378,11 +770,14 @@ results.css (結果表示専用)
 1. **system.css**: 全ての基盤・変更禁止
 2. **base.css/results.css**: system.cssを元にクリーンに再構築
 3. **ui-catalog.css**: 独立したカタログ専用スタイル
-4. **分離設計**: カタログスタイルは実装に影響しない
+4. **[機能名]-test.css**: テストページ専用スタイル（本番環境分離）
+5. **分離設計**: カタログ・テストスタイルは実装に影響しない
 
 ### **作業時の注意点**
 - UIカタログでの視覚確認はui-catalog.css内で実装
 - 実際のアプリスタイルはbase.css/results.cssで管理
+- **テスト専用スタイルは[機能名]-test.cssで完全分離**
+- **本番用CSSファイルにテスト専用スタイル混入禁止**
 - system.cssの変数・ユーティリティを最大活用
 - 重複コードを避けクリーンなCSS構造を維持
 
@@ -393,6 +788,56 @@ results.css (結果表示専用)
 4. **現状報告** - 既存実装の状態を把握・報告
 5. **system.cssを最後に確認** - 基盤となる定義を確認（変更禁止）
 6. **修正方針決定** - UIカタログのコンポーネントを優先使用
+7. **テスト専用スタイル分離** - テストページは専用CSSファイルで管理
+
+### **🧪 テスト専用CSS分離ルール（新規追加）**
+
+#### **基本方針**
+- **完全分離**: すべてのテストページは専用CSSファイルで管理
+- **命名規則**: `[機能名]-test.css` （例：`voice-range-test.css`、`microphone-test.css`）
+- **配置場所**: テストページと同じディレクトリ構造内に配置
+- **本番環境保護**: 本番用CSSファイルにテスト専用スタイルの混入を禁止
+
+#### **必須実施項目**
+1. **テストページ作成時**: 必ず専用CSSファイルを同時作成
+2. **既存テストページ**: 本番CSSから専用CSSへの移行を実施
+3. **スタイル調査時**: 本番CSSにテスト専用スタイルが混入していないか確認
+4. **命名衝突回避**: テスト専用のクラス・ID名を使用
+
+#### **実装例**
+```html
+<!-- テストページのCSS読み込み順序 -->
+<link rel="stylesheet" href="../../Bolt/v2/styles/base.css">
+<link rel="stylesheet" href="../../Bolt/v2/styles/results.css">
+<link rel="stylesheet" href="css/voice-range-test.css"> <!-- 専用CSS -->
+```
+
+```css
+/* voice-range-test.css の例 */
+/* === 音域テスト専用スタイル === */
+.range-icon-img {
+    width: 80px;
+    height: 80px;
+    display: block;
+}
+
+#range-icon.measuring {
+    animation: range-icon-pulse 1.5s ease-in-out infinite;
+}
+```
+
+#### **禁止事項**
+- ❌ **base.css/training.css等へのテスト専用スタイル追加**
+- ❌ **テストページでの本番CSSファイルの直接編集**
+- ❌ **テスト専用スタイルの本番環境への混入**
+- ❌ **複数テスト機能の単一CSSファイル統合**
+
+#### **移行手順**
+1. 本番CSSファイルからテスト専用スタイルを特定
+2. `[機能名]-test.css`ファイルを新規作成
+3. 特定したスタイルを専用CSSファイルに移動
+4. 本番CSSファイルから該当スタイルを削除
+5. テストページのHTML読み込み部分に専用CSS追加
 
 ### **🚨 インライン記述禁止原則（最重要）**
 
@@ -690,12 +1135,67 @@ pitchDetector.setCallbacks({
 - **VolumeBarController**: `/js/volume-bar-controller.js`
 - **実装例**: `/test-volume-controller.html`（シンプル実装例）
 - **統合テスト**: `/test-ui-integration.html`（完全統合テスト）
-- **仕様書**: `/specifications/VOLUME_BAR_INTEGRATION_SPECIFICATION.md`
+- **仕様書**: `/PitchPro-SPA/specifications/VOLUME_BAR_INTEGRATION_SPECIFICATION.md`
 
 ### **🎯 次期実装フェーズ**
 - preparation.html・training.htmlへのVolumeBarController統合
 - トレーニング機能の完全統合実装
 - リリース準備・最終調整
+
+---
+
+## 🎯 **2025年1月9日 重要更新**: AudioDetectionComponent UI切り替え問題の解決
+
+### **🔧 問題の概要**
+- **症状**: 音域テスト開始時、マイクテスト用の音量バー（`volume-progress`）が動作し続け、音域テスト用の音量バー（`range-test-volume-bar`）が更新されない
+- **原因**: AudioDetectionComponentが初期化時のセレクターを内部でキャッシュし、後から変更できない仕様
+- **影響**: マイクテストから音域テストへの切り替え時にUI要素が正しく更新されない
+
+### **❌ 試行錯誤した方法（すべて無効）**
+1. ID重複を疑って複数要素を一括更新
+2. コールバックの上書き防止処理
+3. DOM要素のID動的変更
+4. styleプロパティの読み取り専用化
+5. セレクター変更メソッドの探索（存在しなかった）
+
+### **✅ 正しい解決方法**
+```javascript
+// 音域テスト開始時の処理
+if (audioDetector) {
+    // 1. 既存のAudioDetectorを停止
+    audioDetector.stopDetection();
+    
+    // 2. リソースを完全に破棄（重要！）
+    audioDetector.destroy();
+    
+    // 3. 音域テスト用のセレクターで新規作成
+    audioDetector = new AudioDetectionComponent({
+        volumeBarSelector: '#range-test-volume-bar',
+        volumeTextSelector: '#range-test-volume-text',
+        frequencySelector: '#range-test-frequency-value',
+        // その他の設定...
+    });
+    
+    // 4. 再初期化
+    await audioDetector.initialize();
+}
+```
+
+### **📋 AudioDetectionComponent利用可能メソッド**
+- ✅ `initialize()` - 初期化処理
+- ✅ `startDetection()` - 音声検出開始
+- ✅ `stopDetection()` - 音声検出を停止
+- ✅ `destroy()` - リソースを完全に破棄
+- ✅ `updateSelectors()` - UI要素の動的切り替え（PitchPro Native機能）
+- ✅ `setCallbacks()` - コールバック設定
+- ❌ `cleanup()` - 存在しない
+- ❌ `release()` - 存在しない
+
+### **🎯 重要な教訓（2025年1月更新）**
+- AudioDetectionComponentは**updateSelectors()でセレクターを動的変更可能**
+- UI要素切り替えは**updateSelectors()が推奨方法**（高速・効率的）
+- destroy() → 再作成は**フォールバック用途**（updateSelectors()失敗時のみ）
+- PitchPro READMEに完全なメソッド仕様が文書化されている
 
 ---
 

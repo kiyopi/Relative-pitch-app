@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucide v0.263.0 グレードアイコンテスト</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            padding: 40px;
+            line-height: 1.6;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+        .icon-test {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+        .icon-test.success {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .icon-test.error {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+        .icon-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 12px;
+            color: #fff;
+        }
+        .icon-status {
+            font-size: 12px;
+            margin-top: 8px;
+            opacity: 0.7;
+        }
+        h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            opacity: 0.7;
+            margin-bottom: 32px;
+        }
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 32px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Lucide v0.263.0 グレードアイコンテスト</h1>
+    <p class="subtitle">総合評価グレード（S～E級）のアイコン互換性確認</p>
+
+    <div class="test-grid" id="icon-grid"></div>
+
+    <div class="log" id="log"></div>
+
+    <!-- Lucide v0.263.0 -->
+    <script src="https://unpkg.com/lucide@0.263.0/dist/umd/lucide.js"></script>
+
+    <script>
+        const icons = [
+            { name: 'crown', grade: 'S級', description: 'プロレベル' },
+            { name: 'medal', grade: 'A級', description: '楽器アンサンブル' },
+            { name: 'circle-star', grade: 'B級', description: '合唱・弾き語り' },
+            { name: 'smile', grade: 'C級', description: 'カラオケ・趣味' },
+            { name: 'meh', grade: 'D級', description: '練習中' },
+            { name: 'frown', grade: 'E級', description: '基礎から' }
+        ];
+
+        const grid = document.getElementById('icon-grid');
+        const log = document.getElementById('log');
+        let logText = '🔍 Lucide v0.263.0 アイコンテスト開始\n\n';
+
+        icons.forEach(icon => {
+            const div = document.createElement('div');
+            div.className = 'icon-test';
+            div.innerHTML = `
+                <i data-lucide="${icon.name}" style="width: 64px; height: 64px;"></i>
+                <div class="icon-name">${icon.grade}</div>
+                <div class="icon-status">${icon.name}</div>
+                <div class="icon-status">${icon.description}</div>
+            `;
+            grid.appendChild(div);
+        });
+
+        // Lucideアイコン初期化
+        try {
+            lucide.createIcons();
+            logText += '✅ lucide.createIcons() 実行完了\n\n';
+        } catch (error) {
+            logText += `❌ lucide.createIcons() エラー: ${error.message}\n\n`;
+        }
+
+        // アイコン検証
+        setTimeout(() => {
+            icons.forEach((icon, index) => {
+                const divs = grid.querySelectorAll('.icon-test');
+                const div = divs[index];
+                const svgElement = div.querySelector('svg');
+
+                if (svgElement) {
+                    div.classList.add('success');
+                    logText += `✅ ${icon.name} (${icon.grade}): 正常に表示\n`;
+                } else {
+                    div.classList.add('error');
+                    logText += `❌ ${icon.name} (${icon.grade}): 表示失敗 → v0.263.0で存在しない可能性\n`;
+                }
+            });
+
+            logText += '\n📊 テスト完了\n';
+            logText += 'コンソールで警告メッセージを確認してください。\n';
+            logText += '[Warning] icon name was not found が表示されたアイコンは代替が必要です。';
+            log.textContent = logText;
+        }, 500);
+
+        // コンソールログをキャプチャ
+        const originalWarn = console.warn;
+        console.warn = function(...args) {
+            const message = args.join(' ');
+            if (message.includes('icon') || message.includes('not found')) {
+                logText += `\n⚠️ Console Warning: ${message}`;
+                log.textContent = logText;
+            }
+            originalWarn.apply(console, args);
+        };
+    </script>
+</body>
+</html>

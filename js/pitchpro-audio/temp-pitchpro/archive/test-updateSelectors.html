@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>updateSelectors メソッドテスト</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .volume-bar { width: 100%; height: 20px; background: #eee; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .volume-fill { height: 100%; background: linear-gradient(90deg, #28a745, #ffc107, #dc3545); width: 0%; transition: width 0.1s; }
+    </style>
+</head>
+<body>
+    <h1>updateSelectors メソッドテスト</h1>
+    
+    <div id="test-results"></div>
+    
+    <!-- Test UI Elements -->
+    <div class="volume-bar">
+        <div class="volume-fill" id="volume-bar1"></div>
+    </div>
+    <div id="volume-text1">0.0%</div>
+    <div id="frequency1">0.0 Hz</div>
+    
+    <div class="volume-bar">
+        <div class="volume-fill" id="volume-bar2"></div>
+    </div>
+    <div id="volume-text2">0.0%</div>
+    <div id="frequency2">0.0 Hz</div>
+    
+    <button id="test-esm">ESM版でテスト</button>
+    <button id="test-umd">UMD版でテスト</button>
+
+    <script type="module">
+        const results = document.getElementById('test-results');
+        
+        function addResult(message, isSuccess = true) {
+            const div = document.createElement('div');
+            div.className = `test-result ${isSuccess ? 'success' : 'error'}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+        
+        // ESM版テスト
+        document.getElementById('test-esm').addEventListener('click', async () => {
+            try {
+                addResult('ESM版のインポートを試行中...');
+                
+                const { AudioDetectionComponent } = await import('./dist/index.esm.js');
+                addResult('✅ ESM版のインポート成功');
+                
+                const audioDetector = new AudioDetectionComponent({
+                    volumeBarSelector: '#volume-bar1',
+                    volumeTextSelector: '#volume-text1',
+                    frequencySelector: '#frequency1',
+                    debug: true
+                });
+                
+                addResult('✅ AudioDetectionComponent インスタンス作成成功');
+                
+                // updateSelectors メソッドの存在確認
+                if (typeof audioDetector.updateSelectors === 'function') {
+                    addResult('✅ updateSelectors メソッドが存在します');
+                    
+                    // メソッド呼び出しテスト
+                    try {
+                        audioDetector.updateSelectors({
+                            volumeBarSelector: '#volume-bar2',
+                            volumeTextSelector: '#volume-text2',
+                            frequencySelector: '#frequency2'
+                        });
+                        addResult('✅ updateSelectors メソッド実行成功');
+                    } catch (error) {
+                        addResult(`❌ updateSelectors メソッド実行エラー: ${error.message}`, false);
+                    }
+                } else {
+                    addResult(`❌ updateSelectors メソッドが存在しません。型: ${typeof audioDetector.updateSelectors}`, false);
+                    addResult(`利用可能なメソッド: ${Object.getOwnPropertyNames(Object.getPrototypeOf(audioDetector)).filter(name => typeof audioDetector[name] === 'function').join(', ')}`, false);
+                }
+                
+            } catch (error) {
+                addResult(`❌ ESM版テストエラー: ${error.message}`, false);
+                console.error('ESM test error:', error);
+            }
+        });
+        
+        // UMD版テスト
+        document.getElementById('test-umd').addEventListener('click', async () => {
+            try {
+                addResult('UMD版のロードを試行中...');
+                
+                // UMDファイルを動的にロード
+                const script = document.createElement('script');
+                script.src = './dist/pitchpro.umd.js';
+                
+                script.onload = () => {
+                    try {
+                        addResult('✅ UMD版のロード成功');
+                        
+                        if (window.PitchPro && window.PitchPro.AudioDetectionComponent) {
+                            addResult('✅ PitchPro.AudioDetectionComponent が利用可能');
+                            
+                            const audioDetector = new window.PitchPro.AudioDetectionComponent({
+                                volumeBarSelector: '#volume-bar1',
+                                volumeTextSelector: '#volume-text1',
+                                frequencySelector: '#frequency1',
+                                debug: true
+                            });
+                            
+                            addResult('✅ UMD AudioDetectionComponent インスタンス作成成功');
+                            
+                            if (typeof audioDetector.updateSelectors === 'function') {
+                                addResult('✅ UMD版でも updateSelectors メソッドが存在します');
+                                
+                                try {
+                                    audioDetector.updateSelectors({
+                                        volumeBarSelector: '#volume-bar2',
+                                        volumeTextSelector: '#volume-text2',
+                                        frequencySelector: '#frequency2'
+                                    });
+                                    addResult('✅ UMD版 updateSelectors メソッド実行成功');
+                                } catch (error) {
+                                    addResult(`❌ UMD版 updateSelectors メソッド実行エラー: ${error.message}`, false);
+                                }
+                            } else {
+                                addResult(`❌ UMD版で updateSelectors メソッドが存在しません。型: ${typeof audioDetector.updateSelectors}`, false);
+                                addResult(`UMD版利用可能なメソッド: ${Object.getOwnPropertyNames(Object.getPrototypeOf(audioDetector)).filter(name => typeof audioDetector[name] === 'function').join(', ')}`, false);
+                            }
+                        } else {
+                            addResult('❌ window.PitchPro.AudioDetectionComponent が利用できません', false);
+                            addResult(`window.PitchPro の内容: ${Object.keys(window.PitchPro || {}).join(', ')}`, false);
+                        }
+                    } catch (error) {
+                        addResult(`❌ UMD版テストエラー: ${error.message}`, false);
+                        console.error('UMD test error:', error);
+                    }
+                };
+                
+                script.onerror = () => {
+                    addResult('❌ UMD版のロードに失敗しました', false);
+                };
+                
+                document.head.appendChild(script);
+                
+            } catch (error) {
+                addResult(`❌ UMD版テスト準備エラー: ${error.message}`, false);
+            }
+        });
+    </script>
+</body>
+</html>

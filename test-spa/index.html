@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ミニマルSPAテスト - PitchPro継承検証</title>
+
+    <!-- 基本CSS（既存を活用） -->
+    <link rel="stylesheet" href="../Bolt/v2/styles/base.css">
+
+    <style>
+        /* 背景とテキスト色の明示的設定 */
+        body {
+            background-color: white;
+            color: #333;
+        }
+
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            color: #333;
+        }
+
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .test-header h1 {
+            color: #333;
+        }
+
+        .test-header p {
+            color: #666;
+        }
+
+        .navigation {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            border: 1px solid #ccc;
+            background: #f0f0f0;
+            color: #333;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .nav-btn.active {
+            background: #007bff;
+            color: white;
+        }
+
+        /* メインコンテンツエリア */
+        #app-main {
+            background-color: white;
+            color: #333;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .status-log {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 15px;
+            margin-top: 20px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .status-log div {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <!-- テストヘッダー -->
+        <div class="test-header">
+            <h1>🧪 ミニマルSPAテスト</h1>
+            <p>PitchProインスタンス継承・マイク許可状態維持の検証</p>
+        </div>
+
+        <!-- ナビゲーション -->
+        <div class="navigation">
+            <button class="nav-btn active" data-page="mic-test">
+                🎤 マイクテスト
+            </button>
+            <button class="nav-btn" data-page="audio-test">
+                🎵 音声テスト
+            </button>
+        </div>
+
+        <!-- メインコンテンツエリア -->
+        <main id="app-main">
+            <div class="loading">
+                <p>初期化中...</p>
+            </div>
+        </main>
+
+        <!-- ステータスログ -->
+        <div class="status-log" id="status-log">
+            <div>🚀 アプリケーション開始...</div>
+        </div>
+    </div>
+
+    <!-- 必要なライブラリ -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="../Bolt/v2/pages/js/pitchpro-v1.3.1.umd.js"></script>
+    <script src="../Bolt/v2/pages/js/global-audio-manager.js"></script>
+
+    <!-- マイク許可管理コンポーネント -->
+    <script src="js/mic-permission-manager.js"></script>
+
+    <!-- アプリケーション司令塔 -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

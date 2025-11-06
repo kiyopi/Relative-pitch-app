@@ -1,0 +1,153 @@
+<!-- ヘッダー -->
+<header class="page-header">
+            <div class="page-header-content">
+                <div class="page-header-icon-wrapper">
+                    <div class="page-header-icon gradient-catalog-green">
+                        <i id="training-mode-icon" data-lucide="shuffle" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;"></i>
+                    </div>
+                </div>
+                <div class="page-header-text">
+                    <h1 class="page-title" id="training-mode-title">ランダム基音モード</h1>
+                    <p class="page-subtitle text-green-200">トレーニング実施中</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main class="narrow-main">
+            <!-- 進行バーセクション（セッション中） -->
+            <div class="progress-section progress-section-training">
+                <div class="flex items-center gap-4">
+                    <div class="progress-bar with-margin">
+                        <div class="progress-fill gradient-catalog-blue" style="width: 25%;"></div>
+                    </div>
+                    <div class="session-badge">
+                        セッション 1/8
+                    </div>
+                </div>
+            </div>
+            <!-- マイク許可セクション -->
+            <div class="glass-card">
+                <section class="test-section" id="permission-section">
+                    <div class="section-header-training">
+                        <h4 class="text-sub-title heading-md">
+                            <i data-lucide="music-2" class="text-blue-300" style="width: 48px; height: 48px; transform: translateY(-8px);"></i>
+                            <span>基音再生とドレミガイド</span>
+                        </h4>
+                        <p class="text-body">基音スタートボタンでトレーニング開始</p>
+                    </div>
+                    
+                    <div class="base-note-control">
+                        <button class="btn btn-primary" id="play-base-note">
+                            <i data-lucide="volume-2" style="width: 24px; height: 24px;"></i>
+                            <span>基音スタート</span>
+                        </button>
+                        
+                        <!-- プログレス四角（ボタンと横並び） -->
+                        <div class="progress-section-inline">
+                            <div class="progress-labels">
+                                <span>ドレミガイド開始インターバル</span>
+                            </div>
+                            <div class="progress-squares" id="progress-squares">
+                                <div class="progress-square"></div>
+                                <div class="progress-square"></div>
+                                <div class="progress-square"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ドレミガイド（同じglass-card内） -->
+                    <h4 class="text-sub-title heading-sm">ドレミガイド</h4>
+                    <div class="doremi-guide">
+                        <div class="note-circles">
+                            <div class="note-circle" data-note="ド">ド</div>
+                            <div class="note-circle" data-note="レ">レ</div>
+                            <div class="note-circle" data-note="ミ">ミ</div>
+                            <div class="note-circle" data-note="ファ">ファ</div>
+                            <div class="note-circle" data-note="ソ">ソ</div>
+                            <div class="note-circle" data-note="ラ">ラ</div>
+                            <div class="note-circle" data-note="シ">シ</div>
+                            <div class="note-circle" data-note="ド">ド</div>
+                        </div>
+                        <div class="test-status">ガイドに合わせて発声しましょう</div>
+                        
+                        <!-- マイク認識 -->
+                        <div class="mic-recognition-section">
+                            <div class="test-instruction test-instruction-green" id="mic-badge">
+                                <i data-lucide="mic" style="width: 20px; height: 20px;"></i>
+                            </div>
+                            <div class="progress-bar flex">
+                                <div class="progress-fill gradient-catalog-green" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- 12音階モード専用：音域調整（ドレミガイド下） -->
+                        <div class="range-adjustment" id="range-adjustment">
+                            <!-- トグルヘッダー -->
+                            <div class="range-toggle-header" id="range-toggle-header">
+                                <div>
+                                    <h5 class="heading-sm">
+                                        <i data-lucide="sliders" class="text-blue-300"></i>
+                                        <span>音域調整</span>
+                                    </h5>
+                                </div>
+                                <button class="btn btn-ghost" id="range-toggle-btn">
+                                    <i data-lucide="chevron-down" style="width: 20px; height: 20px;"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- 調整コントロール（初期は非表示） -->
+                            <div class="range-controls range-controls-collapsed" id="range-controls">
+                                <p class="range-description text-sm text-white-60">あなたの声域に合わせて基音の高さを調整できます</p>
+                                <div class="flex items-center gap-3">
+                                    <button class="btn btn-primary" id="range-down">
+                                        <i data-lucide="chevron-down" style="width: 20px; height: 20px;"></i>
+                                        <span>下げる</span>
+                                    </button>
+                                    <div class="range-indicator" id="range-indicator">
+                                        <span class="text-sm">標準</span>
+                                    </div>
+                                    <button class="btn btn-primary" id="range-up">
+                                        <i data-lucide="chevron-up" style="width: 20px; height: 20px;"></i>
+                                        <span>上げる</span>
+                                    </button>
+                                </div>
+                                
+                                <!-- 音域テストボタン -->
+                                <div class="range-test-buttons">
+                                    <div class="flex items-center gap-3">
+                                        <button class="btn btn-outline" id="test-lowest">
+                                            <i data-lucide="volume-1" class="icon-md"></i>
+                                            <span>最低音<span class="mobile-hide">を確認</span></span>
+                                        </button>
+                                        <button class="btn btn-outline" id="test-highest">
+                                            <i data-lucide="volume-2" class="icon-md"></i>
+                                            <span>最高音<span class="mobile-hide">を確認</span></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+
+            <!-- デバッグ用：マイク許可ボタン -->
+            <section class="text-center">
+                <button class="btn btn-secondary" id="debug-mic-permission">
+                    <i data-lucide="mic"></i>
+                    <span>マイク許可（デバッグ用）</span>
+                </button>
+            </section>
+
+            <!-- ホームボタン -->
+            <section class="text-center">
+                <button class="btn btn-outline" id="btn-home-training">
+                    <i data-lucide="home"></i>
+                    <span>ホームに戻る</span>
+                </button>
+            </section>
+        </main>
+
+    <!-- trainingController.jsで処理 -->

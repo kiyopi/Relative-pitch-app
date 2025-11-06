@@ -1,0 +1,1165 @@
+/* ==========================================================================
+   トレーニング関連ページ専用スタイル
+   preparation.html, training.html用
+   ========================================================================== */
+
+/* ==========================================================================
+   マイクテスト・準備ページ
+   ========================================================================== */
+/* 統一: base.cssの.narrow-mainクラスを使用 */
+
+/* ==========================================================================
+   トレーニングページ
+   ========================================================================== */
+/* 統一: base.cssの.narrow-mainクラスを使用 */
+
+/* 基音コントロール（ボタン + プログレスバー） */
+.base-note-control {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.base-note-control .btn {
+  flex: 0 0 33.333%;
+  min-width: 140px;
+}
+
+.progress-section-inline {
+  flex: 1;
+}
+
+/* モバイル時の縦並びレイアウト */
+@media (max-width: 768px) {
+  .base-note-control {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .base-note-control .btn {
+    flex: none;
+    width: 100%;
+  }
+  
+  .progress-section-inline {
+    width: 100%;
+  }
+}
+
+/* 表示制御クラス（JavaScript動的制御用） */
+.range-adjustment-hidden {
+  display: none !important;
+}
+
+.range-adjustment-visible {
+  display: block !important;
+}
+
+.range-controls-collapsed {
+  display: none !important;
+}
+
+.range-controls-expanded {
+  display: block !important;
+}
+
+/* レンジ説明テキストの下マージン */
+.range-description {
+  margin-bottom: 1rem;
+}
+
+/* テストセクション */
+.test-section {
+  margin-bottom: 0;
+  transition: all 0.5s ease;
+}
+
+.test-section.hidden {
+  display: none;
+}
+
+/* 音域テストセクション表示修正 */
+#range-test-section:not(.hidden) {
+  display: block !important;
+}
+
+/* メインステータス・サブ情報表示 */
+.main-status-display {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.sub-info-display {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* セクションヘッダー */
+.section-header {
+  margin-bottom: 1.5rem;
+}
+
+.section-header h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+/* セクション説明 */
+.section-description {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  margin-bottom: 24px;
+}
+
+/* テキストセクションタイトル */
+.text-section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+/* === アラート系CSS（base.cssに移行完了） === */
+/* アラート基本定義はbase.cssを参照 */
+
+/* モバイルでボタンの順序を調整 - より特定的なセレクタ */
+@media (max-width: 767px) {
+  .range-info-container + .flex.gap-3.mt-4,
+  .success-alert + .flex.gap-3.mt-4 {
+    flex-direction: column-reverse !important;
+    gap: 12px !important;
+  }
+
+  .range-info-container + .flex.gap-3.mt-4 button,
+  .success-alert + .flex.gap-3.mt-4 button {
+    width: 100% !important;
+  }
+}
+
+/* ネストしたglass-card（range-saved-display）の専用スタイル */
+#range-saved-display.glass-card {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* iPadでの追加対応 */
+@media (max-width: 1024px) {
+  #range-saved-display.glass-card {
+    background: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* メーターグループ */
+.meter-group {
+  margin-bottom: 20px;
+}
+
+.meter-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+}
+
+.meter-value {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* プログレスバー（オレンジ） */
+.progress-bar.progress-orange .progress-fill {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+/* 結果カード */
+.result-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.result-card h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 16px;
+}
+
+.range-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.range-info-row:last-child {
+  border-bottom: none;
+}
+
+.range-info-row span:first-child {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.range-info-value {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.range-instruction-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.range-test-left i {
+  color: rgba(59, 130, 246, 0.8) !important;
+}
+
+
+.range-info-container {
+  margin-bottom: 0;
+}
+
+.range-info-container + .flex {
+  margin-top: 24px;
+}
+
+/* レスポンシブ対応：モバイルは縦並び、タブレット以上は横並び */
+@media (min-width: 768px) {
+  .md\:flex-row {
+    flex-direction: row;
+  }
+}
+
+/* テストステータス */
+.test-status {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  font-style: italic;
+  margin-bottom: 16px;
+}
+
+/* マイク認識セクション */
+.mic-recognition-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* preparation.html専用: 音声テスト・結果ボタンのモバイル対応 */
+@media (max-width: 768px) {
+  .flex.gap-3.mt-4 {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* 音域テストレイアウトのモバイル対応 */
+  .range-test-layout {
+    position: static;
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin: 20px 0;
+  }
+
+  .range-test-left {
+    position: static;
+    transform: none;
+    order: 1;
+  }
+
+  .voice-range-display-container {
+    position: static;
+    order: 2;
+  }
+
+  .range-test-right {
+    position: static;
+    transform: none;
+    width: auto;
+    height: auto;
+    order: 3;
+  }
+
+  /* 音域テストレイアウトのモバイル対応 */
+  .range-test-layout-flex {
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .range-instruction-text {
+    font-size: 0.875rem;
+  }
+  
+  
+}
+
+/* ==========================================================================
+   ステップインジケーター
+   ========================================================================== */
+.step-indicator {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  color: rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+
+.step-indicator.active {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-color: #3b82f6;
+  color: white;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+}
+
+.step-indicator.completed {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-color: #10b981;
+  color: white;
+}
+
+.step-connector {
+  flex: 0 0 40px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+
+.step-connector.active {
+  background: linear-gradient(90deg, #10b981, #3b82f6);
+}
+
+
+/* ==========================================================================
+   音声指示セクション
+   ========================================================================== */
+.voice-instruction {
+  position: relative;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+  margin: 24px 0;
+  text-align: center;
+  overflow: visible; /* リップルの広がりを表示するため */
+  animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+  }
+}
+
+.voice-instruction-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.voice-instruction-icon.success {
+  background: #22c55e;
+}
+
+
+.voice-instruction-text {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  letter-spacing: 0.05em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.voice-instruction-pulse {
+  /* HTMLのpulse要素を完全に無効化 */
+  display: none !important;
+  visibility: hidden !important;
+}
+
+
+/* 波紋エフェクト（元のシンプル実装） */
+.voice-instruction::before,
+.voice-instruction::after {
+  content: '';
+  position: absolute;
+  top: calc(32px + 24px); /* アイコン中心位置 */
+  left: 50%;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: transparent;
+  border: 2px solid rgba(59, 130, 246, 0.6);
+  transform: translate(-50%, -50%);
+  animation: ripple 3s linear infinite;
+  pointer-events: none;
+}
+
+.voice-instruction::after {
+  animation-delay: 1.5s;
+}
+
+/* リップルアニメーション停止用クラス */
+.voice-instruction.ripple-stopped::before,
+.voice-instruction.ripple-stopped::after {
+  animation: none !important;
+  display: none !important;
+}
+
+@keyframes ripple {
+  0% {
+    width: 64px;
+    height: 64px;
+    opacity: 0.5;
+  }
+  100% {
+    width: 400px;
+    height: 400px;
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   音域テストセクション
+   ========================================================================== */
+
+
+/* 現在テスト中の音表示 */
+.current-test-note {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.test-note-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* ==========================================================================
+   音域調整UI（12音階モード専用・トグル式）
+   ========================================================================== */
+
+/* メインコンテナ */
+.range-adjustment {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+/* トグルヘッダー部分 */
+.range-toggle-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  margin-bottom: 0;
+  min-height: auto;
+}
+
+.range-toggle-header:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 0.5rem;
+  margin: -0.5rem;
+  transition: all 0.2s ease;
+}
+
+.range-toggle-header .heading-sm {
+  margin: 0 0 0.25rem 0;
+}
+
+.range-toggle-header .btn {
+  padding: 0.25rem;
+  min-height: auto;
+  height: auto;
+  width: auto;
+  min-width: auto;
+}
+
+/* 説明文 */
+.range-description {
+  margin: 0;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+}
+
+/* 調整コントロール部分 */
+.range-controls {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* 調整ボタングループ */
+.range-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 0;
+}
+
+.range-controls .flex {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  justify-content: center;
+  margin-bottom: 0;
+}
+
+/* 音域インジケーター */
+.range-indicator {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1));
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 8px;
+  min-width: 100px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+  transition: all 0.3s ease;
+}
+
+.range-indicator:hover {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.2));
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.range-indicator span {
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+  font-size: 1.125rem;
+  letter-spacing: 0.025em;
+}
+
+/* 音域調整ボタン */
+.range-adjust-btn {
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.range-adjust-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.range-adjust-btn:active {
+  transform: translateY(0);
+}
+
+/* 音域テストボタン部分 */
+.range-test-buttons {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.range-test-buttons .flex {
+  justify-content: center !important;
+}
+
+/* 音域テストボタン */
+.range-test-btn {
+  padding: 0.4rem 0.8rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.range-test-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(96, 165, 250, 0.5);
+  color: #60a5fa;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .range-controls-group {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .range-adjust-btn,
+  .range-test-btn {
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   プログレス関連（bolt-new-designから移植）
+   ========================================================================== */
+/* .progress-section定義はbase.cssを使用（重複削除） */
+
+/* トレーニング専用進行バーセクション */
+.progress-section-training {
+  margin-bottom: 1.5rem !important;
+}
+
+.section-header-training {
+  margin-bottom: 1rem;
+}
+
+.section-header-training .heading-md {
+  margin-bottom: 0;
+}
+
+.range-adjustment {
+  display: none;
+}
+
+.range-controls {
+  display: none;
+}
+
+.range-controls .btn i {
+  flex-shrink: 0;
+}
+
+
+@media (max-width: 768px) {
+  #range-down span,
+  #range-up span {
+    display: none;
+  }
+  
+  .mobile-hide {
+    display: none;
+  }
+  
+  #range-down,
+  #range-up {
+    min-width: 44px;
+    padding: 0.75rem;
+  }
+  
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 8px;
+}
+
+.progress-marker {
+  position: absolute;
+  top: -4px;
+  right: 20%;
+  font-size: 1.2rem;
+  z-index: 2;
+}
+
+/* ==========================================================================
+   ドレミガイド（bolt-new-designから移植）
+   ========================================================================== */
+.doremi-guide {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.note-circles {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+  justify-content: center;
+  max-width: 580px;
+  margin: 0 auto 24px auto;
+}
+
+/* プログレス四角 */
+.progress-squares {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.progress-square {
+  flex: 1;
+  height: 10px;
+  background: #60a5fa;
+  border-radius: 2px;
+}
+
+.progress-square.consumed {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* モバイル時は2行配置（上4下4） */
+@media (max-width: 768px) {
+  .note-circles {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    justify-items: center;
+  }
+}
+
+.note-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  position: relative;
+  overflow: visible;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.note-circle.current {
+  background: linear-gradient(135deg, #ff69b4, #ff1493);
+  color: #ffffff;
+  transform: scale(1.2);
+  box-shadow: 0 0 20px rgba(255, 105, 180, 0.6);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.note-circle.completed {
+  background: linear-gradient(135deg, rgba(255, 105, 180, 0.6), rgba(255, 20, 147, 0.4));
+  color: #ffffff;
+  border-color: rgba(255, 105, 180, 0.4);
+  box-shadow: 0 0 15px rgba(255, 105, 180, 0.4);
+}
+
+/* 波紋エフェクト */
+@keyframes ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.8);
+    opacity: 0;
+  }
+}
+
+.note-circle.current::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 140%;
+  height: 140%;
+  border-radius: 50%;
+  background: rgba(255, 105, 180, 0.3);
+  transform: translate(-50%, -50%) scale(1);
+  transform-origin: center;
+  animation: ripple 1.5s infinite;
+}
+
+.note-circle.current::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 140%;
+  height: 140%;
+  border-radius: 50%;
+  background: rgba(255, 105, 180, 0.2);
+  transform: translate(-50%, -50%) scale(1);
+  transform-origin: center;
+  animation: ripple 1.5s infinite 0.75s;
+}
+
+/* ==========================================================================
+   音域テスト専用 - 完全オリジナルクラス
+   ========================================================================== */
+
+/* 音域テストレイアウト - 単一要素中央配置 */
+.range-test-layout-flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 20px auto;
+}
+
+.range-test-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 旧版レイアウト（互換性のため残す） */
+.range-test-layout {
+  position: relative;
+  margin: 20px auto;
+  width: 160px;
+  height: 160px;
+}
+
+.range-test-left {
+  position: absolute;
+  left: -120px;
+  top: 60%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.range-test-right {
+  position: absolute;
+  right: -100px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.voice-range-display-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  width: 160px;
+  height: 160px;
+}
+
+/* SVG円形プログレス */
+.voice-stability-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.voice-progress-circle {
+  transition: stroke-dashoffset 0.1s ease;
+}
+
+/* 確定時のアニメーション */
+.voice-stability-svg.completed .voice-progress-circle {
+  stroke: #10b981;
+  animation: voice-completion-pulse 0.5s ease-out;
+}
+
+@keyframes voice-completion-pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* 音程表示バッジ */
+.voice-note-badge {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.voice-note-badge.measuring {
+  animation: voice-badge-pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+}
+
+.voice-note-badge.confirmed {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+}
+
+.voice-note-badge.confirming-animation {
+  animation: voice-badge-confirm 0.6s ease-out;
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.6) !important;
+}
+
+@keyframes voice-badge-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(245, 158, 11, 0.7);
+  }
+}
+
+@keyframes voice-badge-confirm {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 0 35px rgba(16, 185, 129, 0.8);
+  }
+  100% {
+    transform: scale(1);
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+  }
+}
+
+.voice-note-text {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.voice-freq-text {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+
+.note-name {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.note-frequency {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+.test-instruction {
+  background: rgba(239, 68, 68, 0.1);  /* 赤色背景に変更 */
+  border: 1px solid rgba(239, 68, 68, 0.2);  /* 赤色ボーダーに変更 */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* preparation.html用の大きな.test-instruction */
+#range-test-section .test-instruction {
+  width: 48px;
+  height: 48px;
+  margin: 0;
+  background: rgba(239, 68, 68, 0.15);  /* 赤色背景（やや濃いめ） */
+  border: 1px solid rgba(239, 68, 68, 0.3);  /* 赤色ボーダー（やや濃いめ） */
+}
+
+#range-test-section .text-sub-title {
+  text-align: center !important;  /* センター寄せに変更 */
+  margin: 0;
+}
+
+/* モバイル版でテキストサイズ調整 */
+@media (max-width: 768px) {
+  #range-test-section .text-sub-title {
+    font-size: 1rem;
+    text-align: center !important;  /* モバイルでもセンター寄せ */
+  }
+}
+
+/* マイクステータスアイコンのスタイル */
+.mic-status-container {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* 待機状態（白のグラス効果） */
+.mic-status-container.standby {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+  /* Safari 18 backdrop-filterバグ回避 */
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.mic-status-container.standby i {
+  color: white;
+  width: 36px;
+  height: 36px;
+}
+
+/* 録音状態（赤のグラス効果 + パルスアニメーション） */
+.mic-status-container.recording {
+  background: rgba(239, 68, 68, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  /* Safari 18 backdrop-filterバグ回避 */
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.mic-status-container.recording i {
+  color: #ef4444;
+  width: 36px;
+  height: 36px;
+}
+
+/* パルスアニメーション（グローが広がったり縮んだり） */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3),
+                0 0 40px rgba(239, 68, 68, 0.2);
+  }
+  50% {
+    box-shadow: 0 4px 30px rgba(239, 68, 68, 0.5),
+                0 0 60px rgba(239, 68, 68, 0.4),
+                0 0 80px rgba(239, 68, 68, 0.2);
+  }
+}
+
+/* パルスリング（追加エフェクト） */
+.mic-status-container.recording::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid rgba(239, 68, 68, 0.5);
+  animation: pulseRing 2s ease-in-out infinite;
+}
+
+@keyframes pulseRing {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.3);
+    opacity: 0;
+  }
+}
+
+.test-instruction-green {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.test-instruction.measuring {
+  animation: instruction-glow 2s ease-in-out infinite;
+}
+
+@keyframes instruction-glow {
+  0%, 100% {
+    background: rgba(239, 68, 68, 0.15);  /* 赤色に変更 */
+    border-color: rgba(239, 68, 68, 0.3);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+  }
+  50% {
+    background: rgba(239, 68, 68, 0.3);  /* 赤色に変更 */
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
+  }
+}
+
+.test-instruction p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* 検出メーター */
+.detection-meters {
+  margin-bottom: 24px;
+}
+
+.detection-meters .meter-group {
+  margin-bottom: 16px;
+}
+
+
+
+/* ==========================================================================
+   フッター（700px制限）
+   ========================================================================== */
+.footer-base {
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}

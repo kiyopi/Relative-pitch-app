@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AudioDetectionComponent updateSelectors() デモ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0d1117;
+            color: #c9d1d9;
+        }
+        .container {
+            background: #161b22;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #58a6ff;
+            margin-bottom: 30px;
+        }
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .mode-btn {
+            padding: 10px 20px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .mode-btn:hover {
+            background: #2ea043;
+        }
+        .mode-btn.active {
+            background: #1f6feb;
+        }
+        .mode-btn:disabled {
+            background: #484f58;
+            cursor: not-allowed;
+        }
+        .ui-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #21262d;
+            border-radius: 8px;
+            border-left: 4px solid #f85149;
+        }
+        .ui-section.active {
+            border-left-color: #3fb950;
+            background: #0d2818;
+        }
+        .ui-section h3 {
+            margin: 0 0 15px 0;
+            color: #f0f6fc;
+        }
+        .meter-group {
+            margin: 10px 0;
+        }
+        .meter-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #21262d;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3fb950 0%, #f85149 100%);
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+        .frequency-display {
+            font-size: 18px;
+            font-weight: bold;
+            color: #58a6ff;
+            text-align: center;
+            padding: 10px;
+            background: #0d1117;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: 500;
+        }
+        .status.ready { 
+            background: #033a16; 
+            color: #3fb950; 
+            border: 1px solid #238636;
+        }
+        .status.active { 
+            background: #0c2d48; 
+            color: #58a6ff; 
+            border: 1px solid #1f6feb;
+        }
+        .status.error { 
+            background: #490202; 
+            color: #f85149; 
+            border: 1px solid #da3633;
+        }
+        .log {
+            background: #0d1117;
+            color: #7d8590;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            padding: 15px;
+            border-radius: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 updateSelectors() デモ</h1>
+        
+        <div class="status" id="status">初期化前...</div>
+        
+        <div class="mode-selector">
+            <button class="mode-btn" id="initBtn">🎤 初期化</button>
+            <button class="mode-btn" id="startBtn" disabled>▶️ 開始</button>
+            <button class="mode-btn" id="stopBtn" disabled>⏹ 停止</button>
+            <button class="mode-btn" id="micModeBtn" disabled>マイクテストモード</button>
+            <button class="mode-btn" id="rangeModeBtn" disabled>音域テストモード</button>
+            <button class="mode-btn" id="practiceModeBtn" disabled>練習モード</button>
+        </div>
+
+        <!-- マイクテストモードのUI -->
+        <div class="ui-section" id="mic-mode">
+            <h3>🎤 マイクテストモード</h3>
+            <div class="meter-group">
+                <div class="meter-label">
+                    <span>音量レベル</span>
+                    <span id="mic-volume-text">0.0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="mic-volume-bar"></div>
+                </div>
+            </div>
+            <div class="frequency-display" id="mic-frequency">0.0 Hz</div>
+        </div>
+
+        <!-- 音域テストモードのUI -->
+        <div class="ui-section" id="range-mode">
+            <h3>🎵 音域テストモード</h3>
+            <div class="meter-group">
+                <div class="meter-label">
+                    <span>検出音量</span>
+                    <span id="range-volume-text">0.0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="range-volume-bar"></div>
+                </div>
+            </div>
+            <div class="frequency-display" id="range-frequency-value">0.0 Hz</div>
+        </div>
+
+        <!-- 練習モードのUI -->
+        <div class="ui-section" id="practice-mode">
+            <h3>🎶 練習モード</h3>
+            <div class="meter-group">
+                <div class="meter-label">
+                    <span>練習音量</span>
+                    <span id="practice-volume-text">0.0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="practice-volume-bar"></div>
+                </div>
+            </div>
+            <div class="frequency-display" id="practice-frequency">0.0 Hz</div>
+            <div class="frequency-display" id="practice-note">-</div>
+        </div>
+
+        <div class="log" id="log">ログ待機中...</div>
+    </div>
+
+    <script type="module">
+        import { AudioDetectionComponent } from './dist/index.esm.js';
+        
+        let audioDetector = null;
+        let currentMode = 'mic';
+        let logLines = [];
+        
+        const elements = {
+            status: document.getElementById('status'),
+            initBtn: document.getElementById('initBtn'),
+            startBtn: document.getElementById('startBtn'),
+            stopBtn: document.getElementById('stopBtn'),
+            micModeBtn: document.getElementById('micModeBtn'),
+            rangeModeBtn: document.getElementById('rangeModeBtn'),
+            practiceModeBtn: document.getElementById('practiceModeBtn'),
+            log: document.getElementById('log'),
+            
+            micMode: document.getElementById('mic-mode'),
+            rangeMode: document.getElementById('range-mode'),
+            practiceMode: document.getElementById('practice-mode')
+        };
+        
+        function updateStatus(message, type = 'ready') {
+            elements.status.textContent = message;
+            elements.status.className = `status ${type}`;
+        }
+        
+        function addLog(message) {
+            const time = new Date().toLocaleTimeString('ja-JP');
+            logLines.push(`[${time}] ${message}`);
+            if (logLines.length > 50) logLines.shift();
+            elements.log.textContent = logLines.join('\n');
+            elements.log.scrollTop = elements.log.scrollHeight;
+        }
+        
+        function updateModeUI(mode) {
+            // すべてのUIセクションを非アクティブに
+            Object.values(elements).forEach(el => {
+                if (el && el.classList && el.classList.contains('ui-section')) {
+                    el.classList.remove('active');
+                }
+            });
+            
+            // UI要素のリセットはPitchProのupdateSelectors()で自動実行されるため削除
+            
+            // ボタン状態更新
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 現在のモードをアクティブに
+            if (mode === 'mic') {
+                elements.micMode.classList.add('active');
+                elements.micModeBtn.classList.add('active');
+            } else if (mode === 'range') {
+                elements.rangeMode.classList.add('active');
+                elements.rangeModeBtn.classList.add('active');
+            } else if (mode === 'practice') {
+                elements.practiceMode.classList.add('active');
+                elements.practiceModeBtn.classList.add('active');
+            }
+            
+            currentMode = mode;
+        }
+        
+        // 初期化
+        elements.initBtn.addEventListener('click', async () => {
+            try {
+                updateStatus('初期化中...', 'ready');
+                addLog('AudioDetectionComponent初期化開始');
+                
+                audioDetector = new AudioDetectionComponent({
+                    volumeBarSelector: '#mic-volume-bar',
+                    volumeTextSelector: '#mic-volume-text',
+                    frequencySelector: '#mic-frequency',
+                    clarityThreshold: 0.3,
+                    minVolumeAbsolute: 0.002,
+                    debug: true
+                });
+                
+                audioDetector.setCallbacks({
+                    onPitchUpdate: (result) => {
+                        if (result.frequency > 0) {
+                            addLog(`🎵 ${result.frequency.toFixed(1)}Hz, 音量: ${result.volume.toFixed(1)}%`);
+                        }
+                    },
+                    onError: (error) => {
+                        addLog(`❌ エラー: ${error.message}`);
+                        updateStatus(`エラー: ${error.message}`, 'error');
+                    },
+                    onStateChange: (state) => {
+                        addLog(`🔄 状態変更: ${state}`);
+                    }
+                });
+                
+                await audioDetector.initialize();
+                
+                // updateSelectors メソッドの存在確認
+                if (typeof audioDetector.updateSelectors === 'function') {
+                    addLog('✅ updateSelectors メソッド確認済み');
+                } else {
+                    addLog(`❌ updateSelectors メソッドが見つかりません。型: ${typeof audioDetector.updateSelectors}`);
+                    addLog(`利用可能なメソッド: ${Object.getOwnPropertyNames(Object.getPrototypeOf(audioDetector)).filter(name => typeof audioDetector[name] === 'function').join(', ')}`);
+                }
+                
+                updateStatus('初期化完了 - 開始ボタンをクリック', 'ready');
+                addLog('✅ 初期化完了');
+                
+                elements.initBtn.disabled = true;
+                elements.startBtn.disabled = false;
+                elements.micModeBtn.disabled = false;
+                elements.rangeModeBtn.disabled = false;
+                elements.practiceModeBtn.disabled = false;
+                
+                updateModeUI('mic'); // デフォルトでマイクモード
+                
+            } catch (error) {
+                addLog(`❌ 初期化エラー: ${error.message}`);
+                updateStatus(`初期化エラー: ${error.message}`, 'error');
+            }
+        });
+        
+        // 開始
+        elements.startBtn.addEventListener('click', () => {
+            if (audioDetector) {
+                const started = audioDetector.startDetection();
+                if (started) {
+                    updateStatus('🎤 検出中...', 'active');
+                    elements.startBtn.disabled = true;
+                    elements.stopBtn.disabled = false;
+                    addLog('🎤 音声検出開始');
+                } else {
+                    addLog('❌ 検出開始に失敗');
+                }
+            }
+        });
+        
+        // 停止
+        elements.stopBtn.addEventListener('click', () => {
+            if (audioDetector) {
+                audioDetector.stopDetection();
+                updateStatus('停止', 'ready');
+                elements.startBtn.disabled = false;
+                elements.stopBtn.disabled = true;
+                addLog('⏹ 音声検出停止');
+            }
+        });
+        
+        // マイクテストモード
+        elements.micModeBtn.addEventListener('click', () => {
+            if (audioDetector) {
+                addLog(`🔍 updateSelectors メソッド型: ${typeof audioDetector.updateSelectors}`);
+                if (typeof audioDetector.updateSelectors === 'function') {
+                    addLog('🔄 マイクテストモードのupdateSelectors実行中...');
+                    try {
+                        audioDetector.updateSelectors({
+                    volumeBarSelector: '#mic-volume-bar',
+                    volumeTextSelector: '#mic-volume-text',
+                    frequencySelector: '#mic-frequency'
+                        });
+                        addLog('✅ マイクテストモード updateSelectors 成功');
+                        updateModeUI('mic');
+                        addLog('🔄 マイクテストモードに切り替え');
+                        addLog('📊 セレクター更新: #mic-volume-bar, #mic-volume-text, #mic-frequency');
+                    } catch (error) {
+                        addLog(`❌ マイクモード切り替えエラー: ${error.message}`);
+                        console.error('Mic mode error:', error);
+                    }
+                } else {
+                    addLog(`❌ updateSelectors メソッドが利用できません (型: ${typeof audioDetector.updateSelectors})`);
+                }
+            } else {
+                addLog('❌ audioDetector が初期化されていません');
+            }
+        });
+        
+        // 音域テストモード
+        elements.rangeModeBtn.addEventListener('click', () => {
+            if (audioDetector) {
+                addLog(`🔍 音域モード - updateSelectors メソッド型: ${typeof audioDetector.updateSelectors}`);
+                if (typeof audioDetector.updateSelectors === 'function') {
+                    try {
+                        audioDetector.updateSelectors({
+                            volumeBarSelector: '#range-volume-bar',
+                            volumeTextSelector: '#range-volume-text',
+                            frequencySelector: '#range-frequency-value'
+                        });
+                        addLog('✅ 音域テストモード updateSelectors 成功');
+                        updateModeUI('range');
+                        addLog('🔄 音域テストモードに切り替え');
+                        addLog('📊 セレクター更新: #range-volume-bar, #range-volume-text, #range-frequency-value');
+                    } catch (error) {
+                        addLog(`❌ 音域モード切り替えエラー: ${error.message}`);
+                        console.error('Range mode error:', error);
+                    }
+                } else {
+                    addLog(`❌ updateSelectors メソッドが利用できません (型: ${typeof audioDetector.updateSelectors})`);
+                }
+            } else {
+                addLog('❌ audioDetector が初期化されていません');
+            }
+        });
+        
+        // 練習モード
+        elements.practiceModeBtn.addEventListener('click', () => {
+            if (audioDetector) {
+                addLog(`🔍 練習モード - updateSelectors メソッド型: ${typeof audioDetector.updateSelectors}`);
+                if (typeof audioDetector.updateSelectors === 'function') {
+                    try {
+                        audioDetector.updateSelectors({
+                            volumeBarSelector: '#practice-volume-bar',
+                            volumeTextSelector: '#practice-volume-text',
+                            frequencySelector: '#practice-frequency',
+                            noteSelector: '#practice-note'
+                        });
+                        addLog('✅ 練習モード updateSelectors 成功');
+                        updateModeUI('practice');
+                        addLog('🔄 練習モードに切り替え');
+                        addLog('📊 セレクター更新: #practice-volume-bar, #practice-volume-text, #practice-frequency, #practice-note');
+                    } catch (error) {
+                        addLog(`❌ 練習モード切り替えエラー: ${error.message}`);
+                        console.error('Practice mode error:', error);
+                    }
+                } else {
+                    addLog(`❌ updateSelectors メソッドが利用できません (型: ${typeof audioDetector.updateSelectors})`);
+                }
+            } else {
+                addLog('❌ audioDetector が初期化されていません');
+            }
+        });
+        
+        // 初期ログ
+        addLog('AudioDetectionComponent updateSelectors() デモ準備完了');
+        addLog('手順: 1) 初期化 → 2) 開始 → 3) モード切り替えテスト');
+        
+        updateModeUI('mic');
+    </script>
+</body>
+</html>

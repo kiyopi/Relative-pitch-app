@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>8va相対音感トレーニング - ホーム</title>
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- JavaScript モジュール -->
+    <script src="../../js/data-manager.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="app-header">
+                <div class="header-brand">
+                    <div class="header-icon-wrapper">
+                        <div class="header-icon">
+                            <i data-lucide="music" class="icon-lg text-white"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-white">8va相対音感トレーニング</h1>
+                        <p class="text-purple-200">あなたの音感を科学的に向上させましょう</p>
+                    </div>
+                </div>
+                <!-- モバイル用ハンバーガーメニュー -->
+                <button class="menu-toggle" id="menu-toggle">
+                    <i data-lucide="menu" class="icon-md"></i>
+                </button>
+                
+                <!-- PC用ナビゲーション -->
+                <nav class="header-nav" id="header-nav">
+                    <button class="nav-button" onclick="window.location.href='../templates/records.html'" title="トレーニング記録を見る">
+                        <i data-lucide="history" class="icon-md"></i>
+                        <span class="nav-text">記録</span>
+                    </button>
+                    <button class="nav-button" onclick="window.location.href='../templates/results.html'" title="総合評価を見る">
+                        <i data-lucide="bar-chart-3" class="icon-md"></i>
+                        <span class="nav-text">評価</span>
+                    </button>
+                    <button class="nav-button">
+                        <i data-lucide="settings" class="icon-md"></i>
+                        <span class="nav-text">設定</span>
+                    </button>
+                    <button class="nav-button">
+                        <i data-lucide="share" class="icon-md"></i>
+                        <span class="nav-text">共有</span>
+                    </button>
+                </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="wide-main">
+                <!-- Stats Overview -->
+                <div class="stats-grid">
+                    <div class="glass-card-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <i data-lucide="trending-up" class="icon-lg text-green-300"></i>
+                            <span class="text-2xl font-bold text-white">A</span>
+                        </div>
+                        <p class="text-green-200 mb-0">総合音感レベル</p>
+                    </div>
+                    <div class="glass-card-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <i data-lucide="calendar-check" class="icon-lg text-blue-300"></i>
+                            <span class="text-2xl font-bold text-white">156</span>
+                        </div>
+                        <p class="text-green-200 mb-0">総練習セッション数</p>
+                    </div>
+                    <div class="glass-card-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <i data-lucide="target" class="icon-lg text-yellow-300"></i>
+                            <span class="text-2xl font-bold text-white">±20¢</span>
+                        </div>
+                        <p class="text-green-200 mb-0">全体平均誤差</p>
+                    </div>
+                    <div class="glass-card-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <i data-lucide="zap" class="icon-lg text-purple-200"></i>
+                            <span class="text-2xl font-bold text-white">12</span>
+                        </div>
+                        <p class="text-green-200 mb-0">最高連続正解</p>
+                    </div>
+                </div>
+
+                <!-- Training Modes -->
+                <section class="hero-section">
+                    <h2 class="text-3xl font-bold text-white mb-8 text-center">トレーニングモードを選択</h2>
+                    <div class="modes-grid">
+                        <!-- ランダム基音モード -->
+                        <div class="mode-card beginner" data-mode="random">
+                            <div class="card-header">
+                                <div class="mode-icon">
+                                    <i data-lucide="shuffle" class="icon-md text-white"></i>
+                                </div>
+                                <span class="difficulty-badge beginner">初級</span>
+                            </div>
+                            <div class="card-body">
+                                <h3 class="mode-title">ランダム基音モード</h3>
+                                <p class="mode-subtitle">初級者向け</p>
+                                <p class="mode-description">カラオケなどで音程を合わせて歌えるようになる基礎トレーニング</p>
+                                
+                                <div class="features">
+                                    <div class="feature-highlight">
+                                        <i data-lucide="sparkles" class="icon-xs text-yellow-300"></i>
+                                        <span>8セッション</span>
+                                    </div>
+                                    <ul class="feature-list">
+                                        <li>
+                                            <i data-lucide="check" class="icon-xs text-green-300"></i>
+                                            基本的な相対音感
+                                        </li>
+                                        <li>
+                                            <i data-lucide="check" class="icon-xs text-green-300"></i>
+                                            音程の安定化
+                                        </li>
+                                        <li>
+                                            <i data-lucide="check" class="icon-xs text-green-300"></i>
+                                            セッション別評価
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-primary" onclick="window.location.href='preparation.html?mode=random&session=1'">
+                                    <span>始める</span>
+                                    <i data-lucide="music" style="width: 24px; height: 24px;"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 連続チャレンジモード -->
+                        <div class="mode-card intermediate" data-mode="continuous">
+                            <div class="card-header">
+                                <div class="mode-icon">
+                                    <i data-lucide="zap" class="icon-md text-white"></i>
+                                </div>
+                                <span class="difficulty-badge intermediate">中級</span>
+                            </div>
+                            <div class="card-body">
+                                <h3 class="mode-title">連続チャレンジモード</h3>
+                                <p class="mode-subtitle">中級者向け</p>
+                                <p class="mode-description">半音も含めた音を聞き分け、集中力を維持しながら相対音感を鍛える</p>
+                                
+                                <div class="features">
+                                    <div class="feature-highlight">
+                                        <i data-lucide="sparkles" class="icon-xs text-yellow-300"></i>
+                                        <span>12セッション連続</span>
+                                    </div>
+                                    <ul class="feature-list">
+                                        <li>
+                                            <i data-lucide="check" class="icon-xs text-green-300"></i>
+                                            クロマチック12音
+                                        </li>
+                                        <li>
+                                            <i data-lucide="check" class="icon-xs text-green-300"></i>
+                                            連続集中練習
+                                        </li>
+                                        <li>
+                                            <i data-lucide="check" class="icon-xs text-green-300"></i>
+                                            総合評価
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-primary" onclick="window.location.href='training.html?mode=continuous&session=1'">
+                                    <span>始める</span>
+                                    <i data-lucide="music" style="width: 24px; height: 24px;"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 12音階モード -->
+                        <div class="mode-card advanced" data-mode="twelve">
+                            <div class="card-header">
+                                <div class="mode-icon">
+                                    <i data-lucide="music" class="icon-md text-white"></i>
+                                </div>
+                                <span class="difficulty-badge advanced">上級</span>
+                            </div>
+                            <div class="card-body">
+                                <h3 class="mode-title">12音階モード</h3>
+                                <p class="mode-subtitle">上級者向け</p>
+                                <p class="mode-description">すべての音に対して完璧な相対音感を習得するプロレベル練習</p>
+                                
+                                <div class="features">
+                                    <div class="feature-highlight">
+                                        <i data-lucide="sparkles" class="icon-xs text-yellow-300"></i>
+                                        <span>12-24セッション</span>
+                                    </div>
+                                    <ul class="feature-list">
+                                        <li>
+                                            <i data-lucide="check" class="icon-xs text-green-300"></i>
+                                            上昇・下降・両方向
+                                        </li>
+                                        <li>
+                                            <i data-lucide="check" class="icon-xs text-green-300"></i>
+                                            プロレベル判定
+                                        </li>
+                                        <li>
+                                            <i data-lucide="check" class="icon-xs text-green-300"></i>
+                                            S級認定
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-primary" onclick="window.location.href='training.html?mode=twelve&session=1'">
+                                    <span>始める</span>
+                                    <i data-lucide="music" style="width: 24px; height: 24px;"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 弱点練習モード -->
+                        <div class="mode-card special">
+                            <div class="card-header">
+                                <div class="mode-icon">
+                                    <i data-lucide="locate-fixed" class="icon-md text-white"></i>
+                                </div>
+                                <span class="difficulty-badge coming-soon">次期版</span>
+                            </div>
+                            <div class="card-body">
+                                <h3 class="mode-title">弱点練習モード</h3>
+                                <p class="mode-subtitle">AI分析による個別最適化</p>
+                                <p class="mode-description">あなたの弱点音程を自動分析し、効率的に苦手を克服する練習プログラム</p>
+                                
+                                <div class="features">
+                                    <div class="feature-highlight">
+                                        <i data-lucide="sparkles" class="icon-xs text-yellow-300"></i>
+                                        <span>個別最適化</span>
+                                    </div>
+                                    <ul class="feature-list">
+                                        <li>
+                                            <i data-lucide="check" class="icon-xs text-green-300"></i>
+                                            AI弱点分析
+                                        </li>
+                                        <li>
+                                            <i data-lucide="check" class="icon-xs text-green-300"></i>
+                                            カスタム練習
+                                        </li>
+                                        <li>
+                                            <i data-lucide="check" class="icon-xs text-green-300"></i>
+                                            集中改善
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <p class="text-center text-white text-sm">次期バージョンで提供予定</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Theory Section -->
+                <section class="theory-section">
+                    <div class="theory-card">
+                        <div class="theory-icon">
+                            <i data-lucide="brain" class="icon-lg text-yellow-300"></i>
+                        </div>
+                        <div class="theory-content">
+                            <h4>脳内ピアノ理論</h4>
+                            <p>相対音感の向上は歌唱力だけでなく、円滑な人間関係構築にも効果があることが知られています。音楽は人と人をつなぐ普遍的な言語なのです。</p>
+                        </div>
+                    </div>
+                </section>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="footer-base">
+            <p class="footer-copyright">© 2024 8va相対音感トレーニングアプリ</p>
+            <p class="footer-tagline">音楽の新しい扉を開こう</p>
+        </footer>
+    </div>
+
+    <!-- Lucide初期化 -->
+    <script src="js/lucide-init.js"></script>
+    
+    <!-- メニュー開閉スクリプト -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const headerNav = document.getElementById('header-nav');
+            
+            menuToggle.addEventListener('click', function() {
+                headerNav.classList.toggle('active');
+                // アイコン切り替え
+                const icon = menuToggle.querySelector('i');
+                if (headerNav.classList.contains('active')) {
+                    icon.setAttribute('data-lucide', 'x');
+                } else {
+                    icon.setAttribute('data-lucide', 'menu');
+                }
+                lucide.createIcons();
+            });
+            
+            // 外側クリックで閉じる
+            document.addEventListener('click', function(event) {
+                if (!menuToggle.contains(event.target) && !headerNav.contains(event.target)) {
+                    headerNav.classList.remove('active');
+                    const icon = menuToggle.querySelector('i');
+                    icon.setAttribute('data-lucide', 'menu');
+                    lucide.createIcons();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

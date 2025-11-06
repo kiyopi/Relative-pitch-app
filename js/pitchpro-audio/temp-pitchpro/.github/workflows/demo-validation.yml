@@ -1,0 +1,248 @@
+name: Demo Pages Validation
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ develop ]
+    # mainブランチへのプッシュ時は特定のパスのみ
+    paths:
+      - 'demos/**'
+      - 'test/**'
+      - '*.html'
+  release:
+    types: [ published ]
+
+jobs:
+  demo-validation:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build project
+      run: npm run build
+      
+    - name: Verify build outputs
+      run: |
+        echo "Checking build outputs..."
+        ls -la dist/
+        
+        # 必須ファイルの存在確認
+        test -f dist/index.js || (echo "❌ CJS build missing" && exit 1)
+        test -f dist/index.esm.js || (echo "❌ ESM build missing" && exit 1) 
+        test -f dist/pitchpro.umd.js || (echo "❌ UMD build missing" && exit 1)
+        test -f dist/index.d.ts || (echo "❌ Type definitions missing" && exit 1)
+        
+        # 後方互換性シンボリックリンクの確認
+        test -L dist/pitchpro.esm.js || (echo "⚠️ Legacy ESM symlink missing" && exit 0)
+        test -L dist/pitchpro.cjs.js || (echo "⚠️ Legacy CJS symlink missing" && exit 0)
+        
+        echo "✅ All build outputs verified"
+        
+    - name: Run import path tests
+      run: npm run test:imports
+      
+    - name: Run full test suite
+      run: npm test -- --run
+      
+    - name: Install playwright for demo testing
+      run: npx playwright install --with-deps chromium
+      
+    - name: Create demo validation script
+      run: |
+        cat > validate-demos.js << 'EOF'
+        const { chromium } = require('playwright');
+        const fs = require('fs');
+        const path = require('path');
+
+        async function validateDemo(page, filePath, testName) {
+          console.log(`🔍 Testing ${testName}...`);
+          
+          const fullPath = `file://${path.resolve(filePath)}`;
+          
+          try {
+            // コンソールエラーをキャプチャ
+            const errors = [];
+            page.on('console', msg => {
+              if (msg.type() === 'error') {
+                errors.push(msg.text());
+              }
+            });
+            
+            // ページリクエストエラーをキャプチャ (304 Not Modifiedは除外)
+            const networkErrors = [];
+            page.on('response', response => {
+              if (!response.ok() && response.status() !== 304 && response.url().includes('.js')) {
+                networkErrors.push(`${response.status()}: ${response.url()}`);
+              }
+            });
+            
+            await page.goto(fullPath, { waitUntil: 'networkidle' });
+            
+            // ページタイトルの確認
+            const title = await page.title();
+            console.log(`  📄 Title: ${title}`);
+            
+            // 必須要素の存在確認
+            const hasContent = await page.locator('body').isVisible();
+            if (!hasContent) {
+              throw new Error('Page body not visible');
+            }
+            
+            // JavaScriptエラーのチェック
+            if (errors.length > 0) {
+              console.log(`  ⚠️ Console errors: ${errors.length}`);
+              errors.forEach(err => console.log(`    - ${err}`));
+            }
+            
+            // ネットワークエラーのチェック  
+            if (networkErrors.length > 0) {
+              console.log(`  ❌ Network errors: ${networkErrors.length}`);
+              networkErrors.forEach(err => console.log(`    - ${err}`));
+              throw new Error(`Network errors detected: ${networkErrors.join(', ')}`);
+            }
+            
+            console.log(`  ✅ ${testName} validation passed`);
+            return true;
+            
+          } catch (error) {
+            console.log(`  ❌ ${testName} validation failed: ${error.message}`);
+            return false;
+          }
+        }
+
+        async function main() {
+          const browser = await chromium.launch();
+          const page = await browser.newPage();
+          
+          const demos = [
+            ['integration-test-demo.html', 'Integration Test Demo'],
+            ['demos/test-imports.html', 'Import Test Demo'],
+            ['demos/silence-detection-test.html', 'Silence Detection Demo'],
+            ['demos/quick-test.html', 'Quick Test Demo']
+          ];
+          
+          let passed = 0;
+          let failed = 0;
+          
+          for (const [file, name] of demos) {
+            if (fs.existsSync(file)) {
+              const success = await validateDemo(page, file, name);
+              success ? passed++ : failed++;
+            } else {
+              console.log(`⚠️ Demo file not found: ${file}`);
+            }
+          }
+          
+          await browser.close();
+          
+          console.log(`\n📊 Demo Validation Results:`);
+          console.log(`  ✅ Passed: ${passed}`);
+          console.log(`  ❌ Failed: ${failed}`);
+          
+          if (failed > 0) {
+            process.exit(1);
+          }
+        }
+
+        main().catch(console.error);
+        EOF
+        
+    - name: Run demo validation
+      run: |
+        npm install playwright
+        node validate-demos.js
+        
+    - name: Check package.json consistency
+      run: |
+        echo "Verifying package.json exports..."
+        node -e "
+          const pkg = require('./package.json');
+          const fs = require('fs');
+          
+          // main, module, types のファイル存在確認
+          const files = [pkg.main, pkg.module, pkg.types];
+          let allExist = true;
+          
+          files.forEach(file => {
+            if (!fs.existsSync(file)) {
+              console.log(\`❌ Missing: \${file}\`);
+              allExist = false;
+            } else {
+              console.log(\`✅ Found: \${file}\`);
+            }
+          });
+          
+          if (!allExist) {
+            process.exit(1);
+          }
+          
+          console.log('✅ Package.json exports validation passed');
+        "
+        
+    - name: Performance benchmark
+      run: |
+        # 基本的なパフォーマンステスト
+        npm run test:performance
+        
+        # ビルドサイズのチェック
+        echo "📏 Build size analysis:"
+        ls -lh dist/ | grep -E '\.(js|d\.ts)$'
+        
+        # gzip圧縮後のサイズ
+        gzip -c dist/index.esm.js | wc -c | xargs echo "ESM gzipped:"
+        gzip -c dist/index.js | wc -c | xargs echo "CJS gzipped:"
+        gzip -c dist/pitchpro.umd.js | wc -c | xargs echo "UMD gzipped:"
+        
+    - name: Generate validation report
+      if: always()
+      run: |
+        cat > validation-report.md << 'EOF'
+        # Demo Validation Report
+        
+        **Build**: ${{ github.sha }}
+        **Node.js**: ${{ matrix.node-version }}
+        **Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        
+        ## Build Outputs
+        - ✅ CJS: `dist/index.js`
+        - ✅ ESM: `dist/index.esm.js`  
+        - ✅ UMD: `dist/pitchpro.umd.js`
+        - ✅ Types: `dist/index.d.ts`
+        
+        ## Demo Pages Status
+        $(node validate-demos.js 2>&1 || echo "See demo validation logs above")
+        
+        ## Package Integrity
+        - ✅ Package.json exports verified
+        - ✅ Import paths tested
+        - ✅ Type definitions aligned
+        
+        EOF
+        
+        echo "Validation report generated"
+        
+    - name: Upload validation artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: demo-validation-${{ matrix.node-version }}
+        path: |
+          validation-report.md
+          dist/
+        retention-days: 7

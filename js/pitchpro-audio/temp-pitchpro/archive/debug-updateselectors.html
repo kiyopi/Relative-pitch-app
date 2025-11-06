@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug updateSelectors Method</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .error { color: red; }
+        .success { color: green; }
+        .info { color: blue; }
+        .step { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>🔍 updateSelectors Method Debug</h1>
+    
+    <div id="test-freq-1">0.0 Hz</div>
+    <div id="test-freq-2">0.0 Hz</div>
+    
+    <div id="log"></div>
+    
+    <script src="dist/pitchpro.umd.js"></script>
+    <script>
+        const logDiv = document.getElementById('log');
+        
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `step ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            logDiv.appendChild(div);
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+        
+        try {
+            log('🚀 デバッグテスト開始');
+            
+            // Step 1: Basic checks
+            log(`window.PitchPro 存在: ${!!window.PitchPro}`, window.PitchPro ? 'success' : 'error');
+            
+            if (!window.PitchPro) {
+                log('PitchPro が利用できません。スクリプトの読み込みに失敗している可能性があります。', 'error');
+                throw new Error('PitchPro not available');
+            }
+            
+            // Step 2: Check exports
+            const exports = Object.keys(window.PitchPro);
+            log(`利用可能なエクスポート (${exports.length}個): ${exports.join(', ')}`, 'info');
+            
+            // Step 3: Check AudioDetectionComponent
+            const AudioDetectionComponent = window.PitchPro.AudioDetectionComponent;
+            log(`AudioDetectionComponent 存在: ${!!AudioDetectionComponent}`, AudioDetectionComponent ? 'success' : 'error');
+            
+            if (!AudioDetectionComponent) {
+                log('AudioDetectionComponent が見つかりません。', 'error');
+                throw new Error('AudioDetectionComponent not found');
+            }
+            
+            // Step 4: Create instance
+            log('インスタンスを作成中...', 'info');
+            const component = new AudioDetectionComponent({
+                frequencySelector: '#test-freq-1',
+                debug: true
+            });
+            log('インスタンス作成: ✅ 成功', 'success');
+            
+            // Step 5: Check method existence
+            log(`updateSelectors メソッド存在: ${typeof component.updateSelectors === 'function'}`, 
+                typeof component.updateSelectors === 'function' ? 'success' : 'error');
+                
+            if (typeof component.updateSelectors !== 'function') {
+                // List all available methods
+                const methods = [];
+                let obj = component;
+                do {
+                    Object.getOwnPropertyNames(obj)
+                        .filter(name => typeof component[name] === 'function' && name !== 'constructor')
+                        .forEach(name => {
+                            if (!methods.includes(name)) methods.push(name);
+                        });
+                } while ((obj = Object.getPrototypeOf(obj)) && obj !== Object.prototype);
+                
+                log(`利用可能メソッド: ${methods.join(', ')}`, 'error');
+                throw new Error('updateSelectors method not found');
+            }
+            
+            // Step 6: Try calling updateSelectors
+            log('updateSelectors を呼び出し中...', 'info');
+            try {
+                component.updateSelectors({
+                    frequencySelector: '#test-freq-2'
+                });
+                log('updateSelectors 呼び出し: ✅ 成功', 'success');
+            } catch (err) {
+                log(`updateSelectors 呼び出しエラー: ${err.message}`, 'error');
+                log(`エラーの詳細: ${err.stack}`, 'error');
+                throw err;
+            }
+            
+            // Step 7: Check if method actually exists on prototype
+            log('プロトタイプチェーンの詳細調査...', 'info');
+            const proto = Object.getPrototypeOf(component);
+            const hasUpdateSelectors = proto.hasOwnProperty('updateSelectors');
+            log(`プロトタイプに updateSelectors 存在: ${hasUpdateSelectors}`, hasUpdateSelectors ? 'success' : 'error');
+            
+            if (hasUpdateSelectors) {
+                const descriptor = Object.getOwnPropertyDescriptor(proto, 'updateSelectors');
+                log(`updateSelectors descriptor: ${JSON.stringify({
+                    configurable: descriptor.configurable,
+                    enumerable: descriptor.enumerable,
+                    writable: descriptor.writable,
+                    isFunction: typeof descriptor.value === 'function'
+                })}`, 'info');
+            }
+            
+            log('🎉 すべてのテストが成功しました！', 'success');
+            
+        } catch (error) {
+            log(`❌ テストエラー: ${error.message}`, 'error');
+            log(`エラースタック: ${error.stack}`, 'error');
+            
+            // Additional debugging
+            if (window.PitchPro && window.PitchPro.AudioDetectionComponent) {
+                try {
+                    const instance = new window.PitchPro.AudioDetectionComponent();
+                    log('エラー後の追加確認:', 'info');
+                    log(`インスタンス作成可能: ${!!instance}`, 'info');
+                    log(`updateSelectorsの型: ${typeof instance.updateSelectors}`, 'info');
+                } catch (err) {
+                    log(`追加確認もエラー: ${err.message}`, 'error');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

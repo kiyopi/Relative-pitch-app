@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>8va相対音感トレーニング - 詳細分析（プレミアム）</title>
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/results.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <style>
+        /* 背景グラデーションアニメーション - iOS対応版 */
+        body {
+            position: relative;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            -webkit-overflow-scrolling: touch;
+            background: #0f172a; /* フォールバック */
+        }
+        
+        /* 疑似要素で背景アニメーション */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0f172a 0%, #581c87 50%, #0f172a 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            -webkit-animation: gradientShift 15s ease infinite;
+            z-index: -1;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            will-change: background-position;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @-webkit-keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* フローティングアニメーション */
+        .page-header-icon {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* PREMIUMバッジ位置調整 */
+        .premium-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ffd700, #ffb347);
+            color: #333;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+        
+        /* フッターナビゲーションスタイルは system.css に統一 */
+        
+        /* タブナビゲーション */
+        .tab-navigation {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+        
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+        
+        .tab-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .tab-button.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .analysis-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .card-title {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .tone-analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+        
+        .tone-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .tone-card.strong {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        
+        .tone-card.weak {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        
+        .tone-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Debug Navigation -->
+    <nav class="debug-nav">
+        <h4>Debug Nav</h4>
+        <div class="nav-grid">
+            <a href="../index.html" class="nav-btn">
+                <i data-lucide="home" style="width: 12px; height: 12px;"></i>
+                <span>ホーム</span>
+            </a>
+            <a href="preparation-step1.html" class="nav-btn">
+                <i data-lucide="mic" style="width: 12px; height: 12px;"></i>
+                <span>マイクテスト</span>
+            </a>
+            <a href="training.html" class="nav-btn">
+                <i data-lucide="target" style="width: 12px; height: 12px;"></i>
+                <span>トレーニング</span>
+            </a>
+            <a href="result-session.html" class="nav-btn">
+                <i data-lucide="check-circle" style="width: 12px; height: 12px;"></i>
+                <span>セッション結果</span>
+            </a>
+            <a href="results-overview.html" class="nav-btn">
+                <i data-lucide="trophy" style="width: 12px; height: 12px;"></i>
+                <span>総合結果（無料）</span>
+            </a>
+            <a href="results-overview.html" class="nav-btn">
+                <i data-lucide="crown" style="width: 12px; height: 12px;"></i>
+                <span>総合評価（有料）</span>
+            </a>
+            <a href="results-premium-analysis.html" class="nav-btn current">
+                <i data-lucide="bar-chart-3" style="width: 12px; height: 12px;"></i>
+                <span>詳細分析（有料）</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="min-h-screen p-6">
+        <div class="container">
+            <!-- Premium Badge -->
+            <div class="premium-badge">
+                <i data-lucide="crown" style="width: 16px; height: 16px;"></i>
+                <span>PREMIUM</span>
+            </div>
+            
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <div class="flex justify-center mb-6">
+                    <div class="page-header-icon page-header-icon-purple">
+                        <i data-lucide="microscope" class="icon-2xl text-white" data-stroke-width="2"></i>
+                    </div>
+                </div>
+                <h1 class="text-4xl font-bold text-white mb-4">詳細分析レポート</h1>
+                <p class="text-green-200 text-xl mb-6">あなたの相対音感を科学的に分析</p>
+                <p class="text-blue-200">具体的な改善方法とパーソナライズされた練習プランを提供します</p>
+            </div>
+
+            <!-- メインコンテンツエリア -->
+            <main class="main-content">
+                <!-- タブナビゲーション -->
+                <section class="tab-section">
+                    <div class="tab-navigation">
+                        <button class="tab-button active" data-tab="twelve-tone-analysis">
+                            <i data-lucide="bar-chart-2" style="width: 16px; height: 16px;"></i>
+                            <span>音程精度分析</span>
+                        </button>
+                        <button class="tab-button" data-tab="weakness-analysis">
+                            <i data-lucide="search" style="width: 16px; height: 16px;"></i>
+                            <span>エラーパターン分析</span>
+                        </button>
+                        <button class="tab-button" data-tab="practice-plan">
+                            <i data-lucide="clipboard-list" style="width: 16px; height: 16px;"></i>
+                            <span>練習プラン</span>
+                        </button>
+                        <button class="tab-button" data-tab="growth-tracking">
+                            <i data-lucide="trending-up" style="width: 16px; height: 16px;"></i>
+                            <span>成長記録</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- 音程精度分析タブ -->
+                <section id="twelve-tone-analysis" class="tab-content active">
+                    <div class="analysis-card">
+                        <h3 class="card-title">
+                            <i data-lucide="bar-chart-2" style="width: 20px; height: 20px;"></i>
+                            音程間隔別精度分析
+                        </h3>
+                        
+                        <!-- 全体精度 -->
+                        <div style="text-align: center; margin-bottom: 2rem;">
+                            <div style="font-size: 3rem; font-weight: 700; color: #fbbf24;">±32¢</div>
+                            <p style="color: #cbd5e1; margin: 0;">平均音程精度</p>
+                            <p style="color: #10b981; font-size: 0.875rem; margin-top: 0.5rem;">
+                                B級レベル（±35¢以内）を達成
+                            </p>
+                        </div>
+
+                        <!-- 音程間隔別分析 -->
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="color: #fbbf24; font-size: 1.1rem; margin-bottom: 1rem;">音程間隔別精度</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.75rem;">
+                                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 1rem; text-align: center;">
+                                    <div style="color: white; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">2度</div>
+                                    <div style="color: #10b981; font-weight: 700; font-size: 1.125rem;">±18¢</div>
+                                    <div style="color: #cbd5e1; font-size: 0.75rem;">優秀</div>
+                                </div>
+                                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 1rem; text-align: center;">
+                                    <div style="color: white; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">3度</div>
+                                    <div style="color: #10b981; font-weight: 700; font-size: 1.125rem;">±24¢</div>
+                                    <div style="color: #cbd5e1; font-size: 0.75rem;">良好</div>
+                                </div>
+                                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 1rem; text-align: center;">
+                                    <div style="color: white; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">4度</div>
+                                    <div style="color: #10b981; font-weight: 700; font-size: 1.125rem;">±28¢</div>
+                                    <div style="color: #cbd5e1; font-size: 0.75rem;">良好</div>
+                                </div>
+                                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 1rem; text-align: center;">
+                                    <div style="color: white; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">5度</div>
+                                    <div style="color: #10b981; font-weight: 700; font-size: 1.125rem;">±22¢</div>
+                                    <div style="color: #cbd5e1; font-size: 0.75rem;">優秀</div>
+                                </div>
+                                <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 1rem; text-align: center;">
+                                    <div style="color: white; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">6度</div>
+                                    <div style="color: #f59e0b; font-weight: 700; font-size: 1.125rem;">±41¢</div>
+                                    <div style="color: #cbd5e1; font-size: 0.75rem;">要改善</div>
+                                </div>
+                                <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 1rem; text-align: center;">
+                                    <div style="color: white; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">7度</div>
+                                    <div style="color: #ef4444; font-weight: 700; font-size: 1.125rem;">±52¢</div>
+                                    <div style="color: #cbd5e1; font-size: 0.75rem;">苦手</div>
+                                </div>
+                                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 1rem; text-align: center;">
+                                    <div style="color: white; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.875rem;">8度</div>
+                                    <div style="color: #10b981; font-weight: 700; font-size: 1.125rem;">±19¢</div>
+                                    <div style="color: #cbd5e1; font-size: 0.75rem;">優秀</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 上行・下行比較 -->
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="color: #fbbf24; font-size: 1.1rem; margin-bottom: 1rem;">上行・下行音程比較</h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div style="background: rgba(255, 255, 255, 0.08); padding: 1rem; border-radius: 8px; text-align: center;">
+                                    <h5 style="color: white; font-weight: 600; margin-bottom: 0.5rem;">上行音程</h5>
+                                    <div style="color: #10b981; font-weight: 700; font-size: 1.5rem; margin-bottom: 0.25rem;">±29¢</div>
+                                    <p style="color: #cbd5e1; font-size: 0.875rem; margin: 0;">音程を上がる時の精度</p>
+                                </div>
+                                <div style="background: rgba(255, 255, 255, 0.08); padding: 1rem; border-radius: 8px; text-align: center;">
+                                    <h5 style="color: white; font-weight: 600; margin-bottom: 0.5rem;">下行音程</h5>
+                                    <div style="color: #f59e0b; font-weight: 700; font-size: 1.5rem; margin-bottom: 0.25rem;">±36¢</div>
+                                    <p style="color: #cbd5e1; font-size: 0.875rem; margin: 0;">音程を下がる時の精度</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 主要発見 -->
+                        <div style="background: rgba(255, 255, 255, 0.08); padding: 1.5rem; border-radius: 12px; margin-top: 2rem;">
+                            <h4 style="color: #fbbf24; font-size: 1.1rem; margin-bottom: 1rem;">
+                                <i data-lucide="search" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
+                                主要発見
+                            </h4>
+                            <div style="color: #cbd5e1; line-height: 1.6;">
+                                <p style="margin-bottom: 0.5rem;">• <strong style="color: white;">7度音程（±52¢）</strong>が最も困難で集中的な練習が必要</p>
+                                <p style="margin-bottom: 0.5rem;">• <strong style="color: white;">下行音程</strong>が上行音程より7¢悪く、下降練習を強化すべき</p>
+                                <p style="margin: 0;">• <strong style="color: white;">完全音程（4度・5度・8度）</strong>は安定して正確</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 音程精度向上傾向 -->
+                        <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1)); padding: 1.5rem; border-radius: 12px; margin-top: 2rem; border: 1px solid rgba(59, 130, 246, 0.2);">
+                            <h4 style="color: #60a5fa; font-size: 1.1rem; margin-bottom: 1rem;">
+                                <i data-lucide="trending-up" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
+                                音程精度向上傾向
+                            </h4>
+                            
+                            <!-- 進歩グラフ -->
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                                <div style="text-align: center;">
+                                    <div style="color: #ef4444; font-size: 1.5rem; font-weight: 600;">±48¢</div>
+                                    <div style="color: #94a3b8; font-size: 0.875rem;">1ヶ月前</div>
+                                    <div style="color: #cbd5e1; font-size: 0.75rem;">C級レベル</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="color: #f59e0b; font-size: 1.5rem; font-weight: 600;">±38¢</div>
+                                    <div style="color: #94a3b8; font-size: 0.875rem;">2週間前</div>
+                                    <div style="color: #cbd5e1; font-size: 0.75rem;">B-級レベル</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="color: #10b981; font-size: 1.5rem; font-weight: 600;">±32¢</div>
+                                    <div style="color: #94a3b8; font-size: 0.875rem;">現在</div>
+                                    <div style="color: #cbd5e1; font-size: 0.75rem;">B級レベル</div>
+                                </div>
+                            </div>
+                            
+                            <!-- 詳細分析 -->
+                            <div style="color: #cbd5e1; line-height: 1.6;">
+                                <p style="margin-bottom: 1rem;">
+                                    <strong style="color: white;">順調な改善</strong>：1ヶ月で平均音程精度が±48¢から±32¢へと16¢改善しました。
+                                    この改善ペースなら、<strong style="color: #10b981;">2ヶ月後にA級達成</strong>が可能です。
+                                </p>
+                                <p style="margin-bottom: 1rem;">
+                                    <strong style="color: white;">現在の重点課題</strong>：7度音程と下行音程の精度向上が最優先です。
+                                    これらを改善することで全体的な音程精度が大幅に向上します。
+                                </p>
+                                <p style="margin: 0;">
+                                    <strong style="color: white;">次のステップ</strong>：苦手な音程間隔を重点的に練習し、
+                                    上行・下行のバランスを整えることで安定した相対音感を獲得できます。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- エラーパターン分析タブ -->
+                <section id="weakness-analysis" class="tab-content">
+                    <div class="analysis-card">
+                        <h3 class="card-title">
+                            <i data-lucide="search" style="width: 20px; height: 20px;"></i>
+                            エラーパターン分析
+                        </h3>
+
+                        <!-- シャープ/フラット傾向分析 -->
+                        <div style="background: rgba(255, 255, 255, 0.08); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #ef4444, #dc2626); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                    <i data-lucide="trending-up" style="width: 20px; height: 20px; color: white;"></i>
+                                </div>
+                                <div>
+                                    <h4 style="margin: 0; color: white; font-size: 1.125rem; font-weight: 600;">音程方向エラー分析</h4>
+                                    <p style="margin: 0; color: white; font-size: 0.875rem;">シャープ・フラット傾向の特定</p>
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                                <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 1rem; border-radius: 8px; text-align: center;">
+                                    <h5 style="color: #ef4444; font-weight: 600; margin-bottom: 0.5rem;">シャープ傾向</h5>
+                                    <div style="color: white; font-weight: 700; font-size: 1.5rem; margin-bottom: 0.25rem;">62%</div>
+                                    <p style="color: #cbd5e1; font-size: 0.875rem; margin: 0;">音程を高く歌いがち</p>
+                                </div>
+                                <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); padding: 1rem; border-radius: 8px; text-align: center;">
+                                    <h5 style="color: #60a5fa; font-weight: 600; margin-bottom: 0.5rem;">フラット傾向</h5>
+                                    <div style="color: white; font-weight: 700; font-size: 1.5rem; margin-bottom: 0.25rem;">38%</div>
+                                    <p style="color: #cbd5e1; font-size: 0.875rem; margin: 0;">音程を低く歌いがち</p>
+                                </div>
+                            </div>
+                            
+                            <div class="info-alert">
+                                <i data-lucide="info" style="width: 16px; height: 16px; color: #60a5fa;"></i>
+                                <p><strong>分析結果:</strong> 音程を高く歌う傾向（シャープ傾向）が強く、意識的に音程を低めに調整する練習が効果的です。</p>
+                            </div>
+                        </div>
+
+                        <!-- 音程拡大/縮小傾向 -->
+                        <div style="background: rgba(255, 255, 255, 0.08); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                    <i data-lucide="maximize-2" style="width: 20px; height: 20px; color: white;"></i>
+                                </div>
+                                <div>
+                                    <h4 style="margin: 0; color: white; font-size: 1.125rem; font-weight: 600;">音程間隔エラーパターン</h4>
+                                    <p style="margin: 0; color: white; font-size: 0.875rem;">拡大・縮小傾向の分析</p>
+                                </div>
+                            </div>
+                            
+                            <!-- 拡大・縮小傾向 -->
+                            <div style="margin-bottom: 1.5rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                                    <i data-lucide="alert-circle" style="width: 20px; height: 20px; color: #f59e0b;"></i>
+                                    <h5 style="color: white; font-weight: 700; margin: 0; font-size: 1rem;">音程間隔のエラー傾向</h5>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                                    <div style="position: relative; text-align: center; padding: 1rem; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;">
+                                        <div style="position: absolute; top: 0.5rem; left: 0.5rem; color: white; font-weight: 700; font-size: 1rem;">1</div>
+                                        <div style="display: flex; align-items: end; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem; margin-top: 1rem;">
+                                            <div style="color: white; font-weight: 700; font-size: 1.125rem; line-height: 1;">7度音程</div>
+                                            <div style="color: white; font-weight: 700; font-size: 1rem; line-height: 1;">±52¢</div>
+                                        </div>
+                                        <div style="color: white; font-size: 0.8rem;">拡大しすぎる傾向</div>
+                                    </div>
+                                    <div style="position: relative; text-align: center; padding: 1rem; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;">
+                                        <div style="position: absolute; top: 0.5rem; left: 0.5rem; color: white; font-weight: 700; font-size: 1rem;">2</div>
+                                        <div style="display: flex; align-items: end; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem; margin-top: 1rem;">
+                                            <div style="color: white; font-weight: 700; font-size: 1.125rem; line-height: 1;">6度音程</div>
+                                            <div style="color: white; font-weight: 700; font-size: 1rem; line-height: 1;">±41¢</div>
+                                        </div>
+                                        <div style="color: white; font-size: 0.8rem;">縮小しがちな傾向</div>
+                                    </div>
+                                    <div style="position: relative; text-align: center; padding: 1rem; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;">
+                                        <div style="position: absolute; top: 0.5rem; left: 0.5rem; color: white; font-weight: 700; font-size: 1rem;">3</div>
+                                        <div style="display: flex; align-items: end; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem; margin-top: 1rem;">
+                                            <div style="color: white; font-weight: 700; font-size: 1.125rem; line-height: 1;">下行音程</div>
+                                            <div style="color: white; font-weight: 700; font-size: 1rem; line-height: 1;">±36¢</div>
+                                        </div>
+                                        <div style="color: white; font-size: 0.8rem;">下降時の不正確性</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 一貫性のあるエラーパターン -->
+                        <div style="background: rgba(255, 255, 255, 0.08); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                    <i data-lucide="repeat" style="width: 20px; height: 20px; color: white;"></i>
+                                </div>
+                                <div>
+                                    <h4 style="margin: 0; color: white; font-size: 1.125rem; font-weight: 600;">一貫性エラーパターン</h4>
+                                    <p style="margin: 0; color: white; font-size: 0.875rem;">繰り返される特定のエラー</p>
+                                </div>
+                            </div>
+                            
+                            <!-- 得意な音程間隔TOP3 - 横並びブロック形式 -->
+                            <div style="margin-bottom: 1.5rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                                    <i data-lucide="star" style="width: 20px; height: 20px; color: #10b981;"></i>
+                                    <h5 style="color: white; font-weight: 700; margin: 0; font-size: 1rem;">安定した音程 TOP 3</h5>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                                    <div style="position: relative; text-align: center; padding: 1rem; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;">
+                                        <div style="position: absolute; top: 0.5rem; left: 0.5rem; color: white; font-weight: 700; font-size: 1rem;">1</div>
+                                        <div style="display: flex; align-items: end; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem; margin-top: 1rem;">
+                                            <div style="color: white; font-weight: 700; font-size: 1.125rem; line-height: 1;">2度</div>
+                                            <div style="color: white; font-weight: 700; font-size: 1rem; line-height: 1;">±18¢</div>
+                                        </div>
+                                        <div style="color: white; font-size: 0.8rem;">最も安定</div>
+                                    </div>
+                                    <div style="position: relative; text-align: center; padding: 1rem; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;">
+                                        <div style="position: absolute; top: 0.5rem; left: 0.5rem; color: white; font-weight: 700; font-size: 1rem;">2</div>
+                                        <div style="display: flex; align-items: end; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem; margin-top: 1rem;">
+                                            <div style="color: white; font-weight: 700; font-size: 1.125rem; line-height: 1;">8度</div>
+                                            <div style="color: white; font-weight: 700; font-size: 1rem; line-height: 1;">±19¢</div>
+                                        </div>
+                                        <div style="color: white; font-size: 0.8rem;">オクターブ認識良好</div>
+                                    </div>
+                                    <div style="position: relative; text-align: center; padding: 1rem; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;">
+                                        <div style="position: absolute; top: 0.5rem; left: 0.5rem; color: white; font-weight: 700; font-size: 1rem;">3</div>
+                                        <div style="display: flex; align-items: end; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem; margin-top: 1rem;">
+                                            <div style="color: white; font-weight: 700; font-size: 1.125rem; line-height: 1;">5度</div>
+                                            <div style="color: white; font-weight: 700; font-size: 1rem; line-height: 1;">±22¢</div>
+                                        </div>
+                                        <div style="color: white; font-size: 0.8rem;">完全協和音程</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 練習アドバイス -->
+                            <div style="background: rgba(255, 255, 255, 0.08); padding: 1rem; border-radius: 8px;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                                    <i data-lucide="lightbulb" style="width: 16px; height: 16px; color: #fbbf24;"></i>
+                                    <h5 style="color: #fbbf24; font-weight: 600; margin: 0; font-size: 0.875rem;">エラー改善戦略</h5>
+                                </div>
+                                <p style="color: #cbd5e1; font-size: 0.875rem; margin: 0; line-height: 1.5;">シャープ傾向が強いため、意識的に低めに歌う練習が必要です。特に7度・6度音程と下行音程の精度向上に集中しましょう。</p>
+                            </div>
+                        </div>
+
+                        <!-- 技術的分析 -->
+                        <div style="background: rgba(255, 255, 255, 0.08); padding: 1.5rem; border-radius: 12px;">
+                            <h4 style="color: #fbbf24; font-size: 1.1rem; margin-bottom: 1rem;">
+                                <i data-lucide="microscope" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
+                                総合エラー分析
+                            </h4>
+                            <div style="color: #cbd5e1; line-height: 1.6;">
+                                <p style="margin-bottom: 1rem;">
+                                    <strong style="color: white;">音程方向の一貫性</strong>：62%でシャープ傾向があり、音程調整の意識改善が必要です。
+                                    完全音程（4度・5度・8度）は安定しているため、基本的な音程感覚は身についています。
+                                </p>
+                                <p style="margin-bottom: 1rem;">
+                                    <strong style="color: white;">大きい音程での課題</strong>：6度・7度の大きな音程で精度が低下する傾向があります。
+                                    これは音程幅の把握が不十分であることを示しています。
+                                </p>
+                                <p style="margin: 0;">
+                                    <strong style="color: white;">改善の方向性</strong>：エラーパターンが明確なため、
+                                    <strong style="color: #10b981;">的確な練習により短期間での改善</strong>が期待できます。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 練習プランタブ -->
+                <section id="practice-plan" class="tab-content">
+                    <div class="analysis-card">
+                        <h3 class="card-title">
+                            <i data-lucide="clipboard-list" style="width: 20px; height: 20px;"></i>
+                            AI個別練習プラン
+                        </h3>
+
+                        <!-- 優先度1 -->
+                        <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                            <h4 style="color: #ef4444; font-size: 1.1rem; margin-bottom: 1rem;">
+                                <i data-lucide="flame" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
+                                優先度1：7度音程精度集中改善
+                            </h4>
+                            <div style="color: #cbd5e1; line-height: 1.6;">
+                                <p style="margin-bottom: 1rem;">
+                                    <strong style="color: white;">目標</strong>: 7度音程の誤差を±52¢から±35¢以内に改善<br>
+                                    <strong style="color: white;">期間</strong>: 4週間
+                                </p>
+                                <div style="background: rgba(255, 255, 255, 0.08); padding: 1rem; border-radius: 8px;">
+                                    <p style="font-weight: 600; margin-bottom: 0.5rem; color: white;">具体的練習法</p>
+                                    <ul style="color: #cbd5e1; line-height: 1.4; margin-left: 1.5rem;">
+                                        <li style="margin-bottom: 0.25rem;">7度音程（ド→シ）の正確な発声練習（毎日5分）</li>
+                                        <li style="margin-bottom: 0.25rem;">基音がランダムに変わっても7度を正確に歌う練習（週3回・10分）</li>
+                                        <li style="margin-bottom: 0.25rem;">5度から7度への音程拡張練習（週2回・15分）</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 優先度2 -->
+                        <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                            <h4 style="color: #f59e0b; font-size: 1.1rem; margin-bottom: 1rem;">
+                                <i data-lucide="zap" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
+                                優先度2：シャープ傾向矯正訓練
+                            </h4>
+                            <div style="color: #cbd5e1; line-height: 1.6;">
+                                <p style="margin-bottom: 1rem;">
+                                    <strong style="color: white;">目標</strong>: 62%のシャープ傾向を50%以下に改善<br>
+                                    <strong style="color: white;">期間</strong>: 6週間
+                                </p>
+                                <div style="background: rgba(255, 255, 255, 0.08); padding: 1rem; border-radius: 8px;">
+                                    <p style="font-weight: 600; margin-bottom: 0.5rem; color: white;">具体的練習法</p>
+                                    <ul style="color: #cbd5e1; line-height: 1.4; margin-left: 1.5rem;">
+                                        <li style="margin-bottom: 0.25rem;">意識的に低めに歌う音程修正練習（週3回・10分）</li>
+                                        <li style="margin-bottom: 0.25rem;">楽器との音程比較による正確性確認（週2回・15分）</li>
+                                        <li style="margin-bottom: 0.25rem;">下行音程での精度向上集中練習（週1回・10分）</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 優先度3 -->
+                        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 1.5rem; border-radius: 12px;">
+                            <h4 style="color: #10b981; font-size: 1.1rem; margin-bottom: 1rem;">
+                                <i data-lucide="check-circle" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
+                                優先度3：得意音程の維持・活用
+                            </h4>
+                            <div style="color: #cbd5e1; line-height: 1.6;">
+                                <p style="margin-bottom: 1rem;">
+                                    <strong style="color: white;">目標</strong>: 2度・5度・8度の高精度を維持し参考点として活用<br>
+                                    <strong style="color: white;">期間</strong>: 継続
+                                </p>
+                                <div style="background: rgba(255, 255, 255, 0.08); padding: 1rem; border-radius: 8px;">
+                                    <p style="font-weight: 600; margin-bottom: 0.5rem; color: white;">具体的練習法</p>
+                                    <ul style="color: #cbd5e1; line-height: 1.4; margin-left: 1.5rem;">
+                                        <li style="margin-bottom: 0.25rem;">得意音程から苦手音程への段階的移行練習（週2回・10分）</li>
+                                        <li style="margin-bottom: 0.25rem;">5度を基準にした7度音程の相対的把握練習（週1回・15分）</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 成長追跡タブ -->
+                <section id="growth-tracking" class="tab-content">
+                    <div class="analysis-card">
+                        <h3 class="card-title">
+                            <i data-lucide="trending-up" style="width: 20px; height: 20px;"></i>
+                            長期成長パターン分析
+                        </h3>
+
+                        <!-- 成長予測 -->
+                        <div style="margin-bottom: 2rem;">
+                            <h4 style="color: #10b981; font-size: 1.1rem; margin-bottom: 1rem;">
+                                <i data-lucide="rocket" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
+                                成長予測（AI分析）
+                            </h4>
+                            <div style="color: #cbd5e1; line-height: 1.6;">
+                                <p style="margin-bottom: 1rem;">
+                                    過去3ヶ月のデータから、あなたの成長パターンを分析しました。
+                                </p>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                                    <div style="text-align: center;">
+                                        <div style="color: #10b981; font-size: 2rem; font-weight: 600;">-4¢/月</div>
+                                        <div style="color: #94a3b8; font-size: 0.875rem;">平均改善ペース</div>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <div style="color: #fbbf24; font-size: 2rem; font-weight: 600;">3ヶ月</div>
+                                        <div style="color: #94a3b8; font-size: 0.875rem;">A級達成予測</div>
+                                    </div>
+                                </div>
+                                <p style="background: rgba(255, 255, 255, 0.08); padding: 1rem; border-radius: 8px; margin: 0;">
+                                    <strong style="color: white;">予測根拠</strong>: 現在のB級（±42¢）からA級基準（±35¢）まで
+                                    あと7¢の改善が必要。現在ペース月-4¢なら約2ヶ月で達成可能。
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- 月別進歩 -->
+                        <div style="background: rgba(255, 255, 255, 0.08); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                            <h4 style="color: #fbbf24; font-size: 1.1rem; margin-bottom: 1rem;">
+                                <i data-lucide="bar-chart" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
+                                月別進歩記録
+                            </h4>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                                <div style="text-align: center;">
+                                    <div style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 0.5rem;">3ヶ月前</div>
+                                    <div style="color: #ef4444; font-size: 1.25rem; font-weight: 600;">±54¢</div>
+                                    <div style="color: #94a3b8; font-size: 0.75rem;">C級</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 0.5rem;">1ヶ月前</div>
+                                    <div style="color: #f59e0b; font-size: 1.25rem; font-weight: 600;">±48¢</div>
+                                    <div style="color: #94a3b8; font-size: 0.75rem;">B-級</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 0.5rem;">現在</div>
+                                    <div style="color: #10b981; font-size: 1.25rem; font-weight: 600;">±42¢</div>
+                                    <div style="color: #94a3b8; font-size: 0.75rem;">B級</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 音程間隔別成長グラフ -->
+                        <div style="background: rgba(255, 255, 255, 0.08); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                    <i data-lucide="bar-chart-3" style="width: 20px; height: 20px; color: white;"></i>
+                                </div>
+                                <div>
+                                    <h4 style="margin: 0; color: white; font-size: 1.125rem; font-weight: 600;">音程間隔別成長グラフ</h4>
+                                    <p style="margin: 0; color: white; font-size: 0.875rem;">3ヶ月間の音程精度変化</p>
+                                </div>
+                            </div>
+                            
+                            <!-- 最も改善した音程TOP3 -->
+                            <div style="margin-bottom: 1.5rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                                    <i data-lucide="trending-up" style="width: 20px; height: 20px; color: #10b981;"></i>
+                                    <h5 style="color: white; font-weight: 700; margin: 0; font-size: 1rem;">最も改善した音程 TOP 3</h5>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                                    <div style="position: relative; text-align: center; padding: 1rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px;">
+                                        <div style="position: absolute; top: 0.5rem; left: 0.5rem; color: white; font-weight: 700; font-size: 1rem;">1</div>
+                                        <div style="color: white; font-weight: 700; font-size: 1rem; margin-top: 1rem; margin-bottom: 0.5rem;">3度</div>
+                                        <div style="color: #10b981; font-size: 0.8rem; margin-bottom: 0.25rem;">3ヶ月前: ±48¢</div>
+                                        <div style="color: #10b981; font-size: 0.8rem; margin-bottom: 0.25rem;">現在: ±24¢</div>
+                                        <div style="color: white; font-weight: 600; font-size: 0.875rem;">改善幅: -24¢</div>
+                                    </div>
+                                    <div style="position: relative; text-align: center; padding: 1rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px;">
+                                        <div style="position: absolute; top: 0.5rem; left: 0.5rem; color: white; font-weight: 700; font-size: 1rem;">2</div>
+                                        <div style="color: white; font-weight: 700; font-size: 1rem; margin-top: 1rem; margin-bottom: 0.5rem;">4度</div>
+                                        <div style="color: #10b981; font-size: 0.8rem; margin-bottom: 0.25rem;">3ヶ月前: ±45¢</div>
+                                        <div style="color: #10b981; font-size: 0.8rem; margin-bottom: 0.25rem;">現在: ±28¢</div>
+                                        <div style="color: white; font-weight: 600; font-size: 0.875rem;">改善幅: -17¢</div>
+                                    </div>
+                                    <div style="position: relative; text-align: center; padding: 1rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px;">
+                                        <div style="position: absolute; top: 0.5rem; left: 0.5rem; color: white; font-weight: 700; font-size: 1rem;">3</div>
+                                        <div style="color: white; font-weight: 700; font-size: 1rem; margin-top: 1rem; margin-bottom: 0.5rem;">2度</div>
+                                        <div style="color: #10b981; font-size: 0.8rem; margin-bottom: 0.25rem;">3ヶ月前: ±32¢</div>
+                                        <div style="color: #10b981; font-size: 0.8rem; margin-bottom: 0.25rem;">現在: ±18¢</div>
+                                        <div style="color: white; font-weight: 600; font-size: 0.875rem;">改善幅: -14¢</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 最も停滞した音程TOP3 -->
+                            <div style="margin-bottom: 1.5rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                                    <i data-lucide="trending-down" style="width: 20px; height: 20px; color: #f59e0b;"></i>
+                                    <h5 style="color: white; font-weight: 700; margin: 0; font-size: 1rem;">改善が停滞した音程 TOP 3</h5>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                                    <div style="position: relative; text-align: center; padding: 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;">
+                                        <div style="position: absolute; top: 0.5rem; left: 0.5rem; color: white; font-weight: 700; font-size: 1rem;">1</div>
+                                        <div style="color: white; font-weight: 700; font-size: 1rem; margin-top: 1rem; margin-bottom: 0.5rem;">7度</div>
+                                        <div style="color: #ef4444; font-size: 0.8rem; margin-bottom: 0.25rem;">3ヶ月前: ±56¢</div>
+                                        <div style="color: #ef4444; font-size: 0.8rem; margin-bottom: 0.25rem;">現在: ±52¢</div>
+                                        <div style="color: white; font-weight: 600; font-size: 0.875rem;">改善幅: -4¢</div>
+                                    </div>
+                                    <div style="position: relative; text-align: center; padding: 1rem; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px;">
+                                        <div style="position: absolute; top: 0.5rem; left: 0.5rem; color: white; font-weight: 700; font-size: 1rem;">2</div>
+                                        <div style="color: white; font-weight: 700; font-size: 1rem; margin-top: 1rem; margin-bottom: 0.5rem;">6度</div>
+                                        <div style="color: #f59e0b; font-size: 0.8rem; margin-bottom: 0.25rem;">3ヶ月前: ±46¢</div>
+                                        <div style="color: #f59e0b; font-size: 0.8rem; margin-bottom: 0.25rem;">現在: ±41¢</div>
+                                        <div style="color: white; font-weight: 600; font-size: 0.875rem;">改善幅: -5¢</div>
+                                    </div>
+                                    <div style="position: relative; text-align: center; padding: 1rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px;">
+                                        <div style="position: absolute; top: 0.5rem; left: 0.5rem; color: white; font-weight: 700; font-size: 1rem;">3</div>
+                                        <div style="color: white; font-weight: 700; font-size: 1rem; margin-top: 1rem; margin-bottom: 0.5rem;">8度</div>
+                                        <div style="color: #10b981; font-size: 0.8rem; margin-bottom: 0.25rem;">3ヶ月前: ±28¢</div>
+                                        <div style="color: #10b981; font-size: 0.8rem; margin-bottom: 0.25rem;">現在: ±19¢</div>
+                                        <div style="color: white; font-weight: 600; font-size: 0.875rem;">改善幅: -9¢</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- アドバイス -->
+                            <div style="background: rgba(255, 255, 255, 0.08); padding: 1rem; border-radius: 8px;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                                    <i data-lucide="lightbulb" style="width: 16px; height: 16px; color: #fbbf24;"></i>
+                                    <h5 style="color: #fbbf24; font-weight: 600; margin: 0; font-size: 0.875rem;">成長アドバイス</h5>
+                                </div>
+                                <p style="color: #cbd5e1; font-size: 0.875rem; margin: 0; line-height: 1.5;">3度・4度の順調な成長に対し、7度・6度の改善が停滞しています。これらの大きな音程に集中した練習が必要です。</p>
+                            </div>
+                        </div>
+
+                        <!-- 時系列パフォーマンス分析 -->
+                        <div style="background: rgba(255, 255, 255, 0.08); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                    <i data-lucide="activity" style="width: 20px; height: 20px; color: white;"></i>
+                                </div>
+                                <div>
+                                    <h4 style="margin: 0; color: white; font-size: 1.125rem; font-weight: 600;">時系列パフォーマンス分析</h4>
+                                    <p style="margin: 0; color: white; font-size: 0.875rem;">学習効果・疲労パターン分析</p>
+                                </div>
+                            </div>
+                            
+                            <!-- 学習効果 -->
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                                <h5 style="color: white; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem;">学習効果</h5>
+                                <p style="color: #cbd5e1; font-size: 0.875rem; margin: 0; line-height: 1.5;">前半±28.3¢から後半±19.7¢へと±8.6¢の顕著な改善が見られ、継続練習の効果が現れています。</p>
+                            </div>
+                            
+                            <!-- 疲労パターン -->
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                                <h5 style="color: white; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem;">疲労パターン</h5>
+                                <p style="color: #cbd5e1; font-size: 0.875rem; margin: 0; line-height: 1.5;">セッション内で平均±4.2¢の精度低下が検出されており、短時間集中型の練習が効果的です。</p>
+                            </div>
+                            
+                            <!-- 練習最適化 -->
+                            <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px;">
+                                <h5 style="color: white; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem;">練習最適化</h5>
+                                <p style="color: #cbd5e1; font-size: 0.875rem; margin: 0; line-height: 1.5;">1セッション15分以内、休憩を挿んで1日3セッションの練習パターンが最も効果的です。</p>
+                            </div>
+                        </div>
+
+                        <!-- 他ユーザーとの比較 -->
+                        <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); padding: 1.5rem; border-radius: 12px;">
+                            <h4 style="color: #60a5fa; font-size: 1.1rem; margin-bottom: 1rem;">
+                                <i data-lucide="users" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
+                                匿名ユーザー比較
+                            </h4>
+                            <div style="color: #cbd5e1; line-height: 1.6;">
+                                <p style="margin-bottom: 1rem;">
+                                    同レベル練習期間（3-6ヶ月）のユーザー比較
+                                </p>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                    <div>
+                                        <div style="color: #60a5fa; font-weight: 600;">上位30%</div>
+                                        <div style="color: #94a3b8; font-size: 0.875rem;">あなたの位置</div>
+                                    </div>
+                                    <div>
+                                        <div style="color: #10b981; font-weight: 600;">月-4¢</div>
+                                        <div style="color: #94a3b8; font-size: 0.875rem;">平均-2.8¢より優秀</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- フッターナビゲーション -->
+            <footer class="footer-navigation">
+                <div class="nav-buttons">
+                    <a href="results-overview.html" class="btn btn-secondary">
+                        <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                        <span>総合評価に戻る</span>
+                    </a>
+                    <a href="../index.html" class="btn btn-secondary">
+                        <i data-lucide="home" style="width: 16px; height: 16px;"></i>
+                        <span>ホームに戻る</span>
+                    </a>
+                    <a href="training.html" class="btn btn-primary">
+                        <i data-lucide="refresh-cw"></i>
+                        再チャレンジ
+                    </a>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        lucide.createIcons();
+        
+        // タブ切り替え機能
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                // 全タブボタンの状態をリセット
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                // クリックされたタブをアクティブに
+                button.classList.add('active');
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

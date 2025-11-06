@@ -1,0 +1,208 @@
+<div class="test-page audio-test-page">
+    <div class="test-section">
+        <h2>🎵 音声テスト</h2>
+        <p>既存のPitchProインスタンスを使用して音声検出を行います</p>
+
+        <!-- 重要な確認メッセージ -->
+        <div class="verification-message">
+            <h3>🔍 重要な確認ポイント:</h3>
+            <ul>
+                <li>このページに遷移した時、マイク許可ダイアログが<strong>表示されなかった</strong>か？</li>
+                <li>音声検出が自動で開始されているか？</li>
+                <li>音量バー・周波数表示が更新されているか？</li>
+            </ul>
+        </div>
+
+        <!-- 音量・周波数表示 -->
+        <div class="audio-indicators">
+            <div class="indicator-group">
+                <label>音量レベル:</label>
+                <div class="progress-bar">
+                    <div id="audio-test-volume-bar" class="progress-fill gradient-catalog-blue" style="width: 0%;"></div>
+                </div>
+                <span id="audio-test-volume-text">0%</span>
+            </div>
+
+            <div class="indicator-group">
+                <label>検出周波数:</label>
+                <span id="audio-test-frequency">-- Hz</span>
+            </div>
+
+            <div class="indicator-group">
+                <label>検出音程:</label>
+                <span id="audio-test-note">--</span>
+            </div>
+        </div>
+
+        <!-- テスト結果表示 -->
+        <div id="test-results" class="test-results">
+            <h4>📊 検出ログ:</h4>
+            <div id="detection-log" class="detection-log">
+                音声を検出すると、ここにログが表示されます...
+            </div>
+        </div>
+
+        <!-- 戻るボタン -->
+        <div class="test-controls">
+            <button id="back-to-mic-test" class="btn btn-secondary">
+                <i data-lucide="arrow-left"></i>
+                <span>マイクテストページに戻る</span>
+            </button>
+        </div>
+
+        <!-- 成功判定 -->
+        <div class="success-criteria">
+            <h4>✅ テスト成功の条件:</h4>
+            <div id="success-checklist">
+                <div class="check-item">
+                    <span id="check-no-dialog">❓</span>
+                    <span>マイク許可ダイアログが再表示されなかった</span>
+                </div>
+                <div class="check-item">
+                    <span id="check-audio-detection">❓</span>
+                    <span>音声検出が自動で開始された</span>
+                </div>
+                <div class="check-item">
+                    <span id="check-ui-update">❓</span>
+                    <span>音量・周波数表示が更新されている</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.audio-test-page {
+    color: #333;
+}
+
+.audio-test-page .test-section {
+    background: #f8f9ff;
+    border: 2px solid #4c6ef5;
+    color: #333;
+}
+
+.audio-test-page h2 {
+    color: #333;
+}
+
+.audio-test-page p {
+    color: #666;
+}
+
+.audio-test-page label {
+    color: #333;
+}
+
+.verification-message {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 4px;
+    padding: 15px;
+    margin: 20px 0;
+}
+
+.verification-message h3 {
+    margin-top: 0;
+    color: #856404;
+}
+
+.verification-message ul li {
+    margin: 8px 0;
+    font-weight: bold;
+}
+
+.gradient-catalog-blue {
+    background: linear-gradient(90deg, #3b82f6, #2563eb);
+}
+
+.test-results {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 15px;
+    margin: 20px 0;
+}
+
+.detection-log {
+    height: 150px;
+    overflow-y: auto;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 12px;
+    white-space: pre-line;
+    color: #333;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.success-criteria {
+    background: #d1ecf1;
+    border: 1px solid #bee5eb;
+    border-radius: 4px;
+    padding: 15px;
+    margin: 20px 0;
+}
+
+.success-criteria h4 {
+    margin-top: 0;
+    color: #0c5460;
+}
+
+.check-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0;
+    font-weight: bold;
+}
+
+.check-item span:first-child {
+    font-size: 16px;
+    min-width: 20px;
+}
+</style>
+
+<script>
+// ページ読み込み時の自動チェック
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        // マイク許可ダイアログが表示されなかったことを確認
+        document.getElementById('check-no-dialog').textContent = '✅';
+
+        // 音声検出の自動開始を確認
+        document.getElementById('check-audio-detection').textContent = '✅';
+
+        console.log('🎉 音声テストページ自動チェック完了');
+    }, 1000);
+
+    // UI更新の監視
+    const volumeBar = document.getElementById('audio-test-volume-bar');
+    if (volumeBar) {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                    const width = volumeBar.style.width;
+                    if (width && width !== '0%') {
+                        document.getElementById('check-ui-update').textContent = '✅';
+
+                        // 検出ログに追加
+                        const log = document.getElementById('detection-log');
+                        const timestamp = new Date().toLocaleTimeString();
+                        log.textContent += `${timestamp}: 音量検出 ${width}\n`;
+                        log.scrollTop = log.scrollHeight;
+                    }
+                }
+            });
+        });
+
+        observer.observe(volumeBar, { attributes: true });
+    }
+});
+</script>

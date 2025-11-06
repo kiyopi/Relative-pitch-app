@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音域テストコントローラー デモ - ワンメソッド呼び出し</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../Bolt/v2/styles/base.css">
+    <link rel="stylesheet" href="../../Bolt/v2/styles/results.css">
+    <link rel="stylesheet" href="../../Bolt/v2/styles/training.css">
+    <link rel="stylesheet" href="css/voice-range-test.css">
+</head>
+<body>
+    <div class="container">
+        <!-- ヘッダー -->
+        <header class="page-header">
+            <div class="page-header-content">
+                <div class="page-header-icon-wrapper">
+                    <div class="page-header-icon gradient-catalog-purple">
+                        <i data-lucide="package" class="text-white" data-stroke-width="2" class="icon-xl"></i>
+                    </div>
+                </div>
+                <div class="page-header-text">
+                    <h1 class="page-title">VoiceRangeTestController デモ</h1>
+                    <p class="page-subtitle text-purple-200">PitchPro v1.3.1統合版 - ワンメソッド呼び出しで完全な音域テスト</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main class="narrow-main">
+            <!-- マイク許可セクション -->
+            <div style="text-align: center; padding: 20px 0;">
+                <button class="btn btn-primary mic-button mic-idle system-control-btn" id="request-mic-permission">
+                    <i data-lucide="mic" class="icon-md"></i>
+                    <span>マイク許可を要求</span>
+                </button>
+
+                <div id="mic-permission-status" class="mt-4" aria-live="polite">
+                    <p class="text-sm" id="mic-status-text">マイクの許可を待っています...</p>
+                </div>
+            </div>
+            
+            <!-- 音域テスト実行エリア -->
+            <div class="glass-card">
+                <div class="section-header">
+                    <div>
+                        <h3 class="text-section-title">音域テスト</h3>
+                        <p class="section-description">あなたの快適な音域を測定します</p>
+                        <!-- マイクステータスアイコン -->
+                        <div class="text-center">
+                            <div class="mic-status-container standby" id="mic-status-container" style="margin: 12px auto 0 auto;">
+                                <i data-lucide="mic" id="mic-status-icon" style="width: 40px; height: 40px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- メインステータス -->
+                <div class="text-center mb-6">
+                    <h4 class="voice-range-main-text" id="main-status-text">「音域テスト開始」ボタンでテストを開始してください</h4>
+                </div>
+                
+                <!-- 音域テストバッジ -->
+                <div class="range-test-layout-flex">
+                    <div class="range-test-item">
+                        <div class="voice-range-display-container">
+                            <svg class="voice-stability-svg" width="160" height="160" id="stability-ring">
+                                <circle cx="80" cy="80" r="72" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="16"/>
+                                <circle cx="80" cy="80" r="72" fill="none" stroke="#3b82f6" stroke-width="16" 
+                                        stroke-dasharray="452" stroke-dashoffset="452" 
+                                        transform="rotate(-90 80 80)" class="voice-progress-circle"/>
+                            </svg>
+                            <div class="voice-note-badge">
+                                <div id="range-icon" class="icon-4xl text-white" style="display: block;">
+                                    <img src="./icons/arrow-down.png" alt="下向き矢印" style="width: 80px; height: 80px; display: block;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- サブ情報 -->
+                <div class="text-center mt-4">
+                    <p class="text-sm voice-range-sub-text" id="sub-info-text">待機中...</p>
+                </div>
+
+                <!-- 検出状況表示 -->
+                <div class="detection-meters" style="margin-top: 24px;">
+                    <!-- 音量レベル -->
+                    <div class="meter-group" id="range-volume-container">
+                        <div class="meter-label">
+                            <span>音量レベル</span>
+                            <span class="volume-text meter-value" id="range-test-volume-text">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill gradient-catalog-green" 
+                                 id="range-test-volume-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- 検出周波数 -->
+                    <div class="meter-group">
+                        <div class="meter-label">
+                            <span>検出周波数</span>
+                            <span class="meter-value" id="range-test-frequency-value">0 Hz</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- コントロールボタン（実用機能のみ） -->
+                <div class="text-center mt-6">
+                    <button class="btn btn-primary voice-range-btn" id="begin-range-test-btn" disabled>
+                        <i data-lucide="play" class="icon-sm"></i>
+                        <span>音域テスト開始</span>
+                    </button>
+
+                    <button class="btn btn-outline ml-3 voice-range-btn btn-hidden" id="retry-measurement-btn">
+                        <i data-lucide="refresh-cw" class="icon-sm"></i>
+                        <span>再測定</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 結果表示エリア -->
+            <div class="glass-card mt-6 hidden" id="results-section">
+                <h3 class="heading-md">
+                    <i data-lucide="bar-chart-3" class="text-green-300"></i>
+                    <span>音域テスト結果</span>
+                </h3>
+
+                <!-- 基本結果 -->
+                <div class="result-info-container">
+                    <div class="result-info-row">
+                        <span>🎵 音域範囲</span>
+                        <span class="result-info-value" id="result-range">-</span>
+                    </div>
+                    <div class="result-info-row">
+                        <span>🎹 オクターブ数</span>
+                        <span class="result-info-value" id="result-octaves">-</span>
+                    </div>
+                    <div class="result-info-row">
+                        <span>🔽 最低音</span>
+                        <span class="result-info-value" id="result-low-freq">-</span>
+                    </div>
+                    <div class="result-info-row">
+                        <span>🔼 最高音</span>
+                        <span class="result-info-value" id="result-high-freq">-</span>
+                    </div>
+                </div>
+
+                <!-- 詳細統計 -->
+                <div class="mt-5">
+                    <h4 class="heading-sm">
+                        <i data-lucide="activity" class="text-blue-300"></i>
+                        <span>測定統計</span>
+                    </h4>
+                    <div class="result-info-container" id="result-details">
+                        <!-- JavaScript で動的に追加される -->
+                    </div>
+                </div>
+
+                <!-- アクションボタン -->
+                <div class="text-center mt-5">
+                    <button class="btn btn-primary voice-range-btn" id="remeasure-btn">
+                        <i data-lucide="refresh-cw" class="icon-sm"></i>
+                        <span>再測定</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 🧪 テスト用: リアルタイム音域データ表示 -->
+            <div class="glass-card mt-6 bg-gradient-to-br from-green-500/15 to-blue-500/15" id="debug-range-data" style="display: none;">
+                <h3 class="heading-md">
+                    <i data-lucide="activity" class="text-green-300"></i>
+                    <span>🧪 テスト表示: リアルタイム音域データ</span>
+                </h3>
+                <div style="padding: 10px 0;">
+                    <!-- システム状態確認 -->
+                    <div class="result-info-container">
+                        <div class="result-info-row">
+                            <span>🎛️ 音声検出状態</span>
+                            <span class="result-info-value" id="debug-detection-status">待機中</span>
+                        </div>
+                        <div class="result-info-row">
+                            <span>🎤 マイク状態</span>
+                            <span class="result-info-value" id="debug-mic-status">未許可</span>
+                        </div>
+                    </div>
+
+                    <!-- 現在の検出情報 -->
+                    <div class="result-info-container mt-3">
+                        <div class="result-info-row">
+                            <span>🎵 現在の音程</span>
+                            <span class="result-info-value" id="debug-current-note">-</span>
+                        </div>
+                        <div class="result-info-row">
+                            <span>📊 現在の周波数</span>
+                            <span class="result-info-value" id="debug-current-freq">- Hz</span>
+                        </div>
+                        <div class="result-info-row">
+                            <span>🔊 現在の音量</span>
+                            <span class="result-info-value" id="debug-current-volume">- %</span>
+                        </div>
+                    </div>
+
+                    <!-- 測定中の範囲情報 -->
+                    <div class="mt-4">
+                        <h4 class="heading-sm">
+                            <i data-lucide="target" class="text-blue-300"></i>
+                            <span>測定範囲 (リアルタイム)</span>
+                        </h4>
+                        <div class="result-info-container">
+                            <div class="result-info-row">
+                                <span>🔽 検出最低音</span>
+                                <span class="result-info-value" id="debug-min-note">-</span>
+                            </div>
+                            <div class="result-info-row">
+                                <span>📊 最低音周波数</span>
+                                <span class="result-info-value" id="debug-min-freq">- Hz</span>
+                            </div>
+                            <div class="result-info-row">
+                                <span>🔼 検出最高音</span>
+                                <span class="result-info-value" id="debug-max-note">-</span>
+                            </div>
+                            <div class="result-info-row">
+                                <span>📊 最高音周波数</span>
+                                <span class="result-info-value" id="debug-max-freq">- Hz</span>
+                            </div>
+                            <div class="result-info-row">
+                                <span>📏 暫定音域</span>
+                                <span class="result-info-value" id="debug-temp-range">-</span>
+                            </div>
+                            <div class="result-info-row">
+                                <span>📈 検出回数</span>
+                                <span class="result-info-value" id="debug-detection-count">0回</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PitchProバージョン情報 -->
+            <div class="glass-card mt-6 bg-gradient-to-br from-blue-500/15 to-purple-500/15">
+                <h3 class="heading-md">
+                    <i data-lucide="info" class="text-purple-300"></i>
+                    <span>PitchPro v1.3.1 統合情報</span>
+                </h3>
+                <div style="padding: 10px 0;">
+                    <p class="text-sm text-white-70">🎵 音声処理エンジン: <strong>PitchPro v1.3.1</strong></p>
+                    <p class="text-sm text-white-70">📦 AudioDetectionComponent: <strong id="adc-status">確認中...</strong></p>
+                    <p class="text-sm text-white-70">🔧 デバイス最適化: <strong id="device-opt">自動検出</strong></p>
+                    <p class="text-sm text-white-70">🧪 テスト表示: <button class="btn btn-outline btn-sm debug-btn" id="toggle-debug-display">デバッグ表示ON</button></p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- 🎵 PitchPro v1.3.1 音声処理エンジン -->
+    <script src="js/pitchpro-v1.3.1.umd.js"></script>
+    <script>
+        // PitchPro v1.3.1 読み込み確認
+        console.log('%c📌 PitchPro v1.3.1 Loading...', 'color: #8b5cf6; font-weight: bold; font-size: 14px;');
+    </script>
+
+    <!-- 音域テストデモメインスクリプト（PitchPro v1.2.2統合版） -->
+    <script type="module" src="js/voice-range-test-demo.js"></script>
+</body>
+</html>

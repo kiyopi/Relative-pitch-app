@@ -1,0 +1,99 @@
+<!-- SPA用テンプレート: result-session
+     このファイルはindex.htmlのrouter.jsから読み込まれます。
+     スクリプトタグは不要（index.htmlで既に読み込み済み）
+-->
+<div class="container container-result-session">
+        <!-- ヘッダー -->
+        <header class="page-header">
+                <div class="page-header-content">
+                    <div class="page-header-icon-wrapper">
+                        <div class="page-header-icon gradient-catalog-blue">
+                            <i data-lucide="check-circle" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;"></i>
+                        </div>
+                    </div>
+                    <div class="page-header-text">
+                        <h1 class="page-title">セッション 1 完了！</h1>
+                        <p class="page-subtitle text-green-200">基音 C4 - 8音の評価結果</p>
+                    </div>
+                </div>
+            </header>
+
+        <!-- メインコンテンツ -->
+        <main class="narrow-main">
+            <!-- 進行バー -->
+            <div class="progress-section progress-section-training">
+                <div class="flex items-center gap-4">
+                    <div class="progress-bar with-margin">
+                        <div class="progress-fill gradient-catalog-blue" style="width: 25%;"></div>
+                    </div>
+                    <div class="session-badge">
+                        セッション 1/8
+                    </div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <button class="btn btn-primary btn-next-session">
+                        <i data-lucide="arrow-right" style="width: 24px; height: 24px;"></i>
+                        <span>次の基音へ</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- セッション概要 -->
+            <div class="glass-card">
+                <div class="score-section">
+                    <div class="score-grid">
+                        <!-- 基音表示（左） -->
+                        <div class="base-note-section">
+                            <div class="score-base-note text-white" id="session-base-note">C4</div>
+                            <p class="text-body-green">基音</p>
+                        </div>
+
+                        <!-- トロフィーアイコン（中央・JavaScriptで動的生成） -->
+                        <div class="trophy-section flex flex-col items-center text-center justify-end">
+                            <div class="accuracy-badge accuracy-badge-excellent relative">
+                                <!-- アイコン・ヘルプボタンはJavaScriptで動的生成されます -->
+                            </div>
+                            <p class="text-sub-title mt-4">素晴らしい精度！</p>
+                        </div>
+
+                        <!-- 平均誤差（右） -->
+                        <div class="error-section">
+                            <div class="score-average text-white" id="average-error">+0.0¢</div>
+                            <p class="text-body-green">セッション平均誤差</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 評価分布見出し -->
+                <h3 class="text-xl font-medium text-white mb-4 text-center">評価分布</h3>
+                
+                <!-- 評価分布バー -->
+                <div class="flex flex-col gap-3 px-4">
+                    <!-- JavaScriptで動的生成 -->
+                </div>
+            </div>
+
+            <!-- 詳細分析 -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <i data-lucide="microscope" style="width: 24px; height: 24px;"></i>
+                    <span>詳細分析</span>
+                </h3>
+                <div class="space-y-2" id="note-results">
+                    <!-- JavaScriptで動的生成 -->
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <section class="action-buttons">
+                <button class="btn btn-primary btn-next-session">
+                    <i data-lucide="arrow-right" style="width: 24px; height: 24px;"></i>
+                    <span>次の基音へ</span>
+                </button>
+                <button class="btn btn-outline" onclick="window.location.hash='home'">
+                    <i data-lucide="home" style="width: 24px; height: 24px;"></i>
+                    <span>ホームに戻る</span>
+                </button>
+            </section>
+        </main>
+    </div> <!-- container end -->

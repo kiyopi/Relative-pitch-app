@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ヘルプアイコンテスト</title>
+    <link rel="stylesheet" href="PitchPro-SPA/styles/base.css">
+    <link rel="stylesheet" href="PitchPro-SPA/styles/results.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px;
+            display: flex;
+            gap: 50px;
+            flex-wrap: wrap;
+        }
+
+        .test-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .icon-circle {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h3 style="color: white; margin-bottom: 20px;">help-icon-btn (help-circle)</h3>
+        <div class="icon-circle">
+            <button class="help-icon-btn text-white">
+                <i data-lucide="help-circle" class="icon-help"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h3 style="color: white; margin-bottom: 20px;">help-icon-btn (circle-help)</h3>
+        <div class="icon-circle">
+            <button class="help-icon-btn text-white">
+                <i data-lucide="circle-help" class="icon-help"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h3 style="color: white; margin-bottom: 20px;">help-icon-btn (info)</h3>
+        <div class="icon-circle">
+            <button class="help-icon-btn text-white">
+                <i data-lucide="info" class="icon-help"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h3 style="color: white; margin-bottom: 20px;">アイコン比較テスト</h3>
+        <div style="padding: 20px; display: flex; gap: 20px; flex-direction: column;">
+            <div style="color: white;">
+                <span>help-circle: </span>
+                <i data-lucide="help-circle" class="text-white" style="width: 40px; height: 40px;"></i>
+            </div>
+            <div style="color: white;">
+                <span>circle-help: </span>
+                <i data-lucide="circle-help" class="text-white" style="width: 40px; height: 40px;"></i>
+            </div>
+            <div style="color: white;">
+                <span>info: </span>
+                <i data-lucide="info" class="text-white" style="width: 40px; height: 40px;"></i>
+            </div>
+            <div style="color: white;">
+                <span>alert-circle: </span>
+                <i data-lucide="alert-circle" class="text-white" style="width: 40px; height: 40px;"></i>
+            </div>
+            <div style="color: white;">
+                <span>trophy (確認用): </span>
+                <i data-lucide="trophy" class="text-white" style="width: 40px; height: 40px;"></i>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@0.263.0/dist/umd/lucide.js"></script>
+    <script src="PitchPro-SPA/js/lucide-init.js"></script>
+    <script>
+        window.initializeLucideIcons({ immediate: true });
+    </script>
+</body>
+</html>

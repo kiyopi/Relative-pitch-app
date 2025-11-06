@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>8va相対音感トレーニング - 総合評価</title>
+    
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/results.css"><!-- 結果表示専用スタイル（開発効率優先・将来分離予定） -->
+    
+    <!-- フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container container-results-overview">
+            <!-- ヘッダーセクション -->
+            <div class="page-header">
+                <div class="page-header-content">
+                    <div class="page-header-icon-wrapper">
+                        <div class="page-header-icon gradient-catalog-purple">
+                            <i data-lucide="bar-chart-2" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;"></i>
+                        </div>
+                    </div>
+                    <div class="page-header-text">
+                        <h1 class="page-title">総合評価</h1>
+                        <p class="page-subtitle text-green-200">8セッション (64音) の総合評価</p>
+                    </div>
+                </div>
+            </div>
+
+        <!-- メインコンテンツエリア -->
+        <main class="wide-main">
+                
+                <!-- 総合評価セクション -->
+                <section class="rank-section glass-card share-card">
+                    <div class="rank-mode">
+                        <h3 class="mode-title" id="main-mode-title">ランダム基音モード</h3>
+                    </div>
+                    <div class="rank-content-row">
+                        <!-- グレードアイコン（JavaScriptで動的生成） -->
+                        <div class="rank-icon">
+                            <div class="rank-circle rank-md rank-circle-b" style="position: relative;">
+                                <!-- アイコン・ヘルプボタンはJavaScriptで動的生成されます -->
+                            </div>
+                        </div>
+                        
+                        <!-- 統計情報 -->
+                        <div class="rank-stats-row">
+                            <div class="rank-stat-item">
+                                <div class="stat-value-rank grade-value" id="dynamic-grade">B</div>
+                                <div class="stat-label-rank">総合グレード</div>
+                            </div>
+                            <div class="rank-stat-item">
+                                <div class="stat-value-rank stat-value-avg-error avg-error">±18.2¢</div>
+                                <div class="stat-label-rank">平均誤差（セント）</div>
+                            </div>
+                            <div class="rank-stat-item">
+                                <div class="stat-value-rank excellence-rate" id="excellence-rate">50%</div>
+                                <div class="stat-label-rank">優秀率（±20¢以内）</div>
+                            </div>
+                            <div class="rank-stat-item">
+                                <div class="stat-value-rank stat-value-session-count session-count">8</div>
+                                <div class="stat-label-rank">セッション数</div>
+                            </div>
+                        </div>
+                        
+                        <!-- ランク取得メッセージ -->
+                        <div class="rank-achievement-message text-center">
+                            <p id="share-message" class="text-body text-white-90">
+                                B級ランク取得！グッドプレイヤー！
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="rank-divider"></div>
+                    
+                    <!-- シェアセクション -->
+                    <div class="rank-share-section">
+                        <h3 class="heading-md">
+                            <i data-lucide="share-2" class="text-blue-400"></i>
+                            <span>みんなに成果をシェアしよう！</span>
+                        </h3>
+                        <div class="share-buttons">
+                            <a href="#" class="share-btn twitter" onclick="shareToTwitter(event)" title="Xでシェア">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+                                </svg>
+                            </a>
+                            <a href="#" class="share-btn line" onclick="shareToLine(event)" title="LINEで送る">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.348 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"></path>
+                                </svg>
+                            </a>
+                            <a href="#" class="share-btn facebook" onclick="shareToFacebook(event)" title="Facebookでシェア">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path>
+                                </svg>
+                            </a>
+                            <button class="share-btn copy" onclick="copyShareText(event)" title="リンクをコピー">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 評価分布 -->
+                <section class="glass-card">
+                    <h4 class="heading-md" style="margin-bottom: 0.75rem;">
+                        <i data-lucide="bar-chart-3" class="text-blue-300"></i>
+                        <span>評価分布</span>
+                    </h4>
+
+                    <p class="text-sm text-white-60" style="margin-bottom: 1rem;">全セッションの各音の精度評価を集計した分布です。Excellentが多いほど高精度です。</p>
+
+                    <!-- 評価分布バー -->
+                    <div class="flex flex-col gap-3">
+                        <!-- JavaScriptで動的生成 -->
+                    </div>
+                </section>
+
+                <!-- 誤差推移グラフ -->
+                <section class="glass-card">
+                    <h2 class="heading-md">
+                        <i data-lucide="trending-up" style="width: 24px; height: 24px;"></i>
+                        <span>誤差推移</span>
+                    </h2>
+                    <div class="chart-container">
+                        <canvas id="error-trend-chart"></canvas>
+                    </div>
+                </section>
+
+                <!-- セッショングリッド -->
+                <section class="glass-card">
+                    <h2 class="heading-md">
+                        <i data-lucide="grid" style="width: 24px; height: 24px;"></i>
+                        <span>セッション一覧</span>
+                    </h2>
+                    <div id="session-grid-container">
+                        <!-- JavaScriptで動的生成 -->
+                    </div>
+                </section>
+
+                <!-- 詳細分析セクション -->
+                <section class="glass-card">
+                    <!-- ナビゲーションヘッダー -->
+                    <div class="section-header mb-4">
+                        <div class="flex items-center justify-between w-full">
+                            <button id="prev-session-btn" class="glass-card-sm">
+                                <i data-lucide="chevron-left" class="text-white icon-md"></i>
+                            </button>
+                            <div class="text-center flex-1 px-2">
+                                <h3 class="text-sub-title detail-analysis-title">
+                                    <span>詳細分析</span>
+                                    <span class="dash-separator"> - </span>
+                                    <span>セッション1</span>
+                                </h3>
+                            </div>
+                            <button id="next-session-btn" class="glass-card-sm">
+                                <i data-lucide="chevron-right" class="text-white icon-md"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="detail-analysis-container">
+                        <!-- セッション概要表示 -->
+                        <div class="score-section">
+                            <!-- PC版3列グリッド -->
+                            <div class="rank-display-grid">
+                                <!-- 基音表示（左） -->
+                                <div class="rank-grid-left">
+                                    <div class="score-base-note text-white">C4</div>
+                                    <p class="text-body-green mb-0">基音</p>
+                                </div>
+                                
+                                <!-- トロフィーアイコン（中央・JavaScriptで動的生成） -->
+                                <div class="rank-grid-center">
+                                    <div class="accuracy-badge accuracy-badge-excellent accuracy-badge-container">
+                                        <!-- アイコン・ヘルプボタンはJavaScriptで動的生成されます -->
+                                    </div>
+                                    <p class="text-sub-title mt-4 mb-0">素晴らしい精度！</p>
+                                </div>
+                                
+                                <!-- 平均誤差（右） -->
+                                <div class="rank-grid-right">
+                                    <div class="score-average text-white">±12.1¢</div>
+                                    <p class="text-body-green mb-0">平均誤差</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 音別詳細結果 -->
+                        <div class="space-y-2" id="detail-note-results">
+                            <!-- JavaScriptで動的生成 -->
+                        </div>
+                        
+                        <!-- 追加の分析情報（未定） -->
+                        <!-- JavaScriptで動的生成 -->
+                    </div>
+                </section>
+
+                <!-- 次のステップ -->
+                <section class="glass-card">
+                    <h2 class="heading-md">
+                        <i data-lucide="compass" style="width: 24px; height: 24px;"></i>
+                        <span>次のステップ</span>
+                    </h2>
+                    <div class="next-steps-grid">
+                        <!-- UIカタログ準拠のコンポーネント -->
+                    </div>
+                </section>
+
+                <!-- 無料版 vs プレミアム版比較 -->
+                <section class="glass-card mb-8">
+                    <h2 class="heading-md">
+                        <i data-lucide="scale" style="width: 24px; height: 24px;"></i>
+                        <span>無料版 vs プレミアム版</span>
+                    </h2>
+                    
+                    <!-- 機能比較テーブル -->
+                    <div class="comparison-table">
+                        <!-- ヘッダー -->
+                        <div class="comparison-header-row">
+                            <div class="comparison-cell comparison-feature-header">
+                                <h4>機能</h4>
+                            </div>
+                            <div class="comparison-cell comparison-plan-header">
+                                <div class="plan-header">
+                                    <i data-lucide="user" class="icon-sm"></i>
+                                    <h4>無料版</h4>
+                                </div>
+                            </div>
+                            <div class="comparison-cell comparison-plan-header">
+                                <div class="plan-header">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
+                                        <path d="M5 21h14"></path>
+                                    </svg>
+                                    <h4>プレミアム版</h4>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- ランダムモード -->
+                        <div class="comparison-row">
+                            <div class="comparison-cell comparison-feature">
+                                <span>ランダム基音モード</span>
+                            </div>
+                            <div class="comparison-cell comparison-value">
+                                <i data-lucide="check-circle" class="icon-sm text-green-400"></i>
+                            </div>
+                            <div class="comparison-cell comparison-value">
+                                <i data-lucide="check-circle" class="icon-sm text-green-400"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- 連続チャレンジモード（未定） -->
+                        <div class="comparison-row">
+                            <div class="comparison-cell comparison-feature">
+                                <span>連続チャレンジモード（※未定）</span>
+                            </div>
+                            <div class="comparison-cell comparison-value">
+                                <i data-lucide="minus" class="icon-sm text-gray-500"></i>
+                            </div>
+                            <div class="comparison-cell comparison-value">
+                                <i data-lucide="check-circle" class="icon-sm text-green-400"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- 詳細分析レポート -->
+                        <div class="comparison-row">
+                            <div class="comparison-cell comparison-feature">
+                                <span>詳細分析レポート</span>
+                            </div>
+                            <div class="comparison-cell comparison-value">
+                                <span class="text-gray-400 text-sm">基本表示</span>
+                            </div>
+                            <div class="comparison-cell comparison-value">
+                                <span class="text-white text-sm">AI分析付き</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 12音階マスターモード -->
+                        <div class="comparison-row">
+                            <div class="comparison-cell comparison-feature">
+                                <span>12音階マスターモード</span>
+                            </div>
+                            <div class="comparison-cell comparison-value">
+                                <i data-lucide="minus" class="icon-sm text-gray-500"></i>
+                            </div>
+                            <div class="comparison-cell comparison-value">
+                                <i data-lucide="check-circle" class="icon-sm text-green-400"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- 弱点特定・改善提案 -->
+                        <div class="comparison-row">
+                            <div class="comparison-cell comparison-feature">
+                                <span>弱点特定・改善提案</span>
+                            </div>
+                            <div class="comparison-cell comparison-value">
+                                <i data-lucide="minus" class="icon-sm text-gray-500"></i>
+                            </div>
+                            <div class="comparison-cell comparison-value">
+                                <i data-lucide="check-circle" class="icon-sm text-green-400"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- データエクスポート -->
+                        <div class="comparison-row comparison-row-last">
+                            <div class="comparison-cell comparison-feature">
+                                <span>データエクスポート</span>
+                            </div>
+                            <div class="comparison-cell comparison-value">
+                                <i data-lucide="minus" class="icon-sm text-gray-500"></i>
+                            </div>
+                            <div class="comparison-cell comparison-value">
+                                <i data-lucide="check-circle" class="icon-sm text-green-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- プレミアム版CTA -->
+                    <div class="text-center">
+                        <button class="btn btn-primary">
+                            <i data-lucide="star" class="icon-xs"></i>
+                            7日間無料でお試し
+                        </button>
+                        <p class="text-caption mt-2">月額480円 • いつでもキャンセル可能</p>
+                    </div>
+                </section>
+
+                <!-- アクションボタン -->
+                <section class="action-buttons mb-6">
+                    <button class="btn btn-primary" id="btn-new-training">
+                        <i data-lucide="play" class="text-blue-300"></i>
+                        <span>新しいトレーニング開始</span>
+                    </button>
+                    <button class="btn btn-outline" onclick="window.location.hash='home'">
+                        <i data-lucide="home" class="text-white"></i>
+                        <span>ホームに戻る</span>
+                    </button>
+                </section>
+        </main>
+
+        <!-- 総合グレード説明ポップオーバー -->
+        <div id="grade-popover" class="rank-popover">
+            <button class="popover-close-btn" onclick="toggleGradePopover()">
+                <i data-lucide="x" class="icon-help"></i>
+            </button>
+            <h4 class="popover-title">総合グレード</h4>
+
+            <div class="rank-item">
+                <svg xmlns="http://www.w3.org/2000/svg" class="text-yellow-300 icon-md shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path>
+                    <path d="M5 21h14"></path>
+                </svg>
+                <div>
+                    <div class="rank-name">S級</div>
+                    <div class="rank-description">レコーディング品質の精度</div>
+                    <div class="rank-range">8回モード: ±25¢ / 12回: ±20¢ / 24回: ±15¢</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <i data-lucide="medal" class="text-gray-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name">A級</div>
+                    <div class="rank-description">楽器アンサンブルに対応できる精度</div>
+                    <div class="rank-range">8回モード: ±35¢ / 12回: ±30¢ / 24回: ±25¢</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <i data-lucide="award" class="text-orange-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name">B級</div>
+                    <div class="rank-description">合唱や弾き語りに適した精度</div>
+                    <div class="rank-range">8回モード: ±45¢ / 12回: ±40¢ / 24回: ±35¢</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <i data-lucide="smile" class="text-green-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name">C級</div>
+                    <div class="rank-description">カラオケや趣味演奏を楽しめる精度</div>
+                    <div class="rank-range">8回モード: ±55¢ / 12回: ±50¢ / 24回: ±45¢</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <i data-lucide="meh" class="text-blue-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name">D級</div>
+                    <div class="rank-description">基礎を身につけている段階</div>
+                    <div class="rank-range">8回モード: ±65¢ / 12回: ±60¢ / 24回: ±55¢</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <i data-lucide="frown" class="text-red-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name">E級</div>
+                    <div class="rank-description">基礎から学んでいる段階</div>
+                    <div class="rank-range">8回モード: ±80¢ / 12回: ±75¢ / 24回: ±70¢</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- セッション精度ランク説明ポップオーバー -->
+        <div id="session-rank-popover" class="rank-popover">
+            <button class="popover-close-btn" onclick="toggleSessionRankPopover()">
+                <i data-lucide="x" class="icon-help"></i>
+            </button>
+            <h4 class="popover-title">精度ランク</h4>
+
+            <div class="rank-item">
+                <i data-lucide="trophy" class="text-yellow-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-excellent">Excellent</div>
+                    <div class="rank-range">±20セント以内</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <i data-lucide="star" class="text-green-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-good">Good</div>
+                    <div class="rank-range">±35セント以内</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <i data-lucide="thumbs-up" class="text-blue-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-pass">Pass</div>
+                    <div class="rank-range">±50セント以内</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <i data-lucide="alert-triangle" class="text-red-300 icon-md shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-practice">Practice</div>
+                    <div class="rank-range">50セント以上</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript: 全てのスクリプトはindex.htmlで読み込み済み（SPAアーキテクチャ） -->
+    <!-- Chart.js、データマネージャー、評価計算機、コントローラーはindex.htmlで管理 -->
+</body>
+</html>

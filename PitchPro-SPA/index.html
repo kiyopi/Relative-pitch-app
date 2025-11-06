@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- キャッシュ無効化 -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>8va相対音感トレーニング - ホーム</title>
+    <link rel="stylesheet" href="styles/base.css?v=20251030001">
+    <link rel="stylesheet" href="styles/results.css?v=20251030001">
+    <link rel="stylesheet" href="styles/training.css?v=20251030001">
+    <link rel="stylesheet" href="styles/voice-range.css?v=20251030001">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons - unpkg CDN (安定版・特定バージョン指定) -->
+    <script src="https://unpkg.com/lucide@0.263.0/dist/umd/lucide.js"></script>
+
+    <!-- Chart.js（総合評価ページで使用） -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+
+    <!-- JavaScript モジュール -->
+    <script src="js/data-manager.js?v=20251029012"></script>
+    <script src="js/navigation-manager.js?v=20251029012"></script>
+    <script src="js/evaluation-calculator.js?v=20251029012"></script>
+    <script src="js/controllers/session-data-recorder.js?v=20251029012"></script>
+    <script src="pages/js/result-session-controller.js?v=20251030002"></script>
+    <script src="pages/js/results-overview-controller.js?v=20251030002"></script>
+    <script src="js/core/pitchpro-v1.3.1.umd.js?v=20251030002"></script>
+
+    <!-- 音域テスト正規版（SPA対応・条件付き初期化） -->
+    <script src="pages/js/voice-range-test.js?v=20251029012"></script>
+    <!-- タイムスタンプ方式でキャッシュを強制無効化 -->
+    <script>
+        const script = document.createElement('script');
+        script.src = `pages/js/preparation-pitchpro-cycle.js?t=${Date.now()}`;
+        document.head.appendChild(script);
+    </script>
+
+    <!-- Tone.js Library (Required for PitchShifter) -->
+    <script type="importmap">
+    {
+        "imports": {
+            "tone": "https://cdn.jsdelivr.net/npm/tone@15.1.22/+esm"
+        }
+    }
+    </script>
+
+    <!-- PitchShifter Library -->
+    <script type="module">
+        import { PitchShifter } from './js/core/reference-tones.js?v=2.9.0&t=1761735209&nocache=1';
+        import * as Tone from 'tone';
+
+        window.PitchShifter = PitchShifter;
+        window.Tone = Tone;
+
+        console.log('✅ PitchShifter loaded globally (v2.9.0 - Optimized Envelope)');
+        console.log('📦 [CACHE BUSTER] Timestamp: 1761735209');
+        console.log('⚙️ [ENVELOPE] attack: 0.02s, sustain: 1.0s, release: 1.5s (2.52s total), curve: linear');
+        console.log('✅ Tone.js v15.1.22 (stable latest) loaded globally');
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="app-header">
+                <div class="header-brand">
+                    <div class="header-icon-wrapper">
+                        <div class="header-icon">
+                            <i data-lucide="music" class="icon-lg text-white"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-white">8va相対音感トレーニング</h1>
+                        <p class="text-purple-200">あなたの音感を科学的に向上させましょう</p>
+                    </div>
+                </div>
+                <!-- モバイル用ハンバーガーメニュー -->
+                <button class="menu-toggle" id="menu-toggle">
+                    <i data-lucide="menu" class="icon-md"></i>
+                </button>
+                
+                <!-- PC用ナビゲーション -->
+                <nav class="header-nav" id="header-nav">
+                    <button class="nav-button" onclick="location.hash='records'" title="トレーニング記録を見る">
+                        <i data-lucide="history" class="icon-md"></i>
+                        <span class="nav-text">記録</span>
+                    </button>
+                    <button class="nav-button" onclick="location.hash='results'" title="総合評価を見る">
+                        <i data-lucide="bar-chart-3" class="icon-md"></i>
+                        <span class="nav-text">評価</span>
+                    </button>
+                    <button class="nav-button">
+                        <i data-lucide="settings" class="icon-md"></i>
+                        <span class="nav-text">設定</span>
+                    </button>
+                    <button class="nav-button">
+                        <i data-lucide="share" class="icon-md"></i>
+                        <span class="nav-text">共有</span>
+                    </button>
+                </nav>
+        </header>
+
+        <!-- Main Content Container for SPA -->
+        <main id="app-root" class="wide-main">
+            <!-- 動的にコンテンツがここに読み込まれます -->
+        </main>
+        
+        <!-- Footer -->
+        <footer class="footer-base">
+            <p class="footer-copyright">© 2024 8va相対音感トレーニングアプリ</p>
+            <p class="footer-tagline">音楽の新しい扉を開こう</p>
+        </footer>
+    </div>
+
+    <!-- Lucide初期化 -->
+    <script src="js/lucide-init.js?v=20251029012"></script>
+
+    <!-- SPA Router -->
+    <script src="js/router.js?v=20251029012"></script>
+
+    <!-- メニュー開閉スクリプト -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const headerNav = document.getElementById('header-nav');
+            
+            menuToggle.addEventListener('click', function() {
+                headerNav.classList.toggle('active');
+                // アイコン切り替え
+                const icon = menuToggle.querySelector('i');
+                if (icon) {
+                    if (headerNav.classList.contains('active')) {
+                        icon.setAttribute('data-lucide', 'x');
+                    } else {
+                        icon.setAttribute('data-lucide', 'menu');
+                    }
+                    // 統合初期化関数を使用（即座実行モード）
+                    if (typeof window.initializeLucideIcons === 'function') {
+                        window.initializeLucideIcons({ immediate: true });
+                    }
+                }
+            });
+            
+            // 外側クリックで閉じる
+            document.addEventListener('click', function(event) {
+                if (!menuToggle.contains(event.target) && !headerNav.contains(event.target)) {
+                    headerNav.classList.remove('active');
+                    const icon = menuToggle.querySelector('i');
+                    if (icon) {
+                        icon.setAttribute('data-lucide', 'menu');
+                        // 統合初期化関数を使用（即座実行モード）
+                        if (typeof window.initializeLucideIcons === 'function') {
+                            window.initializeLucideIcons({ immediate: true });
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

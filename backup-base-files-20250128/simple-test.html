@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>簡単テスト - Preparation分割</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+        .big-button {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 15px 0;
+            text-decoration: none;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .big-button:hover {
+            transform: translateY(-2px);
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        .status.success { background: rgba(76, 175, 80, 0.3); }
+        .status.warning { background: rgba(255, 193, 7, 0.3); }
+        .status.error { background: rgba(244, 67, 54, 0.3); }
+        .instructions {
+            background: rgba(33, 150, 243, 0.2);
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .step {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .reset-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🧪 簡単テスト</h1>
+        <p>3クリックでテスト完了！</p>
+
+        <div id="current-status" class="status warning">
+            テスト準備完了
+        </div>
+
+        <div class="instructions">
+            <h3>📋 テスト手順（簡単3ステップ）</h3>
+            <div class="step">
+                <strong>ステップ1:</strong> 下の「マイク許可テスト」ボタンをクリック
+            </div>
+            <div class="step">
+                <strong>ステップ2:</strong> マイク許可ダイアログで「許可」をクリック
+            </div>
+            <div class="step">
+                <strong>ステップ3:</strong> 成功メッセージを確認
+            </div>
+        </div>
+
+        <!-- メインテストボタン -->
+        <button class="big-button" id="mic-test-btn">
+            🎤 マイク許可テスト開始
+        </button>
+
+        <button class="big-button" id="data-test-btn" style="background: linear-gradient(45deg, #2196F3, #1976D2);">
+            📊 データ保存テスト開始
+        </button>
+
+        <!-- リセットボタン -->
+        <button class="big-button reset-btn" id="reset-btn">
+            🔄 テストリセット
+        </button>
+
+        <!-- 結果表示 -->
+        <div id="test-results" style="margin-top: 30px;">
+            <h3>📋 テスト結果</h3>
+            <div id="test-log" style="background: #000; color: #0f0; padding: 15px; border-radius: 8px; font-family: monospace; min-height: 100px; white-space: pre-line;"></div>
+        </div>
+
+        <!-- localStorage状態 -->
+        <div style="margin-top: 20px;">
+            <h4>💾 データ状態</h4>
+            <div id="storage-display" style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px; font-family: monospace;"></div>
+        </div>
+    </div>
+
+    <script>
+        let testLog = '';
+
+        function log(message) {
+            const time = new Date().toLocaleTimeString();
+            testLog += `[${time}] ${message}\n`;
+            document.getElementById('test-log').textContent = testLog;
+            console.log(message);
+        }
+
+        function updateStatus(message, type = 'warning') {
+            const statusEl = document.getElementById('current-status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+        }
+
+        function updateStorageDisplay() {
+            const micPermission = localStorage.getItem('micPermissionGranted');
+            const audioTest = localStorage.getItem('audioTestCompleted');
+
+            document.getElementById('storage-display').innerHTML = `
+micPermissionGranted: ${micPermission || 'null'}
+audioTestCompleted: ${audioTest || 'null'}
+            `;
+        }
+
+        // マイク許可テスト
+        document.getElementById('mic-test-btn').addEventListener('click', async () => {
+            log('🎤 マイク許可テスト開始');
+            updateStatus('マイク許可処理中...', 'warning');
+
+            try {
+                log('📋 ブラウザにマイク許可ダイアログが表示されます');
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                log('✅ マイク許可成功！');
+                updateStatus('マイク許可テスト成功！', 'success');
+
+                // データ保存
+                localStorage.setItem('micPermissionGranted', 'true');
+                log('💾 データ保存完了');
+                updateStorageDisplay();
+
+                // ストリーム停止
+                stream.getTracks().forEach(track => track.stop());
+                log('📋 マイクストリーム停止（テスト完了）');
+
+            } catch (error) {
+                log(`❌ マイク許可エラー: ${error.message}`);
+                updateStatus('マイク許可テスト失敗', 'error');
+            }
+        });
+
+        // データ保存テスト
+        document.getElementById('data-test-btn').addEventListener('click', () => {
+            log('📊 データ保存テスト開始');
+
+            try {
+                // テストデータ保存
+                localStorage.setItem('audioTestCompleted', 'true');
+                localStorage.setItem('testTimestamp', new Date().toISOString());
+
+                log('✅ データ保存テスト成功');
+                updateStatus('データ保存テスト成功！', 'success');
+                updateStorageDisplay();
+
+                // データ読み込み確認
+                const micPermission = localStorage.getItem('micPermissionGranted');
+                const audioTest = localStorage.getItem('audioTestCompleted');
+
+                if (micPermission === 'true' && audioTest === 'true') {
+                    log('🎉 全てのテスト完了！Step1→Step2遷移準備OK');
+                    updateStatus('全テスト成功！分割実装準備完了', 'success');
+                }
+
+            } catch (error) {
+                log(`❌ データ保存エラー: ${error.message}`);
+                updateStatus('データ保存テスト失敗', 'error');
+            }
+        });
+
+        // リセット
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            localStorage.clear();
+            testLog = '';
+            document.getElementById('test-log').textContent = '';
+            updateStatus('テストリセット完了', 'warning');
+            updateStorageDisplay();
+            log('🔄 全データクリア・テストリセット完了');
+        });
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            log('🚀 簡単テストページ初期化完了');
+            updateStorageDisplay();
+        });
+    </script>
+</body>
+</html>

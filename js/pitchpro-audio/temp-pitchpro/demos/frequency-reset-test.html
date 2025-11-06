@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>周波数リセットテスト</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .test-area {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            background: #fafafa;
+            min-height: 300px;
+        }
+        
+        .frequency-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+            text-align: center;
+            padding: 15px 10px;
+            background: white;
+            border-radius: 5px;
+            margin: 10px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: black;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .mode-display {
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 5px;
+        }
+        
+        .log-info { color: #0056b3; }
+        .log-success { color: #155724; }
+        .log-warning { color: #856404; }
+        .log-error { color: #721c24; }
+        
+        /* 3つの周波数表示を同時に表示 */
+        .frequency-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .frequency-box {
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            background: white;
+            min-width: 0;
+            overflow: hidden;
+        }
+        
+        .frequency-box.active {
+            border-color: #007bff;
+            background: #e7f3ff;
+        }
+        
+        .frequency-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 周波数リセットテスト</h1>
+        
+        <div class="test-area">
+            <h2>現在のアクティブモード: <span id="current-mode">モード1</span></h2>
+            
+            <!-- 3つの周波数表示を同時に表示 -->
+            <div class="frequency-group">
+                <!-- モード1 -->
+                <div id="mode-1-box" class="frequency-box active">
+                    <div class="frequency-label">📱 モード1 - マイクテスト</div>
+                    <div class="frequency-display" id="freq-1">0.0 Hz</div>
+                </div>
+                
+                <!-- モード2 -->
+                <div id="mode-2-box" class="frequency-box">
+                    <div class="frequency-label">🎵 モード2 - 音域テスト</div>
+                    <div class="frequency-display" id="freq-2">0.0 Hz</div>
+                </div>
+                
+                <!-- モード3 -->
+                <div id="mode-3-box" class="frequency-box">
+                    <div class="frequency-label">🎯 モード3 - 練習モード</div>
+                    <div class="frequency-display" id="freq-3">0.0 Hz</div>
+                    <div class="frequency-display" id="note-3" style="font-size: 18px; color: #28a745;">-</div>
+                </div>
+            </div>
+            
+            <div class="mode-display" style="text-align: center; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                ℹ️ 青色の枠がアクティブなモードです。モード切り替え時に他の表示がリセットされるか確認してください。
+            </div>
+            
+            <div class="mode-display" style="padding: 15px; background: #e8f4fd; border-radius: 5px; margin: 10px 0;">
+                <h4 style="margin: 0 0 10px 0; color: #0056b3;">🧪 音程リセットテストガイド</h4>
+                <ol style="margin: 0; padding-left: 20px; font-size: 14px;">
+                    <li>「440Hz シミュレート」で全モードに値を設定</li>
+                    <li>「統合リセット (MicrophoneController)」をクリック</li>
+                    <li>すべてのモードが「0.0 Hz」「-」にリセットされるか確認</li>
+                    <li>ログで「✅ 音程表示リセット成功」が表示されるか確認</li>
+                </ol>
+                <p style="margin: 10px 0 0 0; color: #856404; font-size: 12px;">
+                    ⚠️ v1.1.9で追加された統合リセット機能により、MicrophoneController.reset()は
+                    PitchDetectorの基本リセット + AudioDetectionComponentの包括的UIリセットを両方実行します。
+                </p>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="init-btn" class="btn-primary">初期化</button>
+            <button id="start-btn" class="btn-success" disabled>開始</button>
+            <button id="stop-btn" class="btn-danger" disabled>停止</button>
+        </div>
+        
+        <div class="controls">
+            <button id="mode-1-btn" class="btn-warning">モード1に切替</button>
+            <button id="mode-2-btn" class="btn-warning">モード2に切替</button>
+            <button id="mode-3-btn" class="btn-warning">モード3に切替</button>
+        </div>
+        
+        <div class="controls">
+            <button id="manual-reset-btn" class="btn-primary">手動リセット</button>
+            <button id="integrated-reset-btn" class="btn-danger">統合リセット (MicrophoneController)</button>
+            <button id="audio-component-reset-btn" class="btn-warning">UI リセット (AudioDetectionComponent)</button>
+            <button id="simulate-pitch-btn" class="btn-primary">440Hz シミュレート</button>
+        </div>
+        
+        <h3>ログ</h3>
+        <div id="log" class="log"></div>
+    </div>
+    
+    <script src="dist/pitchpro.umd.js"></script>
+    <script>
+        // グローバル変数
+        let audioDetector = null;
+        let currentMode = 1;
+        let isDetecting = false;
+        
+        // ログ表示
+        function log(message, type = 'info') {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString('ja-JP', { hour12: false, fractional: true });
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${timestamp}] ${message}`;
+            logElement.appendChild(entry);
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        // モード切り替えUI更新
+        function updateModeUI(mode) {
+            // すべてのボックスから active クラスを削除
+            document.getElementById('mode-1-box').classList.remove('active');
+            document.getElementById('mode-2-box').classList.remove('active');
+            document.getElementById('mode-3-box').classList.remove('active');
+            
+            // 選択されたモードのボックスに active クラスを追加
+            document.getElementById(`mode-${mode}-box`).classList.add('active');
+            document.getElementById('current-mode').textContent = `モード${mode}`;
+            currentMode = mode;
+            
+            log(`UIをモード${mode}に切り替え（青枠で表示）`, 'info');
+        }
+        
+        // 周波数表示を手動でリセット
+        function manualReset() {
+            document.getElementById('freq-1').textContent = '0.0 Hz';
+            document.getElementById('freq-2').textContent = '0.0 Hz';
+            document.getElementById('freq-3').textContent = '0.0 Hz';
+            document.getElementById('note-3').textContent = '-';
+            log('手動リセット実行', 'warning');
+        }
+        
+        // 初期化
+        document.getElementById('init-btn').addEventListener('click', async () => {
+            try {
+                log('初期化開始...', 'info');
+                
+                // PitchPro AudioDetectionComponent を作成
+                // UMDビルドではPitchProとして公開
+                if (!window.PitchPro) {
+                    throw new Error('PitchProが見つかりません。スクリプトが正しく読み込まれているか確認してください。');
+                }
+                
+                const AudioDetectionComponent = window.PitchPro.AudioDetectionComponent;
+                
+                if (!AudioDetectionComponent) {
+                    // 利用可能なエクスポートを表示
+                    console.log('PitchPro exports:', Object.keys(window.PitchPro));
+                    throw new Error('AudioDetectionComponentが見つかりません。利用可能: ' + Object.keys(window.PitchPro).join(', '));
+                }
+                
+                audioDetector = new AudioDetectionComponent({
+                    frequencySelector: '#freq-1',
+                    debug: true,
+                    autoUpdateUI: true,
+                    uiUpdateInterval: 33
+                });
+                
+                // コールバック設定
+                audioDetector.setCallbacks({
+                    onPitchUpdate: (result) => {
+                        if (result.frequency > 0) {
+                            log(`🎵 周波数検出: ${result.frequency.toFixed(1)}Hz`, 'success');
+                        }
+                    },
+                    onError: (error) => {
+                        log(`❌ エラー: ${error.message}`, 'error');
+                    },
+                    onStateChange: (state) => {
+                        log(`状態変更: ${state}`, 'info');
+                    }
+                });
+                
+                await audioDetector.initialize();
+                
+                log('✅ 初期化完了', 'success');
+                document.getElementById('init-btn').disabled = true;
+                document.getElementById('start-btn').disabled = false;
+                
+            } catch (error) {
+                log(`初期化エラー: ${error.message}`, 'error');
+            }
+        });
+        
+        // 開始
+        document.getElementById('start-btn').addEventListener('click', async () => {
+            if (audioDetector) {
+                const started = await audioDetector.startDetection();
+                if (started) {
+                    isDetecting = true;
+                    log('🎤 検出開始', 'success');
+                    document.getElementById('start-btn').disabled = true;
+                    document.getElementById('stop-btn').disabled = false;
+                }
+            }
+        });
+        
+        // 停止
+        document.getElementById('stop-btn').addEventListener('click', () => {
+            if (audioDetector) {
+                audioDetector.stopDetection();
+                isDetecting = false;
+                log('⏹ 検出停止', 'warning');
+                document.getElementById('start-btn').disabled = false;
+                document.getElementById('stop-btn').disabled = true;
+            }
+        });
+        
+        // モード切り替え
+        document.getElementById('mode-1-btn').addEventListener('click', () => {
+            log('🔄 モード1への切り替え開始', 'warning');
+            
+            if (audioDetector && audioDetector.updateSelectors) {
+                // 全モードの現在値を記録
+                const values = {
+                    mode1: document.getElementById('freq-1').textContent,
+                    mode2: document.getElementById('freq-2').textContent,
+                    mode3: document.getElementById('freq-3').textContent,
+                    note3: document.getElementById('note-3').textContent
+                };
+                log(`切り替え前: [1]${values.mode1} [2]${values.mode2} [3]${values.mode3} [note3]${values.note3}`, 'info');
+                
+                // updateSelectorsを呼び出し（noteSelector自動クリア）
+                audioDetector.updateSelectors({
+                    frequencySelector: '#freq-1'
+                });
+                
+                // UI更新
+                updateModeUI(1);
+                
+                // 切り替え後の値をチェック（複数のタイミングで）
+                setTimeout(() => {
+                    const after50 = {
+                        mode1: document.getElementById('freq-1').textContent,
+                        mode2: document.getElementById('freq-2').textContent,
+                        mode3: document.getElementById('freq-3').textContent,
+                        note3: document.getElementById('note-3').textContent
+                    };
+                    log(`50ms後: [1]${after50.mode1} [2]${after50.mode2} [3]${after50.mode3} [note3]${after50.note3}`, 'info');
+                }, 50);
+                
+                setTimeout(() => {
+                    const after200 = {
+                        mode1: document.getElementById('freq-1').textContent,
+                        mode2: document.getElementById('freq-2').textContent,
+                        mode3: document.getElementById('freq-3').textContent,
+                        note3: document.getElementById('note-3').textContent
+                    };
+                    log(`200ms後: [1]${after200.mode1} [2]${after200.mode2} [3]${after200.mode3} [note3]${after200.note3}`, 'success');
+                }, 200);
+            }
+        });
+        
+        document.getElementById('mode-2-btn').addEventListener('click', () => {
+            log('🔄 モード2への切り替え開始', 'warning');
+            
+            if (audioDetector && audioDetector.updateSelectors) {
+                const values = {
+                    mode1: document.getElementById('freq-1').textContent,
+                    mode2: document.getElementById('freq-2').textContent,
+                    mode3: document.getElementById('freq-3').textContent,
+                    note3: document.getElementById('note-3').textContent
+                };
+                log(`切り替え前: [1]${values.mode1} [2]${values.mode2} [3]${values.mode3} [note3]${values.note3}`, 'info');
+                
+                audioDetector.updateSelectors({
+                    frequencySelector: '#freq-2'
+                });
+                
+                updateModeUI(2);
+                
+                setTimeout(() => {
+                    const after50 = {
+                        mode1: document.getElementById('freq-1').textContent,
+                        mode2: document.getElementById('freq-2').textContent,
+                        mode3: document.getElementById('freq-3').textContent,
+                        note3: document.getElementById('note-3').textContent
+                    };
+                    log(`50ms後: [1]${after50.mode1} [2]${after50.mode2} [3]${after50.mode3} [note3]${after50.note3}`, 'info');
+                }, 50);
+                
+                setTimeout(() => {
+                    const after200 = {
+                        mode1: document.getElementById('freq-1').textContent,
+                        mode2: document.getElementById('freq-2').textContent,
+                        mode3: document.getElementById('freq-3').textContent,
+                        note3: document.getElementById('note-3').textContent
+                    };
+                    log(`200ms後: [1]${after200.mode1} [2]${after200.mode2} [3]${after200.mode3} [note3]${after200.note3}`, 'success');
+                }, 200);
+            }
+        });
+        
+        document.getElementById('mode-3-btn').addEventListener('click', () => {
+            log('🔄 モード3への切り替え開始', 'warning');
+            
+            if (audioDetector && audioDetector.updateSelectors) {
+                const values = {
+                    mode1: document.getElementById('freq-1').textContent,
+                    mode2: document.getElementById('freq-2').textContent,
+                    mode3: document.getElementById('freq-3').textContent,
+                    note3: document.getElementById('note-3').textContent
+                };
+                log(`切り替え前: [1]${values.mode1} [2]${values.mode2} [3]${values.mode3} [note-3]${values.note3}`, 'info');
+                
+                audioDetector.updateSelectors({
+                    frequencySelector: '#freq-3',
+                    noteSelector: '#note-3'
+                });
+                
+                updateModeUI(3);
+                
+                setTimeout(() => {
+                    const after50 = {
+                        mode1: document.getElementById('freq-1').textContent,
+                        mode2: document.getElementById('freq-2').textContent,
+                        mode3: document.getElementById('freq-3').textContent,
+                        note3: document.getElementById('note-3').textContent
+                    };
+                    log(`50ms後: [1]${after50.mode1} [2]${after50.mode2} [3]${after50.mode3} [note-3]${after50.note3}`, 'info');
+                }, 50);
+                
+                setTimeout(() => {
+                    const after200 = {
+                        mode1: document.getElementById('freq-1').textContent,
+                        mode2: document.getElementById('freq-2').textContent,
+                        mode3: document.getElementById('freq-3').textContent,
+                        note3: document.getElementById('note-3').textContent
+                    };
+                    log(`200ms後: [1]${after200.mode1} [2]${after200.mode2} [3]${after200.mode3} [note-3]${after200.note3}`, 'success');
+                }, 200);
+            }
+        });
+        
+        // 手動リセット
+        document.getElementById('manual-reset-btn').addEventListener('click', manualReset);
+        
+        // 統合リセット (MicrophoneController)
+        document.getElementById('integrated-reset-btn').addEventListener('click', () => {
+            if (audioDetector && audioDetector.microphoneController) {
+                log('🔄 MicrophoneController統合リセット実行中...', 'warning');
+                
+                // リセット前の値を記録
+                const beforeValues = {
+                    mode1: document.getElementById('freq-1').textContent,
+                    mode2: document.getElementById('freq-2').textContent,
+                    mode3: document.getElementById('freq-3').textContent,
+                    note3: document.getElementById('note-3').textContent
+                };
+                log(`リセット前: [1]${beforeValues.mode1} [2]${beforeValues.mode2} [3]${beforeValues.mode3} [note-3]${beforeValues.note3}`, 'info');
+                
+                // 統合リセット実行
+                audioDetector.microphoneController.reset();
+                
+                // 複数のタイミングで結果を確認
+                setTimeout(() => {
+                    const after50Values = {
+                        mode1: document.getElementById('freq-1').textContent,
+                        mode2: document.getElementById('freq-2').textContent,
+                        mode3: document.getElementById('freq-3').textContent,
+                        note3: document.getElementById('note-3').textContent
+                    };
+                    log(`50ms後: [1]${after50Values.mode1} [2]${after50Values.mode2} [3]${after50Values.mode3} [note-3]${after50Values.note3}`, 'info');
+                }, 50);
+                
+                setTimeout(() => {
+                    const afterValues = {
+                        mode1: document.getElementById('freq-1').textContent,
+                        mode2: document.getElementById('freq-2').textContent,
+                        mode3: document.getElementById('freq-3').textContent,
+                        note3: document.getElementById('note-3').textContent
+                    };
+                    log(`200ms後: [1]${afterValues.mode1} [2]${afterValues.mode2} [3]${afterValues.mode3} [note-3]${afterValues.note3}`, 'success');
+                    
+                    // 音程表示のリセット成功確認
+                    if (afterValues.note3 === '-' || afterValues.note3 === '--') {
+                        log('✅ 音程表示リセット成功', 'success');
+                    } else {
+                        log('❌ 音程表示リセット失敗', 'error');
+                    }
+                    
+                    // 周波数表示のリセット確認
+                    const resetSuccess = [afterValues.mode1, afterValues.mode2, afterValues.mode3].every(val => 
+                        val === '0.0 Hz' || val === '0 Hz' || val.startsWith('0.0') || val.startsWith('0 ')
+                    );
+                    if (resetSuccess) {
+                        log('✅ 周波数表示リセット成功', 'success');
+                    } else {
+                        log('❌ 周波数表示リセット失敗', 'error');
+                    }
+                }, 200);
+                
+                log('🎉 統合リセット完了', 'success');
+            } else {
+                log('❌ MicrophoneControllerが利用できません', 'error');
+            }
+        });
+        
+        // AudioDetectionComponent UI リセット
+        document.getElementById('audio-component-reset-btn').addEventListener('click', () => {
+            if (audioDetector && audioDetector.resetDisplayElements) {
+                log('🔄 AudioDetectionComponent UIリセット実行中...', 'warning');
+                
+                const beforeValues = {
+                    mode1: document.getElementById('freq-1').textContent,
+                    mode2: document.getElementById('freq-2').textContent,
+                    mode3: document.getElementById('freq-3').textContent,
+                    note3: document.getElementById('note-3').textContent
+                };
+                log(`リセット前: [1]${beforeValues.mode1} [2]${beforeValues.mode2} [3]${beforeValues.mode3} [note-3]${beforeValues.note3}`, 'info');
+                
+                audioDetector.resetDisplayElements();
+                
+                setTimeout(() => {
+                    const afterValues = {
+                        mode1: document.getElementById('freq-1').textContent,
+                        mode2: document.getElementById('freq-2').textContent,
+                        mode3: document.getElementById('freq-3').textContent,
+                        note3: document.getElementById('note-3').textContent
+                    };
+                    log(`リセット後: [1]${afterValues.mode1} [2]${afterValues.mode2} [3]${afterValues.mode3} [note-3]${afterValues.note3}`, 'success');
+                }, 100);
+                
+                log('🎉 AudioDetectionComponent UIリセット完了', 'success');
+            } else {
+                log('❌ resetDisplayElementsメソッドが利用できません', 'error');
+            }
+        });
+        
+        // 440Hz シミュレート
+        document.getElementById('simulate-pitch-btn').addEventListener('click', () => {
+            log('440Hz をシミュレート - 全モードに値を設定', 'info');
+            
+            // 直接DOM要素に値を設定（全モード同時設定）
+            document.getElementById('freq-1').textContent = '440.0 Hz';
+            document.getElementById('freq-2').textContent = '523.3 Hz';  // C5
+            document.getElementById('freq-3').textContent = '659.3 Hz';  // E5
+            document.getElementById('note-3').textContent = 'E5';
+            
+            log('設定完了: [1]440.0 Hz [2]523.3 Hz [3]659.3 Hz [note-3]E5', 'success');
+            
+            // AudioDetectionComponentのupdateUIも実行（現在のアクティブモード用）
+            if (audioDetector && audioDetector.updateUI) {
+                audioDetector.updateUI({
+                    frequency: 440,
+                    note: 'A4',
+                    octave: 4,
+                    volume: 75,
+                    clarity: 0.9
+                });
+                log('AudioDetectionComponent.updateUIも実行', 'info');
+            }
+        });
+        
+        // 初期ログ
+        log('ページ読み込み完了', 'info');
+        log('PitchPro v1.1.9 周波数リセットテスト', 'info');
+    </script>
+</body>
+</html>
