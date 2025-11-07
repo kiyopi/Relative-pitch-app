@@ -147,22 +147,6 @@ export async function initializeTrainingPage() {
         console.error('❌ play-base-noteボタンが見つかりません');
     }
 
-    // デバッグ用：マイク許可ボタン
-    const debugMicButton = document.getElementById('debug-mic-permission');
-    if (debugMicButton) {
-        debugMicButton.addEventListener('click', async () => {
-            console.log('🎤 デバッグ：マイク許可取得開始');
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                stream.getTracks().forEach(track => track.stop());
-                console.log('✅ マイク許可取得完了');
-            } catch (error) {
-                console.error('❌ マイク許可拒否:', error);
-            }
-        });
-        console.log('✅ デバッグ用マイク許可ボタン登録完了');
-    }
-
     // ホームボタンに確認ダイアログを追加
     setupHomeButton();
 
