@@ -61,7 +61,7 @@ window.initRecords = async function() {
 /**
  * トレーニング記録を読み込んで表示
  */
-function loadTrainingRecords() {
+async function loadTrainingRecords() {
     console.log('[Records] Loading training records...');
 
     try {
@@ -73,30 +73,61 @@ function loadTrainingRecords() {
         }
 
         if (!sessions || sessions.length === 0) {
+            hideAllLoading();
             showNoDataMessage();
             return;
         }
 
-        // 統計を計算
+        // 統計を計算（非同期で段階的に表示）
         const stats = calculateStatistics(sessions);
         console.log('[Records] Statistics:', stats);
 
-        // UIを更新
-        displayStatistics(stats);
-        displaySessionList(sessions);
-        displayAccuracyChart(sessions);
+        // 統計情報を表示
+        await displayStatistics(stats);
+        hideLoading('stats');
+
+        // セッションリストを表示
+        await displaySessionList(sessions);
+        hideLoading('sessions');
+
+        // グラフを表示
+        await displayAccuracyChart(sessions);
+        hideLoading('chart');
 
         // データあり時の表示制御
         document.getElementById('no-data-message').style.display = 'none';
-        document.getElementById('recent-sessions').style.display = 'flex';
         document.getElementById('chart-section').style.display = 'block';
-        // アクションボタンは常に表示（データなし時のボタンと重複するため非表示に変更）
         document.getElementById('action-buttons-section').style.display = 'block';
 
     } catch (error) {
         console.error('[Records] Error loading records:', error);
+        hideAllLoading();
         showNoDataMessage();
     }
+}
+
+/**
+ * ローディング表示を非表示にしてコンテンツを表示
+ * @param {string} section - 'stats' | 'chart' | 'sessions'
+ */
+function hideLoading(section) {
+    const loadingId = `${section}-loading`;
+    const contentId = `${section}-content`;
+
+    const loadingEl = document.getElementById(loadingId);
+    const contentEl = document.getElementById(contentId);
+
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (contentEl) contentEl.style.display = 'block';
+}
+
+/**
+ * すべてのローディング表示を非表示
+ */
+function hideAllLoading() {
+    hideLoading('stats');
+    hideLoading('chart');
+    hideLoading('sessions');
 }
 
     /**
@@ -221,7 +252,7 @@ function displayStatistics(stats) {
     /**
      * セッション一覧を表示
      */
-function displaySessionList(sessions) {
+async function displaySessionList(sessions) {
     const container = document.getElementById('recent-sessions');
     const countEl = document.getElementById('records-count');
 
@@ -231,10 +262,13 @@ function displaySessionList(sessions) {
     // 最新10件のみ表示
     const displaySessions = sessions.slice(0, 10);
 
-    displaySessions.forEach(session => {
+    // 非同期で段階的に表示（UX向上）
+    for (const session of displaySessions) {
         const sessionCard = createSessionCard(session);
         container.appendChild(sessionCard);
-    });
+        // 次のフレームまで待機（レンダリングを段階的に実行）
+        await new Promise(resolve => setTimeout(resolve, 0));
+    }
 }
 
     /**
@@ -419,6 +453,13 @@ function displayAccuracyChart(sessions) {
      * データなしメッセージを表示
      */
 function showNoDataMessage() {
+    // すべてのローディングを非表示
+    hideAllLoading();
+
+    // 統計コンテンツを表示してデフォルト値を設定
+    const statsContent = document.getElementById('stats-content');
+    if (statsContent) statsContent.style.display = 'block';
+
     document.getElementById('streak-count').textContent = '0';
     document.getElementById('total-sessions').textContent = '0';
     document.getElementById('avg-accuracy').textContent = '-';
@@ -429,9 +470,11 @@ function showNoDataMessage() {
     statusEl.textContent = 'トレーニングを開始しましょう';
     statusEl.className = 'text-lg text-blue-300';
 
-    // データなしメッセージを表示
+    // セッションコンテンツを非表示、データなしメッセージを表示
+    const sessionsContent = document.getElementById('sessions-content');
+    if (sessionsContent) sessionsContent.style.display = 'none';
+
     document.getElementById('no-data-message').style.display = 'flex';
-    document.getElementById('recent-sessions').style.display = 'none';
     document.getElementById('records-count').textContent = '0件';
 
     // グラフセクションを非表示

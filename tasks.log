@@ -7585,3 +7585,86 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 21:39:07] コミット: fix: トレーニング記録ページの初期表示問題とモバイルマージン修正
+
+## 問題1: 初期表示されない（リロード必要）
+**症状**: iPhoneでトップページから遷移すると記録が表示されない
+
+**原因**:
+- SPA遷移時にDOM挿入が完了する前にinitRecords()が実行されていた
+- 非同期処理の待機が不十分だった
+
+**解決方法**:
+1. records-controller.js: DOMの準備完了を明示的に待機
+2. records.html: 次のイベントループまで待機してから初期化
+3. 統合Lucideアイコン初期化関数を使用
+
+## 問題2: モバイルで左右マージンが表示される
+**症状**: container-recordsクラスにモバイル専用スタイルが未定義
+
+**原因**:
+- base.cssで.container-recordsの定義がなかった
+- デフォルトの.containerスタイルが適用されていた
+
+**解決方法**:
+- .container-recordsを.container-result-sessionと同様に定義
+- モバイルでpadding: 0を適用
+
+## 変更内容
+
+### records-controller.js
+- await Promise でDOM準備完了を保証
+- window.initializeLucideIcons()統合関数を優先使用
+- フォールバックでlucide.createIcons()
+
+### records.html
+- 非同期即時関数でラップ
+- setTimeout(resolve, 0)で次のイベントループまで待機
+- 初期化完了・エラーログ追加
+
+### base.css
+- .container-recordsをモバイル専用スタイルに追加
+- モバイル: padding: 0（左右マージンなし）
+- PC: padding: 0 var(--space-6)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 21:44:18] コミット: refactor: .containerの重複メディアクエリを削除
+
+## 問題
+- .containerに不要なメディアクエリが存在
+- モバイルでもPC時と同じpadding: 0 var(--space-6)を設定
+- 重複しており意味がない
+
+## 修正内容
+```css
+/* 修正前 */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 var(--space-6);  /* ← 重複 */
+  }
+}
+
+/* 修正後 */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-6);  /* PC・モバイル共通 */
+}
+```
+
+## メリット
+- コードの冗長性を削減
+- 意図が明確（PC・モバイル共通パディング）
+- CSSファイルサイズの微減
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

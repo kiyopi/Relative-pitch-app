@@ -20,62 +20,89 @@
 
         <!-- メイン統計セクション -->
         <section class="glass-card">
-            <!-- 連続記録バッジ -->
-            <div class="flex flex-col items-center gap-3 mb-6">
-                <div class="flex items-center gap-3">
-                    <i data-lucide="flame" class="text-orange-300" style="width: 48px; height: 48px;"></i>
-                    <div>
-                        <div class="text-3xl font-bold text-white" id="streak-count">-</div>
-                        <div class="text-white-70">日間連続記録達成！</div>
-                    </div>
-                </div>
-                <div class="text-lg text-blue-300" id="improvement-status">
-                    トレーニングを開始しましょう
-                </div>
+            <!-- ローディング表示 -->
+            <div class="flex flex-col items-center gap-3 py-8" id="stats-loading">
+                <i data-lucide="loader-2" class="text-blue-300 animate-spin" style="width: 48px; height: 48px;"></i>
+                <p class="text-white-60">統計情報を読み込み中...</p>
             </div>
 
-            <!-- 基本統計 -->
-            <div class="flex justify-around gap-4">
-                <div class="flex flex-col items-center">
-                    <div class="text-2xl font-bold text-blue-300" id="total-sessions">-</div>
-                    <div class="text-white-60 text-sm">総セッション数</div>
+            <!-- 統計コンテンツ（初期非表示） -->
+            <div id="stats-content" style="display: none;">
+                <!-- 連続記録バッジ -->
+                <div class="flex flex-col items-center gap-3 mb-6">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="flame" class="text-orange-300" style="width: 48px; height: 48px;"></i>
+                        <div>
+                            <div class="text-3xl font-bold text-white" id="streak-count">-</div>
+                            <div class="text-white-70">日間連続記録達成！</div>
+                        </div>
+                    </div>
+                    <div class="text-lg text-blue-300" id="improvement-status">
+                        トレーニングを開始しましょう
+                    </div>
                 </div>
-                <div class="flex flex-col items-center">
-                    <div class="text-2xl font-bold text-green-300" id="avg-accuracy">-</div>
-                    <div class="text-white-60 text-sm">平均誤差（¢）</div>
-                </div>
-                <div class="flex flex-col items-center">
-                    <div class="text-2xl font-bold text-yellow-300" id="best-grade">-</div>
-                    <div class="text-white-60 text-sm">最高グレード</div>
+
+                <!-- 基本統計 -->
+                <div class="flex justify-around gap-4">
+                    <div class="flex flex-col items-center">
+                        <div class="text-2xl font-bold text-blue-300" id="total-sessions">-</div>
+                        <div class="text-white-60 text-sm">総セッション数</div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="text-2xl font-bold text-green-300" id="avg-accuracy">-</div>
+                        <div class="text-white-60 text-sm">平均誤差（¢）</div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="text-2xl font-bold text-yellow-300" id="best-grade">-</div>
+                        <div class="text-white-60 text-sm">最高グレード</div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- 成長グラフセクション -->
         <section class="glass-card" id="chart-section">
-            <div class="flex items-center justify-between mb-4">
-                <h4 class="heading-md">
-                    <i data-lucide="trending-up" class="text-green-300"></i>
-                    <span>精度推移グラフ</span>
-                </h4>
+            <!-- ローディング表示 -->
+            <div class="flex flex-col items-center gap-3 py-8" id="chart-loading">
+                <i data-lucide="loader-2" class="text-green-300 animate-spin" style="width: 48px; height: 48px;"></i>
+                <p class="text-white-60">グラフを読み込み中...</p>
             </div>
-            <div style="height: 300px;">
-                <canvas id="accuracyChart"></canvas>
+
+            <!-- グラフコンテンツ（初期非表示） -->
+            <div id="chart-content" style="display: none;">
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="heading-md">
+                        <i data-lucide="trending-up" class="text-green-300"></i>
+                        <span>精度推移グラフ</span>
+                    </h4>
+                </div>
+                <div style="height: 300px;">
+                    <canvas id="accuracyChart"></canvas>
+                </div>
             </div>
         </section>
 
         <!-- 最近の記録セクション -->
         <section class="glass-card">
-            <div class="flex items-center justify-between mb-4">
-                <h4 class="heading-md">
-                    <i data-lucide="calendar" class="text-blue-300"></i>
-                    <span>トレーニング履歴</span>
-                </h4>
-                <div class="text-white-60 text-sm" id="records-count">-件</div>
+            <!-- ローディング表示 -->
+            <div class="flex flex-col items-center gap-3 py-8" id="sessions-loading">
+                <i data-lucide="loader-2" class="text-purple-300 animate-spin" style="width: 48px; height: 48px;"></i>
+                <p class="text-white-60">トレーニング履歴を読み込み中...</p>
             </div>
 
-            <div class="flex flex-col gap-3" id="recent-sessions">
-                <!-- JavaScriptで動的生成 -->
+            <!-- セッションコンテンツ（初期非表示） -->
+            <div id="sessions-content" style="display: none;">
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="heading-md">
+                        <i data-lucide="calendar" class="text-blue-300"></i>
+                        <span>トレーニング履歴</span>
+                    </h4>
+                    <div class="text-white-60 text-sm" id="records-count">-件</div>
+                </div>
+
+                <div class="flex flex-col gap-3" id="recent-sessions">
+                    <!-- JavaScriptで動的生成 -->
+                </div>
             </div>
 
             <!-- データなし表示 -->
@@ -101,7 +128,7 @@
 </div>
 
 <!-- Records Page Controller -->
-<script src="pages/js/records-controller.js?v=20251109005"></script>
+<script src="pages/js/records-controller.js?v=20251109006"></script>
 <script>
     // SPA対応：ページ読み込み完了後に初期化
     (async function() {
