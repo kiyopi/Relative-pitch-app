@@ -85,7 +85,10 @@ function calculateStatistics(sessions) {
     const totalSessions = sessions.length;
 
     // 平均誤差を計算（絶対値）
-    const avgErrors = sessions.map(s => Math.abs(s.averageError ?? s.avgError ?? 0));
+    const avgErrors = sessions.map(s => {
+        const error = s.averageError ?? s.avgError ?? (s.evaluation && s.evaluation.averageError) ?? 0;
+        return Math.abs(error);
+    });
     const avgAccuracy = avgErrors.length > 0
         ? Math.round(avgErrors.reduce((a, b) => a + b, 0) / avgErrors.length)
         : 0;
@@ -93,7 +96,8 @@ function calculateStatistics(sessions) {
     // 最高グレード
     const gradeOrder = ['S+', 'S', 'A+', 'A', 'B+', 'B', 'C+', 'C', 'D'];
     const bestGrade = sessions.reduce((best, session) => {
-        const grade = session.grade || session.overallGrade;
+        const grade = session.grade || session.overallGrade || session.evaluationGrade ||
+                      (session.evaluation && session.evaluation.grade);
         const currentIdx = gradeOrder.indexOf(grade);
         const bestIdx = gradeOrder.indexOf(best);
         return (currentIdx !== -1 && (bestIdx === -1 || currentIdx < bestIdx))
@@ -213,9 +217,14 @@ function createSessionCard(session) {
         'C': 'text-orange-300',
         'D': 'text-red-300'
     };
-    const gradeColor = gradeColors[session.grade] || 'text-white';
-    const grade = session.grade || session.overallGrade || '-';
-    const averageError = session.averageError ?? session.avgError ?? 0;
+    // グレード取得（複数のフィールド名に対応）
+    const grade = session.grade || session.overallGrade || session.evaluationGrade ||
+                  (session.evaluation && session.evaluation.grade) || '-';
+    const gradeColor = gradeColors[grade] || 'text-white';
+
+    // 平均誤差取得（複数のフィールド名に対応）
+    const averageError = session.averageError ?? session.avgError ??
+                         (session.evaluation && session.evaluation.averageError) ?? 0;
 
     card.innerHTML = `
         <div class="flex items-center justify-between">

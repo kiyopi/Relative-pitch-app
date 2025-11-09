@@ -7407,3 +7407,24 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 19:47:38] コミット: fix: records-controller セッションデータ構造の互換性修正
+
+問題:
+- セッションカードで NaN/NaN, undefined, ±NaN¢ と表示される
+- DataManagerのセッションデータ構造とrecords-controllerの期待が不一致
+
+修正内容:
+- completedAt → startTime へのフォールバック対応
+- grade → overallGrade へのフォールバック対応
+- averageError → avgError へのフォールバック対応
+- null/undefined チェックを追加（?? 演算子使用）
+- デバッグログ追加（セッションデータ構造確認用）
+
+対応フィールド:
+- 日付: session.startTime || session.completedAt || Date.now()
+- グレード: session.grade || session.overallGrade || '-'
+- 平均誤差: session.averageError ?? session.avgError ?? 0
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
