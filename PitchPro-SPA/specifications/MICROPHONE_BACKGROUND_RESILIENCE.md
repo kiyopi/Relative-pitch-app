@@ -1,9 +1,50 @@
 # マイクロフォン バックグラウンド耐性仕様書
 
-**バージョン**: 1.0.0
+**バージョン**: 2.0.0
 **作成日**: 2025-11-09
 **最終更新日**: 2025-11-09
-**ステータス**: ✅ 実装完了
+**ステータス**: ✅ PitchPro v1.3.2に統合完了
+
+---
+
+## 🔄 アップデート履歴
+
+### v2.0.0 (2025-11-09)
+**PitchPro v1.3.2への統合完了**
+
+本仕様書で設計・実装したバックグラウンド耐性機能が、PitchProライブラリ v1.3.2に正式統合されました。
+
+**主な変更点**:
+- ✅ **アプリ側コード削除**: `preparation-pitchpro-cycle.js`から以下を削除
+  - `setupBackgroundControl()` メソッド
+  - `detectPageReload()` メソッド
+  - `state.wasActiveBeforeBackground` プロパティ
+  - `state.isReloadDetected` プロパティ
+- ✅ **ライブラリ側実装**: PitchPro `MicrophoneLifecycleManager.ts`に統合
+  - `handleVisibilityChange()` メソッド改修
+  - ページ非表示時の完全なヘルスチェック停止
+  - ページ表示時の自動復旧試行回数リセット
+- ✅ **バージョン更新**: `index.html`でv1.3.2を参照
+  ```html
+  <script src="js/core/pitchpro-v1.3.2.umd.js?v=20251109002"></script>
+  ```
+
+**技術的影響**:
+- アプリケーション側の実装が大幅に簡素化
+- バックグラウンド制御がライブラリレベルで自動処理
+- 他のPitchPro利用アプリでも同じ耐性機能を享受可能
+- メンテナンス性の向上（アプリ側でのバグ修正不要）
+
+**参考リンク**:
+- [PitchPro v1.3.2 Release](https://github.com/kiyopi/pitchpro-audio-processing/releases/tag/v1.3.2)
+
+---
+
+### v1.0.0 (2025-11-09)
+**初期実装 - アプリ側ハイブリッドアプローチ**
+
+アプリケーション側（`preparation-pitchpro-cycle.js`）でバックグラウンド制御を実装。
+本バージョンの設計思想と実装パターンがv1.3.2のライブラリ統合に引き継がれました。
 
 ---
 

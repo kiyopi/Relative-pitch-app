@@ -1,7 +1,7 @@
 # PitchPro-SPA 仕様書ディレクトリ
 
 **最終更新日**: 2025-11-09
-**バージョン**: 2.3.0
+**バージョン**: 2.4.0
 
 ## 📋 概要
 
@@ -172,34 +172,30 @@
 
 ### 10. マイクロフォン バックグラウンド耐性仕様書
 **ファイル**: `MICROPHONE_BACKGROUND_RESILIENCE.md`
-**バージョン**: 1.0.0
-**最終更新**: 2025-11-09（新規作成）
+**バージョン**: 2.0.0
+**最終更新**: 2025-11-09（PitchPro v1.3.2統合完了）
 
 **内容**:
+- ✅ **v2.0.0 (2025-11-09)**: PitchPro v1.3.2への統合完了
+  - ライブラリ側実装への完全移行
+  - アプリ側コード削除（setupBackgroundControl等）
+  - バックグラウンド制御の自動処理化
 - バックグラウンド/フォアグラウンド遷移時のマイク権限問題
 - PitchPro MicrophoneLifecycleManagerのエラー状態分析
   - 最大復旧試行回数到達エラーの根本原因
   - ブラウザのマイクストリーム管理
   - 無限ループ防止機構
-- 解決策の設計
+- 解決策の設計（v1.0.0実装、v1.3.2統合）
   - visibilitychangeイベントによる予防的制御
   - エラー状態からの自動復旧ロジック
   - ハイブリッドアプローチ（予防 + 復旧）
-- 実装詳細
-  - `setupBackgroundControl()` メソッド
-  - `handleAudioError()` 拡張
-  - 状態管理（wasActiveBeforeBackground）
 - 動作フロー（3シナリオ）
 - テストシナリオ（4パターン）
-- 今後の拡張計画
-  - トレーニングフェーズへの適用
-  - エラー状態の詳細ログ
-  - ユーザー通知システム
-  - オフライン検出との統合
 
 **対象実装**:
-- `/PitchPro-SPA/pages/js/preparation-pitchpro-cycle.js`
-- `/PitchPro-SPA/pages/js/training-controller.js`（今後）
+- ✅ **PitchProライブラリ v1.3.2**: `MicrophoneLifecycleManager.ts`
+- `/PitchPro-SPA/index.html`（v1.3.2参照）
+- `/PitchPro-SPA/pages/js/preparation-pitchpro-cycle.js`（v2.0.0: アプリ側コード削除済み）
 
 ## 📚 参照情報
 
@@ -264,8 +260,16 @@ PitchPro-SPA/
 
 ### 更新履歴
 
+#### 2025-11-09 (v2.4.0)
+- `MICROPHONE_BACKGROUND_RESILIENCE.md` v2.0.0にアップデート
+- PitchPro v1.3.2への統合完了を文書化
+- アプリ側コード削除（setupBackgroundControl, detectPageReload等）を記録
+- ライブラリ側実装への完全移行を明記
+- 技術的影響（簡素化、自動処理、メンテナンス性向上）を追加
+- README.mdを v2.4.0 にアップデート
+
 #### 2025-11-09 (v2.3.0)
-- `MICROPHONE_BACKGROUND_RESILIENCE.md` 新規作成・追加
+- `MICROPHONE_BACKGROUND_RESILIENCE.md` v1.0.0 新規作成・追加
 - PitchProマイクロフォン権限問題の完全分析と解決策を文書化
 - バックグラウンド/フォアグラウンド遷移時の自動復旧システム仕様化
 - ハイブリッドアプローチ（visibilitychange予防 + エラー自動復旧）の実装詳細
