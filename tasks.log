@@ -7711,3 +7711,18 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 22:13:57] コミット: fix: ローディング表示が消えない根本原因を修正
+
+問題の本質: ローディング要素にdisplay初期値が未指定
+- flex class適用でもdisplay値が確定していなかった
+- display: noneを実行しても視覚的に消えなかった
+
+修正内容:
+- 全ローディング要素にstyle="display: flex;"を明示指定
+- stats-loading, chart-loading, sessions-loadingすべて対応
+- hideLoading()でdisplay: noneが確実に機能するよう修正
+- デバッグログ追加で問題追跡を改善
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
