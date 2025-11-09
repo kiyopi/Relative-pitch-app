@@ -147,8 +147,8 @@ export async function initializeTrainingPage() {
         console.error('❌ play-base-noteボタンが見つかりません');
     }
 
-    // ホームボタンに確認ダイアログを追加
-    setupHomeButton();
+    // ホームボタンはフッターナビゲーションで管理（index.html の handleFooterHomeButtonClick）
+    // setupHomeButton(); // 削除: フッターで確認ダイアログ付きホームボタンを提供
 
     // ブラウザバック防止はrouter.jsで自動管理されます
 

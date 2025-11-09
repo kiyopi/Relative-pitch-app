@@ -826,6 +826,19 @@ body::before {
   box-shadow: 0 8px 30px rgba(34, 197, 94, 0.4);
 }
 
+.btn-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #ffffff;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #f87171, #ef4444);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(239, 68, 68, 0.4);
+}
+
 .btn-outline {
   background: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.9);
@@ -1010,6 +1023,13 @@ body::before {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.footer-nav {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
 .footer-content {
   margin-bottom: 1.5rem;
 }
@@ -1106,6 +1126,28 @@ body::before {
   }
 }
 
+/* === 設定ページ専用スタイル === */
+.settings-description-list {
+  list-style: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.settings-warning-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.settings-home-button {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
 /* 次のステップグリッド */
 .next-steps-grid {
   display: grid;
@@ -1117,6 +1159,69 @@ body::before {
   .next-steps-grid {
     grid-template-columns: repeat(3, 1fr);
   }
+}
+
+/* 次のステップカード */
+.next-step-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  min-height: 240px; /* カード最小高さを確保 */
+}
+
+.next-step-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.next-step-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.next-step-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  text-align: center;
+  margin: 0;
+}
+
+.next-step-card-description {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  line-height: 1.5;
+  margin: 0;
+  margin-bottom: 0.5rem; /* 説明文とボタンの適切な距離を確保 */
+}
+
+.next-step-card .btn {
+  width: 100%;
+  margin-top: auto; /* ボタンを常に下部に配置 */
+}
+
+.next-step-card.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.next-step-card.disabled:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: none;
 }
 
 /* ヘルプボタン */

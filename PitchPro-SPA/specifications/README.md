@@ -1,7 +1,7 @@
 # PitchPro-SPA 仕様書ディレクトリ
 
-**最終更新日**: 2025-10-27
-**バージョン**: 2.1.0
+**最終更新日**: 2025-11-09
+**バージョン**: 2.3.0
 
 ## 📋 概要
 
@@ -143,6 +143,64 @@
 - 弱点克服モード
 - プレミアム分析ページ
 
+### 9. 総合評価ページ仕様書
+**ファイル**: `RESULTS_OVERVIEW_SPECIFICATION.md`
+**バージョン**: 1.0.0
+**最終更新**: 2025-11-09（新規作成）
+
+**内容**:
+- 総合評価ページの機能仕様
+- 次のステップセクション詳細仕様
+  - Phase分離の設計思想（アクション vs 分析）
+  - 旧実装との差異説明（意図的な変更）
+  - モード別設定オブジェクト仕様
+- UIコンポーネント仕様
+  - レスポンシブグリッドレイアウト
+  - カードレイアウト（ボタン位置統一）
+  - 無効化カード（準備中機能）
+- JavaScript実装仕様
+  - `displayNextSteps()` 関数仕様
+  - 将来拡張計画（グレード別カスタマイズ）
+- アイコン・カラー設計
+- Phase 3-5 拡張計画
+
+**対象実装**:
+- `/PitchPro-SPA/pages/results-overview.html`
+- `/PitchPro-SPA/pages/js/results-overview-controller.js`
+- `/PitchPro-SPA/styles/base.css`（次のステップカード）
+- `/UI-Catalog/ui-catalog-components.html`
+
+### 10. マイクロフォン バックグラウンド耐性仕様書
+**ファイル**: `MICROPHONE_BACKGROUND_RESILIENCE.md`
+**バージョン**: 1.0.0
+**最終更新**: 2025-11-09（新規作成）
+
+**内容**:
+- バックグラウンド/フォアグラウンド遷移時のマイク権限問題
+- PitchPro MicrophoneLifecycleManagerのエラー状態分析
+  - 最大復旧試行回数到達エラーの根本原因
+  - ブラウザのマイクストリーム管理
+  - 無限ループ防止機構
+- 解決策の設計
+  - visibilitychangeイベントによる予防的制御
+  - エラー状態からの自動復旧ロジック
+  - ハイブリッドアプローチ（予防 + 復旧）
+- 実装詳細
+  - `setupBackgroundControl()` メソッド
+  - `handleAudioError()` 拡張
+  - 状態管理（wasActiveBeforeBackground）
+- 動作フロー（3シナリオ）
+- テストシナリオ（4パターン）
+- 今後の拡張計画
+  - トレーニングフェーズへの適用
+  - エラー状態の詳細ログ
+  - ユーザー通知システム
+  - オフライン検出との統合
+
+**対象実装**:
+- `/PitchPro-SPA/pages/js/preparation-pitchpro-cycle.js`
+- `/PitchPro-SPA/pages/js/training-controller.js`（今後）
+
 ## 📚 参照情報
 
 ### 関連ドキュメント
@@ -194,9 +252,10 @@ PitchPro-SPA/
 - クエリパラメータ → ハッシュルーティングへの移行を反映
 
 ### 今後の追加予定
-- [ ] 結果表示機能仕様書（results-overview詳細仕様）
 - [ ] 音域テスト機能仕様書（SPA版v4.0）
 - [ ] 弱点克服モード詳細仕様書（PREMIUM_FEATURES_SPECIFICATIONから分離）
+- [x] マイクロフォン バックグラウンド耐性仕様書（完了・2025-11-09）
+- [x] 結果表示機能仕様書（完了・2025-11-09）
 - [x] データ管理仕様書（完了・移動済み）
 - [x] 評価システム仕様書（完了・移動済み）
 - [x] 音量バー統合仕様書（完了・移動済み）
@@ -204,6 +263,21 @@ PitchPro-SPA/
 - [x] 有料プラン機能仕様書（完了・新規作成）
 
 ### 更新履歴
+
+#### 2025-11-09 (v2.3.0)
+- `MICROPHONE_BACKGROUND_RESILIENCE.md` 新規作成・追加
+- PitchProマイクロフォン権限問題の完全分析と解決策を文書化
+- バックグラウンド/フォアグラウンド遷移時の自動復旧システム仕様化
+- ハイブリッドアプローチ（visibilitychange予防 + エラー自動復旧）の実装詳細
+- 動作フロー3シナリオ・テストシナリオ4パターンを記録
+- README.mdを v2.3.0 にアップデート
+
+#### 2025-11-09 (v2.2.0)
+- `RESULTS_OVERVIEW_SPECIFICATION.md` 新規作成・追加
+- 総合評価ページの次のステップセクション仕様を文書化
+- Phase分離の設計思想・旧実装との差異を明文化
+- CSS設計原則（ボタン位置統一）の記録
+- README.mdを v2.2.0 にアップデート
 
 #### 2025-10-27 (v2.1.0)
 - `PREMIUM_FEATURES_SPECIFICATION.md` 新規作成・追加

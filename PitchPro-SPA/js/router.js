@@ -110,6 +110,16 @@ class SimpleRouter {
                 }
             }
 
+            // 4.5. フッターナビゲーションの表示/非表示を切り替え（ホームページ以外で表示）
+            const footerNav = document.getElementById('footer-nav');
+            if (footerNav) {
+                if (page === 'home') {
+                    footerNav.style.display = 'none';
+                } else {
+                    footerNav.style.display = 'flex';
+                }
+            }
+
             // 5. Lucideアイコンを再描画（統合初期化関数を使用）
             if (typeof window.initializeLucideIcons === 'function') {
                 window.initializeLucideIcons();
@@ -513,3 +523,4 @@ class SimpleRouter {
 
 // ルーター初期化
 const router = new SimpleRouter();
+window.router = router; // グローバルアクセス用

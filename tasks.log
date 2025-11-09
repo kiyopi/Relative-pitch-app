@@ -7178,3 +7178,105 @@ window.DeviceDetector = {
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 13:18:14] コミット: feat: Phase 1-2完了 - 設定ページ実装（データ管理・エクスポート/インポート）
+
+マルチデバイス対応・データバックアップ機能実装
+
+## 主な変更内容
+
+### 新規ファイル
+- `pages/settings.html` - 設定ページHTML
+  - デバイス情報表示セクション
+  - データ管理セクション（エクスポート/インポート）
+  - データリセットセクション（段階的削除）
+  - アプリ情報表示
+
+- `pages/js/settings-controller.js` - 設定ページコントローラー
+  - DeviceDetector統合でデバイス情報表示
+  - DataManager拡張機能の活用
+  - エラーハンドリング・確認ダイアログ実装
+
+### 修正ファイル
+- `js/data-manager.js` - エクスポート/インポート機能追加
+  - exportAllData(): 全データをJSON形式で取得
+  - downloadExportData(): JSONファイルとしてダウンロード
+  - importDataFromFile(): ファイルからデータ復元
+  - resetTrainingData(): トレーニング記録のみ削除
+  - resetVoiceRangeData(): 音域テスト結果のみ削除
+  - resetAllData(): 全データリセット
+
+- `js/router.js` - 設定ページルート追加
+  - 'settings': 'pages/settings.html'
+
+- `index.html` - ヘッダー設定ボタンにリンク追加
+  - onclick="location.hash='settings'"
+
+## 実装機能
+
+### 1. データエクスポート/インポート
+- ✅ JSON形式でのデータバックアップ
+- ✅ マルチデバイス対応（手動同期）
+- ✅ バージョン管理・互換性チェック
+- ✅ エラーハンドリング
+
+### 2. デバイス情報表示
+- ✅ DeviceDetector統合
+- ✅ デバイスタイプ表示（iPhone/iPad/Android/PC）
+- ✅ 音量設定・感度設定表示
+- ✅ 画面サイズ表示
+
+### 3. データリセット機能
+- ✅ トレーニング記録のみ削除
+- ✅ 音域テスト結果のみ削除
+- ✅ 全データリセット（二重確認）
+- ✅ 確認ダイアログ実装
+
+## データ形式
+
+```json
+{
+  "version": "2.1.0",
+  "exportDate": "2025-11-09T...",
+  "appVersion": "1.0.0",
+  "data": {
+    "USER_SETTINGS": {...},
+    "VOICE_RANGE": {...},
+    "SESSION_DATA": [...],
+    "OVERALL_EVALUATION": {...}
+  }
+}
+```
+
+## ユーザーフロー（マルチデバイス対応）
+
+1. 端末A: 設定 → データエクスポート → JSONダウンロード
+2. ユーザー: Google Drive/iCloud等にアップロード
+3. 端末B: 設定 → データインポート → ファイル選択
+4. 完了: 端末Bでデータ利用可能
+
+## 将来の拡張計画
+
+### Phase 4-5: クラウド自動同期（将来実装）
+- Google Drive API統合
+- 自動同期機能
+- 競合解決ロジック
+
+## 効果
+- ✅ マルチデバイス対応実現
+- ✅ データバックアップ機能
+- ✅ 機種変更時のデータ引き継ぎ
+- ✅ 段階的データ削除で柔軟な管理
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 13:26:10] コミット: fix: 設定ページSPA対応修正（CSS・JS パス修正）
+
+- head/bodyタグを削除してSPAテンプレート化
+- CSSはindex.htmlで既に読み込み済み
+- JavaScriptパスを相対パスからSPAルートパスに修正
+- ボタンスタイルが正しく適用されるように修正
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

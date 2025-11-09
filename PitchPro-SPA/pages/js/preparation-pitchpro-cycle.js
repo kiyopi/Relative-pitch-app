@@ -33,7 +33,9 @@ class PitchProCycleManager {
             detectionActive: false,
             detectedPitches: [],
             detectionStartTime: null,
-            currentMode: 'permission' // permission, audiotest
+            currentMode: 'permission', // permission, audiotest
+            wasActiveBeforeBackground: false, // バックグラウンド前の状態保持
+            isReloadDetected: null // リロード検出結果のキャッシュ
         };
 
         // 設定値（PitchPro v1.3.1対応）
@@ -42,6 +44,86 @@ class PitchProCycleManager {
             // PitchProの内部最適化を信頼し、独自フィルタは使用しない
         };
 
+        // バックグラウンド制御を初期化時に設定
+        this.setupBackgroundControl();
+    }
+
+    /**
+     * バックグラウンド制御の設定
+     * ページが非表示になった時にPitchProを一時停止し、
+     * 表示時に再開またはリセットする
+     */
+    setupBackgroundControl() {
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // バックグラウンドに移動時
+                console.log('🔇 Page hidden - pausing PitchPro');
+                if (this.audioDetector && this.state.detectionActive) {
+                    this.state.wasActiveBeforeBackground = true;
+                    this.audioDetector.stopDetection();
+                }
+            } else {
+                // フォアグラウンド復帰時
+                console.log('🔊 Page visible - resuming PitchPro');
+
+                // リロード検出: Performance Navigation APIで確認
+                const isReload = this.detectPageReload();
+                if (isReload) {
+                    console.log('🔄 Page reload detected - skipping auto-resume');
+                    return; // リロード時は自動再開をスキップ
+                }
+
+                if (this.audioDetector && this.state.wasActiveBeforeBackground) {
+                    if (this.audioDetector.state !== 'error') {
+                        this.audioDetector.startDetection();
+                    } else {
+                        // エラー状態の場合は完全リセット
+                        console.log('⚠️ PitchPro in error state - performing reset');
+                        this.audioDetector.reset();
+                        setTimeout(() => {
+                            this.audioDetector.startDetection();
+                        }, 500);
+                    }
+                    this.state.wasActiveBeforeBackground = false;
+                }
+            }
+        });
+    }
+
+    /**
+     * ページリロード検出
+     * Performance Navigation APIを使用してリロードを検出
+     * 結果はキャッシュされ、複数回の呼び出しでも1回だけ判定される
+     * @returns {boolean} true: リロード, false: 通常のページ復帰
+     */
+    detectPageReload() {
+        // キャッシュされた結果がある場合はそれを返す
+        if (this.state.isReloadDetected !== null) {
+            return this.state.isReloadDetected;
+        }
+
+        let isReload = false;
+
+        // 古いAPI（Safari互換性）
+        if (performance.navigation) {
+            const navType = performance.navigation.type;
+            if (navType === 1) {
+                // TYPE_RELOAD
+                isReload = true;
+            }
+        }
+
+        // 新しいAPI（フォールバック）
+        if (!isReload) {
+            const navEntries = performance.getEntriesByType('navigation');
+            if (navEntries.length > 0 && navEntries[0].type === 'reload') {
+                isReload = true;
+            }
+        }
+
+        // 結果をキャッシュ
+        this.state.isReloadDetected = isReload;
+        return isReload;
     }
 
     /**
@@ -474,7 +556,28 @@ class PitchProCycleManager {
         console.error(`🚨 Audio Error [${context}]:`, error);
         this.state.detectionActive = false;
 
-        // エラー時UI更新
+        // 自動復旧ロジック: 最大試行回数到達エラーの場合
+        if (error.code === 'MICROPHONE_ACCESS_DENIED' &&
+            error.context?.maxAttemptsReached) {
+            console.log('🔄 Auto-recovering from max attempts error...');
+
+            setTimeout(async () => {
+                if (this.audioDetector) {
+                    await this.audioDetector.reset();
+                    console.log('✅ PitchPro reset complete');
+
+                    // UIをリセット状態に戻す
+                    if (this.uiElements.requestMicBtn) {
+                        this.uiElements.requestMicBtn.disabled = false;
+                        this.uiElements.requestMicBtn.innerHTML = '<i data-lucide="mic" style="width: 24px; height: 24px;"></i><span>マイク許可</span>';
+                        lucide.createIcons();
+                    }
+                }
+            }, 1000);
+            return;
+        }
+
+        // 既存のエラー時UI更新
         if (this.uiElements.requestMicBtn) {
             this.uiElements.requestMicBtn.disabled = false;
             this.uiElements.requestMicBtn.innerHTML = '<i data-lucide="alert-circle" style="width: 24px; height: 24px;"></i><span>エラー - 再試行</span>';

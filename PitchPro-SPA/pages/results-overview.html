@@ -212,8 +212,8 @@
                         <i data-lucide="compass" style="width: 24px; height: 24px;"></i>
                         <span>次のステップ</span>
                     </h2>
-                    <div class="next-steps-grid">
-                        <!-- UIカタログ準拠のコンポーネント -->
+                    <div class="next-steps-grid" id="next-steps-container">
+                        <!-- JavaScriptで動的生成 -->
                     </div>
                 </section>
 
@@ -335,18 +335,6 @@
                         </button>
                         <p class="text-caption mt-2">月額480円 • いつでもキャンセル可能</p>
                     </div>
-                </section>
-
-                <!-- アクションボタン -->
-                <section class="action-buttons mb-6">
-                    <button class="btn btn-primary" id="btn-new-training">
-                        <i data-lucide="play" class="text-blue-300"></i>
-                        <span>新しいトレーニング開始</span>
-                    </button>
-                    <button class="btn btn-outline" onclick="window.location.hash='home'">
-                        <i data-lucide="home" class="text-white"></i>
-                        <span>ホームに戻る</span>
-                    </button>
                 </section>
         </main>
 

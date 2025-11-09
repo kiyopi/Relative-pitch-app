@@ -461,6 +461,210 @@
                     </div>
                 </section>
 
+                <!-- 設定ページ専用コンポーネント -->
+                <section id="settings-components" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">⚙️ 設定ページコンポーネント</h2>
+                    <p class="text-white-70 mb-6">設定ページで使用する専用スタイル</p>
+
+                    <h3 class="text-white font-medium mb-4">説明文リスト (.settings-description-list)</h3>
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <div class="glass-card">
+                                <h5 class="text-body font-semibold mb-2">データをエクスポート</h5>
+                                <ul class="settings-description-list">
+                                    <li>全トレーニング記録をJSONファイルとしてダウンロード</li>
+                                </ul>
+                            </div>
+
+                            <div class="code-sample">
+&lt;h5 class="text-body font-semibold mb-2"&gt;データをエクスポート&lt;/h5&gt;
+&lt;ul class="settings-description-list"&gt;
+    &lt;li&gt;全トレーニング記録をJSONファイルとしてダウンロード&lt;/li&gt;
+&lt;/ul&gt;</div>
+                        </div>
+                    </div>
+
+                    <h3 class="text-white font-medium mb-4 mt-8">警告アイテム (.settings-warning-item)</h3>
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <div class="glass-card">
+                                <h5 class="text-body font-semibold mb-2">全データをリセット</h5>
+                                <ul class="settings-description-list">
+                                    <li class="settings-warning-item">
+                                        <i data-lucide="alert-circle" class="icon-sm text-red-300"></i>
+                                        <span>全てのデータを完全に削除</span>
+                                    </li>
+                                    <li>復元不可</li>
+                                </ul>
+                            </div>
+
+                            <div class="code-sample">
+&lt;ul class="settings-description-list"&gt;
+    &lt;li class="settings-warning-item"&gt;
+        &lt;i data-lucide="alert-circle" class="icon-sm text-red-300"&gt;&lt;/i&gt;
+        &lt;span&gt;全てのデータを完全に削除&lt;/span&gt;
+    &lt;/li&gt;
+    &lt;li&gt;復元不可&lt;/li&gt;
+&lt;/ul&gt;</div>
+                        </div>
+                    </div>
+
+                    <h3 class="text-white font-medium mb-4 mt-8">ホームボタンラッパー (.settings-home-button)</h3>
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <div class="settings-home-button">
+                                <button class="btn btn-outline">
+                                    <i data-lucide="home" style="width: 20px; height: 20px;"></i>
+                                    <span>ホームに戻る</span>
+                                </button>
+                            </div>
+
+                            <div class="code-sample">
+&lt;div class="settings-home-button"&gt;
+    &lt;button class="btn btn-outline"&gt;
+        &lt;i data-lucide="home" style="width: 20px; height: 20px;"&gt;&lt;/i&gt;
+        &lt;span&gt;ホームに戻る&lt;/span&gt;
+    &lt;/button&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
+                <!-- 次のステップカード -->
+                <section id="next-step-cards" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">🎯 次のステップカード</h2>
+                    <p class="text-white-70 mb-6">総合評価ページで使用する次のステップ提案カード</p>
+
+                    <h3 class="text-white font-medium mb-4">3カードグリッドレイアウト</h3>
+
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <div class="next-steps-grid">
+                                <!-- カード1: もっと練習する -->
+                                <div class="next-step-card">
+                                    <div class="next-step-card-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                                        <i data-lucide="repeat" class="text-white" style="width: 24px; height: 24px;"></i>
+                                    </div>
+                                    <h3 class="next-step-card-title">もっと練習する</h3>
+                                    <p class="next-step-card-description">毎日5分の継続練習でさらなる上達を目指しましょう</p>
+                                    <button class="btn btn-primary">同じモードで再挑戦</button>
+                                </div>
+
+                                <!-- カード2: 次のレベルに挑戦 -->
+                                <div class="next-step-card">
+                                    <div class="next-step-card-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                                        <i data-lucide="arrow-up-circle" class="text-white" style="width: 24px; height: 24px;"></i>
+                                    </div>
+                                    <h3 class="next-step-card-title">次のレベルに挑戦</h3>
+                                    <p class="next-step-card-description">連続チャレンジモードで半音を含む12音に挑戦</p>
+                                    <button class="btn btn-primary">連続チャレンジを開始</button>
+                                </div>
+
+                                <!-- カード3: 成長の軌跡を確認 -->
+                                <div class="next-step-card">
+                                    <div class="next-step-card-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                                        <i data-lucide="trending-up" class="text-white" style="width: 24px; height: 24px;"></i>
+                                    </div>
+                                    <h3 class="next-step-card-title">成長の軌跡を確認</h3>
+                                    <p class="next-step-card-description">トレーニング記録であなたの上達を可視化</p>
+                                    <button class="btn btn-primary">記録を見る</button>
+                                </div>
+                            </div>
+
+                            <div class="code-sample mt-4">
+&lt;div class="next-steps-grid"&gt;
+    &lt;!-- カード1 --&gt;
+    &lt;div class="next-step-card"&gt;
+        &lt;div class="next-step-card-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"&gt;
+            &lt;i data-lucide="repeat" class="text-white" style="width: 24px; height: 24px;"&gt;&lt;/i&gt;
+        &lt;/div&gt;
+        &lt;h3 class="next-step-card-title"&gt;もっと練習する&lt;/h3&gt;
+        &lt;p class="next-step-card-description"&gt;毎日5分の継続練習でさらなる上達を目指しましょう&lt;/p&gt;
+        &lt;button class="btn btn-primary"&gt;同じモードで再挑戦&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;!-- カード2 --&gt;
+    &lt;div class="next-step-card"&gt;
+        &lt;div class="next-step-card-icon" style="background: linear-gradient(135deg, #10b981, #059669);"&gt;
+            &lt;i data-lucide="arrow-up-circle" class="text-white" style="width: 24px; height: 24px;"&gt;&lt;/i&gt;
+        &lt;/div&gt;
+        &lt;h3 class="next-step-card-title"&gt;次のレベルに挑戦&lt;/h3&gt;
+        &lt;p class="next-step-card-description"&gt;連続チャレンジモードで半音を含む12音に挑戦&lt;/p&gt;
+        &lt;button class="btn btn-primary"&gt;連続チャレンジを開始&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;!-- カード3 --&gt;
+    &lt;div class="next-step-card"&gt;
+        &lt;div class="next-step-card-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);"&gt;
+            &lt;i data-lucide="trending-up" class="text-white" style="width: 24px; height: 24px;"&gt;&lt;/i&gt;
+        &lt;/div&gt;
+        &lt;h3 class="next-step-card-title"&gt;成長の軌跡を確認&lt;/h3&gt;
+        &lt;p class="next-step-card-description"&gt;トレーニング記録であなたの上達を可視化&lt;/p&gt;
+        &lt;button class="btn btn-primary"&gt;記録を見る&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </div>
+
+                    <h3 class="text-white font-medium mb-4 mt-8">無効化カード（準備中機能用）</h3>
+
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <div class="next-steps-grid">
+                                <div class="next-step-card disabled">
+                                    <div class="next-step-card-icon" style="background: linear-gradient(135deg, #6b7280, #4b5563);">
+                                        <i data-lucide="lock" class="text-white" style="width: 24px; height: 24px;"></i>
+                                    </div>
+                                    <h3 class="next-step-card-title">12音階モード</h3>
+                                    <p class="next-step-card-description">プロレベルの完璧な12音律習得（準備中）</p>
+                                    <button class="btn btn-outline" disabled>準備中</button>
+                                </div>
+                            </div>
+
+                            <div class="code-sample mt-4">
+&lt;div class="next-step-card disabled"&gt;
+    &lt;div class="next-step-card-icon" style="background: linear-gradient(135deg, #6b7280, #4b5563);"&gt;
+        &lt;i data-lucide="lock" class="text-white" style="width: 24px; height: 24px;"&gt;&lt;/i&gt;
+    &lt;/div&gt;
+    &lt;h3 class="next-step-card-title"&gt;12音階モード&lt;/h3&gt;
+    &lt;p class="next-step-card-description"&gt;プロレベルの完璧な12音律習得（準備中）&lt;/p&gt;
+    &lt;button class="btn btn-outline" disabled&gt;準備中&lt;/button&gt;
+&lt;/div&gt;</div>
+                        </div>
+                    </div>
+
+                    <!-- 使用ガイドライン -->
+                    <div class="bg-white/5 rounded-lg p-4 mt-6">
+                        <h5 class="text-white font-medium mb-2">💡 使用ガイドライン</h5>
+                        <ul class="text-white-60 text-sm space-y-1">
+                            <li>レスポンシブ: モバイル1列、PC3列の自動切り替え</li>
+                            <li>アイコン背景: グラデーション推奨（青・緑・紫の3色パターン）</li>
+                            <li>ホバーエフェクト: カード全体がインタラクティブ</li>
+                            <li>無効化: .disabled クラスで透明度低下＋ホバー無効</li>
+                            <li>モード別カスタマイズ: nextStepsConfig オブジェクトで定義</li>
+                        </ul>
+                    </div>
+
+                    <!-- CSS設計原則（ボタン位置統一） -->
+                    <div class="bg-white/5 rounded-lg p-4 mt-4">
+                        <h5 class="text-white font-medium mb-2">🎨 CSS設計原則（重要）</h5>
+                        <ul class="text-white-60 text-sm space-y-1">
+                            <li><code>min-height: 280px</code> でカード高さを統一</li>
+                            <li><code>flex-grow: 1</code> で説明文が可変領域を占める</li>
+                            <li><code>margin-top: auto</code> でボタンを常に下部に配置</li>
+                            <li>結果: 説明文の長さに関わらず、全カードのボタン位置が揃う</li>
+                        </ul>
+                    </div>
+
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
             </main>
 
             <!-- フッター -->

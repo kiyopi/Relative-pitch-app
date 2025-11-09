@@ -117,6 +117,14 @@
         
         <!-- Footer -->
         <footer class="footer-base">
+            <!-- ナビゲーションボタン（トップページ以外で表示） -->
+            <div class="footer-nav" id="footer-nav" style="display: none;">
+                <button class="btn btn-outline" onclick="handleFooterHomeButtonClick()">
+                    <i data-lucide="home"></i>
+                    <span>ホームに戻る</span>
+                </button>
+            </div>
+
             <p class="footer-copyright">© 2024 8va相対音感トレーニングアプリ</p>
             <p class="footer-tagline">音楽の新しい扉を開こう</p>
         </footer>
@@ -166,6 +174,37 @@
                 }
             });
         });
+
+        /**
+         * フッター「ホームに戻る」ボタンのクリックハンドラー
+         * 準備・トレーニングページでは確認ダイアログを表示
+         */
+        function handleFooterHomeButtonClick() {
+            const currentPage = window.router ? window.router.currentPage : '';
+
+            // 準備フェーズ・トレーニングページでは確認ダイアログ
+            if (currentPage === 'preparation' || currentPage === 'training') {
+                const message = currentPage === 'preparation'
+                    ? '音域テストを中断してホームに戻りますか？'
+                    : 'トレーニングを中断してホームに戻りますか？\n（進行中のデータは保存されます）';
+
+                if (confirm(message)) {
+                    // NavigationManagerを使用して安全に遷移
+                    if (window.NavigationManager) {
+                        NavigationManager.navigate('home');
+                    } else {
+                        window.location.hash = 'home';
+                    }
+                }
+            } else {
+                // その他のページは確認なしで遷移
+                if (window.NavigationManager) {
+                    NavigationManager.navigate('home');
+                } else {
+                    window.location.hash = 'home';
+                }
+            }
+        }
     </script>
 </body>
 </html>

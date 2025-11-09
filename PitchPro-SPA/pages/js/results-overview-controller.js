@@ -223,6 +223,9 @@ function updateOverviewUI(evaluation, sessionData) {
 
     // セッショングリッド表示
     displaySessionGrid(sessionData);
+
+    // 次のステップ表示
+    displayNextSteps(currentMode, evaluation);
 }
 
 /**
@@ -898,6 +901,158 @@ window.copyShareText = function(event) {
         btn.classList.add('copied');
         setTimeout(() => btn.classList.remove('copied'), 2000);
     });
+}
+
+/**
+ * 次のステップを表示
+ * @param {string} currentMode - 現在のモード（random, continuous等）
+ * @param {object} evaluation - 評価結果（将来の拡張用、現在未使用）
+ */
+function displayNextSteps(currentMode, evaluation) {
+    const container = document.getElementById('next-steps-container');
+    if (!container) return;
+
+    // 将来の拡張: evaluationのグレードに応じてメッセージをカスタマイズ可能
+    // 例: evaluation.grade === 'A'なら「次のレベルに挑戦」を強調表示
+
+    // モード別の次のステップ定義（将来の下行モード対応含む）
+    const nextStepsConfig = {
+        'random': {
+            practice: {
+                icon: 'repeat',
+                iconBg: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                title: 'もっと練習する',
+                description: '毎日5分の継続練習でさらなる上達を目指しましょう',
+                buttonText: '同じモードで再挑戦',
+                action: () => window.location.hash = 'training?mode=random'
+            },
+            upgrade: {
+                icon: 'arrow-up-circle',
+                iconBg: 'linear-gradient(135deg, #10b981, #059669)',
+                title: '次のレベルに挑戦',
+                description: '連続チャレンジモードで半音を含む12音に挑戦',
+                buttonText: '連続チャレンジを開始',
+                action: () => window.location.hash = 'training?mode=continuous'
+            },
+            records: {
+                icon: 'trending-up',
+                iconBg: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                title: '成長の軌跡を確認',
+                description: 'トレーニング記録であなたの上達を可視化',
+                buttonText: '記録を見る',
+                action: () => window.location.hash = 'records'
+            }
+        },
+        'continuous': {
+            practice: {
+                icon: 'repeat',
+                iconBg: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                title: 'もっと練習する',
+                description: '週3回・15分の集中練習で実用レベルを完全習得',
+                buttonText: '同じモードで再挑戦',
+                action: () => window.location.hash = 'training?mode=continuous'
+            },
+            upgrade: {
+                icon: 'lock',
+                iconBg: 'linear-gradient(135deg, #6b7280, #4b5563)',
+                title: '12音階モード',
+                description: 'プロレベルの完璧な12音律習得（準備中）',
+                buttonText: '準備中',
+                action: null,
+                disabled: true
+            },
+            records: {
+                icon: 'trending-up',
+                iconBg: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                title: '成長の軌跡を確認',
+                description: 'トレーニング記録であなたの上達を可視化',
+                buttonText: '記録を見る',
+                action: () => window.location.hash = 'records'
+            }
+        },
+        // 将来の下行モード対応（未実装）
+        'random-down': {
+            practice: {
+                icon: 'repeat',
+                iconBg: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                title: 'もっと練習する',
+                description: '下行での音程感覚をさらに磨きましょう',
+                buttonText: '同じモードで再挑戦',
+                action: () => window.location.hash = 'training?mode=random-down'
+            },
+            upgrade: {
+                icon: 'arrow-up-circle',
+                iconBg: 'linear-gradient(135deg, #10b981, #059669)',
+                title: '次のレベルに挑戦',
+                description: '連続チャレンジ（下行）で半音を含む12音に挑戦',
+                buttonText: '連続チャレンジ（下行）',
+                action: () => window.location.hash = 'training?mode=continuous-down'
+            },
+            records: {
+                icon: 'trending-up',
+                iconBg: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                title: '成長の軌跡を確認',
+                description: 'トレーニング記録であなたの上達を可視化',
+                buttonText: '記録を見る',
+                action: () => window.location.hash = 'records'
+            }
+        },
+        'continuous-down': {
+            practice: {
+                icon: 'repeat',
+                iconBg: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                title: 'もっと練習する',
+                description: '下行での12音律システム習得を完成させましょう',
+                buttonText: '同じモードで再挑戦',
+                action: () => window.location.hash = 'training?mode=continuous-down'
+            },
+            upgrade: {
+                icon: 'lock',
+                iconBg: 'linear-gradient(135deg, #6b7280, #4b5563)',
+                title: '12音階モード（下行）',
+                description: 'プロレベルの下行完璧習得（準備中）',
+                buttonText: '準備中',
+                action: null,
+                disabled: true
+            },
+            records: {
+                icon: 'trending-up',
+                iconBg: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                title: '成長の軌跡を確認',
+                description: 'トレーニング記録であなたの上達を可視化',
+                buttonText: '記録を見る',
+                action: () => window.location.hash = 'records'
+            }
+        }
+    };
+
+    // 現在のモードの設定を取得（フォールバック: random）
+    const config = nextStepsConfig[currentMode] || nextStepsConfig['random'];
+
+    // 3つのカードを生成
+    const cards = ['practice', 'upgrade', 'records'];
+    container.innerHTML = cards.map(cardType => {
+        const card = config[cardType];
+        const disabledClass = card.disabled ? 'disabled' : '';
+
+        return `
+            <div class="next-step-card ${disabledClass}" ${card.action ? `onclick="(${card.action.toString()})()"` : ''}>
+                <div class="next-step-card-icon" style="background: ${card.iconBg};">
+                    <i data-lucide="${card.icon}" class="text-white" style="width: 24px; height: 24px;"></i>
+                </div>
+                <h3 class="next-step-card-title">${card.title}</h3>
+                <p class="next-step-card-description">${card.description}</p>
+                <button class="btn ${card.disabled ? 'btn-outline' : 'btn-primary'}" ${card.disabled ? 'disabled' : ''}>
+                    ${card.buttonText}
+                </button>
+            </div>
+        `;
+    }).join('');
+
+    // Lucideアイコン再初期化
+    if (typeof window.initializeLucideIcons === 'function') {
+        window.initializeLucideIcons({ immediate: true });
+    }
 }
 
 /**

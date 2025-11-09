@@ -61,23 +61,33 @@
                 <span>データ管理</span>
             </h4>
 
-            <div class="flex flex-col gap-3">
+            <div class="flex flex-col gap-4">
                 <!-- データエクスポート -->
                 <div class="flex flex-col gap-2">
-                    <button class="btn-catalog btn-catalog-primary" id="btn-export-data">
+                    <div>
+                        <h5 class="text-body font-semibold mb-2">データをエクスポート</h5>
+                        <ul class="settings-description-list">
+                            <li>全トレーニング記録をJSONファイルとしてダウンロード</li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-primary" id="btn-export-data">
                         <i data-lucide="download" style="width: 20px; height: 20px;"></i>
-                        <span>データをエクスポート</span>
+                        <span>エクスポート実行</span>
                     </button>
-                    <p class="text-xs text-white-60">全トレーニング記録をJSONファイルとしてダウンロードします</p>
                 </div>
 
                 <!-- データインポート -->
                 <div class="flex flex-col gap-2">
-                    <button class="btn-catalog btn-catalog-secondary" id="btn-import-data">
+                    <div>
+                        <h5 class="text-body font-semibold mb-2">データをインポート</h5>
+                        <ul class="settings-description-list">
+                            <li>エクスポートしたJSONファイルからデータを復元</li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-outline" id="btn-import-data">
                         <i data-lucide="upload" style="width: 20px; height: 20px;"></i>
-                        <span>データをインポート</span>
+                        <span>インポート実行</span>
                     </button>
-                    <p class="text-xs text-white-60">エクスポートしたJSONファイルからデータを復元します</p>
                     <input type="file" id="file-import-data" accept=".json" style="display: none;">
                 </div>
             </div>
@@ -90,32 +100,53 @@
                 <span>データリセット</span>
             </h4>
 
-            <div class="flex flex-col gap-3">
+            <div class="flex flex-col gap-4">
                 <!-- トレーニング記録削除 -->
                 <div class="flex flex-col gap-2">
-                    <button class="btn-catalog btn-catalog-danger" id="btn-reset-training">
+                    <div>
+                        <h5 class="text-body font-semibold mb-2">トレーニング記録を削除</h5>
+                        <ul class="settings-description-list">
+                            <li>全てのトレーニング記録を削除</li>
+                            <li>音域テスト結果は保持</li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-danger" id="btn-reset-training">
                         <i data-lucide="trash-2" style="width: 20px; height: 20px;"></i>
-                        <span>トレーニング記録を削除</span>
+                        <span>削除実行</span>
                     </button>
-                    <p class="text-xs text-white-60">全てのトレーニング記録を削除します（音域テスト結果は保持）</p>
                 </div>
 
                 <!-- 音域テスト結果削除 -->
                 <div class="flex flex-col gap-2">
-                    <button class="btn-catalog btn-catalog-danger" id="btn-reset-voice-range">
+                    <div>
+                        <h5 class="text-body font-semibold mb-2">音域テスト結果を削除</h5>
+                        <ul class="settings-description-list">
+                            <li>音域テスト結果を削除</li>
+                            <li>トレーニング記録は保持</li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-danger" id="btn-reset-voice-range">
                         <i data-lucide="trash-2" style="width: 20px; height: 20px;"></i>
-                        <span>音域テスト結果を削除</span>
+                        <span>削除実行</span>
                     </button>
-                    <p class="text-xs text-white-60">音域テスト結果を削除します（トレーニング記録は保持）</p>
                 </div>
 
                 <!-- 全データリセット -->
                 <div class="flex flex-col gap-2">
-                    <button class="btn-catalog btn-catalog-danger" id="btn-reset-all">
+                    <div>
+                        <h5 class="text-body font-semibold mb-2">全データをリセット</h5>
+                        <ul class="settings-description-list">
+                            <li class="settings-warning-item">
+                                <i data-lucide="alert-circle" class="icon-sm text-red-300"></i>
+                                <span>全てのデータを完全に削除</span>
+                            </li>
+                            <li>復元不可</li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-danger" id="btn-reset-all">
                         <i data-lucide="alert-triangle" style="width: 20px; height: 20px;"></i>
-                        <span>全データをリセット</span>
+                        <span>リセット実行</span>
                     </button>
-                    <p class="text-xs text-white-60">⚠️ 全てのデータを完全に削除します（復元不可）</p>
                 </div>
             </div>
         </section>
@@ -139,14 +170,6 @@
                 </div>
             </div>
         </section>
-
-        <!-- ホームに戻るボタン -->
-        <div class="flex justify-center" style="margin-top: 2rem;">
-            <button class="btn-catalog btn-catalog-secondary" onclick="location.hash=''">
-                <i data-lucide="home" style="width: 20px; height: 20px;"></i>
-                <span>ホームに戻る</span>
-            </button>
-        </div>
 
     </main>
 </div>
