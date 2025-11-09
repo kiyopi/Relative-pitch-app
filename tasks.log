@@ -7679,3 +7679,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 22:00:57] コミット: fix: ローディング表示が消えない問題を修正
+
+- displayStatistics(), displayAccuracyChart()をasync関数に変更
+- 各関数でレンダリング完了を待機するawait追加
+- hideLoading()が適切なタイミングで実行されるよう修正
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
