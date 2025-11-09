@@ -25,6 +25,9 @@
 
 console.log('[Records] Controller loading...');
 
+// Chart.jsインスタンスを保持（SPA対応: 再初期化時に破棄するため）
+let accuracyChartInstance = null;
+
 /**
  * トレーニング記録ページの初期化（SPA対応）
  */
@@ -372,6 +375,12 @@ async function displayAccuracyChart(sessions) {
     const canvas = document.getElementById('accuracyChart');
     if (!canvas) return;
 
+    // 既存のチャートインスタンスを破棄（SPA対応: 再初期化時の重複防止）
+    if (accuracyChartInstance) {
+        accuracyChartInstance.destroy();
+        accuracyChartInstance = null;
+    }
+
     const ctx = canvas.getContext('2d');
 
     // 最新20件を取得して逆順（古い→新しい）
@@ -398,7 +407,7 @@ async function displayAccuracyChart(sessions) {
         }
     });
 
-    new Chart(ctx, {
+    accuracyChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
