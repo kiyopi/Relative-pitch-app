@@ -7469,3 +7469,21 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 19:53:17] コミット: fix: records HTML初期値を適切なメッセージに修正
+
+問題:
+- improvement-status の初期値が「データを取得中...」のまま
+- JavaScriptで更新されるまで不適切なメッセージが表示される
+
+修正内容:
+- 初期値を「トレーニングを開始しましょう」に変更
+- クラスも text-green-300 → text-blue-300 に統一（データなし時と同じ）
+
+表示フロー:
+1. HTML読み込み: 「トレーニングを開始しましょう」（青色）
+2. データなし時: そのまま「トレーニングを開始しましょう」（青色）
+3. データあり時: JavaScriptで適切なメッセージに更新（緑/青/黄）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

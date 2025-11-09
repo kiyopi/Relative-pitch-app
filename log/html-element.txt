@@ -71,8 +71,8 @@
                         <div class="text-white-70">日間連続記録達成！</div>
                     </div>
                 </div>
-                <div class="text-lg text-green-300" id="improvement-status">
-                    データを取得中...
+                <div class="text-lg text-blue-300" id="improvement-status">
+                    トレーニングを開始しましょう
                 </div>
             </div>
 

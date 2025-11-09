@@ -87,17 +87,23 @@ function calculateStatistics(sessions) {
 
     // 平均誤差を計算（絶対値）
     const avgErrors = sessions.map(s => {
-        const error = s.averageError ?? s.avgError ?? (s.evaluation && s.evaluation.averageError) ?? 0;
+        // 仕様書準拠: sessionSummary.averageCentError
+        const error = s.averageError ?? s.avgError ??
+                     (s.sessionSummary && s.sessionSummary.averageCentError) ??
+                     (s.evaluation && s.evaluation.averageError) ?? 0;
         return Math.abs(error);
     });
     const avgAccuracy = avgErrors.length > 0
         ? Math.round(avgErrors.reduce((a, b) => a + b, 0) / avgErrors.length)
         : 0;
 
-    // 最高グレード
+    // 最高グレード（注意: セッションデータにはグレードがない可能性が高い）
     const gradeOrder = ['S+', 'S', 'A+', 'A', 'B+', 'B', 'C+', 'C', 'D'];
     const bestGrade = sessions.reduce((best, session) => {
+        // 仕様書準拠: overallEvaluation.finalEvaluation.dynamicGrade
+        // セッションデータには通常存在しないため、フォールバック多め
         const grade = session.grade || session.overallGrade || session.evaluationGrade ||
+                      (session.finalEvaluation && session.finalEvaluation.dynamicGrade) ||
                       (session.evaluation && session.evaluation.grade);
         const currentIdx = gradeOrder.indexOf(grade);
         const bestIdx = gradeOrder.indexOf(best);
@@ -219,12 +225,16 @@ function createSessionCard(session) {
         'D': 'text-red-300'
     };
     // グレード取得（複数のフィールド名に対応）
+    // 仕様書準拠: overallEvaluation.finalEvaluation.dynamicGrade（セッションには通常存在しない）
     const grade = session.grade || session.overallGrade || session.evaluationGrade ||
+                  (session.finalEvaluation && session.finalEvaluation.dynamicGrade) ||
                   (session.evaluation && session.evaluation.grade) || '-';
     const gradeColor = gradeColors[grade] || 'text-white';
 
     // 平均誤差取得（複数のフィールド名に対応）
+    // 仕様書準拠: sessionSummary.averageCentError
     const averageError = session.averageError ?? session.avgError ??
+                         (session.sessionSummary && session.sessionSummary.averageCentError) ??
                          (session.evaluation && session.evaluation.averageError) ?? 0;
 
     card.innerHTML = `
