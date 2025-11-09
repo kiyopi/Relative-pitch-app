@@ -101,4 +101,10 @@
 </div>
 
 <!-- Records Page Controller -->
-<script src="pages/js/records-controller.js?v=20251109003"></script>
+<script src="pages/js/records-controller.js?v=20251109004"></script>
+<script>
+    // SPA対応：ページ読み込み完了後に初期化
+    if (typeof window.initRecords === 'function') {
+        window.initRecords();
+    }
+</script>

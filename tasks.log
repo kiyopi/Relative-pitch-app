@@ -7379,3 +7379,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 19:40:30] コミット: fix: records データなし状態の表示改善
+
+- グラフセクションをデータなし時に完全非表示
+- ボタン重複を解消：データあり時は「新しいトレーニングを開始」のみ表示
+- データなし時は履歴セクション内の「最初のトレーニングを始める」のみ表示
+- records-count表示を「0件」に設定
+- 各セクションにIDを追加して表示/非表示を適切に制御
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
