@@ -7776,3 +7776,32 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 23:11:53] コミット: feat: LoadingComponent v1.1.0とトレーニング記録ページ完全修正
+
+新機能:
+- LoadingComponent v1.1.0エラー表示機能追加
+  - createError()メソッド実装
+  - showError()で自動エラー表示切り替え
+  - hideError()でエラー非表示
+  - アクションボタン付きエラー表示対応
+- COMPONENTS_GUIDE.md v1.1.0作成（完全なAPIドキュメント）
+- UIカタログにローディング・エラー表示セクション追加
+
+修正内容:
+- トレーニング記録ページのボタン重複問題解決
+  - データなしメッセージ内のボタン削除
+  - 「新しいトレーニングを開始」ボタンに統一
+  - sessions-content表示ロジック追加
+  - キャッシュ対策：古いボタンを強制削除するロジック実装
+- records-controller.js表示制御ロジック改善
+  - データあり/なし時の表示切り替え完全対応
+  - アクションボタンセクション常時表示
+
+ドキュメント:
+- /PitchPro-SPA/docs/COMPONENTS_GUIDE.md（新規作成）
+- /UI-Catalog/ui-catalog-essentials.html（ローディング・エラーセクション追加）
+- CLAUDE.md（クイックリファレンス更新）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

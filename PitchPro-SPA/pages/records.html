@@ -1,7 +1,4 @@
-<!--
-    キャッシュ制御: v20251109016
-    このファイルはキャッシュされません
--->
+<!-- SPA用テンプレート: records -->
 <div class="container container-records">
     <!-- ヘッダーセクション -->
     <div class="page-header">
@@ -127,21 +124,11 @@
 </div>
 
 <!-- Records Page Controller -->
-<script src="pages/js/records-controller.js?v=20251109015" onload="initRecordsPage()"></script>
+<script src="pages/js/records-controller.js?v=20251109016" onload="initRecordsPage()"></script>
 <script>
     // SPA対応：ページ読み込み完了後に初期化
     async function initRecordsPage() {
         console.log('📊 [Records] スクリプト読み込み完了、初期化開始');
-
-        // 【緊急修正】キャッシュされたHTMLの古いボタンを強制削除
-        const noDataMessage = document.getElementById('no-data-message');
-        if (noDataMessage) {
-            const oldButton = noDataMessage.querySelector('button');
-            if (oldButton) {
-                console.warn('⚠️ [Records] 古いボタンを検出・削除');
-                oldButton.remove();
-            }
-        }
 
         // DOMが完全に準備されるまで待機
         await new Promise(resolve => setTimeout(resolve, 0));

@@ -98,7 +98,10 @@ async function loadTrainingRecords() {
         hideLoading('chart');
 
         // データあり時の表示制御
-        document.getElementById('no-data-message').style.display = 'none';
+        const noDataMessage = document.getElementById('no-data-message');
+        if (noDataMessage) {
+            noDataMessage.style.setProperty('display', 'none', 'important');
+        }
         document.getElementById('chart-section').style.display = 'block';
         document.getElementById('action-buttons-section').style.display = 'block';
 
