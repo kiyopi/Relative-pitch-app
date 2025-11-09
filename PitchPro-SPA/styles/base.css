@@ -157,13 +157,7 @@ body::before {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 var(--space-6);
-}
-
-@media (max-width: 768px) {
-  .container {
-    padding: 0 var(--space-6);
-  }
+  padding: 0 var(--space-6);  /* PC・モバイル共通 */
 }
 
 /* セッション評価・総合評価・記録ページ専用（モバイルのみパディングなし） */
