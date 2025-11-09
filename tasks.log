@@ -7487,3 +7487,101 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 19:57:49] コミット: refactor: records-controller データ仕様書準拠に修正
+
+仕様書確認:
+- DATA_MANAGEMENT_SPECIFICATION.md (v2.0.0) を参照
+- セッションデータ構造を確認
+
+修正内容:
+- sessionSummary.averageCentError への対応追加（仕様書準拠）
+- finalEvaluation.dynamicGrade への対応追加（総合評価データ構造）
+- フォールバック順序の最適化
+
+データフィールド優先順位:
+
+平均誤差:
+1. session.averageError（後方互換）
+2. session.avgError（後方互換）
+3. session.sessionSummary.averageCentError（仕様書準拠）
+4. session.evaluation.averageError（旧構造）
+
+グレード:
+1. session.grade（後方互換）
+2. session.overallGrade（後方互換）
+3. session.evaluationGrade（後方互換）
+4. session.finalEvaluation.dynamicGrade（仕様書準拠）
+5. session.evaluation.grade（旧構造）
+
+注意:
+- セッションデータにはグレードが通常存在しない可能性あり
+- グレードはoverallEvaluationデータに格納される設計
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 21:15:03] コミット: feat: グレード一覧表v1.1.0完成とrecords-controller修正
+
+Phase 2-2: トレーニング記録ページ実装完了
+
+## 主要な変更
+
+### 1. グレード一覧表の完成 (GRADE_REFERENCE_TABLE.md v1.1.0)
+- 総合グレード（S/A/B/C/D/E）の完全仕様
+- セッション評価4ランク（Excellent/Good/Pass/Practice）を追加
+- UI表示情報（色・アイコン・CSSクラス）の完全統合
+- JavaScript実装リファレンス追加
+- モード別評価基準の詳細記載
+
+### 2. records-controller.js修正
+- グレード表記を仕様書準拠に修正（S/A/B/C/D/Eのみ）
+- プラス記号付きグレード（S+/A+等）を削除
+- gradeOrder配列を6段階に統一
+- gradeColors定義を6段階に統一
+
+## 技術的詳細
+
+### グレード一覧表の構成
+- 総合グレード: 6段階（S/A/B/C/D/E）
+- セッション評価: 4ランク（Excellent/Good/Pass/Practice）
+- 各評価の色・アイコン・メッセージを統一定義
+- evaluation-calculator.js実装との完全一致
+
+### 禁止事項の明記
+- プラス記号付きグレード使用禁止
+- 独自の色定義禁止
+- 独自のアイコン使用禁止
+
+### Single Source of Truth
+- グレード関連の全情報を一元管理
+- 実装・UI・仕様書間の一貫性を保証
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 21:32:18] コミット: fix: 総合評価画面の次のステップボタンでブラウザバック判定が起きる問題を修正
+
+## 問題
+- 次のステップカードのonclick属性にアロー関数を文字列化して埋め込んでいた
+- `onclick="(() => window.location.hash = 'training?mode=continuous')()"`
+- この方式では正しく実行されず、ブラウザバック判定が発生していた
+
+## 解決方法
+- onclick属性を使用せず、data属性とイベントリスナーで実装
+- `data-action-id`属性でアクションを識別
+- `handleNextStepAction(actionId)`関数で集中管理
+
+## 変更内容
+1. nextStepsConfigの`action`プロパティを`actionId`に変更
+2. HTML生成時に`data-action-id`属性を付与
+3. `handleNextStepAction()`関数を新規作成
+4. addEventListener()でクリックイベントを適切にバインド
+
+## メリット
+- イベントハンドラーが正しく動作
+- コードの保守性向上（アクション定義が一箇所に集約）
+- 将来の下行モード追加時も対応可能
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

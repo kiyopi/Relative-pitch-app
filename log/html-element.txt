@@ -1,248 +1,341 @@
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="app-header" style="display: none;">
-                <div class="header-brand">
-                    <div class="header-icon-wrapper">
-                        <div class="header-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="music" class="lucide lucide-music icon-lg text-white"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
-                        </div>
-                    </div>
-                    <div>
-                        <h1 class="text-3xl font-bold text-white">8va相対音感トレーニング</h1>
-                        <p class="text-purple-200">あなたの音感を科学的に向上させましょう</p>
-                    </div>
-                </div>
-                <!-- モバイル用ハンバーガーメニュー -->
-                <button class="menu-toggle" id="menu-toggle">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="menu" class="lucide lucide-menu icon-md"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
-                </button>
-                
-                <!-- PC用ナビゲーション -->
-                <nav class="header-nav" id="header-nav">
-                    <button class="nav-button" onclick="location.hash='records'" title="トレーニング記録を見る">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="history" class="lucide lucide-history icon-md"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>
-                        <span class="nav-text">記録</span>
-                    </button>
-                    <button class="nav-button" onclick="location.hash='results'" title="総合評価を見る">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="bar-chart-3" class="lucide lucide-bar-chart-3 icon-md"><path d="M3 3v18h18"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg>
-                        <span class="nav-text">評価</span>
-                    </button>
-                    <button class="nav-button" onclick="location.hash='settings'" title="設定・データ管理">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="settings" class="lucide lucide-settings icon-md"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                        <span class="nav-text">設定</span>
-                    </button>
-                    <button class="nav-button">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="share" class="lucide lucide-share icon-md"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" x2="12" y1="2" y2="15"></line></svg>
-                        <span class="nav-text">共有</span>
-                    </button>
-                </nav>
-        </header>
+<h1>📊 評価計算パフォーマンステスト</h1>
+<pre id="output">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 評価計算パフォーマンステスト結果
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-        <!-- Main Content Container for SPA -->
-        <main id="app-root" class="wide-main"><!-- SPA用テンプレート: records -->
-<div class="container container-records">
-    <!-- ヘッダーセクション -->
-    <div class="page-header">
-        <div class="page-header-content">
-            <div class="page-header-icon-wrapper">
-                <div class="page-header-icon gradient-catalog-purple">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="bar-chart-3" class="lucide lucide-bar-chart-3 text-white" data-stroke-width="2" style="width: 36px; height: 36px;"><path d="M3 3v18h18"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg>
-                </div>
-            </div>
-            <div class="page-header-text">
-                <h1 class="page-title">トレーニング記録</h1>
-                <p class="page-subtitle text-purple-200">成長の軌跡を確認しよう</p>
-            </div>
-        </div>
-    </div>
+🖥️  デバイス情報:
+   UserAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Safari/605.1.15
+   Platform: MacIntel
 
-    <!-- メインコンテンツエリア -->
-    <main class="wide-main">
+✅ テスト1: 1セッション計算
+   計算時間: 39.000ms
+   グレード: S
+   平均誤差: 11.6¢
 
-        <!-- メイン統計セクション -->
-        <section class="glass-card">
-            <!-- 連続記録バッジ -->
-            <div class="flex flex-col items-center gap-3 mb-6">
-                <div class="flex items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="flame" class="lucide lucide-flame text-orange-300" style="width: 48px; height: 48px;"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
-                    <div>
-                        <div class="text-3xl font-bold text-white" id="streak-count">-</div>
-                        <div class="text-white-70">日間連続記録達成！</div>
-                    </div>
-                </div>
-                <div class="text-lg text-blue-300" id="improvement-status">
-                    トレーニングを開始しましょう
-                </div>
-            </div>
+✅ テスト2: 10セッション個別計算
+   合計時間: 0.000ms
+   平均時間: 0.000ms/セッション
 
-            <!-- 基本統計 -->
-            <div class="flex justify-around gap-4">
-                <div class="flex flex-col items-center">
-                    <div class="text-2xl font-bold text-blue-300" id="total-sessions">-</div>
-                    <div class="text-white-60 text-sm">総セッション数</div>
-                </div>
-                <div class="flex flex-col items-center">
-                    <div class="text-2xl font-bold text-green-300" id="avg-accuracy">-</div>
-                    <div class="text-white-60 text-sm">平均誤差（¢）</div>
-                </div>
-                <div class="flex flex-col items-center">
-                    <div class="text-2xl font-bold text-yellow-300" id="best-grade">-</div>
-                    <div class="text-white-60 text-sm">最高グレード</div>
-                </div>
-            </div>
-        </section>
+✅ テスト3: 50セッション個別計算（records表示想定）
+   合計時間: 2.000ms
+   平均時間: 0.040ms/セッション
+   体感速度: 完全に即座（60FPS維持）
 
-        <!-- 成長グラフセクション -->
-        <section class="glass-card" id="chart-section">
-            <div class="flex items-center justify-between mb-4">
-                <h4 class="heading-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="trending-up" class="lucide lucide-trending-up text-green-300"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
-                    <span>精度推移グラフ</span>
-                </h4>
-            </div>
-            <div style="height: 300px;">
-                <canvas id="accuracyChart"></canvas>
-            </div>
-        </section>
+✅ テスト4: 100回繰り返し統計
+   平均: 0.240ms
+   中央値: 0.000ms
+   最小: 0.000ms
+   最大: 20.000ms
 
-        <!-- 最近の記録セクション -->
-        <section class="glass-card">
-            <div class="flex items-center justify-between mb-4">
-                <h4 class="heading-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="calendar" class="lucide lucide-calendar text-blue-300"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect><line x1="16" x2="16" y1="2" y2="6"></line><line x1="8" x2="8" y1="2" y2="6"></line><line x1="3" x2="21" y1="10" y2="10"></line></svg>
-                    <span>トレーニング履歴</span>
-                </h4>
-                <div class="text-white-60 text-sm" id="records-count">-件</div>
-            </div>
+⚠️  テスト5: 実データなし
+   localStorageにセッションデータがありません
+   トレーニングを1回実行後、再度テストしてください
 
-            <div class="flex flex-col gap-3" id="recent-sessions">
-                <!-- JavaScriptで動的生成 -->
-            </div>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📌 総合結論:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-            <!-- データなし表示 -->
-            <div class="flex flex-col items-center gap-3 py-8" id="no-data-message" style="display: none;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="inbox" class="lucide lucide-inbox text-white-40" style="width: 48px; height: 48px;"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
-                <p class="text-white-60">まだトレーニング記録がありません</p>
-                <button onclick="window.NavigationManager.navigate('home')" class="btn btn-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="play" style="width: 20px; height: 20px;" class="lucide lucide-play"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                    <span>最初のトレーニングを始める</span>
-                </button>
-            </div>
-        </section>
+   🔹 1セッション平均計算時間: 0.24ms
+   🔹 50セッション表示時間: 2.000ms
+   🔹 ユーザー体験: 完全に即座（60FPS維持）
 
-        <!-- アクションボタン -->
-        <section class="action-buttons" id="action-buttons-section" style="display: none;">
-            <button onclick="window.NavigationManager.navigate('home')" class="btn btn-primary">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="play" style="width: 24px; height: 24px;" class="lucide lucide-play"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                <span>新しいトレーニングを開始</span>
-            </button>
-        </section>
+💡 推奨実装方針:
 
-    </main>
-</div>
+   ✅ 動的計算で問題なし
+   ✅ キャッシュ不要（計算コストが十分低い）
+   ✅ 評価基準変更に柔軟に対応可能
+   ✅ データ一貫性を保持
 
-<!-- Records Page Controller -->
-<script src="pages/js/records-controller.js?v=20251109004"></script>
+   📝 実装方針:
+      - SessionDataRecorderは生データのみ保存
+      - records-controllerで表示時に動的計算
+      - 評価基準変更時も過去データを正しく再評価
+</pre>
+
 <script>
-    // SPA対応：ページ読み込み完了後に初期化
-    if (typeof window.initRecords === 'function') {
-        window.initRecords();
+// EvaluationCalculatorの簡略版（計算コア部分のみ）
+class EvaluationCalculator {
+    static calculateDynamicGrade(sessionData) {
+        const modeInfo = this.detectMode(sessionData);
+        const deviceInfo = this.detectDeviceQuality();
+        const basicMetrics = this.calculateBasicMetrics(sessionData, deviceInfo);
+        const metricsWithAdjustment = this.applyTechnicalAdjustment(basicMetrics, deviceInfo);
+        const thresholdInfo = this.getModeSpecificThresholds(modeInfo.actualSessions);
+        const gradeResult = this.determineGrade(metricsWithAdjustment.adjusted, thresholdInfo.thresholds);
+
+        return {
+            grade: gradeResult.grade,
+            metrics: metricsWithAdjustment
+        };
     }
-</script>
-</main>
-        
-        <!-- Footer -->
-        <footer class="footer-base">
-            <!-- ナビゲーションボタン（トップページ以外で表示） -->
-            <div class="footer-nav" id="footer-nav" style="display: flex;">
-                <button class="btn btn-outline" onclick="handleFooterHomeButtonClick()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="home" class="lucide lucide-home"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                    <span>ホームに戻る</span>
-                </button>
-            </div>
 
-            <p class="footer-copyright">© 2024 8va相対音感トレーニングアプリ</p>
-            <p class="footer-tagline">音楽の新しい扉を開こう</p>
-        </footer>
-    </div>
+    static detectMode(sessionData) {
+        const sessionCount = sessionData.length;
+        if (sessionCount <= 8) return { mode: 'random', actualSessions: sessionCount };
+        if (sessionCount <= 12) return { mode: 'continuous', actualSessions: sessionCount };
+        return { mode: '12tone', actualSessions: sessionCount };
+    }
 
-    <!-- Lucide初期化 -->
-    <script src="js/lucide-init.js?v=20251029012"></script>
+    static detectDeviceQuality() {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const sampleRate = audioContext.sampleRate;
+            audioContext.close();
+            return { quality: 'standard', factor: 1.0, sampleRate };
+        } catch (error) {
+            return { quality: 'standard', factor: 1.0, sampleRate: 'unknown' };
+        }
+    }
 
-    <!-- SPA Router -->
-    <script src="js/router.js?v=20251029012"></script>
+    static calculateBasicMetrics(sessionData, deviceInfo) {
+        let totalError = 0;
+        let totalNotes = 0;
+        let excellentNotes = 0;
+        let errors = [];
 
-    <!-- メニュー開閉スクリプト -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuToggle = document.getElementById('menu-toggle');
-            const headerNav = document.getElementById('header-nav');
-            
-            menuToggle.addEventListener('click', function() {
-                headerNav.classList.toggle('active');
-                // アイコン切り替え
-                const icon = menuToggle.querySelector('i');
-                if (icon) {
-                    if (headerNav.classList.contains('active')) {
-                        icon.setAttribute('data-lucide', 'x');
-                    } else {
-                        icon.setAttribute('data-lucide', 'menu');
-                    }
-                    // 統合初期化関数を使用（即座実行モード）
-                    if (typeof window.initializeLucideIcons === 'function') {
-                        window.initializeLucideIcons({ immediate: true });
-                    }
-                }
-            });
-            
-            // 外側クリックで閉じる
-            document.addEventListener('click', function(event) {
-                if (!menuToggle.contains(event.target) && !headerNav.contains(event.target)) {
-                    headerNav.classList.remove('active');
-                    const icon = menuToggle.querySelector('i');
-                    if (icon) {
-                        icon.setAttribute('data-lucide', 'menu');
-                        // 統合初期化関数を使用（即座実行モード）
-                        if (typeof window.initializeLucideIcons === 'function') {
-                            window.initializeLucideIcons({ immediate: true });
-                        }
-                    }
-                }
+        sessionData.forEach(session => {
+            if (!session.pitchErrors) return;
+            session.pitchErrors.forEach(note => {
+                const absError = Math.abs(note.errorInCents);
+                totalError += absError;
+                totalNotes++;
+                errors.push(absError);
+                if (absError <= 30) excellentNotes++;
             });
         });
 
-        /**
-         * フッター「ホームに戻る」ボタンのクリックハンドラー
-         * 準備・トレーニングページでは確認ダイアログを表示
-         */
-        function handleFooterHomeButtonClick() {
-            const currentPage = window.router ? window.router.currentPage : '';
+        if (totalNotes === 0) {
+            return { avgError: 50.0, excellenceRate: 0.5, stability: 15.0, totalNotes: 0 };
+        }
 
-            // 準備フェーズ・トレーニングページでは確認ダイアログ
-            if (currentPage === 'preparation' || currentPage === 'training') {
-                const message = currentPage === 'preparation'
-                    ? '音域テストを中断してホームに戻りますか？'
-                    : 'トレーニングを中断してホームに戻りますか？\n（進行中のデータは保存されます）';
+        const outlierThreshold = 180;
+        const validErrors = errors.filter(e => e <= outlierThreshold);
+        const avgError = validErrors.length > 0
+            ? validErrors.reduce((a, b) => a + b, 0) / validErrors.length
+            : totalError / totalNotes;
 
-                if (confirm(message)) {
-                    // NavigationManagerを使用して安全に遷移
-                    if (window.NavigationManager) {
-                        NavigationManager.navigate('home');
-                    } else {
-                        window.location.hash = 'home';
-                    }
-                }
-            } else {
-                // その他のページは確認なしで遷移
-                if (window.NavigationManager) {
-                    NavigationManager.navigate('home');
-                } else {
-                    window.location.hash = 'home';
-                }
+        const excellenceRate = excellentNotes / totalNotes;
+        const mean = validErrors.reduce((a, b) => a + b, 0) / validErrors.length;
+        const variance = validErrors.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / validErrors.length;
+        const stability = Math.sqrt(variance);
+
+        return {
+            avgError: Math.round(avgError * 10) / 10,
+            excellenceRate: Math.round(excellenceRate * 1000) / 1000,
+            stability: Math.round(stability * 10) / 10,
+            totalNotes
+        };
+    }
+
+    static applyTechnicalAdjustment(basicMetrics, deviceInfo) {
+        return {
+            raw: basicMetrics,
+            adjusted: {
+                avgError: basicMetrics.avgError / deviceInfo.factor,
+                excellenceRate: basicMetrics.excellenceRate,
+                stability: basicMetrics.stability / deviceInfo.factor,
+                totalNotes: basicMetrics.totalNotes
+            }
+        };
+    }
+
+    static getModeSpecificThresholds(actualSessions) {
+        const sessionCount = actualSessions <= 8 ? 8 : actualSessions <= 12 ? 12 : 24;
+        const thresholds = {
+            8: { S: { avgError: 25, excellence: 0.70 }, A: { avgError: 35, excellence: 0.60 }, B: { avgError: 45, excellence: 0.50 }, C: { avgError: 55, excellence: 0.40 }, D: { avgError: 65, excellence: 0.30 }, E: { avgError: 80, excellence: 0.20 } },
+            12: { S: { avgError: 20, excellence: 0.75 }, A: { avgError: 30, excellence: 0.65 }, B: { avgError: 40, excellence: 0.55 }, C: { avgError: 50, excellence: 0.45 }, D: { avgError: 60, excellence: 0.35 }, E: { avgError: 75, excellence: 0.25 } },
+            24: { S: { avgError: 15, excellence: 0.80 }, A: { avgError: 25, excellence: 0.70 }, B: { avgError: 35, excellence: 0.60 }, C: { avgError: 45, excellence: 0.50 }, D: { avgError: 55, excellence: 0.40 }, E: { avgError: 70, excellence: 0.30 } }
+        };
+        return { thresholds: thresholds[sessionCount], sessionCount };
+    }
+
+    static determineGrade(adjustedMetrics, thresholds) {
+        const grades = ['S', 'A', 'B', 'C', 'D', 'E'];
+        for (const grade of grades) {
+            const threshold = thresholds[grade];
+            if (!threshold) continue;
+            if (adjustedMetrics.avgError <= threshold.avgError &&
+                adjustedMetrics.excellenceRate >= threshold.excellence) {
+                return { grade, thresholds: threshold };
             }
         }
-    </script>
+        return { grade: 'E', thresholds: thresholds.E || {} };
+    }
+}
+
+// ダミーセッションデータ生成
+function generateDummySession(sessionId) {
+    const pitchErrors = [];
+    for (let i = 0; i < 8; i++) {
+        pitchErrors.push({
+            step: i,
+            errorInCents: (Math.random() - 0.5) * 60  // ±30¢のランダム誤差
+        });
+    }
+    return {
+        sessionId,
+        mode: 'random',
+        startTime: Date.now() - sessionId * 1000000,
+        pitchErrors
+    };
+}
+
+// パフォーマンステスト実行
+setTimeout(() => {
+    const output = document.getElementById('output');
+    let log = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+    log += '📊 評価計算パフォーマンステスト結果\n';
+    log += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+
+    // デバイス情報
+    log += '🖥️  デバイス情報:\n';
+    log += `   UserAgent: ${navigator.userAgent}\n`;
+    log += `   Platform: ${navigator.platform}\n\n`;
+
+    // テスト1: 1セッションの計算時間
+    const singleSession = [generateDummySession(1)];
+    const start1 = performance.now();
+    const result1 = EvaluationCalculator.calculateDynamicGrade(singleSession);
+    const end1 = performance.now();
+    const time1 = (end1 - start1).toFixed(3);
+    log += `✅ テスト1: 1セッション計算\n`;
+    log += `   計算時間: ${time1}ms\n`;
+    log += `   グレード: ${result1.grade}\n`;
+    log += `   平均誤差: ${result1.metrics.adjusted.avgError.toFixed(1)}¢\n\n`;
+
+    // テスト2: 10セッションの計算時間（個別計算）
+    const sessions10 = Array.from({ length: 10 }, (_, i) => generateDummySession(i + 1));
+    const start2 = performance.now();
+    const results10 = sessions10.map(s => EvaluationCalculator.calculateDynamicGrade([s]));
+    const end2 = performance.now();
+    const time2 = (end2 - start2).toFixed(3);
+    const avg2 = ((end2 - start2) / 10).toFixed(3);
+    log += `✅ テスト2: 10セッション個別計算\n`;
+    log += `   合計時間: ${time2}ms\n`;
+    log += `   平均時間: ${avg2}ms/セッション\n\n`;
+
+    // テスト3: 50セッションの計算時間（records表示想定）
+    const sessions50 = Array.from({ length: 50 }, (_, i) => generateDummySession(i + 1));
+    const start3 = performance.now();
+    const results50 = sessions50.map(s => EvaluationCalculator.calculateDynamicGrade([s]));
+    const end3 = performance.now();
+    const time3 = (end3 - start3).toFixed(3);
+    const avg3 = ((end3 - start3) / 50).toFixed(3);
+    log += `✅ テスト3: 50セッション個別計算（records表示想定）\n`;
+    log += `   合計時間: ${time3}ms\n`;
+    log += `   平均時間: ${avg3}ms/セッション\n`;
+
+    // 体感速度評価
+    const time3Num = parseFloat(time3);
+    let userExperience = '';
+    if (time3Num < 16) {
+        userExperience = '完全に即座（60FPS維持）';
+    } else if (time3Num < 100) {
+        userExperience = '体感的に即座';
+    } else if (time3Num < 300) {
+        userExperience = '許容範囲';
+    } else {
+        userExperience = '遅いと感じる可能性あり';
+    }
+    log += `   体感速度: ${userExperience}\n\n`;
+
+    // テスト4: 100回繰り返し（統計的信頼性）
+    const times = [];
+    for (let i = 0; i < 100; i++) {
+        const session = [generateDummySession(i)];
+        const s = performance.now();
+        EvaluationCalculator.calculateDynamicGrade(session);
+        const e = performance.now();
+        times.push(e - s);
+    }
+    const avgTime = times.reduce((a, b) => a + b, 0) / times.length;
+    const minTime = Math.min(...times);
+    const maxTime = Math.max(...times);
+    const medianTime = times.sort((a, b) => a - b)[50];
+
+    log += `✅ テスト4: 100回繰り返し統計\n`;
+    log += `   平均: ${avgTime.toFixed(3)}ms\n`;
+    log += `   中央値: ${medianTime.toFixed(3)}ms\n`;
+    log += `   最小: ${minTime.toFixed(3)}ms\n`;
+    log += `   最大: ${maxTime.toFixed(3)}ms\n\n`;
+
+    // LocalStorageからの実データテスト
+    const realSessions = JSON.parse(localStorage.getItem('pitchpro_sessions') || '[]');
+    if (realSessions.length > 0) {
+        log += `✅ テスト5: 実データテスト（localStorage）\n`;
+        log += `   保存セッション数: ${realSessions.length}件\n`;
+
+        const testCount = Math.min(10, realSessions.length);
+        const startReal = performance.now();
+        const realResults = realSessions.slice(0, testCount).map(s => {
+            try {
+                return EvaluationCalculator.calculateDynamicGrade([s]);
+            } catch (e) {
+                console.error('評価計算エラー:', e, s);
+                return null;
+            }
+        });
+        const endReal = performance.now();
+        const timeReal = (endReal - startReal).toFixed(3);
+
+        const validResults = realResults.filter(r => r !== null);
+        log += `   テストセッション数: ${testCount}件\n`;
+        log += `   計算時間: ${timeReal}ms\n`;
+        log += `   有効結果: ${validResults.length}件\n`;
+        log += `   平均時間: ${(timeReal / testCount).toFixed(3)}ms/セッション\n`;
+
+        if (validResults.length > 0) {
+            const grades = validResults.map(r => r.grade);
+            log += `   グレード分布: ${grades.join(', ')}\n`;
+        }
+        log += '\n';
+    } else {
+        log += `⚠️  テスト5: 実データなし\n`;
+        log += `   localStorageにセッションデータがありません\n`;
+        log += `   トレーニングを1回実行後、再度テストしてください\n\n`;
+    }
+
+    // 結論
+    log += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+    log += '📌 総合結論:\n';
+    log += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+
+    log += `   🔹 1セッション平均計算時間: ${avgTime.toFixed(2)}ms\n`;
+    log += `   🔹 50セッション表示時間: ${time3}ms\n`;
+    log += `   🔹 ユーザー体験: ${userExperience}\n\n`;
+
+    // 推奨方針
+    log += '💡 推奨実装方針:\n\n';
+
+    if (time3Num < 100) {
+        log += '   ✅ 動的計算で問題なし\n';
+        log += '   ✅ キャッシュ不要（計算コストが十分低い）\n';
+        log += '   ✅ 評価基準変更に柔軟に対応可能\n';
+        log += '   ✅ データ一貫性を保持\n\n';
+        log += '   📝 実装方針:\n';
+        log += '      - SessionDataRecorderは生データのみ保存\n';
+        log += '      - records-controllerで表示時に動的計算\n';
+        log += '      - 評価基準変更時も過去データを正しく再評価\n';
+    } else if (time3Num < 300) {
+        log += '   ⚠️  動的計算は可能だがキャッシュ推奨\n';
+        log += '   ✅ メモリキャッシュで最適化\n';
+        log += '   ✅ 評価基準変更時はキャッシュクリア\n\n';
+        log += '   📝 実装方針:\n';
+        log += '      - 動的計算 + Map()ベースのキャッシュ\n';
+        log += '      - EvaluationCalculator.VERSIONでキャッシュ管理\n';
+    } else {
+        log += '   ⚠️  計算コストが高い\n';
+        log += '   ⚠️  SessionDataRecorderで事前計算推奨\n\n';
+        log += '   📝 実装方針:\n';
+        log += '      - セッション保存時に評価計算・保存\n';
+        log += '      - 評価基準変更時は再計算機能を実装\n';
+    }
+
+    output.textContent = log;
+    console.log(log);
+}, 100);
+</script>
 <!-- Code injected by live-server -->
 <script>
 	// <![CDATA[  <-- For SVG support
@@ -281,5 +374,6 @@
 	}
 	// ]]>
 </script>
+
 
 </body>

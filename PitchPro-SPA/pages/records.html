@@ -101,10 +101,18 @@
 </div>
 
 <!-- Records Page Controller -->
-<script src="pages/js/records-controller.js?v=20251109004"></script>
+<script src="pages/js/records-controller.js?v=20251109005"></script>
 <script>
     // SPA対応：ページ読み込み完了後に初期化
-    if (typeof window.initRecords === 'function') {
-        window.initRecords();
-    }
+    (async function() {
+        // 次のイベントループまで待機してからDOMが完全に準備された状態で初期化
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        if (typeof window.initRecords === 'function') {
+            await window.initRecords();
+            console.log('✅ [Records] 初期化完了');
+        } else {
+            console.error('❌ [Records] initRecords関数が見つかりません');
+        }
+    })();
 </script>

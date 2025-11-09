@@ -32,17 +32,30 @@ window.initRecords = async function() {
     console.log('📊 [Records] トレーニング記録ページ初期化開始');
 
     try {
-    // データ取得と表示
-    loadTrainingRecords();
+        // DOMの準備が完了するまで待機（SPAでのDOM挿入完了を保証）
+        await new Promise(resolve => {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', resolve, { once: true });
+            } else {
+                // すでにDOMContentLoaded済み（SPAページ遷移時）
+                setTimeout(resolve, 0);
+            }
+        });
 
-    // Lucideアイコン初期化
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-        console.log('[Records] Lucide icons initialized');
+        // データ取得と表示
+        loadTrainingRecords();
+
+        // Lucideアイコン初期化（統合初期化関数を使用）
+        if (typeof window.initializeLucideIcons === 'function') {
+            window.initializeLucideIcons({ immediate: true });
+            console.log('[Records] Lucide icons initialized');
+        } else if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+            console.log('[Records] Lucide icons initialized (fallback)');
+        }
+    } catch (error) {
+        console.error('[Records] 初期化エラー:', error);
     }
-} catch (error) {
-    console.error('[Records] 初期化エラー:', error);
-}
 };
 
 /**
