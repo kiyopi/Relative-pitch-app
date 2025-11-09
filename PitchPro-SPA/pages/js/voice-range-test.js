@@ -577,6 +577,10 @@ async function startBasicTest() {
                         console.log(`🎵 検出: ${result.note} (${result.frequency.toFixed(1)} Hz)`);
                     }
                 },
+                // 【重要修正】onVolumeUpdateコールバックを追加（音量バー更新のために必須）
+                onVolumeUpdate: (volume) => {
+                    // 音量バーの自動更新はPitchProが担当
+                },
                 onError: (error) => {
                     console.error('❌ 基本テストエラー:', error);
                 }
@@ -645,9 +649,18 @@ async function startVoiceRangeTest(audioDetectorInstance) { // 引数を追加
             volumeTextSelector: '#range-test-volume-text',
             frequencySelector: '#range-test-frequency-value'
         });
+
+        // 【重要修正】onVolumeUpdateコールバックを追加（音量バー更新のために必須）
         window.globalAudioDetector.setCallbacks({
             onPitchUpdate: (result) => {
                 handleVoiceDetection(result, window.globalAudioDetector);
+            },
+            onVolumeUpdate: (volume) => {
+                // 音量バーの自動更新はPitchProが担当
+                // このコールバックが設定されていることが重要
+            },
+            onError: (context, error) => {
+                console.error('❌ PitchPro音声検出エラー:', context, error);
             }
         });
 

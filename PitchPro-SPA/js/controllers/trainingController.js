@@ -950,14 +950,17 @@ function checkVoiceRangeData() {
         return false;
     }
 
-    // comfortableRangeの存在確認
-    const rangeData = voiceRangeData.results.comfortableRange || voiceRangeData.results;
+    // 全音域データを使用（comfortableRangeは廃止）
+    // 理由: comfortableRangeの計算ロジックが存在せず、全音域で十分
+    const rangeData = voiceRangeData.results;
     if (!rangeData.lowFreq || !rangeData.highFreq) {
         return false;
     }
 
     // オクターブ数が1以上か確認
     const octaves = Math.log2(rangeData.highFreq / rangeData.lowFreq);
+    console.log(`🔍 音域検証: ${octaves.toFixed(2)}オクターブ (${rangeData.lowFreq.toFixed(1)}Hz - ${rangeData.highFreq.toFixed(1)}Hz)`);
+
     if (octaves < 1.0) {
         console.warn(`⚠️ オクターブ数不足: ${octaves.toFixed(2)}オクターブ（1.0以上必要）`);
         return false;
