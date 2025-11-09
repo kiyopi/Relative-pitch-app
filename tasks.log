@@ -7118,3 +7118,63 @@ Phase 1完了後のモジュール化分析と今後の実装方針を整理
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 13:01:59] コミット: feat: デバイス検出モジュール実装完了（Android対応含む）
+
+Phase 1.5完了: iOS/Android/PC統一判定システム実装
+
+## 主な変更内容
+
+### 新規ファイル
+- `/js/core/device-detector.js` - デバイス検出統合モジュール
+  - iOS（iPhone/iPad）、Android、PC判定
+  - iPadOS 13+の"Macintosh"偽装対策
+  - デバイス別最適化設定（音量・感度）
+
+- `DEVICE_DETECTOR_IMPACT_ANALYSIS.md` - Android対応影響範囲分析ドキュメント
+  - 実機テスト必要項目の詳細
+  - 暫定設定値の根拠
+  - 将来的な拡張計画
+
+### 修正ファイル
+- `index.html` - device-detector.js読み込み追加
+- `trainingController.js` - デバイス検出関数をラッパー化（@deprecated）
+  - 約50行削減達成
+  - 後方互換性維持
+
+- `MODULE_ARCHITECTURE.md` - Phase 1.5実装完了を反映
+  - デバイス検出モジュール実装状況更新
+  - 実装済みAPI一覧追加
+
+## 実装済みAPI
+
+```javascript
+window.DeviceDetector = {
+    getDeviceType(),                    // 'iphone' | 'ipad' | 'android' | 'pc'
+    detectIOSDeviceTypeByScreen(),      // iOS専用判定
+    detectAndroidDeviceType(),          // Android専用判定（将来拡張用）
+    getDeviceVolume(),                  // PitchShifter音量（dB）
+    getDeviceSensitivity(),             // PitchPro感度（倍率）
+    getDeviceInfo(),                    // デバッグ情報
+    logDeviceInfo()                     // デバッグ出力
+};
+```
+
+## Android対応
+
+### 暫定設定
+- 音量: +18dB（iPhoneと同等）
+- 感度: 4.5x（iPhoneと同等）
+
+### 次期作業
+- Android実機テスト実施
+- 音量・感度設定の最適化
+
+## 効果
+- ✅ trainingController.js約50行削減
+- ✅ iOS/Android/PC統一判定
+- ✅ 全ページで活用可能な基盤モジュール
+- ✅ テスト容易性の向上
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

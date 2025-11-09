@@ -977,14 +977,14 @@ class DataManager {
   static getStorageUsage() {
     let totalSize = 0;
     const details = {};
-    
+
     Object.values(this.KEYS).forEach(key => {
       const data = localStorage.getItem(key);
       const size = data ? new Blob([data]).size : 0;
       details[key] = size;
       totalSize += size;
     });
-    
+
     return {
       totalSize,
       totalMB: Math.round(totalSize / 1024 / 1024 * 100) / 100,
@@ -992,6 +992,166 @@ class DataManager {
       limit: 5 * 1024 * 1024, // 5MB目安
       usage: Math.round(totalSize / (5 * 1024 * 1024) * 100)
     };
+  }
+
+  // === データエクスポート/インポート機能 ===
+
+  /**
+   * 全データをエクスポート（JSON形式）
+   * @returns {Object} エクスポートデータ
+   */
+  static exportAllData() {
+    const exportData = {
+      version: this.VERSION,
+      exportDate: new Date().toISOString(),
+      appVersion: '1.0.0',
+      data: {}
+    };
+
+    // 全てのlocalStorageデータを収集
+    Object.entries(this.KEYS).forEach(([keyName, storageKey]) => {
+      const data = this.getFromStorage(storageKey);
+      if (data) {
+        exportData.data[keyName] = data;
+      }
+    });
+
+    return exportData;
+  }
+
+  /**
+   * データをJSONファイルとしてダウンロード
+   */
+  static downloadExportData() {
+    try {
+      const exportData = this.exportAllData();
+      const jsonString = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      // ダウンロードリンク生成
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `pitchpro-data-${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      console.log('✅ データエクスポート成功');
+      return true;
+    } catch (error) {
+      console.error('❌ データエクスポート失敗:', error);
+      return false;
+    }
+  }
+
+  /**
+   * JSONファイルからデータをインポート
+   * @param {File} file - インポート対象のJSONファイル
+   * @returns {Promise<Object>} インポート結果
+   */
+  static async importDataFromFile(file) {
+    try {
+      // ファイル読み込み
+      const text = await file.text();
+      const importData = JSON.parse(text);
+
+      // バージョンチェック
+      if (!importData.version) {
+        throw new Error('無効なデータ形式です');
+      }
+
+      // データ復元
+      const result = this.importData(importData);
+      console.log('✅ データインポート成功');
+      return result;
+    } catch (error) {
+      console.error('❌ データインポート失敗:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * データオブジェクトからインポート
+   * @param {Object} importData - インポートデータ
+   * @returns {Object} インポート結果
+   */
+  static importData(importData) {
+    const result = {
+      success: true,
+      imported: [],
+      skipped: [],
+      errors: []
+    };
+
+    if (!importData.data) {
+      throw new Error('データが見つかりません');
+    }
+
+    // 各データをlocalStorageに保存
+    Object.entries(importData.data).forEach(([keyName, data]) => {
+      try {
+        const storageKey = this.KEYS[keyName];
+        if (storageKey) {
+          this.saveToStorage(storageKey, data);
+          result.imported.push(keyName);
+        } else {
+          result.skipped.push(keyName);
+        }
+      } catch (error) {
+        result.errors.push({ key: keyName, error: error.message });
+      }
+    });
+
+    result.success = result.errors.length === 0;
+    return result;
+  }
+
+  /**
+   * トレーニング記録のみ削除
+   */
+  static resetTrainingData() {
+    try {
+      localStorage.removeItem(this.KEYS.SESSION_DATA);
+      localStorage.removeItem(this.KEYS.OVERALL_EVALUATION);
+      localStorage.removeItem(this.KEYS.WEAKNESS_ANALYSIS);
+      console.log('✅ トレーニング記録削除完了');
+      return true;
+    } catch (error) {
+      console.error('❌ トレーニング記録削除失敗:', error);
+      return false;
+    }
+  }
+
+  /**
+   * 音域テスト結果のみ削除
+   */
+  static resetVoiceRangeData() {
+    try {
+      localStorage.removeItem(this.KEYS.VOICE_RANGE);
+      console.log('✅ 音域テスト結果削除完了');
+      return true;
+    } catch (error) {
+      console.error('❌ 音域テスト結果削除失敗:', error);
+      return false;
+    }
+  }
+
+  /**
+   * 全データリセット（完全削除）
+   */
+  static resetAllData() {
+    try {
+      Object.values(this.KEYS).forEach(key => {
+        localStorage.removeItem(key);
+      });
+      console.log('✅ 全データリセット完了');
+      return true;
+    } catch (error) {
+      console.error('❌ 全データリセット失敗:', error);
+      return false;
+    }
   }
 }
 

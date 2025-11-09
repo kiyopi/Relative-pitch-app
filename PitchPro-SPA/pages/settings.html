@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>8va相対音感トレーニング - 設定</title>
+
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/results.css">
+
+    <!-- フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container container-results-overview">
+        <!-- ヘッダーセクション -->
+        <div class="page-header">
+            <div class="page-header-content">
+                <div class="page-header-icon-wrapper">
+                    <div class="page-header-icon gradient-catalog-blue">
+                        <i data-lucide="settings" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;"></i>
+                    </div>
+                </div>
+                <div class="page-header-text">
+                    <h1 class="page-title">設定</h1>
+                    <p class="page-subtitle text-blue-200">データ管理・デバイス情報</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- メインコンテンツエリア -->
+        <main class="wide-main">
+
+            <!-- デバイス情報セクション -->
+            <section class="glass-card">
+                <h4 class="heading-md">
+                    <i data-lucide="smartphone" class="text-blue-300"></i>
+                    <span>デバイス情報</span>
+                </h4>
+
+                <div class="flex flex-col gap-3">
+                    <!-- デバイスタイプ -->
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-white-80">デバイスタイプ</span>
+                        <span class="text-sm text-white" id="device-type">-</span>
+                    </div>
+
+                    <!-- 音量設定 -->
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-white-80">基準音音量</span>
+                        <span class="text-sm text-white" id="device-volume">-</span>
+                    </div>
+
+                    <!-- 感度設定 -->
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-white-80">マイク感度</span>
+                        <span class="text-sm text-white" id="device-sensitivity">-</span>
+                    </div>
+
+                    <!-- 画面サイズ -->
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-white-80">画面サイズ</span>
+                        <span class="text-sm text-white" id="screen-size">-</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- データ管理セクション -->
+            <section class="glass-card">
+                <h4 class="heading-md">
+                    <i data-lucide="database" class="text-green-300"></i>
+                    <span>データ管理</span>
+                </h4>
+
+                <div class="flex flex-col gap-3">
+                    <!-- データエクスポート -->
+                    <div class="flex flex-col gap-2">
+                        <button class="btn-catalog btn-catalog-primary" id="btn-export-data">
+                            <i data-lucide="download" style="width: 20px; height: 20px;"></i>
+                            <span>データをエクスポート</span>
+                        </button>
+                        <p class="text-xs text-white-60">全トレーニング記録をJSONファイルとしてダウンロードします</p>
+                    </div>
+
+                    <!-- データインポート -->
+                    <div class="flex flex-col gap-2">
+                        <button class="btn-catalog btn-catalog-secondary" id="btn-import-data">
+                            <i data-lucide="upload" style="width: 20px; height: 20px;"></i>
+                            <span>データをインポート</span>
+                        </button>
+                        <p class="text-xs text-white-60">エクスポートしたJSONファイルからデータを復元します</p>
+                        <input type="file" id="file-import-data" accept=".json" style="display: none;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- データリセットセクション -->
+            <section class="glass-card">
+                <h4 class="heading-md">
+                    <i data-lucide="alert-triangle" class="text-red-300"></i>
+                    <span>データリセット</span>
+                </h4>
+
+                <div class="flex flex-col gap-3">
+                    <!-- トレーニング記録削除 -->
+                    <div class="flex flex-col gap-2">
+                        <button class="btn-catalog btn-catalog-danger" id="btn-reset-training">
+                            <i data-lucide="trash-2" style="width: 20px; height: 20px;"></i>
+                            <span>トレーニング記録を削除</span>
+                        </button>
+                        <p class="text-xs text-white-60">全てのトレーニング記録を削除します（音域テスト結果は保持）</p>
+                    </div>
+
+                    <!-- 音域テスト結果削除 -->
+                    <div class="flex flex-col gap-2">
+                        <button class="btn-catalog btn-catalog-danger" id="btn-reset-voice-range">
+                            <i data-lucide="trash-2" style="width: 20px; height: 20px;"></i>
+                            <span>音域テスト結果を削除</span>
+                        </button>
+                        <p class="text-xs text-white-60">音域テスト結果を削除します（トレーニング記録は保持）</p>
+                    </div>
+
+                    <!-- 全データリセット -->
+                    <div class="flex flex-col gap-2">
+                        <button class="btn-catalog btn-catalog-danger" id="btn-reset-all">
+                            <i data-lucide="alert-triangle" style="width: 20px; height: 20px;"></i>
+                            <span>全データをリセット</span>
+                        </button>
+                        <p class="text-xs text-white-60">⚠️ 全てのデータを完全に削除します（復元不可）</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- アプリ情報セクション -->
+            <section class="glass-card">
+                <h4 class="heading-md">
+                    <i data-lucide="info" class="text-purple-300"></i>
+                    <span>アプリ情報</span>
+                </h4>
+
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-white-80">バージョン</span>
+                        <span class="text-sm text-white">1.0.0</span>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-white-80">データ形式</span>
+                        <span class="text-sm text-white">JSON v1.0.0</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ホームに戻るボタン -->
+            <div class="flex justify-center" style="margin-top: 2rem;">
+                <button class="btn-catalog btn-catalog-secondary" onclick="location.hash=''">
+                    <i data-lucide="home" style="width: 20px; height: 20px;"></i>
+                    <span>ホームに戻る</span>
+                </button>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@0.263.0/dist/umd/lucide.js"></script>
+
+    <!-- 設定ページコントローラー -->
+    <script src="js/settings-controller.js?v=20251109001"></script>
+</body>
+</html>

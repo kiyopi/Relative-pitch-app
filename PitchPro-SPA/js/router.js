@@ -12,7 +12,8 @@ class SimpleRouter {
             'result-session': 'pages/result-session.html',
             'records': 'pages/records.html',
             'results': 'pages/results-overview.html',
-            'results-overview': 'pages/results-overview.html'
+            'results-overview': 'pages/results-overview.html',
+            'settings': 'pages/settings.html'
         };
 
         this.appRoot = document.getElementById('app-root');
