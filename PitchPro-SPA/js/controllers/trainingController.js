@@ -583,14 +583,16 @@ async function startDoremiGuide() {
         if (!audioDetector) {
             // 初回セッション: 新規作成
             console.log('🎤 AudioDetectionComponent初期化中...');
-            audioDetector = new window.PitchPro.AudioDetectionComponent({
-                volumeBarSelector: '.mic-recognition-section .progress-fill',
-                volumeTextSelector: null,
-                frequencySelector: null,
-                noteSelector: null,
-                autoUpdateUI: true,
-                debug: false
-            });
+
+            // 統一設定モジュールを使用（倍音補正・周波数範囲を統一管理）
+            audioDetector = new window.PitchPro.AudioDetectionComponent(
+                window.PitchProConfig.getDefaultConfig({
+                    volumeBarSelector: '.mic-recognition-section .progress-fill',
+                    volumeTextSelector: null,
+                    frequencySelector: null,
+                    noteSelector: null
+                })
+            );
 
             await audioDetector.initialize();
             console.log('✅ AudioDetectionComponent初期化完了');

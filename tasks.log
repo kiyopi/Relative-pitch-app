@@ -6951,3 +6951,45 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-06 21:03:18] コミット: Merge feature/modular-spa-architecture: ポップオーバーUI改善完了
+[2025-11-06 21:11:45] コミット: docs: CSS編集時の混乱防止策をCLAUDE.mdに追加
+
+- ファイル重複確認の必須化
+- 本番環境（PitchPro-SPA）と開発環境（Bolt/v2）の明確な区別
+- URLパス確認とGitHub Pages配信元の説明
+- 今後の同様の混乱を防止
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-06 21:17:43] コミット: fix: iPadガラス効果重複による白化問題を修正
+
+問題:
+- 詳細分析の各音程表(.note-result-item)がiPadで白く表示される
+- ナビゲーションボタン(.glass-card-sm)も同様に白化
+
+原因:
+- .glass-card内に配置された子要素にもbackdrop-filterが適用
+- iPadではガラス効果が重複すると背景が白くなる
+
+修正:
+- .note-result-item のbackdrop-filter削除（親.glass-cardのみ使用）
+- .glass-card-sm のbackdrop-filter削除（親.glass-cardのみ使用）
+- コメント追加: 重複防止の理由を明記
+
+影響範囲:
+- result-session.html: 詳細分析の音程表
+- results-overview.html: セッション切り替えナビゲーションボタン
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-07 14:26:50] コミット: chore: デバッグ用マイク許可ボタンを削除
+
+- training.htmlからデバッグ用マイク許可ボタンを削除
+- trainingController.jsから関連JavaScriptコードを削除
+- マイク許可は準備ページで取得済みのため不要
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
