@@ -102,6 +102,12 @@ async function loadTrainingRecords() {
         document.getElementById('chart-section').style.display = 'block';
         document.getElementById('action-buttons-section').style.display = 'block';
 
+        // セッションコンテンツを確実に表示
+        const sessionsContent = document.getElementById('sessions-content');
+        if (sessionsContent) {
+            sessionsContent.style.display = 'block';
+        }
+
     } catch (error) {
         console.error('[Records] Error loading records:', error);
         hideAllLoading();
@@ -492,10 +498,10 @@ function showNoDataMessage() {
         chartSection.style.display = 'none';
     }
 
-    // アクションボタンセクションを非表示（データなしメッセージ内にボタンがあるため）
+    // アクションボタンセクションを表示（データなし時も「新しいトレーニングを開始」ボタンを表示）
     const actionButtons = document.getElementById('action-buttons-section');
     if (actionButtons) {
-        actionButtons.style.display = 'none';
+        actionButtons.style.display = 'block';
     }
 }
 

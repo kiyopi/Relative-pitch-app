@@ -1,4 +1,7 @@
-<!-- SPA用テンプレート: records -->
+<!--
+    キャッシュ制御: v20251109016
+    このファイルはキャッシュされません
+-->
 <div class="container container-records">
     <!-- ヘッダーセクション -->
     <div class="page-header">
@@ -109,10 +112,6 @@
             <div class="flex flex-col items-center gap-3 py-8" id="no-data-message" style="display: none;">
                 <i data-lucide="inbox" class="text-white-40" style="width: 48px; height: 48px;"></i>
                 <p class="text-white-60">まだトレーニング記録がありません</p>
-                <button onclick="window.NavigationManager.navigate('home')" class="btn btn-primary">
-                    <i data-lucide="play" style="width: 20px; height: 20px;"></i>
-                    <span>最初のトレーニングを始める</span>
-                </button>
             </div>
         </section>
 
@@ -128,11 +127,21 @@
 </div>
 
 <!-- Records Page Controller -->
-<script src="pages/js/records-controller.js?v=20251109011" onload="initRecordsPage()"></script>
+<script src="pages/js/records-controller.js?v=20251109015" onload="initRecordsPage()"></script>
 <script>
     // SPA対応：ページ読み込み完了後に初期化
     async function initRecordsPage() {
         console.log('📊 [Records] スクリプト読み込み完了、初期化開始');
+
+        // 【緊急修正】キャッシュされたHTMLの古いボタンを強制削除
+        const noDataMessage = document.getElementById('no-data-message');
+        if (noDataMessage) {
+            const oldButton = noDataMessage.querySelector('button');
+            if (oldButton) {
+                console.warn('⚠️ [Records] 古いボタンを検出・削除');
+                oldButton.remove();
+            }
+        }
 
         // DOMが完全に準備されるまで待機
         await new Promise(resolve => setTimeout(resolve, 0));

@@ -1,14 +1,22 @@
 /**
  * Loading Component
  *
- * @version 1.0.0
- * @description 共通ローディング表示コンポーネント
+ * @version 1.1.0
+ * @description 共通ローディング表示・エラー表示コンポーネント
  *
  * 使用方法:
  * const loading = LoadingComponent.create({
  *   id: 'stats-loading',
  *   color: 'blue',
  *   message: '統計情報を読み込み中...'
+ * });
+ *
+ * エラー表示:
+ * const error = LoadingComponent.createError({
+ *   id: 'stats-error',
+ *   message: 'データの読み込みに失敗しました',
+ *   actionText: '再読み込み',
+ *   actionCallback: () => location.reload()
  * });
  *
  * 色オプション: blue, green, purple, orange, yellow, red
@@ -32,6 +40,105 @@ class LoadingComponent {
     <i data-lucide="loader-2" class="${colorClass} animate-spin" style="width: ${size}; height: ${size};"></i>
     <p class="text-white-60">${message}</p>
 </div>`.trim();
+    }
+
+    /**
+     * エラー表示HTML要素を生成
+     * @param {Object} options - オプション
+     * @param {string} options.id - 要素ID
+     * @param {string} options.message - エラーメッセージ
+     * @param {string} options.actionText - アクションボタンテキスト（オプション）
+     * @param {Function} options.actionCallback - アクションボタンコールバック（オプション）
+     * @param {string} options.size - アイコンサイズ（default: '48px'）
+     * @returns {string} HTML文字列
+     */
+    static createError({ id, message = 'エラーが発生しました', actionText = null, actionCallback = null, size = '48px' }) {
+        const actionButton = actionText && actionCallback
+            ? `<button class="btn btn-outline" onclick="LoadingComponent.handleErrorAction('${id}')">${actionText}</button>`
+            : '';
+
+        // コールバックを保存（グローバルマップで管理）
+        if (actionCallback) {
+            if (!window._loadingComponentCallbacks) {
+                window._loadingComponentCallbacks = new Map();
+            }
+            window._loadingComponentCallbacks.set(id, actionCallback);
+        }
+
+        return `
+<div class="flex flex-col items-center gap-3 py-8" id="${id}" style="display: flex;">
+    <i data-lucide="alert-triangle" class="text-red-300" style="width: ${size}; height: ${size};"></i>
+    <p class="text-white-60">${message}</p>
+    ${actionButton}
+</div>`.trim();
+    }
+
+    /**
+     * エラーアクションハンドラー（内部使用）
+     * @param {string} id - エラー要素ID
+     */
+    static handleErrorAction(id) {
+        if (window._loadingComponentCallbacks && window._loadingComponentCallbacks.has(id)) {
+            const callback = window._loadingComponentCallbacks.get(id);
+            callback();
+        }
+    }
+
+    /**
+     * エラー表示に切り替え
+     * @param {string} sectionName - セクション名
+     * @param {string} message - エラーメッセージ
+     * @param {string} actionText - アクションボタンテキスト（オプション）
+     * @param {Function} actionCallback - アクションボタンコールバック（オプション）
+     */
+    static showError(sectionName, message, actionText = null, actionCallback = null) {
+        const loadingId = `${sectionName}-loading`;
+        const contentId = `${sectionName}-content`;
+        const errorId = `${sectionName}-error`;
+
+        // ローディングとコンテンツを非表示
+        const loadingEl = document.getElementById(loadingId);
+        const contentEl = document.getElementById(contentId);
+        if (loadingEl) loadingEl.style.setProperty('display', 'none', 'important');
+        if (contentEl) contentEl.style.display = 'none';
+
+        // エラー表示を作成または更新
+        let errorEl = document.getElementById(errorId);
+        if (!errorEl) {
+            // エラー要素が存在しない場合は作成して挿入
+            const parent = loadingEl ? loadingEl.parentElement : contentEl?.parentElement;
+            if (parent) {
+                const errorHTML = this.createError({
+                    id: errorId,
+                    message,
+                    actionText,
+                    actionCallback
+                });
+                parent.insertAdjacentHTML('beforeend', errorHTML);
+
+                // Lucideアイコン再初期化
+                if (typeof window.initializeLucideIcons === 'function') {
+                    window.initializeLucideIcons({ immediate: true });
+                } else if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }
+        } else {
+            // 既存のエラー要素を表示
+            errorEl.style.setProperty('display', 'flex', 'important');
+        }
+    }
+
+    /**
+     * エラー表示を非表示
+     * @param {string} sectionName - セクション名
+     */
+    static hideError(sectionName) {
+        const errorId = `${sectionName}-error`;
+        const errorEl = document.getElementById(errorId);
+        if (errorEl) {
+            errorEl.style.setProperty('display', 'none', 'important');
+        }
     }
 
     /**

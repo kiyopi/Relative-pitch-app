@@ -374,6 +374,140 @@
                     </div>
                 </section>
 
+                <!-- ローディング・エラー表示 -->
+                <section id="loading-error-states" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">⏳ ローディング・エラー表示</h2>
+                    <p class="text-white-70 mb-6">LoadingComponentを使った状態表示システム</p>
+
+                    <h3 class="text-white font-medium mb-4">📦 LoadingComponent v1.1.0</h3>
+                    <p class="text-white-60 mb-4">ローディング状態とエラー状態を統一的に管理する共通コンポーネント</p>
+
+                    <div class="component-grid grid-cols-1">
+                        <!-- ローディング表示例 -->
+                        <div class="component-item">
+                            <h4 class="text-white font-medium mb-3">🔄 ローディング表示</h4>
+                            <div class="glass-card">
+                                <div class="flex flex-col items-center gap-3 py-8">
+                                    <i data-lucide="loader-2" class="text-blue-300 animate-spin" style="width: 48px; height: 48px;"></i>
+                                    <p class="text-white-60">統計情報を読み込み中...</p>
+                                </div>
+                            </div>
+                            <div class="code-sample">// JavaScript生成
+const loadingHTML = LoadingComponent.create({
+    id: 'stats-loading',
+    color: 'blue',
+    message: '統計情報を読み込み中...',
+    size: '48px'
+});
+
+// セクション切り替え（推奨）
+LoadingComponent.toggle('stats', true);  // ローディング表示
+LoadingComponent.toggle('stats', false); // コンテンツ表示</div>
+                        </div>
+
+                        <!-- エラー表示例 -->
+                        <div class="component-item">
+                            <h4 class="text-white font-medium mb-3">⚠️ エラー表示</h4>
+                            <div class="glass-card">
+                                <div class="flex flex-col items-center gap-3 py-8">
+                                    <i data-lucide="alert-triangle" class="text-red-300" style="width: 48px; height: 48px;"></i>
+                                    <p class="text-white-60">データの読み込みに失敗しました</p>
+                                    <button class="btn btn-outline">再読み込み</button>
+                                </div>
+                            </div>
+                            <div class="code-sample">// エラー表示切り替え
+LoadingComponent.showError('stats',
+    'データの読み込みに失敗しました',
+    '再読み込み',
+    () => location.reload()
+);
+
+// エラーHTML生成
+const errorHTML = LoadingComponent.createError({
+    id: 'stats-error',
+    message: 'データの読み込みに失敗しました',
+    actionText: '再読み込み',
+    actionCallback: () => location.reload()
+});</div>
+                        </div>
+
+                        <!-- 色バリエーション -->
+                        <div class="component-item">
+                            <h4 class="text-white font-medium mb-3">🎨 色バリエーション</h4>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                <div class="glass-card">
+                                    <div class="flex flex-col items-center gap-2 py-4">
+                                        <i data-lucide="loader-2" class="text-blue-300 animate-spin" style="width: 32px; height: 32px;"></i>
+                                        <p class="text-white-60 text-sm">統計情報</p>
+                                        <code class="text-xs text-blue-200">blue</code>
+                                    </div>
+                                </div>
+                                <div class="glass-card">
+                                    <div class="flex flex-col items-center gap-2 py-4">
+                                        <i data-lucide="loader-2" class="text-green-300 animate-spin" style="width: 32px; height: 32px;"></i>
+                                        <p class="text-white-60 text-sm">グラフ</p>
+                                        <code class="text-xs text-green-200">green</code>
+                                    </div>
+                                </div>
+                                <div class="glass-card">
+                                    <div class="flex flex-col items-center gap-2 py-4">
+                                        <i data-lucide="loader-2" class="text-purple-300 animate-spin" style="width: 32px; height: 32px;"></i>
+                                        <p class="text-white-60 text-sm">履歴</p>
+                                        <code class="text-xs text-purple-200">purple</code>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="code-sample">color: 'blue'   // 統計情報用
+color: 'green'  // グラフ・成功系
+color: 'purple' // 履歴・一覧系</div>
+                        </div>
+
+                        <!-- APIリファレンス -->
+                        <div class="component-item">
+                            <h4 class="text-white font-medium mb-3">📖 主要メソッド</h4>
+                            <div class="glass-card">
+                                <div class="text-white-70 text-sm space-y-2">
+                                    <div><code class="text-blue-200">create(options)</code> - ローディングHTML生成</div>
+                                    <div><code class="text-blue-200">createError(options)</code> - エラーHTML生成</div>
+                                    <div><code class="text-blue-200">toggle(section, isLoading)</code> - セクション切り替え</div>
+                                    <div><code class="text-blue-200">showError(section, message, ...)</code> - エラー表示</div>
+                                    <div><code class="text-blue-200">hide(loadingId)</code> - ローディング非表示</div>
+                                    <div><code class="text-blue-200">show(loadingId)</code> - ローディング表示</div>
+                                </div>
+                            </div>
+                            <div class="code-sample">// 詳細ドキュメント
+/PitchPro-SPA/docs/COMPONENTS_GUIDE.md</div>
+                        </div>
+
+                        <!-- 実装パターン例 -->
+                        <div class="component-item">
+                            <h4 class="text-white font-medium mb-3">💡 実装パターン例</h4>
+                            <div class="code-sample">async function loadData() {
+    try {
+        // データ取得処理
+        const data = await fetchData();
+
+        // 成功時: コンテンツ表示
+        displayData(data);
+        LoadingComponent.toggle('stats', false);
+
+    } catch (error) {
+        // エラー時: エラー表示
+        LoadingComponent.showError('stats',
+            'データの読み込みに失敗しました',
+            '再試行',
+            () => loadData()
+        );
+    }
+}</div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
                 <!-- ガラスエフェクト -->
                 <section id="glass-effects" class="catalog-section">
                     <h2 class="text-2xl font-bold text-white mb-4">🔮 ガラスエフェクト</h2>

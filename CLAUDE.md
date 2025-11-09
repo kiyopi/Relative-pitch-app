@@ -80,6 +80,23 @@
 <div class="flex items-center gap-3"><!-- コンテンツ --></div>
 ```
 
+### 🔄 **LoadingComponent実装例**
+
+```javascript
+// ローディング切り替え（推奨）
+LoadingComponent.toggle('stats', false);  // コンテンツ表示
+LoadingComponent.toggle('stats', true);   // ローディング表示
+
+// HTML生成（動的）
+const html = LoadingComponent.create({
+    id: 'stats-loading',
+    color: 'blue',  // blue, green, purple, orange, yellow, red
+    message: '統計情報を読み込み中...'
+});
+
+// 詳細は /PitchPro-SPA/docs/COMPONENTS_GUIDE.md を参照
+```
+
 ### 🎚️ **VolumeBarController実装例**
 
 ```javascript
