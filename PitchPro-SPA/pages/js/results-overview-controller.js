@@ -924,7 +924,7 @@ function displayNextSteps(currentMode, evaluation) {
                 title: 'もっと練習する',
                 description: '毎日5分の継続練習でさらなる上達を目指しましょう',
                 buttonText: '同じモードで再挑戦',
-                action: () => window.location.hash = 'training?mode=random'
+                actionId: 'next-step-random-practice'
             },
             upgrade: {
                 icon: 'arrow-up-circle',
@@ -932,7 +932,7 @@ function displayNextSteps(currentMode, evaluation) {
                 title: '次のレベルに挑戦',
                 description: '連続チャレンジモードで半音を含む12音に挑戦',
                 buttonText: '連続チャレンジを開始',
-                action: () => window.location.hash = 'training?mode=continuous'
+                actionId: 'next-step-random-upgrade'
             },
             records: {
                 icon: 'trending-up',
@@ -940,7 +940,7 @@ function displayNextSteps(currentMode, evaluation) {
                 title: '成長の軌跡を確認',
                 description: 'トレーニング記録であなたの上達を可視化',
                 buttonText: '記録を見る',
-                action: () => window.location.hash = 'records'
+                actionId: 'next-step-random-records'
             }
         },
         'continuous': {
@@ -950,7 +950,7 @@ function displayNextSteps(currentMode, evaluation) {
                 title: 'もっと練習する',
                 description: '週3回・15分の集中練習で実用レベルを完全習得',
                 buttonText: '同じモードで再挑戦',
-                action: () => window.location.hash = 'training?mode=continuous'
+                actionId: 'next-step-continuous-practice'
             },
             upgrade: {
                 icon: 'lock',
@@ -958,7 +958,7 @@ function displayNextSteps(currentMode, evaluation) {
                 title: '12音階モード',
                 description: 'プロレベルの完璧な12音律習得（準備中）',
                 buttonText: '準備中',
-                action: null,
+                actionId: null,
                 disabled: true
             },
             records: {
@@ -967,7 +967,7 @@ function displayNextSteps(currentMode, evaluation) {
                 title: '成長の軌跡を確認',
                 description: 'トレーニング記録であなたの上達を可視化',
                 buttonText: '記録を見る',
-                action: () => window.location.hash = 'records'
+                actionId: 'next-step-continuous-records'
             }
         },
         // 将来の下行モード対応（未実装）
@@ -978,7 +978,7 @@ function displayNextSteps(currentMode, evaluation) {
                 title: 'もっと練習する',
                 description: '下行での音程感覚をさらに磨きましょう',
                 buttonText: '同じモードで再挑戦',
-                action: () => window.location.hash = 'training?mode=random-down'
+                actionId: 'next-step-random-down-practice'
             },
             upgrade: {
                 icon: 'arrow-up-circle',
@@ -986,7 +986,7 @@ function displayNextSteps(currentMode, evaluation) {
                 title: '次のレベルに挑戦',
                 description: '連続チャレンジ（下行）で半音を含む12音に挑戦',
                 buttonText: '連続チャレンジ（下行）',
-                action: () => window.location.hash = 'training?mode=continuous-down'
+                actionId: 'next-step-random-down-upgrade'
             },
             records: {
                 icon: 'trending-up',
@@ -994,7 +994,7 @@ function displayNextSteps(currentMode, evaluation) {
                 title: '成長の軌跡を確認',
                 description: 'トレーニング記録であなたの上達を可視化',
                 buttonText: '記録を見る',
-                action: () => window.location.hash = 'records'
+                actionId: 'next-step-random-down-records'
             }
         },
         'continuous-down': {
@@ -1004,7 +1004,7 @@ function displayNextSteps(currentMode, evaluation) {
                 title: 'もっと練習する',
                 description: '下行での12音律システム習得を完成させましょう',
                 buttonText: '同じモードで再挑戦',
-                action: () => window.location.hash = 'training?mode=continuous-down'
+                actionId: 'next-step-continuous-down-practice'
             },
             upgrade: {
                 icon: 'lock',
@@ -1012,7 +1012,7 @@ function displayNextSteps(currentMode, evaluation) {
                 title: '12音階モード（下行）',
                 description: 'プロレベルの下行完璧習得（準備中）',
                 buttonText: '準備中',
-                action: null,
+                actionId: null,
                 disabled: true
             },
             records: {
@@ -1021,7 +1021,7 @@ function displayNextSteps(currentMode, evaluation) {
                 title: '成長の軌跡を確認',
                 description: 'トレーニング記録であなたの上達を可視化',
                 buttonText: '記録を見る',
-                action: () => window.location.hash = 'records'
+                actionId: 'next-step-continuous-down-records'
             }
         }
     };
@@ -1036,7 +1036,7 @@ function displayNextSteps(currentMode, evaluation) {
         const disabledClass = card.disabled ? 'disabled' : '';
 
         return `
-            <div class="next-step-card ${disabledClass}" ${card.action ? `onclick="(${card.action.toString()})()"` : ''}>
+            <div class="next-step-card ${disabledClass}" ${card.actionId ? `data-action-id="${card.actionId}"` : ''}>
                 <div class="next-step-card-icon" style="background: ${card.iconBg};">
                     <i data-lucide="${card.icon}" class="text-white" style="width: 24px; height: 24px;"></i>
                 </div>
@@ -1049,9 +1049,51 @@ function displayNextSteps(currentMode, evaluation) {
         `;
     }).join('');
 
+    // イベントリスナーを追加
+    container.querySelectorAll('.next-step-card').forEach(card => {
+        const actionId = card.getAttribute('data-action-id');
+        if (actionId) {
+            card.addEventListener('click', () => handleNextStepAction(actionId));
+        }
+    });
+
     // Lucideアイコン再初期化
     if (typeof window.initializeLucideIcons === 'function') {
         window.initializeLucideIcons({ immediate: true });
+    }
+}
+
+/**
+ * 次のステップアクション処理
+ * @param {string} actionId - アクションID
+ */
+function handleNextStepAction(actionId) {
+    console.log('🎯 Next step action:', actionId);
+
+    const actions = {
+        // ランダム基音モード
+        'next-step-random-practice': () => window.location.hash = 'training?mode=random',
+        'next-step-random-upgrade': () => window.location.hash = 'training?mode=continuous',
+        'next-step-random-records': () => window.location.hash = 'records',
+
+        // 連続チャレンジモード
+        'next-step-continuous-practice': () => window.location.hash = 'training?mode=continuous',
+        'next-step-continuous-records': () => window.location.hash = 'records',
+
+        // 下行モード（将来実装）
+        'next-step-random-down-practice': () => window.location.hash = 'training?mode=random-down',
+        'next-step-random-down-upgrade': () => window.location.hash = 'training?mode=continuous-down',
+        'next-step-random-down-records': () => window.location.hash = 'records',
+
+        'next-step-continuous-down-practice': () => window.location.hash = 'training?mode=continuous-down',
+        'next-step-continuous-down-records': () => window.location.hash = 'records'
+    };
+
+    const action = actions[actionId];
+    if (action) {
+        action();
+    } else {
+        console.warn('⚠️ Unknown action ID:', actionId);
     }
 }
 
