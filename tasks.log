@@ -7668,3 +7668,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 21:57:03] コミット: feat: トレーニング記録ページにローディング状態を実装
+
+- セクション別ローディングインジケーター追加（統計・グラフ・履歴）
+- 段階的コンテンツ表示でUX改善
+- loader-2アイコン + animate-spinでローディング表示
+- hideLoading()関数で各セクションの表示制御を実装
+- async/awaitで非同期レンダリング最適化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

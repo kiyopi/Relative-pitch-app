@@ -229,7 +229,7 @@ function calculateStreak(sessions) {
     /**
      * 統計を表示
      */
-function displayStatistics(stats) {
+async function displayStatistics(stats) {
     document.getElementById('streak-count').textContent = stats.streak;
     document.getElementById('total-sessions').textContent = stats.totalSessions;
     document.getElementById('avg-accuracy').textContent = `±${stats.avgAccuracy}`;
@@ -247,6 +247,9 @@ function displayStatistics(stats) {
         statusEl.textContent = `平均誤差: ±${stats.avgAccuracy}¢ (練習を続けよう！)`;
         statusEl.className = 'text-lg text-yellow-300';
     }
+
+    // レンダリング完了まで待機
+    await new Promise(resolve => setTimeout(resolve, 0));
 }
 
     /**
@@ -365,7 +368,7 @@ function viewSessionDetail(session) {
      * 精度推移グラフを表示
      * @version 2.0.0 - 動的評価計算統合
      */
-function displayAccuracyChart(sessions) {
+async function displayAccuracyChart(sessions) {
     const canvas = document.getElementById('accuracyChart');
     if (!canvas) return;
 
@@ -447,6 +450,9 @@ function displayAccuracyChart(sessions) {
             }
         }
     });
+
+    // グラフ描画完了まで待機
+    await new Promise(resolve => setTimeout(resolve, 0));
 }
 
     /**
