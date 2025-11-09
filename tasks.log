@@ -7428,3 +7428,24 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 19:49:55] コミット: fix: records-controller グレード取得ロジック強化
+
+問題:
+- グレードが '-' のまま表示される
+- session.evaluation オブジェクト内にグレードが格納されている可能性
+
+修正内容:
+- 複数のフィールド名からグレードを取得するロジック追加:
+  - session.grade
+  - session.overallGrade
+  - session.evaluationGrade
+  - session.evaluation.grade
+- 平均誤差も同様にsession.evaluation.averageErrorに対応
+- calculateStatistics()とcreateSessionCard()両方で対応
+
+デバッグ推奨:
+- コンソールログ '[Records] First session sample:' でデータ構造確認
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

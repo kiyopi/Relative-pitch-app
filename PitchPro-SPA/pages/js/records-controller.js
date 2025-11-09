@@ -70,6 +70,7 @@ function loadTrainingRecords() {
         document.getElementById('no-data-message').style.display = 'none';
         document.getElementById('recent-sessions').style.display = 'flex';
         document.getElementById('chart-section').style.display = 'block';
+        // アクションボタンは常に表示（データなし時のボタンと重複するため非表示に変更）
         document.getElementById('action-buttons-section').style.display = 'block';
 
     } catch (error) {
