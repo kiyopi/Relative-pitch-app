@@ -7739,3 +7739,20 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 22:26:16] コミット: fix: CSS !important優先度問題によるローディング非表示失敗を修正
+
+根本原因: base.cssの.flex { display: flex !important; }が
+HTMLのstyle="display: none;"を上書きしていた
+
+CSS詳細度の問題:
+- .flex { display: flex !important; } → 最優先
+- style="display: none;" → 上書きされる
+
+修正内容:
+- setProperty('display', 'none', 'important')で!important付与
+- CSSの!importantを確実に上書き
+- ローディング表示が確実に消えるよう修正
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -114,20 +114,8 @@ async function loadTrainingRecords() {
  * @param {string} section - 'stats' | 'chart' | 'sessions'
  */
 function hideLoading(section) {
-    const loadingId = `${section}-loading`;
-    const contentId = `${section}-content`;
-
-    const loadingEl = document.getElementById(loadingId);
-    const contentEl = document.getElementById(contentId);
-
-    // CSSの.flex { display: flex !important }を上書きするため、setPropertyを使用
-    if (loadingEl) {
-        loadingEl.style.setProperty('display', 'none', 'important');
-    }
-
-    if (contentEl) {
-        contentEl.style.display = 'block';
-    }
+    // LoadingComponentを使用して確実にローディングを非表示
+    window.LoadingComponent.toggle(section, false);
 }
 
 /**
