@@ -7449,3 +7449,23 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 19:51:31] コミット: fix: records アクションボタンセクション初期状態を非表示に修正
+
+問題:
+- データあり時に両方のボタンが表示される
+- 「最初のトレーニングを始める」と「新しいトレーニングを開始」が重複
+
+原因:
+- HTMLの初期状態でaction-buttons-sectionが表示状態だった
+
+修正内容:
+- action-buttons-section の初期状態を display: none に変更
+- JavaScriptでデータあり時のみ display: block に切り替え
+
+表示ロジック:
+- データなし時: 「最初のトレーニングを始める」のみ（no-data-message内）
+- データあり時: 「新しいトレーニングを開始」のみ（action-buttons-section）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
