@@ -172,13 +172,21 @@ pitchDetector.setCallbacks({
 
 ## 📄 重要ファイル
 
+### **仕様書・計画書**
 - `APP_SPECIFICATION.md`: アプリケーション仕様書（v1.3.0）
 - `REQUIREMENTS_SPECIFICATION.md`: 要件定義書（v1.0.0）
 - `TECHNICAL_SPECIFICATIONS.md`: 技術仕様書（v1.0.0）
 - `RELEASE_AND_MONETIZATION_PLAN.md`: リリース計画・収益化戦略書（v1.0.0）
 - `GLOSSARY.md`: プロジェクト用語集（v1.0.0）
+
+### **開発ガイドライン**
 - `CLAUDE.md`: 開発ガイドライン（本ファイル）
 - `README.md`: プロジェクト概要・構造ドキュメント
+- `PitchPro-SPA/MODULE_ARCHITECTURE.md`: モジュールアーキテクチャドキュメント（v1.0.0）
+
+### **実装計画**
+- Serenaメモリ: `PERM-implementation-roadmap-5phase-20251109-1500` - 5フェーズ実装ロードマップ
+- Serenaメモリ: `PERM-module-architecture-analysis-20251109-1530` - モジュール化分析レポート
 
 ## 📁 **プロジェクト構造（重要）**
 

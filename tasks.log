@@ -6993,3 +6993,52 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 12:45:15] コミット: fix: PitchPro統一設定モジュール実装でオクターブ誤認識を完全修正
+
+Phase 1-1完了: ドレミの音程判定調整（1000Hz超誤差）
+
+## 🔥 問題の特定と解決
+
+### 発見された問題
+- **オクターブ誤認識**: シ(233Hz) → 120Hz（1オクターブ下）を誤検出
+- **誤差**: -1136.9¢（約11半音 = ほぼ1オクターブ）
+- **根本原因**: AudioDetectionComponentに倍音補正設定が未指定
+
+### 実装した解決策
+
+#### 1. PitchPro統一設定モジュール作成
+- **新規ファイル**: `/js/core/pitchpro-config.js`
+- **目的**: 全ページで同一のPitchPro設定を一元管理
+- **効果**: 保守性向上・設定の重複/不整合を防止
+
+#### 2. 統一設定の内容
+```javascript
+{
+  clarityThreshold: 0.4,        // 明瞭度閾値
+  minVolumeAbsolute: 0.003,     // 最小音量
+  fftSize: 4096,                // 高精度FFT
+  smoothing: 0.1,               // 最小限の平滑化
+  minFrequency: 80,             // 最低周波数
+  maxFrequency: 800,            // 最高周波数
+  enableHarmonicCorrection: true // 🔥 倍音補正有効化
+}
+```
+
+#### 3. 適用箇所
+- ✅ `trainingController.js` - 統一設定モジュール使用に変更
+- ✅ `preparation-pitchpro-cycle.js` - 統一設定モジュール使用に変更
+- ✅ `index.html` - pitchpro-config.js読み込み追加
+
+### 期待される効果
+- ✅ オクターブ誤認識の完全防止
+- ✅ 高音域（200Hz以上）での安定した音程検出
+- ✅ 全ページで統一された検出精度
+
+### 技術的詳細
+- **enableHarmonicCorrection**: 基音ではなく倍音を誤検出する問題を自動補正
+- **minFrequency/maxFrequency**: 人間の声の範囲（80-800Hz）に制限し、倍音誤検出を防止
+- **統一管理**: 設定変更時は1箇所を修正すれば全体に反映
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
