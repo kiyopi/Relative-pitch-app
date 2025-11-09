@@ -48,6 +48,9 @@ function loadTrainingRecords() {
         // DataManagerからセッション履歴を取得
         const sessions = DataManager.getSessionHistory(null, 50); // 全モード、最大50件
         console.log(`[Records] Loaded ${sessions ? sessions.length : 0} sessions`);
+        if (sessions && sessions.length > 0) {
+            console.log('[Records] First session sample:', sessions[0]);
+        }
 
         if (!sessions || sessions.length === 0) {
             showNoDataMessage();
@@ -82,7 +85,7 @@ function calculateStatistics(sessions) {
     const totalSessions = sessions.length;
 
     // 平均誤差を計算（絶対値）
-    const avgErrors = sessions.map(s => Math.abs(s.averageError || 0));
+    const avgErrors = sessions.map(s => Math.abs(s.averageError ?? s.avgError ?? 0));
     const avgAccuracy = avgErrors.length > 0
         ? Math.round(avgErrors.reduce((a, b) => a + b, 0) / avgErrors.length)
         : 0;
@@ -90,10 +93,11 @@ function calculateStatistics(sessions) {
     // 最高グレード
     const gradeOrder = ['S+', 'S', 'A+', 'A', 'B+', 'B', 'C+', 'C', 'D'];
     const bestGrade = sessions.reduce((best, session) => {
-        const currentIdx = gradeOrder.indexOf(session.grade);
+        const grade = session.grade || session.overallGrade;
+        const currentIdx = gradeOrder.indexOf(grade);
         const bestIdx = gradeOrder.indexOf(best);
         return (currentIdx !== -1 && (bestIdx === -1 || currentIdx < bestIdx))
-            ? session.grade
+            ? grade
             : best;
     }, '-');
 
@@ -116,7 +120,7 @@ function calculateStreak(sessions) {
 
     // セッションを日付でグループ化
     const dates = sessions.map(s => {
-        const date = new Date(s.completedAt);
+        const date = new Date(s.startTime || s.completedAt);
         return date.toDateString();
     });
 
@@ -194,7 +198,7 @@ function createSessionCard(session) {
     card.style.cursor = 'pointer';
     card.onclick = () => viewSessionDetail(session);
 
-    const date = new Date(session.completedAt);
+    const date = new Date(session.startTime || session.completedAt || Date.now());
     const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
 
     // グレードに応じた色
@@ -210,6 +214,8 @@ function createSessionCard(session) {
         'D': 'text-red-300'
     };
     const gradeColor = gradeColors[session.grade] || 'text-white';
+    const grade = session.grade || session.overallGrade || '-';
+    const averageError = session.averageError ?? session.avgError ?? 0;
 
     card.innerHTML = `
         <div class="flex items-center justify-between">
@@ -222,11 +228,11 @@ function createSessionCard(session) {
             </div>
             <div class="flex items-center gap-4">
                 <div class="text-center">
-                    <div class="${gradeColor} text-xl font-bold">${session.grade}</div>
+                    <div class="${gradeColor} text-xl font-bold">${grade}</div>
                     <div class="text-white-60 text-xs">グレード</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-white text-lg">±${Math.abs(session.averageError).toFixed(1)}¢</div>
+                    <div class="text-white text-lg">±${Math.abs(averageError).toFixed(1)}¢</div>
                     <div class="text-white-60 text-xs">平均誤差</div>
                 </div>
                 <i data-lucide="chevron-right" class="text-white-40" style="width: 20px; height: 20px;"></i>

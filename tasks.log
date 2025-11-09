@@ -7390,3 +7390,20 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 19:43:03] コミット: fix: records-controller SPA対応修正
+
+問題:
+- DOMContentLoadedイベントがSPA遷移時に発火せず、要素が存在しないエラー発生
+- TypeError: null is not an object エラーが発生
+
+修正内容:
+- DOMContentLoadedイベントリスナーを削除
+- window.initRecords()グローバル関数として定義（SPA対応）
+- IIFE構造を削除してグローバルスコープに変更
+- HTMLでscript読み込み後にinitRecords()を即座に呼び出し
+- バージョン番号を1.1.0に更新
+- コントローラーの責任範囲をドキュメント化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
