@@ -24,13 +24,15 @@
 | ファイル | 役割 | グローバルオブジェクト | 状態 |
 |---------|------|---------------------|------|
 | `js/core/pitchpro-v1.3.1.umd.js` | PitchPro音声検出ライブラリ | `window.PitchPro` | ✅ 安定 |
-| `js/core/pitchpro-config.js` | **PitchPro統一設定** | `window.PitchProConfig` | ✅ **新規作成** |
+| `js/core/pitchpro-config.js` | **PitchPro統一設定** | `window.PitchProConfig` | ✅ **Phase 1-1実装** |
+| `js/core/device-detector.js` | **デバイス検出統合モジュール** | `window.DeviceDetector` | ✅ **Phase 1.5実装** |
 | `js/core/reference-tones.js` | PitchShifter音程生成ライブラリ | `window.PitchShifter` | ✅ 安定 |
 | `js/core/global-audio-manager.js` | グローバル音声管理（未使用） | - | ⚠️ 要調査 |
 | `js/core/mic-permission-manager.js` | マイク許可管理（未使用） | - | ⚠️ 要調査 |
 
 **モジュール化の成功例**:
 - ✅ `pitchpro-config.js` - Phase 1-1で実装完了、オクターブ誤認識を完全修正
+- ✅ `device-detector.js` - Phase 1.5で実装完了、iOS/Android/PC統一判定、約50行削減
 
 ---
 
@@ -84,31 +86,35 @@ UI表示・アイコン管理
 
 ### **🔴 優先度: 高（即座に実装推奨）**
 
-#### **1. デバイス検出モジュール**
-**現状の問題**:
-- `trainingController.js`にデバイス検出ロジックが重複（Line 286-323）
-- iPad/iPhone/PC判定が複数箇所で必要になる可能性
+#### **1. デバイス検出モジュール** ✅ **Phase 1.5実装完了**
 
-**提案**: `/js/core/device-detector.js`
+**実装内容**:
+- ✅ `/js/core/device-detector.js` 作成完了
+- ✅ iOS/Android/PC統一判定
+- ✅ Android暫定対応（+18dB, 4.5x）
+- ✅ trainingController.js約50行削減
 
+**実装済みAPI**:
 ```javascript
 window.DeviceDetector = {
-    getDeviceType() { ... },
-    detectIOSDeviceTypeByScreen() { ... },
-    getDeviceVolume() { ... },
-    getDeviceSensitivity() { ... }
+    getDeviceType(),                    // 'iphone' | 'ipad' | 'android' | 'pc'
+    detectIOSDeviceTypeByScreen(),      // iOS専用判定
+    detectAndroidDeviceType(),          // Android専用判定（将来拡張用）
+    getDeviceVolume(),                  // PitchShifter音量（dB）
+    getDeviceSensitivity(),             // PitchPro感度（倍率）
+    getDeviceInfo(),                    // デバッグ情報
+    logDeviceInfo()                     // デバッグ出力
 };
 ```
 
-**効果**:
-- ✅ デバイス検出ロジックの一元管理
-- ✅ PitchPro・PitchShifter・UIで統一したデバイス判定
-- ✅ テスト容易性の向上
-
 **影響範囲**:
-- `trainingController.js` - デバイス検出関数を削除
-- `preparation-pitchpro-cycle.js` - 統一モジュール使用
-- 将来の新規ページでも活用可能
+- ✅ `index.html` - 読み込み追加完了
+- ✅ `trainingController.js` - ラッパー関数化完了（@deprecated）
+- 📋 詳細分析: `DEVICE_DETECTOR_IMPACT_ANALYSIS.md`
+
+**次期作業**:
+- ⏳ Android実機テスト実施
+- ⏳ 音量・感度設定の最適化
 
 ---
 
@@ -273,10 +279,11 @@ const moduleName = { ... }; // グローバル汚染
 
 ## 📅 今後の実装計画
 
-### **Phase 1.5: デバイス検出モジュール（即座実施推奨）**
-- **工数**: 1-2時間
-- **ファイル**: `/js/core/device-detector.js`
-- **効果**: trainingController.js約50行削減
+### **Phase 1.5: デバイス検出モジュール** ✅ **完了**
+- **工数**: 1-2時間 → 実際: 1.5時間
+- **ファイル**: `/js/core/device-detector.js` ✅ 実装完了
+- **効果**: trainingController.js約50行削減 ✅ 達成
+- **追加成果**: Android対応、影響範囲分析ドキュメント作成
 
 ### **Phase 2.5: 基音選定モジュール（Phase 2後に実施）**
 - **工数**: 3-4時間
@@ -327,7 +334,7 @@ const moduleName = { ... }; // グローバル汚染
 
 ## 🎯 推奨実装順序（まとめ）
 
-1. **Phase 1.5（即座）**: デバイス検出モジュール
+1. ✅ **Phase 1.5（完了）**: デバイス検出モジュール
 2. **Phase 1-2（次）**: 設定ページ実装
 3. **Phase 2**: 総合評価・記録ページ実装
 4. **Phase 2.5**: 基音選定モジュール
@@ -339,5 +346,5 @@ const moduleName = { ... }; // グローバル汚染
 ---
 
 **更新履歴**:
-- 2025-11-09: 初版作成（Phase 1-1完了後）
-- pitchpro-config.jsモジュール化成功を受けて、他のモジュール化候補を整理
+- 2025-11-09 14:00: 初版作成（Phase 1-1完了後）
+- 2025-11-09 15:30: Phase 1.5完了（device-detector.js実装、Android対応）
