@@ -120,8 +120,21 @@ function hideLoading(section) {
     const loadingEl = document.getElementById(loadingId);
     const contentEl = document.getElementById(contentId);
 
-    if (loadingEl) loadingEl.style.display = 'none';
-    if (contentEl) contentEl.style.display = 'block';
+    console.log(`[Records] hideLoading(${section}): loading=${!!loadingEl}, content=${!!contentEl}`);
+
+    if (loadingEl) {
+        loadingEl.style.display = 'none';
+        console.log(`[Records] ✅ ${section}-loading hidden`);
+    } else {
+        console.warn(`[Records] ❌ ${section}-loading not found`);
+    }
+
+    if (contentEl) {
+        contentEl.style.display = 'block';
+        console.log(`[Records] ✅ ${section}-content shown`);
+    } else {
+        console.warn(`[Records] ❌ ${section}-content not found`);
+    }
 }
 
 /**

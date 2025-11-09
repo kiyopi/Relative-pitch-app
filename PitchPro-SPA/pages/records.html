@@ -21,7 +21,7 @@
         <!-- メイン統計セクション -->
         <section class="glass-card">
             <!-- ローディング表示 -->
-            <div class="flex flex-col items-center gap-3 py-8" id="stats-loading">
+            <div class="flex flex-col items-center gap-3 py-8" id="stats-loading" style="display: flex;">
                 <i data-lucide="loader-2" class="text-blue-300 animate-spin" style="width: 48px; height: 48px;"></i>
                 <p class="text-white-60">統計情報を読み込み中...</p>
             </div>
@@ -63,7 +63,7 @@
         <!-- 成長グラフセクション -->
         <section class="glass-card" id="chart-section">
             <!-- ローディング表示 -->
-            <div class="flex flex-col items-center gap-3 py-8" id="chart-loading">
+            <div class="flex flex-col items-center gap-3 py-8" id="chart-loading" style="display: flex;">
                 <i data-lucide="loader-2" class="text-green-300 animate-spin" style="width: 48px; height: 48px;"></i>
                 <p class="text-white-60">グラフを読み込み中...</p>
             </div>
@@ -85,7 +85,7 @@
         <!-- 最近の記録セクション -->
         <section class="glass-card">
             <!-- ローディング表示 -->
-            <div class="flex flex-col items-center gap-3 py-8" id="sessions-loading">
+            <div class="flex flex-col items-center gap-3 py-8" id="sessions-loading" style="display: flex;">
                 <i data-lucide="loader-2" class="text-purple-300 animate-spin" style="width: 48px; height: 48px;"></i>
                 <p class="text-white-60">トレーニング履歴を読み込み中...</p>
             </div>
@@ -128,7 +128,7 @@
 </div>
 
 <!-- Records Page Controller -->
-<script src="pages/js/records-controller.js?v=20251109008"></script>
+<script src="pages/js/records-controller.js?v=20251109009"></script>
 <script>
     // SPA対応：ページ読み込み完了後に初期化
     (async function() {
