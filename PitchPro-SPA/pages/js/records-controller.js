@@ -57,6 +57,12 @@
             displaySessionList(sessions);
             displayAccuracyChart(sessions);
 
+            // データあり時の表示制御
+            document.getElementById('no-data-message').style.display = 'none';
+            document.getElementById('recent-sessions').style.display = 'flex';
+            document.getElementById('chart-section').style.display = 'block';
+            document.getElementById('action-buttons-section').style.display = 'block';
+
         } catch (error) {
             console.error('[Records] Error loading records:', error);
             showNoDataMessage();
@@ -325,11 +331,18 @@
         // データなしメッセージを表示
         document.getElementById('no-data-message').style.display = 'flex';
         document.getElementById('recent-sessions').style.display = 'none';
+        document.getElementById('records-count').textContent = '0件';
 
         // グラフセクションを非表示
-        const chartSection = document.getElementById('accuracyChart').closest('.glass-card');
+        const chartSection = document.getElementById('chart-section');
         if (chartSection) {
             chartSection.style.display = 'none';
+        }
+
+        // アクションボタンセクションを非表示（データなしメッセージ内にボタンがあるため）
+        const actionButtons = document.getElementById('action-buttons-section');
+        if (actionButtons) {
+            actionButtons.style.display = 'none';
         }
     }
 

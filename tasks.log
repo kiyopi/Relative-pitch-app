@@ -7370,3 +7370,12 @@ Phase 2-2完了: トレーニング記録の基本機能実装済み
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 19:35:45] コミット: fix: records-controller データなし状態の改善状況メッセージ修正
+
+- showNoDataMessage()で改善状況メッセージが「データを取得中...」のまま残る問題を修正
+- 改善状況メッセージを「トレーニングを開始しましょう」に更新
+- スタイルクラスも適切に設定（text-blue-300）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
