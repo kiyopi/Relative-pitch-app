@@ -53,6 +53,28 @@ class NavigationManager {
     };
 
     /**
+     * 最後のvisibilitychange発生時刻（ウィンドウ切り替え誤検出防止用）
+     */
+    static lastVisibilityChange = 0;
+
+    /**
+     * visibilitychange監視を初期化
+     */
+    static initVisibilityTracking() {
+        if (!this.visibilityTrackingInitialized) {
+            document.addEventListener('visibilitychange', () => {
+                this.lastVisibilityChange = Date.now();
+                console.log('🔍 [NavigationManager] visibilitychange検出:', document.hidden ? 'hidden' : 'visible');
+                console.log('🔍 [NavigationManager] lastVisibilityChange更新:', this.lastVisibilityChange);
+                console.log('🔍 [NavigationManager] 現在のURL:', window.location.href);
+                console.log('🔍 [NavigationManager] performance.navigation.type:', performance.navigation?.type);
+            });
+            this.visibilityTrackingInitialized = true;
+            console.log('✅ [NavigationManager] visibilitychange監視を初期化');
+        }
+    }
+
+    /**
      * trainingページへの正常な遷移フラグを設定
      *
      * 【重要】この関数を呼び出さずにtrainingへ遷移すると、リロードとして誤検出される
@@ -72,7 +94,18 @@ class NavigationManager {
     static detectReload() {
         console.log('🔍 [NavigationManager] リロード検出開始');
 
-        // 1. リダイレクト済みフラグをチェック（2回目の検出を防止）
+        // 0. visibilitychange監視を初期化（初回のみ）
+        this.initVisibilityTracking();
+
+        // 1. ウィンドウ切り替え誤検出を防止（1秒以内のvisibilitychangeは除外）
+        const timeSinceVisibilityChange = Date.now() - this.lastVisibilityChange;
+        console.log('🔍 [NavigationManager] 最後のvisibilitychangeからの経過時間:', timeSinceVisibilityChange + 'ms');
+        if (timeSinceVisibilityChange < 1000) {
+            console.log('✅ [NavigationManager] ウィンドウ切り替え検出 - リロードではない');
+            return false;
+        }
+
+        // 2. リダイレクト済みフラグをチェック（2回目の検出を防止）
         const alreadyRedirected = sessionStorage.getItem(this.KEYS.REDIRECT_COMPLETED);
         if (alreadyRedirected === 'true') {
             console.log('✅ [NavigationManager] リダイレクト済み - 2回目の検出をスキップ');
@@ -80,7 +113,7 @@ class NavigationManager {
             return false;
         }
 
-        // 2. 正常な遷移フラグをチェック（preparation → training 等）
+        // 3. 正常な遷移フラグをチェック（preparation → training 等）
         const normalTransition = sessionStorage.getItem(this.KEYS.NORMAL_TRANSITION);
         console.log('🔍 [NavigationManager] normalTransition フラグ:', normalTransition);
         if (normalTransition === 'true') {
@@ -89,34 +122,27 @@ class NavigationManager {
             return false;
         }
 
-        // 3. Performance Navigation API で検出（Safari では最も信頼できる）
-        if (performance.navigation) {
-            const navType = performance.navigation.type;
-            console.log('🔍 [NavigationManager] performance.navigation.type:', navType);
-
-            if (navType === 1) {
-                // TYPE_RELOAD
-                console.log('✅ [NavigationManager] リロード検出（古いAPI）: type === 1');
+        // 4. Navigation Timing API v2（モダンAPI優先）
+        const navEntries = performance.getEntriesByType('navigation');
+        console.log('🔍 [NavigationManager] Navigation Timing API v2:', navEntries);
+        if (navEntries.length > 0) {
+            const navType = navEntries[0].type;
+            console.log('🔍 [NavigationManager] navEntries[0].type:', navType);
+            if (navType === 'reload') {
+                console.log('✅ [NavigationManager] リロード検出（Navigation Timing API v2）: type === "reload"');
                 sessionStorage.setItem(this.KEYS.REDIRECT_COMPLETED, 'true');
                 return true;
-            } else if (navType === 0) {
-                // TYPE_NAVIGATE - SPA遷移として扱い、新しいAPIをスキップ
-                // Safari では新しいAPIが誤って "reload" を返すため、古いAPIを優先
-                console.log('✅ [NavigationManager] 正常な遷移（古いAPI）: type === 0 - 新しいAPIをスキップ');
+            } else {
+                console.log('✅ [NavigationManager] 正常な遷移（Navigation Timing API v2）: type === "' + navType + '"');
                 return false;
             }
         }
 
-        // 4. Navigation Timing API v2（古いAPIが存在しない場合のみ）
-        const navEntries = performance.getEntriesByType('navigation');
-        console.log('🔍 [NavigationManager] Navigation Timing API v2（フォールバック）:', navEntries);
-        if (navEntries.length > 0) {
-            console.log('🔍 [NavigationManager] navEntries[0].type:', navEntries[0].type);
-            if (navEntries[0].type === 'reload') {
-                console.log('✅ [NavigationManager] リロード検出（新しいAPI）: type === "reload"');
-                sessionStorage.setItem(this.KEYS.REDIRECT_COMPLETED, 'true');
-                return true;
-            }
+        // 5. フォールバック: 古いAPI（非推奨だが念のため）
+        if (performance.navigation && performance.navigation.type === 1) {
+            console.log('⚠️ [NavigationManager] リロード検出（古いAPI・フォールバック）: type === 1');
+            sessionStorage.setItem(this.KEYS.REDIRECT_COMPLETED, 'true');
+            return true;
         }
 
         console.log('❌ [NavigationManager] リロード未検出 - 通常のSPA遷移として扱う');
@@ -315,8 +341,8 @@ class NavigationManager {
         this.disableNavigationWarning();
         this.removeBrowserBackPrevention();
 
-        // 3. 正常な遷移フラグを設定（training への遷移のみ）
-        if (page === 'training') {
+        // 3. 正常な遷移フラグを設定（training, result-session への遷移）
+        if (page === 'training' || page === 'result-session') {
             this.setNormalTransition();
         }
 
@@ -494,5 +520,8 @@ class NavigationManager {
 
 // グローバルスコープに公開
 window.NavigationManager = NavigationManager;
+
+// 【重要】visibilitychange監視を即座に初期化（PitchProより先に登録）
+NavigationManager.initVisibilityTracking();
 
 console.log('✅ [NavigationManager] ロード完了');
