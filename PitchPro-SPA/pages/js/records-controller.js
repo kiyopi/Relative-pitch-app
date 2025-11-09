@@ -316,7 +316,13 @@
         document.getElementById('total-sessions').textContent = '0';
         document.getElementById('avg-accuracy').textContent = '-';
         document.getElementById('best-grade').textContent = '-';
-        document.getElementById('improvement-status').textContent = 'トレーニングを開始しましょう';
+
+        // 改善状況メッセージを更新
+        const statusEl = document.getElementById('improvement-status');
+        statusEl.textContent = 'トレーニングを開始しましょう';
+        statusEl.className = 'text-lg text-blue-300';
+
+        // データなしメッセージを表示
         document.getElementById('no-data-message').style.display = 'flex';
         document.getElementById('recent-sessions').style.display = 'none';
 
