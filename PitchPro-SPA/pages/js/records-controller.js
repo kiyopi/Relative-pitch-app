@@ -120,20 +120,13 @@ function hideLoading(section) {
     const loadingEl = document.getElementById(loadingId);
     const contentEl = document.getElementById(contentId);
 
-    console.log(`[Records] hideLoading(${section}): loading=${!!loadingEl}, content=${!!contentEl}`);
-
+    // CSSの.flex { display: flex !important }を上書きするため、setPropertyを使用
     if (loadingEl) {
-        loadingEl.style.display = 'none';
-        console.log(`[Records] ✅ ${section}-loading hidden`);
-    } else {
-        console.warn(`[Records] ❌ ${section}-loading not found`);
+        loadingEl.style.setProperty('display', 'none', 'important');
     }
 
     if (contentEl) {
         contentEl.style.display = 'block';
-        console.log(`[Records] ✅ ${section}-content shown`);
-    } else {
-        console.warn(`[Records] ❌ ${section}-content not found`);
     }
 }
 

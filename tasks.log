@@ -7726,3 +7726,16 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 22:16:26] コミット: fix: records-controller.js読み込みタイミング問題を修正
+
+問題: スクリプトが読み込まれる前にinitRecords()が実行される
+原因: 即時実行関数がスクリプト読み込み完了を待たない
+
+修正内容:
+- script onload="initRecordsPage()"で読み込み完了を待機
+- initRecordsPage()関数で確実に初期化実行
+- エラー「initRecords関数が見つかりません」を解消
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
