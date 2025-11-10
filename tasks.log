@@ -8187,3 +8187,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 13:03:55] コミット: feat: 連続チャレンジモード連続重複防止機能追加
+
+- selectContinuousMode()に連続重複防止ロジック実装
+- 2段階優先度候補選択システム（未使用+前回と異なる → 未使用のみ）
+- lastNote追跡機能追加でC3→C3→D3のような連続重複を防止
+- 仕様書v1.1.0更新：モード別基音選定システムセクション追加
+- Phase 2（オクターブ跳躍）は音程間隔分析との整合性を考慮し将来実装として記録
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

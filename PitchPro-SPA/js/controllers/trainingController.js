@@ -1226,9 +1226,36 @@ function selectRandomMode(availableNotes, maxSessions) {
 /**
  * 連続チャレンジモード（中級）: 全音、重複なし、連続重複防止（12セッション）
  * v2.0.0: 連続重複防止機能追加
+ * v3.0.0: オクターブ跳躍機能追加（音域2.5オクターブ以上の場合）
  */
 function selectContinuousMode(availableNotes, maxSessions) {
-    console.log(`📊 連続チャレンジモード: ${availableNotes.length}音から${maxSessions}セッション選定（重複なし・連続重複防止）`);
+    // 音域データからオクターブ数を取得
+    let octaves = 2.0; // デフォルト値
+    let enableOctaveVariation = false;
+
+    if (voiceRangeData && voiceRangeData.results) {
+        const { lowFreq, highFreq } = voiceRangeData.results;
+        octaves = Math.log2(highFreq / lowFreq);
+        enableOctaveVariation = octaves >= 2.5;
+    }
+
+    console.log(`📊 連続チャレンジモード: ${availableNotes.length}音から${maxSessions}セッション選定`);
+    console.log(`   音域: ${octaves.toFixed(2)}オクターブ`);
+    console.log(`   オクターブ跳躍: ${enableOctaveVariation ? '有効' : '無効'} (2.5オクターブ以上で有効化)`);
+
+    if (enableOctaveVariation) {
+        return selectContinuousModeWithOctaveVariation(availableNotes, maxSessions);
+    } else {
+        return selectContinuousModeBasic(availableNotes, maxSessions);
+    }
+}
+
+/**
+ * 連続チャレンジモード: 基本実装（オクターブ跳躍なし）
+ * 音域2.5オクターブ未満の場合に使用
+ */
+function selectContinuousModeBasic(availableNotes, maxSessions) {
+    console.log(`   モード: 基本（連続重複防止のみ）`);
 
     const selectedNotes = [];
     let lastNote = null;
@@ -1258,6 +1285,86 @@ function selectContinuousMode(availableNotes, maxSessions) {
     }
 
     console.log(`✅ 連続チャレンジモード基音選定完了: ${selectedNotes.map(n => n.note).join(' → ')}`);
+    return selectedNotes;
+}
+
+/**
+ * 連続チャレンジモード: オクターブ跳躍実装（音域2.5オクターブ以上）
+ * 異なるオクターブの同じ音名を使用可能（例: C3, E4, G2, A3）
+ * 音程間隔分析への影響を最小化するため、音名の重複は避ける
+ */
+function selectContinuousModeWithOctaveVariation(availableNotes, maxSessions) {
+    console.log(`   モード: オクターブ跳躍（音名重複なし・オクターブ跳躍あり）`);
+
+    const allNotes = window.PitchShifter.AVAILABLE_NOTES;
+    const { lowFreq, highFreq } = voiceRangeData.results;
+
+    // 音域内の全音符（基音+1オクターブが音域内に収まる）
+    const notesInRange = allNotes.filter(note => {
+        const topFreq = note.frequency * 2;
+        return note.frequency >= lowFreq && topFreq <= highFreq;
+    });
+
+    console.log(`   音域内利用可能音: ${notesInRange.length}音`);
+
+    // 音名のみでグループ化（例: C3, C4 → "C"）
+    const noteNameGroups = {};
+    notesInRange.forEach(note => {
+        const noteName = note.note.replace(/\d+$/, ''); // C3 → C
+        if (!noteNameGroups[noteName]) {
+            noteNameGroups[noteName] = [];
+        }
+        noteNameGroups[noteName].push(note);
+    });
+
+    const uniqueNoteNames = Object.keys(noteNameGroups);
+    console.log(`   使用可能音名: ${uniqueNoteNames.length}種類 (${uniqueNoteNames.join(', ')})`);
+
+    const selectedNotes = [];
+    const usedNoteNames = new Set(); // 使用済み音名（C, D, E等）
+    let lastNote = null;
+
+    for (let session = 0; session < maxSessions; session++) {
+        // 優先順位1: 未使用音名 + 前回と異なる音名
+        let candidateNoteNames = uniqueNoteNames.filter(noteName =>
+            !usedNoteNames.has(noteName) &&
+            (!lastNote || noteName !== lastNote.note.replace(/\d+$/, ''))
+        );
+
+        // 優先順位2: 未使用音名のみ（フォールバック）
+        if (candidateNoteNames.length === 0) {
+            candidateNoteNames = uniqueNoteNames.filter(noteName =>
+                !usedNoteNames.has(noteName)
+            );
+        }
+
+        // 優先順位3: 全音名から選択（12セッション超過時）
+        if (candidateNoteNames.length === 0) {
+            candidateNoteNames = uniqueNoteNames.filter(noteName =>
+                !lastNote || noteName !== lastNote.note.replace(/\d+$/, '')
+            );
+        }
+
+        if (candidateNoteNames.length === 0) {
+            console.error(`❌ セッション${session + 1}: 候補なし（重複回避失敗）`);
+            break;
+        }
+
+        // ランダムに音名を選択
+        const selectedNoteName = candidateNoteNames[Math.floor(Math.random() * candidateNoteNames.length)];
+
+        // その音名の中からランダムにオクターブを選択
+        const notesForName = noteNameGroups[selectedNoteName];
+        const selectedNote = notesForName[Math.floor(Math.random() * notesForName.length)];
+
+        selectedNotes.push(selectedNote);
+        usedNoteNames.add(selectedNoteName);
+        lastNote = selectedNote;
+    }
+
+    console.log(`✅ 連続チャレンジモード基音選定完了（オクターブ跳躍）: ${selectedNotes.map(n => n.note).join(' → ')}`);
+    console.log(`   音域跳躍例: ${selectedNotes.slice(0, 4).map(n => `${n.note} (${n.frequency.toFixed(1)}Hz)`).join(' → ')}`);
+
     return selectedNotes;
 }
 
