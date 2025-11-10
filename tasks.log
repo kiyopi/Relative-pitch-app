@@ -8216,3 +8216,23 @@ Phase 2設計判断:
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 13:20:12] コミット: fix: 音域範囲表示にオクターブ番号を追加（F-C# → F2-C#4）
+
+問題:
+- 音域範囲が「F - C#」のように表示され、どのオクターブか不明確
+- ユーザーが正確な音域を把握できない
+
+修正内容:
+- getFullNoteNameFromFrequency()関数を追加
+- 最低音・最高音記録時にオクターブ番号を確実に付与
+- result.noteにオクターブ番号がない場合は周波数から計算
+- 表示例: 「F - C#」→「F2 - C#4」
+
+実装箇所:
+- voice-range-test.js:993: getFullNoteNameFromFrequency()追加
+- voice-range-test.js:816: lowestNote記録時の修正
+- voice-range-test.js:849: highestNote記録時の修正
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

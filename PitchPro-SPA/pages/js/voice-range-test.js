@@ -815,7 +815,7 @@ function recordMeasurementData(result) {
             // result.noteにオクターブ番号が含まれていない場合に備えて、周波数から計算
             data.lowestNote = result.note && /\d/.test(result.note)
                 ? result.note
-                : getFullNoteNameFromFrequency(result.frequency);
+                : (typeof MusicTheory !== 'undefined' ? MusicTheory.frequencyToNote(result.frequency) : result.note);
         }
 
         // 平均音量計算
@@ -848,7 +848,7 @@ function recordMeasurementData(result) {
             // result.noteにオクターブ番号が含まれていない場合に備えて、周波数から計算
             data.highestNote = result.note && /\d/.test(result.note)
                 ? result.note
-                : getFullNoteNameFromFrequency(result.frequency);
+                : (typeof MusicTheory !== 'undefined' ? MusicTheory.frequencyToNote(result.frequency) : result.note);
         }
 
         // 平均音量計算
@@ -992,31 +992,6 @@ function calculateVoiceRange() {
 }
 
 /**
- * 周波数から音名+オクターブ番号を取得（例: 261.63Hz → C4）
- * @param {number} frequency - 周波数（Hz）
- * @returns {string} 音名+オクターブ番号（例: C4, F2, C#5）
- */
-function getFullNoteNameFromFrequency(frequency) {
-    // A4 = 440Hzを基準に、12平均律で音名を計算
-    const A4 = 440;
-    const C0 = A4 * Math.pow(2, -4.75); // C0 = 16.35Hz
-
-    // C0からの半音数を計算
-    const halfStepsFromC0 = Math.round(12 * Math.log2(frequency / C0));
-
-    // オクターブ番号を計算
-    const octave = Math.floor(halfStepsFromC0 / 12);
-
-    // オクターブ内の半音位置（0-11）
-    const noteIndex = halfStepsFromC0 % 12;
-
-    // 音名配列（Cから始まる）
-    const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-
-    return `${noteNames[noteIndex]}${octave}`;
-}
-
-/**
  * 快適音域を計算します（検出音域の80%）
  * @param {number} lowestFreq - 検出された最低周波数
  * @param {number} highestFreq - 検出された最高周波数
@@ -1038,9 +1013,13 @@ function calculateComfortableVoiceRange(lowestFreq, highestFreq) {
     const comfortableLowFreq = centerFreq / Math.pow(2, halfComfortableRange);
     const comfortableHighFreq = centerFreq * Math.pow(2, halfComfortableRange);
     
-    // 周波数を音程名に変換
-    const comfortableLowNote = frequencyToNote(comfortableLowFreq);
-    const comfortableHighNote = frequencyToNote(comfortableHighFreq);
+    // 周波数を音程名に変換（MusicTheory共通ユーティリティ使用）
+    const comfortableLowNote = typeof MusicTheory !== 'undefined'
+        ? MusicTheory.frequencyToNote(comfortableLowFreq)
+        : `${comfortableLowFreq.toFixed(1)}Hz`;
+    const comfortableHighNote = typeof MusicTheory !== 'undefined'
+        ? MusicTheory.frequencyToNote(comfortableHighFreq)
+        : `${comfortableHighFreq.toFixed(1)}Hz`;
     
     return {
         lowFreq: Math.round(comfortableLowFreq * 10) / 10,
@@ -1054,28 +1033,7 @@ function calculateComfortableVoiceRange(lowestFreq, highestFreq) {
     };
 }
 
-/**
- * 周波数を音程名に変換します（簡易版）
- * @param {number} frequency - 周波数 (Hz)
- * @returns {string} 音程名 (例: "C4", "A#3")
- */
-function frequencyToNote(frequency) {
-    const A4 = 440.0;
-    const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    
-    // A4からの半音数を計算
-    const semitonesFromA4 = Math.round(12 * Math.log2(frequency / A4));
-    
-    // オクターブとノートインデックスを計算
-    const octave = 4 + Math.floor((semitonesFromA4 + 9) / 12);
-    const noteIndex = (semitonesFromA4 + 9) % 12;
-    
-    // 負の値の処理
-    const adjustedNoteIndex = noteIndex < 0 ? noteIndex + 12 : noteIndex;
-    const adjustedOctave = noteIndex < 0 ? octave - 1 : octave;
-    
-    return `${noteNames[adjustedNoteIndex]}${adjustedOctave}`;
-}
+// 【削除】frequencyToNote関数は MusicTheory.frequencyToNote() に統一
 
 /**
  * 測定品質を評価し、適切なバッジとメッセージを返します
