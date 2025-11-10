@@ -269,7 +269,7 @@ function preselectBaseNote() {
         console.log('═══════════════════════════════════════════════════');
         console.log(`🎼 [セッション ${sessionIndex + 1}/${selectedBaseNotes.length}] 基音セット完了`);
         console.log(`   現在の基音: ${baseNoteInfo.note} (${baseNoteInfo.frequency.toFixed(1)}Hz)`);
-        console.log(`   選定モード: ${currentMode} (${modeConfig[currentMode]?.name || '不明'})`);
+        console.log(`   選定モード: ${currentMode} (${modeConfig[currentMode]?.title || '不明'})`);
         console.log(`   全基音リスト: ${selectedBaseNotes.map(n => n.note).join(' → ')}`);
         console.log('═══════════════════════════════════════════════════');
         console.log('');
@@ -1011,14 +1011,23 @@ function getAvailableNotes() {
         console.log(`   範囲: ${availableNotes[0].note} (${availableNotes[0].frequency.toFixed(1)}Hz) - ${availableNotes[availableNotes.length - 1].note} (${availableNotes[availableNotes.length - 1].frequency.toFixed(1)}Hz)`);
     }
 
-    // 【連続チャレンジモード・12音階モード】12音に満たない場合は、音域上限側から追加
-    // オクターブ相対音感トレーニングとして12音は必須
-    if (availableNotes.length < 12 && (currentMode === 'continuous' || currentMode === '12tone')) {
-        const neededNotes = 12 - availableNotes.length;
-        const modeName = currentMode === 'continuous' ? '連続チャレンジモード' : '12音階モード';
-        console.warn(`⚠️ [${modeName}] 音域不足: ${availableNotes.length}音 → 12音に拡張（${neededNotes}音追加）`);
+    // 【モード別最小音数チェック】音域不足の場合は自動拡張
+    let requiredNotes = 0;
+    let modeName = '';
+
+    if (currentMode === 'random') {
+        requiredNotes = 8; // ランダム基音モードは8音必須
+        modeName = 'ランダム基音モード';
+    } else if (currentMode === 'continuous' || currentMode === '12tone') {
+        requiredNotes = 12; // 連続チャレンジ・12音階モードは12音必須
+        modeName = currentMode === 'continuous' ? '連続チャレンジモード' : '12音階モード';
+    }
+
+    if (requiredNotes > 0 && availableNotes.length < requiredNotes) {
+        const neededNotes = requiredNotes - availableNotes.length;
+        console.warn(`⚠️ [${modeName}] 音域不足: ${availableNotes.length}音 → ${requiredNotes}音に拡張（${neededNotes}音追加）`);
         console.warn(`   推奨: 2.0オクターブ以上の音域（現在: ${(Math.log2(highFreq / lowFreq)).toFixed(2)}オクターブ）`);
-        console.warn(`   ※ テスト期間中のため、音域不足でも12音確保を優先`);
+        console.warn(`   ※ テスト期間中のため、音域不足でも${requiredNotes}音確保を優先`);
 
         // 音域内の基音のうち、最高音を見つける
         const highestAvailableNote = availableNotes[availableNotes.length - 1];
@@ -1036,9 +1045,9 @@ function getAvailableNotes() {
         const notesToAdd = higherNotes.slice(0, neededNotes);
         availableNotes = [...availableNotes, ...notesToAdd];
 
-        console.log(`✅ 12音確保完了: ${availableNotes.map(n => n.note).join(', ')}`);
+        console.log(`✅ ${requiredNotes}音確保完了: ${availableNotes.map(n => n.note).join(', ')}`);
         console.log(`   ※ 追加された${neededNotes}音は基音+1オクターブが音域上限を若干超えますが、`);
-        console.log(`     オクターブ相対音感トレーニングとして12音使用を優先します`);
+        console.log(`     オクターブ相対音感トレーニングとして${requiredNotes}音使用を優先します`);
     }
 
     console.log(`🎵 最終的な利用可能基音: ${availableNotes.length}音`);

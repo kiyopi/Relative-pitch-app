@@ -318,7 +318,8 @@ class SimpleRouter {
             console.log('Full hash:', fullHash);
 
             // 動的にtrainingControllerをインポート（キャッシュバスター追加）
-            const { initializeTrainingPage } = await import(`./controllers/trainingController.js?v=${Date.now()}`);
+            // 🔥 強制リロード: タイムスタンプ + ランダム値でキャッシュ完全無効化
+            const { initializeTrainingPage } = await import(`./controllers/trainingController.js?v=${Date.now()}&r=${Math.random()}`);
 
             // コントローラーの初期化関数を実行
             await initializeTrainingPage();

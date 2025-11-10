@@ -7805,3 +7805,315 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 23:16:28] コミット: fix: データあり時のno-data-message非表示を確実化
+
+修正内容:
+- no-data-messageをsetProperty()で!important付きで非表示
+- データがある場合に「まだトレーニング記録がありません」が表示される問題を修正
+- records-controller.jsバージョン更新(v20251109016)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-09 23:44:05] コミット: fix: 音域テスト→トレーニング遷移失敗と音量バー動作不良を修正
+
+【問題1: 音域テスト→トレーニング遷移失敗】
+- 症状: 1.11オクターブの音域データがあるのに0.89オクターブと誤判定され、トレーニングに遷移できない
+- 原因: trainingController.jsがcomfortableRangeを優先使用していたが、計算ロジックが存在せず不正確な値になっていた
+- 修正: 全音域データ（voiceRangeData.results）を直接使用するように変更
+- ファイル: PitchPro-SPA/js/controllers/trainingController.js (Line 953-962)
+
+【問題2: 音量バーが低音域で動かない】
+- 症状: 音量バーが全く更新されず、特に低音域で反応しない
+- 原因: voice-range-test.jsでonVolumeUpdateコールバックが設定されていなかった（初期実装からの欠陥）
+- 修正: preparation-pitchpro-cycle.jsと同様の空のonVolumeUpdateコールバックを追加
+  - PitchProは「コールバックが設定されているか」をチェックし、設定されていれば音量バーを自動更新する
+  - 空の実装でも音量バー更新には十分
+- ファイル: PitchPro-SPA/pages/js/voice-range-test.js (Line 580-583, 654-664)
+
+【調査結果】
+- コンポーネント化の影響ではないことを確認
+- preparation-pitchpro-cycle.jsは最初から正しく実装されていた
+- voice-range-test.jsだけが初期実装時からonVolumeUpdateを欠いていた
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 04:17:39] コミット: fix: 意図しないリロード問題を修正（visibilitychange検出 + normalTransition拡張）
+
+主要な変更:
+- NavigationManager: visibilitychange監視を即座に初期化（PitchProより先に登録）
+- NavigationManager: result-sessionへのnormalTransitionフラグ設定を追加
+- PitchPro v1.3.3準備: ノイズゲート閾値を10倍→2.0倍に緩和（音量バー安定化）
+- index.html: キャッシュバスター更新（v=20251110006）
+
+修正内容:
+1. visibilitychange監視の初期化タイミング改善
+   - navigation-manager.js: ページロード時に即座にinitVisibilityTracking()実行
+   - PitchProのMicrophoneLifecycleManagerより先にイベントリスナーを登録
+   - ウィンドウ切り替え時の確実なタイムスタンプ記録を実現
+
+2. result-session遷移時のリロード誤検出を防止
+   - navigation-manager.js: result-sessionをnormalTransition対象に追加
+   - training → result-session遷移が正常な遷移として認識される
+   - Navigation Timing API v2の「reload」誤判定を回避
+
+3. PitchPro v1.3.3準備（音量バー問題修正）
+   - AudioDetectionComponent: ノイズゲート閾値を10倍→2.0倍に緩和
+   - PC環境で23.0% → 4.60%に改善、音量バー安定化
+   - 実機テスト済みの最適値を適用
+
+4. リリース準備ドキュメント
+   - PERM-pitchpro-v133-release-preparation-20251110-0330.md作成
+   - v1.3.3の全変更内容を完全整理（4つの修正）
+
+テスト結果:
+- ✅ training → result-session遷移: リダイレクトなし
+- ✅ ウィンドウ切り替え（複数回）: リロードなし
+- ✅ セッション評価ページ表示: 正常動作
+- ✅ 音量バー動作: 安定化確認
+
+技術的詳細:
+- Safari visibilitychangeイベントの優先順位制御
+- Navigation Timing API v2とnormalTransitionフラグの併用
+- PitchPro MicrophoneLifecycleManagerとの共存戦略
+
+関連ファイル:
+- PitchPro-SPA/js/navigation-manager.js
+- PitchPro-SPA/index.html
+- PitchPro-SPA/js/core/pitchpro-v1.3.2.umd.js
+- .serena/memories/PERM-pitchpro-v133-release-preparation-20251110-0330.md
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 04:28:20] コミット: chore: PitchProバージョンをv1.3.3に更新
+
+- package.json: @pitchpro/audio-processing v1.1.1 → v1.3.3
+- パフォーマンス最適化と音量バー安定化を含むバージョン
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 04:31:14] コミット: chore: PitchProファイル名をv1.3.3に更新
+
+- pitchpro-v1.3.2.umd.js → pitchpro-v1.3.3.umd.js にリネーム
+- index.html: 読み込みファイル名をv1.3.3に更新
+- バージョン管理の明確化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 04:31:37] コミット: chore: PitchProファイル名をv1.3.3に更新
+
+- pitchpro-v1.3.2.umd.js → pitchpro-v1.3.3.umd.js にリネーム
+- index.html: 読み込みファイル名をv1.3.3に更新
+- バージョン管理の明確化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 11:43:43] コミット: docs: v3.2.0 - visibilitychange監視とリロード検出改善を仕様書に追加
+
+## 追加内容
+
+### v3.2.0セクション（2025-11-10実装内容）
+
+**背景と問題**:
+- Safariウィンドウ切り替え時のリロード誤検出問題を文書化
+- 根本原因の分析を記録
+
+**実装した機能**:
+1. visibilitychange監視の即座初期化
+   - PitchProより先にイベントリスナー登録
+   - lastVisibilityChangeタイムスタンプ記録
+   - スクリプト読み込み時の自動初期化
+
+2. detectReload()完全書き換え
+   - 5段階チェック優先順位（ウィンドウ切り替え→リダイレクト済み→normalTransition→Navigation Timing API v2→古いAPI）
+   - 1秒grace periodで誤検出防止
+   - モダンAPI優先使用
+
+3. result-sessionへのnormalTransition拡張
+   - training, result-sessionへの遷移をカバー
+   - Navigation Timing API v2誤判定回避
+
+4. navigate()汎用メソッド追加
+   - リダイレクトループ防止
+   - ブラウザバック防止自動解除
+   - normalTransitionフラグ自動設定
+
+**フロー図**:
+- ウィンドウ切り替えシナリオ
+- リロードシナリオ
+- training → result-session遷移シナリオ
+
+**テスト結果**:
+- ウィンドウ切り替え: 正常動作確認
+- 実際のリロード: 正常検出
+- result-session遷移: 正常動作
+- iPhone/iPad互換性: 問題なし
+
+## バージョン更新
+
+- 3.1.0 → 3.2.0
+- 最終更新日: 2025-10-24 → 2025-11-10
+- アーキテクチャ図にvisibilitychange監視システム追加
+- 改訂履歴に3.2.0エントリー追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 12:11:06] コミット: fix: ランダム基音モードで連続重複とゾーン順序固定の問題を修正
+
+## 問題
+
+ランダム基音モードで以下の問題が発生していた:
+1. 同じ基音が連続して選択される（例: F3→F3→F3）
+2. トレーニング毎に同じゾーン順序（低音→中音→高音）
+3. 8音しかない場合、毎回同じ8音を同じ順序で使用
+
+## 根本原因
+
+- 連続重複チェックがなかった
+- ゾーン順序が固定（常にゾーン0→1→2→3の順）
+- 8セッションで8音を使い切る設計のため、バリエーションがなかった
+
+## 実装した修正
+
+### 1. 連続重複防止ロジック (selectRandomMode)
+- `lastNote`で前回の基音を記録
+- 優先順位1: ゾーン内で未使用 + 前回と異なる音
+- 優先順位2: ゾーン内で未使用
+- 優先順位3: 全体から未使用 + 前回と異なる音
+- 優先順位4: 全体から未使用（フォールバック）
+
+### 2. ゾーン順序のランダム化
+- `shuffleArray()`ヘルパー関数を追加（Fisher-Yates アルゴリズム）
+- ゾーン配列をランダムにシャッフル
+- 毎回異なるゾーン順序で選択（例: [2,0,3,1] or [1,3,0,2]）
+
+### 3. numZones === 1の場合の改善
+- 音域が狭い場合は完全ランダム（連続重複のみ回避）
+- 重複を許可して自然なランダム性を確保
+
+## 効果
+
+**修正前**:
+- セッション1-3: F3→F3→F3（連続重複）
+- トレーニング毎: 同じ8音、同じ順序
+
+**修正後**:
+- セッション1-3: F3→C3→A2（連続重複なし）
+- トレーニング毎: 異なるゾーン順序でバリエーション増加
+
+## テスト
+
+- [ ] 8音（2.07オクターブ）での連続重複確認
+- [ ] ゾーン順序ランダム化の動作確認
+- [ ] 複数回のトレーニングでバリエーション確認
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 12:20:20] コミット: fix: result-sessionページでバックグラウンド長時間後のリロード誤検出を修正
+
+## 問題
+
+Safariでresult-sessionページを長時間バックグラウンドにした後、
+フォアグラウンドに戻るとリロードとして誤検出され、
+preparationページにリダイレクトされる問題が発生していた。
+
+**ログ例**:
+```
+最後のvisibilitychangeからの経過時間: 1762744156967ms (約20日前！)
+navEntries[0].type: "reload" (誤検出)
+⚠️ result-sessionでリロード検出 - preparationへリダイレクト
+```
+
+## 根本原因
+
+1. **Safariのサスペンド動作**:
+   - 長時間バックグラウンドでページがサスペンド
+   - visibilitychangeイベントが発火しない
+   - `lastVisibilityChange`が初期値`0`のまま
+
+2. **Navigation Timing API v2の誤判定**:
+   - バックグラウンド復帰を`type: "reload"`として返す
+   - SPAの表示専用ページには不適切な動作
+
+3. **そもそもresult-sessionでリロード検出は不要**:
+   - 表示専用ページ（マイク不要、音声処理なし）
+   - データはlocalStorageから読み取るのみ
+   - ダイレクトアクセス対応済み（データなし時はダミー表示）
+
+## 実装した修正
+
+### 1. result-session-controller.js - リロード検出を完全削除
+
+**修正前**:
+```javascript
+if (NavigationManager.detectReload()) {
+    console.warn('⚠️ result-sessionでリロード検出 - preparationへリダイレクト');
+    NavigationManager.showReloadDialog();
+    await NavigationManager.redirectToPreparation('result-sessionでリロード検出');
+    return;
+}
+```
+
+**修正後**:
+```javascript
+// 【v2.1.0変更】リロード検出を削除
+// 理由:
+// - 表示専用ページ（マイク不要、音声処理なし）
+// - データはlocalStorageから読み取るのみ
+// - リロードやダイレクトアクセスでも正常に動作
+// - データがない場合はダミーデータ表示で対応済み
+```
+
+### 2. navigation-manager.js - visibilityState確認を追加（予防的改善）
+
+```javascript
+// 1秒以内 OR lastVisibilityChangeが記録されていない（初期値0）場合
+if (timeSinceVisibilityChange < 1000 || this.lastVisibilityChange === 0) {
+    if (this.lastVisibilityChange === 0) {
+        console.log('✅ visibilitychange未記録 - 長時間バックグラウンドまたは初回アクセス');
+    }
+
+    // さらに、ページが実際に表示されている（visible）か確認
+    if (document.visibilityState === 'visible') {
+        console.log('✅ ページ可視状態確認 - バックグラウンドからの復帰');
+        return false;
+    }
+}
+```
+
+## 効果
+
+**修正前**:
+- バックグラウンド長時間 → preparationへリダイレクト（不要な動作）
+- セッション結果が見れない
+
+**修正後**:
+- バックグラウンド長時間 → 正常にresult-session表示
+- リロードでも正常に表示
+- ダイレクトアクセスも正常に表示
+
+## ダイレクトアクセス対応
+
+既に実装済み（Line 43-44）:
+```javascript
+if (sessionData) {
+    updateSessionUI(sessionData, sessionNumber);
+} else {
+    showDummyData(sessionNumber); // データなし時はダミー表示
+}
+```
+
+## バージョン更新
+
+- result-session-controller.js: v2.0.0 → v2.1.0
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
