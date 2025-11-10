@@ -8117,3 +8117,29 @@ if (sessionData) {
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 12:33:24] コミット: feat: ランダム基音モード8音自動拡張とログ表示修正
+
+- ランダム基音モードで8音に満たない場合の自動拡張機能を追加
+- 音域が2オクターブ未満（例: F-E 1.9オクターブ）でも8音確保
+- モード名表示バグ修正（modeConfig[mode].name → .title）
+- 連続重複防止とゾーン順序ランダム化機能追加（v2.0.0）
+- result-session-controllerからリロード検出削除（v2.1.0）
+
+【修正内容】
+1. getAvailableNotes()にランダム基音モード8音自動拡張ロジック追加
+   - requiredNotes = 8（random）, 12（continuous/12tone）
+   - 音域上限側から不足分を自動追加
+   - 基音+1オクターブが若干超えることを許容
+
+2. 基音選定改善（selectRandomMode v2.0.0）
+   - 連続重複防止（lastNoteトラッキング）
+   - ゾーン順序ランダム化（Fisher-Yatesアルゴリズム）
+   - 4段階優先度による候補選択
+
+3. Safari長時間バックグラウンド問題解決
+   - result-session-controller.jsからリロード検出完全削除
+   - 表示専用ページのため不要と判断
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -930,6 +930,11 @@ function calculateVoiceRange() {
                 console.warn(`⚠️ やや狭い音域検出: ${octaves.toFixed(2)}オクターブ`);
                 console.warn(`   低音: ${lowData.lowestFreq.toFixed(1)}Hz (${lowData.lowestNote}) | 高音: ${highData.highestFreq.toFixed(1)}Hz (${highData.highestNote})`);
                 console.warn(`   警告: トレーニングは可能ですが、基音の選択肢が限られます`);
+            } else if (octaves < 2.0) {
+                isNarrowRange = true;
+                console.warn(`⚠️ 音域やや不足検出: ${octaves.toFixed(2)}オクターブ（推奨: 2.0オクターブ以上）`);
+                console.warn(`   低音: ${lowData.lowestFreq.toFixed(1)}Hz (${lowData.lowestNote}) | 高音: ${highData.highestFreq.toFixed(1)}Hz (${highData.highestNote})`);
+                console.warn(`   警告: ランダム基音モードで一部の音が音域外になる可能性があります`);
             }
         }
 
@@ -1264,17 +1269,34 @@ function displayVoiceRangeResults(results) {
                 </div>
             `;
         } else if (results.isNarrowRange) {
-            // 🎵 v3.2.0: やや狭い音域（1.0～1.5オクターブ） - 警告付き許可
-            detailsEl.innerHTML = `
-                <div class="info-alert">
-                    <i data-lucide="info" style="color: #60a5fa; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
-                    <div>
-                        <p class="alert-title">音域がやや狭い (${results.octaves}オクターブ)</p>
-                        <p>トレーニングは可能ですが、選択できる基音の種類が限られます。</p>
-                        <p class="alert-note">快適音域: ${results.comfortableRange ? results.comfortableRange.range : '計算中...'}</p>
+            // 🎵 v3.3.0: 音域不足警告 - 1.0～2.0オクターブ
+            const octaves = parseFloat(results.octaves);
+
+            if (octaves >= 1.5 && octaves < 2.0) {
+                // 🎵 1.5～2.0オクターブ: 8音不足の明確な警告
+                detailsEl.innerHTML = `
+                    <div class="warning-alert">
+                        <i data-lucide="alert-triangle" style="color: #f59e0b; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
+                        <div>
+                            <p class="alert-title">音域不足の警告 (${results.octaves}オクターブ)</p>
+                            <p>ランダム基音モードには2.0オクターブ（8音）が推奨されますが、現在の音域では不足しています。</p>
+                            <p class="alert-note"><strong>注意:</strong> トレーニング中、一部の基音では1オクターブ上の音が測定音域を超える場合があります。無理のない範囲で発声してください。再測定で音域を広げることをおすすめします。</p>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            } else {
+                // 🎵 1.0～1.5オクターブ: 従来の警告
+                detailsEl.innerHTML = `
+                    <div class="info-alert">
+                        <i data-lucide="info" style="color: #60a5fa; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
+                        <div>
+                            <p class="alert-title">音域がやや狭い (${results.octaves}オクターブ)</p>
+                            <p>トレーニングは可能ですが、選択できる基音の種類が限られます。</p>
+                            <p class="alert-note">快適音域: ${results.comfortableRange ? results.comfortableRange.range : '計算中...'}</p>
+                        </div>
+                    </div>
+                `;
+            }
         } else {
             // 🎵 v3.2.0: 通常の結果表示（1.5オクターブ以上）
             detailsEl.innerHTML = `
