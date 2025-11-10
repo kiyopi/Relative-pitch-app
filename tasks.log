@@ -8198,3 +8198,21 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 13:13:58] コミット: feat: 連続チャレンジモードオクターブ跳躍機能実装（Phase 2）
+
+- 音域2.5オクターブ以上で自動有効化
+- selectContinuousMode()を2つのモードに分岐
+  - 基本モード（<2.5oct）: selectContinuousModeBasic()
+  - オクターブ跳躍（≥2.5oct）: selectContinuousModeWithOctaveVariation()
+- 音名重複なし・オクターブランダム選択（例: C3, E4, G2, A3）
+- 音程間隔分析との整合性を保持（音名は12種類のみ使用）
+- 仕様書v2.0.0更新: セクション8.2.2「オクターブ跳躍モード」追加
+
+Phase 2設計判断:
+- C3→E4でも音程間隔は「3度」として分析可能
+- 広い音域を活用し、単調さを解消
+- 音程間隔別精度分析（2度±18¢等）への影響最小化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

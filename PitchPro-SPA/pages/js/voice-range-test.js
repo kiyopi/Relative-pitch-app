@@ -809,10 +809,13 @@ function recordMeasurementData(result) {
             timestamp: timestamp
         });
 
-        // 最低音記録
+        // 最低音記録（オクターブ番号付き音名を確実に使用）
         if (!data.lowestFreq || result.frequency < data.lowestFreq) {
             data.lowestFreq = result.frequency;
-            data.lowestNote = result.note;
+            // result.noteにオクターブ番号が含まれていない場合に備えて、周波数から計算
+            data.lowestNote = result.note && /\d/.test(result.note)
+                ? result.note
+                : getFullNoteNameFromFrequency(result.frequency);
         }
 
         // 平均音量計算
@@ -839,10 +842,13 @@ function recordMeasurementData(result) {
             timestamp: timestamp
         });
 
-        // 最高音記録
+        // 最高音記録（オクターブ番号付き音名を確実に使用）
         if (!data.highestFreq || result.frequency > data.highestFreq) {
             data.highestFreq = result.frequency;
-            data.highestNote = result.note;
+            // result.noteにオクターブ番号が含まれていない場合に備えて、周波数から計算
+            data.highestNote = result.note && /\d/.test(result.note)
+                ? result.note
+                : getFullNoteNameFromFrequency(result.frequency);
         }
 
         // 平均音量計算
@@ -983,6 +989,31 @@ function calculateVoiceRange() {
         isNarrowRange: isNarrowRange,                  // 🎵 v3.2.0: やや狭い音域フラグ (1.0～1.5オクターブ)
         isReversedRange: isReversedRange               // 🎵 v3.1.22: 低音・高音逆転フラグ
     };
+}
+
+/**
+ * 周波数から音名+オクターブ番号を取得（例: 261.63Hz → C4）
+ * @param {number} frequency - 周波数（Hz）
+ * @returns {string} 音名+オクターブ番号（例: C4, F2, C#5）
+ */
+function getFullNoteNameFromFrequency(frequency) {
+    // A4 = 440Hzを基準に、12平均律で音名を計算
+    const A4 = 440;
+    const C0 = A4 * Math.pow(2, -4.75); // C0 = 16.35Hz
+
+    // C0からの半音数を計算
+    const halfStepsFromC0 = Math.round(12 * Math.log2(frequency / C0));
+
+    // オクターブ番号を計算
+    const octave = Math.floor(halfStepsFromC0 / 12);
+
+    // オクターブ内の半音位置（0-11）
+    const noteIndex = halfStepsFromC0 % 12;
+
+    // 音名配列（Cから始まる）
+    const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+    return `${noteNames[noteIndex]}${octave}`;
 }
 
 /**
