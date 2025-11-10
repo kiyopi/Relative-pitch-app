@@ -1,8 +1,8 @@
 # ナビゲーション・リソース管理仕様書
 
-**バージョン**: 3.1.0
+**バージョン**: 3.2.0
 **作成日**: 2025-10-22
-**最終更新**: 2025-10-24
+**最終更新**: 2025-11-10
 **対象**: PitchPro-SPA（8va相対音感トレーニングアプリ）
 
 ---
@@ -781,7 +781,7 @@ saveIncompleteSession() {
 ### 概要
 
 **実装日**: 2025-10-23
-**最終更新**: 2025-10-24（v3.0.0 ブラウザバック防止統合）
+**最終更新**: 2025-11-10（v3.2.0 visibilitychange監視とリロード検出改善）
 **目的**: リロード検出・ナビゲーション制御・ブラウザバック防止の一元管理
 
 従来、リロード検出関連のコードが複数ファイルに散在し、`normalTransitionToTraining`フラグの設定漏れリスクがあった。また、ブラウザバック防止機能がrouter.jsに実装されており、ページ設定もrouter.js内に分散していた。NavigationManagerクラスを導入することで、コードの一元管理・保守性向上・設定漏れ防止を実現。
@@ -794,25 +794,38 @@ saveIncompleteSession() {
 5. **ダブルダミーエントリーパターン**: より確実なブラウザバック防止を実現
 6. **alert()ダイアログ通知**: ユーザーへの明確な通知（OKボタンのみ、ナビゲーション禁止）
 
-**v3.0.0での責任範囲**:
+**v3.2.0での主要変更** (2025-11-10):
+1. **visibilitychange監視システム**: ウィンドウ切り替えとリロードを正確に区別
+2. **即座初期化戦略**: PitchProより先にイベントリスナーを登録
+3. **result-session対応**: normalTransitionフラグを拡張してSPA遷移の誤検出を防止
+4. **Navigation Timing API v2優先**: モダンAPIを優先使用し、古いAPIはフォールバックのみ
+
+**v3.2.0での責任範囲**:
 - **NavigationManagerの責任**:
   - リロード検出とマイク許可再取得
+  - visibilitychange監視とウィンドウ切り替え検出
   - ブラウザバック防止機能（PAGE_CONFIG管理、popstateハンドラー管理）
-  - normalTransition フラグ管理
+  - normalTransition フラグ管理（training, result-session への遷移）
 - **sessionCounter管理は SessionDataRecorder の責任**
 - **localStorage管理も SessionDataRecorder の責任**
 
 ### アーキテクチャ
 
 ```
-NavigationManager (グローバルクラス) v3.0.0
+NavigationManager (グローバルクラス) v3.2.0
 ├── 【リロード検出・遷移管理】
 │   ├── setNormalTransition()       - 正常な遷移フラグを設定
-│   ├── detectReload()              - リロード検出
+│   ├── detectReload()              - リロード検出（v3.2.0で改善）
 │   ├── showReloadDialog()          - ダイアログ表示
 │   ├── redirectToPreparation()     - preparationへリダイレクト
+│   ├── navigate(page)              - 汎用遷移メソッド（v3.2.0で追加）
 │   ├── navigateToTraining()        - trainingへ遷移（★フラグ自動設定）
 │   └── createRedirectError()       - リダイレクトエラー生成
+│
+├── 【ウィンドウ切り替え検出（v3.2.0新規追加）】
+│   ├── lastVisibilityChange        - 最後のvisibilitychange時刻
+│   ├── initVisibilityTracking()    - visibilitychange監視初期化
+│   └── visibilityTrackingInitialized - 初期化済みフラグ
 │
 └── 【ブラウザバック防止（v3.0.0新規追加）】
     ├── PAGE_CONFIG                 - ページごとの防止設定
@@ -828,7 +841,7 @@ NavigationManager (グローバルクラス) v3.0.0
 ### クラス定義
 
 **ファイル**: `/PitchPro-SPA/js/navigation-manager.js`
-**バージョン**: 3.0.0
+**バージョン**: 3.2.0
 
 ```javascript
 /**
@@ -1260,6 +1273,297 @@ NavigationManager.navigateToTraining()
 
 **セッション管理の詳細フローは `SESSION_MANAGEMENT_SPECIFICATION.md` を参照**
 
+---
+
+### v3.2.0 - visibilitychange監視とリロード検出改善（2025-11-10）
+
+**実装日**: 2025-11-10
+**目的**: ウィンドウ切り替え時の誤検出防止とリロード検出精度の向上
+
+#### 背景と問題
+
+**発見された問題**:
+Safariでウィンドウを切り替えた際、リロードとして誤検出され、意図せずpreparationページにリダイレクトされる問題が発生。
+
+**根本原因**:
+1. 古いAPI（`performance.navigation.type`）がvisibilitychangeイベントでもtype=1（リロード）を返す
+2. visibilitychangeイベントリスナーが初期化されておらず、ウィンドウ切り替えを検出できない
+3. PitchProのMicrophoneLifecycleManagerもvisibilitychangeを使用しており、登録順序が重要
+
+#### 実装した機能
+
+##### 1. visibilitychange監視の即座初期化
+
+**実装箇所**: `navigation-manager.js` Lines 55-75
+
+```javascript
+/**
+ * 最後のvisibilitychange発生時刻（ウィンドウ切り替え誤検出防止用）
+ */
+static lastVisibilityChange = 0;
+
+/**
+ * visibilitychange監視を初期化
+ */
+static initVisibilityTracking() {
+    if (!this.visibilityTrackingInitialized) {
+        document.addEventListener('visibilitychange', () => {
+            this.lastVisibilityChange = Date.now();
+            console.log('🔍 [NavigationManager] visibilitychange検出:', document.hidden ? 'hidden' : 'visible');
+            console.log('🔍 [NavigationManager] lastVisibilityChange更新:', this.lastVisibilityChange);
+        });
+        this.visibilityTrackingInitialized = true;
+        console.log('✅ [NavigationManager] visibilitychange監視を初期化');
+    }
+}
+```
+
+**スクリプト読み込み時に即座実行** (Line 525):
+```javascript
+// グローバルスコープに公開
+window.NavigationManager = NavigationManager;
+
+// 【重要】visibilitychange監視を即座に初期化（PitchProより先に登録）
+NavigationManager.initVisibilityTracking();
+
+console.log('✅ [NavigationManager] ロード完了');
+```
+
+**効果**:
+- PitchProのMicrophoneLifecycleManagerより先にイベントリスナーを登録
+- ウィンドウ切り替え時のタイムスタンプを確実に記録
+- 初回アクセス時からウィンドウ切り替えを検出可能
+
+##### 2. detectReload()の完全書き換え
+
+**実装箇所**: `navigation-manager.js` Lines 91-147
+
+```javascript
+static detectReload() {
+    console.log('🔍 [NavigationManager] リロード検出開始');
+
+    // 0. visibilitychange監視を初期化（初回のみ）
+    this.initVisibilityTracking();
+
+    // 1. ウィンドウ切り替え誤検出を防止（1秒以内のvisibilitychangeは除外）
+    const timeSinceVisibilityChange = Date.now() - this.lastVisibilityChange;
+    console.log('🔍 [NavigationManager] 最後のvisibilitychangeからの経過時間:', timeSinceVisibilityChange + 'ms');
+    if (timeSinceVisibilityChange < 1000) {
+        console.log('✅ [NavigationManager] ウィンドウ切り替え検出 - リロードではない');
+        return false;
+    }
+
+    // 2. リダイレクト済みフラグをチェック
+    const alreadyRedirected = sessionStorage.getItem(this.KEYS.REDIRECT_COMPLETED);
+    if (alreadyRedirected === 'true') {
+        console.log('✅ [NavigationManager] リダイレクト済み - 2回目の検出をスキップ');
+        sessionStorage.removeItem(this.KEYS.REDIRECT_COMPLETED);
+        return false;
+    }
+
+    // 3. 正常な遷移フラグをチェック
+    const normalTransition = sessionStorage.getItem(this.KEYS.NORMAL_TRANSITION);
+    console.log('🔍 [NavigationManager] normalTransition フラグ:', normalTransition);
+    if (normalTransition === 'true') {
+        sessionStorage.removeItem(this.KEYS.NORMAL_TRANSITION);
+        console.log('✅ [NavigationManager] 正常な遷移を検出');
+        return false;
+    }
+
+    // 4. Navigation Timing API v2（モダンAPI優先）
+    const navEntries = performance.getEntriesByType('navigation');
+    console.log('🔍 [NavigationManager] Navigation Timing API v2:', navEntries);
+    if (navEntries.length > 0) {
+        const navType = navEntries[0].type;
+        console.log('🔍 [NavigationManager] navEntries[0].type:', navType);
+        if (navType === 'reload') {
+            console.log('✅ [NavigationManager] リロード検出（Navigation Timing API v2）: type === "reload"');
+            sessionStorage.setItem(this.KEYS.REDIRECT_COMPLETED, 'true');
+            return true;
+        } else {
+            console.log('✅ [NavigationManager] 正常な遷移（Navigation Timing API v2）: type === "' + navType + '"');
+            return false;
+        }
+    }
+
+    // 5. フォールバック: 古いAPI（非推奨だが念のため）
+    if (performance.navigation && performance.navigation.type === 1) {
+        console.log('⚠️ [NavigationManager] リロード検出（古いAPI・フォールバック）: type === 1');
+        sessionStorage.setItem(this.KEYS.REDIRECT_COMPLETED, 'true');
+        return true;
+    }
+
+    console.log('❌ [NavigationManager] リロード未検出 - 通常のSPA遷移として扱う');
+    return false;
+}
+```
+
+**チェック順序**:
+1. **ウィンドウ切り替え確認** (最優先): 1秒以内のvisibilitychangeは除外
+2. **リダイレクト済みフラグ**: 2回目の検出を防止
+3. **正常な遷移フラグ**: SPA内の通常遷移を識別
+4. **Navigation Timing API v2**: モダンAPIを優先使用
+5. **古いAPI**: フォールバックのみ
+
+##### 3. result-sessionへのnormalTransition拡張
+
+**実装箇所**: `navigation-manager.js` Lines 344-347
+
+```javascript
+// 3. 正常な遷移フラグを設定（training, result-session への遷移）
+if (page === 'training' || page === 'result-session') {
+    this.setNormalTransition();
+}
+```
+
+**問題**:
+- training → result-session の遷移時、Navigation Timing API v2が `type: "reload"` を返す
+- SPAのハッシュ遷移が誤ってリロードとして検出される
+
+**効果**:
+- result-sessionへの遷移も正常な遷移として識別
+- Navigation Timing API v2の誤判定を回避
+- 即座のリダイレクトを防止
+
+##### 4. navigate()汎用メソッドの追加
+
+**実装箇所**: `navigation-manager.js` Lines 308-347
+
+```javascript
+/**
+ * 汎用ナビゲーションメソッド（normalTransition自動設定）
+ * @param {string} page - 遷移先ページ名
+ * @param {Object|null} params - URLパラメータ（オプション）
+ */
+static navigate(page, params = null) {
+    console.log(`🚀 [NavigationManager] ${page}へ遷移`);
+
+    // 1. 事前チェック: リダイレクトループ防止
+    if (page === 'preparation' && window.location.hash.includes('preparation')) {
+        console.warn('⚠️ [NavigationManager] 既にpreparationページにいます - リダイレクトをスキップ');
+        return;
+    }
+
+    // 2. ブラウザバック防止を解除（遷移元ページ）
+    this.removeBrowserBackPrevention();
+
+    // 3. 正常な遷移フラグを設定（training, result-session への遷移）
+    if (page === 'training' || page === 'result-session') {
+        this.setNormalTransition();
+    }
+
+    // 4. 遷移実行
+    if (params) {
+        const urlParams = new URLSearchParams(params);
+        window.location.hash = `${page}?${urlParams.toString()}`;
+        console.log(`✅ [NavigationManager] ${page}へ遷移完了（パラメータ付き）`);
+    } else {
+        window.location.hash = page;
+        console.log(`✅ [NavigationManager] ${page}へ遷移完了`);
+    }
+}
+```
+
+**機能**:
+- リダイレクトループ防止チェック
+- ブラウザバック防止の自動解除
+- normalTransitionフラグの自動設定
+- パラメータ付き遷移のサポート
+
+#### フロー図
+
+##### ウィンドウ切り替えシナリオ
+
+```
+【Safariでウィンドウを切り替える】
+training ページ表示中
+  ↓
+別のウィンドウに切り替え
+  ↓
+document.visibilitychange イベント発火（hidden）
+  ↓
+NavigationManager.lastVisibilityChange = Date.now() 記録
+  ↓
+training ページに戻る
+  ↓
+document.visibilitychange イベント発火（visible）
+  ↓
+NavigationManager.lastVisibilityChange = Date.now() 更新
+  ↓
+【もしリロード検出が実行された場合】
+NavigationManager.detectReload()
+  ├─ timeSinceVisibilityChange = Date.now() - lastVisibilityChange
+  ├─ timeSinceVisibilityChange < 1000ms → true
+  └─ return false（リロードではない）
+  ↓
+正常に training ページ継続
+```
+
+##### リロードシナリオ
+
+```
+【training ページでF5リロード】
+training ページ表示中
+  ↓
+F5キー押下
+  ↓
+ページ完全リロード（visibilitychange発火なし）
+  ↓
+NavigationManager.detectReload()
+  ├─ timeSinceVisibilityChange > 1000ms（または初期値0）
+  ├─ normalTransition フラグ: null
+  ├─ Navigation Timing API v2: type === "reload"
+  └─ return true（リロード検出）
+  ↓
+preparationページへリダイレクト
+```
+
+##### training → result-session 遷移シナリオ
+
+```
+【トレーニング完了後の遷移】
+training ページ（セッション完了）
+  ↓
+result-session-controller.js
+  ↓
+NavigationManager.navigate('result-session')
+  ├─ removeBrowserBackPrevention() 実行
+  ├─ setNormalTransition() 実行（★重要）
+  └─ window.location.hash = 'result-session'
+  ↓
+result-session ページ読み込み
+  ↓
+【もし detectReload() が実行された場合】
+NavigationManager.detectReload()
+  ├─ normalTransition フラグ: 'true'（★設定済み）
+  ├─ フラグ削除
+  └─ return false（正常な遷移）
+  ↓
+正常に result-session ページ表示
+```
+
+#### テスト結果
+
+**テストシナリオ1: ウィンドウ切り替え**
+- ✅ training ページ表示中にウィンドウ切り替え
+- ✅ リロード誤検出なし
+- ✅ 正常に training ページ継続
+
+**テストシナリオ2: 実際のリロード**
+- ✅ F5キーでリロード実行
+- ✅ リロード正常検出
+- ✅ preparation ページへリダイレクト
+
+**テストシナリオ3: training → result-session 遷移**
+- ✅ normalTransition フラグ設定
+- ✅ Navigation Timing API v2の誤判定を回避
+- ✅ 正常に result-session ページ表示
+
+**テストシナリオ4: iPhone/iPad互換性**
+- ✅ iPhone Safari: 正常動作確認
+- ✅ iPad Safari: 正常動作確認
+- ✅ デバイス固有の問題なし
+
 #### v3.0.0での重要な実装ポイント
 
 1. **責任範囲の明確化**
@@ -1276,6 +1580,31 @@ NavigationManager.navigateToTraining()
    - 遷移前に必ず removeBrowserBackPrevention() を呼び出す
    - popstateハンドラーの適切なクリーンアップでメモリリーク防止
    - router.jsの cleanupCurrentPage() で自動解除
+
+#### v3.2.0での重要な実装ポイント
+
+1. **visibilitychange監視システム**
+   - スクリプト読み込み時に即座初期化
+   - PitchProより先にイベントリスナー登録
+   - ウィンドウ切り替えのタイムスタンプを記録
+
+2. **リロード検出の優先順位**
+   - ウィンドウ切り替え確認（最優先）
+   - リダイレクト済みフラグ
+   - 正常な遷移フラグ
+   - Navigation Timing API v2（モダンAPI優先）
+   - 古いAPI（フォールバックのみ）
+
+3. **result-session対応**
+   - normalTransitionフラグをtraining, result-sessionに拡張
+   - Navigation Timing API v2の誤判定を回避
+   - SPA遷移の正確な識別
+
+4. **汎用navigate()メソッド**
+   - リダイレクトループ防止
+   - ブラウザバック防止の自動解除
+   - normalTransitionフラグの自動設定
+   - パラメータ付き遷移のサポート
 
 ### 今後の拡張可能性
 
@@ -1409,6 +1738,13 @@ NavigationManager.navigateToTraining()
 
 | バージョン | 日付 | 変更内容 | 担当者 |
 |-----------|------|---------|--------|
+| 3.2.0 | 2025-11-10 | visibilitychange監視とリロード検出改善 | Claude |
+|  |  | - ✅ visibilitychange監視システム実装（即座初期化） |  |
+|  |  | - ✅ detectReload()完全書き換え（優先順位最適化） |  |
+|  |  | - ✅ result-sessionへのnormalTransition拡張 |  |
+|  |  | - ✅ navigate()汎用メソッド追加 |  |
+|  |  | - ✅ ウィンドウ切り替え誤検出防止（1秒grace period） |  |
+|  |  | - ✅ Navigation Timing API v2優先使用 |  |
 | 3.1.0 | 2025-10-24 | SessionDataRecorder同期修正 | Claude |
 |  |  | - ✅ preparation-pitchpro-cycle.jsで`resetSession()`呼び出し追加 |  |
 |  |  | - ✅ router.jsで`resetSession()`呼び出し追加 |  |
