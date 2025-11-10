@@ -561,7 +561,8 @@ async function startDoremiGuide() {
                     volumeBarSelector: '.mic-recognition-section .progress-fill',
                     volumeTextSelector: null,
                     frequencySelector: null,
-                    noteSelector: null
+                    noteSelector: null,
+                    smoothing: 0.1  // 🔥 DeviceDetectionの0.25を上書き（CPU負荷軽減）
                 })
             );
 
@@ -582,6 +583,13 @@ async function startDoremiGuide() {
                     console.error(`❌ AudioDetection Error [${context}]:`, error);
                 }
             });
+
+            // 🔥 v1.3.2対応: UIキャッシュを明示的に再構築
+            console.log('🔄 UIキャッシュを再構築中...');
+            await audioDetector.updateSelectors({
+                volumeBarSelector: '.mic-recognition-section .progress-fill'
+            });
+            console.log('✅ UIキャッシュ再構築完了');
         } else {
             // 2回目以降: 既存のAudioDetectorを再開
             console.log('🎤 既存のAudioDetectorを再開');
@@ -646,14 +654,14 @@ function handlePitchUpdate(result) {
     // 音量バーは autoUpdateUI: true により自動更新される
 
     // 音程検出のログ（デバッグ用）
-    if (result.frequency && result.clarity > 0.3) {
+    if (result.frequency && result.clarity > 0.25) {
         // 1秒に1回だけログ出力
         if (!lastPitchLog || Date.now() - lastPitchLog > 1000) {
             console.log(`🎵 音程検出: ${result.frequency.toFixed(1)}Hz (${result.note || ''}), 明瞭度: ${result.clarity.toFixed(2)}, 音量: ${(result.volume * 100).toFixed(1)}%`);
             lastPitchLog = Date.now();
         }
 
-        // 音程データをバッファに追加（明瞭度が十分な場合のみ）
+        // 音程データをバッファに追加（明瞭度0.25以上で収集 - 精度とデータ量のバランス最適化）
         if (currentIntervalIndex < intervals.length) {
             pitchDataBuffer.push({
                 step: currentIntervalIndex,
@@ -1103,7 +1111,20 @@ function selectAllBaseNotesForMode(config) {
 }
 
 /**
- * ランダム基音モード（初級）: 白鍵のみ、ゾーン分割、重複なし
+ * 配列をシャッフルするヘルパー関数（Fisher-Yates アルゴリズム）
+ */
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+/**
+ * ランダム基音モード（初級）: 白鍵のみ、連続重複なし
+ * v2.0.0: 連続重複防止 + ゾーン順序ランダム化
  */
 function selectRandomMode(availableNotes, maxSessions) {
     const whiteKeys = availableNotes.filter(note => !note.note.includes('#'));
@@ -1114,37 +1135,78 @@ function selectRandomMode(availableNotes, maxSessions) {
     const selectedNotes = [];
 
     if (numZones === 1) {
-        // 音域狭い: 完全ランダム（重複なし）
-        const shuffled = [...whiteKeys].sort(() => Math.random() - 0.5);
-        for (let i = 0; i < maxSessions && i < shuffled.length; i++) {
-            selectedNotes.push(shuffled[i]);
+        // 音域狭い: 完全ランダム（連続重複のみ回避）
+        console.log(`📍 ゾーン分割なし（${octaves.toFixed(2)}オクターブ）- 連続重複回避モード`);
+        let lastNote = null;
+        for (let i = 0; i < maxSessions; i++) {
+            // 前回と異なる音を候補にする
+            let candidates = whiteKeys.filter(note =>
+                !lastNote || note.note !== lastNote.note
+            );
+
+            // 候補がない場合は全体から選択（通常はありえない）
+            if (candidates.length === 0) {
+                candidates = whiteKeys;
+            }
+
+            const newNote = candidates[Math.floor(Math.random() * candidates.length)];
+            selectedNotes.push(newNote);
+            lastNote = newNote;
         }
     } else {
-        // ゾーン分割選択（重複なし）
+        // ゾーン分割選択（重複なし + ゾーン順序ランダム化 + 連続重複回避）
         const sessionsPerZone = Math.ceil(maxSessions / numZones);
         const notesPerZone = Math.ceil(whiteKeys.length / numZones);
 
-        for (let session = 0; session < maxSessions; session++) {
-            const currentZone = Math.floor(session / sessionsPerZone);
-            const zoneStart = currentZone * notesPerZone;
-            const zoneEnd = Math.min((currentZone + 1) * notesPerZone, whiteKeys.length);
-            const zoneNotes = whiteKeys.slice(zoneStart, zoneEnd);
+        // ゾーンリストを作成
+        const zones = [];
+        for (let z = 0; z < numZones; z++) {
+            const zoneStart = z * notesPerZone;
+            const zoneEnd = Math.min((z + 1) * notesPerZone, whiteKeys.length);
+            zones.push(whiteKeys.slice(zoneStart, zoneEnd));
+        }
 
-            // ゾーン内で未使用の音を選択
-            const unusedInZone = zoneNotes.filter(note =>
-                !selectedNotes.some(selected => selected.note === note.note)
+        // ゾーン順序をランダム化
+        const zoneOrder = shuffleArray([...Array(numZones).keys()]);
+        console.log(`🎲 ゾーン順序をランダム化: ${zoneOrder.join(' → ')} (${numZones}ゾーン)`);
+
+        let lastNote = null;
+        for (let session = 0; session < maxSessions; session++) {
+            const zoneIndex = zoneOrder[Math.floor(session / sessionsPerZone) % numZones];
+            const zoneNotes = zones[zoneIndex];
+
+            // 優先順位1: ゾーン内で未使用 + 前回と異なる音
+            let candidates = zoneNotes.filter(note =>
+                !selectedNotes.some(selected => selected.note === note.note) &&
+                (!lastNote || note.note !== lastNote.note)
             );
 
-            if (unusedInZone.length > 0) {
-                selectedNotes.push(unusedInZone[Math.floor(Math.random() * unusedInZone.length)]);
-            } else {
-                // ゾーン内に未使用がない場合は全体から選択
-                const unusedAll = whiteKeys.filter(note =>
+            // 優先順位2: ゾーン内で未使用（前回と同じでも許容）
+            if (candidates.length === 0) {
+                candidates = zoneNotes.filter(note =>
                     !selectedNotes.some(selected => selected.note === note.note)
                 );
-                if (unusedAll.length > 0) {
-                    selectedNotes.push(unusedAll[Math.floor(Math.random() * unusedAll.length)]);
-                }
+            }
+
+            // 優先順位3: 全体から未使用 + 前回と異なる音
+            if (candidates.length === 0) {
+                candidates = whiteKeys.filter(note =>
+                    !selectedNotes.some(selected => selected.note === note.note) &&
+                    (!lastNote || note.note !== lastNote.note)
+                );
+            }
+
+            // 優先順位4: 全体から未使用（フォールバック）
+            if (candidates.length === 0) {
+                candidates = whiteKeys.filter(note =>
+                    !selectedNotes.some(selected => selected.note === note.note)
+                );
+            }
+
+            if (candidates.length > 0) {
+                const newNote = candidates[Math.floor(Math.random() * candidates.length)];
+                selectedNotes.push(newNote);
+                lastNote = newNote;
             }
         }
     }
