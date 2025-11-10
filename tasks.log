@@ -8143,3 +8143,47 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 12:46:28] コミット: feat: 音域不足時の明確な警告アラート追加（1.5～2.0オクターブ）
+
+- 1.5～2.0オクターブの場合に黄色の警告アラート表示
+- 音域外の音を歌う可能性を明示してユーザーに注意喚起
+- ユーザーが内容を理解した上でトレーニング開始できるUI
+
+【実装内容】
+1. 判定ロジック追加（octaves < 2.0）
+   - 1.5～2.0オクターブをisNarrowRangeフラグでキャッチ
+   - コンソールログで明確な警告メッセージ
+
+2. UI表示分岐
+   - 1.5～2.0オクターブ: warning-alert（黄色）
+     - タイトル: 「音域不足の警告」
+     - 説明: 8音推奨だが不足している旨
+     - 注意: 音域を超える音を歌う可能性を明記
+   - 1.0～1.5オクターブ: info-alert（青）- 従来通り
+
+3. ユーザー体験向上
+   - F-E（1.9オクターブ）のケースで適切な警告
+   - 再測定の選択肢を提示
+   - インフォームドコンセントの実現
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 12:52:30] コミット: docs: 音域不足時の自動拡張と警告システム仕様書作成
+
+- VOICE_RANGE_AUTO_EXPANSION_SPECIFICATION.md v1.0.0
+- モード別必要音数、判定基準、自動拡張ロジックを完全文書化
+- ユーザーフロー、警告アラートUI仕様、テストケースを記載
+- インフォームドコンセント実現の設計思想を明記
+
+【仕様書内容】
+1. 音域判定カテゴリ（5段階）
+2. 自動拡張アルゴリズム（音域上限側から追加）
+3. 警告アラートUI仕様（warning-alert使用）
+4. ユーザーフロー（再測定 or トレーニング開始）
+5. コンソールログ仕様
+6. テストケース（正常系・異常系・境界値）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

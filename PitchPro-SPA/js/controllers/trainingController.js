@@ -1224,30 +1224,40 @@ function selectRandomMode(availableNotes, maxSessions) {
 }
 
 /**
- * 連続チャレンジモード（中級）: 全音、重複なし（12セッション）
+ * 連続チャレンジモード（中級）: 全音、重複なし、連続重複防止（12セッション）
+ * v2.0.0: 連続重複防止機能追加
  */
 function selectContinuousMode(availableNotes, maxSessions) {
-    console.log(`📊 連続チャレンジモード: ${availableNotes.length}音から${maxSessions}セッション選定（重複なし）`);
+    console.log(`📊 連続チャレンジモード: ${availableNotes.length}音から${maxSessions}セッション選定（重複なし・連続重複防止）`);
 
     const selectedNotes = [];
+    let lastNote = null;
 
-    // 初回はランダム
-    selectedNotes.push(availableNotes[Math.floor(Math.random() * availableNotes.length)]);
-
-    // 2回目以降は重複を避けて選択
-    for (let session = 1; session < maxSessions; session++) {
-        const candidates = availableNotes.filter(note =>
-            !selectedNotes.some(selected => selected.note === note.note)
+    for (let session = 0; session < maxSessions; session++) {
+        // 優先順位1: 未使用 + 前回と異なる音
+        let candidates = availableNotes.filter(note =>
+            !selectedNotes.some(selected => selected.note === note.note) &&
+            (!lastNote || note.note !== lastNote.note)
         );
+
+        // 優先順位2: 未使用のみ（前回と同じでも許容・フォールバック）
+        if (candidates.length === 0) {
+            candidates = availableNotes.filter(note =>
+                !selectedNotes.some(selected => selected.note === note.note)
+            );
+        }
 
         if (candidates.length === 0) {
             console.error(`❌ セッション${session + 1}: 候補なし（重複回避失敗）`);
             break;
         }
 
-        selectedNotes.push(candidates[Math.floor(Math.random() * candidates.length)]);
+        const newNote = candidates[Math.floor(Math.random() * candidates.length)];
+        selectedNotes.push(newNote);
+        lastNote = newNote;
     }
 
+    console.log(`✅ 連続チャレンジモード基音選定完了: ${selectedNotes.map(n => n.note).join(' → ')}`);
     return selectedNotes;
 }
 
