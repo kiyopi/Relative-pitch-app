@@ -1,8 +1,8 @@
-# 音域テスト機能 - 詳細仕様書 v3.2
+# 音域テスト機能 - 詳細仕様書 v3.3
 
-**バージョン**: 3.2.0
-**最終更新日**: 2025-01-22
-**基準実装**: voice-range-test-demo.js (PitchPro v1.3.1対応版)
+**バージョン**: 3.3.0
+**最終更新日**: 2025-11-10
+**基準実装**: voice-range-test.js (PitchPro v1.3.4対応版)
 **用途**: 音域テスト機能の完全仕様書（理論・実装・UI統合版）
 
 ---
@@ -16,7 +16,25 @@
 - **シンプルなUX**: 基準音なし・自由発声による直感的な測定方式
 - **トレーニング要件準拠**: 基音から1オクターブ上まで歌える音域の保証
 
-### ⚠️ v3.2.0の主要変更点（最新） 🆕
+### ⚠️ v3.3.0の主要変更点（最新） 🆕
+1. **PitchPro v1.3.4統合**: `result.note`が常にオクターブ番号付き（例: "E4", "C#2"）を返すように改善
+2. **データ構造最適化**: localStorage保存時に音名フィールド（`lowNote`, `highNote`）を削除
+3. **設計思想の転換**: 周波数が唯一の真実（Single Source of Truth）
+4. **コード簡潔化**: フォールバック処理削除により12行のコード削減
+5. **表示の正確性向上**: 音域範囲が常に完全な音名（オクターブ番号付き）で表示
+
+**変更理由**:
+- PitchPro v1.3.4で`result.note`が完全な音名を返すようになった
+- 冗長なフォールバック処理が不要になった
+- 周波数データのみ保存することでデータ一貫性を向上
+- 将来の音名変換ロジック変更に対して柔軟な設計
+
+**技術的詳細**:
+- `voice-range-test.js`: 815, 845行目のフォールバック処理削除
+- localStorage: `lowNote`, `highNote`フィールドを削除（周波数のみ保存）
+- 表示時: `MusicTheory.frequencyToNote()`で音名を動的生成
+
+### ⚠️ v3.2.0の主要変更点
 1. **音域判定基準の大幅変更**: トレーニング要件に合わせて最低音域要件を引き上げ
 2. **最低音域要件**: 0.3オクターブ → **1.0オクターブ**（3倍以上の厳格化）
 3. **判定フラグ再定義**: `isVeryNarrowRange` 削除 → `isInsufficientRange` 追加
@@ -96,24 +114,40 @@ setTimeout(() => displayResults(), 1500); // UX配慮の遅延
 - `onDetectionSuccess()` - 分岐処理 (`preparation-pitchpro-cycle.js:583-632`)
 - `setupMicPermissionFlow()` - マイク許可フロー (`preparation-pitchpro-cycle.js:877-920`)
 
-**保存データ構造**:
+**保存データ構造（v3.3.0）**:
 ```javascript
 {
   results: {
-    range: "A2 - F5",           // 音域範囲（文字列）
+    range: "A2 - F5",           // 音域範囲（完全な音名、v3.3.0で常にオクターブ番号付き）
     octaves: 2.6,               // オクターブ数
     semitones: 32,              // 半音数
-    lowFreq: 110.0,             // 最低周波数（Hz）
-    lowNote: "A2",              // 最低音（音名）
-    highFreq: 698.5,            // 最高周波数（Hz）
-    highNote: "F5",             // 最高音（音名）
-    comfortableRange: {...},    // 快適音域情報
+    lowFreq: 110.0,             // 最低周波数（Hz）- 唯一の真実
+    // lowNote: 削除（v3.3.0: 周波数から動的生成）
+    highFreq: 698.5,            // 最高周波数（Hz）- 唯一の真実
+    // highNote: 削除（v3.3.0: 周波数から動的生成）
+    comfortableRange: {
+      lowFreq: 127.4,           // 快適音域最低周波数
+      highFreq: 604.8,          // 快適音域最高周波数
+      lowNote: "C3",            // 快適音域最低音（MusicTheory.frequencyToNote()で生成）
+      highNote: "D5",           // 快適音域最高音（MusicTheory.frequencyToNote()で生成）
+      range: "C3 - D5",         // 快適音域範囲
+      octaves: 2.08,            // 快適音域オクターブ数
+      semitones: 25,            // 快適音域半音数
+      percentage: 80            // 元音域に対する割合
+    },
     isNarrowRange: false,       // やや狭い音域フラグ（1.0～1.5オクターブ）v3.2.0更新
     isInsufficientRange: false  // 音域不足フラグ（<1.0オクターブ）v3.2.0追加
   },
-  timestamp: "2025-10-20T10:15:30.123Z"  // 保存日時
+  timestamp: "2025-11-10T08:04:02.786Z"  // 保存日時
 }
 ```
+
+**v3.3.0データ構造の設計原則**:
+- ✅ **周波数が唯一の真実**: `lowFreq`, `highFreq`のみ保存
+- ✅ **音名は動的生成**: 表示時に`MusicTheory.frequencyToNote()`で変換
+- ✅ **将来の変更に強い**: 音名変換ロジック改善時も過去データに影響しない
+- ✅ **データ一貫性**: 周波数と音名の不整合が発生しない
+- ✅ **容量削減**: 冗長なフィールド削除によるストレージ効率化
 
 **分岐ロジック**:
 - **音域データあり**: 音声テスト完了後1.5秒で音域設定済み表示に自動切り替え
