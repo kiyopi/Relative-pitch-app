@@ -374,6 +374,135 @@
                     </div>
                 </section>
 
+                <!-- タブナビゲーション -->
+                <section id="tab-navigation" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">📑 タブナビゲーション</h2>
+                    <p class="text-white-70 mb-6">複数のコンテンツを切り替えるタブUIシステム（プレミアム分析ページで使用）</p>
+
+                    <h3 class="text-white font-medium mb-4">🎯 基本タブナビゲーション</h3>
+                    <p class="text-white-60 mb-4">アイコン + テキストのタブナビゲーション（モバイルではアイコンのみ表示）</p>
+
+                    <div class="component-grid grid-cols-1">
+                        <!-- タブナビゲーション例 -->
+                        <div class="component-item">
+                            <h4 class="text-white font-medium mb-3">✨ 4タブナビゲーション</h4>
+
+                            <!-- タブナビゲーション -->
+                            <div class="tab-navigation">
+                                <button class="tab-button active" data-tab="demo-tab-1">
+                                    <i data-lucide="music"></i>
+                                    <span>音程精度</span>
+                                </button>
+                                <button class="tab-button" data-tab="demo-tab-2">
+                                    <i data-lucide="alert-triangle"></i>
+                                    <span>エラー分析</span>
+                                </button>
+                                <button class="tab-button" data-tab="demo-tab-3">
+                                    <i data-lucide="target"></i>
+                                    <span>練習プラン</span>
+                                </button>
+                                <button class="tab-button" data-tab="demo-tab-4">
+                                    <i data-lucide="trending-up"></i>
+                                    <span>成長記録</span>
+                                </button>
+                            </div>
+
+                            <!-- タブコンテンツ -->
+                            <div id="demo-tab-1" class="tab-content active">
+                                <div class="glass-card">
+                                    <h4 class="text-white font-medium mb-2">音程精度</h4>
+                                    <p class="text-white-60">音程間隔別の精度分析を表示します</p>
+                                </div>
+                            </div>
+                            <div id="demo-tab-2" class="tab-content">
+                                <div class="glass-card">
+                                    <h4 class="text-white font-medium mb-2">エラー分析</h4>
+                                    <p class="text-white-60">シャープ・フラット傾向を分析します</p>
+                                </div>
+                            </div>
+                            <div id="demo-tab-3" class="tab-content">
+                                <div class="glass-card">
+                                    <h4 class="text-white font-medium mb-2">練習プラン</h4>
+                                    <p class="text-white-60">個別の練習方法を提案します</p>
+                                </div>
+                            </div>
+                            <div id="demo-tab-4" class="tab-content">
+                                <div class="glass-card">
+                                    <h4 class="text-white font-medium mb-2">成長記録</h4>
+                                    <p class="text-white-60">長期的な成長を可視化します</p>
+                                </div>
+                            </div>
+
+                            <!-- コード例 -->
+                            <div class="code-sample">
+                                <h5 class="text-white font-medium mb-2">HTML</h5>
+                                <pre class="code-block">&lt;!-- タブナビゲーション --&gt;
+&lt;div class="tab-navigation"&gt;
+    &lt;button class="tab-button active" data-tab="tab-1"&gt;
+        &lt;i data-lucide="music"&gt;&lt;/i&gt;
+        &lt;span&gt;タブ1&lt;/span&gt;
+    &lt;/button&gt;
+    &lt;button class="tab-button" data-tab="tab-2"&gt;
+        &lt;i data-lucide="settings"&gt;&lt;/i&gt;
+        &lt;span&gt;タブ2&lt;/span&gt;
+    &lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- タブコンテンツ --&gt;
+&lt;div id="tab-1" class="tab-content active"&gt;
+    &lt;!-- コンテンツ --&gt;
+&lt;/div&gt;
+&lt;div id="tab-2" class="tab-content"&gt;
+    &lt;!-- コンテンツ --&gt;
+&lt;/div&gt;</pre>
+
+                                <h5 class="text-white font-medium mb-2 mt-4">JavaScript（タブ切り替え）</h5>
+                                <pre class="code-block">// タブ切り替え機能
+document.querySelectorAll('.tab-button').forEach(button => {
+    button.addEventListener('click', () => {
+        // 全タブをリセット
+        document.querySelectorAll('.tab-button').forEach(btn =>
+            btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content =>
+            content.classList.remove('active'));
+
+        // クリックされたタブをアクティブ化
+        button.classList.add('active');
+        const tabId = button.getAttribute('data-tab');
+        document.getElementById(tabId).classList.add('active');
+    });
+});</pre>
+                            </div>
+
+                            <!-- 使用例 -->
+                            <div class="usage-note">
+                                <h5 class="text-white font-medium mb-2">💡 使用例</h5>
+                                <ul class="text-white-60" style="margin-left: 1.5rem; line-height: 1.8;">
+                                    <li><strong>プレミアム分析ページ:</strong> 4タブ（音程精度・エラー分析・練習プラン・成長記録）</li>
+                                    <li><strong>設定ページ:</strong> 複数の設定カテゴリ切り替え</li>
+                                    <li><strong>結果表示:</strong> セッション別・モード別の切り替え</li>
+                                </ul>
+                            </div>
+
+                            <!-- デザイン仕様 -->
+                            <div class="design-specs">
+                                <h5 class="text-white font-medium mb-2">🎨 デザイン仕様</h5>
+                                <ul class="text-white-60" style="margin-left: 1.5rem; line-height: 1.8;">
+                                    <li><strong>背景:</strong> rgba(255, 255, 255, 0.05) + backdrop-filter</li>
+                                    <li><strong>アクティブ:</strong> グラデーション（#a855f7 → #6366f1） + ボックスシャドウ</li>
+                                    <li><strong>ホバー:</strong> rgba(255, 255, 255, 0.1)</li>
+                                    <li><strong>モバイル:</strong> テキスト非表示、アイコンのみ表示（768px以下）</li>
+                                    <li><strong>アニメーション:</strong> fadeIn 0.3s（タブコンテンツ切り替え時）</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
                 <!-- ローディング・エラー表示 -->
                 <section id="loading-error-states" class="catalog-section">
                     <h2 class="text-2xl font-bold text-white mb-4">⏳ ローディング・エラー表示</h2>

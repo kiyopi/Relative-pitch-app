@@ -13,6 +13,7 @@ class SimpleRouter {
             'records': 'pages/records.html',
             'results': 'pages/results-overview.html',
             'results-overview': 'pages/results-overview.html',
+            'premium-analysis': 'pages/premium-analysis.html',
             'settings': 'pages/settings.html'
         };
 
@@ -159,6 +160,9 @@ class SimpleRouter {
             case 'results':
             case 'results-overview':
                 this.setupResultsOverviewEvents();
+                break;
+            case 'premium-analysis':
+                this.setupPremiumAnalysisEvents();
                 break;
             default:
                 break;
@@ -408,6 +412,22 @@ class SimpleRouter {
         } else {
             console.warn('⚠️ btn-new-training が見つかりません');
         }
+    }
+
+    setupPremiumAnalysisEvents() {
+        console.log('Setting up premium-analysis page events...');
+
+        // ページ初期化関数を実行（スクリプトロードを待つ）
+        setTimeout(() => {
+            console.log('🔍 [Router] Checking for initPremiumAnalysis...');
+            if (typeof window.initPremiumAnalysis === 'function') {
+                console.log('✅ [Router] initPremiumAnalysis found, calling...');
+                window.initPremiumAnalysis();
+            } else {
+                console.error('❌ [Router] initPremiumAnalysis function not found');
+                console.log('🔍 [Router] window keys:', Object.keys(window).filter(k => k.includes('init')));
+            }
+        }, 300);
     }
 
     // 現在のページのクリーンアップ

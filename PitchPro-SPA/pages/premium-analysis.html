@@ -1,0 +1,205 @@
+<!-- プレミアム分析ページ（SPA用テンプレート） -->
+<!-- このファイルはrouter.jsによって#app-rootに動的読み込みされます -->
+
+<div class="page-container">
+    <!-- ページヘッダー -->
+    <div class="page-header">
+        <div class="page-header-icon-wrapper">
+            <div class="page-header-icon">
+                <i data-lucide="bar-chart-3" class="icon-xl" style="color: white;"></i>
+            </div>
+        </div>
+        <h1 class="page-title">詳細分析</h1>
+        <p class="page-subtitle">あなたの音感を科学的に分析します</p>
+    </div>
+
+    <!-- タブナビゲーション -->
+    <div class="tab-navigation">
+        <button class="tab-button active" data-tab="tab-accuracy">
+            <i data-lucide="music"></i>
+            <span>音程精度</span>
+        </button>
+        <button class="tab-button" data-tab="tab-patterns">
+            <i data-lucide="alert-triangle"></i>
+            <span>エラー分析</span>
+        </button>
+        <button class="tab-button" data-tab="tab-practice">
+            <i data-lucide="target"></i>
+            <span>練習プラン</span>
+        </button>
+        <button class="tab-button" data-tab="tab-growth">
+            <i data-lucide="trending-up"></i>
+            <span>成長記録</span>
+        </button>
+    </div>
+
+    <!-- Tab 1: 音程精度分析 -->
+    <section id="tab-accuracy" class="tab-content active">
+        <!-- 平均音程精度 -->
+        <div class="glass-card">
+            <div class="flex items-center gap-3" style="margin-bottom: 1rem;">
+                <i data-lucide="music" class="text-blue-300" style="width: 24px; height: 24px;"></i>
+                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">平均音程精度</h3>
+            </div>
+            <div style="text-align: center; padding: 2rem 0;">
+                <div id="average-accuracy" style="color: #10b981; font-size: 3rem; font-weight: 700; margin-bottom: 0.5rem;">
+                    ±--¢
+                </div>
+                <p style="color: #cbd5e1; font-size: 1rem; margin: 0;">
+                    全<span id="total-data-points">--</span>音のデータから算出
+                </p>
+            </div>
+        </div>
+
+        <!-- 音程間隔別精度 -->
+        <div class="glass-card" style="margin-top: 1.5rem;">
+            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+                <i data-lucide="bar-chart-3" class="text-yellow-300" style="width: 24px; height: 24px;"></i>
+                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">音程間隔別精度</h3>
+            </div>
+
+            <div id="interval-accuracy-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                <!-- 動的に生成される -->
+            </div>
+        </div>
+
+        <!-- 上行・下行比較（Phase 4で有効化） -->
+        <div id="ascending-descending-section" class="glass-card" style="margin-top: 1.5rem; display: none;">
+            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+                <i data-lucide="arrow-up-down" class="text-purple-300" style="width: 24px; height: 24px;"></i>
+                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">上行・下行音程比較</h3>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div style="background: rgba(255, 255, 255, 0.08); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                    <h4 style="color: white; font-weight: 600; margin-bottom: 0.75rem; font-size: 1.125rem;">上行音程</h4>
+                    <div id="ascending-accuracy" style="color: #10b981; font-weight: 700; font-size: 2rem; margin-bottom: 0.5rem;">±--¢</div>
+                    <p style="color: #cbd5e1; font-size: 0.875rem; margin: 0;">音程を上がる時の精度</p>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.08); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                    <h4 style="color: white; font-weight: 600; margin-bottom: 0.75rem; font-size: 1.125rem;">下行音程</h4>
+                    <div id="descending-accuracy" style="color: #f59e0b; font-weight: 700; font-size: 2rem; margin-bottom: 0.5rem;">±--¢</div>
+                    <p style="color: #cbd5e1; font-size: 0.875rem; margin: 0;">音程を下がる時の精度</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tab 2: エラーパターン分析 -->
+    <section id="tab-patterns" class="tab-content">
+        <!-- シャープ・フラット傾向 -->
+        <div class="glass-card">
+            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+                <i data-lucide="alert-triangle" class="text-orange-300" style="width: 24px; height: 24px;"></i>
+                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">シャープ・フラット傾向</h3>
+            </div>
+
+            <div style="text-align: center; padding: 1.5rem 0;">
+                <div style="position: relative; width: 200px; height: 200px; margin: 0 auto;">
+                    <!-- 円グラフ風の表示（CSSベース） -->
+                    <div id="sharp-flat-chart" style="width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(#f59e0b 0% var(--sharp-percent), #3b82f6 var(--sharp-percent) 100%);" data-sharp-percent="50"></div>
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #0f172a; width: 140px; height: 140px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <div id="sharp-percentage" style="color: #f59e0b; font-size: 2rem; font-weight: 700;">--</div>
+                        <div style="color: #cbd5e1; font-size: 0.875rem;">シャープ傾向</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 16px; height: 16px; background: #f59e0b; border-radius: 4px;"></div>
+                        <span style="color: #cbd5e1; font-size: 0.875rem;">シャープ（高め）</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 16px; height: 16px; background: #3b82f6; border-radius: 4px;"></div>
+                        <span style="color: #cbd5e1; font-size: 0.875rem;">フラット（低め）</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 音程拡大・縮小パターン -->
+        <div class="glass-card" style="margin-top: 1.5rem;">
+            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+                <i data-lucide="maximize-2" class="text-green-300" style="width: 24px; height: 24px;"></i>
+                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">音程拡大・縮小パターン</h3>
+            </div>
+
+            <div id="interval-expansion-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                <!-- 動的に生成される -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Tab 3: 練習プラン -->
+    <section id="tab-practice" class="tab-content">
+        <div id="practice-plan-container">
+            <!-- 動的に生成される -->
+        </div>
+    </section>
+
+    <!-- Tab 4: 成長記録 -->
+    <section id="tab-growth" class="tab-content">
+        <!-- 月間成長比較 -->
+        <div class="glass-card">
+            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+                <i data-lucide="calendar" class="text-blue-300" style="width: 24px; height: 24px;"></i>
+                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">月間成長比較</h3>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <div style="text-align: center;">
+                    <div style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 0.5rem;">1ヶ月前</div>
+                    <div id="old-average" style="color: #f59e0b; font-size: 1.5rem; font-weight: 600;">±--¢</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 0.5rem;">現在</div>
+                    <div id="recent-average" style="color: #10b981; font-size: 1.5rem; font-weight: 600;">±--¢</div>
+                </div>
+            </div>
+
+            <div id="monthly-improvement" style="text-align: center; margin-top: 1rem; padding: 1rem; background: rgba(16, 185, 129, 0.1); border-radius: 8px;">
+                <span style="color: #10b981; font-weight: 600; font-size: 1.125rem;">改善: --¢</span>
+            </div>
+        </div>
+
+        <!-- 音程間隔別成長グラフ -->
+        <div class="glass-card" style="margin-top: 1.5rem;">
+            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+                <i data-lucide="trending-up" class="text-green-300" style="width: 24px; height: 24px;"></i>
+                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">最も改善した音程 TOP 3</h3>
+            </div>
+
+            <div id="top3-improved" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                <!-- 動的に生成される -->
+            </div>
+        </div>
+
+        <!-- 停滞音程 -->
+        <div class="glass-card" style="margin-top: 1.5rem;">
+            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+                <i data-lucide="trending-down" class="text-orange-300" style="width: 24px; height: 24px;"></i>
+                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">改善が停滞した音程 TOP 3</h3>
+            </div>
+
+            <div id="top3-stagnant" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                <!-- 動的に生成される -->
+            </div>
+        </div>
+
+        <!-- 時系列パフォーマンス分析 -->
+        <div class="glass-card" style="margin-top: 1.5rem;">
+            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+                <i data-lucide="activity" class="text-purple-300" style="width: 24px; height: 24px;"></i>
+                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">時系列パフォーマンス分析</h3>
+            </div>
+
+            <div id="time-series-analysis" style="display: flex; flex-direction: column; gap: 1rem;">
+                <!-- 動的に生成される -->
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- JavaScript読み込み -->
+<script src="pages/js/premium-analysis-calculator.js"></script>
+<script src="pages/js/premium-analysis-controller.js"></script>
