@@ -100,9 +100,20 @@ class NavigationManager {
         // 1. ウィンドウ切り替え誤検出を防止（1秒以内のvisibilitychangeは除外）
         const timeSinceVisibilityChange = Date.now() - this.lastVisibilityChange;
         console.log('🔍 [NavigationManager] 最後のvisibilitychangeからの経過時間:', timeSinceVisibilityChange + 'ms');
-        if (timeSinceVisibilityChange < 1000) {
-            console.log('✅ [NavigationManager] ウィンドウ切り替え検出 - リロードではない');
-            return false;
+
+        // 1秒以内 OR lastVisibilityChangeが記録されていない（初期値0）場合
+        if (timeSinceVisibilityChange < 1000 || this.lastVisibilityChange === 0) {
+            if (this.lastVisibilityChange === 0) {
+                console.log('✅ [NavigationManager] visibilitychange未記録 - 長時間バックグラウンドまたは初回アクセス');
+            } else {
+                console.log('✅ [NavigationManager] ウィンドウ切り替え検出 - リロードではない');
+            }
+
+            // さらに、ページが実際に表示されている（visible）か確認
+            if (document.visibilityState === 'visible') {
+                console.log('✅ [NavigationManager] ページ可視状態確認 - バックグラウンドからの復帰');
+                return false;
+            }
         }
 
         // 2. リダイレクト済みフラグをチェック（2回目の検出を防止）

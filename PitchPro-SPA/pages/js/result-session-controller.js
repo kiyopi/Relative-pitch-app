@@ -1,8 +1,13 @@
 /**
  * セッション結果ページコントローラー
- * @version 2.0.0
+ * @version 2.1.0
+ * @lastUpdate 2025-11-10
  *
  * 変更履歴:
+ * - 2.1.0: リロード検出を完全削除（表示専用ページのため不要）
+ *   - バックグラウンド長時間後の誤検出問題を根本解決
+ *   - ダイレクトアクセス・リロードを同じように扱う
+ *   - データがない場合はダミーデータ表示で対応
  * - 2.0.0: 評価基準をv2.0.0に更新（科学的バランス型・デバイス誤差考慮）
  *   - 個別音符評価: ±15¢→±20¢, ±25¢→±35¢, ±40¢→±50¢
  *   - セッション総合バッジ: 同じ閾値に統一
@@ -15,16 +20,12 @@
 async function initializeResultSessionPage() {
     console.log('📊 セッション結果ページ初期化開始');
 
-    // 【v1.3.0変更】リロード検出を復活
-    // NavigationManager が改善され、古いAPI（performance.navigation.type）を優先するため、
-    // Safari での SPA 遷移誤検出が解消された
-    // 手動リロード（F5）の場合は preparation へリダイレクトし、マイク許可を再取得
-    if (NavigationManager.detectReload()) {
-        console.warn('⚠️ result-sessionでリロード検出 - preparationへリダイレクト');
-        NavigationManager.showReloadDialog();
-        await NavigationManager.redirectToPreparation('result-sessionでリロード検出');
-        return; // リダイレクト後は以降の処理を実行しない
-    }
+    // 【v2.1.0変更】リロード検出を削除
+    // 理由:
+    // - 表示専用ページ（マイク不要、音声処理なし）
+    // - データはlocalStorageから読み取るのみ
+    // - リロードやダイレクトアクセスでも正常に動作
+    // - データがない場合はダミーデータ表示で対応済み（Line 43-44）
 
     // URLハッシュからセッション番号を取得
     const hash = window.location.hash.substring(1); // '#'を削除
