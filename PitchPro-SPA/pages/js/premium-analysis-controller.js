@@ -339,6 +339,139 @@ function updateTab4UI(data) {
             </div>
         `;
     }
+
+    // 音程間隔別成長グラフ（Chart.js）
+    renderIntervalGrowthChart(data.intervalGrowth);
+}
+
+/**
+ * Chart.js: 音程間隔別成長グラフを描画
+ */
+function renderIntervalGrowthChart(intervalGrowth) {
+    const canvas = document.getElementById('interval-growth-chart');
+    if (!canvas || !intervalGrowth) return;
+
+    const ctx = canvas.getContext('2d');
+
+    // 既存のチャートを破棄
+    if (window.intervalGrowthChartInstance) {
+        window.intervalGrowthChartInstance.destroy();
+    }
+
+    // データ準備
+    const intervals = [2, 3, 4, 5, 6, 7, 8];
+    const oldData = intervals.map(interval => {
+        const item = intervalGrowth.find(i => i.interval === interval);
+        return item ? item.oldAverage : 0;
+    });
+    const recentData = intervals.map(interval => {
+        const item = intervalGrowth.find(i => i.interval === interval);
+        return item ? item.recentAverage : 0;
+    });
+
+    // Chart.js設定
+    window.intervalGrowthChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['2度', '3度', '4度', '5度', '6度', '7度', '8度'],
+            datasets: [
+                {
+                    label: '3ヶ月前',
+                    data: oldData,
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#f59e0b',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                },
+                {
+                    label: '現在',
+                    data: recentData,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        color: '#ffffff',
+                        font: {
+                            size: 12,
+                            weight: 600
+                        },
+                        padding: 15,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#cbd5e1',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ±${context.parsed.y.toFixed(1)}¢`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#cbd5e1',
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#cbd5e1',
+                        font: {
+                            size: 11
+                        },
+                        callback: function(value) {
+                            return '±' + value + '¢';
+                        }
+                    }
+                }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false
+            }
+        }
+    });
 }
 
 /**
