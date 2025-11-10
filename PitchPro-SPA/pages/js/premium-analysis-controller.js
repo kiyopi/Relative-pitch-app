@@ -183,71 +183,30 @@ function updateTab3UI(plan) {
 
     container.innerHTML = '';
 
-    plan.forEach((item, index) => {
-        const priorityColors = {
-            1: { bg: 'rgba(239, 68, 68, 0.1)', border: 'rgba(239, 68, 68, 0.3)', text: '#ef4444', icon: 'alert-circle' },
-            2: { bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.3)', text: '#f59e0b', icon: 'info' },
-            3: { bg: 'rgba(16, 185, 129, 0.1)', border: 'rgba(16, 185, 129, 0.3)', text: '#10b981', icon: 'check-circle' }
+    plan.forEach((item) => {
+        const priorityIcons = {
+            1: 'flame',
+            2: 'zap',
+            3: 'check-circle'
         };
 
-        const colors = priorityColors[item.priority];
-        const cardId = `practice-card-${index}`;
-        const detailsId = `practice-details-${index}`;
-
-        // 難易度・推定時間を追加
-        const difficulty = item.priority === 1 ? '高' : item.priority === 2 ? '中' : '低';
-        const estimatedTime = item.priority === 1 ? '15-20分' : item.priority === 2 ? '10-15分' : '5-10分';
+        const icon = priorityIcons[item.priority] || 'info';
 
         container.innerHTML += `
-            <div class="glass-card practice-plan-card" id="${cardId}" style="margin-bottom: 1.5rem; cursor: pointer; transition: all 0.3s ease;">
-                <!-- カードヘッダー（クリック可能） -->
-                <div onclick="togglePracticeDetails('${detailsId}', '${cardId}')">
-                    <div class="flex items-center gap-3" style="margin-bottom: 1rem;">
-                        <div style="background: ${colors.bg}; border: 1px solid ${colors.border}; padding: 0.5rem 1rem; border-radius: 8px;">
-                            <i data-lucide="${colors.icon}" style="width: 14px; height: 14px; color: ${colors.text}; margin-right: 0.5rem;"></i>
-                            <span style="color: ${colors.text}; font-weight: 600; font-size: 0.875rem;">
-                                優先度 ${item.priority} - ${item.level}
-                            </span>
-                        </div>
-                        <div style="flex: 1;"></div>
-                        <i data-lucide="chevron-down" id="${cardId}-chevron" style="width: 20px; height: 20px; color: #cbd5e1; transition: transform 0.3s ease;"></i>
-                    </div>
-
-                    <h4 style="color: white; font-size: 1.125rem; font-weight: 600; margin-bottom: 0.75rem;">
-                        ${item.title}
-                    </h4>
-
-                    <p style="color: #cbd5e1; line-height: 1.6; margin-bottom: 1rem;">
-                        ${item.description}
+            <div class="practice-plan-card priority-${item.priority}">
+                <h4 class="practice-plan-title priority-${item.priority}">
+                    <i data-lucide="${icon}" style="width: 16px; height: 16px;"></i>
+                    優先度${item.priority}：${item.title}
+                </h4>
+                <div class="practice-plan-content">
+                    <p class="practice-plan-meta">
+                        <strong>目標</strong>: ${item.description}<br>
+                        <strong>期間</strong>: ${item.priority === 1 ? '4週間' : item.priority === 2 ? '6週間' : '継続'}
                     </p>
-
-                    <!-- メタ情報 -->
-                    <div class="flex items-center gap-4" style="margin-bottom: 1rem;">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="clock" style="width: 16px; height: 16px; color: #94a3b8;"></i>
-                            <span style="color: #94a3b8; font-size: 0.875rem;">推定時間: ${estimatedTime}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="trending-up" style="width: 16px; height: 16px; color: #94a3b8;"></i>
-                            <span style="color: #94a3b8; font-size: 0.875rem;">難易度: ${difficulty}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 展開可能な詳細エリア -->
-                <div id="${detailsId}" style="display: none; margin-top: 1rem; animation: fadeIn 0.3s ease;">
-                    <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px; border-left: 3px solid ${colors.text};">
-                        <div class="flex items-center gap-2" style="margin-bottom: 0.75rem;">
-                            <i data-lucide="lightbulb" style="width: 16px; height: 16px; color: #fbbf24;"></i>
-                            <h5 style="color: #fbbf24; font-weight: 600; margin: 0; font-size: 0.875rem;">具体的な練習方法</h5>
-                        </div>
-                        <ul style="color: #cbd5e1; font-size: 0.875rem; line-height: 1.6; margin: 0; padding-left: 1.5rem;">
-                            ${item.exercises.map(ex => `
-                                <li style="margin-bottom: 0.75rem; position: relative;">
-                                    <span style="position: absolute; left: -1.5rem; color: ${colors.text};">•</span>
-                                    ${ex}
-                                </li>
-                            `).join('')}
+                    <div class="practice-plan-exercises">
+                        <p class="practice-plan-exercises-title">具体的練習法</p>
+                        <ul>
+                            ${item.exercises.map(ex => `<li>${ex}</li>`).join('')}
                         </ul>
                     </div>
                 </div>
@@ -255,29 +214,6 @@ function updateTab3UI(plan) {
         `;
     });
 }
-
-/**
- * 練習プラン詳細の展開/折りたたみ
- */
-window.togglePracticeDetails = function(detailsId, cardId) {
-    const detailsElement = document.getElementById(detailsId);
-    const chevronElement = document.getElementById(`${cardId}-chevron`);
-
-    if (!detailsElement || !chevronElement) return;
-
-    if (detailsElement.style.display === 'none') {
-        detailsElement.style.display = 'block';
-        chevronElement.style.transform = 'rotate(180deg)';
-    } else {
-        detailsElement.style.display = 'none';
-        chevronElement.style.transform = 'rotate(0deg)';
-    }
-
-    // Lucideアイコン再初期化
-    if (typeof window.initializeLucideIcons === 'function') {
-        window.initializeLucideIcons({ immediate: true });
-    }
-};
 
 /**
  * Tab 4: 成長記録のUI更新

@@ -2784,15 +2784,77 @@ body::before {
 
 /* 練習プランカード（プレミアム分析） */
 .practice-plan-card {
-  transition: all 0.3s ease;
-  position: relative;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
 }
 
-.practice-plan-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(168, 85, 247, 0.2);
+.practice-plan-card.priority-1 {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
-.practice-plan-card:active {
-  transform: translateY(0);
+.practice-plan-card.priority-2 {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.practice-plan-card.priority-3 {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.practice-plan-title {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.practice-plan-title.priority-1 {
+  color: #ef4444;
+}
+
+.practice-plan-title.priority-2 {
+  color: #f59e0b;
+}
+
+.practice-plan-title.priority-3 {
+  color: #10b981;
+}
+
+.practice-plan-content {
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.practice-plan-meta {
+  margin-bottom: 1rem;
+}
+
+.practice-plan-meta strong {
+  color: white;
+}
+
+.practice-plan-exercises {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.practice-plan-exercises-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.practice-plan-exercises ul {
+  color: #cbd5e1;
+  line-height: 1.4;
+  margin-left: 1.5rem;
+}
+
+.practice-plan-exercises li {
+  margin-bottom: 0.25rem;
 }
