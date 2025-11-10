@@ -413,15 +413,13 @@ function renderIntervalGrowthChart(intervalGrowth) {
         window.intervalGrowthChartInstance.destroy();
     }
 
-    // データ準備
+    // データ準備（intervalGrowthはオブジェクト形式: {2: {oldAverage, recentAverage}, ...}）
     const intervals = [2, 3, 4, 5, 6, 7, 8];
     const oldData = intervals.map(interval => {
-        const item = intervalGrowth.find(i => i.interval === interval);
-        return item ? item.oldAverage : 0;
+        return intervalGrowth[interval] ? intervalGrowth[interval].oldAverage : 0;
     });
     const recentData = intervals.map(interval => {
-        const item = intervalGrowth.find(i => i.interval === interval);
-        return item ? item.recentAverage : 0;
+        return intervalGrowth[interval] ? intervalGrowth[interval].recentAverage : 0;
     });
 
     // Chart.js設定
