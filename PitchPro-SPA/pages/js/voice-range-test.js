@@ -809,13 +809,10 @@ function recordMeasurementData(result) {
             timestamp: timestamp
         });
 
-        // 最低音記録（オクターブ番号付き音名を確実に使用）
+        // 最低音記録（PitchPro v1.3.4+: result.noteは常にオクターブ番号付き）
         if (!data.lowestFreq || result.frequency < data.lowestFreq) {
             data.lowestFreq = result.frequency;
-            // result.noteにオクターブ番号が含まれていない場合に備えて、周波数から計算
-            data.lowestNote = result.note && /\d/.test(result.note)
-                ? result.note
-                : (typeof MusicTheory !== 'undefined' ? MusicTheory.frequencyToNote(result.frequency) : result.note);
+            data.lowestNote = result.note;  // 常に "E2" のような完全な音名
         }
 
         // 平均音量計算
@@ -842,13 +839,10 @@ function recordMeasurementData(result) {
             timestamp: timestamp
         });
 
-        // 最高音記録（オクターブ番号付き音名を確実に使用）
+        // 最高音記録（PitchPro v1.3.4+: result.noteは常にオクターブ番号付き）
         if (!data.highestFreq || result.frequency > data.highestFreq) {
             data.highestFreq = result.frequency;
-            // result.noteにオクターブ番号が含まれていない場合に備えて、周波数から計算
-            data.highestNote = result.note && /\d/.test(result.note)
-                ? result.note
-                : (typeof MusicTheory !== 'undefined' ? MusicTheory.frequencyToNote(result.frequency) : result.note);
+            data.highestNote = result.note;  // 常に "E4" のような完全な音名
         }
 
         // 平均音量計算
@@ -1341,6 +1335,7 @@ function displayVoiceRangeResults(results) {
     // 💾 音域データをlocalStorageに保存
     // 完全失敗・部分結果・逆転以外の場合は保存する
     // isInsufficientRangeの場合も保存する（トレーニングで利用可能）
+    // v3.3.0: 周波数のみ保存、音名は表示時にMusicTheory.frequencyToNote()で変換
     if (!results.isCompleteFail && !results.isPartialResult && !results.isReversedRange) {
         const voiceRangeData = {
             results: {
@@ -1348,9 +1343,9 @@ function displayVoiceRangeResults(results) {
                 octaves: results.octaves,
                 semitones: results.semitones,
                 lowFreq: results.lowFreq,
-                lowNote: results.lowNote,
+                // lowNote: 削除（表示時に周波数から変換）
                 highFreq: results.highFreq,
-                highNote: results.highNote,
+                // highNote: 削除（表示時に周波数から変換）
                 comfortableRange: results.comfortableRange,
                 isNarrowRange: results.isNarrowRange,
                 isInsufficientRange: results.isInsufficientRange  // v3.2.0: 更新
