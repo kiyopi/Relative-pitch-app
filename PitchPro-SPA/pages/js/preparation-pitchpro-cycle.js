@@ -505,20 +505,6 @@ class PitchProCycleManager {
     // ===== ユーティリティ関数 =====
 
     /**
-     * 周波数から音程名変換
-     */
-    frequencyToNote(frequency) {
-        const A4_FREQ = 440.0;
-        const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-
-        const semitones = Math.round(12 * Math.log2(frequency / A4_FREQ));
-        const octave = Math.floor((semitones + 9) / 12) + 4;
-        const noteIndex = (semitones + 9 + 120) % 12;
-
-        return `${noteNames[noteIndex]}${octave}`;
-    }
-
-    /**
      * 検出進捗更新（シンプル版）
      */
     updateDetectionProgress(elapsedTime) {
