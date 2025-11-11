@@ -1,0 +1,189 @@
+/**
+ * モード管理統合コントローラー
+ * @version 1.0.0
+ * @description 全トレーニングモードの定義と設定を一元管理
+ *
+ * 【責任範囲】
+ * - モード定義の一元管理
+ * - セッション数の動的計算
+ * - モード名の統一管理
+ * - 基音選択方式の定義
+ *
+ * 【使用箇所】
+ * - trainingController.js: トレーニング実行
+ * - records-controller.js: レッスングループ化
+ * - session-data-recorder.js: セッションデータ保存
+ */
+
+const ModeController = {
+    /**
+     * モード定義マスターデータ
+     */
+    modes: {
+        'random': {
+            id: 'random',
+            name: 'ランダム基音モード',
+            shortName: 'ランダム基音',
+            description: '音域内ランダム基音、連続重複なし',
+            sessionsPerLesson: 8,
+            baseNoteSelection: 'random_c3_octave',
+            hasIndividualResults: true,
+            hasRangeAdjustment: false,
+            difficulty: 'beginner',
+            icon: 'shuffle'
+        },
+        'continuous': {
+            id: 'continuous',
+            name: '連続チャレンジモード',
+            shortName: '連続チャレンジ',
+            description: 'クロマチック12音、連続重複防止',
+            sessionsPerLesson: 12,
+            baseNoteSelection: 'random_chromatic',
+            hasIndividualResults: false,
+            hasRangeAdjustment: false,
+            difficulty: 'intermediate',
+            icon: 'zap'
+        },
+        '12tone': {
+            id: '12tone',
+            name: '12音階モード',
+            shortName: '12音階',
+            description: '12音階順次使用（上昇/下降/両方向）',
+            // セッション数は方向性で動的に決定
+            sessionsPerLesson: (options = {}) => {
+                if (options.direction === 'both') return 24;
+                return 12; // ascending or descending
+            },
+            baseNoteSelection: 'sequential_chromatic',
+            hasIndividualResults: false,
+            hasRangeAdjustment: true,
+            difficulty: 'advanced',
+            icon: 'music',
+            // 12音階モード専用オプション
+            directions: {
+                'ascending': { name: '上昇', sessions: 12 },
+                'descending': { name: '下降', sessions: 12 },
+                'both': { name: '両方向', sessions: 24 }
+            }
+        },
+        // 将来の拡張用（コメントアウト）
+        // 'chromatic': {
+        //     id: 'chromatic',
+        //     name: '12音階モード',
+        //     shortName: '12音階',
+        //     description: '旧名称（互換性のため残す）',
+        //     sessionsPerLesson: 12,
+        //     baseNoteSelection: 'sequential_chromatic',
+        //     hasIndividualResults: false,
+        //     hasRangeAdjustment: true,
+        //     difficulty: 'advanced',
+        //     icon: 'music',
+        //     deprecated: true,
+        //     replacedBy: '12tone'
+        // }
+    },
+
+    /**
+     * モード設定を取得
+     * @param {string} modeId - モードID
+     * @returns {object} モード設定オブジェクト
+     */
+    getMode(modeId) {
+        const mode = this.modes[modeId];
+        if (!mode) {
+            console.warn(`⚠️ 未知のモードID: ${modeId}`);
+            return this.modes['random']; // デフォルト
+        }
+        return mode;
+    },
+
+    /**
+     * セッション数を取得（動的計算対応）
+     * @param {string} modeId - モードID
+     * @param {object} options - オプション設定（direction等）
+     * @returns {number} セッション数
+     */
+    getSessionsPerLesson(modeId, options = {}) {
+        const mode = this.getMode(modeId);
+
+        if (typeof mode.sessionsPerLesson === 'function') {
+            return mode.sessionsPerLesson(options);
+        }
+
+        return mode.sessionsPerLesson;
+    },
+
+    /**
+     * モード名を取得
+     * @param {string} modeId - モードID
+     * @param {boolean} useShortName - 短縮名を使用するか
+     * @returns {string} モード名
+     */
+    getModeName(modeId, useShortName = false) {
+        const mode = this.getMode(modeId);
+        return useShortName ? mode.shortName : mode.name;
+    },
+
+    /**
+     * trainingController用のmodeConfig形式に変換
+     * @returns {object} modeConfig形式のオブジェクト
+     */
+    toTrainingConfig() {
+        const config = {};
+
+        Object.keys(this.modes).forEach(modeId => {
+            const mode = this.modes[modeId];
+
+            config[modeId] = {
+                maxSessions: typeof mode.sessionsPerLesson === 'function'
+                    ? 12 // デフォルト値（動的に変更される）
+                    : mode.sessionsPerLesson,
+                title: mode.name,
+                hasIndividualResults: mode.hasIndividualResults,
+                baseNoteSelection: mode.baseNoteSelection,
+                hasRangeAdjustment: mode.hasRangeAdjustment || false
+            };
+        });
+
+        return config;
+    },
+
+    /**
+     * セッションデータから方向性を抽出
+     * @param {array} sessions - セッション配列
+     * @returns {string|null} 方向性（'ascending', 'descending', 'both'）
+     */
+    extractDirection(sessions) {
+        if (!sessions || sessions.length === 0) return null;
+
+        const firstSession = sessions[0];
+        return firstSession.direction || null;
+    },
+
+    /**
+     * 全モードのリストを取得
+     * @param {object} filters - フィルター条件
+     * @returns {array} モード配列
+     */
+    getAllModes(filters = {}) {
+        let modes = Object.values(this.modes);
+
+        // 非推奨モードを除外
+        if (filters.excludeDeprecated) {
+            modes = modes.filter(m => !m.deprecated);
+        }
+
+        // 難易度でフィルター
+        if (filters.difficulty) {
+            modes = modes.filter(m => m.difficulty === filters.difficulty);
+        }
+
+        return modes;
+    }
+};
+
+// グローバルに公開
+window.ModeController = ModeController;
+
+console.log('✅ ModeController初期化完了');
+console.log('📋 登録モード:', Object.keys(ModeController.modes).join(', '));

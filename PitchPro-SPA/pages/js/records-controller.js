@@ -26,7 +26,10 @@
 console.log('[Records] Controller loading...');
 
 // Chart.jsインスタンスを保持（SPA対応: 再初期化時に破棄するため）
-let accuracyChartInstance = null;
+// グローバルスコープで管理して重複宣言エラーを回避
+if (typeof window.accuracyChartInstance === 'undefined') {
+    window.accuracyChartInstance = null;
+}
 
 /**
  * トレーニング記録ページの初期化（SPA対応）
@@ -44,6 +47,9 @@ window.initRecords = async function() {
                 setTimeout(resolve, 0);
             }
         });
+
+        // 総合評価ページから戻った際のクリーンアップ
+        cleanupRecordsViewElements();
 
         // データ取得と表示
         loadTrainingRecords();
@@ -137,62 +143,80 @@ function hideAllLoading() {
 }
 
     /**
-     * 統計を計算
-     * @version 2.0.0 - 動的評価計算統合
+     * 統計を計算（モード別）
+     * @version 3.0.0 - モード別統計計算
      */
 function calculateStatistics(sessions) {
-    const totalSessions = sessions.length;
+    // レッスン単位にグループ化
+    const lessons = groupSessionsIntoLessons(sessions);
 
-    // v2.0.0: 動的評価計算で平均誤差とグレードを取得
-    const avgErrors = [];
-    const grades = [];
+    console.log(`📊 [Statistics] 総セッション数: ${sessions.length}, グループ化後レッスン数: ${lessons.length}`);
 
-    sessions.forEach(session => {
+    // モード別に統計を計算
+    const modeData = {};
+    const modeNames = {
+        'random': 'ランダム基音モード',
+        'continuous': '連続チャレンジモード',
+        'chromatic': '12音階モード',
+        '12tone': '12音階モード'
+    };
+
+    lessons.forEach(lesson => {
+        const mode = lesson.mode;
+        console.log(`📊 [Statistics] レッスン処理: モード=${mode}, セッション数=${lesson.sessions.length}`);
+        if (!modeData[mode]) {
+            modeData[mode] = {
+                lessons: [],
+                avgErrors: [],
+                grades: []
+            };
+        }
+
+        modeData[mode].lessons.push(lesson);
+
+        // レッスン全体の評価を計算
         try {
-            if (session.pitchErrors && session.pitchErrors.length > 0) {
-                // 動的計算
-                const evaluation = window.EvaluationCalculator.calculateDynamicGrade([session]);
-                avgErrors.push(Math.abs(evaluation.metrics.adjusted.avgError));
-                grades.push(evaluation.grade);
-            } else {
-                // フォールバック: 保存済みデータ
-                const error = session.averageError ?? session.avgError ??
-                             (session.sessionSummary && session.sessionSummary.averageCentError) ??
-                             (session.evaluation && session.evaluation.averageError) ?? 0;
-                avgErrors.push(Math.abs(error));
-
-                const grade = session.grade || session.overallGrade || session.evaluationGrade ||
-                             (session.finalEvaluation && session.finalEvaluation.dynamicGrade) ||
-                             (session.evaluation && session.evaluation.grade);
-                if (grade) grades.push(grade);
-            }
+            const evaluation = window.EvaluationCalculator.calculateDynamicGrade(lesson.sessions);
+            modeData[mode].avgErrors.push(Math.abs(evaluation.metrics.adjusted.avgError));
+            modeData[mode].grades.push(evaluation.grade);
         } catch (error) {
-            console.warn('[Records] 統計計算エラー:', error, session);
+            console.warn('[Records] モード別統計計算エラー:', error, lesson);
         }
     });
 
-    // 平均誤差計算
-    const avgAccuracy = avgErrors.length > 0
-        ? Math.round(avgErrors.reduce((a, b) => a + b, 0) / avgErrors.length)
-        : 0;
+    // モード別統計を作成
+    const modeStats = Object.keys(modeData).map(mode => {
+        const data = modeData[mode];
+        const avgAccuracy = data.avgErrors.length > 0
+            ? Math.round(data.avgErrors.reduce((a, b) => a + b, 0) / data.avgErrors.length)
+            : 0;
 
-    // 最高グレード（仕様書準拠: DYNAMIC_GRADE_LOGIC_SPECIFICATION.md）
-    const gradeOrder = ['S', 'A', 'B', 'C', 'D', 'E'];
-    const bestGrade = grades.reduce((best, grade) => {
-        const currentIdx = gradeOrder.indexOf(grade);
-        const bestIdx = gradeOrder.indexOf(best);
-        return (currentIdx !== -1 && (bestIdx === -1 || currentIdx < bestIdx))
-            ? grade
-            : best;
-    }, '-');
+        // 最高グレード
+        const gradeOrder = ['S', 'A', 'B', 'C', 'D', 'E'];
+        const bestGrade = data.grades.reduce((best, grade) => {
+            const currentIdx = gradeOrder.indexOf(grade);
+            const bestIdx = gradeOrder.indexOf(best);
+            return (currentIdx !== -1 && (bestIdx === -1 || currentIdx < bestIdx)) ? grade : best;
+        }, '-');
+
+        console.log(`📊 [Statistics] モード=${mode}: レッスン数=${data.lessons.length}, 平均誤差=${avgAccuracy}, 最高グレード=${bestGrade}`);
+
+        return {
+            mode,
+            modeName: modeNames[mode] || mode,
+            lessonCount: data.lessons.length,
+            avgAccuracy,
+            bestGrade
+        };
+    });
+
+    console.log(`📊 [Statistics] モード別統計: ${modeStats.length}モード`, modeStats);
 
     // 連続記録日数を計算
     const streak = calculateStreak(sessions);
 
     return {
-        totalSessions,
-        avgAccuracy,
-        bestGrade,
+        modeStats,
         streak
     };
 }
@@ -233,25 +257,49 @@ function calculateStreak(sessions) {
 }
 
     /**
-     * 統計を表示
+     * 統計を表示（モード別）
      */
 async function displayStatistics(stats) {
     document.getElementById('streak-count').textContent = stats.streak;
-    document.getElementById('total-sessions').textContent = stats.totalSessions;
-    document.getElementById('avg-accuracy').textContent = `±${stats.avgAccuracy}`;
-    document.getElementById('best-grade').textContent = stats.bestGrade;
 
-    // 改善状況メッセージ
+    // 改善状況メッセージ（全体の傾向を表示）
     const statusEl = document.getElementById('improvement-status');
-    if (stats.avgAccuracy <= 20) {
-        statusEl.textContent = `平均誤差: ±${stats.avgAccuracy}¢ (素晴らしい！↗️)`;
-        statusEl.className = 'text-lg text-green-300';
-    } else if (stats.avgAccuracy <= 40) {
-        statusEl.textContent = `平均誤差: ±${stats.avgAccuracy}¢ (良好！)`;
-        statusEl.className = 'text-lg text-blue-300';
-    } else {
-        statusEl.textContent = `平均誤差: ±${stats.avgAccuracy}¢ (練習を続けよう！)`;
-        statusEl.className = 'text-lg text-yellow-300';
+    const totalLessons = stats.modeStats.reduce((sum, mode) => sum + mode.lessonCount, 0);
+    statusEl.textContent = `総レッスン数: ${totalLessons}`;
+    statusEl.className = 'text-lg text-blue-300';
+
+    // モード別統計を表示
+    const container = document.getElementById('mode-statistics');
+    container.innerHTML = '';
+
+    stats.modeStats.forEach(mode => {
+        const modeCard = document.createElement('div');
+        modeCard.className = 'glass-card';
+
+        modeCard.innerHTML = `
+            <h5 class="text-white font-medium mb-3">${mode.modeName}</h5>
+            <div class="flex justify-around gap-4">
+                <div class="flex flex-col items-center">
+                    <div class="text-2xl font-bold text-blue-300">${mode.lessonCount}</div>
+                    <div class="text-white-60 text-sm">レッスン数</div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="text-2xl font-bold text-green-300">±${mode.avgAccuracy}</div>
+                    <div class="text-white-60 text-sm">平均誤差（¢）</div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="text-2xl font-bold text-yellow-300">${mode.bestGrade}</div>
+                    <div class="text-white-60 text-sm">最高グレード</div>
+                </div>
+            </div>
+        `;
+
+        container.appendChild(modeCard);
+    });
+
+    // Lucideアイコン再初期化
+    if (typeof window.initializeLucideIcons === 'function') {
+        window.initializeLucideIcons({ immediate: true });
     }
 
     // レンダリング完了まで待機
@@ -265,23 +313,189 @@ async function displaySessionList(sessions) {
     const container = document.getElementById('recent-sessions');
     const countEl = document.getElementById('records-count');
 
-    countEl.textContent = `${sessions.length}件`;
+    // セッションをレッスン単位にグループ化
+    const lessons = groupSessionsIntoLessons(sessions);
+
+    countEl.textContent = `${lessons.length}件`;
     container.innerHTML = '';
 
     // 最新10件のみ表示
-    const displaySessions = sessions.slice(0, 10);
+    const displayLessons = lessons.slice(0, 10);
 
     // 非同期で段階的に表示（UX向上）
-    for (const session of displaySessions) {
-        const sessionCard = createSessionCard(session);
-        container.appendChild(sessionCard);
+    for (const lesson of displayLessons) {
+        const lessonCard = createLessonCard(lesson);
+        container.appendChild(lessonCard);
         // 次のフレームまで待機（レンダリングを段階的に実行）
         await new Promise(resolve => setTimeout(resolve, 0));
     }
 }
 
+/**
+ * セッションをレッスン単位にグループ化
+ * @param {Array} sessions - 全セッション
+ * @returns {Array} レッスン配列
+ */
+function groupSessionsIntoLessons(sessions) {
+    const lessons = [];
+
+    // モード別のセッション数定義（動的判定関数）
+    const getSessionsPerLesson = (mode, sessions) => {
+        if (mode === 'random') return 8;
+        if (mode === 'continuous') return 12;
+        if (mode === 'chromatic' || mode === '12tone') {
+            // 12音階モードは方向性で判定
+            const firstSession = sessions[0];
+            if (firstSession && firstSession.direction === 'both') {
+                return 24; // 両方向
+            }
+            return 12; // 片方向（上昇/下降）
+        }
+        return 8; // デフォルト
+    };
+
+    // モード別にセッションを分類
+    const sessionsByMode = {};
+    sessions.forEach(session => {
+        const mode = session.mode || 'random';
+        if (!sessionsByMode[mode]) {
+            sessionsByMode[mode] = [];
+        }
+        sessionsByMode[mode].push(session);
+    });
+
+    console.log('🔍 [Grouping] 総セッション数:', sessions.length);
+    console.log('🔍 [Grouping] モード別セッション数:', Object.keys(sessionsByMode).map(m => `${m}: ${sessionsByMode[m].length}`).join(', '));
+
+    // 各モードでグループ化
+    Object.keys(sessionsByMode).forEach(mode => {
+        const modeSessions = sessionsByMode[mode];
+        const sessionsPerLesson = getSessionsPerLesson(mode, modeSessions);
+
+        console.log(`🔍 [Grouping] ${mode}モード: ${modeSessions.length}セッション → ${sessionsPerLesson}セッション/レッスンで分割`);
+
+        // セッションIDでソート（古い順）
+        modeSessions.sort((a, b) => a.sessionId - b.sessionId);
+
+        // グループ化
+        for (let i = 0; i < modeSessions.length; i += sessionsPerLesson) {
+            const lessonSessions = modeSessions.slice(i, i + sessionsPerLesson);
+
+            console.log(`🔍 [Grouping] ${mode} レッスン${Math.floor(i / sessionsPerLesson) + 1}: ${lessonSessions.length}/${sessionsPerLesson}セッション`);
+
+            // レッスンが完了しているか確認（必要なセッション数が揃っているか）
+            if (lessonSessions.length === sessionsPerLesson) {
+                lessons.push({
+                    mode: mode,
+                    sessions: lessonSessions,
+                    lessonNumber: Math.floor(i / sessionsPerLesson) + 1,
+                    startTime: lessonSessions[0].startTime,
+                    endTime: lessonSessions[lessonSessions.length - 1].endTime || lessonSessions[lessonSessions.length - 1].startTime
+                });
+                console.log(`✅ [Grouping] ${mode} レッスン${Math.floor(i / sessionsPerLesson) + 1} 追加完了`);
+            } else {
+                console.log(`⚠️ [Grouping] ${mode} レッスン${Math.floor(i / sessionsPerLesson) + 1} スキップ（未完了）`);
+            }
+        }
+    });
+
+    // 最新順にソート
+    lessons.sort((a, b) => b.startTime - a.startTime);
+
+    return lessons;
+}
+
+/**
+ * レッスンカードを作成（レッスン = 複数セッションのグループ）
+ * @param {Object} lesson - レッスンデータ
+ * @returns {HTMLElement} カード要素
+ */
+function createLessonCard(lesson) {
+    const card = document.createElement('div');
+    card.className = 'glass-card';
+    card.style.cursor = 'pointer';
+    card.onclick = () => viewLessonDetail(lesson);
+
+    const date = new Date(lesson.startTime);
+    const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+
+    // レッスン全体の評価を計算
+    let grade = '-';
+    let averageError = 0;
+
+    try {
+        // 全セッションで評価計算
+        const evaluation = window.EvaluationCalculator.calculateDynamicGrade(lesson.sessions);
+        grade = evaluation.grade;
+        averageError = evaluation.metrics.adjusted.avgError;
+    } catch (error) {
+        console.warn('[Records] 評価計算エラー:', error, lesson);
+    }
+
+    // モード名を日本語に変換
+    const modeNames = {
+        'random': 'ランダム基音',
+        'continuous': '連続チャレンジ',
+        'chromatic': '12音階',
+        '12tone': '12音階'
+    };
+    const modeName = modeNames[lesson.mode] || lesson.mode;
+
+    // グレードに応じた色
+    const gradeColors = {
+        'S': 'text-yellow-300',
+        'A': 'text-green-300',
+        'B': 'text-blue-300',
+        'C': 'text-orange-300',
+        'D': 'text-red-300',
+        'E': 'text-gray-300'
+    };
+    const gradeColor = gradeColors[grade] || 'text-white';
+
+    card.innerHTML = `
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <i data-lucide="music" class="text-blue-300" style="width: 20px; height: 20px;"></i>
+                <div>
+                    <div class="text-white font-medium">${modeName}モード</div>
+                    <div class="text-white-60 text-sm">${dateStr} · ${lesson.sessions.length}セッション</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-center">
+                    <div class="${gradeColor} text-xl font-bold">${grade}</div>
+                    <div class="text-white-60 text-sm">グレード</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-white text-lg">±${Math.abs(averageError).toFixed(1)}¢</div>
+                    <div class="text-white-60 text-sm">平均誤差</div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Lucideアイコン初期化
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+
+    return card;
+}
+
+/**
+ * レッスン詳細を表示
+ * @param {Object} lesson - レッスンデータ
+ */
+function viewLessonDetail(lesson) {
+    // 総合評価ページへ遷移（モード + トレーニング記録からの遷移フラグ付き）
+    window.NavigationManager.navigate('results-overview', {
+        mode: lesson.mode,
+        fromRecords: 'true'
+    });
+}
+
     /**
-     * セッションカードを作成
+     * セッションカードを作成（旧版・互換性のため残す）
      * @version 2.0.0 - 動的評価計算統合
      */
 function createSessionCard(session) {
@@ -379,9 +593,9 @@ async function displayAccuracyChart(sessions) {
     if (!canvas) return;
 
     // 既存のチャートインスタンスを破棄（SPA対応: 再初期化時の重複防止）
-    if (accuracyChartInstance) {
-        accuracyChartInstance.destroy();
-        accuracyChartInstance = null;
+    if (window.accuracyChartInstance) {
+        window.accuracyChartInstance.destroy();
+        window.accuracyChartInstance = null;
     }
 
     const ctx = canvas.getContext('2d');
@@ -410,7 +624,7 @@ async function displayAccuracyChart(sessions) {
         }
     });
 
-    accuracyChartInstance = new Chart(ctx, {
+    window.accuracyChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
@@ -479,14 +693,17 @@ function showNoDataMessage() {
     if (statsContent) statsContent.style.display = 'block';
 
     document.getElementById('streak-count').textContent = '0';
-    document.getElementById('total-sessions').textContent = '0';
-    document.getElementById('avg-accuracy').textContent = '-';
-    document.getElementById('best-grade').textContent = '-';
 
     // 改善状況メッセージを更新
     const statusEl = document.getElementById('improvement-status');
     statusEl.textContent = 'トレーニングを開始しましょう';
     statusEl.className = 'text-lg text-blue-300';
+
+    // モード別統計コンテナをクリア
+    const modeStatsContainer = document.getElementById('mode-statistics');
+    if (modeStatsContainer) {
+        modeStatsContainer.innerHTML = '<p class="text-white-60 text-center">まだトレーニングデータがありません</p>';
+    }
 
     // セッションコンテンツを非表示、データなしメッセージを表示
     const sessionsContent = document.getElementById('sessions-content');
@@ -505,6 +722,27 @@ function showNoDataMessage() {
     const actionButtons = document.getElementById('action-buttons-section');
     if (actionButtons) {
         actionButtons.style.display = 'block';
+    }
+}
+
+/**
+ * 総合評価ページから戻った際のクリーンアップ
+ * - 戻るボタン削除
+ * - 日時表示クラス削除
+ */
+function cleanupRecordsViewElements() {
+    // 総合評価ページの戻るボタンを削除
+    const backButton = document.getElementById('records-back-button');
+    if (backButton) {
+        backButton.remove();
+        console.log('✅ [Records] 戻るボタンをクリーンアップ');
+    }
+
+    // 日時表示クラスを削除（サブタイトルが通常表示に戻るように）
+    const pageSubtitle = document.querySelector('.page-subtitle');
+    if (pageSubtitle && pageSubtitle.classList.contains('records-view-date')) {
+        pageSubtitle.classList.remove('records-view-date');
+        console.log('✅ [Records] 日時表示クラスをクリーンアップ');
     }
 }
 

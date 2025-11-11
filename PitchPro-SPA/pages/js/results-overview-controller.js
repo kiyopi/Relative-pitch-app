@@ -38,12 +38,14 @@ window.initResultsOverview = async function() {
         return;
     }
 
-    // URLパラメータからモードを取得
+    // URLパラメータからモードとトレーニング記録からの遷移フラグを取得
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash.split('?')[1] || '');
     const currentMode = params.get('mode') || 'random';
+    const fromRecords = params.get('fromRecords') === 'true';
     if (DEBUG_MODE) {
         console.log(`🔍 [DEBUG] 現在のモード: ${currentMode}`);
+        console.log(`🔍 [DEBUG] トレーニング記録から遷移: ${fromRecords}`);
         console.log(`🔍 [DEBUG] URL hash: ${window.location.hash}`);
     }
 
@@ -81,8 +83,8 @@ window.initResultsOverview = async function() {
     const evaluation = window.EvaluationCalculator.calculateDynamicGrade(sessionData);
     console.log('✅ 評価結果:', evaluation);
 
-    // UI更新
-    updateOverviewUI(evaluation, sessionData);
+    // UI更新（トレーニング記録からの遷移フラグを渡す）
+    updateOverviewUI(evaluation, sessionData, fromRecords);
 
     // Chart.js初期化
     if (typeof Chart !== 'undefined') {
@@ -92,6 +94,14 @@ window.initResultsOverview = async function() {
     // Lucideアイコン再初期化（統合初期化関数を使用）
     if (typeof window.initializeLucideIcons === 'function') {
         window.initializeLucideIcons({ immediate: true });
+    }
+
+    // トレーニング記録からの遷移の場合、UI要素を調整（Lucide初期化後に実行）
+    if (fromRecords) {
+        // DOMが完全に更新されるまで少し待機
+        setTimeout(() => {
+            handleRecordsViewMode();
+        }, 100);
     }
 
     // ナビゲーションボタンのイベントリスナーを追加
@@ -171,8 +181,11 @@ function loadAllSessionData() {
 
 /**
  * 総合評価UIを更新
+ * @param {Object} evaluation - 評価結果
+ * @param {Array} sessionData - セッションデータ
+ * @param {Boolean} fromRecords - トレーニング記録からの遷移フラグ
  */
-function updateOverviewUI(evaluation, sessionData) {
+function updateOverviewUI(evaluation, sessionData, fromRecords = false) {
     console.log('🎨 UI更新開始:', evaluation);
 
     // モード名更新
@@ -181,9 +194,9 @@ function updateOverviewUI(evaluation, sessionData) {
         modeTitleEl.textContent = evaluation.modeInfo.name;
     }
 
-    // サブタイトル更新
+    // サブタイトル更新（トレーニング記録からの遷移時は日時表示を保持）
     const subtitleEl = document.querySelector('.page-subtitle');
-    if (subtitleEl) {
+    if (subtitleEl && !subtitleEl.classList.contains('records-view-date')) {
         const totalNotes = evaluation.metrics.raw.totalNotes;
         subtitleEl.textContent = `${sessionData.length}セッション (${totalNotes}音) の総合評価`;
     }
@@ -233,8 +246,10 @@ function updateOverviewUI(evaluation, sessionData) {
     // セッショングリッド表示
     displaySessionGrid(sessionData);
 
-    // 次のステップ表示
-    displayNextSteps(currentMode, evaluation);
+    // 次のステップ表示（トレーニング記録からの遷移時はスキップ）
+    if (!fromRecords) {
+        displayNextSteps(currentMode, evaluation);
+    }
 }
 
 /**
@@ -1213,6 +1228,76 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+/**
+ * トレーニング記録からの遷移時のUI調整
+ * - 次のステップセクションを非表示
+ * - プレミアム比較セクションを非表示
+ * - トレーニング記録へ戻るボタンを追加
+ */
+function handleRecordsViewMode() {
+    console.log('📊 [Records View Mode] UI調整開始');
+
+    // 重複実行防止チェック
+    if (document.getElementById('records-back-button')) {
+        console.log('⚠️ すでにUI調整済み、スキップします');
+        return;
+    }
+
+    // 次のステップセクションを非表示（テキストで検索）
+    const allSections = document.querySelectorAll('main.wide-main > section.glass-card');
+    console.log(`📊 [Records View Mode] 検索対象セクション数: ${allSections.length}`);
+
+    allSections.forEach(section => {
+        const heading = section.querySelector('h2.heading-md span, h2 span');
+        if (heading) {
+            const text = heading.textContent.trim();
+            console.log(`📊 [Records View Mode] セクション見出し: "${text}"`);
+            if (text === '次のステップ') {
+                section.style.display = 'none';
+                console.log('✅ 次のステップセクションを非表示化');
+            } else if (text === '無料版 vs プレミアム版') {
+                section.style.display = 'none';
+                console.log('✅ プレミアム比較セクションを非表示化');
+            }
+        }
+    });
+
+    // ページヘッダーに実行日を追加
+    const pageSubtitle = document.querySelector('.page-subtitle');
+    if (pageSubtitle && window.filteredSessionData && window.filteredSessionData.length > 0) {
+        const latestSession = window.filteredSessionData[window.filteredSessionData.length - 1];
+        const date = new Date(latestSession.startTime);
+        const dateStr = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+        pageSubtitle.textContent = `実行日時: ${dateStr}`;
+        pageSubtitle.classList.add('records-view-date'); // 上書き防止フラグ
+        console.log('✅ 実行日時を表示');
+    }
+
+    // トレーニング記録へ戻るボタンを追加（containerの一番下に配置）
+    const container = document.querySelector('.container.container-results-overview');
+    if (container) {
+        const backButtonWrapper = document.createElement('div');
+        backButtonWrapper.id = 'records-back-button'; // ID追加で重複防止
+        backButtonWrapper.style.textAlign = 'center';
+        backButtonWrapper.style.marginTop = '2rem';
+        backButtonWrapper.style.marginBottom = '2rem';
+        backButtonWrapper.innerHTML = `
+            <button class="btn btn-outline" onclick="window.NavigationManager.navigate('records')">
+                <i data-lucide="arrow-left"></i>
+                <span>トレーニング記録に戻る</span>
+            </button>
+        `;
+        // containerの一番下に追加
+        container.appendChild(backButtonWrapper);
+        console.log('✅ トレーニング記録へ戻るボタンを追加');
+
+        // Lucideアイコンを再初期化
+        if (typeof window.initializeLucideIcons === 'function') {
+            window.initializeLucideIcons({ immediate: true });
+        }
+    }
+}
 
 // グローバルに公開
 window.toggleGradePopover = toggleGradePopover;

@@ -26,9 +26,10 @@ class SessionDataRecorder {
      * 新しいセッションを開始
      * @param {string} baseNote - 基音（例: "C4"）
      * @param {number} baseFrequency - 基音周波数（Hz）
-     * @param {string} mode - トレーニングモード（'random', 'continuous', '12-tone'）
+     * @param {string} mode - トレーニングモード（'random', 'continuous', '12tone'）
+     * @param {object} options - オプション設定（direction等）
      */
-    startNewSession(baseNote, baseFrequency, mode = 'random') {
+    startNewSession(baseNote, baseFrequency, mode = 'random', options = {}) {
         // セッション開始前にlocalStorageと同期（localStorage消去対策）
         const existingSessions = DataManager.getFromStorage('sessionData') || [];
         const maxId = existingSessions.length > 0
@@ -51,7 +52,9 @@ class SessionDataRecorder {
             baseFrequency: baseFrequency,
             startTime: Date.now(),
             pitchErrors: [],
-            completed: false
+            completed: false,
+            // 12音階モードの方向情報（オプション）
+            ...(options.direction && { direction: options.direction })
         };
 
         console.log('📊 新しいセッション開始:', this.currentSession);

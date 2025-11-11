@@ -78,6 +78,15 @@ export async function initializeTrainingPage() {
     if (currentMode === '12tone' && directionParam) {
         window.currentTrainingDirection = directionParam;
         console.log(`✅ 12音階モード方向: ${directionParam}`);
+
+        // 両方向の場合はmaxSessionsを24に変更
+        if (directionParam === 'both') {
+            modeConfig['12tone'].maxSessions = 24;
+            console.log(`✅ 12音階モード両方向: maxSessions=24に設定`);
+        } else {
+            modeConfig['12tone'].maxSessions = 12;
+            console.log(`✅ 12音階モード片方向: maxSessions=12に設定`);
+        }
     }
 
     // 【NavigationManager統合】リロード検出 → preparationへリダイレクト
@@ -478,8 +487,15 @@ async function startTraining() {
         // セッションデータ記録開始
         if (window.sessionDataRecorder) {
             sessionRecorder = window.sessionDataRecorder;
-            sessionRecorder.startNewSession(baseNoteInfo.note, baseNoteInfo.frequency, currentMode);
-            console.log('📊 セッションデータ記録開始 (mode:', currentMode, ')');
+
+            // 12音階モードの場合、方向情報を含める
+            const sessionOptions = {};
+            if (currentMode === '12tone' && window.currentTrainingDirection) {
+                sessionOptions.direction = window.currentTrainingDirection;
+            }
+
+            sessionRecorder.startNewSession(baseNoteInfo.note, baseNoteInfo.frequency, currentMode, sessionOptions);
+            console.log('📊 セッションデータ記録開始 (mode:', currentMode, sessionOptions.direction ? `direction: ${sessionOptions.direction}` : '', ')');
         } else {
             console.warn('⚠️ SessionDataRecorderが読み込まれていません');
         }
@@ -1372,11 +1388,46 @@ function selectContinuousModeWithOctaveVariation(availableNotes, maxSessions) {
  * 12音階モード（上級）: クロマチック12音を順次使用
  */
 function selectSequentialMode(availableNotes, maxSessions) {
-    console.log(`🎹 12音階モード: クロマチック順次選択`);
+    console.log(`🎹 12音階モード: クロマチック順次選択 (${maxSessions}セッション)`);
 
     const selectedNotes = [];
-    for (let session = 0; session < maxSessions; session++) {
-        selectedNotes.push(availableNotes[session % availableNotes.length]);
+    const chromaticNotes = availableNotes.slice(0, 12); // 最初の12音（クロマチック）
+
+    if (maxSessions === 12) {
+        // 片方向（上昇 or 下降）
+        const direction = window.currentTrainingDirection;
+        if (direction === 'descending') {
+            // 下降: B → C
+            for (let i = 11; i >= 0; i--) {
+                selectedNotes.push(chromaticNotes[i]);
+            }
+            console.log(`🔽 下降モード: ${selectedNotes.map(n => n.note).join(' → ')}`);
+        } else {
+            // 上昇: C → B
+            for (let i = 0; i < 12; i++) {
+                selectedNotes.push(chromaticNotes[i]);
+            }
+            console.log(`🔼 上昇モード: ${selectedNotes.map(n => n.note).join(' → ')}`);
+        }
+    } else if (maxSessions === 24) {
+        // 両方向: 上昇12 + 下降12
+        // 上昇: C → B
+        for (let i = 0; i < 12; i++) {
+            selectedNotes.push(chromaticNotes[i]);
+        }
+        // 下降: B → C
+        for (let i = 11; i >= 0; i--) {
+            selectedNotes.push(chromaticNotes[i]);
+        }
+        console.log(`🔼🔽 両方向モード: 上昇12 + 下降12`);
+        console.log(`  上昇: ${selectedNotes.slice(0, 12).map(n => n.note).join(' → ')}`);
+        console.log(`  下降: ${selectedNotes.slice(12, 24).map(n => n.note).join(' → ')}`);
+    } else {
+        // フォールバック: 繰り返し
+        for (let session = 0; session < maxSessions; session++) {
+            selectedNotes.push(chromaticNotes[session % 12]);
+        }
+        console.warn(`⚠️ 予期しないセッション数: ${maxSessions}`);
     }
 
     return selectedNotes;

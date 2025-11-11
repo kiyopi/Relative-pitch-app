@@ -444,7 +444,23 @@
         </div>
     </div>
 
-    <!-- JavaScript: 全てのスクリプトはindex.htmlで読み込み済み（SPAアーキテクチャ） -->
-    <!-- Chart.js、データマネージャー、評価計算機、コントローラーはindex.htmlで管理 -->
+    <!-- Results Overview Page Controller -->
+    <script src="pages/js/results-overview-controller.js?v=20251111002" onload="initResultsOverviewPage()"></script>
+    <script>
+        // SPA対応：ページ読み込み完了後に初期化
+        async function initResultsOverviewPage() {
+            console.log('📊 [Results Overview] スクリプト読み込み完了、初期化開始');
+
+            // DOMが完全に準備されるまで待機
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            if (typeof window.initResultsOverview === 'function') {
+                await window.initResultsOverview();
+                console.log('✅ [Results Overview] 初期化完了');
+            } else {
+                console.error('❌ [Results Overview] initResultsOverview関数が見つかりません');
+            }
+        }
+    </script>
 </body>
 </html>
