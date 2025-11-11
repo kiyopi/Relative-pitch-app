@@ -87,35 +87,104 @@
                 </div>
             </div>
         </div>
+
+        <!-- 脳内処理パターン分析 -->
+        <div class="glass-card brain-processing-section">
+            <div class="flex items-center gap-3" style="margin-bottom: 1rem;">
+                <i data-lucide="brain" class="text-cyan-300" style="width: 24px; height: 24px;"></i>
+                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">脳内処理パターン分析</h3>
+            </div>
+            <p class="brain-processing-intro">
+                音楽は左脳と右脳で処理されています。左脳はC〜F#を、両脳でG〜Bを処理します。
+            </p>
+
+            <!-- 左脳 vs 両脳 比較 -->
+            <div class="brain-processing-comparison">
+                <!-- 左脳処理音 -->
+                <div class="brain-group-card">
+                    <div class="brain-group-title">
+                        <i data-lucide="circle" class="text-blue-300" style="width: 18px; height: 18px;"></i>
+                        <span>左脳処理音</span>
+                    </div>
+                    <div class="brain-group-notes">C C# D D# E F F#</div>
+                    <div class="brain-group-avg">
+                        <p class="brain-group-avg-label">平均誤差</p>
+                        <div id="left-brain-avg" class="brain-group-avg-value" style="color: #10b981;">±--¢</div>
+                    </div>
+                    <div class="progress-bar" style="margin-bottom: 0.75rem;">
+                        <div id="left-brain-progress" class="progress-fill gradient-catalog-blue" style="width: 0%;"></div>
+                    </div>
+                    <p id="left-brain-count" class="brain-group-count">測定回数: --</p>
+                </div>
+
+                <!-- 両脳処理音 -->
+                <div class="brain-group-card">
+                    <div class="brain-group-title">
+                        <i data-lucide="zap" class="text-purple-300" style="width: 18px; height: 18px;"></i>
+                        <span>両脳処理音</span>
+                    </div>
+                    <div class="brain-group-notes">G G# A B♭ B</div>
+                    <div class="brain-group-avg">
+                        <p class="brain-group-avg-label">平均誤差</p>
+                        <div id="both-brain-avg" class="brain-group-avg-value" style="color: #f59e0b;">±--¢</div>
+                    </div>
+                    <div class="progress-bar" style="margin-bottom: 0.75rem;">
+                        <div id="both-brain-progress" class="progress-fill gradient-catalog-purple" style="width: 0%;"></div>
+                    </div>
+                    <p id="both-brain-count" class="brain-group-count">測定回数: --</p>
+                </div>
+            </div>
+
+            <!-- 処理難易度の差 -->
+            <div class="brain-difficulty-section">
+                <div class="brain-difficulty-title">
+                    <i data-lucide="bar-chart-3" class="text-orange-300" style="width: 18px; height: 18px;"></i>
+                    <span>処理難易度の差</span>
+                </div>
+                <div id="brain-difficulty-value" class="brain-difficulty-value" style="color: #f59e0b;">--</div>
+                <p id="brain-difficulty-analysis" class="brain-difficulty-analysis"></p>
+            </div>
+
+            <!-- 両脳処理音の詳細分析 -->
+            <div class="brain-notes-detail-section">
+                <div class="brain-notes-detail-title">
+                    <i data-lucide="music" class="text-green-300" style="width: 18px; height: 18px;"></i>
+                    <span>両脳処理音の詳細分析</span>
+                </div>
+                <div id="brain-notes-detail-list" class="brain-notes-detail-list">
+                    <!-- 動的に生成される -->
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- Tab 2: エラーパターン分析 -->
     <section id="tab-patterns" class="tab-content">
         <!-- シャープ・フラット傾向 -->
         <div class="glass-card">
-            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
-                <i data-lucide="alert-triangle" class="text-orange-300" style="width: 24px; height: 24px;"></i>
-                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">シャープ・フラット傾向</h3>
-            </div>
+            <h3 class="heading-md">
+                <i data-lucide="alert-triangle" class="text-orange-300"></i>
+                <span>シャープ・フラット傾向</span>
+            </h3>
 
-            <div style="text-align: center; padding: 1.5rem 0;">
-                <div style="position: relative; width: 200px; height: 200px; margin: 0 auto;">
+            <div class="chart-container">
+                <div class="chart-wrapper">
                     <!-- 円グラフ風の表示（CSSベース） -->
-                    <div id="sharp-flat-chart" style="width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(#f59e0b 0% var(--sharp-percent), #3b82f6 var(--sharp-percent) 100%);" data-sharp-percent="50"></div>
-                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #0f172a; width: 140px; height: 140px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                        <div id="sharp-percentage" style="color: #f59e0b; font-size: 2rem; font-weight: 700;">--</div>
-                        <div style="color: #cbd5e1; font-size: 0.875rem;">シャープ傾向</div>
+                    <div id="sharp-flat-chart" class="chart-circle" data-sharp-percent="50"></div>
+                    <div class="chart-center">
+                        <div id="sharp-percentage" class="chart-percentage">--</div>
+                        <div class="chart-label">シャープ傾向</div>
                     </div>
                 </div>
 
-                <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <div style="width: 16px; height: 16px; background: #f59e0b; border-radius: 4px;"></div>
-                        <span style="color: #cbd5e1; font-size: 0.875rem;">シャープ（高め）</span>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-color sharp"></div>
+                        <span class="legend-text">シャープ（高め）</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <div style="width: 16px; height: 16px; background: #3b82f6; border-radius: 4px;"></div>
-                        <span style="color: #cbd5e1; font-size: 0.875rem;">フラット（低め）</span>
+                    <div class="legend-item">
+                        <div class="legend-color flat"></div>
+                        <span class="legend-text">フラット（低め）</span>
                     </div>
                 </div>
             </div>
@@ -123,12 +192,12 @@
 
         <!-- 音程拡大・縮小パターン -->
         <div class="glass-card" style="margin-top: 1.5rem;">
-            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
-                <i data-lucide="maximize-2" class="text-green-300" style="width: 24px; height: 24px;"></i>
-                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">音程拡大・縮小パターン</h3>
-            </div>
+            <h3 class="heading-md">
+                <i data-lucide="maximize-2" class="text-green-300"></i>
+                <span>音程拡大・縮小パターン</span>
+            </h3>
 
-            <div id="interval-expansion-list" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div id="interval-expansion-list" class="expansion-list">
                 <!-- 動的に生成される -->
             </div>
         </div>
@@ -210,6 +279,42 @@
             </div>
 
             <div id="time-series-analysis" style="display: flex; flex-direction: column; gap: 1rem;">
+                <!-- 動的に生成される -->
+            </div>
+        </div>
+
+        <!-- モード別分析 -->
+        <div class="glass-card" style="margin-top: 1.5rem;">
+            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+                <i data-lucide="layers" class="text-cyan-300" style="width: 24px; height: 24px;"></i>
+                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">モード別分析</h3>
+            </div>
+
+            <!-- クイックジャンプナビゲーション -->
+            <div id="mode-quick-nav" style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                <!-- 動的に生成される -->
+            </div>
+
+            <!-- モード別熟練度コンテンツ -->
+            <div id="mode-mastery-content">
+                <!-- 動的に生成される -->
+            </div>
+        </div>
+
+        <!-- モード別詳細統計 -->
+        <div class="glass-card" style="margin-top: 1.5rem;">
+            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+                <i data-lucide="bar-chart-2" class="text-green-300" style="width: 24px; height: 24px;"></i>
+                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">モード別詳細統計</h3>
+            </div>
+
+            <!-- クイックジャンプナビゲーション -->
+            <div id="mode-stats-quick-nav" style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                <!-- 動的に生成される -->
+            </div>
+
+            <!-- モード別詳細統計コンテンツ -->
+            <div id="mode-stats-content">
                 <!-- 動的に生成される -->
             </div>
         </div>

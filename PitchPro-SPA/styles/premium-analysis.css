@@ -1,0 +1,875 @@
+/**
+ * premium-analysis.css
+ * プレミアム分析ページ専用スタイル
+ * Version: 1.0.0
+ *
+ * 対応タブ:
+ * - Tab 1: 音程精度分析
+ * - Tab 2: エラーパターン分析
+ * - Tab 3: 練習プラン
+ * - Tab 4: 成長記録
+ * - Tab 5: モード別分析（新規）
+ */
+
+/* ================================================================
+   タブナビゲーション（プレミアム分析ページ用）
+   ================================================================ */
+
+.tab-navigation {
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  padding: 0.5rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tab-button {
+  flex: 1;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  border: none;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.tab-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.tab-button.active {
+  background: linear-gradient(135deg, #a855f7, #6366f1);
+  color: white;
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+}
+
+.tab-button i {
+  width: 16px;
+  height: 16px;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.3s ease-in;
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+  .tab-button span {
+    display: none;
+  }
+
+  .tab-button {
+    min-width: 60px;
+    padding: 0.75rem;
+  }
+}
+
+/* ================================================================
+   Tab 3: 練習プランカード
+   ================================================================ */
+
+.practice-plan-card {
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.practice-plan-card.priority-1 {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.practice-plan-card.priority-2 {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.practice-plan-card.priority-3 {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.practice-plan-title {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.practice-plan-title.priority-1 {
+  color: #ef4444;
+}
+
+.practice-plan-title.priority-2 {
+  color: #f59e0b;
+}
+
+.practice-plan-title.priority-3 {
+  color: #10b981;
+}
+
+.practice-plan-content {
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.practice-plan-meta {
+  margin-bottom: 1rem;
+}
+
+.practice-plan-meta strong {
+  color: white;
+}
+
+.practice-plan-exercises {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.practice-plan-exercises-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.practice-plan-exercises ul {
+  color: #cbd5e1;
+  line-height: 1.4;
+  margin-left: 1.5rem;
+}
+
+.practice-plan-exercises li {
+  margin-bottom: 0.25rem;
+}
+
+/* ================================================================
+   Tab 2: エラーパターン分析
+   ================================================================ */
+
+.chart-container {
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.chart-wrapper {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+}
+
+.chart-circle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(#f59e0b 0% var(--sharp-percent), #3b82f6 var(--sharp-percent) 100%);
+}
+
+.chart-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #0f172a;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-percentage {
+  color: #f59e0b;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.chart-label {
+  color: #cbd5e1;
+  font-size: 0.875rem;
+}
+
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+.legend-color.sharp {
+  background: #f59e0b;
+}
+
+.legend-color.flat {
+  background: #3b82f6;
+}
+
+.legend-text {
+  color: #cbd5e1;
+  font-size: 0.875rem;
+}
+
+.expansion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.expansion-item {
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.expansion-interval {
+  color: white;
+  font-weight: 600;
+  min-width: 60px;
+  font-size: 1rem;
+}
+
+.expansion-tendency-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.expansion-tendency {
+  font-weight: 600;
+}
+
+.expansion-tendency.expand {
+  color: #ef4444;
+}
+
+.expansion-tendency.contract {
+  color: #3b82f6;
+}
+
+.expansion-tendency.accurate {
+  color: #10b981;
+}
+
+.expansion-semitones {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+/* ================================================================
+   Tab 5: モード別分析 - 熟練度サマリー
+   ================================================================ */
+
+/* アコーディオンコンテナ */
+.mode-mastery-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* 各モードセクション */
+.mode-mastery-section {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* 親モードヘッダー（アコーディオンボタン） */
+.mode-mastery-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: white;
+}
+
+.mode-mastery-header:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.mode-mastery-header.active {
+  background: rgba(255, 255, 255, 0.1);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.mode-mastery-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mode-mastery-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+}
+
+.mode-mastery-summary {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.mode-summary-level {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.mode-summary-rate {
+  color: #cbd5e1;
+  font-size: 0.9rem;
+}
+
+.mode-summary-sessions {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.mode-chevron {
+  transition: transform 0.3s;
+  color: #cbd5e1;
+}
+
+.mode-mastery-header.active .mode-chevron {
+  transform: rotate(180deg);
+}
+
+/* バリアント一覧（折りたたみ可能） */
+.mode-mastery-variants {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: none;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.mode-mastery-variants.active {
+  max-height: 600px;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+/* バリアントアイテム（glass-card-sm使用） */
+.mode-variant-item {
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.mode-variant-item:hover {
+  transform: translateY(-2px);
+}
+
+.mode-variant-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.mode-variant-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.variant-level {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.variant-rate {
+  color: #cbd5e1;
+  font-size: 0.875rem;
+}
+
+.variant-sessions {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+/* ================================================================
+   Tab 5: モード別詳細統計（3階層アコーディオン）
+   ================================================================ */
+
+.mode-details-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+/* レベル1: 親モードヘッダー */
+.mode-details-header.level-1 {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: white;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.mode-details-header.level-1:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.mode-details-header.level-1.active {
+  background: rgba(255, 255, 255, 0.1);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* レベル1コンテンツ */
+.mode-details-content.level-1 {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s ease;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: none;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.mode-details-content.level-1.active {
+  max-height: 2000px;
+  padding: 1rem;
+}
+
+/* レベル2: バリアントヘッダー */
+.mode-details-variant {
+  margin-bottom: 0.75rem;
+  border-left: 3px solid rgba(168, 85, 247, 0.3);
+  padding-left: 1rem;
+}
+
+.mode-details-header.level-2 {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.875rem 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.mode-details-header.level-2:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.mode-details-header.level-2.active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* レベル2コンテンツ */
+.mode-details-content.level-2 {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.mode-details-content.level-2.active {
+  max-height: 800px;
+  padding: 1rem 0;
+}
+
+/* Chevronアイコンアニメーション */
+.mode-details-chevron {
+  transition: transform 0.3s;
+  color: #94a3b8;
+}
+
+.mode-details-header.active .mode-details-chevron {
+  transform: rotate(180deg);
+}
+
+/* 統計グリッド */
+.mode-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.mode-stat-item {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.stat-label {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.stat-value {
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.stat-improvement {
+  color: #10b981;
+  font-weight: 700;
+  margin-left: 0.5rem;
+}
+
+.stat-decline {
+  color: #ef4444;
+  font-weight: 700;
+  margin-left: 0.5rem;
+}
+
+/* 特徴分析タグ */
+.mode-characteristics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.characteristic-tag {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 16px;
+  color: #93c5fd;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* ================================================================
+   クイックジャンプナビゲーション（全展開方式用）
+   ================================================================ */
+
+.mode-quick-jump-btn {
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #cbd5e1;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mode-quick-jump-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* モードセクション（全展開表示） */
+.mode-section {
+  margin-bottom: 2rem;
+  scroll-margin-top: 100px;
+}
+
+.mode-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.mode-section-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: white;
+}
+
+/* バリアントリスト（全展開） */
+.mode-variants-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+/* 統計セクション（全展開） */
+.mode-stats-section {
+  margin-bottom: 2rem;
+  scroll-margin-top: 100px;
+}
+
+.mode-stats-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.variant-stats-card {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 1rem;
+  border-radius: 10px;
+  border-left: 3px solid rgba(168, 85, 247, 0.5);
+  margin-bottom: 1.5rem;
+}
+
+.variant-stats-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  color: white;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+/* ================================================================
+   レスポンシブ対応
+   ================================================================ */
+
+@media (max-width: 768px) {
+  .mode-mastery-summary {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .mode-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mode-mastery-variants.active {
+    grid-template-columns: 1fr;
+  }
+
+  .mode-variants-list {
+    grid-template-columns: 1fr;
+  }
+
+  .brain-processing-comparison {
+    grid-template-columns: 1fr;
+  }
+
+  .brain-notes-detail-item {
+    font-size: 0.8rem;
+  }
+}
+
+/* ================================================================
+   脳内処理パターン分析スタイル
+   ================================================================ */
+
+.brain-processing-section {
+  margin-top: 1.5rem;
+}
+
+.brain-processing-intro {
+  color: #cbd5e1;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.brain-processing-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.brain-group-card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brain-group-title {
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brain-group-notes {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.brain-group-avg {
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+
+.brain-group-avg-label {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.brain-group-avg-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.brain-group-count {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.brain-difficulty-section {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brain-difficulty-title {
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brain-difficulty-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.brain-difficulty-analysis {
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.brain-notes-detail-section {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brain-notes-detail-title {
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brain-notes-detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.brain-notes-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brain-notes-detail-note {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-width: 40px;
+}
+
+.brain-notes-detail-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-width: 60px;
+  text-align: right;
+}

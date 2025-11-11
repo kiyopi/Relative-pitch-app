@@ -71,6 +71,128 @@ window.PremiumAnalysisCalculator = {
     },
 
     /**
+     * 脳内処理パターン分析の計算（脳内ピアノ理論）
+     * @param {Array} sessionData - セッションデータ配列
+     * @returns {Object} 脳内処理パターン分析結果
+     */
+    calculateBrainProcessingPattern(sessionData) {
+        if (!sessionData || sessionData.length === 0) {
+            return null;
+        }
+
+        // 脳内処理グループ定義
+        const LEFT_BRAIN_NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#'];
+        const BOTH_BRAIN_NOTES = ['G', 'G#', 'A', 'A#', 'B'];
+
+        // 音名正規化（B♭表記統一）
+        const normalizeNoteName = (note) => {
+            const noteMap = {
+                'A#': 'B♭',
+                'Bb': 'B♭'
+            };
+            return noteMap[note] || note;
+        };
+
+        // 左脳処理音データ
+        const leftBrainErrors = [];
+        const leftBrainNotes = {};
+
+        // 両脳処理音データ
+        const bothBrainErrors = [];
+        const bothBrainNotes = {
+            'G': [],
+            'G#': [],
+            'A': [],
+            'B♭': [],
+            'B': []
+        };
+
+        // セッションデータから音階別エラーを収集
+        sessionData.forEach(session => {
+            if (!session.steps || !Array.isArray(session.steps)) return;
+
+            session.steps.forEach(step => {
+                if (step.pitchError === undefined || step.pitchError === null) return;
+                if (!step.note) return;
+
+                const absError = Math.abs(step.pitchError);
+                const baseNote = step.note.replace(/[0-9]/g, ''); // オクターブ番号削除
+
+                // 左脳処理音
+                if (LEFT_BRAIN_NOTES.includes(baseNote)) {
+                    leftBrainErrors.push(absError);
+                    if (!leftBrainNotes[baseNote]) {
+                        leftBrainNotes[baseNote] = [];
+                    }
+                    leftBrainNotes[baseNote].push(absError);
+                }
+                // 両脳処理音
+                else if (BOTH_BRAIN_NOTES.includes(baseNote)) {
+                    bothBrainErrors.push(absError);
+                    const normalizedNote = normalizeNoteName(baseNote);
+                    if (bothBrainNotes[normalizedNote]) {
+                        bothBrainNotes[normalizedNote].push(absError);
+                    }
+                }
+            });
+        });
+
+        // 平均計算ヘルパー
+        const calcAverage = (errors) => {
+            if (errors.length === 0) return 0;
+            return errors.reduce((sum, e) => sum + e, 0) / errors.length;
+        };
+
+        // 左脳処理音の統計
+        const leftBrainAvg = calcAverage(leftBrainErrors);
+        const leftBrainCount = leftBrainErrors.length;
+
+        // 両脳処理音の統計
+        const bothBrainAvg = calcAverage(bothBrainErrors);
+        const bothBrainCount = bothBrainErrors.length;
+
+        // 各音の平均計算
+        const bothBrainNoteStats = {};
+        Object.keys(bothBrainNotes).forEach(note => {
+            const errors = bothBrainNotes[note];
+            bothBrainNoteStats[note] = {
+                avgError: calcAverage(errors),
+                count: errors.length
+            };
+        });
+
+        // 処理難易度の差
+        const difficulty = bothBrainAvg - leftBrainAvg;
+        const difficultyPercentage = leftBrainAvg > 0
+            ? ((difficulty / leftBrainAvg) * 100)
+            : 0;
+
+        return {
+            leftBrain: {
+                avgError: parseFloat(leftBrainAvg.toFixed(1)),
+                count: leftBrainCount,
+                notes: LEFT_BRAIN_NOTES
+            },
+            bothBrain: {
+                avgError: parseFloat(bothBrainAvg.toFixed(1)),
+                count: bothBrainCount,
+                notes: ['G', 'G#', 'A', 'B♭', 'B'],
+                noteStats: bothBrainNoteStats
+            },
+            difficulty: {
+                difference: parseFloat(difficulty.toFixed(1)),
+                percentage: parseFloat(difficultyPercentage.toFixed(1)),
+                isHarder: difficulty > 0,
+                analysis: difficulty > 5
+                    ? '両脳処理音は左脳処理音より明確に難しい傾向があります。脳内ピアノ理論により予測される傾向と一致しています。'
+                    : difficulty > 0
+                    ? '両脳処理音はやや難しい傾向が見られます。'
+                    : '両グループ間で明確な差は見られません。'
+            }
+        };
+    },
+
+    /**
      * Tab 2: エラーパターン分析の計算
      * @param {Array} sessionData - セッションデータ配列
      * @returns {Object} エラーパターン分析結果
@@ -394,7 +516,353 @@ window.PremiumAnalysisCalculator = {
             .filter(step => step.pitchError !== undefined && step.pitchError !== null)
             .map(step => Math.abs(step.pitchError));
         return errors.length > 0 ? errors.reduce((sum, e) => sum + e, 0) / errors.length : 0;
+    },
+
+    /**
+     * モード別分析の計算
+     * @param {Array} sessionData - セッションデータ配列
+     * @returns {Object} モード別分析結果
+     */
+    calculateModeAnalysis(sessionData) {
+        if (!sessionData || sessionData.length === 0) {
+            return null;
+        }
+
+        // モード定義
+        const MODE_DEFINITIONS = {
+            'random': { name: 'ランダム基音', displayName: 'ランダム基音（標準）', color: 'blue', icon: 'shuffle', parentMode: 'random', direction: null },
+            'random-ascending': { name: 'ランダム基音', displayName: 'ランダム基音（上行）', color: 'blue', icon: 'arrow-up', parentMode: 'random', direction: 'ascending' },
+            'random-descending': { name: 'ランダム基音', displayName: 'ランダム基音（下行）', color: 'blue', icon: 'arrow-down', parentMode: 'random', direction: 'descending' },
+            'continuous': { name: '連続チャレンジ', displayName: '連続チャレンジ（標準）', color: 'green', icon: 'zap', parentMode: 'continuous', direction: null },
+            'continuous-ascending': { name: '連続チャレンジ', displayName: '連続チャレンジ（上行）', color: 'green', icon: 'arrow-up', parentMode: 'continuous', direction: 'ascending' },
+            'continuous-descending': { name: '連続チャレンジ', displayName: '連続チャレンジ（下行）', color: 'green', icon: 'arrow-down', parentMode: 'continuous', direction: 'descending' },
+            'twelve-ascending': { name: '12音階', displayName: '12音階（上昇）', color: 'purple', icon: 'trending-up', parentMode: 'twelve', direction: 'ascending' },
+            'twelve-descending': { name: '12音階', displayName: '12音階（下降）', color: 'purple', icon: 'trending-down', parentMode: 'twelve', direction: 'descending' },
+            'twelve-both': { name: '12音階', displayName: '12音階（両方向）', color: 'purple', icon: 'repeat', parentMode: 'twelve', direction: 'both' }
+        };
+
+        const PARENT_MODES = {
+            'random': { name: 'ランダム基音', color: 'blue', icon: 'shuffle', variants: ['random', 'random-ascending', 'random-descending'] },
+            'continuous': { name: '連続チャレンジ', color: 'green', icon: 'zap', variants: ['continuous', 'continuous-ascending', 'continuous-descending'] },
+            'twelve': { name: '12音階', color: 'purple', icon: 'music', variants: ['twelve-ascending', 'twelve-descending', 'twelve-both'] }
+        };
+
+        // モードキーの正規化
+        const normalizeMode = (session) => {
+            const mode = session.mode || 'random';
+            const direction = session.direction || null;
+
+            if (mode === 'twelve' || mode === '12tone') {
+                const dir = direction || 'ascending';
+                return `twelve-${dir}`;
+            }
+
+            if (direction && direction !== 'both') {
+                return `${mode}-${direction}`;
+            }
+
+            return mode;
+        };
+
+        // モード別にセッションを分類
+        const modeGroups = {};
+        sessionData.forEach(session => {
+            const modeKey = normalizeMode(session);
+            if (!modeGroups[modeKey]) {
+                modeGroups[modeKey] = [];
+            }
+            modeGroups[modeKey].push(session);
+        });
+
+        // 各モードの統計計算
+        const modeStats = {};
+        Object.keys(modeGroups).forEach(modeKey => {
+            const sessions = modeGroups[modeKey];
+            if (sessions.length === 0) return;
+
+            const modeInfo = MODE_DEFINITIONS[modeKey];
+            if (!modeInfo) return;
+
+            const avgError = this._calculateAverageError(sessions);
+            const successRate = this._calculateSuccessRate(sessions);
+
+            modeStats[modeKey] = {
+                modeKey: modeKey,
+                name: modeInfo.name,
+                displayName: modeInfo.displayName,
+                color: modeInfo.color,
+                icon: modeInfo.icon,
+                parentMode: modeInfo.parentMode,
+                direction: modeInfo.direction,
+                totalSessions: sessions.length,
+                level: this._calculateMasteryLevel(modeKey, sessions),
+                masteryRate: this._calculateMasteryRate(modeKey, sessions),
+                avgErrorOld: this._calculatePeriodAverage(sessions, 90, 30),
+                avgErrorRecent: this._calculatePeriodAverage(sessions, 30, 0),
+                successRateOld: this._calculateSuccessRate(sessions, 90, 30),
+                successRateRecent: this._calculateSuccessRate(sessions, 30, 0),
+                bestError: this._findBestError(sessions),
+                bestDate: this._findBestDate(sessions),
+                intervalStats: this._calculateIntervalStatsForMode(sessions),
+                characteristics: this._analyzeCharacteristics(modeKey, sessions, modeInfo),
+                timeSeriesData: this._prepareTimeSeriesData(sessions, 30)
+            };
+
+            // 改善率計算
+            if (modeStats[modeKey].avgErrorOld > 0 && modeStats[modeKey].avgErrorRecent > 0) {
+                const improvement = modeStats[modeKey].avgErrorOld - modeStats[modeKey].avgErrorRecent;
+                modeStats[modeKey].improvementPercent = Math.round((improvement / modeStats[modeKey].avgErrorOld) * 100);
+                modeStats[modeKey].improvementAbsolute = Math.round(improvement * 10) / 10;
+            } else {
+                modeStats[modeKey].improvementPercent = 0;
+                modeStats[modeKey].improvementAbsolute = 0;
+            }
+
+            modeStats[modeKey].successRateImprovement = Math.round((modeStats[modeKey].successRateRecent - modeStats[modeKey].successRateOld) * 100);
+        });
+
+        // 親モード別に統計を集約
+        const parentModeStats = {};
+        Object.keys(PARENT_MODES).forEach(parentKey => {
+            const parentInfo = PARENT_MODES[parentKey];
+            const variants = parentInfo.variants;
+
+            const variantStats = {};
+            let totalSessions = 0;
+            let weightedLevel = 0;
+            let weightedMasteryRate = 0;
+
+            variants.forEach(variantKey => {
+                if (modeStats[variantKey]) {
+                    variantStats[variantKey] = modeStats[variantKey];
+                    totalSessions += modeStats[variantKey].totalSessions;
+                    weightedLevel += modeStats[variantKey].level * modeStats[variantKey].totalSessions;
+                    weightedMasteryRate += modeStats[variantKey].masteryRate * modeStats[variantKey].totalSessions;
+                }
+            });
+
+            if (totalSessions > 0) {
+                parentModeStats[parentKey] = {
+                    name: parentInfo.name,
+                    color: parentInfo.color,
+                    icon: parentInfo.icon,
+                    totalSessions: totalSessions,
+                    averageLevel: Math.round(weightedLevel / totalSessions * 10) / 10,
+                    averageMasteryRate: Math.round(weightedMasteryRate / totalSessions),
+                    variants: variantStats,
+                    variantCount: Object.keys(variantStats).length
+                };
+            }
+        });
+
+        return {
+            modeStats,
+            parentModeStats
+        };
+    },
+
+    // モード分析用ヘルパーメソッド
+    _calculateAverageError(sessions) {
+        const allErrors = [];
+        sessions.forEach(session => {
+            if (session.steps && Array.isArray(session.steps)) {
+                session.steps.forEach(step => {
+                    if (step.pitchError !== undefined && step.pitchError !== null) {
+                        allErrors.push(Math.abs(step.pitchError));
+                    }
+                });
+            }
+        });
+        return allErrors.length > 0 ? allErrors.reduce((sum, e) => sum + e, 0) / allErrors.length : 0;
+    },
+
+    _calculateSuccessRate(sessions, daysAgo = null, daysRecent = null) {
+        let filteredSessions = sessions;
+
+        if (daysAgo !== null && daysRecent !== null) {
+            const now = Date.now();
+            const startTime = now - (daysAgo * 24 * 60 * 60 * 1000);
+            const endTime = now - (daysRecent * 24 * 60 * 60 * 1000);
+
+            filteredSessions = sessions.filter(s => {
+                const sessionTime = new Date(s.startTime || s.timestamp).getTime();
+                return sessionTime >= endTime && sessionTime < startTime;
+            });
+        }
+
+        if (filteredSessions.length === 0) return 0;
+
+        let successCount = 0;
+        let totalSteps = 0;
+
+        filteredSessions.forEach(session => {
+            if (session.steps && Array.isArray(session.steps)) {
+                session.steps.forEach(step => {
+                    totalSteps++;
+                    if (step.grade && (step.grade === 'Excellent' || step.grade === 'Good')) {
+                        successCount++;
+                    }
+                });
+            }
+        });
+
+        return totalSteps > 0 ? successCount / totalSteps : 0;
+    },
+
+    _calculatePeriodAverage(sessions, daysAgo, daysRecent) {
+        const now = Date.now();
+        const startTime = now - (daysAgo * 24 * 60 * 60 * 1000);
+        const endTime = now - (daysRecent * 24 * 60 * 60 * 1000);
+
+        const periodSessions = sessions.filter(s => {
+            const sessionTime = new Date(s.startTime || s.timestamp).getTime();
+            return sessionTime >= endTime && sessionTime < startTime;
+        });
+
+        return this._calculateAverageError(periodSessions);
+    },
+
+    _calculateMasteryLevel(modeKey, sessions) {
+        const totalSessions = sessions.length;
+        const avgError = this._calculateAverageError(sessions);
+        const successRate = this._calculateSuccessRate(sessions);
+
+        // 基準値定義
+        const thresholds = {
+            'random': { sessions: [5, 15, 30, 50, 80, 120, 180, 250, 350, 500], avgError: [50, 40, 30, 25, 20, 15, 12, 10, 8, 6], successRate: [0.5, 0.6, 0.7, 0.75, 0.8, 0.85, 0.9, 0.92, 0.95, 0.97] },
+            'random-ascending': { sessions: [3, 10, 20, 35, 55, 80, 120, 170, 230, 320], avgError: [55, 45, 35, 30, 25, 20, 16, 13, 10, 8], successRate: [0.45, 0.55, 0.65, 0.7, 0.75, 0.8, 0.85, 0.88, 0.92, 0.95] },
+            'random-descending': { sessions: [3, 10, 20, 35, 55, 80, 120, 170, 230, 320], avgError: [60, 50, 40, 35, 30, 25, 20, 17, 13, 10], successRate: [0.4, 0.5, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.93] },
+            'continuous': { sessions: [3, 10, 20, 35, 55, 80, 110, 150, 200, 300], avgError: [60, 50, 40, 35, 30, 25, 20, 17, 14, 12], successRate: [0.4, 0.5, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.88, 0.9] },
+            'continuous-ascending': { sessions: [2, 8, 15, 28, 45, 65, 90, 125, 170, 240], avgError: [65, 55, 45, 40, 35, 30, 25, 22, 18, 15], successRate: [0.35, 0.45, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.88] },
+            'continuous-descending': { sessions: [2, 8, 15, 28, 45, 65, 90, 125, 170, 240], avgError: [70, 60, 50, 45, 40, 35, 30, 27, 22, 18], successRate: [0.3, 0.4, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85] },
+            'twelve-ascending': { sessions: [2, 8, 15, 25, 40, 60, 85, 115, 150, 200], avgError: [70, 60, 50, 45, 40, 35, 30, 27, 24, 20], successRate: [0.3, 0.4, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85] },
+            'twelve-descending': { sessions: [2, 8, 15, 25, 40, 60, 85, 115, 150, 200], avgError: [75, 65, 55, 50, 45, 40, 35, 32, 28, 25], successRate: [0.25, 0.35, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8] },
+            'twelve-both': { sessions: [1, 5, 10, 18, 30, 45, 65, 90, 120, 160], avgError: [80, 70, 60, 55, 50, 45, 40, 37, 33, 30], successRate: [0.2, 0.3, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75] }
+        };
+
+        const threshold = thresholds[modeKey] || thresholds['random'];
+
+        const sessionLevel = this._findLevel(totalSessions, threshold.sessions);
+        const errorLevel = this._findLevel(avgError, threshold.avgError, true);
+        const rateLevel = this._findLevel(successRate, threshold.successRate);
+
+        return Math.floor((sessionLevel * 0.4 + errorLevel * 0.3 + rateLevel * 0.3) * 10) / 10;
+    },
+
+    _calculateMasteryRate(modeKey, sessions) {
+        const level = this._calculateMasteryLevel(modeKey, sessions);
+        return Math.min(Math.round(level * 10), 100);
+    },
+
+    _findLevel(value, thresholds, reverse = false) {
+        if (reverse) {
+            for (let i = thresholds.length - 1; i >= 0; i--) {
+                if (value <= thresholds[i]) {
+                    return i + 1;
+                }
+            }
+            return 1;
+        } else {
+            for (let i = 0; i < thresholds.length; i++) {
+                if (value <= thresholds[i]) {
+                    return i + 1;
+                }
+            }
+            return thresholds.length;
+        }
+    },
+
+    _findBestError(sessions) {
+        let bestError = Infinity;
+        sessions.forEach(session => {
+            if (session.steps && Array.isArray(session.steps)) {
+                session.steps.forEach(step => {
+                    if (step.pitchError !== undefined && step.pitchError !== null) {
+                        const absError = Math.abs(step.pitchError);
+                        if (absError < bestError) {
+                            bestError = absError;
+                        }
+                    }
+                });
+            }
+        });
+        return bestError === Infinity ? 0 : Math.round(bestError * 10) / 10;
+    },
+
+    _findBestDate(sessions) {
+        let bestError = Infinity;
+        let bestDate = null;
+        sessions.forEach(session => {
+            const sessionError = this._calculateAverageError([session]);
+            if (sessionError < bestError) {
+                bestError = sessionError;
+                bestDate = session.startTime || session.timestamp;
+            }
+        });
+        return bestDate;
+    },
+
+    _calculateIntervalStatsForMode(sessions) {
+        const intervalErrors = { 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [] };
+
+        sessions.forEach(session => {
+            if (session.steps && Array.isArray(session.steps)) {
+                session.steps.forEach(step => {
+                    if (step.pitchError !== undefined && step.pitchError !== null && step.interval) {
+                        const interval = step.interval;
+                        if (interval >= 2 && interval <= 8) {
+                            intervalErrors[interval].push(Math.abs(step.pitchError));
+                        }
+                    }
+                });
+            }
+        });
+
+        const stats = {};
+        Object.keys(intervalErrors).forEach(interval => {
+            const errors = intervalErrors[interval];
+            if (errors.length > 0) {
+                stats[interval] = {
+                    average: Math.round((errors.reduce((sum, e) => sum + e, 0) / errors.length) * 10) / 10,
+                    count: errors.length
+                };
+            }
+        });
+
+        return stats;
+    },
+
+    _analyzeCharacteristics(modeKey, sessions, modeInfo) {
+        const characteristics = [];
+        const direction = modeInfo.direction;
+
+        if (direction === 'ascending') {
+            characteristics.push('上行音程の練習');
+        } else if (direction === 'descending') {
+            characteristics.push('下行音程の練習');
+        } else if (direction === 'both') {
+            characteristics.push('上昇・下降の両方を練習中');
+        } else {
+            characteristics.push('標準的な音程練習');
+        }
+
+        return characteristics;
+    },
+
+    _prepareTimeSeriesData(sessions, days) {
+        const now = Date.now();
+        const startTime = now - (days * 24 * 60 * 60 * 1000);
+
+        const recentSessions = sessions.filter(s => {
+            const sessionTime = new Date(s.startTime || s.timestamp).getTime();
+            return sessionTime >= startTime;
+        });
+
+        return recentSessions.map(session => ({
+            date: session.startTime || session.timestamp,
+            avgError: this._calculateAverageError([session])
+        }));
     }
 };
 
-console.log('✅ PremiumAnalysisCalculator loaded');
+console.log('✅ PremiumAnalysisCalculator loaded (with Mode Analysis)');

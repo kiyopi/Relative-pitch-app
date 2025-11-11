@@ -50,6 +50,7 @@ window.initPremiumAnalysis = async function() {
     // 分析計算の実行
     console.log('🔢 分析計算開始...');
     const intervalAccuracy = window.PremiumAnalysisCalculator.calculateIntervalAccuracy(sessionData);
+    const brainProcessing = window.PremiumAnalysisCalculator.calculateBrainProcessingPattern(sessionData);
     const errorPatterns = window.PremiumAnalysisCalculator.calculateErrorPatterns(sessionData);
     const growthRecords = window.PremiumAnalysisCalculator.calculateGrowthRecords(sessionData);
     const practicePlan = window.PremiumAnalysisCalculator.generatePracticePlan(
@@ -57,19 +58,23 @@ window.initPremiumAnalysis = async function() {
         errorPatterns,
         growthRecords
     );
+    const modeAnalysis = window.PremiumAnalysisCalculator.calculateModeAnalysis(allSessionData);
 
     console.log('✅ 分析計算完了:', {
         intervalAccuracy,
+        brainProcessing,
         errorPatterns,
         growthRecords,
-        practicePlan
+        practicePlan,
+        modeAnalysis
     });
 
     // UI更新
-    updateTab1UI(intervalAccuracy);
+    updateTab1UI(intervalAccuracy, brainProcessing);
     updateTab2UI(errorPatterns);
     updateTab3UI(practicePlan);
     updateTab4UI(growthRecords);
+    updateModeAnalysisUI(modeAnalysis);
 
     // タブ切り替え機能の初期化
     initTabSwitching();
@@ -85,7 +90,7 @@ window.initPremiumAnalysis = async function() {
 /**
  * Tab 1: 音程精度分析のUI更新
  */
-function updateTab1UI(data) {
+function updateTab1UI(data, brainProcessing) {
     if (!data) return;
 
     // 平均音程精度
@@ -124,6 +129,100 @@ function updateTab1UI(data) {
             `;
         });
     }
+
+    // 脳内処理パターン分析
+    updateBrainProcessingUI(brainProcessing);
+}
+
+/**
+ * 脳内処理パターン分析のUI更新
+ */
+function updateBrainProcessingUI(data) {
+    if (!data) {
+        console.warn('⚠️ 脳内処理パターン分析データがありません');
+        return;
+    }
+
+    // 左脳処理音
+    const leftBrainAvgElement = document.getElementById('left-brain-avg');
+    const leftBrainProgressElement = document.getElementById('left-brain-progress');
+    const leftBrainCountElement = document.getElementById('left-brain-count');
+
+    if (leftBrainAvgElement && data.leftBrain) {
+        leftBrainAvgElement.textContent = `±${data.leftBrain.avgError}¢`;
+        leftBrainAvgElement.style.color = data.leftBrain.avgError < 30 ? '#10b981' : data.leftBrain.avgError < 50 ? '#f59e0b' : '#ef4444';
+    }
+
+    if (leftBrainProgressElement && data.leftBrain) {
+        const percentage = Math.max(0, 100 - data.leftBrain.avgError);
+        leftBrainProgressElement.style.width = `${percentage}%`;
+    }
+
+    if (leftBrainCountElement && data.leftBrain) {
+        leftBrainCountElement.textContent = `測定回数: ${data.leftBrain.count}`;
+    }
+
+    // 両脳処理音
+    const bothBrainAvgElement = document.getElementById('both-brain-avg');
+    const bothBrainProgressElement = document.getElementById('both-brain-progress');
+    const bothBrainCountElement = document.getElementById('both-brain-count');
+
+    if (bothBrainAvgElement && data.bothBrain) {
+        bothBrainAvgElement.textContent = `±${data.bothBrain.avgError}¢`;
+        bothBrainAvgElement.style.color = data.bothBrain.avgError < 30 ? '#10b981' : data.bothBrain.avgError < 50 ? '#f59e0b' : '#ef4444';
+    }
+
+    if (bothBrainProgressElement && data.bothBrain) {
+        const percentage = Math.max(0, 100 - data.bothBrain.avgError);
+        bothBrainProgressElement.style.width = `${percentage}%`;
+    }
+
+    if (bothBrainCountElement && data.bothBrain) {
+        bothBrainCountElement.textContent = `測定回数: ${data.bothBrain.count}`;
+    }
+
+    // 処理難易度の差
+    const difficultyValueElement = document.getElementById('brain-difficulty-value');
+    const difficultyAnalysisElement = document.getElementById('brain-difficulty-analysis');
+
+    if (difficultyValueElement && data.difficulty) {
+        const { difference, percentage, isHarder } = data.difficulty;
+        const sign = isHarder ? '+' : '';
+        difficultyValueElement.textContent = `両脳処理音は左脳処理音より ${sign}${difference}¢ (${percentage.toFixed(0)}%) ${isHarder ? '難しい' : '同等'}`;
+        difficultyValueElement.style.color = isHarder ? '#f59e0b' : '#10b981';
+    }
+
+    if (difficultyAnalysisElement && data.difficulty) {
+        difficultyAnalysisElement.textContent = data.difficulty.analysis;
+    }
+
+    // 両脳処理音の詳細分析
+    const notesDetailListElement = document.getElementById('brain-notes-detail-list');
+    if (notesDetailListElement && data.bothBrain && data.bothBrain.noteStats) {
+        notesDetailListElement.innerHTML = '';
+
+        const notes = ['G', 'G#', 'A', 'B♭', 'B'];
+        notes.forEach(note => {
+            const stats = data.bothBrain.noteStats[note];
+            if (!stats || stats.count === 0) return;
+
+            const avgError = stats.avgError.toFixed(1);
+            const percentage = Math.max(0, 100 - stats.avgError);
+            const color = stats.avgError < 30 ? '#10b981' : stats.avgError < 50 ? '#f59e0b' : '#ef4444';
+
+            notesDetailListElement.innerHTML += `
+                <div class="brain-notes-detail-item">
+                    <span class="brain-notes-detail-note">${note}:</span>
+                    <div class="progress-bar" style="flex: 1;">
+                        <div class="progress-fill-custom" style="width: ${percentage}%; background: ${color};"></div>
+                    </div>
+                    <span class="brain-notes-detail-value" style="color: ${color};">±${avgError}¢</span>
+                </div>
+            `;
+        });
+    }
+
+    console.log('✅ 脳内処理パターン分析UI更新完了');
 }
 
 /**
@@ -149,20 +248,20 @@ function updateTab2UI(data) {
     if (expansionElement && data.intervalExpansion) {
         expansionElement.innerHTML = '';
         Object.entries(data.intervalExpansion).forEach(([interval, info]) => {
-            const color = info.tendency === '拡大' ? '#ef4444' : info.tendency === '縮小' ? '#3b82f6' : '#10b981';
+            const tendencyClass = info.tendency === '拡大' ? 'expand' : info.tendency === '縮小' ? 'contract' : 'accurate';
             const icon = info.tendency === '拡大' ? 'arrow-up' : info.tendency === '縮小' ? 'arrow-down' : 'check';
 
             expansionElement.innerHTML += `
-                <div class="flex items-center" style="padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
-                    <div style="color: white; font-weight: 600; min-width: 60px; font-size: 1rem;">
+                <div class="expansion-item">
+                    <div class="expansion-interval">
                         ${interval}度
                     </div>
-                    <div class="flex items-center gap-2" style="flex: 1;">
-                        <i data-lucide="${icon}" style="width: 16px; height: 16px; color: ${color};"></i>
-                        <span style="color: ${color}; font-weight: 600;">
+                    <div class="expansion-tendency-container">
+                        <i data-lucide="${icon}" style="width: 16px; height: 16px;"></i>
+                        <span class="expansion-tendency ${tendencyClass}">
                             ${info.tendency}
                         </span>
-                        <span style="color: #94a3b8; font-size: 0.875rem;">
+                        <span class="expansion-semitones">
                             (${info.semitones > 0 ? '+' : ''}${info.semitones}半音)
                         </span>
                     </div>
@@ -333,6 +432,209 @@ function updateTab4UI(data) {
 
     // 音程間隔別成長グラフ（Chart.js）
     renderIntervalGrowthChart(data.intervalGrowth);
+}
+
+/**
+ * モード別分析のUI更新
+ */
+function updateModeAnalysisUI(modeAnalysis) {
+    if (!modeAnalysis || !modeAnalysis.parentModeStats) {
+        console.warn('⚠️ モード別分析データがありません');
+        return;
+    }
+
+    const { parentModeStats } = modeAnalysis;
+
+    // クイックジャンプナビゲーション（モード別熟練度）
+    const modeQuickNavElement = document.getElementById('mode-quick-nav');
+    if (modeQuickNavElement) {
+        modeQuickNavElement.innerHTML = '';
+        Object.keys(parentModeStats).forEach(parentMode => {
+            const mode = parentModeStats[parentMode];
+            const colorClass = mode.color === 'blue' ? 'text-blue-300' :
+                              mode.color === 'green' ? 'text-green-300' :
+                              'text-purple-300';
+
+            modeQuickNavElement.innerHTML += `
+                <button class="mode-quick-jump-btn" onclick="document.getElementById('mode-section-${parentMode}').scrollIntoView({behavior: 'smooth'})">
+                    <i data-lucide="${mode.icon}" class="${colorClass}"></i>
+                    <span>${mode.name}</span>
+                </button>
+            `;
+        });
+    }
+
+    // モード別熟練度コンテンツ（全展開）
+    const modeMasteryElement = document.getElementById('mode-mastery-content');
+    if (modeMasteryElement) {
+        modeMasteryElement.innerHTML = '';
+
+        Object.keys(parentModeStats).forEach(parentMode => {
+            const mode = parentModeStats[parentMode];
+            const colorClass = mode.color === 'blue' ? 'text-blue-300' :
+                              mode.color === 'green' ? 'text-green-300' :
+                              'text-purple-300';
+
+            modeMasteryElement.innerHTML += `
+                <div class="mode-section" id="mode-section-${parentMode}">
+                    <div class="mode-section-header">
+                        <i data-lucide="${mode.icon}" class="${colorClass}"></i>
+                        <h4 class="mode-section-title">${mode.name}</h4>
+                    </div>
+
+                    <div class="mode-variants-list">
+                        ${mode.variants.map(variantKey => {
+                            const variant = mode.modeStats[variantKey];
+                            if (!variant || variant.totalSessions === 0) return '';
+
+                            const masteryLevel = variant.masteryLevel || 0;
+                            const masteryRate = variant.masteryRate || 0;
+                            const masteryColor = masteryLevel >= 8 ? '#10b981' : masteryLevel >= 5 ? '#f59e0b' : '#ef4444';
+
+                            return `
+                                <div class="glass-card-sm">
+                                    <div class="flex items-center justify-between" style="margin-bottom: 0.75rem;">
+                                        <div class="flex items-center gap-2">
+                                            <i data-lucide="${variant.icon}" class="${colorClass}" style="width: 20px; height: 20px;"></i>
+                                            <h5 style="color: white; font-weight: 600; font-size: 0.95rem; margin: 0;">${variant.displayName}</h5>
+                                        </div>
+                                        <div style="background: rgba(255, 255, 255, 0.1); padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 600; color: ${masteryColor};">
+                                            Lv.${masteryLevel}
+                                        </div>
+                                    </div>
+
+                                    <div class="progress-bar" style="margin-bottom: 0.5rem;">
+                                        <div class="progress-fill gradient-catalog-${mode.color}" style="width: ${masteryRate}%;"></div>
+                                    </div>
+                                    <p style="color: #94a3b8; font-size: 0.8rem; margin: 0 0 0.75rem 0;">熟練度: ${masteryRate.toFixed(1)}%</p>
+
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.8rem;">
+                                        <div>
+                                            <p style="color: #94a3b8; margin: 0;">セッション数</p>
+                                            <p style="color: white; font-weight: 600; margin: 0; font-size: 1.1rem;">${variant.totalSessions}</p>
+                                        </div>
+                                        <div>
+                                            <p style="color: #94a3b8; margin: 0;">平均誤差</p>
+                                            <p style="color: ${variant.avgError < 30 ? '#10b981' : variant.avgError < 50 ? '#f59e0b' : '#ef4444'}; font-weight: 600; margin: 0; font-size: 1.1rem;">±${variant.avgError}¢</p>
+                                        </div>
+                                    </div>
+
+                                    ${variant.bestRecord ? `
+                                        <div style="margin-top: 0.75rem; padding: 0.5rem; background: rgba(16, 185, 129, 0.1); border-radius: 6px;">
+                                            <p style="color: #10b981; font-size: 0.75rem; margin: 0;">ベスト記録: ±${variant.bestRecord.error}¢</p>
+                                            <p style="color: #94a3b8; font-size: 0.7rem; margin: 0;">${variant.bestRecord.date}</p>
+                                        </div>
+                                    ` : ''}
+
+                                    ${variant.characteristics ? `
+                                        <p style="color: #cbd5e1; font-size: 0.8rem; margin: 0.75rem 0 0 0; line-height: 1.4;">
+                                            ${variant.characteristics}
+                                        </p>
+                                    ` : ''}
+                                </div>
+                            `;
+                        }).filter(html => html !== '').join('')}
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // クイックジャンプナビゲーション（モード別詳細統計）
+    const modeStatsQuickNavElement = document.getElementById('mode-stats-quick-nav');
+    if (modeStatsQuickNavElement) {
+        modeStatsQuickNavElement.innerHTML = '';
+        Object.keys(parentModeStats).forEach(parentMode => {
+            const mode = parentModeStats[parentMode];
+            const colorClass = mode.color === 'blue' ? 'text-blue-300' :
+                              mode.color === 'green' ? 'text-green-300' :
+                              'text-purple-300';
+
+            modeStatsQuickNavElement.innerHTML += `
+                <button class="mode-quick-jump-btn" onclick="document.getElementById('mode-stats-section-${parentMode}').scrollIntoView({behavior: 'smooth'})">
+                    <i data-lucide="${mode.icon}" class="${colorClass}"></i>
+                    <span>${mode.name}</span>
+                </button>
+            `;
+        });
+    }
+
+    // モード別詳細統計コンテンツ（全展開）
+    const modeStatsElement = document.getElementById('mode-stats-content');
+    if (modeStatsElement) {
+        modeStatsElement.innerHTML = '';
+
+        Object.keys(parentModeStats).forEach(parentMode => {
+            const mode = parentModeStats[parentMode];
+            const colorClass = mode.color === 'blue' ? 'text-blue-300' :
+                              mode.color === 'green' ? 'text-green-300' :
+                              'text-purple-300';
+
+            modeStatsElement.innerHTML += `
+                <div class="mode-stats-section" id="mode-stats-section-${parentMode}">
+                    <div class="mode-section-header">
+                        <i data-lucide="${mode.icon}" class="${colorClass}"></i>
+                        <h4 class="mode-section-title">${mode.name}</h4>
+                    </div>
+
+                    ${mode.variants.map(variantKey => {
+                        const variant = mode.modeStats[variantKey];
+                        if (!variant || variant.totalSessions === 0) return '';
+
+                        return `
+                            <div class="glass-card-sm" style="margin-bottom: 1rem;">
+                                <div class="flex items-center gap-2" style="margin-bottom: 1rem;">
+                                    <i data-lucide="${variant.icon}" class="${colorClass}" style="width: 20px; height: 20px;"></i>
+                                    <h5 style="color: white; font-weight: 600; font-size: 0.95rem; margin: 0;">${variant.displayName}</h5>
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1rem;">
+                                    <div style="text-align: center; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                        <p style="color: #94a3b8; font-size: 0.75rem; margin: 0 0 0.25rem 0;">総セッション数</p>
+                                        <p style="color: white; font-weight: 700; font-size: 1.5rem; margin: 0;">${variant.totalSessions}</p>
+                                    </div>
+                                    <div style="text-align: center; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                        <p style="color: #94a3b8; font-size: 0.75rem; margin: 0 0 0.25rem 0;">成功率</p>
+                                        <p style="color: ${variant.successRate >= 80 ? '#10b981' : variant.successRate >= 60 ? '#f59e0b' : '#ef4444'}; font-weight: 700; font-size: 1.5rem; margin: 0;">${variant.successRate}%</p>
+                                    </div>
+                                    <div style="text-align: center; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                        <p style="color: #94a3b8; font-size: 0.75rem; margin: 0 0 0.25rem 0;">平均誤差</p>
+                                        <p style="color: ${variant.avgError < 30 ? '#10b981' : variant.avgError < 50 ? '#f59e0b' : '#ef4444'}; font-weight: 700; font-size: 1.25rem; margin: 0;">±${variant.avgError}¢</p>
+                                    </div>
+                                    <div style="text-align: center; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+                                        <p style="color: #94a3b8; font-size: 0.75rem; margin: 0 0 0.25rem 0;">熟練度</p>
+                                        <p style="color: #10b981; font-weight: 700; font-size: 1.25rem; margin: 0;">Lv.${variant.masteryLevel}</p>
+                                    </div>
+                                </div>
+
+                                ${variant.intervalStats && Object.keys(variant.intervalStats).length > 0 ? `
+                                    <div style="background: rgba(255, 255, 255, 0.05); padding: 0.75rem; border-radius: 8px;">
+                                        <h6 style="color: white; font-weight: 600; font-size: 0.85rem; margin: 0 0 0.5rem 0;">音程間隔別統計</h6>
+                                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                            ${Object.keys(variant.intervalStats).sort((a, b) => parseInt(a) - parseInt(b)).map(interval => {
+                                                const stats = variant.intervalStats[interval];
+                                                return `
+                                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                        <span style="color: #94a3b8; font-size: 0.75rem; min-width: 30px;">${interval}度:</span>
+                                                        <div class="progress-bar" style="flex: 1;">
+                                                            <div class="progress-fill-custom" style="width: ${Math.min(100, (100 - stats.avgError) / 100 * 100)}%; background: ${stats.avgError < 30 ? '#10b981' : stats.avgError < 50 ? '#f59e0b' : '#ef4444'};"></div>
+                                                        </div>
+                                                        <span style="color: ${stats.avgError < 30 ? '#10b981' : stats.avgError < 50 ? '#f59e0b' : '#ef4444'}; font-size: 0.75rem; font-weight: 600; min-width: 50px; text-align: right;">±${stats.avgError}¢</span>
+                                                    </div>
+                                                `;
+                                            }).join('')}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).filter(html => html !== '').join('')}
+                </div>
+            `;
+        });
+    }
+
+    console.log('✅ モード別分析UI更新完了');
 }
 
 /**
