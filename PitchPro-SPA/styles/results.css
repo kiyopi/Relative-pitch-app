@@ -348,6 +348,7 @@
     margin-bottom: 4px;
     transition: transform 0.2s ease;
     line-height: 1;
+    text-align: center;
 }
 
 .stat-value-rank.grade-value {
@@ -365,6 +366,7 @@
     line-height: 1.1;
     margin: 0;
     white-space: nowrap;
+    text-align: center;
 }
 
 .rank-circle {
@@ -888,6 +890,7 @@
     margin-bottom: 4px;
     transition: transform 0.2s ease;
     line-height: 1;
+    text-align: center;
 }
 
 .stat-label-rank {
@@ -896,6 +899,7 @@
     line-height: 1.1;
     margin: 0;
     white-space: nowrap;
+    text-align: center;
 }
 
 /* シェアボタンスタイル */

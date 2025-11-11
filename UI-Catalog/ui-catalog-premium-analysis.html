@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 UIカタログ - プレミアム分析</title>
+
+    <!-- favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="../PitchPro-SPA/styles/base.css">
+    <link rel="stylesheet" href="../PitchPro-SPA/styles/premium-analysis.css">
+    <link rel="stylesheet" href="ui-catalog.css">
+
+    <!-- フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- アイコンライブラリ -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <div class="ui-catalog min-h-screen p-6">
+        <div class="container max-w-7xl mx-auto">
+            <!-- ヘッダー -->
+            <header class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-white mb-4">📊 プレミアム分析 UIカタログ</h1>
+                <p class="text-yellow-200 text-xl">詳細分析ページ専用コンポーネント</p>
+                <p class="text-white-70 mt-2">
+                    <a href="ui-catalog-index.html" class="text-blue-300 hover:text-blue-200">← カタログトップに戻る</a>
+                </p>
+            </header>
+
+            <!-- メインコンテンツエリア -->
+            <main id="catalog-content">
+
+                <!-- タブナビゲーション -->
+                <section id="tab-navigation" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">🔹 タブナビゲーション</h2>
+                    <p class="text-white-70 mb-6">プレミアム分析ページのタブ切り替えシステム</p>
+
+                    <div class="component-showcase">
+                        <div class="tab-navigation">
+                            <button class="tab-button active">
+                                <i data-lucide="music"></i>
+                                <span>音程精度</span>
+                            </button>
+                            <button class="tab-button">
+                                <i data-lucide="alert-triangle"></i>
+                                <span>エラー分析</span>
+                            </button>
+                            <button class="tab-button">
+                                <i data-lucide="target"></i>
+                                <span>練習プラン</span>
+                            </button>
+                            <button class="tab-button">
+                                <i data-lucide="trending-up"></i>
+                                <span>成長記録</span>
+                            </button>
+                            <button class="tab-button">
+                                <i data-lucide="bar-chart-2"></i>
+                                <span>モード別</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 練習プランカード -->
+                <section id="practice-plan-cards" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">🔹 練習プランカード</h2>
+                    <p class="text-white-70 mb-6">優先度別の練習プラン表示</p>
+
+                    <div class="component-showcase">
+                        <!-- 優先度1 -->
+                        <div class="practice-plan-card priority-1">
+                            <h4 class="practice-plan-title priority-1">
+                                <i data-lucide="flame" style="width: 16px; height: 16px;"></i>
+                                優先度1：7度音程精度集中改善
+                            </h4>
+                            <div class="practice-plan-content">
+                                <p class="practice-plan-meta">
+                                    <strong>目標</strong>: 7度音程の誤差を±52¢から±35¢以内に改善<br>
+                                    <strong>期間</strong>: 4週間
+                                </p>
+                                <div class="practice-plan-exercises">
+                                    <p class="practice-plan-exercises-title">具体的練習法</p>
+                                    <ul>
+                                        <li>7度音程（ド→シ）の正確な発声練習（毎日5分）</li>
+                                        <li>基音がランダムに変わっても7度を正確に歌う練習（週3回・10分）</li>
+                                        <li>5度から7度への音程拡張練習（週2回・15分）</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 優先度2 -->
+                        <div class="practice-plan-card priority-2" style="margin-top: 1rem;">
+                            <h4 class="practice-plan-title priority-2">
+                                <i data-lucide="zap" style="width: 16px; height: 16px;"></i>
+                                優先度2：3度・4度音程の安定化
+                            </h4>
+                            <div class="practice-plan-content">
+                                <p class="practice-plan-meta">
+                                    <strong>目標</strong>: 3度・4度の誤差を±25¢以内に安定<br>
+                                    <strong>期間</strong>: 6週間
+                                </p>
+                                <div class="practice-plan-exercises">
+                                    <p class="practice-plan-exercises-title">具体的練習法</p>
+                                    <ul>
+                                        <li>3度・4度の階段練習（毎日7分）</li>
+                                        <li>和音感覚トレーニング（週2回・12分）</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 優先度3 -->
+                        <div class="practice-plan-card priority-3" style="margin-top: 1rem;">
+                            <h4 class="practice-plan-title priority-3">
+                                <i data-lucide="check-circle" style="width: 16px; height: 16px;"></i>
+                                優先度3：得意音程の完璧化
+                            </h4>
+                            <div class="practice-plan-content">
+                                <p class="practice-plan-meta">
+                                    <strong>目標</strong>: 5度・6度を±10¢以内の精度に<br>
+                                    <strong>期間</strong>: 継続
+                                </p>
+                                <div class="practice-plan-exercises">
+                                    <p class="practice-plan-exercises-title">具体的練習法</p>
+                                    <ul>
+                                        <li>完璧な5度発声の維持練習（週2回・10分）</li>
+                                        <li>高速音程移動トレーニング（週1回・15分）</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- エラーパターン分析 -->
+                <section id="error-patterns" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">🔹 エラーパターン分析</h2>
+                    <p class="text-white-70 mb-6">シャープ・フラット傾向と音程拡大・縮小パターン</p>
+
+                    <div class="component-showcase">
+                        <div class="glass-card">
+                            <h3 class="heading-md">
+                                <i data-lucide="alert-triangle" class="text-orange-300"></i>
+                                <span>シャープ・フラット傾向</span>
+                            </h3>
+
+                            <div class="chart-container">
+                                <div class="chart-wrapper">
+                                    <div id="sharp-flat-chart-demo" class="chart-circle" style="--sharp-percent: 65%"></div>
+                                    <div class="chart-center">
+                                        <div class="chart-percentage">65%</div>
+                                        <div class="chart-label">シャープ傾向</div>
+                                    </div>
+                                </div>
+
+                                <div class="chart-legend">
+                                    <div class="legend-item">
+                                        <div class="legend-color sharp"></div>
+                                        <span class="legend-text">シャープ（高め）</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color flat"></div>
+                                        <span class="legend-text">フラット（低め）</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card" style="margin-top: 1.5rem;">
+                            <h3 class="heading-md">
+                                <i data-lucide="maximize-2" class="text-green-300"></i>
+                                <span>音程拡大・縮小パターン</span>
+                            </h3>
+
+                            <div class="expansion-list">
+                                <div class="expansion-item">
+                                    <div class="expansion-interval">3度</div>
+                                    <div class="expansion-tendency-container">
+                                        <i data-lucide="arrow-up" style="width: 16px; height: 16px;"></i>
+                                        <span class="expansion-tendency expand">拡大</span>
+                                        <span class="expansion-semitones">(+1半音)</span>
+                                    </div>
+                                </div>
+                                <div class="expansion-item">
+                                    <div class="expansion-interval">5度</div>
+                                    <div class="expansion-tendency-container">
+                                        <i data-lucide="check" style="width: 16px; height: 16px;"></i>
+                                        <span class="expansion-tendency accurate">正確</span>
+                                        <span class="expansion-semitones">(±0半音)</span>
+                                    </div>
+                                </div>
+                                <div class="expansion-item">
+                                    <div class="expansion-interval">7度</div>
+                                    <div class="expansion-tendency-container">
+                                        <i data-lucide="arrow-down" style="width: 16px; height: 16px;"></i>
+                                        <span class="expansion-tendency contract">縮小</span>
+                                        <span class="expansion-semitones">(-1半音)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- モード別熟練度サマリー -->
+                <section id="mode-mastery" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">🔹 モード別熟練度サマリー</h2>
+                    <p class="text-white-70 mb-6">全モードの習得状況を一目で確認</p>
+
+                    <div class="component-showcase">
+                        <div class="glass-card">
+                            <h3 class="heading-md">
+                                <i data-lucide="target" class="text-purple-300"></i>
+                                <span>モード別熟練度</span>
+                            </h3>
+
+                            <div class="mode-mastery-accordion">
+                                <!-- ランダム基音モード -->
+                                <div class="mode-mastery-section">
+                                    <button class="mode-mastery-header active">
+                                        <div class="mode-mastery-header-left">
+                                            <i data-lucide="shuffle" class="icon-sm"></i>
+                                            <span class="mode-mastery-name">ランダム基音</span>
+                                        </div>
+                                        <div class="mode-mastery-summary">
+                                            <span class="mode-summary-level">総合 Lv.5 ⭐⭐⭐⭐⭐</span>
+                                            <span class="mode-summary-rate">習得率 85%</span>
+                                            <span class="mode-summary-sessions">総70回</span>
+                                            <i data-lucide="chevron-down" class="mode-chevron icon-sm"></i>
+                                        </div>
+                                    </button>
+
+                                    <div class="mode-mastery-variants active">
+                                        <!-- 標準 -->
+                                        <div class="glass-card-sm mode-variant-item">
+                                            <div class="mode-variant-header">
+                                                <i data-lucide="shuffle" class="icon-xs"></i>
+                                                <span class="mode-variant-name">標準</span>
+                                            </div>
+                                            <div class="mode-variant-stats">
+                                                <span class="variant-level">Lv.5 ⭐⭐⭐⭐⭐</span>
+                                                <span class="variant-rate">習得率 90%</span>
+                                                <span class="variant-sessions">40回</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- 上行 -->
+                                        <div class="glass-card-sm mode-variant-item">
+                                            <div class="mode-variant-header">
+                                                <i data-lucide="arrow-up" class="icon-xs"></i>
+                                                <span class="mode-variant-name">上行</span>
+                                            </div>
+                                            <div class="mode-variant-stats">
+                                                <span class="variant-level">Lv.4 ⭐⭐⭐⭐</span>
+                                                <span class="variant-rate">習得率 75%</span>
+                                                <span class="variant-sessions">18回</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- 下行 -->
+                                        <div class="glass-card-sm mode-variant-item">
+                                            <div class="mode-variant-header">
+                                                <i data-lucide="arrow-down" class="icon-xs"></i>
+                                                <span class="mode-variant-name">下行</span>
+                                            </div>
+                                            <div class="mode-variant-stats">
+                                                <span class="variant-level">Lv.3 ⭐⭐⭐</span>
+                                                <span class="variant-rate">習得率 65%</span>
+                                                <span class="variant-sessions">12回</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- モード別詳細統計 -->
+                <section id="mode-details" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">🔹 モード別詳細統計</h2>
+                    <p class="text-white-70 mb-6">各モードの詳細な統計情報（3階層アコーディオン）</p>
+
+                    <div class="component-showcase">
+                        <div class="glass-card">
+                            <h3 class="heading-md">
+                                <i data-lucide="bar-chart-2" class="text-green-300"></i>
+                                <span>モード別詳細統計</span>
+                            </h3>
+
+                            <div class="mode-details-accordion">
+                                <!-- レベル1: 親モード -->
+                                <div class="mode-details-parent">
+                                    <button class="mode-details-header level-1 active">
+                                        <div class="flex items-center gap-3">
+                                            <i data-lucide="shuffle" class="icon-sm"></i>
+                                            <span>ランダム基音モード</span>
+                                        </div>
+                                        <i data-lucide="chevron-down" class="mode-details-chevron icon-sm"></i>
+                                    </button>
+
+                                    <div class="mode-details-content level-1 active">
+                                        <!-- レベル2: バリアント（標準） -->
+                                        <div class="mode-details-variant">
+                                            <button class="mode-details-header level-2 active">
+                                                <div class="flex items-center gap-3">
+                                                    <i data-lucide="shuffle" class="icon-xs"></i>
+                                                    <span>標準</span>
+                                                </div>
+                                                <i data-lucide="chevron-down" class="icon-xs"></i>
+                                            </button>
+
+                                            <div class="mode-details-content level-2 active">
+                                                <!-- レベル3: 詳細統計 -->
+                                                <div class="mode-stats-grid">
+                                                    <div class="mode-stat-item">
+                                                        <span class="stat-label">総セッション数</span>
+                                                        <span class="stat-value">40回</span>
+                                                    </div>
+                                                    <div class="mode-stat-item">
+                                                        <span class="stat-label">平均誤差</span>
+                                                        <span class="stat-value">
+                                                            ±15.2¢ → ±10.3¢
+                                                            <span class="stat-improvement">(-32.2%)</span>
+                                                        </span>
+                                                    </div>
+                                                    <div class="mode-stat-item">
+                                                        <span class="stat-label">成功率</span>
+                                                        <span class="stat-value">
+                                                            75% → 90%
+                                                            <span class="stat-improvement">(+15pt)</span>
+                                                        </span>
+                                                    </div>
+                                                    <div class="mode-stat-item">
+                                                        <span class="stat-label">最高記録</span>
+                                                        <span class="stat-value">±6.8¢ (2025-01-08)</span>
+                                                    </div>
+                                                    <div class="mode-stat-item">
+                                                        <span class="stat-label">弱点音程</span>
+                                                        <span class="stat-value">7度 (±18.4¢)</span>
+                                                    </div>
+                                                    <div class="mode-stat-item">
+                                                        <span class="stat-label">得意音程</span>
+                                                        <span class="stat-value">5度 (±7.1¢)</span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- 特徴分析 -->
+                                                <div class="mode-characteristics">
+                                                    <span class="characteristic-tag">標準的な音程練習</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Lucide初期化 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+    </script>
+</body>
+</html>

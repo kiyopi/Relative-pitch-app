@@ -8236,3 +8236,334 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 13:27:38] コミット: refactor: 周波数→音名変換処理を共通ユーティリティ化
+
+問題:
+- frequencyToNote関数が複数ファイルに重複実装
+- 保守性が低く、変更時に複数箇所を修正する必要
+
+改善内容:
+- MusicTheory共通ユーティリティクラスを作成 (js/utils/music-theory.js)
+- 周波数→音名変換を一元管理
+- voice-range-test.jsの重複関数を削除し、MusicTheoryに統一
+
+実装機能:
+- frequencyToNote(): 周波数→音名+オクターブ (例: 261.63Hz → C4)
+- frequencyToNoteName(): 周波数→音名のみ (例: 261.63Hz → C)
+- frequencyToOctave(): 周波数→オクターブ番号のみ
+- noteToFrequency(): 音名+オクターブ→周波数
+- getRangeString(): 音域範囲文字列生成 (例: F2 - C#4)
+- getRangeInfo(): 音域情報オブジェクト生成
+
+フォールバック処理:
+- MusicTheory未定義時はresult.noteをそのまま使用
+- エラー耐性を確保
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 13:33:27] コミット: refactor: preparation-pitchpro-cycle.jsから未使用のfrequencyToNote関数を削除
+
+- MusicTheoryユーティリティへの統合作業の一環
+- frequencyToNote関数は定義されていたが実際には使用されていなかった（デッドコード）
+- セッション評価等では既に保存済みの音名文字列を使用しているため変換不要を確認
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 16:41:10] コミット: feat: PitchPro v1.3.4統合とデータ保存最適化
+
+## PitchPro v1.3.4統合
+- result.noteが常にオクターブ番号付き（例: "E4"）を返すように改善
+- 音域テストで "E2 - E4" のような完全な音域範囲表示を実現
+
+## コード簡潔化（voice-range-test.js）
+- 低音測定: 複雑なフォールバック処理削除（3行→1行）
+- 高音測定: 複雑なフォールバック処理削除（3行→1行）
+- result.noteを直接使用するシンプルな実装に変更
+
+## データ保存最適化
+- localStorage: 周波数のみ保存、音名フィールド削除
+- 設計原則: 周波数が唯一の真実（Single Source of Truth）
+- 表示時: MusicTheory.frequencyToNote()で音名を動的生成
+- メリット: データサイズ削減、将来の変更に強い設計
+
+## 効果
+- ✅ コード削減: 12行削減
+- ✅ 可読性向上: 複雑な条件分岐を排除
+- ✅ データ一貫性: 周波数中心の設計
+- ✅ 保守性向上: PitchProの仕様に完全依存
+
+## 関連ドキュメント
+- PITCHPRO_V1.3.4_INTEGRATION.md: 統合詳細ドキュメント
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 16:48:37] コミット: fix: キャッシュバスター更新でPitchPro v1.3.4修正を反映
+
+- voice-range-test.jsのキャッシュバスターを更新
+- ブラウザキャッシュ問題を解決し、オクターブ番号付き音名表示を実現
+- 対象ファイル: index.html, test-voice-range-only.html
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 17:02:13] コミット: feat: PitchPro v1.3.4ライブラリ統合
+
+## PitchPro v1.3.4ライブラリ配置
+- pitchpro-audio-processingからv1.3.4ビルドファイルをコピー
+- result.noteが常にオクターブ番号付き（例: "E4", "C#2"）を返す
+
+## HTMLファイル更新
+- index.html: v1.3.3 → v1.3.4
+- test-voice-range-only.html: v1.3.1 → v1.3.4
+
+## 期待される効果
+- 音域範囲表示: "E - F#" → "E2 - F#4"
+- 完全な音名表示の実現
+
+## 関連ドキュメント
+- CACHE_CLEAR_GUIDE.md: キャッシュクリア手順
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 17:16:09] コミット: docs: VOICE_RANGE_TEST_SPECIFICATION v3.3.0更新
+
+## v3.3.0の主要変更
+- PitchPro v1.3.4統合対応
+- result.noteが常にオクターブ番号付きになったことを記載
+- データ構造最適化（周波数のみ保存）を文書化
+- 設計原則：周波数が唯一の真実（Single Source of Truth）
+
+## 更新内容
+1. バージョン: 3.2.0 → 3.3.0
+2. 最終更新日: 2025-01-22 → 2025-11-10
+3. 基準実装: PitchPro v1.3.1 → v1.3.4
+4. データ構造: lowNote/highNote削除を明記
+5. 設計原則の追加: データ一貫性・将来の変更に強い設計
+
+## 関連コミット
+- feat: PitchPro v1.3.4統合とデータ保存最適化
+- feat: PitchPro v1.3.4ライブラリ統合
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 19:46:56] コミット: feat: Phase 3-1 プレミアム分析ページ実装完了（Tab 1: 音程精度分析）
+
+- プレミアム分析ページ新規作成（SPA対応）
+- 計算ロジック実装（音程精度・エラーパターン・成長記録・練習プラン）
+- UIコントローラー実装（4タブシステム・動的データ表示）
+- タブナビゲーションCSS追加（モバイル対応・Glass morphism）
+- UIカタログに包括的なタブナビゲーション例を追加
+- ヘッダーナビゲーション「評価」→「詳細分析」に変更
+
+新規ファイル:
+- pages/premium-analysis.html (4タブ構造)
+- pages/js/premium-analysis-calculator.js (分析計算ロジック)
+- pages/js/premium-analysis-controller.js (UIコントローラー)
+
+主要機能:
+- Tab 1: 音程精度分析（平均精度・音程間隔別・上行下行比較）
+- Tab 2: エラーパターン分析（シャープ/フラット傾向・音程拡大縮小）
+- Tab 3: 練習プラン（優先度別・具体的練習方法）
+- Tab 4: 成長記録（月間比較・TOP3改善/停滞・時系列分析）
+
+技術仕様:
+- localStorage統合（trainingHistory活用）
+- モード別フィルタリング（continuous/random/chromatic）
+- 色分けシステム（<30¢緑・<50¢橙・≥50¢赤）
+- レスポンシブデザイン（768px以下でテキスト非表示）
+- Phase 4準備（上行下行比較は実装済み・非表示）
+
+動作確認済み:
+- データ読み込み・計算処理正常
+- タブ切り替え機能正常
+- Lucideアイコン完全レンダリング
+- Glass Cardスタイル適用完了
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 19:53:28] コミット: fix: プレミアム分析ページヘッダーを新構造に修正（横並び・コンパクト）
+
+UIカタログ準拠の横並びヘッダー構造に変更:
+- page-header-content で横並びレイアウト実現
+- page-header-text でテキストグループ化
+- gradient-catalog-purple でアイコン背景追加
+- セマンティックHTMLタグ（header）使用
+- アイコンサイズ36pxに統一
+
+修正前: 縦並び構造（非推奨）
+修正後: 横並び・コンパクト構造（UIカタログ準拠）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 20:08:16] コミット: feat: Phase 3-3 Tab 4（成長記録）Chart.js統合完了
+
+音程間隔別成長グラフを追加:
+- Chart.js折れ線グラフ実装（2度〜8度の推移）
+- 3ヶ月前 vs 現在の比較表示
+- ダークテーマ対応のスタイリング
+- レスポンシブデザイン対応
+
+グラフ仕様:
+- タイプ: Line Chart（折れ線グラフ）
+- データセット: 3ヶ月前（オレンジ）、現在（グリーン）
+- インタラクション: ホバーで詳細表示
+- Y軸: ±値（¢）表示
+- X軸: 音程間隔（2度〜8度）
+
+技術実装:
+- Chart.js v4.4.0活用
+- canvas要素追加
+- renderIntervalGrowthChart関数実装
+- チャートインスタンス管理（破棄・再生成）
+
+既存機能（実装済み）:
+- 月間成長比較
+- TOP3改善/停滞表示
+- 時系列パフォーマンス分析
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 20:15:00] コミット: feat: Phase 3-4 Tab 3（練習プラン）インタラクティブUI完成
+
+アコーディオン展開/折りたたみ機能追加:
+- クリックで詳細表示/非表示切り替え
+- シェブロンアイコンのアニメーション（180度回転）
+- スムーズなフェードインアニメーション
+
+追加したメタ情報:
+- 推定時間表示（優先度別: 5-20分）
+- 難易度インジケーター（高/中/低）
+- 時計アイコン・トレンドアイコン追加
+
+UI改善:
+- カードホバーエフェクト（浮き上がり + パープルシャドウ）
+- 優先度別アイコン（alert-circle/info/check-circle）
+- 左ボーダー付き詳細エリア（優先度カラー）
+- カスタム箇条書きマーカー（優先度カラー）
+
+技術実装:
+- togglePracticeDetails グローバル関数
+- Lucideアイコン動的再初期化
+- CSSトランジション（0.3s ease）
+- practice-plan-cardクラス追加
+
+ユーザー体験向上:
+- 一目で優先度・時間・難易度がわかる
+- 詳細は必要な時だけ展開
+- 視覚的に魅力的なインタラクション
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 20:18:17] コミット: fix: Chart.jsグラフのintervalGrowthデータ形式エラー修正
+
+問題:
+- intervalGrowth.find is not a function エラー発生
+- intervalGrowthは配列ではなくオブジェクト形式
+
+原因:
+- calculator.jsでは {2: {oldAverage, recentAverage}, ...} 形式で返却
+- controller.jsでは配列として .find() メソッド使用
+
+修正内容:
+- オブジェクトキーアクセス方式に変更
+- intervalGrowth[interval] で直接アクセス
+- コメント追加でデータ形式を明示
+
+修正前:
+const item = intervalGrowth.find(i => i.interval === interval);
+return item ? item.oldAverage : 0;
+
+修正後:
+return intervalGrowth[interval] ? intervalGrowth[interval].oldAverage : 0;
+
+動作確認:
+- エラー解消
+- Chart.js折れ線グラフ正常表示
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-10 20:28:35] コミット: refactor: 練習プランレイアウトをBoltデザインに統一・インライン削除
+
+Boltデモページのデザインに準拠:
+- トグル機能削除（シンプルな常時表示）
+- Bolt/results-premium-analysis.htmlのレイアウトをコピー
+- 優先度別アイコン（flame/zap/check-circle）
+- 期間表示追加（4週間/6週間/継続）
+
+インラインスタイル完全削除:
+- すべてCSSクラス化
+- practice-plan-card（優先度別背景・ボーダー）
+- practice-plan-title（優先度別カラー）
+- practice-plan-content（コンテンツスタイル）
+- practice-plan-meta（目標・期間）
+- practice-plan-exercises（練習方法エリア）
+
+CSS追加クラス:
+- .practice-plan-card.priority-1/2/3
+- .practice-plan-title.priority-1/2/3
+- .practice-plan-content
+- .practice-plan-meta
+- .practice-plan-exercises
+- .practice-plan-exercises-title
+
+デザイン統一:
+- アプリ全体のデザインシステムに適合
+- 優先度1=赤、優先度2=オレンジ、優先度3=緑
+- シンプルで読みやすいレイアウト
+
+コード品質:
+- 未使用変数削除（index）
+- JSでのインライン使用ゼロ
+- 保守性・可読性向上
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-11 15:15:33] コミット: feat: Phase 5 脳内処理パターン分析実装完了
+
+- 脳内ピアノ理論に基づく左脳・両脳処理音の分析機能追加
+- 左脳処理音（C-F#）と両脳処理音（G-B）の精度比較
+- 処理難易度の差異表示と詳細音名分析
+- APP_SPECIFICATION.md v1.5.0 更新（脳内ピアノ理論詳細追記）
+- REQUIREMENTS_SPECIFICATION.md 更新（統一理論文書化）
+
+実装内容:
+- premium-analysis-calculator.js: calculateBrainProcessingPattern()追加
+- premium-analysis-controller.js: updateBrainProcessingUI()追加
+- premium-analysis.html: Tab 1に脳内処理パターン分析セクション追加
+- premium-analysis.css: 脳内処理分析専用スタイル追加
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-11 16:34:50] コミット: fix: トレーニング記録表示の重大バグ修正
+
+【問題1】データなし時の詳細分析ページでヘッダー消失
+- showNoDataMessage()がapp-root全体を置き換えていた
+- 修正: タブコンテンツのみを置き換え、ヘッダー・ナビゲーションを保持
+
+【問題2】総合評価が実データではなくダミーデータを表示
+- 原因: premium-analysis-controller.jsとresults-overview-controller.jsで
+  同名の関数loadAllSessionData()が競合
+- premium-analysis版が後から読み込まれ、誤ったlocalStorageキー
+  (trainingHistory)を使用していたため空配列を返していた
+- 修正: premium-analysis版をloadAllSessionDataForPremium()に改名し、
+  正しいキー(sessionData)を使用
+
+結果:
+- 実際のトレーニングデータが正しく表示される
+- 適切な評価計算（例: C級、平均誤差43.2¢）が実行される
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

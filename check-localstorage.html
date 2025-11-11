@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalStorage確認ツール</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        h1 { color: #00d4ff; }
+        pre {
+            background: #16213e;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid #00d4ff;
+        }
+        .highlight { color: #ff6b6b; font-weight: bold; }
+        .success { color: #51cf66; font-weight: bold; }
+        button {
+            background: #00d4ff;
+            color: #1a1a2e;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover { background: #00a8cc; }
+    </style>
+</head>
+<body>
+    <h1>🔍 LocalStorage 音域データ確認ツール</h1>
+    
+    <button onclick="checkData()">📊 データ確認</button>
+    <button onclick="clearData()">🗑️ データ削除</button>
+    
+    <h2>保存されているデータ:</h2>
+    <pre id="output">ボタンをクリックしてデータを確認してください</pre>
+    
+    <h2>検証結果:</h2>
+    <pre id="validation"></pre>
+
+    <script>
+        function checkData() {
+            const data = localStorage.getItem('voiceRangeData');
+            const output = document.getElementById('output');
+            const validation = document.getElementById('validation');
+            
+            if (!data) {
+                output.textContent = 'データが見つかりません';
+                validation.textContent = '';
+                return;
+            }
+            
+            const parsed = JSON.parse(data);
+            output.textContent = JSON.stringify(parsed, null, 2);
+            
+            // 検証
+            let validationText = '=== データ検証結果 ===\n\n';
+            
+            if (parsed.results) {
+                const r = parsed.results;
+                
+                // 周波数データの確認
+                validationText += `✅ lowFreq: ${r.lowFreq ? r.lowFreq + ' Hz' : '❌ なし'}\n`;
+                validationText += `✅ highFreq: ${r.highFreq ? r.highFreq + ' Hz' : '❌ なし'}\n\n`;
+                
+                // 音名フィールドの確認（削除されているべき）
+                if (r.lowNote !== undefined) {
+                    validationText += `⚠️ lowNote: "${r.lowNote}" （削除されるべき）\n`;
+                } else {
+                    validationText += `✅ lowNote: 削除済み（正しい）\n`;
+                }
+                
+                if (r.highNote !== undefined) {
+                    validationText += `⚠️ highNote: "${r.highNote}" （削除されるべき）\n`;
+                } else {
+                    validationText += `✅ highNote: 削除済み（正しい）\n`;
+                }
+                
+                validationText += `\n音域範囲表示: ${r.range}\n`;
+                
+                // v3.3.0準拠かチェック
+                if (r.lowNote === undefined && r.highNote === undefined) {
+                    validationText += `\n✅ v3.3.0準拠: 周波数のみ保存されています\n`;
+                } else {
+                    validationText += `\n⚠️ 古い形式: 音名フィールドが残っています\n`;
+                    validationText += `→ ブラウザのキャッシュをクリアして再測定してください\n`;
+                }
+            }
+            
+            validation.textContent = validationText;
+        }
+        
+        function clearData() {
+            if (confirm('音域データを削除しますか？')) {
+                localStorage.removeItem('voiceRangeData');
+                document.getElementById('output').textContent = 'データを削除しました';
+                document.getElementById('validation').textContent = '';
+            }
+        }
+        
+        // ページ読み込み時に自動確認
+        window.addEventListener('load', checkData);
+    </script>
+</body>
+</html>

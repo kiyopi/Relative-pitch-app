@@ -1,379 +1,287 @@
-<body>
-<h1>📊 評価計算パフォーマンステスト</h1>
-<pre id="output">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📊 評価計算パフォーマンステスト結果
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+<div class="container container-records">
+    <!-- ヘッダーセクション -->
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="page-header-icon-wrapper">
+                <div class="page-header-icon gradient-catalog-purple">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="bar-chart-3" class="lucide lucide-bar-chart-3 text-white" data-stroke-width="2" style="width: 36px; height: 36px;"><path d="M3 3v18h18"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg>
+                </div>
+            </div>
+            <div class="page-header-text">
+                <h1 class="page-title">トレーニング記録</h1>
+                <p class="page-subtitle text-purple-200">成長の軌跡を確認しよう</p>
+            </div>
+        </div>
+    </div>
 
-🖥️  デバイス情報:
-   UserAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Safari/605.1.15
-   Platform: MacIntel
+    <!-- メインコンテンツエリア -->
+    <main class="wide-main">
 
-✅ テスト1: 1セッション計算
-   計算時間: 39.000ms
-   グレード: S
-   平均誤差: 11.6¢
+        <!-- メイン統計セクション -->
+        <section class="glass-card">
+            <!-- ローディング表示 -->
+            <div class="flex flex-col items-center gap-3 py-8" id="stats-loading" style="display: none !important;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="loader-2" class="lucide lucide-loader-2 text-blue-300 animate-spin" style="width: 48px; height: 48px;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
+                <p class="text-white-60">統計情報を読み込み中...</p>
+            </div>
 
-✅ テスト2: 10セッション個別計算
-   合計時間: 0.000ms
-   平均時間: 0.000ms/セッション
+            <!-- 統計コンテンツ（初期非表示） -->
+            <div id="stats-content" style="display: block;">
+                <!-- 連続記録バッジ -->
+                <div class="flex flex-col items-center gap-3 mb-6">
+                    <div class="flex items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="flame" class="lucide lucide-flame text-orange-300" style="width: 48px; height: 48px;"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
+                        <div>
+                            <div class="text-3xl font-bold text-white" id="streak-count">1</div>
+                            <div class="text-white-70">日間連続記録達成！</div>
+                        </div>
+                    </div>
+                    <div class="text-lg text-yellow-300" id="improvement-status">平均誤差: ±43¢ (練習を続けよう！)</div>
+                </div>
 
-✅ テスト3: 50セッション個別計算（records表示想定）
-   合計時間: 2.000ms
-   平均時間: 0.040ms/セッション
-   体感速度: 完全に即座（60FPS維持）
+                <!-- 基本統計 -->
+                <div class="flex justify-around gap-4">
+                    <div class="flex flex-col items-center">
+                        <div class="text-2xl font-bold text-blue-300" id="total-sessions">8</div>
+                        <div class="text-white-60 text-sm">総セッション数</div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="text-2xl font-bold text-green-300" id="avg-accuracy">±43</div>
+                        <div class="text-white-60 text-sm">平均誤差（¢）</div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <div class="text-2xl font-bold text-yellow-300" id="best-grade">A</div>
+                        <div class="text-white-60 text-sm">最高グレード</div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-✅ テスト4: 100回繰り返し統計
-   平均: 0.240ms
-   中央値: 0.000ms
-   最小: 0.000ms
-   最大: 20.000ms
+        <!-- 成長グラフセクション -->
+        <section class="glass-card" id="chart-section" style="display: block;">
+            <!-- ローディング表示 -->
+            <div class="flex flex-col items-center gap-3 py-8" id="chart-loading" style="display: none !important;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="loader-2" class="lucide lucide-loader-2 text-green-300 animate-spin" style="width: 48px; height: 48px;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
+                <p class="text-white-60">グラフを読み込み中...</p>
+            </div>
 
-⚠️  テスト5: 実データなし
-   localStorageにセッションデータがありません
-   トレーニングを1回実行後、再度テストしてください
+            <!-- グラフコンテンツ（初期非表示） -->
+            <div id="chart-content" style="display: block;">
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="heading-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="trending-up" class="lucide lucide-trending-up text-green-300"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+                        <span>精度推移グラフ</span>
+                    </h4>
+                </div>
+                <div style="height: 300px;">
+                    <canvas id="accuracyChart" width="2172" height="600" style="box-sizing: border-box; display: block; height: 300px; width: 1086px;"></canvas>
+                </div>
+            </div>
+        </section>
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📌 総合結論:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        <!-- 最近の記録セクション -->
+        <section class="glass-card">
+            <!-- ローディング表示 -->
+            <div class="flex flex-col items-center gap-3 py-8" id="sessions-loading" style="display: none !important;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="loader-2" class="lucide lucide-loader-2 text-purple-300 animate-spin" style="width: 48px; height: 48px;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
+                <p class="text-white-60">トレーニング履歴を読み込み中...</p>
+            </div>
 
-   🔹 1セッション平均計算時間: 0.24ms
-   🔹 50セッション表示時間: 2.000ms
-   🔹 ユーザー体験: 完全に即座（60FPS維持）
+            <!-- セッションコンテンツ（初期非表示） -->
+            <div id="sessions-content" style="display: block;">
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="heading-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="calendar" class="lucide lucide-calendar text-blue-300"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect><line x1="16" x2="16" y1="2" y2="6"></line><line x1="8" x2="8" y1="2" y2="6"></line><line x1="3" x2="21" y1="10" y2="10"></line></svg>
+                        <span>トレーニング履歴</span>
+                    </h4>
+                    <div class="text-white-60 text-sm" id="records-count">8件</div>
+                </div>
 
-💡 推奨実装方針:
+                <div class="flex flex-col gap-3" id="recent-sessions"><div class="glass-card" style="cursor: pointer;">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="music" class="lucide lucide-music text-blue-300" style="width: 20px; height: 20px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                <div>
+                    <div class="text-white font-medium">ランダムモード</div>
+                    <div class="text-white-60 text-sm">11/11 16:25</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-center">
+                    <div class="text-gray-300 text-xl font-bold">E</div>
+                    <div class="text-white-60 text-xs">グレード</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-white text-lg">±53.4¢</div>
+                    <div class="text-white-60 text-xs">平均誤差</div>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="chevron-right" class="lucide lucide-chevron-right text-white-40" style="width: 20px; height: 20px;"><path d="m9 18 6-6-6-6"></path></svg>
+            </div>
+        </div>
+    </div><div class="glass-card" style="cursor: pointer;">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="music" class="lucide lucide-music text-blue-300" style="width: 20px; height: 20px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                <div>
+                    <div class="text-white font-medium">ランダムモード</div>
+                    <div class="text-white-60 text-sm">11/11 16:25</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-center">
+                    <div class="text-green-300 text-xl font-bold">A</div>
+                    <div class="text-white-60 text-xs">グレード</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-white text-lg">±26.3¢</div>
+                    <div class="text-white-60 text-xs">平均誤差</div>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="chevron-right" class="lucide lucide-chevron-right text-white-40" style="width: 20px; height: 20px;"><path d="m9 18 6-6-6-6"></path></svg>
+            </div>
+        </div>
+    </div><div class="glass-card" style="cursor: pointer;">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="music" class="lucide lucide-music text-blue-300" style="width: 20px; height: 20px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                <div>
+                    <div class="text-white font-medium">ランダムモード</div>
+                    <div class="text-white-60 text-sm">11/11 16:25</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-center">
+                    <div class="text-gray-300 text-xl font-bold">E</div>
+                    <div class="text-white-60 text-xs">グレード</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-white text-lg">±71.6¢</div>
+                    <div class="text-white-60 text-xs">平均誤差</div>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="chevron-right" class="lucide lucide-chevron-right text-white-40" style="width: 20px; height: 20px;"><path d="m9 18 6-6-6-6"></path></svg>
+            </div>
+        </div>
+    </div><div class="glass-card" style="cursor: pointer;">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="music" class="lucide lucide-music text-blue-300" style="width: 20px; height: 20px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                <div>
+                    <div class="text-white font-medium">ランダムモード</div>
+                    <div class="text-white-60 text-sm">11/11 16:25</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-center">
+                    <div class="text-green-300 text-xl font-bold">A</div>
+                    <div class="text-white-60 text-xs">グレード</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-white text-lg">±20.4¢</div>
+                    <div class="text-white-60 text-xs">平均誤差</div>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="chevron-right" class="lucide lucide-chevron-right text-white-40" style="width: 20px; height: 20px;"><path d="m9 18 6-6-6-6"></path></svg>
+            </div>
+        </div>
+    </div><div class="glass-card" style="cursor: pointer;">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="music" class="lucide lucide-music text-blue-300" style="width: 20px; height: 20px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                <div>
+                    <div class="text-white font-medium">ランダムモード</div>
+                    <div class="text-white-60 text-sm">11/11 16:24</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-center">
+                    <div class="text-gray-300 text-xl font-bold">E</div>
+                    <div class="text-white-60 text-xs">グレード</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-white text-lg">±53.7¢</div>
+                    <div class="text-white-60 text-xs">平均誤差</div>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="chevron-right" class="lucide lucide-chevron-right text-white-40" style="width: 20px; height: 20px;"><path d="m9 18 6-6-6-6"></path></svg>
+            </div>
+        </div>
+    </div><div class="glass-card" style="cursor: pointer;">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="music" class="lucide lucide-music text-blue-300" style="width: 20px; height: 20px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                <div>
+                    <div class="text-white font-medium">ランダムモード</div>
+                    <div class="text-white-60 text-sm">11/11 16:24</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-center">
+                    <div class="text-blue-300 text-xl font-bold">B</div>
+                    <div class="text-white-60 text-xs">グレード</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-white text-lg">±41.7¢</div>
+                    <div class="text-white-60 text-xs">平均誤差</div>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="chevron-right" class="lucide lucide-chevron-right text-white-40" style="width: 20px; height: 20px;"><path d="m9 18 6-6-6-6"></path></svg>
+            </div>
+        </div>
+    </div><div class="glass-card" style="cursor: pointer;">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="music" class="lucide lucide-music text-blue-300" style="width: 20px; height: 20px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                <div>
+                    <div class="text-white font-medium">ランダムモード</div>
+                    <div class="text-white-60 text-sm">11/11 16:24</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-center">
+                    <div class="text-red-300 text-xl font-bold">D</div>
+                    <div class="text-white-60 text-xs">グレード</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-white text-lg">±47.9¢</div>
+                    <div class="text-white-60 text-xs">平均誤差</div>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="chevron-right" class="lucide lucide-chevron-right text-white-40" style="width: 20px; height: 20px;"><path d="m9 18 6-6-6-6"></path></svg>
+            </div>
+        </div>
+    </div><div class="glass-card" style="cursor: pointer;">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <i data-lucide="music" class="text-blue-300" style="width: 20px; height: 20px;"></i>
+                <div>
+                    <div class="text-white font-medium">ランダムモード</div>
+                    <div class="text-white-60 text-sm">11/11 16:24</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-center">
+                    <div class="text-green-300 text-xl font-bold">A</div>
+                    <div class="text-white-60 text-xs">グレード</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-white text-lg">±28.2¢</div>
+                    <div class="text-white-60 text-xs">平均誤差</div>
+                </div>
+                <i data-lucide="chevron-right" class="text-white-40" style="width: 20px; height: 20px;"></i>
+            </div>
+        </div>
+    </div></div>
+            </div>
 
-   ✅ 動的計算で問題なし
-   ✅ キャッシュ不要（計算コストが十分低い）
-   ✅ 評価基準変更に柔軟に対応可能
-   ✅ データ一貫性を保持
+            <!-- データなし表示 -->
+            <div class="flex flex-col items-center gap-3 py-8" id="no-data-message" style="display: none !important;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="inbox" class="lucide lucide-inbox text-white-40" style="width: 48px; height: 48px;"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+                <p class="text-white-60">まだトレーニング記録がありません</p>
+            </div>
+        </section>
 
-   📝 実装方針:
-      - SessionDataRecorderは生データのみ保存
-      - records-controllerで表示時に動的計算
-      - 評価基準変更時も過去データを正しく再評価
-</pre>
+        <!-- アクションボタン -->
+        <section class="action-buttons" id="action-buttons-section" style="display: block;">
+            <button onclick="window.NavigationManager.navigate('home')" class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="play" style="width: 24px; height: 24px;" class="lucide lucide-play"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span>新しいトレーニングを開始</span>
+            </button>
+        </section>
 
-<script>
-// EvaluationCalculatorの簡略版（計算コア部分のみ）
-class EvaluationCalculator {
-    static calculateDynamicGrade(sessionData) {
-        const modeInfo = this.detectMode(sessionData);
-        const deviceInfo = this.detectDeviceQuality();
-        const basicMetrics = this.calculateBasicMetrics(sessionData, deviceInfo);
-        const metricsWithAdjustment = this.applyTechnicalAdjustment(basicMetrics, deviceInfo);
-        const thresholdInfo = this.getModeSpecificThresholds(modeInfo.actualSessions);
-        const gradeResult = this.determineGrade(metricsWithAdjustment.adjusted, thresholdInfo.thresholds);
-
-        return {
-            grade: gradeResult.grade,
-            metrics: metricsWithAdjustment
-        };
-    }
-
-    static detectMode(sessionData) {
-        const sessionCount = sessionData.length;
-        if (sessionCount <= 8) return { mode: 'random', actualSessions: sessionCount };
-        if (sessionCount <= 12) return { mode: 'continuous', actualSessions: sessionCount };
-        return { mode: '12tone', actualSessions: sessionCount };
-    }
-
-    static detectDeviceQuality() {
-        try {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const sampleRate = audioContext.sampleRate;
-            audioContext.close();
-            return { quality: 'standard', factor: 1.0, sampleRate };
-        } catch (error) {
-            return { quality: 'standard', factor: 1.0, sampleRate: 'unknown' };
-        }
-    }
-
-    static calculateBasicMetrics(sessionData, deviceInfo) {
-        let totalError = 0;
-        let totalNotes = 0;
-        let excellentNotes = 0;
-        let errors = [];
-
-        sessionData.forEach(session => {
-            if (!session.pitchErrors) return;
-            session.pitchErrors.forEach(note => {
-                const absError = Math.abs(note.errorInCents);
-                totalError += absError;
-                totalNotes++;
-                errors.push(absError);
-                if (absError <= 30) excellentNotes++;
-            });
-        });
-
-        if (totalNotes === 0) {
-            return { avgError: 50.0, excellenceRate: 0.5, stability: 15.0, totalNotes: 0 };
-        }
-
-        const outlierThreshold = 180;
-        const validErrors = errors.filter(e => e <= outlierThreshold);
-        const avgError = validErrors.length > 0
-            ? validErrors.reduce((a, b) => a + b, 0) / validErrors.length
-            : totalError / totalNotes;
-
-        const excellenceRate = excellentNotes / totalNotes;
-        const mean = validErrors.reduce((a, b) => a + b, 0) / validErrors.length;
-        const variance = validErrors.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / validErrors.length;
-        const stability = Math.sqrt(variance);
-
-        return {
-            avgError: Math.round(avgError * 10) / 10,
-            excellenceRate: Math.round(excellenceRate * 1000) / 1000,
-            stability: Math.round(stability * 10) / 10,
-            totalNotes
-        };
-    }
-
-    static applyTechnicalAdjustment(basicMetrics, deviceInfo) {
-        return {
-            raw: basicMetrics,
-            adjusted: {
-                avgError: basicMetrics.avgError / deviceInfo.factor,
-                excellenceRate: basicMetrics.excellenceRate,
-                stability: basicMetrics.stability / deviceInfo.factor,
-                totalNotes: basicMetrics.totalNotes
-            }
-        };
-    }
-
-    static getModeSpecificThresholds(actualSessions) {
-        const sessionCount = actualSessions <= 8 ? 8 : actualSessions <= 12 ? 12 : 24;
-        const thresholds = {
-            8: { S: { avgError: 25, excellence: 0.70 }, A: { avgError: 35, excellence: 0.60 }, B: { avgError: 45, excellence: 0.50 }, C: { avgError: 55, excellence: 0.40 }, D: { avgError: 65, excellence: 0.30 }, E: { avgError: 80, excellence: 0.20 } },
-            12: { S: { avgError: 20, excellence: 0.75 }, A: { avgError: 30, excellence: 0.65 }, B: { avgError: 40, excellence: 0.55 }, C: { avgError: 50, excellence: 0.45 }, D: { avgError: 60, excellence: 0.35 }, E: { avgError: 75, excellence: 0.25 } },
-            24: { S: { avgError: 15, excellence: 0.80 }, A: { avgError: 25, excellence: 0.70 }, B: { avgError: 35, excellence: 0.60 }, C: { avgError: 45, excellence: 0.50 }, D: { avgError: 55, excellence: 0.40 }, E: { avgError: 70, excellence: 0.30 } }
-        };
-        return { thresholds: thresholds[sessionCount], sessionCount };
-    }
-
-    static determineGrade(adjustedMetrics, thresholds) {
-        const grades = ['S', 'A', 'B', 'C', 'D', 'E'];
-        for (const grade of grades) {
-            const threshold = thresholds[grade];
-            if (!threshold) continue;
-            if (adjustedMetrics.avgError <= threshold.avgError &&
-                adjustedMetrics.excellenceRate >= threshold.excellence) {
-                return { grade, thresholds: threshold };
-            }
-        }
-        return { grade: 'E', thresholds: thresholds.E || {} };
-    }
-}
-
-// ダミーセッションデータ生成
-function generateDummySession(sessionId) {
-    const pitchErrors = [];
-    for (let i = 0; i < 8; i++) {
-        pitchErrors.push({
-            step: i,
-            errorInCents: (Math.random() - 0.5) * 60  // ±30¢のランダム誤差
-        });
-    }
-    return {
-        sessionId,
-        mode: 'random',
-        startTime: Date.now() - sessionId * 1000000,
-        pitchErrors
-    };
-}
-
-// パフォーマンステスト実行
-setTimeout(() => {
-    const output = document.getElementById('output');
-    let log = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
-    log += '📊 評価計算パフォーマンステスト結果\n';
-    log += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
-
-    // デバイス情報
-    log += '🖥️  デバイス情報:\n';
-    log += `   UserAgent: ${navigator.userAgent}\n`;
-    log += `   Platform: ${navigator.platform}\n\n`;
-
-    // テスト1: 1セッションの計算時間
-    const singleSession = [generateDummySession(1)];
-    const start1 = performance.now();
-    const result1 = EvaluationCalculator.calculateDynamicGrade(singleSession);
-    const end1 = performance.now();
-    const time1 = (end1 - start1).toFixed(3);
-    log += `✅ テスト1: 1セッション計算\n`;
-    log += `   計算時間: ${time1}ms\n`;
-    log += `   グレード: ${result1.grade}\n`;
-    log += `   平均誤差: ${result1.metrics.adjusted.avgError.toFixed(1)}¢\n\n`;
-
-    // テスト2: 10セッションの計算時間（個別計算）
-    const sessions10 = Array.from({ length: 10 }, (_, i) => generateDummySession(i + 1));
-    const start2 = performance.now();
-    const results10 = sessions10.map(s => EvaluationCalculator.calculateDynamicGrade([s]));
-    const end2 = performance.now();
-    const time2 = (end2 - start2).toFixed(3);
-    const avg2 = ((end2 - start2) / 10).toFixed(3);
-    log += `✅ テスト2: 10セッション個別計算\n`;
-    log += `   合計時間: ${time2}ms\n`;
-    log += `   平均時間: ${avg2}ms/セッション\n\n`;
-
-    // テスト3: 50セッションの計算時間（records表示想定）
-    const sessions50 = Array.from({ length: 50 }, (_, i) => generateDummySession(i + 1));
-    const start3 = performance.now();
-    const results50 = sessions50.map(s => EvaluationCalculator.calculateDynamicGrade([s]));
-    const end3 = performance.now();
-    const time3 = (end3 - start3).toFixed(3);
-    const avg3 = ((end3 - start3) / 50).toFixed(3);
-    log += `✅ テスト3: 50セッション個別計算（records表示想定）\n`;
-    log += `   合計時間: ${time3}ms\n`;
-    log += `   平均時間: ${avg3}ms/セッション\n`;
-
-    // 体感速度評価
-    const time3Num = parseFloat(time3);
-    let userExperience = '';
-    if (time3Num < 16) {
-        userExperience = '完全に即座（60FPS維持）';
-    } else if (time3Num < 100) {
-        userExperience = '体感的に即座';
-    } else if (time3Num < 300) {
-        userExperience = '許容範囲';
-    } else {
-        userExperience = '遅いと感じる可能性あり';
-    }
-    log += `   体感速度: ${userExperience}\n\n`;
-
-    // テスト4: 100回繰り返し（統計的信頼性）
-    const times = [];
-    for (let i = 0; i < 100; i++) {
-        const session = [generateDummySession(i)];
-        const s = performance.now();
-        EvaluationCalculator.calculateDynamicGrade(session);
-        const e = performance.now();
-        times.push(e - s);
-    }
-    const avgTime = times.reduce((a, b) => a + b, 0) / times.length;
-    const minTime = Math.min(...times);
-    const maxTime = Math.max(...times);
-    const medianTime = times.sort((a, b) => a - b)[50];
-
-    log += `✅ テスト4: 100回繰り返し統計\n`;
-    log += `   平均: ${avgTime.toFixed(3)}ms\n`;
-    log += `   中央値: ${medianTime.toFixed(3)}ms\n`;
-    log += `   最小: ${minTime.toFixed(3)}ms\n`;
-    log += `   最大: ${maxTime.toFixed(3)}ms\n\n`;
-
-    // LocalStorageからの実データテスト
-    const realSessions = JSON.parse(localStorage.getItem('pitchpro_sessions') || '[]');
-    if (realSessions.length > 0) {
-        log += `✅ テスト5: 実データテスト（localStorage）\n`;
-        log += `   保存セッション数: ${realSessions.length}件\n`;
-
-        const testCount = Math.min(10, realSessions.length);
-        const startReal = performance.now();
-        const realResults = realSessions.slice(0, testCount).map(s => {
-            try {
-                return EvaluationCalculator.calculateDynamicGrade([s]);
-            } catch (e) {
-                console.error('評価計算エラー:', e, s);
-                return null;
-            }
-        });
-        const endReal = performance.now();
-        const timeReal = (endReal - startReal).toFixed(3);
-
-        const validResults = realResults.filter(r => r !== null);
-        log += `   テストセッション数: ${testCount}件\n`;
-        log += `   計算時間: ${timeReal}ms\n`;
-        log += `   有効結果: ${validResults.length}件\n`;
-        log += `   平均時間: ${(timeReal / testCount).toFixed(3)}ms/セッション\n`;
-
-        if (validResults.length > 0) {
-            const grades = validResults.map(r => r.grade);
-            log += `   グレード分布: ${grades.join(', ')}\n`;
-        }
-        log += '\n';
-    } else {
-        log += `⚠️  テスト5: 実データなし\n`;
-        log += `   localStorageにセッションデータがありません\n`;
-        log += `   トレーニングを1回実行後、再度テストしてください\n\n`;
-    }
-
-    // 結論
-    log += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
-    log += '📌 総合結論:\n';
-    log += '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
-
-    log += `   🔹 1セッション平均計算時間: ${avgTime.toFixed(2)}ms\n`;
-    log += `   🔹 50セッション表示時間: ${time3}ms\n`;
-    log += `   🔹 ユーザー体験: ${userExperience}\n\n`;
-
-    // 推奨方針
-    log += '💡 推奨実装方針:\n\n';
-
-    if (time3Num < 100) {
-        log += '   ✅ 動的計算で問題なし\n';
-        log += '   ✅ キャッシュ不要（計算コストが十分低い）\n';
-        log += '   ✅ 評価基準変更に柔軟に対応可能\n';
-        log += '   ✅ データ一貫性を保持\n\n';
-        log += '   📝 実装方針:\n';
-        log += '      - SessionDataRecorderは生データのみ保存\n';
-        log += '      - records-controllerで表示時に動的計算\n';
-        log += '      - 評価基準変更時も過去データを正しく再評価\n';
-    } else if (time3Num < 300) {
-        log += '   ⚠️  動的計算は可能だがキャッシュ推奨\n';
-        log += '   ✅ メモリキャッシュで最適化\n';
-        log += '   ✅ 評価基準変更時はキャッシュクリア\n\n';
-        log += '   📝 実装方針:\n';
-        log += '      - 動的計算 + Map()ベースのキャッシュ\n';
-        log += '      - EvaluationCalculator.VERSIONでキャッシュ管理\n';
-    } else {
-        log += '   ⚠️  計算コストが高い\n';
-        log += '   ⚠️  SessionDataRecorderで事前計算推奨\n\n';
-        log += '   📝 実装方針:\n';
-        log += '      - セッション保存時に評価計算・保存\n';
-        log += '      - 評価基準変更時は再計算機能を実装\n';
-    }
-
-    output.textContent = log;
-    console.log(log);
-}, 100);
-</script>
-<!-- Code injected by live-server -->
-<script>
-	// <![CDATA[  <-- For SVG support
-	if ('WebSocket' in window) {
-		(function () {
-			function refreshCSS() {
-				var sheets = [].slice.call(document.getElementsByTagName("link"));
-				var head = document.getElementsByTagName("head")[0];
-				for (var i = 0; i < sheets.length; ++i) {
-					var elem = sheets[i];
-					var parent = elem.parentElement || head;
-					parent.removeChild(elem);
-					var rel = elem.rel;
-					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
-						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
-						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
-					}
-					parent.appendChild(elem);
-				}
-			}
-			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
-			var address = protocol + window.location.host + window.location.pathname + '/ws';
-			var socket = new WebSocket(address);
-			socket.onmessage = function (msg) {
-				if (msg.data == 'reload') window.location.reload();
-				else if (msg.data == 'refreshcss') refreshCSS();
-			};
-			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
-				console.log('Live reload enabled.');
-				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
-			}
-		})();
-	}
-	else {
-		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
-	}
-	// ]]>
-</script>
-
-
-</body>
+    </main>
+</div>

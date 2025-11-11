@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>キャッシュクリア＆再テスト</title>
+    <style>
+        body {
+            font-family: system-ui;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        .step {
+            background: #16213e;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #00d4ff;
+        }
+        button {
+            background: #00d4ff;
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        button:hover { background: #00a8cc; }
+        .success { color: #51cf66; }
+        .warning { color: #ffd43b; }
+    </style>
+</head>
+<body>
+    <h1>🧹 完全キャッシュクリア手順</h1>
+    
+    <div class="step">
+        <h3>STEP 1: LocalStorageクリア</h3>
+        <button onclick="clearStorage()">🗑️ LocalStorage削除</button>
+        <p id="storage-status"></p>
+    </div>
+    
+    <div class="step">
+        <h3>STEP 2: ハードリロード実行</h3>
+        <p>以下のいずれかを実行してください：</p>
+        <ul>
+            <li><strong>Mac Chrome/Edge</strong>: Cmd + Shift + R</li>
+            <li><strong>Mac Safari</strong>: Cmd + Option + R</li>
+            <li><strong>Windows Chrome/Edge</strong>: Ctrl + Shift + R</li>
+        </ul>
+        <p class="warning">⚠️ または、開発者ツール（Application → Storage → Clear site data）</p>
+    </div>
+    
+    <div class="step">
+        <h3>STEP 3: 音域テストページへ</h3>
+        <button onclick="goToTest()">▶️ 音域テストへ移動</button>
+    </div>
+
+    <script>
+        function clearStorage() {
+            localStorage.removeItem('voiceRangeData');
+            document.getElementById('storage-status').innerHTML = 
+                '<span class="success">✅ LocalStorageを削除しました</span>';
+        }
+        
+        function goToTest() {
+            window.location.href = '/PitchPro-SPA/pages/test-voice-range-only.html';
+        }
+    </script>
+</body>
+</html>
