@@ -1,14 +1,23 @@
 # 総合評価ページ仕様書
 
 **作成日**: 2025-11-09
-**バージョン**: 1.0.0
-**最終更新日**: 2025-11-09
+**バージョン**: 1.1.0
+**最終更新日**: 2025-11-11
+
+**変更履歴**:
+- v1.1.0 (2025-11-11): トレーニング記録からの遷移機能追加
+  - `fromRecords=true`パラメータ対応
+  - レッスン詳細表示モード実装
+  - 不要なUI要素の自動非表示
+  - 戻るボタンの動的追加
+  - 実行日時表示機能
+- v1.0.0 (2025-11-09): 初版作成
 
 ---
 
 ## 📋 概要
 
-総合評価ページ（results-overview.html）の機能仕様を定義する。トレーニングセッション完了後に表示され、ユーザーの習熟度を包括的に評価し、次のステップを提案する。
+総合評価ページ（results-overview.html）の機能仕様を定義する。トレーニングセッション完了後、またはトレーニング記録からのレッスン詳細表示時に使用され、ユーザーの習熟度を包括的に評価し、次のステップを提案する。
 
 ### 対象ファイル
 - `/PitchPro-SPA/pages/results-overview.html`
@@ -325,3 +334,237 @@ if (evaluation.grade === 'S' || evaluation.grade === 'A') {
 - [ ] Phase 4: 下行モード対応（設定は準備完了、モード実装待ち）
 - [ ] Phase 5: 総合分析レポートとの連携
 - [ ] A/Bテスト: カードデザイン・メッセージ最適化
+
+---
+
+## 📊 トレーニング記録からの遷移機能（v1.1.0）
+
+### 概要
+
+トレーニング記録ページ（records.html）から過去のレッスン詳細を表示する際、総合評価ページを再利用する。この際、通常のトレーニング完了時とは異なるUI調整を行う。
+
+### URL遷移パターン
+
+```
+records.html
+    ↓ (レッスンカードクリック)
+results-overview.html?mode=random&fromRecords=true
+    ↓ (戻るボタンクリック)
+records.html
+```
+
+### URLパラメータ
+
+| パラメータ | 値 | 説明 |
+|---|---|---|
+| `mode` | `random`, `continuous`, `12tone` | モードID |
+| `fromRecords` | `true` | トレーニング記録からの遷移フラグ |
+
+### UI調整仕様
+
+#### 非表示にするセクション
+
+1. **次のステップセクション**
+   - セレクター: `main.wide-main > section.glass-card` （見出しが「次のステップ」）
+   - 理由: 過去の結果では「次の行動」は不要
+
+2. **無料版 vs プレミアム版セクション**
+   - セレクター: `main.wide-main > section.glass-card` （見出しが「無料版 vs プレミアム版」）
+   - 理由: 過去の結果では宣伝不要
+
+#### サブタイトルの変更
+
+**通常モード**:
+```
+8セッション (64音) の総合評価
+```
+
+**レッスン詳細表示モード**:
+```
+実行日時: 2025/11/11 14:30
+```
+
+**実装詳細**:
+- `records-view-date`クラスをサブタイトルに追加して保護
+- `updateOverviewUI()`で`records-view-date`クラスがあれば上書きしない
+
+#### 戻るボタンの追加
+
+**配置**: `.container.container-results-overview`の末尾
+
+**HTML構造**:
+```html
+<div id="records-back-button" style="text-align: center; margin-top: 2rem; margin-bottom: 2rem;">
+    <button class="btn btn-outline" onclick="window.NavigationManager.navigate('records')">
+        <i data-lucide="arrow-left"></i>
+        <span>トレーニング記録に戻る</span>
+    </button>
+</div>
+```
+
+### 実装フロー
+
+#### results-overview-controller.js
+
+```javascript
+async function initResults() {
+    // URLパラメータ抽出
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash.split('?')[1] || '');
+    const currentMode = params.get('mode') || 'random';
+    const fromRecords = params.get('fromRecords') === 'true';
+
+    // ... 通常の初期化処理 ...
+
+    // トレーニング記録からの遷移時のUI調整
+    if (fromRecords) {
+        setTimeout(() => {
+            handleRecordsViewMode();
+        }, 100);
+    }
+}
+
+function handleRecordsViewMode() {
+    console.log('📊 [Records View Mode] UI調整開始');
+
+    // 重複実行防止
+    if (document.getElementById('records-back-button')) {
+        return;
+    }
+
+    // 次のステップセクションを非表示
+    const allSections = document.querySelectorAll('main.wide-main > section.glass-card');
+    allSections.forEach(section => {
+        const heading = section.querySelector('h2.heading-md span, h2 span');
+        if (heading) {
+            const text = heading.textContent.trim();
+            if (text === '次のステップ' || text === '無料版 vs プレミアム版') {
+                section.style.display = 'none';
+            }
+        }
+    });
+
+    // 実行日時を表示
+    const pageSubtitle = document.querySelector('.page-subtitle');
+    if (pageSubtitle && window.filteredSessionData && window.filteredSessionData.length > 0) {
+        const latestSession = window.filteredSessionData[window.filteredSessionData.length - 1];
+        const date = new Date(latestSession.startTime);
+        const dateStr = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+        pageSubtitle.textContent = `実行日時: ${dateStr}`;
+        pageSubtitle.classList.add('records-view-date');
+    }
+
+    // 戻るボタンを追加
+    const container = document.querySelector('.container.container-results-overview');
+    if (container) {
+        const backButtonWrapper = document.createElement('div');
+        backButtonWrapper.id = 'records-back-button';
+        backButtonWrapper.style.textAlign = 'center';
+        backButtonWrapper.style.marginTop = '2rem';
+        backButtonWrapper.style.marginBottom = '2rem';
+        backButtonWrapper.innerHTML = `
+            <button class="btn btn-outline" onclick="window.NavigationManager.navigate('records')">
+                <i data-lucide="arrow-left"></i>
+                <span>トレーニング記録に戻る</span>
+            </button>
+        `;
+        container.appendChild(backButtonWrapper);
+
+        if (typeof window.initializeLucideIcons === 'function') {
+            window.initializeLucideIcons({ immediate: true });
+        }
+    }
+}
+
+function updateOverviewUI(evaluation, sessionData, fromRecords = false) {
+    // サブタイトル更新（トレーニング記録からの遷移時は日時表示を保持）
+    const subtitleEl = document.querySelector('.page-subtitle');
+    if (subtitleEl && !subtitleEl.classList.contains('records-view-date')) {
+        const totalNotes = evaluation.metrics.raw.totalNotes;
+        subtitleEl.textContent = `${sessionData.length}セッション (${totalNotes}音) の総合評価`;
+    }
+
+    // 次のステップ表示（トレーニング記録からの遷移時はスキップ）
+    if (!fromRecords) {
+        displayNextSteps(currentMode, evaluation);
+    }
+
+    // ... その他の処理 ...
+}
+```
+
+#### records-controller.js
+
+```javascript
+async function initRecords() {
+    console.log('📊 トレーニング記録ページ初期化');
+
+    // 総合評価ページから戻った際のクリーンアップ
+    cleanupRecordsViewElements();
+
+    // ... 以降の処理 ...
+}
+
+function cleanupRecordsViewElements() {
+    // 戻るボタンを削除
+    const backButton = document.getElementById('records-back-button');
+    if (backButton) {
+        backButton.remove();
+        console.log('✅ [Records] 戻るボタンをクリーンアップ');
+    }
+
+    // 日時表示クラスを削除
+    const pageSubtitle = document.querySelector('.page-subtitle');
+    if (pageSubtitle && pageSubtitle.classList.contains('records-view-date')) {
+        pageSubtitle.classList.remove('records-view-date');
+        console.log('✅ [Records] 日時表示クラスをクリーンアップ');
+    }
+}
+```
+
+### タイミング調整
+
+**100msの遅延が必要な理由**:
+1. `initResults()`が先に実行される
+2. DOM構築・Lucideアイコン初期化が完了する必要がある
+3. `displayNextSteps()`等の通常処理が完了してからUI調整を実行
+
+```javascript
+if (fromRecords) {
+    setTimeout(() => {
+        handleRecordsViewMode();
+    }, 100);  // ← 重要
+}
+```
+
+### 問題と解決策
+
+#### 問題1: 隠したセクションが再表示される
+
+**原因**: `displayNextSteps()`が`updateOverviewUI()`内で呼ばれ、セクションを動的生成
+
+**解決策**: `fromRecords=true`の時は`displayNextSteps()`をスキップ
+
+```javascript
+if (!fromRecords) {
+    displayNextSteps(currentMode, evaluation);
+}
+```
+
+#### 問題2: サブタイトルが上書きされる
+
+**原因**: `updateOverviewUI()`が無条件にサブタイトルを上書き
+
+**解決策**: `records-view-date`クラスをフラグとして使用
+
+```javascript
+if (subtitleEl && !subtitleEl.classList.contains('records-view-date')) {
+    subtitleEl.textContent = `${sessionData.length}セッション (${totalNotes}音) の総合評価`;
+}
+```
+
+#### 問題3: 戻るボタンが残り続ける
+
+**原因**: recordsページに戻った際のクリーンアップ処理がない
+
+**解決策**: `cleanupRecordsViewElements()`を`initRecords()`の最初に実行
