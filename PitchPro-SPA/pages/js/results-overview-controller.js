@@ -21,7 +21,7 @@ console.log('🚀 [results-overview-controller] Script loaded - START');
  */
 
 // デバッグモード設定（false = 詳細ログ無効化）
-const DEBUG_MODE = false;
+const DEBUG_MODE = true;
 
 /**
  * 総合評価ページの初期化（即座にグローバル定義）
@@ -150,9 +150,18 @@ window.initResultsOverview = async function() {
  * 全セッションデータを読み込み
  */
 function loadAllSessionData() {
+    console.log('🔍 [loadAllSessionData] 関数開始');
+    console.log('🔍 [loadAllSessionData] DataManager存在チェック:', typeof DataManager);
+
     try {
+        if (typeof DataManager === 'undefined') {
+            console.error('❌ DataManagerが未定義です');
+            return [];
+        }
+
         const data = DataManager.getFromStorage('sessionData') || [];
         console.log('📊 読み込んだセッションデータ:', data);
+        console.log('📊 データ件数:', data.length);
         return data;
     } catch (error) {
         console.error('❌ セッションデータ読み込みエラー:', error);

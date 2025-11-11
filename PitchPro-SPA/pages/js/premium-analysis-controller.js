@@ -24,7 +24,7 @@ window.initPremiumAnalysis = async function() {
     console.log('📊 プレミアム分析ページ初期化開始');
 
     // DataManagerから全セッションデータを取得
-    const allSessionData = loadAllSessionData();
+    const allSessionData = loadAllSessionDataForPremium();
 
     if (!allSessionData || allSessionData.length === 0) {
         console.warn('⚠️ セッションデータが見つかりません');
@@ -798,41 +798,59 @@ function initTabSwitching() {
  * データなしメッセージの表示
  */
 function showNoDataMessage() {
-    const appRoot = document.getElementById('app-root');
-    if (appRoot) {
-        appRoot.innerHTML = `
-            <div class="page-container">
-                <div class="glass-card" style="text-align: center; padding: 3rem;">
-                    <i data-lucide="alert-triangle" style="width: 64px; height: 64px; color: #f59e0b; margin-bottom: 1.5rem;"></i>
-                    <h2 style="color: white; font-size: 1.5rem; margin-bottom: 1rem;">データがありません</h2>
-                    <p style="color: #cbd5e1; margin-bottom: 2rem;">
-                        分析するためのトレーニングデータが見つかりませんでした。<br>
-                        まずはトレーニングを実施してください。
-                    </p>
-                    <button class="btn btn-primary" onclick="window.location.hash='home'">
-                        <i data-lucide="home"></i>
-                        <span>ホームに戻る</span>
-                    </button>
-                </div>
-            </div>
-        `;
+    // タブコンテンツのみを「データなし」メッセージに置き換え（ヘッダーは保持）
+    const tabContents = [
+        'tab-accuracy',
+        'tab-patterns',
+        'tab-practice',
+        'tab-growth'
+    ];
 
-        if (typeof window.initializeLucideIcons === 'function') {
-            window.initializeLucideIcons({ immediate: true });
+    const noDataHTML = `
+        <div class="glass-card" style="text-align: center; padding: 3rem;">
+            <i data-lucide="alert-triangle" style="width: 64px; height: 64px; color: #f59e0b; margin-bottom: 1.5rem;"></i>
+            <h2 style="color: white; font-size: 1.5rem; margin-bottom: 1rem;">データがありません</h2>
+            <p style="color: #cbd5e1; margin-bottom: 2rem;">
+                分析するためのトレーニングデータが見つかりませんでした。<br>
+                まずはトレーニングを実施してください。
+            </p>
+            <button class="btn btn-primary" onclick="window.location.hash='home'">
+                <i data-lucide="home"></i>
+                <span>ホームに戻る</span>
+            </button>
+        </div>
+    `;
+
+    // 全タブのコンテンツを「データなし」メッセージに置き換え
+    tabContents.forEach(tabId => {
+        const tabElement = document.getElementById(tabId);
+        if (tabElement) {
+            tabElement.innerHTML = noDataHTML;
         }
+    });
+
+    // モード分析セクションを非表示
+    const modeAnalysisSection = document.getElementById('mode-analysis-section');
+    if (modeAnalysisSection) {
+        modeAnalysisSection.style.display = 'none';
+    }
+
+    if (typeof window.initializeLucideIcons === 'function') {
+        window.initializeLucideIcons({ immediate: true });
     }
 }
 
 /**
  * 全セッションデータの読み込み（DataManager使用）
+ * premium-analysis専用
  */
-function loadAllSessionData() {
-    if (typeof window.DataManager !== 'undefined' && typeof window.DataManager.getAllSessions === 'function') {
-        return window.DataManager.getAllSessions();
+function loadAllSessionDataForPremium() {
+    if (typeof window.DataManager !== 'undefined' && typeof window.DataManager.getFromStorage === 'function') {
+        return window.DataManager.getFromStorage('sessionData') || [];
     }
 
     // DataManagerが利用できない場合はlocalStorageから直接取得
-    const historyData = localStorage.getItem('trainingHistory');
+    const historyData = localStorage.getItem('sessionData');
     if (historyData) {
         try {
             return JSON.parse(historyData);
