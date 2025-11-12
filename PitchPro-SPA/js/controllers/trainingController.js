@@ -272,10 +272,10 @@ function initializeModeUI() {
     // ページサブタイトルを更新
     const pageSubtitle = document.querySelector('.page-subtitle');
     if (pageSubtitle) {
-        // 【修正】現在のモードのセッション数を正しく計算
+        // 【修正v3.7.0】Bug #11修正: lessonId単位でセッション数カウント
         const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-        const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
-        const sessionCounter = currentModeSessions.length;
+        const currentLessonSessions = allSessions.filter(s => s.lessonId === currentLessonId);
+        const sessionCounter = currentLessonSessions.length;
         const currentSession = sessionCounter + 1;
         pageSubtitle.textContent = `セッション ${currentSession}/${config.maxSessions} 実施中`;
     }
@@ -310,10 +310,10 @@ function initializeModeTraining() {
  * 【新規】事前選定済みの配列から取得
  */
 function preselectBaseNote() {
-    // 現在のモードのセッション数を計算
+    // 【修正v3.7.0】Bug #11修正: lessonId単位でセッション数カウント
     const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-    const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
-    const sessionIndex = currentModeSessions.length;
+    const currentLessonSessions = allSessions.filter(s => s.lessonId === currentLessonId);
+    const sessionIndex = currentLessonSessions.length;
 
     // 事前選定済みの配列から取得
     if (selectedBaseNotes && selectedBaseNotes.length > sessionIndex) {
@@ -506,10 +506,10 @@ async function startTraining() {
             throw new Error('基音が選択されていません');
         }
 
-        // 【追加】基音再生時のログを強化
+        // 【修正v3.7.0】Bug #11修正: lessonId単位でセッション数カウント
         const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-        const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
-        const sessionIndex = currentModeSessions.length;
+        const currentLessonSessions = allSessions.filter(s => s.lessonId === currentLessonId);
+        const sessionIndex = currentLessonSessions.length;
 
         console.log('');
         console.log('🔊🔊🔊 基音再生開始 🔊🔊🔊');
@@ -980,10 +980,10 @@ window.resetTrainingPageFlag = resetTrainingPageFlag;
  * セッション進行状況UIを更新
  */
 function updateSessionProgressUI() {
-    // 【修正】現在のモードのセッション数を正しく計算
+    // 【修正v3.7.0】Bug #11修正: lessonId単位でセッション数カウント
     const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-    const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
-    const sessionCounter = currentModeSessions.length;
+    const currentLessonSessions = allSessions.filter(s => s.lessonId === currentLessonId);
+    const sessionCounter = currentLessonSessions.length;
     const currentSession = sessionCounter + 1; // 次のセッション番号
     const config = modeConfig[currentMode];
     const totalSessions = config.maxSessions;
