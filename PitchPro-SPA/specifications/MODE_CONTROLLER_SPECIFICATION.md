@@ -1,8 +1,8 @@
 # ModeController仕様書
 
-**バージョン**: 1.0.0
+**バージョン**: 2.0.0
 **作成日**: 2025-11-11
-**最終更新**: 2025-11-11
+**最終更新**: 2025-11-12
 
 ---
 
@@ -95,28 +95,166 @@ const ModeController = {
     hasRangeAdjustment: boolean,   // 音域調整機能の有無
     difficulty: string,            // 難易度（'beginner', 'intermediate', 'advanced'）
     icon: string,                  // Lucideアイコン名
-    directions?: object            // 12音階モード専用：方向性設定
+    chromaticDirectionOptions?: object,  // 基音進行方向オプション（v2.0.0追加）
+    scaleDirectionOptions?: object       // 音階方向オプション（v2.0.0追加）
 }
 ```
 
-#### 12音階モード専用フィールド
+---
+
+### 🆕 v2.0.0: 2次元モード管理システム
+
+#### 基音進行方向（chromaticDirection）
+
+トレーニングセッション間での基音の進行方向を指定：
 
 ```javascript
-directions: {
+chromaticDirectionOptions: {
+    'random': {
+        id: 'random',
+        name: 'ランダム',
+        description: '音域内でランダムに基音を選択'
+    },
     'ascending': {
+        id: 'ascending',
         name: '上昇',
-        sessions: 12
+        description: '半音ずつ上昇（C→C#→D...）'
     },
     'descending': {
+        id: 'descending',
         name: '下降',
-        sessions: 12
+        description: '半音ずつ下降（C→B→A#...）'
     },
     'both': {
+        id: 'both',
         name: '両方向',
-        sessions: 24
+        description: '上昇12音+下降12音（24セッション）',
+        sessionsMultiplier: 2  // セッション数を2倍にする
     }
 }
 ```
+
+**適用モード**:
+- ✅ ランダム基音モード（random）
+- ✅ 連続チャレンジモード（continuous）
+- ✅ 12音階モード（12tone）
+
+---
+
+#### 音階方向（scaleDirection）
+
+1セッション内での音階の進行方向を指定：
+
+```javascript
+scaleDirectionOptions: {
+    'ascending': {
+        id: 'ascending',
+        name: '上行',
+        description: 'ド→レ→ミ→ファ→ソ→ラ→シ→ド（上昇音階）'
+    },
+    'descending': {
+        id: 'descending',
+        name: '下行',
+        description: 'ド→シ→ラ→ソ→ファ→ミ→レ→ド（下降音階）'
+    }
+}
+```
+
+**適用モード**:
+- ✅ ランダム基音モード（random）
+- ✅ 連続チャレンジモード（continuous）
+- ✅ 12音階モード（12tone）
+
+---
+
+#### 2次元モード組み合わせ例
+
+**ランダム基音モード**:
+| chromaticDirection | scaleDirection | 説明 | セッション数 |
+|---|---|---|---|
+| random | ascending | ランダム基音・上行音階 | 8 |
+| random | descending | ランダム基音・下行音階 | 8 |
+
+**12音階モード**:
+| chromaticDirection | scaleDirection | 説明 | セッション数 |
+|---|---|---|---|
+| both | ascending | 半音階両方向・上行音階 | 24 |
+| both | descending | 半音階両方向・下行音階 | 24 |
+| ascending | ascending | 半音階上昇・上行音階 | 12 |
+| descending | descending | 半音階下降・下行音階 | 12 |
+
+---
+
+### lessonIdベースのデータ管理
+
+**v2.0.0の重要な変更**: セッションカウント方式からlessonId方式への移行
+
+#### 旧方式（v1.0.0）の問題点
+
+```javascript
+// セッション数でレッスンを判定（問題あり）
+const lessonNum = Math.floor((sessionId - 1) / sessionsPerLesson) + 1;
+
+// 問題1: トレーニング中断時に正確なグループ化ができない
+// 例: Session 1-3を実行 → 中断 → 翌日Session 4-11実行
+// → Session 1-8が同じレッスンと誤判定される
+
+// 問題2: 可変セッション数モード（弱点練習等）に対応できない
+```
+
+#### 新方式（v2.0.0）: lessonId方式
+
+```javascript
+// レッスンID生成（トレーニング開始時に1回だけ）
+const lessonId = `lesson_${timestamp}_${mode}_${chromaticDir}_${scaleDir}`;
+// 例: lesson_1699999999999_random_random_ascending
+
+// 全セッションに同じlessonIdを付与
+session1.lessonId = lessonId;
+session2.lessonId = lessonId;
+// ...
+session8.lessonId = lessonId;
+
+// レッスングループ化（lessonIdで完全一致判定）
+const lessons = sessions.reduce((acc, session) => {
+    if (!acc[session.lessonId]) {
+        acc[session.lessonId] = [];
+    }
+    acc[session.lessonId].push(session);
+    return acc;
+}, {});
+```
+
+**利点**:
+1. **正確なグループ化**: 中断・再開に関係なく正確にレッスンを識別
+2. **可変セッション数対応**: 弱点練習モード等の動的セッション数に対応
+3. **メタデータ保持**: lessonIdにモード・方向情報を含められる
+4. **トレーサビリティ**: タイムスタンプでレッスンの開始時刻を記録
+
+---
+
+### セッションデータ構造（v2.0.0）
+
+```javascript
+{
+    sessionId: 123,                                        // セッション固有ID
+    lessonId: "lesson_1699999999999_random_random_ascending",  // レッスンID（NEW）
+    mode: "random",                                        // トレーニングモード
+    chromaticDirection: "random",                          // 基音進行方向（NEW）
+    scaleDirection: "ascending",                           // 音階方向（NEW）
+    baseNote: "C3",                                        // 基音
+    baseFrequency: 130.81,                                // 基音周波数
+    startTime: 1699999999999,                             // 開始時刻
+    pitchErrors: [...],                                   // 音程誤差データ
+    completed: true,                                      // 完了フラグ
+    endTime: 1699999999999,                               // 終了時刻
+    duration: 8298                                        // 所要時間（ms）
+}
+```
+
+**後方互換性**:
+- `direction`フィールド（旧）→ `chromaticDirection`（新）に自動変換
+- `lessonId`がない旧データ → `legacy_lesson_${mode}_${chromaticDir}_${scaleDir}_${lessonNum}`を生成
 
 ---
 
@@ -565,7 +703,193 @@ getMode(modeId) {
 
 ---
 
+## 🔧 データ修復機能
+
+### 誤ったlessonId自動修復システム
+
+**背景**: trainingController.jsの初期実装で、`startTraining()`が毎回lessonIdを生成していたバグが存在。このバグにより、1つのレッスン（8セッション）が8つの異なるlessonIdを持つ状態で保存されていた。
+
+**実装箇所**: `/PitchPro-SPA/pages/js/records-controller.js`
+- 関数: `repairIncorrectLessonIds(sessions)`
+- 呼び出し: `groupSessionsIntoLessons()` 関数内で最初に実行
+
+---
+
+### 修復判定基準
+
+誤ったlessonIdと判断する**2つの条件**（両方満たす場合のみ修復対象）:
+
+#### 条件1: セッション数が期待値と完全一致
+```javascript
+currentGroup.length === expectedSessions
+```
+
+**期待値**:
+- ランダム基音: 8セッション
+- 連続チャレンジ: 12セッション
+- 12音階（片方向）: 12セッション
+- 12音階（両方向）: 24セッション
+
+#### 条件2: すべてのlessonIdが異なる
+```javascript
+uniqueLessonIds.size === expectedSessions
+```
+
+グループ内のlessonIdの種類数がセッション数と同じ（= すべて異なるlessonId）
+
+---
+
+### 修復ロジック
+
+**STEP 1: グループ化**
+- sessionIdでソート（連続セッションを検出）
+- 同じmode・chromaticDirection・scaleDirectionのセッションをグループ化
+
+**STEP 2: 修復判定**
+```javascript
+const uniqueLessonIds = new Set(currentGroup.map(s => s.lessonId));
+const needsRepair = currentGroup.length === expectedSessions &&
+                    uniqueLessonIds.size === expectedSessions;
+```
+
+**STEP 3: lessonId統一**
+- 最も古いタイムスタンプのlessonIdを基準とする
+- グループ内のすべてのセッションに同じlessonIdを割り当て
+
+**STEP 4: 永続化**
+- 修復したデータをlocalStorageに自動保存
+
+---
+
+### 修復例
+
+#### ✅ 修復対象（誤ったデータ）
+```javascript
+// ランダム基音の8セッション（バグによる異常データ）
+Session 1: lesson_1762916296329_random_random_ascending
+Session 2: lesson_1762916307762_random_random_ascending  // ← タイムスタンプ違い
+Session 3: lesson_1762916318254_random_random_ascending  // ← タイムスタンプ違い
+...
+Session 8: lesson_1762916365123_random_random_ascending  // ← タイムスタンプ違い
+
+// 判定結果
+currentGroup.length = 8 (期待値8と一致) ✅
+uniqueLessonIds.size = 8 (8個すべて異なる) ✅
+→ needsRepair = true（修復実行）
+
+// 修復後
+Session 1-8: lesson_1762916296329_random_random_ascending  // ← 最古のIDに統一
+```
+
+#### ❌ 修復対象外（正常データ）
+
+**ケース1: 正しくグループ化されたレッスン**
+```javascript
+// ランダム基音の8セッション（正常）
+Session 1-8: lesson_1762916296329_random_random_ascending
+
+// 判定結果
+currentGroup.length = 8 (期待値8と一致) ✅
+uniqueLessonIds.size = 1 (すべて同じlessonId) ❌
+→ needsRepair = false（修復不要）
+```
+
+**ケース2: トレーニング中断（不完全なレッスン）**
+```javascript
+// ランダム基音を5セッションで中断
+Session 1-5: 各々異なるlessonId
+
+// 判定結果
+currentGroup.length = 5 (期待値8と不一致) ❌
+uniqueLessonIds.size = 5
+→ needsRepair = false（修復しない - 中断データ）
+```
+
+**ケース3: 部分的に正しいレッスン**
+```javascript
+// ランダム基音8セッション（最初の3つは同じlessonId）
+Session 1-3: lesson_1762916296329_random_random_ascending
+Session 4: lesson_1762916350000_random_random_ascending  // ← 違うID
+Session 5-8: 各々異なるlessonId
+
+// 判定結果
+currentGroup.length = 8 (期待値8と一致) ✅
+uniqueLessonIds.size = 6 (8個ではない) ❌
+→ needsRepair = false（修復しない - 手動確認が必要なケース）
+```
+
+---
+
+### 修復ログ出力
+
+**修復実行時**:
+```
+🔍 [Repair] lessonId修復チェック開始
+🔧 [Repair] randomモードのセッション1-8を修復
+   修復前: 8個の異なるlessonId
+   修復後: lesson_1762916296329_random_random_ascendingに統一
+✅ [Repair] 7個のセッションのlessonIdを修復完了
+💾 [Repair] 修復済みデータをlocalStorageに保存完了
+```
+
+**修復不要時**:
+```
+🔍 [Repair] lessonId修復チェック開始
+✅ [Repair] 修復が必要なセッションはありませんでした
+```
+
+---
+
+### 設計方針
+
+**なぜこの基準なのか**:
+1. **バグの特徴に基づく**: startTraining()が毎回lessonIdを生成していたバグの特徴
+   - 完全なトレーニング完了: セッション数が期待値と一致
+   - すべてのセッションで新規生成: すべて異なるlessonId
+
+2. **安全性優先**: 部分的に誤っているデータは手動確認が必要な可能性があるため修復対象外
+
+3. **自動復旧**: ユーザーがlocalStorageを削除する必要なし
+
+**今後の拡張**:
+- 部分的に誤ったデータの検出・警告機能
+- 修復履歴の記録・ログ機能
+- 修復前データのバックアップ機能
+
+---
+
 ## 📝 変更履歴
+
+### v2.0.0 (2025-11-12)
+
+**🆕 2次元モード管理システム実装**:
+- chromaticDirection（基音進行方向）の追加: random, ascending, descending, both
+- scaleDirection（音階方向）の追加: ascending（上行）, descending（下行）
+- モード × 基音進行方向 × 音階方向の組み合わせ対応
+
+**🔄 lessonIdベースのデータ管理**:
+- セッションカウント方式からlessonId方式への移行
+- トレーニング中断・再開の正確な管理
+- 可変セッション数モードへの対応
+
+**🐛 バグ修正**:
+- trainingController.jsのlessonId生成タイミング修正（初回のみ生成）
+- トレーニング記録のグループ化ロジック修正
+- モード別統計の表示名に基音進行方向を追加
+
+**🔧 データ修復機能追加**:
+- 誤ったlessonId自動修復システム実装（repairIncorrectLessonIds関数）
+- 2つの条件による修復判定（セッション数一致 + すべて異なるlessonId）
+- 修復データの自動localStorage保存
+- 詳細な修復ログ出力機能
+
+**📄 仕様書更新**:
+- 2次元モード管理の詳細追加
+- lessonId方式の設計思想追加
+- セッションデータ構造v2.0.0の定義
+- データ修復機能の詳細仕様追加
+
+---
 
 ### v1.0.0 (2025-11-11)
 - 初版作成

@@ -1,7 +1,13 @@
 /**
  * セッションデータ記録モジュール
- * @version 2.0.0 - プレミアムデータ管理統合
+ * @version 3.0.0 - lessonID方式＋完全なモード管理統合
  * @description トレーニングセッションの音程誤差データを記録
+ *
+ * v3.0.0変更点（2025-11-11）:
+ * - lessonId方式実装（セッションをレッスン単位で正確に管理）
+ * - chromaticDirection追加（基音進行方向：random, ascending, descending等）
+ * - scaleDirection追加（音階方向：ascending上行, descending下行）
+ * - 後方互換性処理（既存のdirectionフィールド対応）
  *
  * v2.0.0変更点:
  * - プレミアムプラン判定統合
@@ -27,7 +33,11 @@ class SessionDataRecorder {
      * @param {string} baseNote - 基音（例: "C4"）
      * @param {number} baseFrequency - 基音周波数（Hz）
      * @param {string} mode - トレーニングモード（'random', 'continuous', '12tone'）
-     * @param {object} options - オプション設定（direction等）
+     * @param {object} options - オプション設定
+     * @param {string} options.lessonId - レッスンID（必須）
+     * @param {string} options.chromaticDirection - 基音進行方向（'random', 'ascending', 'descending', 'both'）
+     * @param {string} options.scaleDirection - 音階方向（'ascending', 'descending'）
+     * @param {string} options.direction - 【非推奨】後方互換性用（chromaticDirectionに変換される）
      */
     startNewSession(baseNote, baseFrequency, mode = 'random', options = {}) {
         // セッション開始前にlocalStorageと同期（localStorage消去対策）
@@ -45,19 +55,27 @@ class SessionDataRecorder {
 
         this.sessionCounter++;
 
+        // 後方互換性: direction → chromaticDirection変換
+        const chromaticDirection = options.chromaticDirection || options.direction || 'random';
+        const scaleDirection = options.scaleDirection || 'ascending';
+
         this.currentSession = {
             sessionId: this.sessionCounter,
-            mode: mode, // トレーニングモード（動的に設定）
+            lessonId: options.lessonId || `legacy_lesson_${Date.now()}`, // レッスンID（必須）
+            mode: mode,
+            chromaticDirection: chromaticDirection, // 基音進行方向
+            scaleDirection: scaleDirection,         // 音階方向
             baseNote: baseNote,
             baseFrequency: baseFrequency,
             startTime: Date.now(),
             pitchErrors: [],
-            completed: false,
-            // 12音階モードの方向情報（オプション）
-            ...(options.direction && { direction: options.direction })
+            completed: false
         };
 
         console.log('📊 新しいセッション開始:', this.currentSession);
+        console.log(`   lessonId: ${this.currentSession.lessonId}`);
+        console.log(`   chromaticDirection: ${chromaticDirection}, scaleDirection: ${scaleDirection}`);
+
         return this.currentSession;
     }
 

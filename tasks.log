@@ -8567,3 +8567,158 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-11 16:57:56] コミット: fix: トレーニング記録ページの統計表示中央寄せ問題を修正
+
+- base.cssに.justify-aroundユーティリティクラスを追加（207行、2091-2093行）
+- results.cssで.stat-value-rankと.stat-label-rankにtext-align: centerを追加済み
+- これにより「総セッション数」「平均誤差」「最高グレード」が完全に中央寄せ表示される
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-11 23:35:37] コミット: feat: トレーニング記録システム完全リファクタリング + 12音階モード両方向実装
+
+## 主要機能追加
+
+### 1. トレーニング記録のモード別統計表示
+- セッション単位からレッスン単位表示に変更
+- モード別（ランダム/連続/12音階）に統計を分離表示
+- レッスン数、平均誤差、最高グレードをモード別に集計
+
+### 2. 12音階モード両方向完全対応
+- 上昇12セッション + 下降12セッション = 24セッション実装
+- セッションデータに方向情報（direction）を保存
+- 基音選択ロジックを完全書き換え（上昇/下降/両方向対応）
+
+### 3. レッスン詳細表示の最適化
+- トレーニング記録からの遷移時に不要UI要素を非表示
+  - 「次のステップ」セクション非表示
+  - 「無料版 vs プレミアム版」セクション非表示
+- 実行日時表示に変更
+- 「トレーニング記録に戻る」ボタン追加
+- ブラウザバック時のクリーンアップ処理実装
+
+### 4. SPA重複宣言エラー修正
+- `accuracyChartInstance`をグローバルスコープで管理
+- Chart.jsインスタンスの適切な破棄と再生成
+
+### 5. モード名統一化
+- 内部ID: `'12tone'`で統一
+- 表示名マッピングを3箇所で統一
+- 旧名称`'chromatic'`との互換性維持
+
+## 技術的改善
+
+### records-controller.js
+- `groupSessionsIntoLessons()`: 動的セッション数判定関数実装
+- `getSessionsPerLesson()`: 方向性を考慮した動的計算
+- `calculateStatistics()`: モード別統計計算に完全書き換え
+- `displayStatistics()`: モードカード動的生成（既存CSSクラス活用）
+
+### trainingController.js
+- `selectSequentialMode()`: 上昇/下降/両方向の完全実装
+- 12音階モード初期化時にmaxSessionsを動的変更（12 or 24）
+- セッション開始時に方向情報を含めて記録
+
+### session-data-recorder.js
+- `startNewSession()`: optionsパラメータ追加
+- セッションデータに`direction`フィールドを保存
+
+### results-overview-controller.js
+- `fromRecords`パラメータでトレーニング記録からの遷移を判定
+- `handleRecordsViewMode()`: UI調整専用関数
+- `updateOverviewUI()`: 条件付きセクション表示
+
+## 新規ファイル
+
+- `mode-controller.js`: モード管理統合コントローラー（次回統合予定）
+
+## バグ修正
+
+- ✅ データなし時のヘッダー消失問題
+- ✅ ランダムトレーニング総合評価が全てExcellent問題
+- ✅ トレーニング記録の統計表示レイアウト
+- ✅ モード名不一致（chromatic vs 12tone）
+- ✅ 12音階モード両方向が12回で終了する問題
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-11 23:49:53] コミット: docs: 仕様書更新・新規作成（ModeController・トレーニング記録・レッスン詳細表示）
+
+## 新規作成
+- MODE_CONTROLLER_SPECIFICATION.md: モード管理統合コントローラー仕様
+  - 3モード統合（random, continuous, 12tone）
+  - 6つの主要API完全実装
+  - 12音階モード両方向対応（24セッション）
+  - 将来モード拡張計画（上行・下行・弱点練習）
+
+- TRAINING_RECORDS_SPECIFICATION.md: トレーニング記録ページ仕様
+  - モード別統計表示実装
+  - レッスングループ化ロジック
+  - 12音階モード両方向対応
+  - SPA重複宣言エラー対策
+  - クリーンアップ処理実装
+
+## 更新
+- RESULTS_OVERVIEW_SPECIFICATION.md (v1.0.0 → v1.1.0)
+  - トレーニング記録からの遷移機能追加
+  - fromRecords=trueパラメータ対応
+  - レッスン詳細表示モード実装
+  - 不要なUI要素自動非表示
+  - 戻るボタン動的追加
+  - 実行日時表示機能
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-12 18:55:04] コミット: fix: Bug #6-10修正完了 - lessonId関連・データ取得制限バグ修正
+
+- Bug #6: result-session-controller.jsがlessonIdを総合評価に渡さない問題
+  - NavigationManager.navigate()にlessonIdパラメータを追加
+  - 8セッション完了時に正しいlessonIdで総合評価ページへ遷移
+
+- Bug #7: records-controller.js getSessionHistory()の50件制限
+  - DataManager.getSessionHistory(null, 50) → (null, 1000)に変更
+  - トレーニング履歴ページで全56セッション表示可能に
+
+- Bug #8: DataManager.generateUserStatistics()の50件制限
+  - ユーザー統計計算で全セッション使用するよう修正
+  - 総セッション数・平均スコア・評価分布が正確に
+
+- Bug #9: DataManager.analyzeWeakIntervals()の50件制限
+  - 音程別弱点分析で全セッション使用するよう修正
+  - do/re/mi等の統計が全データで正確に
+
+- Bug #10: records-controller.js migrateOldSessions()のプロパティ参照
+  - session.direction → session.chromaticDirectionに修正
+  - 12音階両方向モードの旧データが正しくマイグレーション
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-12 19:00:33] コミット: fix: Bug #11修正 - 12音階モード連続実行時のセッション数カウント問題
+
+問題:
+- 12音階（上昇）12セッション完了後、12音階（両方向）を開始
+- セッション数表示が「13/24」から始まる（正しくは「1/24」）
+- mode='12tone'のみでフィルタリングしていたため累積カウントされていた
+
+修正内容:
+- trainingController.js 4箇所を修正
+  - updateTrainingPageUI() Line 277
+  - preselectBaseNote() Line 315
+  - playBaseNote() Line 511
+  - updateSessionProgressUI() Line 985
+- フィルタリング条件を変更
+  - 修正前: filter(s => s.mode === currentMode)
+  - 修正後: filter(s => s.lessonId === currentLessonId)
+
+効果:
+- 各レッスンが独立してセッション数カウント
+- 12音階モード内の複数レッスン実行が正常動作
+- セッション表示が「1/24」から正しく開始
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

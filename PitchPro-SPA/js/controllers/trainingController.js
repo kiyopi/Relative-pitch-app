@@ -21,6 +21,9 @@ let sessionRecorder = null;
 let currentLessonId = null;      // 現在のレッスンID
 let currentScaleDirection = 'ascending';  // 現在の音階方向（'ascending', 'descending'）
 
+// 【v4.0.0追加】SessionManager統合
+let sessionManager = null;       // セッション管理専門クラス
+
 // 相対音程（ドレミ...）と半音ステップの対応
 const intervals = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド'];
 const semitoneSteps = [0, 2, 4, 5, 7, 9, 11, 12]; // ド=0, レ=+2半音, ミ=+4半音...
@@ -133,6 +136,22 @@ export async function initializeTrainingPage() {
         sessionStorage.setItem('currentLessonId', currentLessonId);
     } else {
         console.log(`✅ レッスンID継続使用: ${currentLessonId}`);
+    }
+
+    // 【v4.0.0追加】SessionManager初期化
+    try {
+        const sessionOptions = {
+            chromaticDirection: directionParam || 'random',
+            scaleDirection: currentScaleDirection
+        };
+        sessionManager = new SessionManager(currentMode, currentLessonId, sessionOptions);
+        console.log(`✅ SessionManager初期化完了: ${sessionManager.getProgressText()}`);
+
+        // sessionStorageに保存（個別結果画面から戻る際の保持用）
+        sessionManager.saveToSessionStorage();
+    } catch (error) {
+        console.error('❌ SessionManager初期化エラー:', error);
+        throw new Error('SessionManager初期化に失敗しました');
     }
 
     // 【NavigationManager統合】リロード検出 → preparationへリダイレクト
@@ -272,12 +291,8 @@ function initializeModeUI() {
     // ページサブタイトルを更新
     const pageSubtitle = document.querySelector('.page-subtitle');
     if (pageSubtitle) {
-        // 【修正v3.7.0】Bug #11修正: lessonId単位でセッション数カウント
-        const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-        const currentLessonSessions = allSessions.filter(s => s.lessonId === currentLessonId);
-        const sessionCounter = currentLessonSessions.length;
-        const currentSession = sessionCounter + 1;
-        pageSubtitle.textContent = `セッション ${currentSession}/${config.maxSessions} 実施中`;
+        // 【修正v4.0.0】SessionManager統合: 重複コード削減
+        pageSubtitle.textContent = sessionManager.getProgressDetailText();
     }
 
     // アイコンを再描画
@@ -310,10 +325,8 @@ function initializeModeTraining() {
  * 【新規】事前選定済みの配列から取得
  */
 function preselectBaseNote() {
-    // 【修正v3.7.0】Bug #11修正: lessonId単位でセッション数カウント
-    const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-    const currentLessonSessions = allSessions.filter(s => s.lessonId === currentLessonId);
-    const sessionIndex = currentLessonSessions.length;
+    // 【修正v4.0.0】SessionManager統合: 重複コード削減
+    const sessionIndex = sessionManager.getCurrentSessionCount();
 
     // 事前選定済みの配列から取得
     if (selectedBaseNotes && selectedBaseNotes.length > sessionIndex) {
@@ -506,14 +519,10 @@ async function startTraining() {
             throw new Error('基音が選択されていません');
         }
 
-        // 【修正v3.7.0】Bug #11修正: lessonId単位でセッション数カウント
-        const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-        const currentLessonSessions = allSessions.filter(s => s.lessonId === currentLessonId);
-        const sessionIndex = currentLessonSessions.length;
-
+        // 【修正v4.0.0】SessionManager統合: 重複コード削減
         console.log('');
         console.log('🔊🔊🔊 基音再生開始 🔊🔊🔊');
-        console.log(`   セッション: ${sessionIndex + 1}/${modeConfig[currentMode].maxSessions}`);
+        console.log(`   セッション: ${sessionManager.getProgressText()}`);
         console.log(`   基音: ${baseNoteInfo.note} (${baseNoteInfo.frequency.toFixed(1)}Hz)`);
         console.log('');
 
@@ -856,7 +865,8 @@ function handleSessionComplete() {
             return;
         } else {
             // 連続チャレンジモード・12音階モード：自動継続または総合評価へ
-            if (sessionNumber < config.maxSessions) {
+            // 【修正v4.0.0】SessionManager統合: isLessonComplete()で判定
+            if (!sessionManager.isLessonComplete()) {
                 // 次のセッションへ自動継続
                 console.log(`🔄 セッション${sessionNumber}完了 → セッション${sessionNumber + 1}へ自動継続（1秒後）`);
 
@@ -897,7 +907,8 @@ function handleSessionComplete() {
                 return;
             } else {
                 // 全セッション完了：総合評価ページへ遷移
-                console.log(`✅ 全${config.maxSessions}セッション完了！総合評価ページへ遷移`);
+                // 【修正v4.0.0】SessionManager統合: getMaxSessions()使用
+                console.log(`✅ 全${sessionManager.getMaxSessions()}セッション完了！総合評価ページへ遷移`);
 
                 // 【重要】完了したレッスンのlessonIdを保存（遷移前にリセットしない）
                 const completedLessonId = currentLessonId;
@@ -980,34 +991,29 @@ window.resetTrainingPageFlag = resetTrainingPageFlag;
  * セッション進行状況UIを更新
  */
 function updateSessionProgressUI() {
-    // 【修正v3.7.0】Bug #11修正: lessonId単位でセッション数カウント
-    const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-    const currentLessonSessions = allSessions.filter(s => s.lessonId === currentLessonId);
-    const sessionCounter = currentLessonSessions.length;
-    const currentSession = sessionCounter + 1; // 次のセッション番号
+    // 【修正v4.0.0】SessionManager統合: 重複コード削減
     const config = modeConfig[currentMode];
-    const totalSessions = config.maxSessions;
 
-    console.log(`📊 セッション進行状況: ${currentSession}/${totalSessions} (${config.title})`);
+    console.log(`📊 セッション進行状況: ${sessionManager.getProgressText()} (${config.title})`);
 
     // 進行バーを更新
     const progressFill = document.querySelector('.progress-section .progress-fill');
     if (progressFill) {
-        const progressPercentage = (sessionCounter / totalSessions) * 100;
-        progressFill.style.width = `${progressPercentage}%`;
+        progressFill.style.width = `${sessionManager.getProgressPercentage()}%`;
     }
 
     // セッションバッジを更新
     const sessionBadge = document.querySelector('.session-badge');
     if (sessionBadge) {
-        sessionBadge.textContent = `セッション ${currentSession}/${totalSessions}`;
+        sessionBadge.textContent = `セッション ${sessionManager.getProgressText()}`;
     }
 
     // 【追加】ページサブタイトルを更新
     const pageSubtitle = document.querySelector('.page-subtitle');
     if (pageSubtitle) {
-        pageSubtitle.textContent = `セッション ${currentSession}/${totalSessions} 実施中`;
-        console.log(`✅ サブタイトル更新: セッション ${currentSession}/${totalSessions} 実施中`);
+        // 【修正v4.0.0】SessionManager統合: getProgressDetailText()使用
+        pageSubtitle.textContent = sessionManager.getProgressDetailText();
+        console.log(`✅ サブタイトル更新: ${sessionManager.getProgressDetailText()}`);
     }
 }
 
@@ -1177,7 +1183,8 @@ function getVoiceRangeOctaves() {
  */
 function selectAllBaseNotesForMode(config) {
     const availableNotes = getAvailableNotes();
-    const maxSessions = config.maxSessions;
+    // 【修正v4.0.0】SessionManager統合: getMaxSessions()使用
+    const maxSessions = sessionManager.getMaxSessions();
     const selectionType = config.baseNoteSelection;
 
     console.log(`📋 全${maxSessions}セッション分の基音を事前選定開始 (${selectionType})`);

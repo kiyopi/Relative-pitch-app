@@ -23,6 +23,11 @@ class SimpleRouter {
     }
 
     init() {
+        // 廃止されたlocalStorageキーをクリーンアップ
+        if (typeof window.DataManager !== 'undefined' && typeof DataManager.cleanupDeprecatedKeys === 'function') {
+            DataManager.cleanupDeprecatedKeys();
+        }
+
         // リスナー設定
         window.addEventListener('hashchange', () => this.handleRouteChange());
         window.addEventListener('DOMContentLoaded', () => this.handleRouteChange());

@@ -394,15 +394,26 @@ function displayDetailedAnalysis(pitchErrors, outlierThreshold) {
 function updateNextSessionButton(sessionNumber) {
     const buttons = document.querySelectorAll('.btn-next-session');
 
-    // localStorageから現在のモードのセッション数を取得
+    // 【修正v3.8.0】Bug #11関連修正: lessonId単位でセッション数カウント
     const allSessions = DataManager.getFromStorage('sessionData') || [];
-    const currentMode = 'random'; // 現在はランダムモードのみ実装
-    const completedSessionsInMode = allSessions.filter(s => s.mode === currentMode && s.completed).length;
+    const currentLessonId = sessionStorage.getItem('currentLessonId');
 
-    console.log(`📊 モード別セッション進行: ${currentMode}モードで${completedSessionsInMode}/8セッション完了`);
+    if (!currentLessonId) {
+        console.error('❌ currentLessonIdが見つかりません');
+        return;
+    }
+
+    const currentLessonSessions = allSessions.filter(s => s.lessonId === currentLessonId && s.completed);
+    const completedSessionsInLesson = currentLessonSessions.length;
+    const currentMode = currentLessonSessions[0]?.mode || 'random';
+
+    // SessionManagerから最大セッション数を取得（存在する場合）
+    const maxSessions = window.sessionManager ? window.sessionManager.getMaxSessions() : 8;
+
+    console.log(`📊 レッスン別セッション進行: lessonId=${currentLessonId}, ${completedSessionsInLesson}/${maxSessions}セッション完了`);
 
     buttons.forEach(button => {
-        if (completedSessionsInMode >= 8) {
+        if (completedSessionsInLesson >= maxSessions) {
             // 8セッション完了時は総合評価へ
             button.onclick = () => {
                 // 【修正v3.6.0】lessonIdを取得して総合評価ページに渡す
@@ -430,7 +441,7 @@ function updateNextSessionButton(sessionNumber) {
                 NavigationManager.navigateToTraining();
             };
             button.innerHTML = '<i data-lucide="arrow-right" style="width: 24px; height: 24px;"></i><span>次の基音へ</span>';
-            console.log(`➡️ セッション${completedSessionsInMode + 1}/8 - 次のセッションボタン表示`);
+            console.log(`➡️ セッション${completedSessionsInLesson + 1}/${maxSessions} - 次のセッションボタン表示`);
         }
     });
 

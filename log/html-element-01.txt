@@ -1,3 +1,202 @@
+<html lang="ja"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- キャッシュ無効化 -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>8va相対音感トレーニング - ホーム</title>
+    <link rel="stylesheet" href="styles/base.css?v=20251030001">
+    <link rel="stylesheet" href="styles/results.css?v=20251030001">
+    <link rel="stylesheet" href="styles/training.css?v=20251030001">
+    <link rel="stylesheet" href="styles/voice-range.css?v=20251030001">
+    <link rel="stylesheet" href="styles/premium-analysis.css?v=20251111001">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons - unpkg CDN (安定版・特定バージョン指定) -->
+    <script src="https://unpkg.com/lucide@0.263.0/dist/umd/lucide.js"></script>
+
+    <!-- Chart.js（総合評価ページで使用） -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+
+    <!-- JavaScript モジュール -->
+    <script src="js/utils/music-theory.js?v=20251110001"></script>
+    <script src="js/components/loading-component.js?v=20251109012"></script>
+    <script src="js/data-manager.js?v=20251029012"></script>
+    <script src="js/navigation-manager.js?v=20251029012"></script>
+    <script src="js/evaluation-calculator.js?v=20251029012"></script>
+    <script src="js/controllers/session-data-recorder.js?v=20251029012"></script>
+    <script src="pages/js/result-session-controller.js?v=20251030002"></script>
+    <!-- results-overview-controller.js は results-overview.html 内で読み込み -->
+    <script src="pages/js/premium-analysis-calculator.js?v=20251110001"></script>
+    <script src="pages/js/premium-analysis-controller.js?v=20251110001"></script>
+    <script src="js/core/pitchpro-v1.3.4.umd.js?v=20251110006"></script>
+    <script src="js/core/pitchpro-config.js?v=20251110006"></script>
+    <script src="js/core/device-detector.js?v=20251109001"></script>
+
+    <!-- 音域テスト正規版（SPA対応・条件付き初期化） -->
+    <script src="pages/js/voice-range-test.js?v=1762761450"></script>
+    <!-- タイムスタンプ方式でキャッシュを強制無効化 -->
+    <script>
+        const script = document.createElement('script');
+        script.src = `pages/js/preparation-pitchpro-cycle.js?t=${Date.now()}`;
+        document.head.appendChild(script);
+    </script><script src="pages/js/preparation-pitchpro-cycle.js?t=1762926179254"></script>
+
+    <!-- Tone.js Library (Required for PitchShifter) -->
+    <script type="importmap">
+    {
+        "imports": {
+            "tone": "https://cdn.jsdelivr.net/npm/tone@15.1.22/+esm"
+        }
+    }
+    </script>
+
+    <!-- PitchShifter Library -->
+    <script type="module">
+        import { PitchShifter } from './js/core/reference-tones.js?v=2.9.0&t=1761735209&nocache=1';
+        import * as Tone from 'tone';
+
+        window.PitchShifter = PitchShifter;
+        window.Tone = Tone;
+
+        console.log('✅ PitchShifter loaded globally (v2.9.0 - Optimized Envelope)');
+        console.log('📦 [CACHE BUSTER] Timestamp: 1761735209');
+        console.log('⚙️ [ENVELOPE] attack: 0.02s, sustain: 1.0s, release: 1.5s (2.52s total), curve: linear');
+        console.log('✅ Tone.js v15.1.22 (stable latest) loaded globally');
+    </script>
+<style id="pitchpro-notifications-styles">
+      .pitchpro-notifications {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+        max-width: 400px;
+        pointer-events: none;
+      }
+
+      .pitchpro-notification {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        margin-bottom: 12px;
+        padding: 16px;
+        pointer-events: auto;
+        position: relative;
+        animation: slideIn 0.3s ease-out;
+        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+      }
+
+      .pitchpro-notification.removing {
+        opacity: 0;
+        transform: translateX(100%);
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(100%);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .pitchpro-notification.pitchpro-notification-error {
+        border-left: 4px solid #ef4444;
+      }
+
+      .pitchpro-notification.pitchpro-notification-warning {
+        border-left: 4px solid #f59e0b;
+      }
+
+      .pitchpro-notification.pitchpro-notification-success {
+        border-left: 4px solid #10b981;
+      }
+
+      .pitchpro-notification.pitchpro-notification-info {
+        border-left: 4px solid #3b82f6;
+      }
+
+      .pitchpro-notification-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: #1f2937;
+        margin-bottom: 4px;
+        padding-right: 24px;
+      }
+
+      .pitchpro-notification-message {
+        font-size: 13px;
+        color: #4b5563;
+        margin-bottom: 8px;
+        line-height: 1.4;
+      }
+
+      .pitchpro-notification-details {
+        font-size: 12px;
+        color: #6b7280;
+        margin-bottom: 8px;
+        padding-left: 12px;
+        border-left: 2px solid #e5e7eb;
+      }
+
+      .pitchpro-notification-details li {
+        margin-bottom: 2px;
+      }
+
+      .pitchpro-notification-solution {
+        font-size: 12px;
+        color: #059669;
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        border-radius: 4px;
+        padding: 8px;
+        margin-top: 8px;
+      }
+
+      .pitchpro-notification-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: none;
+        border: none;
+        font-size: 18px;
+        color: #9ca3af;
+        cursor: pointer;
+        padding: 0;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .pitchpro-notification-close:hover {
+        color: #6b7280;
+      }
+
+      .pitchpro-notification.pitchpro-notification-priority-high {
+        border-width: 2px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+
+      @media (max-width: 640px) {
+        .pitchpro-notifications {
+          top: 10px;
+          left: 10px;
+          right: 10px;
+          max-width: none;
+        }
+      }
+    </style></head>
 <body>
     <div class="container">
         <!-- Header -->
@@ -87,11 +286,27 @@
                             <div class="text-white-70">日間連続記録達成！</div>
                         </div>
                     </div>
-                    <div class="text-lg text-blue-300" id="improvement-status">総レッスン数: 4</div>
+                    <div class="text-lg text-blue-300" id="improvement-status">総レッスン数: 3</div>
                 </div>
 
                 <!-- モード別統計 -->
                 <div id="mode-statistics" class="flex flex-col gap-4"><div class="glass-card">
+            <h5 class="text-white font-medium mb-3">ランダム基音（上行）</h5>
+            <div class="flex justify-around gap-4">
+                <div class="flex flex-col items-center">
+                    <div class="text-2xl font-bold text-blue-300">1</div>
+                    <div class="text-white-60 text-sm">レッスン数</div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="text-2xl font-bold text-green-300">±33</div>
+                    <div class="text-white-60 text-sm">平均誤差（¢）</div>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="text-2xl font-bold text-yellow-300">B</div>
+                    <div class="text-white-60 text-sm">最高グレード</div>
+                </div>
+            </div>
+        </div><div class="glass-card">
             <h5 class="text-white font-medium mb-3">12音階（両方向・上行）</h5>
             <div class="flex justify-around gap-4">
                 <div class="flex flex-col items-center">
@@ -99,23 +314,7 @@
                     <div class="text-white-60 text-sm">レッスン数</div>
                 </div>
                 <div class="flex flex-col items-center">
-                    <div class="text-2xl font-bold text-green-300">±141</div>
-                    <div class="text-white-60 text-sm">平均誤差（¢）</div>
-                </div>
-                <div class="flex flex-col items-center">
-                    <div class="text-2xl font-bold text-yellow-300">E</div>
-                    <div class="text-white-60 text-sm">最高グレード</div>
-                </div>
-            </div>
-        </div><div class="glass-card">
-            <h5 class="text-white font-medium mb-3">12音階（上昇・上行）</h5>
-            <div class="flex justify-around gap-4">
-                <div class="flex flex-col items-center">
-                    <div class="text-2xl font-bold text-blue-300">1</div>
-                    <div class="text-white-60 text-sm">レッスン数</div>
-                </div>
-                <div class="flex flex-col items-center">
-                    <div class="text-2xl font-bold text-green-300">±77</div>
+                    <div class="text-2xl font-bold text-green-300">±42</div>
                     <div class="text-white-60 text-sm">平均誤差（¢）</div>
                 </div>
                 <div class="flex flex-col items-center">
@@ -131,27 +330,11 @@
                     <div class="text-white-60 text-sm">レッスン数</div>
                 </div>
                 <div class="flex flex-col items-center">
-                    <div class="text-2xl font-bold text-green-300">±47</div>
+                    <div class="text-2xl font-bold text-green-300">±40</div>
                     <div class="text-white-60 text-sm">平均誤差（¢）</div>
                 </div>
                 <div class="flex flex-col items-center">
-                    <div class="text-2xl font-bold text-yellow-300">E</div>
-                    <div class="text-white-60 text-sm">最高グレード</div>
-                </div>
-            </div>
-        </div><div class="glass-card">
-            <h5 class="text-white font-medium mb-3">ランダム基音（上行）</h5>
-            <div class="flex justify-around gap-4">
-                <div class="flex flex-col items-center">
-                    <div class="text-2xl font-bold text-blue-300">1</div>
-                    <div class="text-white-60 text-sm">レッスン数</div>
-                </div>
-                <div class="flex flex-col items-center">
-                    <div class="text-2xl font-bold text-green-300">±2410</div>
-                    <div class="text-white-60 text-sm">平均誤差（¢）</div>
-                </div>
-                <div class="flex flex-col items-center">
-                    <div class="text-2xl font-bold text-yellow-300">E</div>
+                    <div class="text-2xl font-bold text-yellow-300">C</div>
                     <div class="text-white-60 text-sm">最高グレード</div>
                 </div>
             </div>
@@ -196,7 +379,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="calendar" class="lucide lucide-calendar text-blue-300"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect><line x1="16" x2="16" y1="2" y2="6"></line><line x1="8" x2="8" y1="2" y2="6"></line><line x1="3" x2="21" y1="10" y2="10"></line></svg>
                         <span>トレーニング履歴</span>
                     </h4>
-                    <div class="text-white-60 text-sm" id="records-count">4件</div>
+                    <div class="text-white-60 text-sm" id="records-count">3件</div>
                 </div>
 
                 <div class="flex flex-col gap-3" id="recent-sessions"><div class="glass-card" style="cursor: pointer;">
@@ -204,8 +387,28 @@
             <div class="flex items-center gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="music" class="lucide lucide-music text-blue-300" style="width: 20px; height: 20px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
                 <div>
+                    <div class="text-white font-medium">ランダム基音（上行）</div>
+                    <div class="text-white-60 text-sm">11/12 15:11 · 8セッション</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-center">
+                    <div class="text-blue-300 text-xl font-bold">B</div>
+                    <div class="text-white-60 text-sm">グレード</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-white text-lg">±32.8¢</div>
+                    <div class="text-white-60 text-sm">平均誤差</div>
+                </div>
+            </div>
+        </div>
+    </div><div class="glass-card" style="cursor: pointer;">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="music" class="lucide lucide-music text-blue-300" style="width: 20px; height: 20px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                <div>
                     <div class="text-white font-medium">12音階（両方向・上行）</div>
-                    <div class="text-white-60 text-sm">11/12 17:40 · 24セッション</div>
+                    <div class="text-white-60 text-sm">11/12 14:54 · 24セッション</div>
                 </div>
             </div>
             <div class="flex items-center gap-4">
@@ -214,47 +417,7 @@
                     <div class="text-white-60 text-sm">グレード</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-white text-lg">±141.2¢</div>
-                    <div class="text-white-60 text-sm">平均誤差</div>
-                </div>
-            </div>
-        </div>
-    </div><div class="glass-card" style="cursor: pointer;">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="music" class="lucide lucide-music text-blue-300" style="width: 20px; height: 20px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
-                <div>
-                    <div class="text-white font-medium">12音階（上昇・上行）</div>
-                    <div class="text-white-60 text-sm">11/12 17:38 · 12セッション</div>
-                </div>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="text-center">
-                    <div class="text-gray-300 text-xl font-bold">E</div>
-                    <div class="text-white-60 text-sm">グレード</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-white text-lg">±77.1¢</div>
-                    <div class="text-white-60 text-sm">平均誤差</div>
-                </div>
-            </div>
-        </div>
-    </div><div class="glass-card" style="cursor: pointer;">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="music" class="lucide lucide-music text-blue-300" style="width: 20px; height: 20px;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
-                <div>
-                    <div class="text-white font-medium">連続チャレンジ（上行）</div>
-                    <div class="text-white-60 text-sm">11/12 17:31 · 12セッション</div>
-                </div>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="text-center">
-                    <div class="text-gray-300 text-xl font-bold">E</div>
-                    <div class="text-white-60 text-sm">グレード</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-white text-lg">±46.8¢</div>
+                    <div class="text-white text-lg">±41.5¢</div>
                     <div class="text-white-60 text-sm">平均誤差</div>
                 </div>
             </div>
@@ -264,17 +427,17 @@
             <div class="flex items-center gap-3">
                 <i data-lucide="music" class="text-blue-300" style="width: 20px; height: 20px;"></i>
                 <div>
-                    <div class="text-white font-medium">ランダム基音（上行）</div>
-                    <div class="text-white-60 text-sm">11/12 17:27 · 2セッション</div>
+                    <div class="text-white font-medium">連続チャレンジ（上行）</div>
+                    <div class="text-white-60 text-sm">11/12 14:46 · 12セッション</div>
                 </div>
             </div>
             <div class="flex items-center gap-4">
                 <div class="text-center">
-                    <div class="text-gray-300 text-xl font-bold">E</div>
+                    <div class="text-orange-300 text-xl font-bold">C</div>
                     <div class="text-white-60 text-sm">グレード</div>
                 </div>
                 <div class="text-center">
-                    <div class="text-white text-lg">±2409.5¢</div>
+                    <div class="text-white text-lg">±39.7¢</div>
                     <div class="text-white-60 text-sm">平均誤差</div>
                 </div>
             </div>
@@ -412,4 +575,4 @@
         }
     </script>
 
-<div class="pitchpro-notifications" role="alert" aria-live="polite"></div></body>
+<div class="pitchpro-notifications" role="alert" aria-live="polite"></div></body></html>

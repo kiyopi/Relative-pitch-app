@@ -1,10 +1,41 @@
 # トレーニング機能仕様書（SPA版）
 
-**バージョン**: 3.2.0
+**バージョン**: 3.5.0
 **作成日**: 2025-10-23
-**最終更新**: 2025-10-29
+**最終更新**: 2025-11-12
 
 **変更履歴**:
+- v3.5.0 (2025-11-12): lessonId異モード再利用バグ修正（第4の重大バグ）
+  - **問題**: 異なるトレーニングモード間でlessonIdが再利用され、セッション数が累積
+  - **具体例**: ランダム基音8セッション（途中中断） → 連続チャレンジ4セッション → 合計12セッション判定 → 誤った総合評価表示
+  - **根本原因**: `sessionStorage.getItem('currentLessonId')`が全モード共通で復元され、モード検証なし
+    - ランダム基音モード中断時、sessionStorageに`lesson_xxx_random_xxx`が残存
+    - 連続チャレンジモード開始時、古いlessonIdを復元して使用
+    - 結果: 同一lessonIdに異なるモードのセッションが混在
+  - **解決**: lessonIdからモード情報を抽出し、currentModeと一致確認する検証ロジック追加
+  - **修正ファイル**: `/PitchPro-SPA/js/controllers/trainingController.js` (line 104-119)
+  - **修正前**: `if (storedLessonId)` - 無条件で復元
+  - **修正後**: `if (storedLessonId && lessonIdのモード === currentMode)` - モード一致時のみ復元
+  - **影響**: 異なるモードでの新規トレーニング開始時、必ず新しいlessonIdが生成される
+- v3.4.0 (2025-11-12): 12音階モード早期完了バグ修正（第3の重大バグ）
+  - **問題**: 12音階上行完了後、12音階下行モード開始時に1セッションで総合評価が表示される
+  - **根本原因**: セッション完了判定が「モード全体」のセッション数でカウント（lessonId無視）
+    - 12音階上行（12セッション）完了 → localStorage内に12音階モード12セッション
+    - 12音階下行開始 → 1セッション完了時点で `filter(s => s.mode === currentMode)` → 13セッション
+    - `sessionNumber(13) >= maxSessions(12)` → 誤った総合評価表示
+  - **解決**: `currentModeSessions`から`currentLessonSessions`に変更、lessonId単位でカウント
+  - **修正ファイル**: `/PitchPro-SPA/js/controllers/trainingController.js` (line 820-824)
+  - **修正前**: `allSessions.filter(s => s.mode === currentMode)` - モード全体でカウント
+  - **修正後**: `allSessions.filter(s => s.lessonId === currentLessonId)` - レッスン単位でカウント
+- v3.3.0 (2025-11-12): 重大なデータ消失バグ修正（第1の重大バグ）+ lessonId生成バグ修正（第2の重大バグ）
+  - **問題1**: `preparation-pitchpro-cycle.js`がトレーニング開始時に同一モードの過去セッションを全削除
+    - **影響**: 複数レッスン実行時、同じモードの古いレッスンデータが消失（例: ランダム基音2回実行 → 1回目のデータが削除）
+    - **解決**: モード別データ削除機能を完全削除、全セッションデータをlessonIdでグループ化して保持
+    - **修正ファイル**: `/PitchPro-SPA/pages/js/preparation-pitchpro-cycle.js` (line 1275-1293)
+  - **問題2**: ランダム基音モードで8セッション中8個の異なるlessonIdが生成される
+    - **根本原因**: `currentLessonId`がページスコープ変数で、個別結果ページ遷移時にリセット
+    - **解決**: sessionStorageによるlessonId永続化（ページ遷移でも保持）
+    - **修正ファイル**: `/PitchPro-SPA/js/controllers/trainingController.js` (line 100-119, 888, 1504)
 - v3.2.0 (2025-10-29): 音程測定精度の根本的改善
   - **問題**: 前の音の残響（高明瞭度）が次の音の立ち上がり期間（低明瞭度）より優先選択され、異常値（-191.8¢等）が発生
   - **解決**: 測定開始から最初の200msを除外し、残り500msの安定期間から最高明瞭度データを選択
@@ -87,7 +118,67 @@
 #results-overview     → 総合評価
 ```
 
-### 1.2 主要コンポーネント
+### 1.2 ⚠️ 重要：モード別の動線の違い（必読）
+
+**この動線の違いを理解しないと重大なバグを引き起こします**
+
+#### ランダム基音モード（hasIndividualResults: true）
+
+```
+準備画面 → トレーニング(Session 1) → 【ページ遷移】→ セッション結果画面
+  ↓                                     ↓「次のセッションへ」ボタン
+  └─────────────────────────────────────┘
+トレーニング(Session 2) → 【ページ遷移】→ セッション結果画面
+  ↓ （8セッション繰り返し）
+総合評価画面
+```
+
+**重要な特性**:
+- 毎セッション後に**ページ遷移が発生**
+- `currentLessonId`等のページスコープ変数は**リセットされる**
+- sessionStorageで状態を保持する必要がある
+
+#### 連続チャレンジ・12音階モード（hasIndividualResults: false）
+
+```
+準備画面 → トレーニング(Session 1) → 【自動継続（1秒後）】
+           トレーニング(Session 2) → 【自動継続（1秒後）】
+           トレーニング(Session 3) → ...
+           ↓ （12 or 24セッション連続実行）
+           総合評価画面
+```
+
+**重要な特性**:
+- セッション間で**ページ遷移なし**
+- `currentLessonId`等のページスコープ変数は**保持される**
+- sessionStorage不要（メモリ上で完結）
+
+#### なぜこの違いが重要か
+
+**❌ 間違った実装例（今回のバグ）**:
+```javascript
+// モード全体でセッション数をカウント
+const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
+```
+
+**問題点**:
+- 12音階上行（12セッション）完了後、12音階下行を開始
+- 12音階下行の1セッション完了時点で、モード全体で13セッション
+- `sessionNumber(13) >= maxSessions(12)` → 誤って総合評価表示
+
+**✅ 正しい実装**:
+```javascript
+// lessonId単位でセッション数をカウント
+const currentLessonSessions = allSessions.filter(s => s.lessonId === currentLessonId);
+```
+
+**理由**:
+- lessonIdは準備画面で1度だけ生成され、全セッションに付与される
+- ランダムモード: sessionStorageで保持（ページ遷移対応）
+- 連続・12音階: メモリ上で保持（ページ遷移なし）
+- どちらのモードでも正しくカウントできる
+
+### 1.3 主要コンポーネント
 
 ```javascript
 // trainingController.js
