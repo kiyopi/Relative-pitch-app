@@ -75,7 +75,8 @@ async function loadTrainingRecords() {
 
     try {
         // DataManagerからセッション履歴を取得
-        const sessions = DataManager.getSessionHistory(null, 50); // 全モード、最大50件
+        // 【修正v2.1.0】Bug #7修正: トレーニング履歴ページでは全件取得
+        const sessions = DataManager.getSessionHistory(null, 1000); // 全モード、最大1000件（実質全件）
         console.log(`[Records] Loaded ${sessions ? sessions.length : 0} sessions`);
         if (sessions && sessions.length > 0) {
             console.log('[Records] First session sample:', sessions[0]);
@@ -143,8 +144,8 @@ function hideAllLoading() {
 }
 
     /**
-     * 統計を計算（モード別）
-     * @version 3.0.0 - モード別統計計算
+     * 統計を計算（モード+方向別）
+     * @version 4.0.0 - モード+音階方向別統計計算
      */
 function calculateStatistics(sessions) {
     // レッスン単位にグループ化
@@ -152,41 +153,59 @@ function calculateStatistics(sessions) {
 
     console.log(`📊 [Statistics] 総セッション数: ${sessions.length}, グループ化後レッスン数: ${lessons.length}`);
 
-    // モード別に統計を計算
+    // モード+音階方向別に統計を計算
     const modeData = {};
     const modeNames = {
-        'random': 'ランダム基音モード',
-        'continuous': '連続チャレンジモード',
-        'chromatic': '12音階モード',
-        '12tone': '12音階モード'
+        'random': 'ランダム基音',
+        'continuous': '連続チャレンジ',
+        'chromatic': '12音階',
+        '12tone': '12音階'
+    };
+    const scaleDirectionNames = {
+        'ascending': '上行',
+        'descending': '下行'
+    };
+    const chromaticDirectionNames = {
+        'random': 'ランダム',
+        'ascending': '上昇',
+        'descending': '下降',
+        'both': '両方向'
     };
 
     lessons.forEach(lesson => {
         const mode = lesson.mode;
-        console.log(`📊 [Statistics] レッスン処理: モード=${mode}, セッション数=${lesson.sessions.length}`);
-        if (!modeData[mode]) {
-            modeData[mode] = {
+        const scaleDirection = lesson.scaleDirection || 'ascending';
+        const chromaticDirection = lesson.chromaticDirection || 'random';
+        const key = `${mode}_${chromaticDirection}_${scaleDirection}`;  // 'random_random_ascending', '12tone_both_ascending', etc.
+
+        console.log(`📊 [Statistics] レッスン処理: モード=${mode}, 音階方向=${scaleDirection}, セッション数=${lesson.sessions.length}`);
+
+        if (!modeData[key]) {
+            modeData[key] = {
+                mode,
+                chromaticDirection,
+                scaleDirection,
                 lessons: [],
                 avgErrors: [],
                 grades: []
             };
         }
 
-        modeData[mode].lessons.push(lesson);
+        modeData[key].lessons.push(lesson);
 
         // レッスン全体の評価を計算
         try {
             const evaluation = window.EvaluationCalculator.calculateDynamicGrade(lesson.sessions);
-            modeData[mode].avgErrors.push(Math.abs(evaluation.metrics.adjusted.avgError));
-            modeData[mode].grades.push(evaluation.grade);
+            modeData[key].avgErrors.push(Math.abs(evaluation.metrics.adjusted.avgError));
+            modeData[key].grades.push(evaluation.grade);
         } catch (error) {
             console.warn('[Records] モード別統計計算エラー:', error, lesson);
         }
     });
 
-    // モード別統計を作成
-    const modeStats = Object.keys(modeData).map(mode => {
-        const data = modeData[mode];
+    // モード+方向別統計を作成
+    const modeStats = Object.keys(modeData).map(key => {
+        const data = modeData[key];
         const avgAccuracy = data.avgErrors.length > 0
             ? Math.round(data.avgErrors.reduce((a, b) => a + b, 0) / data.avgErrors.length)
             : 0;
@@ -199,18 +218,34 @@ function calculateStatistics(sessions) {
             return (currentIdx !== -1 && (bestIdx === -1 || currentIdx < bestIdx)) ? grade : best;
         }, '-');
 
-        console.log(`📊 [Statistics] モード=${mode}: レッスン数=${data.lessons.length}, 平均誤差=${avgAccuracy}, 最高グレード=${bestGrade}`);
+        const modeName = modeNames[data.mode] || data.mode;
+        const scaleDirectionName = scaleDirectionNames[data.scaleDirection] || data.scaleDirection;
+        const chromaticDirectionName = chromaticDirectionNames[data.chromaticDirection] || data.chromaticDirection;
+
+        // 完全なモード名の生成（createLessonCardと同じロジック）
+        let fullName;
+        if (data.mode === '12tone' || data.mode === 'chromatic') {
+            // 12音階モード: 「12音階（両方向・上行）」のように基音進行方向も表示
+            fullName = `${modeName}（${chromaticDirectionName}・${scaleDirectionName}）`;
+        } else {
+            // ランダム基音・連続チャレンジ: 「ランダム基音（上行）」のように音階方向のみ
+            fullName = `${modeName}（${scaleDirectionName}）`;
+        }
+
+        console.log(`📊 [Statistics] ${fullName}: レッスン数=${data.lessons.length}, 平均誤差=${avgAccuracy}, 最高グレード=${bestGrade}`);
 
         return {
-            mode,
-            modeName: modeNames[mode] || mode,
+            mode: data.mode,
+            chromaticDirection: data.chromaticDirection,
+            scaleDirection: data.scaleDirection,
+            modeName: fullName,
             lessonCount: data.lessons.length,
             avgAccuracy,
             bestGrade
         };
     });
 
-    console.log(`📊 [Statistics] モード別統計: ${modeStats.length}モード`, modeStats);
+    console.log(`📊 [Statistics] モード+方向別統計: ${modeStats.length}種類`, modeStats);
 
     // 連続記録日数を計算
     const streak = calculateStreak(sessions);
@@ -332,71 +367,200 @@ async function displaySessionList(sessions) {
 }
 
 /**
- * セッションをレッスン単位にグループ化
+ * 誤ったlessonIdを持つセッションを検出・修復
+ * （startTraining()が毎回lessonIdを生成していたバグで作成されたデータ対応）
+ * @param {Array} sessions - セッション配列
+ * @returns {Array} 修復済みセッション配列
+ */
+window.repairIncorrectLessonIds = function repairIncorrectLessonIds(sessions) {
+    console.log('🔍 [Repair] lessonId修復チェック開始');
+
+    // sessionIdでソート（連続セッションを検出するため）
+    sessions.sort((a, b) => a.sessionId - b.sessionId);
+
+    let repairCount = 0;
+    let currentGroup = [];
+
+    for (let i = 0; i < sessions.length; i++) {
+        const session = sessions[i];
+
+        // lessonIdがない場合はスキップ（migrateOldSessionsで処理）
+        if (!session.lessonId) {
+            continue;
+        }
+
+        currentGroup.push(session);
+
+        // 次のセッションを確認
+        const nextSession = sessions[i + 1];
+        const isLastSession = !nextSession;
+        const isDifferentLesson = nextSession && (
+            nextSession.mode !== session.mode ||
+            nextSession.chromaticDirection !== session.chromaticDirection ||
+            nextSession.scaleDirection !== session.scaleDirection
+        );
+
+        // グループ終了条件：最後のセッション or 次が異なるレッスン
+        if (isLastSession || isDifferentLesson) {
+            // モード別の期待セッション数
+            let expectedSessions = 8;
+            if (session.mode === 'continuous') expectedSessions = 12;
+            if (session.mode === 'chromatic' || session.mode === '12tone') {
+                expectedSessions = (session.chromaticDirection === 'both') ? 24 : 12;
+            }
+
+            // グループ内のlessonIdがすべて異なる場合 = 修復が必要
+            const uniqueLessonIds = new Set(currentGroup.map(s => s.lessonId));
+            const needsRepair = currentGroup.length === expectedSessions && uniqueLessonIds.size === expectedSessions;
+
+            if (needsRepair) {
+                // 最も古いタイムスタンプのlessonIdを基準とする
+                const oldestLessonId = currentGroup
+                    .map(s => s.lessonId)
+                    .sort()[0]; // 辞書順でソート（タイムスタンプ部分で比較）
+
+                console.log(`🔧 [Repair] ${session.mode}モードのセッション${currentGroup[0].sessionId}-${currentGroup[currentGroup.length - 1].sessionId}を修復`);
+                console.log(`   修復前: ${uniqueLessonIds.size}個の異なるlessonId`);
+                console.log(`   修復後: ${oldestLessonId}に統一`);
+
+                // すべてのセッションに同じlessonIdを割り当て
+                currentGroup.forEach(s => {
+                    s.lessonId = oldestLessonId;
+                });
+
+                repairCount += currentGroup.length - 1; // 1つは元々正しいのでカウントから除外
+            }
+
+            // グループリセット
+            currentGroup = [];
+        }
+    }
+
+    if (repairCount > 0) {
+        console.log(`✅ [Repair] ${repairCount}個のセッションのlessonIdを修復完了`);
+
+        // 修復したデータをlocalStorageに保存（DataManagerのキーに合わせる）
+        try {
+            localStorage.setItem('sessionData', JSON.stringify(sessions));
+            console.log('💾 [Repair] 修復済みデータをlocalStorageに保存完了');
+        } catch (error) {
+            console.error('❌ [Repair] localStorage保存エラー:', error);
+        }
+    } else {
+        console.log('✅ [Repair] 修復が必要なセッションはありませんでした');
+    }
+
+    return sessions;
+}
+
+/**
+ * 既存データのマイグレーション処理（後方互換性）
+ * @param {Array} sessions - セッション配列
+ * @returns {Array} マイグレーション済みセッション配列
+ */
+function migrateOldSessions(sessions) {
+    let legacyLessonCounter = {};  // モード別のレガシーレッスンカウンター
+
+    return sessions.map(session => {
+        // 既にlessonIdがある場合はそのまま
+        if (session.lessonId) {
+            return session;
+        }
+
+        // lessonIdがない = 旧データ
+        console.log(`🔄 [Migration] セッション${session.sessionId}をマイグレーション`);
+
+        // 後方互換性: direction → chromaticDirection
+        if (!session.chromaticDirection) {
+            session.chromaticDirection = session.direction || 'random';
+        }
+
+        // 後方互換性: scaleDirection追加
+        if (!session.scaleDirection) {
+            session.scaleDirection = 'ascending';  // デフォルト値
+        }
+
+        // レガシーlessonID生成（モード別カウンター使用）
+        const mode = session.mode || 'random';
+        if (!legacyLessonCounter[mode]) {
+            legacyLessonCounter[mode] = 1;
+        }
+
+        // モード別セッション数で判定
+        let sessionsPerLesson = 8;
+        if (mode === 'continuous') sessionsPerLesson = 12;
+        if (mode === 'chromatic' || mode === '12tone') {
+            // 【修正v2.1.0】Bug #10修正: directionプロパティはchromaticDirectionが正しい
+            sessionsPerLesson = (session.chromaticDirection === 'both') ? 24 : 12;
+        }
+
+        // 8個ごと（or 12個/24個ごと）に同じlessonIDを割り当て
+        const lessonNum = Math.floor((session.sessionId - 1) / sessionsPerLesson) + 1;
+        session.lessonId = `legacy_lesson_${mode}_${session.chromaticDirection}_${session.scaleDirection}_${lessonNum}`;
+
+        console.log(`   → lessonId: ${session.lessonId}`);
+
+        return session;
+    });
+}
+
+/**
+ * セッションをレッスン単位にグループ化（lessonId方式）
  * @param {Array} sessions - 全セッション
  * @returns {Array} レッスン配列
  */
 function groupSessionsIntoLessons(sessions) {
-    const lessons = [];
+    console.log('🔍 [Grouping] レッスングループ化開始（lessonId方式）');
+    console.log(`🔍 [Grouping] 総セッション数: ${sessions.length}`);
 
-    // モード別のセッション数定義（動的判定関数）
-    const getSessionsPerLesson = (mode, sessions) => {
-        if (mode === 'random') return 8;
-        if (mode === 'continuous') return 12;
-        if (mode === 'chromatic' || mode === '12tone') {
-            // 12音階モードは方向性で判定
-            const firstSession = sessions[0];
-            if (firstSession && firstSession.direction === 'both') {
-                return 24; // 両方向
-            }
-            return 12; // 片方向（上昇/下降）
-        }
-        return 8; // デフォルト
-    };
+    // 誤ったlessonIdの修復（startTraining()バグで生成されたデータ対応）
+    const repairedSessions = repairIncorrectLessonIds(sessions);
 
-    // モード別にセッションを分類
-    const sessionsByMode = {};
-    sessions.forEach(session => {
-        const mode = session.mode || 'random';
-        if (!sessionsByMode[mode]) {
-            sessionsByMode[mode] = [];
+    // 旧データのマイグレーション
+    const migratedSessions = migrateOldSessions(repairedSessions);
+
+    // lessonIdでグループ化
+    const lessonMap = {};
+
+    migratedSessions.forEach(session => {
+        const lessonId = session.lessonId;
+
+        if (!lessonId) {
+            console.warn(`⚠️ [Grouping] セッション${session.sessionId}にlessonIdがありません（スキップ）`);
+            return;
         }
-        sessionsByMode[mode].push(session);
+
+        if (!lessonMap[lessonId]) {
+            lessonMap[lessonId] = {
+                lessonId: lessonId,
+                mode: session.mode || 'random',
+                chromaticDirection: session.chromaticDirection || 'random',
+                scaleDirection: session.scaleDirection || 'ascending',
+                sessions: [],
+                startTime: session.startTime,
+                endTime: session.startTime
+            };
+        }
+
+        lessonMap[lessonId].sessions.push(session);
+
+        // 開始・終了時刻を更新
+        if (session.startTime < lessonMap[lessonId].startTime) {
+            lessonMap[lessonId].startTime = session.startTime;
+        }
+        if ((session.endTime || session.startTime) > lessonMap[lessonId].endTime) {
+            lessonMap[lessonId].endTime = session.endTime || session.startTime;
+        }
     });
 
-    console.log('🔍 [Grouping] 総セッション数:', sessions.length);
-    console.log('🔍 [Grouping] モード別セッション数:', Object.keys(sessionsByMode).map(m => `${m}: ${sessionsByMode[m].length}`).join(', '));
+    // レッスン配列に変換
+    const lessons = Object.values(lessonMap);
 
-    // 各モードでグループ化
-    Object.keys(sessionsByMode).forEach(mode => {
-        const modeSessions = sessionsByMode[mode];
-        const sessionsPerLesson = getSessionsPerLesson(mode, modeSessions);
+    console.log(`✅ [Grouping] グループ化完了: ${lessons.length}レッスン`);
 
-        console.log(`🔍 [Grouping] ${mode}モード: ${modeSessions.length}セッション → ${sessionsPerLesson}セッション/レッスンで分割`);
-
-        // セッションIDでソート（古い順）
-        modeSessions.sort((a, b) => a.sessionId - b.sessionId);
-
-        // グループ化
-        for (let i = 0; i < modeSessions.length; i += sessionsPerLesson) {
-            const lessonSessions = modeSessions.slice(i, i + sessionsPerLesson);
-
-            console.log(`🔍 [Grouping] ${mode} レッスン${Math.floor(i / sessionsPerLesson) + 1}: ${lessonSessions.length}/${sessionsPerLesson}セッション`);
-
-            // レッスンが完了しているか確認（必要なセッション数が揃っているか）
-            if (lessonSessions.length === sessionsPerLesson) {
-                lessons.push({
-                    mode: mode,
-                    sessions: lessonSessions,
-                    lessonNumber: Math.floor(i / sessionsPerLesson) + 1,
-                    startTime: lessonSessions[0].startTime,
-                    endTime: lessonSessions[lessonSessions.length - 1].endTime || lessonSessions[lessonSessions.length - 1].startTime
-                });
-                console.log(`✅ [Grouping] ${mode} レッスン${Math.floor(i / sessionsPerLesson) + 1} 追加完了`);
-            } else {
-                console.log(`⚠️ [Grouping] ${mode} レッスン${Math.floor(i / sessionsPerLesson) + 1} スキップ（未完了）`);
-            }
-        }
+    // デバッグ: レッスン情報表示
+    lessons.forEach(lesson => {
+        console.log(`   - ${lesson.mode}（${lesson.scaleDirection}）: ${lesson.sessions.length}セッション [${lesson.lessonId}]`);
     });
 
     // 最新順にソート
@@ -441,6 +605,32 @@ function createLessonCard(lesson) {
     };
     const modeName = modeNames[lesson.mode] || lesson.mode;
 
+    // 音階方向を日本語に変換
+    const scaleDirectionNames = {
+        'ascending': '上行',
+        'descending': '下行'
+    };
+    const scaleDirectionName = scaleDirectionNames[lesson.scaleDirection] || lesson.scaleDirection || '上行';
+
+    // 基音進行方向を日本語に変換
+    const chromaticDirectionNames = {
+        'random': 'ランダム',
+        'ascending': '上昇',
+        'descending': '下降',
+        'both': '両方向'
+    };
+    const chromaticDirectionName = chromaticDirectionNames[lesson.chromaticDirection] || lesson.chromaticDirection || 'ランダム';
+
+    // 完全なモード名の生成
+    let fullModeName;
+    if (lesson.mode === '12tone' || lesson.mode === 'chromatic') {
+        // 12音階モード: 「12音階（両方向・上行）」のように基音進行方向も表示
+        fullModeName = `${modeName}（${chromaticDirectionName}・${scaleDirectionName}）`;
+    } else {
+        // ランダム基音・連続チャレンジ: 「ランダム基音（上行）」のように音階方向のみ
+        fullModeName = `${modeName}（${scaleDirectionName}）`;
+    }
+
     // グレードに応じた色
     const gradeColors = {
         'S': 'text-yellow-300',
@@ -457,7 +647,7 @@ function createLessonCard(lesson) {
             <div class="flex items-center gap-3">
                 <i data-lucide="music" class="text-blue-300" style="width: 20px; height: 20px;"></i>
                 <div>
-                    <div class="text-white font-medium">${modeName}モード</div>
+                    <div class="text-white font-medium">${fullModeName}</div>
                     <div class="text-white-60 text-sm">${dateStr} · ${lesson.sessions.length}セッション</div>
                 </div>
             </div>
@@ -487,9 +677,16 @@ function createLessonCard(lesson) {
  * @param {Object} lesson - レッスンデータ
  */
 function viewLessonDetail(lesson) {
-    // 総合評価ページへ遷移（モード + トレーニング記録からの遷移フラグ付き）
+    console.log('🔍 [viewLessonDetail] レッスンデータ:', lesson);
+    console.log('🔍 [viewLessonDetail] lessonId:', lesson.lessonId);
+    console.log('🔍 [viewLessonDetail] sessions数:', lesson.sessions?.length);
+    console.log('🔍 [viewLessonDetail] セッションのlessonId:', lesson.sessions?.map(s => s.lessonId));
+
+    // 総合評価ページへ遷移（モード + 音階方向 + lessonId + トレーニング記録からの遷移フラグ付き）
     window.NavigationManager.navigate('results-overview', {
         mode: lesson.mode,
+        scaleDirection: lesson.scaleDirection || 'ascending',
+        lessonId: lesson.lessonId,
         fromRecords: 'true'
     });
 }
@@ -603,7 +800,7 @@ async function displayAccuracyChart(sessions) {
     // 最新20件を取得して逆順（古い→新しい）
     const chartSessions = sessions.slice(0, 20).reverse();
 
-    const labels = chartSessions.map((s, idx) => `${idx + 1}`);
+    const labels = chartSessions.map((_s, idx) => `${idx + 1}`);
 
     // v2.0.0: 動的評価計算で平均誤差を取得
     const data = chartSessions.map(session => {

@@ -405,11 +405,20 @@ function updateNextSessionButton(sessionNumber) {
         if (completedSessionsInMode >= 8) {
             // 8セッション完了時は総合評価へ
             button.onclick = () => {
+                // 【修正v3.6.0】lessonIdを取得して総合評価ページに渡す
+                const currentSession = allSessions.find(s => s.mode === currentMode && s.completed);
+                const lessonId = currentSession ? currentSession.lessonId : null;
+
+                console.log(`📋 総合評価ページへ遷移: lessonId=${lessonId}`);
+
                 // 【統一ナビゲーション】NavigationManager.navigate()を使用
                 if (window.NavigationManager) {
-                    window.NavigationManager.navigate('results-overview');
+                    window.NavigationManager.navigate('results-overview', {
+                        mode: currentMode,
+                        lessonId: lessonId
+                    });
                 } else {
-                    window.location.hash = 'results-overview';
+                    window.location.hash = `results-overview?mode=${currentMode}&lessonId=${lessonId}`;
                 }
             };
             button.innerHTML = '<i data-lucide="trophy" class="icon-md"></i><span>総合評価を見る</span>';

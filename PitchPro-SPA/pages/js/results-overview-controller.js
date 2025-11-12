@@ -38,13 +38,18 @@ window.initResultsOverview = async function() {
         return;
     }
 
-    // URLパラメータからモードとトレーニング記録からの遷移フラグを取得
+    // URLパラメータからモード・lessonId・scaleDirection・トレーニング記録からの遷移フラグを取得
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash.split('?')[1] || '');
     const currentMode = params.get('mode') || 'random';
+    const lessonId = params.get('lessonId');
+    const scaleDirection = params.get('scaleDirection');
     const fromRecords = params.get('fromRecords') === 'true';
+    
     if (DEBUG_MODE) {
         console.log(`🔍 [DEBUG] 現在のモード: ${currentMode}`);
+        console.log(`🔍 [DEBUG] lessonId: ${lessonId || 'なし（全体表示）'}`);
+        console.log(`🔍 [DEBUG] scaleDirection: ${scaleDirection || 'なし'}`);
         console.log(`🔍 [DEBUG] トレーニング記録から遷移: ${fromRecords}`);
         console.log(`🔍 [DEBUG] URL hash: ${window.location.hash}`);
     }
@@ -58,9 +63,45 @@ window.initResultsOverview = async function() {
         console.log('📊 [DEBUG] モード別セッション数:', modeDistribution);
     }
 
-    // 現在のモードのセッションのみフィルタリング
-    const sessionData = allSessionData.filter(s => s.mode === currentMode);
-    console.log(`✅ セッションデータ取得: ${currentMode}モード=${sessionData.length}セッション (全体=${allSessionData.length}セッション)`);
+    // セッションデータのフィルタリング
+    let sessionData;
+
+    // 【修正v3.5.0】lessonIdがあれば常に優先（fromRecordsフラグは不要）
+    if (lessonId) {
+        // トレーニング完了時 or トレーニング記録から遷移：特定のlessonIdのセッションのみを表示
+        console.log(`🔍 [DEBUG] フィルタリング開始 - 目標lessonId: ${lessonId}`);
+        console.log(`🔍 [DEBUG] 全セッション数: ${allSessionData.length}`);
+        console.log(`🔍 [DEBUG] fromRecords: ${fromRecords}`);
+
+        sessionData = allSessionData.filter(s => s.lessonId === lessonId);
+        console.log(`✅ lessonId=${lessonId}のセッションデータ取得: ${sessionData.length}セッション`);
+
+        if (DEBUG_MODE && sessionData.length > 0) {
+            console.log('🔍 [DEBUG] フィルタリング結果の最初のセッション:', sessionData[0]);
+            console.log('🔍 [DEBUG] すべてのlessonId:', sessionData.map(s => s.lessonId));
+        }
+        
+        if (sessionData.length === 0) {
+            console.warn(`⚠️ lessonId=${lessonId}のセッションが見つかりません`);
+            // フォールバック: モード+scaleDirectionでフィルタリング
+            sessionData = allSessionData.filter(s => 
+                s.mode === currentMode && 
+                (s.scaleDirection || 'ascending') === (scaleDirection || 'ascending')
+            );
+            console.log(`🔄 フォールバック: ${currentMode}モード（${scaleDirection}）のセッション=${sessionData.length}件`);
+        }
+    } else if (scaleDirection) {
+        // scaleDirection指定あり：モード+scaleDirectionでフィルタリング
+        sessionData = allSessionData.filter(s => 
+            s.mode === currentMode && 
+            (s.scaleDirection || 'ascending') === scaleDirection
+        );
+        console.log(`✅ ${currentMode}モード（${scaleDirection}）のセッションデータ取得: ${sessionData.length}セッション`);
+    } else {
+        // 通常のモード別フィルタリング（後方互換性）
+        sessionData = allSessionData.filter(s => s.mode === currentMode);
+        console.log(`✅ セッションデータ取得: ${currentMode}モード=${sessionData.length}セッション (全体=${allSessionData.length}セッション)`);
+    }
 
     // フィルタリング済みセッションデータをグローバル変数に保存
     // showSessionDetail関数で参照するため
@@ -169,9 +210,18 @@ function loadAllSessionData() {
             return [];
         }
 
-        const data = DataManager.getFromStorage('sessionData') || [];
+        let data = DataManager.getFromStorage('sessionData') || [];
         console.log('📊 読み込んだセッションデータ:', data);
         console.log('📊 データ件数:', data.length);
+
+        // 誤ったlessonIdの修復（グローバル関数を使用）
+        if (typeof window.repairIncorrectLessonIds === 'function') {
+            console.log('🔧 [loadAllSessionData] lessonId修復機能を実行');
+            data = window.repairIncorrectLessonIds(data);
+        } else {
+            console.warn('⚠️ [loadAllSessionData] repairIncorrectLessonIds関数が見つかりません');
+        }
+
         return data;
     } catch (error) {
         console.error('❌ セッションデータ読み込みエラー:', error);

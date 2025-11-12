@@ -7,6 +7,10 @@
  * @features 課金制御・弱点分析・統計データ処理対応・プレミアムデータ保存期間管理
  *
  * @changelog
+ * - v2.1.0 (2025-11-12): 廃止キー自動クリーンアップ機能追加
+ *   - DEPRECATED_KEYS: 廃止キー一元管理配列
+ *   - cleanupDeprecatedKeys(): アプリ起動時の自動クリーンアップ
+ *   - resetAllData(): 廃止キーも削除するように改善
  * - v2.1.0 (2025-10-27): プレミアムデータ保存期間管理機能追加
  *   - cleanupSessionData(): プラン別自動クリーンアップ
  *   - saveSessionResultWithCleanup(): 保存時自動クリーンアップ
@@ -27,6 +31,11 @@ class DataManager {
     WEAKNESS_ANALYSIS: 'weaknessAnalysis',
     CUSTOM_MODE_SETTINGS: 'customModeSettings'
   };
+
+  // 廃止されたキー（後方互換性のため自動削除対象）
+  static DEPRECATED_KEYS = [
+    'pitchpro_sessions' // v2.0.0以前で使用されていたキー
+  ];
 
   // === ユーザー設定管理 ===
   
@@ -627,7 +636,8 @@ class DataManager {
    * ユーザー統計を生成
    */
   static generateUserStatistics() {
-    const sessions = this.getSessionHistory();
+    // 【修正v1.1.0】Bug #8修正: 統計計算は全セッション対象
+    const sessions = this.getSessionHistory(null, 1000);
     
     if (sessions.length === 0) {
       return null;
@@ -676,7 +686,8 @@ class DataManager {
    * 音程別の弱点を分析
    */
   static analyzeWeakIntervals() {
-    const sessions = this.getSessionHistory();
+    // 【修正v1.1.0】Bug #9修正: 弱点分析は全セッション対象
+    const sessions = this.getSessionHistory(null, 1000);
     const intervalStats = {};
     
     const intervals = ['do', 're', 'mi', 'fa', 'so', 'la', 'ti', 'do'];
@@ -1113,9 +1124,16 @@ class DataManager {
    */
   static resetTrainingData() {
     try {
+      // 現在のトレーニングデータを削除
       localStorage.removeItem(this.KEYS.SESSION_DATA);
       localStorage.removeItem(this.KEYS.OVERALL_EVALUATION);
       localStorage.removeItem(this.KEYS.WEAKNESS_ANALYSIS);
+      
+      // 廃止されたトレーニング関連キーも削除
+      this.DEPRECATED_KEYS.forEach(key => {
+        localStorage.removeItem(key);
+      });
+      
       console.log('✅ トレーニング記録削除完了');
       return true;
     } catch (error) {
@@ -1139,13 +1157,42 @@ class DataManager {
   }
 
   /**
+   * 廃止されたキーを自動検出・削除
+   * アプリ起動時やデータ操作時に自動実行される
+   */
+  static cleanupDeprecatedKeys() {
+    let removedCount = 0;
+
+    this.DEPRECATED_KEYS.forEach(key => {
+      if (localStorage.getItem(key) !== null) {
+        localStorage.removeItem(key);
+        removedCount++;
+        console.log(`🗑️ 廃止キー削除: ${key}`);
+      }
+    });
+
+    if (removedCount > 0) {
+      console.log(`✅ 廃止キークリーンアップ完了: ${removedCount}件削除`);
+    }
+
+    return removedCount;
+  }
+
+  /**
    * 全データリセット（完全削除）
    */
   static resetAllData() {
     try {
+      // DataManager.KEYSに定義されているキーを削除
       Object.values(this.KEYS).forEach(key => {
         localStorage.removeItem(key);
       });
+
+      // 廃止されたキーも削除
+      this.DEPRECATED_KEYS.forEach(key => {
+        localStorage.removeItem(key);
+      });
+
       console.log('✅ 全データリセット完了');
       return true;
     } catch (error) {

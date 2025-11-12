@@ -18,6 +18,8 @@ let usedBaseNotes = []; // 使用済み基音リスト（トレーニング内�
 
 // セッションデータ記録用
 let sessionRecorder = null;
+let currentLessonId = null;      // 現在のレッスンID
+let currentScaleDirection = 'ascending';  // 現在の音階方向（'ascending', 'descending'）
 
 // 相対音程（ドレミ...）と半音ステップの対応
 const intervals = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド'];
@@ -60,10 +62,12 @@ export async function initializeTrainingPage() {
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash.split('?')[1] || '');
     const modeParam = params.get('mode');
-    const directionParam = params.get('direction'); // 12音階モード方向パラメータ
+    const directionParam = params.get('direction'); // クロマチック方向パラメータ（12音階モード用）
+    const scaleDirectionParam = params.get('scaleDirection'); // 音階方向パラメータ（'ascending', 'descending'）
 
     console.log('🔍 [DEBUG] modeパラメータ:', modeParam);
     console.log('🔍 [DEBUG] directionパラメータ:', directionParam);
+    console.log('🔍 [DEBUG] scaleDirectionパラメータ:', scaleDirectionParam);
 
     if (modeParam && modeConfig[modeParam]) {
         currentMode = modeParam;
@@ -73,6 +77,10 @@ export async function initializeTrainingPage() {
         console.warn(`🔍 [DEBUG] 利用可能なモード:`, Object.keys(modeConfig));
         currentMode = 'random';
     }
+
+    // 音階方向の設定
+    currentScaleDirection = scaleDirectionParam || 'ascending';
+    console.log(`✅ 音階方向設定: ${currentScaleDirection}`);
 
     // 12音階モード方向をグローバル変数に保存
     if (currentMode === '12tone' && directionParam) {
@@ -87,6 +95,44 @@ export async function initializeTrainingPage() {
             modeConfig['12tone'].maxSessions = 12;
             console.log(`✅ 12音階モード片方向: maxSessions=12に設定`);
         }
+    }
+
+    // レッスンID生成（トレーニング全体で1つのレッスンID）
+    // sessionStorageから復元を試みる（個別結果画面からの戻り対応）
+    const storedLessonId = sessionStorage.getItem('currentLessonId');
+
+    // 【修正v3.5.0】sessionStorageのlessonIdが現在のモードと一致するか確認
+    let isValidStoredLessonId = false;
+    if (storedLessonId) {
+        // lessonIdからモード情報を抽出（lesson_1234567890_mode_dir_scaleDir形式）
+        const lessonIdParts = storedLessonId.split('_');
+        const storedMode = lessonIdParts.length >= 3 ? lessonIdParts[2] : null;
+
+        if (storedMode === currentMode) {
+            isValidStoredLessonId = true;
+            console.log(`✅ lessonId検証成功: モード一致 (${storedMode})`);
+        } else {
+            console.warn(`⚠️ lessonId検証失敗: モード不一致 (stored=${storedMode}, current=${currentMode})`);
+            console.warn(`   前のモードのlessonIdが残っていました - 新規生成します`);
+            sessionStorage.removeItem('currentLessonId');
+        }
+    }
+
+    if (isValidStoredLessonId) {
+        // sessionStorageに保存されたlessonIdを復元（モード一致確認済み）
+        currentLessonId = storedLessonId;
+        console.log(`✅ レッスンID復元（sessionStorage）: ${currentLessonId}`);
+    } else if (!currentLessonId) {
+        // 初回のみ生成
+        const timestamp = Date.now();
+        const chromaticDir = directionParam || 'random';
+        currentLessonId = `lesson_${timestamp}_${currentMode}_${chromaticDir}_${currentScaleDirection}`;
+        console.log(`✅ レッスンID生成（初回）: ${currentLessonId}`);
+
+        // sessionStorageに保存（個別結果画面から戻る際の保持用）
+        sessionStorage.setItem('currentLessonId', currentLessonId);
+    } else {
+        console.log(`✅ レッスンID継続使用: ${currentLessonId}`);
     }
 
     // 【NavigationManager統合】リロード検出 → preparationへリダイレクト
@@ -488,14 +534,22 @@ async function startTraining() {
         if (window.sessionDataRecorder) {
             sessionRecorder = window.sessionDataRecorder;
 
-            // 12音階モードの場合、方向情報を含める
-            const sessionOptions = {};
-            if (currentMode === '12tone' && window.currentTrainingDirection) {
-                sessionOptions.direction = window.currentTrainingDirection;
-            }
+            // セッションオプション設定
+            const chromaticDirection = window.currentTrainingDirection || 'random';
+            const sessionOptions = {
+                lessonId: currentLessonId,                     // レッスンID（必須）
+                chromaticDirection: chromaticDirection,        // 基音進行方向
+                scaleDirection: currentScaleDirection,         // 音階方向
+                // 後方互換性のため旧directionフィールドも含める
+                direction: chromaticDirection
+            };
 
             sessionRecorder.startNewSession(baseNoteInfo.note, baseNoteInfo.frequency, currentMode, sessionOptions);
-            console.log('📊 セッションデータ記録開始 (mode:', currentMode, sessionOptions.direction ? `direction: ${sessionOptions.direction}` : '', ')');
+            console.log('📊 セッションデータ記録開始');
+            console.log(`   lessonId: ${currentLessonId}`);
+            console.log(`   mode: ${currentMode}`);
+            console.log(`   chromaticDirection: ${chromaticDirection}`);
+            console.log(`   scaleDirection: ${currentScaleDirection}`);
         } else {
             console.warn('⚠️ SessionDataRecorderが読み込まれていません');
         }
@@ -780,11 +834,11 @@ function handleSessionComplete() {
         const completedSession = sessionRecorder.completeSession();
         console.log('✅ セッションデータ保存完了:', completedSession);
 
-        // 【修正】現在のモードのセッション数を正しく計算
+        // 【修正v3.4.0】現在のlessonIdのセッション数を正しく計算（モード全体ではなくレッスン単位）
         const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-        const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
-        const sessionNumber = currentModeSessions.length;
-        console.log(`🔍 [DEBUG] モード別セッション数: ${currentMode}モード=${sessionNumber}セッション (全体=${allSessions.length}セッション)`);
+        const currentLessonSessions = allSessions.filter(s => s.lessonId === currentLessonId);
+        const sessionNumber = currentLessonSessions.length;
+        console.log(`🔍 [DEBUG] レッスン別セッション数: lessonId=${currentLessonId}, ${sessionNumber}セッション (全体=${allSessions.length}セッション)`);
 
         const config = modeConfig[currentMode];
 
@@ -845,11 +899,25 @@ function handleSessionComplete() {
                 // 全セッション完了：総合評価ページへ遷移
                 console.log(`✅ 全${config.maxSessions}セッション完了！総合評価ページへ遷移`);
 
+                // 【重要】完了したレッスンのlessonIdを保存（遷移前にリセットしない）
+                const completedLessonId = currentLessonId;
+                console.log(`📋 完了したレッスンID: ${completedLessonId}`);
+
+                // レッスンID・音階方向をリセット（次回トレーニング用）
+                currentLessonId = null;
+                currentScaleDirection = 'ascending';
+                sessionStorage.removeItem('currentLessonId'); // sessionStorageもクリア
+                console.log('🔄 currentLessonId・currentScaleDirectionをリセット（sessionStorageもクリア）');
+
                 // 【統一ナビゲーション】NavigationManager.navigate()を使用
+                // 【修正v3.5.0】lessonIdを渡して、完了したレッスンのみを表示
                 if (window.NavigationManager) {
-                    window.NavigationManager.navigate('results-overview', { mode: currentMode });
+                    window.NavigationManager.navigate('results-overview', {
+                        mode: currentMode,
+                        lessonId: completedLessonId  // 完了したレッスンのみ表示
+                    });
                 } else {
-                    window.location.hash = `results-overview?mode=${currentMode}`;
+                    window.location.hash = `results-overview?mode=${currentMode}&lessonId=${completedLessonId}`;
                 }
                 return;
             }
@@ -1455,6 +1523,12 @@ function setupHomeButton() {
         );
 
         if (confirmed) {
+            // レッスンID・音階方向をリセット（中断時）
+            currentLessonId = null;
+            currentScaleDirection = 'ascending';
+            sessionStorage.removeItem('currentLessonId'); // sessionStorageもクリア
+            console.log('🔄 トレーニング中断: currentLessonId・currentScaleDirectionをリセット（sessionStorageもクリア）');
+
             // 【統一ナビゲーション】NavigationManager.navigate()を使用
             // NavigationManagerが自動的にaudioDetector破棄、beforeunload/popstate無効化を実行
             if (window.NavigationManager) {

@@ -1272,25 +1272,9 @@ function setupMicPermissionFlow() {
                 // trainingページで同じMediaStreamを再利用し、マイク許可を再要求しない
                 console.log('📌 PitchProリソースを保持（MediaStream再利用のため）');
 
-                // 【localStorage統合】トレーニング開始時に該当モードのセッションデータをクリア
+                // 【修正】モード別データ削除機能を削除（全セッションデータを保持）
+                // すべてのトレーニング記録は保持され、lessonIdで正しくグループ化される
                 const redirectInfo = window.preparationRedirectInfo;
-                const mode = redirectInfo?.mode || 'random';
-
-                // 全モード共通：新規トレーニング開始時に該当モードの古いデータをクリア
-                const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-                console.log(`🔍 [localStorage] クリア前のセッション数: ${allSessions.length}`);
-                console.log(`🔍 [localStorage] 対象モード: ${mode}`);
-
-                const otherModeSessions = allSessions.filter(s => s.mode !== mode);
-                localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
-
-                console.log(`✅ ${mode}モードのセッションデータをクリアしました`);
-                console.log(`🔍 [localStorage] クリア後のセッション数: ${otherModeSessions.length}`);
-
-                // SessionDataRecorderをlocalStorageと同期（重要！）
-                if (window.sessionDataRecorder) {
-                    window.sessionDataRecorder.resetSession();
-                }
 
                 // 【変更】ブラウザバック防止解除はNavigationManagerが自動実行
                 // NavigationManager.navigateToTraining()内でremoveBrowserBackPrevention()が自動的に呼ばれる
