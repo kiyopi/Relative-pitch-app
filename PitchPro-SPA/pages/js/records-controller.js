@@ -104,18 +104,26 @@ async function loadTrainingRecords() {
         await displayAccuracyChart(sessions);
         hideLoading('chart');
 
-        // データあり時の表示制御
+        // データあり時の表示制御（CSSクラス使用）
         const noDataMessage = document.getElementById('no-data-message');
         if (noDataMessage) {
-            noDataMessage.style.setProperty('display', 'none', 'important');
+            noDataMessage.classList.add('hidden');
         }
-        document.getElementById('chart-section').style.display = 'block';
-        document.getElementById('action-buttons-section').style.display = 'block';
+
+        const chartSection = document.getElementById('chart-section');
+        if (chartSection) {
+            chartSection.classList.remove('hidden');
+        }
+
+        const actionButtons = document.getElementById('action-buttons-section');
+        if (actionButtons) {
+            actionButtons.classList.remove('hidden');
+        }
 
         // セッションコンテンツを確実に表示
         const sessionsContent = document.getElementById('sessions-content');
         if (sessionsContent) {
-            sessionsContent.style.display = 'block';
+            sessionsContent.classList.remove('hidden');
         }
 
     } catch (error) {
@@ -906,23 +914,32 @@ function showNoDataMessage() {
         modeStatsContainer.innerHTML = '<p class="text-white-60 text-center">まだトレーニングデータがありません</p>';
     }
 
-    // セッションコンテンツを非表示、データなしメッセージを表示
+    // セッションコンテンツを非表示、データなしメッセージを表示（CSSクラス使用）
     const sessionsContent = document.getElementById('sessions-content');
-    if (sessionsContent) sessionsContent.style.display = 'none';
+    if (sessionsContent) {
+        sessionsContent.classList.add('hidden');
+    }
 
-    document.getElementById('no-data-message').style.display = 'flex';
-    document.getElementById('records-count').textContent = '0件';
+    const noDataMessage = document.getElementById('no-data-message');
+    if (noDataMessage) {
+        noDataMessage.classList.remove('hidden');
+    }
+
+    const recordsCount = document.getElementById('records-count');
+    if (recordsCount) {
+        recordsCount.textContent = '0件';
+    }
 
     // グラフセクションを非表示
     const chartSection = document.getElementById('chart-section');
     if (chartSection) {
-        chartSection.style.display = 'none';
+        chartSection.classList.add('hidden');
     }
 
     // アクションボタンセクションを表示（データなし時も「新しいトレーニングを開始」ボタンを表示）
     const actionButtons = document.getElementById('action-buttons-section');
     if (actionButtons) {
-        actionButtons.style.display = 'block';
+        actionButtons.classList.remove('hidden');
     }
 }
 

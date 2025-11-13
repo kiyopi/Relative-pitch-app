@@ -57,8 +57,8 @@
             </div>
         </section>
 
-        <!-- 成長グラフセクション -->
-        <section class="glass-card" id="chart-section">
+        <!-- 成長グラフセクション（初期非表示） -->
+        <section class="glass-card hidden" id="chart-section">
             <!-- ローディング表示 -->
             <div class="flex flex-col items-center gap-3 py-8" id="chart-loading" style="display: flex;">
                 <i data-lucide="loader-2" class="text-green-300 animate-spin" style="width: 48px; height: 48px;"></i>
@@ -88,7 +88,7 @@
             </div>
 
             <!-- セッションコンテンツ（初期非表示） -->
-            <div id="sessions-content" style="display: none;">
+            <div id="sessions-content" class="hidden">
                 <div class="flex items-center justify-between mb-4">
                     <h4 class="heading-md">
                         <i data-lucide="calendar" class="text-blue-300"></i>
@@ -102,15 +102,15 @@
                 </div>
             </div>
 
-            <!-- データなし表示 -->
-            <div class="flex flex-col items-center gap-3 py-8" id="no-data-message" style="display: none;">
+            <!-- データなし表示（初期非表示） -->
+            <div class="flex flex-col items-center gap-3 py-8 hidden" id="no-data-message">
                 <i data-lucide="inbox" class="text-white-40" style="width: 48px; height: 48px;"></i>
                 <p class="text-white-60">まだトレーニング記録がありません</p>
             </div>
         </section>
 
-        <!-- アクションボタン -->
-        <section class="action-buttons" id="action-buttons-section" style="display: none;">
+        <!-- アクションボタン（初期非表示） -->
+        <section class="action-buttons hidden" id="action-buttons-section">
             <button onclick="window.NavigationManager.navigate('home')" class="btn btn-primary">
                 <i data-lucide="play" style="width: 24px; height: 24px;"></i>
                 <span>新しいトレーニングを開始</span>
