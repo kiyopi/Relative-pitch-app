@@ -428,18 +428,27 @@ class NavigationManager {
 
     /**
      * 許可された遷移先のマップ（ダイアログを表示しない遷移）
+     *
+     * 【重要】このマップは「ブラウザバック防止対象ページ」からの正当な遷移のみを定義
+     * - ブラウザバック防止対象: preparation, training, result-session, results, results-overview
+     * - 非対象ページ（home, records等）は定義不要（ブラウザバック自由）
      */
     static allowedTransitions = new Map([
+        ['preparation', ['training', 'home']],
         ['training', ['result-session', 'results-overview', 'home']],
         ['result-session', ['training', 'results', 'results-overview', 'home']],
-        ['results', ['home', 'preparation']],
-        ['results-overview', ['home', 'preparation']]
+        ['results', ['home', 'preparation', 'records']],
+        ['results-overview', ['home', 'preparation', 'records', 'training']]
     ]);
 
     /**
      * ブラウザバック防止が必要なページの設定
      */
     static PAGE_CONFIG = {
+        'preparation': {
+            preventBackNavigation: true,
+            backPreventionMessage: 'トレーニング準備中です。\n\nブラウザバックは無効になっています。\nホームボタンからトップページに戻れます。'
+        },
         'training': {
             preventBackNavigation: true,
             backPreventionMessage: 'トレーニング中です。\n\nブラウザバックは無効になっています。\nホームボタンからトップページに戻れます。'

@@ -515,6 +515,16 @@ class SimpleRouter {
      * @param {string} page - ページ名
      */
     preventBrowserBack(page) {
+        // トレーニング記録からの遷移時はブラウザバック防止をスキップ
+        const hash = window.location.hash.substring(1);
+        const params = new URLSearchParams(hash.split('?')[1] || '');
+        const fromRecords = params.get('fromRecords') === 'true';
+
+        if (fromRecords && page === 'results-overview') {
+            console.log('📍 [Router] トレーニング記録からの遷移 - ブラウザバック防止をスキップ');
+            return;
+        }
+
         // NavigationManagerに完全委譲（設定もNavigationManagerで管理）
         if (window.NavigationManager) {
             window.NavigationManager.preventBrowserBack(page);

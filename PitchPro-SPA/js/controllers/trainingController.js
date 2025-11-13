@@ -104,20 +104,38 @@ export async function initializeTrainingPage() {
     // sessionStorageから復元を試みる（個別結果画面からの戻り対応）
     const storedLessonId = sessionStorage.getItem('currentLessonId');
 
-    // 【修正v3.5.0】sessionStorageのlessonIdが現在のモードと一致するか確認
+    // 【修正v4.0.1】sessionStorageのlessonIdが現在のモードと一致するか確認
+    // 【追加v4.0.1】完了済みレッスンの復元を防止
     let isValidStoredLessonId = false;
     if (storedLessonId) {
         // lessonIdからモード情報を抽出（lesson_1234567890_mode_dir_scaleDir形式）
         const lessonIdParts = storedLessonId.split('_');
         const storedMode = lessonIdParts.length >= 3 ? lessonIdParts[2] : null;
 
-        if (storedMode === currentMode) {
-            isValidStoredLessonId = true;
-            console.log(`✅ lessonId検証成功: モード一致 (${storedMode})`);
-        } else {
+        if (storedMode !== currentMode) {
             console.warn(`⚠️ lessonId検証失敗: モード不一致 (stored=${storedMode}, current=${currentMode})`);
             console.warn(`   前のモードのlessonIdが残っていました - 新規生成します`);
-            sessionStorage.removeItem('currentLessonId');
+            SessionManager.clearSessionStorage();
+        } else {
+            // モード一致確認後、完了済みレッスンかチェック
+            const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+            const lessonSessions = allSessions.filter(s => s.lessonId === storedLessonId);
+
+            // 動的にmaxSessionsを取得（12音階モード対応）
+            const tempOptions = {
+                chromaticDirection: directionParam || 'random',
+                scaleDirection: currentScaleDirection
+            };
+            const expectedMaxSessions = window.ModeController.getSessionsPerLesson(currentMode, tempOptions);
+
+            if (lessonSessions.length >= expectedMaxSessions) {
+                console.warn(`⚠️ lessonId検証失敗: 完了済みレッスン (${lessonSessions.length}/${expectedMaxSessions}セッション)`);
+                console.warn(`   完了済みレッスンのlessonIdが残っていました - 新規生成します`);
+                SessionManager.clearSessionStorage();
+            } else {
+                isValidStoredLessonId = true;
+                console.log(`✅ lessonId検証成功: モード一致 + 未完了 (${lessonSessions.length}/${expectedMaxSessions}セッション)`);
+            }
         }
     }
 
@@ -917,8 +935,10 @@ function handleSessionComplete() {
                 // レッスンID・音階方向をリセット（次回トレーニング用）
                 currentLessonId = null;
                 currentScaleDirection = 'ascending';
-                sessionStorage.removeItem('currentLessonId'); // sessionStorageもクリア
-                console.log('🔄 currentLessonId・currentScaleDirectionをリセット（sessionStorageもクリア）');
+
+                // 【修正v4.0.1】SessionManager統合: clearSessionStorage()使用
+                SessionManager.clearSessionStorage();
+                console.log('🔄 currentLessonId・currentScaleDirectionをリセット（sessionStorageクリア）');
 
                 // 【統一ナビゲーション】NavigationManager.navigate()を使用
                 // 【修正v3.5.0】lessonIdを渡して、完了したレッスンのみを表示
@@ -1303,10 +1323,28 @@ function selectRandomMode(availableNotes, maxSessions) {
                 );
             }
 
+            // 【修正v4.0.2】優先順位5: 全白鍵使用済みの場合、前回と異なる音なら重複許可
+            if (candidates.length === 0) {
+                candidates = whiteKeys.filter(note =>
+                    !lastNote || note.note !== lastNote.note
+                );
+                if (candidates.length > 0) {
+                    console.warn(`⚠️ 全白鍵使用済み（${selectedNotes.length}/${maxSessions}セッション）- 重複許可モードで選択`);
+                }
+            }
+
+            // 【修正v4.0.2】優先順位6: 最後のフォールバック（前回と同じでも許可）
+            if (candidates.length === 0) {
+                candidates = whiteKeys;
+                console.error(`❌ 候補なし - 完全ランダム選択（${selectedNotes.length}/${maxSessions}セッション）`);
+            }
+
             if (candidates.length > 0) {
                 const newNote = candidates[Math.floor(Math.random() * candidates.length)];
                 selectedNotes.push(newNote);
                 lastNote = newNote;
+            } else {
+                console.error(`❌ 致命的エラー: 基音選択失敗（${selectedNotes.length}/${maxSessions}セッション）`);
             }
         }
     }

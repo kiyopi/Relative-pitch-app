@@ -1,10 +1,15 @@
 # 総合評価ページ仕様書
 
 **作成日**: 2025-11-09
-**バージョン**: 1.1.0
-**最終更新日**: 2025-11-11
+**バージョン**: 1.2.0
+**最終更新日**: 2025-11-12
 
 **変更履歴**:
+- v1.2.0 (2025-11-12): 12音階モード次のステップ進行パス追加
+  - 12音階モード3バリエーション対応（上昇・下降・両方向）
+  - モード別進行パス仕様を明確化
+  - `direction`パラメータによる動的表示実装
+  - NavigationManagerのallowedTransitions更新
 - v1.1.0 (2025-11-11): トレーニング記録からの遷移機能追加
   - `fromRecords=true`パラメータ対応
   - レッスン詳細表示モード実装
@@ -195,9 +200,26 @@ function displayNextSteps(currentMode, evaluation)
 
 **処理フロー**:
 1. コンテナ要素の取得（`#next-steps-container`）
-2. 現在のモードに対応する設定を取得（フォールバック: 'random'）
-3. 3つのカード（practice, upgrade, records）を生成
-4. Lucideアイコンの再初期化
+2. 12音階モードの場合は`direction`パラメータも取得
+3. モードキーの生成（`12tone` + `direction` → `12tone-ascending`等）
+4. 現在のモードに対応する設定を取得（フォールバック: 'random'）
+5. 3つのカード（practice, upgrade, records）を生成
+6. Lucideアイコンの再初期化
+
+**12音階モード対応**:
+```javascript
+// directionパラメータの取得
+const direction = params.get('direction');  // 'ascending', 'descending', 'both'
+
+// モードキーの生成
+let modeKey = currentMode;
+if (currentMode === '12tone' && direction) {
+    modeKey = `12tone-${direction}`;  // '12tone-ascending'等
+}
+
+// 設定の取得
+const config = nextStepsConfig[modeKey] || nextStepsConfig['random'];
+```
 
 **将来の拡張計画**:
 ```javascript
@@ -270,6 +292,285 @@ if (evaluation.grade === 'S' || evaluation.grade === 'A') {
 
 ---
 
+## 🎵 12音階モード進行パス仕様（v1.2.0）
+
+### 概要
+
+12音階モードは3つのバリエーション（上昇・下降・両方向）を段階的に習得する進行システムを持つ。連続チャレンジモード完了後、12音階モード上昇から開始し、最終的に両方向モードの完全習得を目指す。
+
+### 進行パスフロー
+
+```
+連続チャレンジモード（完了）
+    ↓
+12音階モード（上昇）[開始]
+    ↓ （練習 or 挑戦）
+12音階モード（下降）
+    ↓ （練習 or 挑戦）
+12音階モード（両方向）[最終目標]
+```
+
+### モード設定一覧
+
+#### 12tone-ascending（上昇モード）
+
+**URL**: `training?mode=12tone&direction=ascending`
+
+**nextStepsConfig**:
+
+```javascript
+'12tone-ascending': {
+    practice: {
+        icon: 'repeat',
+        iconBg: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+        title: 'もっと練習する',
+        description: '12音階上昇モードでさらなる精度向上を目指す',
+        buttonText: '同じモードで再挑戦',
+        actionId: 'next-step-12tone-ascending-practice'
+    },
+    upgrade: {
+        icon: 'arrow-down-circle',
+        iconBg: 'linear-gradient(135deg, #10b981, #059669)',
+        title: '下降モードに挑戦',
+        description: '12音階下降モードで下行音程感覚を習得',
+        buttonText: '12音階下降を開始',
+        actionId: 'next-step-12tone-ascending-upgrade'
+    },
+    records: {
+        icon: 'trending-up',
+        iconBg: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+        title: '成長の軌跡を確認',
+        description: 'トレーニング記録であなたの上達を可視化',
+        buttonText: '記録を見る',
+        actionId: 'next-step-12tone-ascending-records'
+    }
+}
+```
+
+**進行方向**:
+- **練習**: 同じモードで再挑戦 → `training?mode=12tone&direction=ascending`
+- **挑戦**: 下降モードに進む → `training?mode=12tone&direction=descending`
+
+#### 12tone-descending（下降モード）
+
+**URL**: `training?mode=12tone&direction=descending`
+
+**nextStepsConfig**:
+
+```javascript
+'12tone-descending': {
+    practice: {
+        icon: 'repeat',
+        iconBg: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+        title: 'もっと練習する',
+        description: '12音階下降モードでさらなる精度向上を目指す',
+        buttonText: '同じモードで再挑戦',
+        actionId: 'next-step-12tone-descending-practice'
+    },
+    upgrade: {
+        icon: 'arrow-left-right',
+        iconBg: 'linear-gradient(135deg, #f59e0b, #d97706)',
+        title: '両方向モードに挑戦',
+        description: '12音階両方向モードで完全習得を目指す',
+        buttonText: '12音階両方向を開始',
+        actionId: 'next-step-12tone-descending-upgrade'
+    },
+    records: {
+        icon: 'trending-up',
+        iconBg: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+        title: '成長の軌跡を確認',
+        description: 'トレーニング記録であなたの上達を可視化',
+        buttonText: '記録を見る',
+        actionId: 'next-step-12tone-descending-records'
+    }
+}
+```
+
+**進行方向**:
+- **練習**: 同じモードで再挑戦 → `training?mode=12tone&direction=descending`
+- **挑戦**: 両方向モードに進む → `training?mode=12tone&direction=both`
+
+#### 12tone-both（両方向モード）
+
+**URL**: `training?mode=12tone&direction=both`
+
+**nextStepsConfig**:
+
+```javascript
+'12tone-both': {
+    practice: {
+        icon: 'repeat',
+        iconBg: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+        title: 'もっと練習する',
+        description: '12音階両方向モードでさらなる精度向上を目指す',
+        buttonText: '同じモードで再挑戦',
+        actionId: 'next-step-12tone-both-practice'
+    },
+    upgrade: {
+        icon: 'trophy',
+        iconBg: 'linear-gradient(135deg, #f59e0b, #d97706)',
+        title: '最上級モード達成',
+        description: 'おめでとうございます！全モードをマスターしました',
+        buttonText: '完了',
+        actionId: null,
+        disabled: true
+    },
+    records: {
+        icon: 'trending-up',
+        iconBg: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+        title: '成長の軌跡を確認',
+        description: 'トレーニング記録であなたの上達を可視化',
+        buttonText: '記録を見る',
+        actionId: 'next-step-12tone-both-records'
+    }
+}
+```
+
+**進行方向**:
+- **練習**: 同じモードで再挑戦 → `training?mode=12tone&direction=both`
+- **挑戦**: なし（最終到達）
+
+### アイコン・カラー設計
+
+| モード | 挑戦カードアイコン | カラー | 意味 |
+|---|---|---|---|
+| **12tone-ascending** | `arrow-down-circle` | 緑グラデーション (#10b981 → #059669) | 下降モードへ進む |
+| **12tone-descending** | `arrow-left-right` | オレンジグラデーション (#f59e0b → #d97706) | 両方向モードへ進む |
+| **12tone-both** | `trophy` | オレンジグラデーション (#f59e0b → #d97706) | 完全習得達成 |
+
+**設計意図**:
+- **上昇 → 下降**: 下向き矢印で視覚的に方向転換を示唆
+- **下降 → 両方向**: 左右矢印で両方向の統合を示唆
+- **両方向（最終）**: トロフィーで完全習得の達成感を演出
+
+### 実装詳細
+
+#### direction パラメータ処理
+
+```javascript
+// URLからdirectionパラメータを取得
+const hash = window.location.hash.substring(1);
+const params = new URLSearchParams(hash.split('?')[1] || '');
+const direction = params.get('direction');  // 'ascending', 'descending', 'both'
+
+// モードキーの生成
+let modeKey = currentMode;
+if (currentMode === '12tone' && direction) {
+    modeKey = `12tone-${direction}`;  // '12tone-ascending', '12tone-descending', '12tone-both'
+}
+
+// 設定の取得
+const config = nextStepsConfig[modeKey] || nextStepsConfig['random'];
+```
+
+#### displayNextSteps 関数シグネチャ
+
+```javascript
+function displayNextSteps(currentMode, evaluation, direction = null)
+```
+
+**パラメータ**:
+- `currentMode` (string): 現在のモード（'random', 'continuous', '12tone'等）
+- `evaluation` (object): 評価結果（将来の拡張用、現在未使用）
+- `direction` (string|null): 12音階モードの方向（'ascending', 'descending', 'both'）
+
+#### アクションハンドラー
+
+```javascript
+const actions = {
+    // 12音階モード（上昇）
+    'next-step-12tone-ascending-practice': () =>
+        window.location.hash = 'training?mode=12tone&direction=ascending',
+    'next-step-12tone-ascending-upgrade': () =>
+        window.location.hash = 'training?mode=12tone&direction=descending',
+    'next-step-12tone-ascending-records': () =>
+        window.location.hash = 'records',
+
+    // 12音階モード（下降）
+    'next-step-12tone-descending-practice': () =>
+        window.location.hash = 'training?mode=12tone&direction=descending',
+    'next-step-12tone-descending-upgrade': () =>
+        window.location.hash = 'training?mode=12tone&direction=both',
+    'next-step-12tone-descending-records': () =>
+        window.location.hash = 'records',
+
+    // 12音階モード（両方向）
+    'next-step-12tone-both-practice': () =>
+        window.location.hash = 'training?mode=12tone&direction=both',
+    'next-step-12tone-both-records': () =>
+        window.location.hash = 'records',
+};
+```
+
+### 連続チャレンジモードからの移行
+
+**連続チャレンジモードの upgrade カード**:
+
+```javascript
+'continuous': {
+    // ... practice, records ...
+    upgrade: {
+        icon: 'arrow-up-circle',
+        iconBg: 'linear-gradient(135deg, #10b981, #059669)',
+        title: '12音階モードに挑戦',
+        description: 'プロレベルの完璧な12音律習得を目指す',
+        buttonText: '12音階モードを開始',
+        actionId: 'next-step-continuous-upgrade'
+    }
+}
+
+// アクションハンドラー
+'next-step-continuous-upgrade': () =>
+    window.location.hash = 'training?mode=12tone&direction=ascending',
+```
+
+**ポイント**:
+- 連続チャレンジモード完了後、必ず12音階上昇モードから開始
+- プレミアム機能の「準備中」表示は廃止し、アクセス可能に変更
+
+### NavigationManager統合
+
+#### allowedTransitions 更新
+
+```javascript
+static allowedTransitions = new Map([
+    ['results-overview', ['home', 'preparation', 'records', 'training']],
+    // 'training' を追加し、12音階モードへの直接遷移を許可
+]);
+```
+
+**理由**: 総合評価ページから `training?mode=12tone&direction=ascending` への遷移を許可するため
+
+### エラーハンドリング
+
+#### モード不一致検出
+
+12音階モードに遷移する際、SessionStorageに保存されたlessonIdが別モードの場合は自動クリア:
+
+```javascript
+// trainingController.js (line 115-118)
+const currentLessonId = SessionManager.getCurrentLessonId();
+const storedMode = currentLessonId ? currentLessonId.split('-')[0] : null;
+
+if (storedMode && storedMode !== currentMode) {
+    console.log(`⚠️ モード不一致検出: ${storedMode} → ${currentMode}`);
+    SessionManager.clearSessionStorage();
+}
+```
+
+#### direction パラメータ欠落
+
+URLに`mode=12tone`のみでdirectionがない場合の処理:
+
+```javascript
+// フォールバック: direction未指定の場合はrandom設定を使用
+const config = nextStepsConfig[modeKey] || nextStepsConfig['random'];
+```
+
+**将来の改善案**: direction未指定時は自動的に 'ascending' を補完する仕様追加を検討
+
+---
+
 ## 📝 実装チェックリスト
 
 ### HTML実装
@@ -288,8 +589,13 @@ if (evaluation.grade === 'S' || evaluation.grade === 'A') {
 - [x] `displayNextSteps()` 関数実装
 - [x] `nextStepsConfig` オブジェクト定義
 - [x] 4モード対応（random, continuous, random-down, continuous-down）
+- [x] 12音階モード対応（12tone-ascending, 12tone-descending, 12tone-both）
+- [x] direction パラメータ処理実装
+- [x] モードキー生成ロジック実装
+- [x] 12音階モード専用アクションハンドラー実装
 - [x] Lucideアイコン再初期化
 - [x] ハッシュルーティング連携
+- [x] NavigationManager allowedTransitions 更新
 
 ### UIカタログ
 - [x] ui-catalog-components.html への追加
@@ -330,6 +636,7 @@ if (evaluation.grade === 'S' || evaluation.grade === 'A') {
 4. **レイアウト最適化**: flex-grow + margin-top: auto でボタン位置を統一
 
 ### 今後の実装予定
+- [x] 12音階モード進行パス実装（v1.2.0で完了）
 - [ ] Phase 3: グレード別カスタマイズ実装
 - [ ] Phase 4: 下行モード対応（設定は準備完了、モード実装待ち）
 - [ ] Phase 5: 総合分析レポートとの連携

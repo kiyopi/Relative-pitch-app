@@ -78,28 +78,35 @@ async function loadSessionData(sessionNumber) {
             return null;
         }
 
-        // 【修正】現在のモードを取得（最新セッションのモード）
-        const latestSession = allSessions[allSessions.length - 1];
-        const currentMode = latestSession.mode;
-        console.log(`🔍 [DEBUG] 現在のモード: ${currentMode}`);
+        // 【修正v4.0.3】現在のlessonIdを取得（sessionStorage優先）
+        const currentLessonId = sessionStorage.getItem('currentLessonId');
 
-        // 現在のモードのセッションのみをフィルタリング
-        const currentModeSessions = allSessions.filter(s => s.mode === currentMode);
-        console.log(`🔍 [DEBUG] ${currentMode}モードのセッション数: ${currentModeSessions.length}`);
+        if (!currentLessonId) {
+            console.warn('⚠️ currentLessonIdがsessionStorageにありません - 最新セッション使用');
+            const latestSession = allSessions[allSessions.length - 1];
+            console.log(`📊 最新セッション使用: ID ${latestSession.sessionId}, lessonId ${latestSession.lessonId}`);
+            return latestSession;
+        }
+
+        console.log(`🔍 [DEBUG] 現在のlessonId: ${currentLessonId}`);
+
+        // 【修正v4.0.3】現在のlessonIdのセッションのみをフィルタリング
+        const currentLessonSessions = allSessions.filter(s => s.lessonId === currentLessonId);
+        console.log(`🔍 [DEBUG] lessonId=${currentLessonId}のセッション数: ${currentLessonSessions.length}`);
 
         // sessionNumberは1から始まるので、配列インデックスに変換（-1）
         const sessionIndex = sessionNumber - 1;
 
-        if (sessionIndex < 0 || sessionIndex >= currentModeSessions.length) {
-            console.warn(`⚠️ セッション番号 ${sessionNumber} が範囲外です（1-${currentModeSessions.length}）。最新セッションを使用します。`);
-            const session = currentModeSessions[currentModeSessions.length - 1];
+        if (sessionIndex < 0 || sessionIndex >= currentLessonSessions.length) {
+            console.warn(`⚠️ セッション番号 ${sessionNumber} が範囲外です（1-${currentLessonSessions.length}）。最新セッションを使用します。`);
+            const session = currentLessonSessions[currentLessonSessions.length - 1];
             console.log(`📊 最新セッション使用: ID ${session.sessionId}, 基音 ${session.baseNote}`);
             return session;
         }
 
         // 指定された番号のセッションを取得
-        const session = currentModeSessions[sessionIndex];
-        console.log(`📊 セッションデータ読み込み: 番号 ${sessionNumber}, ID ${session.sessionId}, 基音 ${session.baseNote} (${session.baseFrequency.toFixed(1)}Hz)`);
+        const session = currentLessonSessions[sessionIndex];
+        console.log(`📊 セッションデータ読み込み: 番号 ${sessionNumber}, ID ${session.sessionId}, lessonId ${session.lessonId}, 基音 ${session.baseNote} (${session.baseFrequency.toFixed(1)}Hz)`);
         return session;
 
     } catch (error) {

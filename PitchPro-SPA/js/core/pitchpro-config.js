@@ -67,10 +67,10 @@
 
                 /**
                  * 最低周波数
-                 * - 80Hz - F2 (87.3Hz) 以下をカバー
-                 * - 人間の声の下限をカバー
+                 * - 60Hz - F3 (174.6Hz) のオクターブ下 (87.3Hz) もカバー
+                 * - 倍音補正が低音域のオクターブ誤検出を修正できるよう範囲拡大
                  */
-                minFrequency: 80,
+                minFrequency: 60,
 
                 /**
                  * 最高周波数
@@ -87,6 +87,18 @@
                  * - C3倍音誤検出対策
                  */
                 enableHarmonicCorrection: true,
+
+                /**
+                 * 倍音補正の詳細設定
+                 * - enabled: 倍音補正の有効化
+                 * - historyWindow: 履歴の時間窓（ミリ秒）
+                 * - minHistorySize: 最小履歴サンプル数
+                 */
+                harmonicConfig: {
+                    enabled: true,
+                    historyWindow: 2000,  // 2秒の履歴を使用
+                    minHistorySize: 8      // 最小8サンプル
+                },
 
                 // ========================================
                 // システム設定

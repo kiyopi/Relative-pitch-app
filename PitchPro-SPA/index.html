@@ -195,9 +195,14 @@
             if (currentPage === 'preparation' || currentPage === 'training') {
                 const message = currentPage === 'preparation'
                     ? '音域テストを中断してホームに戻りますか？'
-                    : 'トレーニングを中断してホームに戻りますか？\n（進行中のデータは保存されます）';
+                    : 'トレーニング中です。\nホームに戻ると進行中のデータが失われます。\n本当にホームに戻りますか？';
 
                 if (confirm(message)) {
+                    // 【修正v4.0.4】トレーニング中断時は未完了レッスンデータを削除
+                    if (currentPage === 'training') {
+                        cleanupIncompleteLesson();
+                    }
+
                     // NavigationManagerを使用して安全に遷移
                     if (window.NavigationManager) {
                         NavigationManager.navigate('home');
@@ -212,6 +217,40 @@
                 } else {
                     window.location.hash = 'home';
                 }
+            }
+        }
+
+        /**
+         * 未完了レッスンのデータをクリーンアップ
+         * トレーニング中断時に呼び出される
+         */
+        function cleanupIncompleteLesson() {
+            try {
+                const currentLessonId = sessionStorage.getItem('currentLessonId');
+                if (!currentLessonId) {
+                    console.log('ℹ️ currentLessonIdなし - クリーンアップ不要');
+                    return;
+                }
+
+                // localStorage から全セッションを取得
+                const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+
+                // 現在のlessonIdのセッションを削除
+                const remainingSessions = allSessions.filter(s => s.lessonId !== currentLessonId);
+
+                // 削除されたセッション数をログ
+                const deletedCount = allSessions.length - remainingSessions.length;
+                console.log(`🗑️ 未完了レッスン削除: lessonId=${currentLessonId}, ${deletedCount}セッション削除`);
+
+                // localStorageを更新
+                localStorage.setItem('sessionData', JSON.stringify(remainingSessions));
+
+                // sessionStorageをクリア
+                SessionManager.clearSessionStorage();
+
+                console.log('✅ 未完了レッスンのクリーンアップ完了');
+            } catch (error) {
+                console.error('❌ クリーンアップエラー:', error);
             }
         }
     </script>

@@ -8722,3 +8722,44 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-12 19:59:31] コミット: feat: SessionManager統合完了（Bug #11完全修正・コード重複削減）
+
+【Phase 1: SessionManagerクラス実装】
+- /js/session-manager.js 新規作成（v1.0.0）
+  - ModeController統合によるモード設定の統一アクセス
+  - lessonId単位での確実なセッション数カウント
+  - 動的セッション数対応（12音階モード: 12/24セッション）
+  - 進行率・完了判定・UI表示用メソッド提供
+  - sessionStorage管理機能（個別結果画面からの復元対応）
+
+【Phase 2: trainingController.js統合】
+- 4箇所の重複コード完全削減（v4.0.0）
+  - updateTrainingPageUI(): Line 295
+  - preselectBaseNote(): Line 329
+  - playBaseNote(): Line 522-527
+  - updateSessionProgressUI(): Line 992-1007
+- SessionManagerインスタンス初期化（Line 141-155）
+- レッスン完了判定統合（Line 869, 911）
+- 基音選定処理統合（Line 1186）
+
+【Bug #11関連修正: result-session-controller.js】
+- updateNextSessionButton(): lessonId単位のセッション数カウントに修正（v3.8.0）
+  - mode フィルタリング → lessonId フィルタリングに変更
+  - SessionManager.getMaxSessions() 活用
+  - 異なるレッスンのセッション累積カウント問題を根本解決
+
+【動作確認】
+✅ ランダム基音モード: 8セッション正常動作
+✅ トレーニング履歴表示: 高速化・正確性向上
+✅ 個別結果→次のセッション遷移: 正常動作
+✅ 総合評価ページ表示: 正常動作
+
+【効果】
+- コード重複削減: 40行以上のコード削減
+- バグ修正の完全性: lessonId単位管理の徹底
+- 保守性向上: セッション管理ロジックの一元化
+- 拡張性向上: ModeController統合による柔軟な設定管理
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

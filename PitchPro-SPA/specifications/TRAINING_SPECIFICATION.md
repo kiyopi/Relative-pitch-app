@@ -1,10 +1,42 @@
 # トレーニング機能仕様書（SPA版）
 
-**バージョン**: 3.5.0
+**バージョン**: 4.0.5
 **作成日**: 2025-10-23
 **最終更新**: 2025-11-12
 
 **変更履歴**:
+- v4.0.5 (2025-11-12): Bug #11完全修正 - 未完了レッスン復元問題（5つの関連バグを包括的に修正）
+  - **Bug #11-1**: 完了済みレッスンの誤復元（v4.0.1）
+    - **問題**: トレーニング完了後、sessionStorageに残った完了済みlessonIdが復元され、1セッションで総合評価表示
+    - **根本原因**: lessonId検証時に「モード一致」のみチェック、完了済みレッスンの検証なし
+    - **解決**: 動的maxSessions取得によるlessonId完了状態の検証追加
+    - **修正ファイル**: `/PitchPro-SPA/js/controllers/trainingController.js` (line 107-139)
+    - **実装**: `ModeController.getSessionsPerLesson()`で動的にmaxSessions取得、完了済みの場合はSessionManager.clearSessionStorage()
+  - **Bug #11-2**: ランダム基音モード基音選択の無限ループ（v4.0.2）
+    - **問題**: 8セッション中7セッション完了時、全白鍵使用済みで候補なし → 無限ループ
+    - **根本原因**: フォールバック処理が4段階で不十分、全白鍵使用済み時の対応なし
+    - **解決**: 5段階フォールバック → 6段階フォールバックに拡張、重複許可モード追加
+    - **修正ファイル**: `/PitchPro-SPA/js/controllers/trainingController.js` (line 1326-1348)
+    - **実装**: 優先順位5「全白鍵使用済み → 重複許可」、優先順位6「最終フォールバック → 完全ランダム」追加
+  - **Bug #11-3**: 個別結果ページのlessonId不一致（v4.0.3）
+    - **問題**: `result-session-controller.js`がモード単位でセッションをフィルタリング、異なるlessonIdのセッションを表示
+    - **根本原因**: `currentModeSessions`がモード全体でフィルタリング、lessonId無視
+    - **解決**: `currentModeSessions` → `currentLessonSessions`に変更、sessionStorageからlessonId取得
+    - **修正ファイル**: `/PitchPro-SPA/pages/js/result-session-controller.js` (line 81-108)
+    - **実装**: `sessionStorage.getItem('currentLessonId')`優先、lessonId単位でフィルタリング
+  - **Bug #11-4**: トレーニング中断時の未完了データ残存（v4.0.4）
+    - **問題**: ホームボタンでトレーニング中断時、未完了レッスンのセッションデータがlocalStorageに残存
+    - **根本原因**: トレーニング中断時のクリーンアップ処理なし
+    - **解決**: `cleanupIncompleteLesson()`関数実装、中断時に未完了lessonIdのセッションを全削除
+    - **修正ファイル**: `/PitchPro-SPA/index.html` (line 201-254)
+    - **実装**: ホームボタンクリック時にcleanupIncompleteLesson()実行、currentLessonIdのセッションをfilter削除
+  - **Bug #11-5**: 音域設定済み表示からのトレーニング開始時の復元（v4.0.5）
+    - **問題**: 音域設定済み表示から「トレーニング開始」ボタン押下時、sessionStorageが残存し中断レッスンを誤復元
+    - **根本原因**: 音域設定済み表示からのトレーニング開始時、sessionStorageクリア処理なし
+    - **解決**: トレーニング開始時（音域設定済み表示からの遷移）にSessionManager.clearSessionStorage()実行
+    - **修正ファイル**: `/PitchPro-SPA/pages/js/preparation-pitchpro-cycle.js` (line 1275-1287, 1515-1521)
+    - **実装**: ランダム基音モードの場合、sessionStorageをクリア、モードクリア時も同様に処理
+  - **影響**: 未完了レッスン復元問題を包括的に解決、lessonId管理の完全性を確保
 - v3.5.0 (2025-11-12): lessonId異モード再利用バグ修正（第4の重大バグ）
   - **問題**: 異なるトレーニングモード間でlessonIdが再利用され、セッション数が累積
   - **具体例**: ランダム基音8セッション（途中中断） → 連続チャレンジ4セッション → 合計12セッション判定 → 誤った総合評価表示

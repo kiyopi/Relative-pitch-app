@@ -298,7 +298,9 @@ function updateOverviewUI(evaluation, sessionData, fromRecords = false) {
 
     // 次のステップ表示（トレーニング記録からの遷移時はスキップ）
     if (!fromRecords) {
-        displayNextSteps(currentMode, evaluation);
+        // 12音階モードの場合はdirectionパラメータも取得
+        const direction = params.get('direction');
+        displayNextSteps(currentMode, evaluation, direction);
     }
 }
 
@@ -979,10 +981,11 @@ window.copyShareText = function(event) {
 
 /**
  * 次のステップを表示
- * @param {string} currentMode - 現在のモード（random, continuous等）
+ * @param {string} currentMode - 現在のモード（random, continuous, 12tone等）
  * @param {object} evaluation - 評価結果（将来の拡張用、現在未使用）
+ * @param {string} direction - 12音階モードの方向（ascending, descending, both）
  */
-function displayNextSteps(currentMode, evaluation) {
+function displayNextSteps(currentMode, evaluation, direction = null) {
     const container = document.getElementById('next-steps-container');
     if (!container) return;
 
@@ -1027,13 +1030,12 @@ function displayNextSteps(currentMode, evaluation) {
                 actionId: 'next-step-continuous-practice'
             },
             upgrade: {
-                icon: 'lock',
-                iconBg: 'linear-gradient(135deg, #6b7280, #4b5563)',
-                title: '12音階モード',
-                description: 'プロレベルの完璧な12音律習得（準備中）',
-                buttonText: '準備中',
-                actionId: null,
-                disabled: true
+                icon: 'arrow-up-circle',
+                iconBg: 'linear-gradient(135deg, #10b981, #059669)',
+                title: '12音階モードに挑戦',
+                description: 'プロレベルの完璧な12音律習得を目指す',
+                buttonText: '12音階モードを開始',
+                actionId: 'next-step-continuous-upgrade'
             },
             records: {
                 icon: 'trending-up',
@@ -1097,11 +1099,94 @@ function displayNextSteps(currentMode, evaluation) {
                 buttonText: '記録を見る',
                 actionId: 'next-step-continuous-down-records'
             }
+        },
+        '12tone-ascending': {
+            practice: {
+                icon: 'repeat',
+                iconBg: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                title: 'もっと練習する',
+                description: '12音階上昇モードでさらなる精度向上を目指す',
+                buttonText: '同じモードで再挑戦',
+                actionId: 'next-step-12tone-ascending-practice'
+            },
+            upgrade: {
+                icon: 'arrow-down-circle',
+                iconBg: 'linear-gradient(135deg, #10b981, #059669)',
+                title: '下降モードに挑戦',
+                description: '12音階下降モードで下行音程感覚を習得',
+                buttonText: '12音階下降を開始',
+                actionId: 'next-step-12tone-ascending-upgrade'
+            },
+            records: {
+                icon: 'trending-up',
+                iconBg: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                title: '成長の軌跡を確認',
+                description: 'トレーニング記録であなたの上達を可視化',
+                buttonText: '記録を見る',
+                actionId: 'next-step-12tone-ascending-records'
+            }
+        },
+        '12tone-descending': {
+            practice: {
+                icon: 'repeat',
+                iconBg: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                title: 'もっと練習する',
+                description: '12音階下降モードでさらなる精度向上を目指す',
+                buttonText: '同じモードで再挑戦',
+                actionId: 'next-step-12tone-descending-practice'
+            },
+            upgrade: {
+                icon: 'arrow-left-right',
+                iconBg: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                title: '両方向モードに挑戦',
+                description: '12音階両方向モードで完全習得を目指す',
+                buttonText: '12音階両方向を開始',
+                actionId: 'next-step-12tone-descending-upgrade'
+            },
+            records: {
+                icon: 'trending-up',
+                iconBg: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                title: '成長の軌跡を確認',
+                description: 'トレーニング記録であなたの上達を可視化',
+                buttonText: '記録を見る',
+                actionId: 'next-step-12tone-descending-records'
+            }
+        },
+        '12tone-both': {
+            practice: {
+                icon: 'repeat',
+                iconBg: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                title: 'もっと練習する',
+                description: '12音階両方向モードで完全習得を継続',
+                buttonText: '同じモードで再挑戦',
+                actionId: 'next-step-12tone-both-practice'
+            },
+            upgrade: {
+                icon: 'trophy',
+                iconBg: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                title: '最上級モード達成',
+                description: 'おめでとうございます！全モードをマスターしました',
+                buttonText: '完了',
+                actionId: null,
+                disabled: true
+            },
+            records: {
+                icon: 'trending-up',
+                iconBg: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                title: '成長の軌跡を確認',
+                description: 'トレーニング記録であなたの上達を可視化',
+                buttonText: '記録を見る',
+                actionId: 'next-step-12tone-both-records'
+            }
         }
     };
 
-    // 現在のモードの設定を取得（フォールバック: random）
-    const config = nextStepsConfig[currentMode] || nextStepsConfig['random'];
+    // 現在のモードの設定を取得（12音階モードはdirectionも考慮）
+    let modeKey = currentMode;
+    if (currentMode === '12tone' && direction) {
+        modeKey = `12tone-${direction}`;
+    }
+    const config = nextStepsConfig[modeKey] || nextStepsConfig['random'];
 
     // 3つのカードを生成
     const cards = ['practice', 'upgrade', 'records'];
@@ -1152,7 +1237,22 @@ function handleNextStepAction(actionId) {
 
         // 連続チャレンジモード
         'next-step-continuous-practice': () => window.location.hash = 'training?mode=continuous',
+        'next-step-continuous-upgrade': () => window.location.hash = 'training?mode=12tone&direction=ascending',
         'next-step-continuous-records': () => window.location.hash = 'records',
+
+        // 12音階モード（上昇）
+        'next-step-12tone-ascending-practice': () => window.location.hash = 'training?mode=12tone&direction=ascending',
+        'next-step-12tone-ascending-upgrade': () => window.location.hash = 'training?mode=12tone&direction=descending',
+        'next-step-12tone-ascending-records': () => window.location.hash = 'records',
+
+        // 12音階モード（下降）
+        'next-step-12tone-descending-practice': () => window.location.hash = 'training?mode=12tone&direction=descending',
+        'next-step-12tone-descending-upgrade': () => window.location.hash = 'training?mode=12tone&direction=both',
+        'next-step-12tone-descending-records': () => window.location.hash = 'records',
+
+        // 12音階モード（両方向）
+        'next-step-12tone-both-practice': () => window.location.hash = 'training?mode=12tone&direction=both',
+        'next-step-12tone-both-records': () => window.location.hash = 'records',
 
         // 下行モード（将来実装）
         'next-step-random-down-practice': () => window.location.hash = 'training?mode=random-down',
