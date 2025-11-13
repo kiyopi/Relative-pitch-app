@@ -440,11 +440,15 @@ window.repairIncorrectLessonIds = function repairIncorrectLessonIds(sessions) {
         console.log(`✅ [Repair] ${repairCount}個のセッションのlessonIdを修復完了`);
 
         // 修復したデータをlocalStorageに保存（DataManagerのキーに合わせる）
-        try {
-            localStorage.setItem('sessionData', JSON.stringify(sessions));
-            console.log('💾 [Repair] 修復済みデータをlocalStorageに保存完了');
-        } catch (error) {
-            console.error('❌ [Repair] localStorage保存エラー:', error);
+        // 【v2.0.0】SessionDataManagerを使用して統一管理
+        if (window.SessionDataManager) {
+            if (window.SessionDataManager.saveAllSessions(sessions)) {
+                console.log('💾 [Repair] 修復済みデータをlocalStorageに保存完了');
+            } else {
+                console.error('❌ [Repair] localStorage保存エラー');
+            }
+        } else {
+            console.error('❌ SessionDataManagerが見つかりません');
         }
     } else {
         console.log('✅ [Repair] 修復が必要なセッションはありませんでした');

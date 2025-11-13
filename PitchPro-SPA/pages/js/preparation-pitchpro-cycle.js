@@ -1499,15 +1499,23 @@ function setupMicPermissionFlow() {
 
             if (mode === 'random') {
                 // ランダムモード：毎回セッションデータをクリア
-                const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-                console.log(`🔍 [localStorage] クリア前のセッション数: ${allSessions.length}`);
+                // 【v2.0.0】SessionDataManagerを使用して統一管理
+                const beforeCount = window.SessionDataManager
+                    ? window.SessionDataManager.getSessionCount()
+                    : 0;
+                console.log(`🔍 [localStorage] クリア前のセッション数: ${beforeCount}`);
                 console.log(`🔍 [localStorage] 対象モード: ${mode}`);
 
-                const otherModeSessions = allSessions.filter(s => s.mode !== mode);
-                localStorage.setItem('sessionData', JSON.stringify(otherModeSessions));
+                if (window.SessionDataManager) {
+                    window.SessionDataManager.clearSessionsByMode(mode);
+                } else {
+                    console.error('❌ SessionDataManagerが見つかりません');
+                }
 
-                console.log(`✅ ${mode}モードのセッションデータをクリアしました`);
-                console.log(`🔍 [localStorage] クリア後のセッション数: ${otherModeSessions.length}`);
+                const afterCount = window.SessionDataManager
+                    ? window.SessionDataManager.getSessionCount()
+                    : 0;
+                console.log(`🔍 [localStorage] クリア後のセッション数: ${afterCount}`);
 
                 // 【修正v4.0.5】sessionStorageもクリア（中断レッスンの復元を防止）
                 if (window.SessionManager) {

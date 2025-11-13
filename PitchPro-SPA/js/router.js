@@ -390,10 +390,12 @@ class SimpleRouter {
                 console.log(`🔍 [DEBUG] 現在のモード: ${currentMode}`);
 
                 // 【修正】現在のモードのセッションデータをlocalStorageからクリア
-                const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-                const otherSessions = allSessions.filter(s => s.mode !== currentMode);
-                localStorage.setItem('sessionData', JSON.stringify(otherSessions));
-                console.log(`✅ ${currentMode}モードのセッションデータをクリアしました`);
+                // 【v2.0.0】SessionDataManagerを使用して統一管理
+                if (window.SessionDataManager) {
+                    window.SessionDataManager.clearSessionsByMode(currentMode);
+                } else {
+                    console.error('❌ SessionDataManagerが見つかりません');
+                }
 
                 // SessionDataRecorderをlocalStorageと同期（重要！）
                 if (window.sessionDataRecorder) {

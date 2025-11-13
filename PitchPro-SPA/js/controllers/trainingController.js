@@ -118,8 +118,9 @@ export async function initializeTrainingPage() {
             SessionManager.clearSessionStorage();
         } else {
             // モード一致確認後、完了済みレッスンかチェック
-            const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-            const lessonSessions = allSessions.filter(s => s.lessonId === storedLessonId);
+            const lessonSessions = window.SessionDataManager
+                ? window.SessionDataManager.getSessionsByLessonId(storedLessonId)
+                : [];
 
             // 動的にmaxSessionsを取得（12音階モード対応）
             const tempOptions = {
@@ -164,6 +165,9 @@ export async function initializeTrainingPage() {
         };
         sessionManager = new SessionManager(currentMode, currentLessonId, sessionOptions);
         console.log(`✅ SessionManager初期化完了: ${sessionManager.getProgressText()}`);
+
+        // グローバルインスタンスとして登録（v2.0.0統合）
+        SessionManager.setCurrent(sessionManager);
 
         // sessionStorageに保存（個別結果画面から戻る際の保持用）
         sessionManager.saveToSessionStorage();
@@ -862,10 +866,14 @@ function handleSessionComplete() {
         console.log('✅ セッションデータ保存完了:', completedSession);
 
         // 【修正v3.4.0】現在のlessonIdのセッション数を正しく計算（モード全体ではなくレッスン単位）
-        const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
-        const currentLessonSessions = allSessions.filter(s => s.lessonId === currentLessonId);
-        const sessionNumber = currentLessonSessions.length;
-        console.log(`🔍 [DEBUG] レッスン別セッション数: lessonId=${currentLessonId}, ${sessionNumber}セッション (全体=${allSessions.length}セッション)`);
+        // 【v3.5.0】SessionDataManagerを使用して統一管理
+        const sessionNumber = window.SessionDataManager
+            ? window.SessionDataManager.getSessionCount({ lessonId: currentLessonId })
+            : 0;
+        const totalSessions = window.SessionDataManager
+            ? window.SessionDataManager.getSessionCount()
+            : 0;
+        console.log(`🔍 [DEBUG] レッスン別セッション数: lessonId=${currentLessonId}, ${sessionNumber}セッション (全体=${totalSessions}セッション)`);
 
         const config = modeConfig[currentMode];
 

@@ -1,0 +1,321 @@
+/**
+ * SessionDataManager - sessionData（localStorage）管理専門クラス
+ *
+ * @version 1.0.0
+ * @description トレーニングセッションデータのlocalStorage管理を一元化
+ *
+ * 【責任範囲】
+ * - sessionData（localStorage）の読み取り・書き込み
+ * - lessonId単位のセッション取得・削除
+ * - mode単位のセッション取得・削除
+ * - 全セッションの取得・保存
+ *
+ * 【依存関係】
+ * - localStorage: sessionDataの永続化
+ *
+ * 【使用箇所】
+ * - SessionManager: セッション数カウント・データ取得
+ * - trainingController.js: セッション初期化・完了チェック
+ * - router.js: モード別クリア処理
+ * - preparation-pitchpro-cycle.js: レッスン開始前クリア
+ * - index.html: 未完了レッスン削除
+ * - records-controller.js: データ修復
+ *
+ * 【重要な設計思想】
+ * - Single Source of Truth: localStorage.getItem('sessionData')への唯一のアクセスポイント
+ * - DRY原則: 重複コードを排除し、バグリスクを軽減
+ * - エラーハンドリング: JSON.parse()のエラーを適切に処理
+ * - 一貫性: 全ての操作でlocalStorageとの同期を保証
+ *
+ * 【統合による改善】
+ * - 9箇所の重複コード削減
+ * - localStorage操作のバグリスク軽減
+ * - sessionData構造変更時の影響範囲を最小化
+ */
+
+class SessionDataManager {
+    /**
+     * localStorageキー
+     * @private
+     * @static
+     */
+    static STORAGE_KEY = 'sessionData';
+
+    // ===== 基本操作 =====
+
+    /**
+     * 全セッションデータを取得
+     *
+     * @returns {Array} セッション配列（取得失敗時は空配列）
+     *
+     * @example
+     * const sessions = SessionDataManager.getAllSessions();
+     * console.log(`全セッション数: ${sessions.length}`);
+     */
+    static getAllSessions() {
+        try {
+            const data = localStorage.getItem(this.STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        } catch (error) {
+            console.error('❌ SessionDataManager: getAllSessions()エラー', error);
+            return [];
+        }
+    }
+
+    /**
+     * 全セッションデータを保存
+     *
+     * @param {Array} sessions - セッション配列
+     * @returns {boolean} 保存成功時true
+     *
+     * @example
+     * const sessions = [{ sessionId: 1, lessonId: 'lesson_123', ... }];
+     * SessionDataManager.saveAllSessions(sessions);
+     */
+    static saveAllSessions(sessions) {
+        try {
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(sessions));
+            console.log(`💾 SessionDataManager: ${sessions.length}セッション保存完了`);
+            return true;
+        } catch (error) {
+            console.error('❌ SessionDataManager: saveAllSessions()エラー', error);
+            return false;
+        }
+    }
+
+    /**
+     * セッションデータを追加
+     *
+     * @param {Object} sessionData - セッションデータ
+     * @returns {boolean} 追加成功時true
+     *
+     * @example
+     * const session = {
+     *     sessionId: 1,
+     *     lessonId: 'lesson_123',
+     *     mode: 'random',
+     *     completed: true
+     * };
+     * SessionDataManager.addSession(session);
+     */
+    static addSession(sessionData) {
+        try {
+            const allSessions = this.getAllSessions();
+            allSessions.push(sessionData);
+            return this.saveAllSessions(allSessions);
+        } catch (error) {
+            console.error('❌ SessionDataManager: addSession()エラー', error);
+            return false;
+        }
+    }
+
+    // ===== lessonId単位の操作 =====
+
+    /**
+     * 特定のlessonIdのセッションを取得
+     *
+     * @param {string} lessonId - レッスンID
+     * @returns {Array} セッション配列
+     *
+     * @example
+     * const sessions = SessionDataManager.getSessionsByLessonId('lesson_123');
+     * console.log(`レッスン内セッション数: ${sessions.length}`);
+     */
+    static getSessionsByLessonId(lessonId) {
+        if (!lessonId) {
+            console.warn('⚠️ SessionDataManager: lessonIdが未指定');
+            return [];
+        }
+
+        const allSessions = this.getAllSessions();
+        return allSessions.filter(s => s.lessonId === lessonId);
+    }
+
+    /**
+     * 特定のlessonIdのセッションを削除
+     *
+     * @param {string} lessonId - レッスンID
+     * @returns {number} 削除されたセッション数
+     *
+     * @example
+     * const deleted = SessionDataManager.clearSessionsByLessonId('lesson_123');
+     * console.log(`${deleted}セッション削除完了`);
+     */
+    static clearSessionsByLessonId(lessonId) {
+        if (!lessonId) {
+            console.warn('⚠️ SessionDataManager: lessonIdが未指定');
+            return 0;
+        }
+
+        const allSessions = this.getAllSessions();
+        const beforeCount = allSessions.length;
+        const remaining = allSessions.filter(s => s.lessonId !== lessonId);
+        const deletedCount = beforeCount - remaining.length;
+
+        this.saveAllSessions(remaining);
+        console.log(`🗑️ SessionDataManager: lessonId=${lessonId}, ${deletedCount}セッション削除`);
+
+        return deletedCount;
+    }
+
+    // ===== mode単位の操作 =====
+
+    /**
+     * 特定のmodeのセッションを取得
+     *
+     * @param {string} mode - モードID (random, continuous, 12tone)
+     * @returns {Array} セッション配列
+     *
+     * @example
+     * const sessions = SessionDataManager.getSessionsByMode('random');
+     * console.log(`ランダムモードセッション数: ${sessions.length}`);
+     */
+    static getSessionsByMode(mode) {
+        if (!mode) {
+            console.warn('⚠️ SessionDataManager: modeが未指定');
+            return [];
+        }
+
+        const allSessions = this.getAllSessions();
+        return allSessions.filter(s => s.mode === mode);
+    }
+
+    /**
+     * 特定のmodeのセッションを削除
+     *
+     * @param {string} mode - モードID (random, continuous, 12tone)
+     * @returns {number} 削除されたセッション数
+     *
+     * @example
+     * const deleted = SessionDataManager.clearSessionsByMode('random');
+     * console.log(`${deleted}セッション削除完了`);
+     */
+    static clearSessionsByMode(mode) {
+        if (!mode) {
+            console.warn('⚠️ SessionDataManager: modeが未指定');
+            return 0;
+        }
+
+        const allSessions = this.getAllSessions();
+        const beforeCount = allSessions.length;
+        const remaining = allSessions.filter(s => s.mode !== mode);
+        const deletedCount = beforeCount - remaining.length;
+
+        this.saveAllSessions(remaining);
+        console.log(`🗑️ SessionDataManager: mode=${mode}, ${deletedCount}セッション削除`);
+
+        return deletedCount;
+    }
+
+    // ===== 高度な操作 =====
+
+    /**
+     * 複数の条件でセッションを取得
+     *
+     * @param {Object} filters - フィルター条件
+     * @param {string} [filters.lessonId] - レッスンID
+     * @param {string} [filters.mode] - モードID
+     * @param {boolean} [filters.completed] - 完了フラグ
+     * @returns {Array} セッション配列
+     *
+     * @example
+     * // 完了済みのランダムモードセッションを取得
+     * const sessions = SessionDataManager.getSessionsByFilters({
+     *     mode: 'random',
+     *     completed: true
+     * });
+     */
+    static getSessionsByFilters(filters = {}) {
+        let sessions = this.getAllSessions();
+
+        if (filters.lessonId) {
+            sessions = sessions.filter(s => s.lessonId === filters.lessonId);
+        }
+
+        if (filters.mode) {
+            sessions = sessions.filter(s => s.mode === filters.mode);
+        }
+
+        if (filters.completed !== undefined) {
+            sessions = sessions.filter(s => s.completed === filters.completed);
+        }
+
+        return sessions;
+    }
+
+    /**
+     * 全セッションデータをクリア
+     *
+     * @returns {boolean} クリア成功時true
+     *
+     * @example
+     * SessionDataManager.clearAllSessions();
+     */
+    static clearAllSessions() {
+        try {
+            localStorage.removeItem(this.STORAGE_KEY);
+            console.log('🗑️ SessionDataManager: 全セッションデータをクリア');
+            return true;
+        } catch (error) {
+            console.error('❌ SessionDataManager: clearAllSessions()エラー', error);
+            return false;
+        }
+    }
+
+    /**
+     * セッション数を取得（高速版）
+     *
+     * @param {Object} filters - フィルター条件（オプション）
+     * @returns {number} セッション数
+     *
+     * @example
+     * // 全セッション数
+     * const total = SessionDataManager.getSessionCount();
+     *
+     * // 特定レッスンのセッション数
+     * const count = SessionDataManager.getSessionCount({ lessonId: 'lesson_123' });
+     */
+    static getSessionCount(filters = {}) {
+        if (Object.keys(filters).length === 0) {
+            // フィルターなし：全セッション数
+            const allSessions = this.getAllSessions();
+            return allSessions.length;
+        }
+
+        // フィルターあり：条件に合うセッション数
+        const sessions = this.getSessionsByFilters(filters);
+        return sessions.length;
+    }
+
+    // ===== デバッグ用 =====
+
+    /**
+     * デバッグ情報を出力
+     */
+    static debug() {
+        const allSessions = this.getAllSessions();
+        console.log('=== SessionDataManager Debug Info ===');
+        console.log('Total Sessions:', allSessions.length);
+
+        // mode別集計
+        const modeGroups = {};
+        allSessions.forEach(s => {
+            modeGroups[s.mode] = (modeGroups[s.mode] || 0) + 1;
+        });
+        console.log('Mode Breakdown:', modeGroups);
+
+        // lessonId別集計
+        const lessonGroups = {};
+        allSessions.forEach(s => {
+            lessonGroups[s.lessonId] = (lessonGroups[s.lessonId] || 0) + 1;
+        });
+        console.log('Lesson Breakdown:', lessonGroups);
+
+        console.log('=====================================');
+    }
+}
+
+// グローバルに公開
+window.SessionDataManager = SessionDataManager;
+
+console.log('✅ SessionDataManager初期化完了');

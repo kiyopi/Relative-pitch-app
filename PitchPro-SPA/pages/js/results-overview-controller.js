@@ -3,7 +3,7 @@ console.log('🚀 [results-overview-controller] Script loaded - START');
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 1.0.0
+ * Version: 1.1.0
  *
  * 【責任範囲】
  * - セッションデータの読み込みとフィルタリング
@@ -16,8 +16,15 @@ console.log('🚀 [results-overview-controller] Script loaded - START');
  * 【依存関係】
  * - DataManager: セッションデータ取得
  * - EvaluationCalculator: 評価計算（v2.1.0統合評価関数）
+ * - SessionManager: 統一的なlessonId管理（v1.1.0追加）
  * - Chart.js: 誤差推移グラフ描画
  * - window.initializeLucideIcons: アイコン初期化
+ *
+ * 【変更履歴】
+ * - 1.1.0: SessionManager統合 - SessionManager.getCurrent()優先使用
+ *   - URLパラメータのlessonIdより、SessionManager経由を優先
+ *   - フォールバック: URL → localStorage最新セッション
+ *   - 統一的なlessonId管理でバグ防止
  */
 
 // デバッグモード設定（false = 詳細ログ無効化）
@@ -38,12 +45,35 @@ window.initResultsOverview = async function() {
         return;
     }
 
-    // URLパラメータからモード・lessonId・scaleDirection・トレーニング記録からの遷移フラグを取得
+    // 【v1.1.0】SessionManager優先でパラメータ取得
+    // 優先順位: SessionManager → URLパラメータ
+    let currentMode = 'random';
+    let lessonId = null;
+    let scaleDirection = null;
+
+    // SessionManagerから取得を試みる
+    if (window.SessionManager) {
+        const sessionManager = SessionManager.getCurrent();
+        if (sessionManager) {
+            currentMode = sessionManager.getMode();
+            lessonId = sessionManager.getLessonId();
+            scaleDirection = sessionManager.getScaleDirection();
+            console.log(`✅ [SessionManager] パラメータ取得: mode=${currentMode}, lessonId=${lessonId}, scaleDirection=${scaleDirection}`);
+        }
+    }
+
+    // URLパラメータから補完（フォールバック）
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash.split('?')[1] || '');
-    const currentMode = params.get('mode') || 'random';
-    const lessonId = params.get('lessonId');
-    const scaleDirection = params.get('scaleDirection');
+    if (!currentMode || currentMode === 'random') {
+        currentMode = params.get('mode') || 'random';
+    }
+    if (!lessonId) {
+        lessonId = params.get('lessonId');
+    }
+    if (!scaleDirection) {
+        scaleDirection = params.get('scaleDirection');
+    }
     const fromRecords = params.get('fromRecords') === 'true';
     
     if (DEBUG_MODE) {
@@ -124,8 +154,8 @@ window.initResultsOverview = async function() {
     const evaluation = window.EvaluationCalculator.calculateDynamicGrade(sessionData);
     console.log('✅ 評価結果:', evaluation);
 
-    // UI更新（トレーニング記録からの遷移フラグを渡す）
-    updateOverviewUI(evaluation, sessionData, fromRecords);
+    // UI更新（トレーニング記録からの遷移フラグとscaleDirectionを渡す）
+    updateOverviewUI(evaluation, sessionData, fromRecords, scaleDirection);
 
     // Chart.js初期化
     if (typeof Chart !== 'undefined') {
@@ -234,8 +264,9 @@ function loadAllSessionData() {
  * @param {Object} evaluation - 評価結果
  * @param {Array} sessionData - セッションデータ
  * @param {Boolean} fromRecords - トレーニング記録からの遷移フラグ
+ * @param {String} scaleDirection - 音階方向 (ascending/descending)
  */
-function updateOverviewUI(evaluation, sessionData, fromRecords = false) {
+function updateOverviewUI(evaluation, sessionData, fromRecords = false, scaleDirection = null) {
     console.log('🎨 UI更新開始:', evaluation);
 
     // モード名更新
@@ -298,9 +329,8 @@ function updateOverviewUI(evaluation, sessionData, fromRecords = false) {
 
     // 次のステップ表示（トレーニング記録からの遷移時はスキップ）
     if (!fromRecords) {
-        // 12音階モードの場合はdirectionパラメータも取得
-        const direction = params.get('direction');
-        displayNextSteps(currentMode, evaluation, direction);
+        // 12音階モードの場合はscaleDirectionパラメータを使用
+        displayNextSteps(currentMode, evaluation, scaleDirection);
     }
 }
 

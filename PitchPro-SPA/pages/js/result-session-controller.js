@@ -1,10 +1,22 @@
 /**
  * セッション結果ページコントローラー
- * @version 2.1.0
- * @lastUpdate 2025-11-10
+ * @version 2.4.0
+ * @lastUpdate 2025-11-13
  *
  * 変更履歴:
- * - 2.1.0: リロード検出を完全削除（表示専用ページのため不要）
+ * - 2.4.0: SessionManager統合 - 統一的なlessonId管理
+ *   - SessionManager.getCurrent()でグローバルインスタンスから取得
+ *   - sessionStorageへの直接アクセスをSessionManager経由に変更
+ *   - lessonId取得の一貫性向上・バグ防止
+ * - 2.3.0: Bug修正 - リロード検出を再度復活（trainingページと統一）
+ *   - リロード時にcurrentLessonIdを削除してpreparationページへリダイレクト
+ *   - 次のセッション継続時のマイク許可問題を解決
+ *   - 他のページ（training・preparation）と挙動を統一
+ * - 2.2.0: Bug修正 - 総合評価ページへの遷移時にlessonIdが誤って取得される問題を修正
+ *   - updateNextSessionButton(): find()で最初に見つかったセッション（古いlessonId）を返す問題
+ *   - 修正: sessionStorageから直接currentLessonIdを取得するように変更
+ *   - 影響: 8セッション完了後の「総合評価を見る」ボタンが正しいlessonIdで遷移
+ * - 2.1.0: リロード検出を完全削除（表示専用ページのため不要）← v2.3.0で撤回
  *   - バックグラウンド長時間後の誤検出問題を根本解決
  *   - ダイレクトアクセス・リロードを同じように扱う
  *   - データがない場合はダミーデータ表示で対応
@@ -20,12 +32,22 @@
 async function initializeResultSessionPage() {
     console.log('📊 セッション結果ページ初期化開始');
 
-    // 【v2.1.0変更】リロード検出を削除
+    // 【v2.3.0復活・v2.4.0 SessionManager統合】リロード検出を再度有効化（trainingページと統一）
     // 理由:
-    // - 表示専用ページ（マイク不要、音声処理なし）
-    // - データはlocalStorageから読み取るのみ
-    // - リロードやダイレクトアクセスでも正常に動作
-    // - データがない場合はダミーデータ表示で対応済み（Line 43-44）
+    // - 「次の基音へ」ボタンでtrainingページに遷移する際、マイク許可が必要
+    // - リロード後はマイク許可が外れるため、preparationページでの再取得が必須
+    // - SessionManager経由でlessonIdをクリア（統一的な管理）
+    if (window.NavigationManager && NavigationManager.detectReload()) {
+        console.warn('⚠️ result-sessionページでリロード検出: データ削除してpreparationへリダイレクト');
+
+        // SessionManager経由でクリア（グローバルインスタンス + sessionStorage）
+        if (window.SessionManager) {
+            SessionManager.clearCurrent();
+        }
+
+        await NavigationManager.redirectToPreparation('result-sessionページでリロード検出');
+        return;
+    }
 
     // URLハッシュからセッション番号を取得
     const hash = window.location.hash.substring(1); // '#'を削除
@@ -78,11 +100,18 @@ async function loadSessionData(sessionNumber) {
             return null;
         }
 
-        // 【修正v4.0.3】現在のlessonIdを取得（sessionStorage優先）
-        const currentLessonId = sessionStorage.getItem('currentLessonId');
+        // 【修正v4.1.0】SessionManager統合 - グローバルインスタンスから取得
+        let currentLessonId = null;
+        if (window.SessionManager) {
+            const sessionManager = SessionManager.getCurrent();
+            if (sessionManager) {
+                currentLessonId = sessionManager.getLessonId();
+                console.log(`✅ [SessionManager] lessonId取得: ${currentLessonId}`);
+            }
+        }
 
         if (!currentLessonId) {
-            console.warn('⚠️ currentLessonIdがsessionStorageにありません - 最新セッション使用');
+            console.warn('⚠️ SessionManagerからlessonId取得失敗 - 最新セッション使用');
             const latestSession = allSessions[allSessions.length - 1];
             console.log(`📊 最新セッション使用: ID ${latestSession.sessionId}, lessonId ${latestSession.lessonId}`);
             return latestSession;
@@ -401,12 +430,20 @@ function displayDetailedAnalysis(pitchErrors, outlierThreshold) {
 function updateNextSessionButton(sessionNumber) {
     const buttons = document.querySelectorAll('.btn-next-session');
 
-    // 【修正v3.8.0】Bug #11関連修正: lessonId単位でセッション数カウント
+    // 【修正v4.2.0】SessionManager統合 - グローバルインスタンスから取得
     const allSessions = DataManager.getFromStorage('sessionData') || [];
-    const currentLessonId = sessionStorage.getItem('currentLessonId');
+
+    let currentLessonId = null;
+    if (window.SessionManager) {
+        const sessionManager = SessionManager.getCurrent();
+        if (sessionManager) {
+            currentLessonId = sessionManager.getLessonId();
+            console.log(`✅ [SessionManager] lessonId取得: ${currentLessonId}`);
+        }
+    }
 
     if (!currentLessonId) {
-        console.error('❌ currentLessonIdが見つかりません');
+        console.error('❌ SessionManagerからlessonId取得失敗');
         return;
     }
 
@@ -423,11 +460,12 @@ function updateNextSessionButton(sessionNumber) {
         if (completedSessionsInLesson >= maxSessions) {
             // 8セッション完了時は総合評価へ
             button.onclick = () => {
-                // 【修正v3.6.0】lessonIdを取得して総合評価ページに渡す
-                const currentSession = allSessions.find(s => s.mode === currentMode && s.completed);
-                const lessonId = currentSession ? currentSession.lessonId : null;
+                // 【修正v4.1.0】Bug修正: sessionStorageのcurrentLessonIdを直接使用
+                // 問題: find()は最初に見つかったセッション（古いlessonId）を返してしまう
+                // 解決: Line 406で既に取得済みのcurrentLessonIdを使用
+                const lessonId = currentLessonId;
 
-                console.log(`📋 総合評価ページへ遷移: lessonId=${lessonId}`);
+                console.log(`📋 総合評価ページへ遷移: lessonId=${lessonId} (sessionStorageから取得)`);
 
                 // 【統一ナビゲーション】NavigationManager.navigate()を使用
                 if (window.NavigationManager) {

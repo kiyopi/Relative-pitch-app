@@ -35,8 +35,10 @@
     <script src="js/evaluation-calculator.js?v=20251029012"></script>
     <!-- 【v1.0.0追加】モード管理システム -->
     <script src="js/mode-controller.js?v=20251112001"></script>
-    <!-- 【v1.0.0追加】セッション管理システム（ModeController依存） -->
-    <script src="js/session-manager.js?v=20251112001"></script>
+    <!-- 【v1.0.0追加】sessionData（localStorage）管理システム -->
+    <script src="js/session-data-manager.js?v=20251113001"></script>
+    <!-- 【v1.0.0追加】セッション管理システム（ModeController, SessionDataManager依存） -->
+    <script src="js/session-manager.js?v=20251113001"></script>
     <script src="js/controllers/session-data-recorder.js?v=20251029012"></script>
     <script src="pages/js/result-session-controller.js?v=20251030002"></script>
     <!-- results-overview-controller.js は results-overview.html 内で読み込み -->
@@ -232,18 +234,15 @@
                     return;
                 }
 
-                // localStorage から全セッションを取得
-                const allSessions = JSON.parse(localStorage.getItem('sessionData')) || [];
+                // localStorage から現在のlessonIdのセッションを削除
+                // 【v2.0.0】SessionDataManagerを使用して統一管理
+                const deletedCount = window.SessionDataManager
+                    ? window.SessionDataManager.clearSessionsByLessonId(currentLessonId)
+                    : 0;
 
-                // 現在のlessonIdのセッションを削除
-                const remainingSessions = allSessions.filter(s => s.lessonId !== currentLessonId);
-
-                // 削除されたセッション数をログ
-                const deletedCount = allSessions.length - remainingSessions.length;
-                console.log(`🗑️ 未完了レッスン削除: lessonId=${currentLessonId}, ${deletedCount}セッション削除`);
-
-                // localStorageを更新
-                localStorage.setItem('sessionData', JSON.stringify(remainingSessions));
+                if (!window.SessionDataManager) {
+                    console.error('❌ SessionDataManagerが見つかりません');
+                }
 
                 // sessionStorageをクリア
                 SessionManager.clearSessionStorage();

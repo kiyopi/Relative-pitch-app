@@ -39,8 +39,13 @@
  * - 古いAPI（performance.navigation）を優先し、新しいAPIをフォールバックに変更
  * - 古いAPIで type === 0 の場合、新しいAPIをスキップ
  *
- * @version 3.0.0
- * @date 2025-10-24
+ * 【v3.1.0更新】
+ * - trainingページ途中離脱時のsessionStorageクリーンアップ機能追加
+ * - result-session・results-overview・training以外への遷移時にcurrentLessonIdを自動削除
+ * - これにより、途中離脱後の新規トレーニングで古いlessonIdが使用される問題を解決
+ *
+ * @version 3.1.0
+ * @date 2025-11-13
  */
 
 class NavigationManager {
@@ -357,14 +362,35 @@ class NavigationManager {
             this.setNormalTransition();
         }
 
-        // 4. ハッシュ構築
+        // 4. 【追加v3.1.0】途中離脱時のsessionStorageクリーンアップ
+        //    trainingページからの遷移で、遷移先がトレーニング継続に関係ない場合はクリア
+        const currentPage = window.location.hash.split('?')[0].substring(1);
+        if (currentPage === 'training') {
+            // トレーニング継続に必要なページ以外への遷移時はcurrentLessonIdをクリア
+            const shouldPreserveLesson =
+                page === 'result-session' ||  // セッション結果（次のセッション継続）
+                page === 'results-overview' || // 総合評価（8セッション完了）
+                page === 'training';           // トレーニング再開
+
+            if (!shouldPreserveLesson) {
+                const currentLessonId = sessionStorage.getItem('currentLessonId');
+                if (currentLessonId) {
+                    sessionStorage.removeItem('currentLessonId');
+                    console.log(`🔄 [NavigationManager] トレーニング途中離脱検出: currentLessonId削除 (${currentLessonId} → ${page})`);
+                }
+            } else {
+                console.log(`✅ [NavigationManager] トレーニング継続: currentLessonId保持 (training → ${page})`);
+            }
+        }
+
+        // 5. ハッシュ構築
         let targetHash = page;
         if (Object.keys(params).length > 0) {
             const urlParams = new URLSearchParams(params);
             targetHash = `${page}?${urlParams.toString()}`;
         }
 
-        // 5. 遷移実行
+        // 6. 遷移実行
         window.location.hash = targetHash;
         console.log(`✅ [NavigationManager] 遷移完了: ${targetHash}`);
     }
