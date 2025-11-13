@@ -14,11 +14,14 @@ class EvaluationCalculator {
    * @param {Array} sessionData - セッションデータ配列
    * @returns {Object} 評価結果オブジェクト
    */
-  static calculateDynamicGrade(sessionData) {
+  static calculateDynamicGrade(sessionData, totalSessionsInLesson = null) {
     console.log('📊 動的グレード計算開始:', sessionData);
+    if (totalSessionsInLesson !== null) {
+        console.log(`📋 [Override] totalSessionsInLesson指定: ${totalSessionsInLesson}`);
+    }
 
-    // 1. モード検出
-    const modeInfo = this.detectMode(sessionData);
+    // 1. モード検出（totalSessionsInLessonが指定されている場合は優先使用）
+    const modeInfo = this.detectMode(sessionData, totalSessionsInLesson);
     console.log('✅ モード検出:', modeInfo);
 
     // 2. デバイス品質検出
@@ -61,8 +64,9 @@ class EvaluationCalculator {
   /**
    * 1. モード検出ロジック
    */
-  static detectMode(sessionData) {
-    const sessionCount = sessionData.length;
+  static detectMode(sessionData, totalSessionsInLesson = null) {
+    // totalSessionsInLessonが指定されている場合は優先使用
+    const sessionCount = totalSessionsInLesson !== null ? totalSessionsInLesson : sessionData.length;
 
     const modeMap = {
       8: {
