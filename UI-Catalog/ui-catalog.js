@@ -234,6 +234,49 @@ class UICatalogManager {
     }
 }
 
+// 上行・下行タブナビゲーション初期化
+class DirectionTabsManager {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        document.addEventListener('DOMContentLoaded', () => {
+            this.initializeDirectionTabs();
+        });
+    }
+
+    initializeDirectionTabs() {
+        const directionTabs = document.querySelectorAll('.tab-button[data-direction]');
+        const directionPanels = document.querySelectorAll('.direction-info-panel');
+
+        if (directionTabs.length === 0 || directionPanels.length === 0) {
+            return; // タブが存在しないページではスキップ
+        }
+
+        directionTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const direction = tab.dataset.direction;
+
+                // 全タブのactive削除
+                directionTabs.forEach(t => t.classList.remove('active'));
+                directionPanels.forEach(p => p.classList.remove('active'));
+
+                // 選択されたタブとパネルをactive化
+                tab.classList.add('active');
+                const targetPanel = document.getElementById(`${direction}-info`);
+                if (targetPanel) {
+                    targetPanel.classList.add('active');
+                }
+
+                console.log(`🔀 [UI-CATALOG] Direction tab switched to: ${direction}`);
+            });
+        });
+
+        console.log('✅ [UI-CATALOG] Direction tabs initialized');
+    }
+}
+
 // グローバル変数として管理
 let uiCatalogManager;
 let codeExampleManager; // 後方互換性のため
@@ -241,7 +284,10 @@ let codeExampleManager; // 後方互換性のため
 // 初期化
 if (typeof window !== 'undefined') {
     uiCatalogManager = new UICatalogManager();
-    
+
+    // 上行・下行タブマネージャーを初期化
+    const directionTabsManager = new DirectionTabsManager();
+
     // 後方互換性のため、グローバルスコープでcodeExampleManagerも利用可能にする
     document.addEventListener('uiCatalogReady', (event) => {
         codeExampleManager = event.detail.codeExampleManager;

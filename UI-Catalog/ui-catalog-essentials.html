@@ -503,6 +503,153 @@ document.querySelectorAll('.tab-button').forEach(button => {
                     </div>
                 </section>
 
+                <!-- 上行・下行タブナビゲーション -->
+                <section id="direction-tabs" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">🔀 上行・下行タブナビゲーション</h2>
+                    <p class="text-white-70 mb-6">トレーニング方向を選択する独立型タブシステム</p>
+
+                    <h3 class="text-white font-medium mb-4">🎯 独立型タブバー（モードカードを囲わないデザイン）</h3>
+                    <p class="text-white-60 mb-4">上行・下行を選択するタブバーが独立して存在し、下部のコンテンツは全幅を維持</p>
+
+                    <div class="component-grid grid-cols-1">
+                        <!-- デモ実装 -->
+                        <div class="component-item">
+                            <h4 class="text-white font-medium mb-3">✨ デモ実装</h4>
+
+                            <!-- 上行・下行タブバー + 情報パネル -->
+                            <div class="direction-tabs-container">
+                                <div class="direction-info-panels">
+                                    <!-- タブナビゲーション -->
+                                    <div class="tab-navigation">
+                                        <button class="tab-button active" data-direction="ascending">
+                                            <i data-lucide="move-up-right" style="width: 16px; height: 16px; stroke-width: 2.5;"></i>
+                                            <span>上行モード</span>
+                                        </button>
+                                        <button class="tab-button" data-direction="descending">
+                                            <i data-lucide="move-down-right" style="width: 16px; height: 16px; stroke-width: 2.5;"></i>
+                                            <span>下行モード</span>
+                                        </button>
+                                    </div>
+
+                                    <!-- 情報パネル（切り替え可能） -->
+                                    <div id="ascending-info" class="direction-info-panel active">
+                                        <h4 class="text-white text-lg" style="margin-bottom: 0.5rem; font-weight: 500;">上行モードとは</h4>
+                                        <p class="text-white-70 leading-relaxed" style="margin-bottom: 0.5rem;">基音からド→レ→ミ→ファ→ソ→ラ→シ→ドと発声して練習します</p>
+                                        <div class="flex items-center gap-2">
+                                            <i data-lucide="lightbulb" class="text-blue-300" style="width: 16px; height: 16px;"></i>
+                                            <p class="text-blue-200 text-sm">初心者におすすめ・自然な音階感覚を養います</p>
+                                        </div>
+                                    </div>
+                                    <div id="descending-info" class="direction-info-panel">
+                                        <h4 class="text-white text-lg" style="margin-bottom: 0.5rem; font-weight: 500;">下行モードとは</h4>
+                                        <p class="text-white-70 leading-relaxed" style="margin-bottom: 0.5rem;">基音からド→シ→ラ→ソ→ファ→ミ→レ→ドと発声して練習します</p>
+                                        <div class="flex items-center gap-2">
+                                            <i data-lucide="lightbulb" class="text-orange-300" style="width: 16px; height: 16px;"></i>
+                                            <p class="text-orange-200 text-sm">上級者向け・より高度な音感トレーニング</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- モードカード例（全幅維持） -->
+                            <div class="modes-grid-demo">
+                                <div class="glass-card">
+                                    <h4 class="text-white font-medium">ランダム基音</h4>
+                                    <p class="text-white-60 text-sm">8セッション</p>
+                                </div>
+                                <div class="glass-card">
+                                    <h4 class="text-white font-medium">連続チャレンジ</h4>
+                                    <p class="text-white-60 text-sm">12セッション</p>
+                                </div>
+                                <div class="glass-card">
+                                    <h4 class="text-white font-medium">12音階</h4>
+                                    <p class="text-white-60 text-sm">12-24セッション</p>
+                                </div>
+                            </div>
+
+                            <!-- コード例 -->
+                            <div class="code-sample">
+                                <h5 class="text-white font-medium mb-2">HTML</h5>
+                                <pre class="code-block">&lt;!-- 上行・下行タブバー --&gt;
+&lt;div class="direction-tabs-container"&gt;
+    &lt;div class="direction-tabs"&gt;
+        &lt;button class="direction-tab active" data-direction="ascending"&gt;
+            &lt;i data-lucide="arrow-up" class="direction-tab-icon"&gt;&lt;/i&gt;
+            &lt;div class="direction-tab-content"&gt;
+                &lt;span class="direction-tab-label"&gt;上行&lt;/span&gt;
+                &lt;span class="direction-tab-badge default"&gt;デフォルト&lt;/span&gt;
+            &lt;/div&gt;
+        &lt;/button&gt;
+        &lt;button class="direction-tab" data-direction="descending"&gt;
+            &lt;i data-lucide="arrow-down" class="direction-tab-icon"&gt;&lt;/i&gt;
+            &lt;div class="direction-tab-content"&gt;
+                &lt;span class="direction-tab-label"&gt;下行&lt;/span&gt;
+                &lt;span class="direction-tab-badge advanced"&gt;上級者向け&lt;/span&gt;
+            &lt;/div&gt;
+        &lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- 情報パネル --&gt;
+&lt;div class="direction-info-panels"&gt;
+    &lt;div id="ascending-info" class="direction-info-panel active"&gt;
+        &lt;!-- 上行の説明 --&gt;
+    &lt;/div&gt;
+    &lt;div id="descending-info" class="direction-info-panel"&gt;
+        &lt;!-- 下行の説明 --&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</pre>
+
+                                <h5 class="text-white font-medium mb-2 mt-4">JavaScript（タブ切り替え）</h5>
+                                <pre class="code-block">// CSS classes管理によるタブ切り替え
+const directionTabs = document.querySelectorAll('.direction-tab');
+const directionPanels = document.querySelectorAll('.direction-info-panel');
+
+directionTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const direction = tab.dataset.direction;
+
+        // 全タブのactive削除
+        directionTabs.forEach(t => t.classList.remove('active'));
+        directionPanels.forEach(p => p.classList.remove('active'));
+
+        // 選択されたタブとパネルをactive化
+        tab.classList.add('active');
+        document.getElementById(`${direction}-info`).classList.add('active');
+    });
+});</pre>
+                            </div>
+
+                            <!-- 使用例 -->
+                            <div class="usage-note">
+                                <h5 class="text-white font-medium mb-2">💡 使用例</h5>
+                                <ul class="text-white-60" style="margin-left: 1.5rem; line-height: 1.8;">
+                                    <li><strong>ホームページ:</strong> モード選択前の上行・下行選択</li>
+                                    <li><strong>独立配置:</strong> タブバーとコンテンツが完全分離、全幅維持</li>
+                                    <li><strong>情報切り替え:</strong> 選択に応じて説明パネルが切り替わる</li>
+                                </ul>
+                            </div>
+
+                            <!-- デザイン仕様 -->
+                            <div class="design-specs">
+                                <h5 class="text-white font-medium mb-2">🎨 デザイン仕様</h5>
+                                <ul class="text-white-60" style="margin-left: 1.5rem; line-height: 1.8;">
+                                    <li><strong>タブバー:</strong> 中央配置、コンパクトなサイズ</li>
+                                    <li><strong>背景:</strong> rgba(255, 255, 255, 0.05) + backdrop-filter（ガラスモーフィズム）</li>
+                                    <li><strong>アクティブ:</strong> グラデーション背景 + ボックスシャドウ</li>
+                                    <li><strong>バッジ:</strong> デフォルト（青）、上級者向け（オレンジ）の色分け</li>
+                                    <li><strong>アニメーション:</strong> fadeIn 0.3s（パネル切り替え時）</li>
+                                    <li><strong>レスポンシブ:</strong> モバイルでは縦スタック、タブレット以上で横並び</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
                 <!-- ローディング・エラー表示 -->
                 <section id="loading-error-states" class="catalog-section">
                     <h2 class="text-2xl font-bold text-white mb-4">⏳ ローディング・エラー表示</h2>
