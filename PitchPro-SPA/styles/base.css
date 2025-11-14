@@ -2724,25 +2724,25 @@ body::before {
     margin: 2rem 0 0.5rem 0;
 }
 
-/* タブナビゲーション */
-.tab-navigation {
+/* 上行・下行タブナビゲーション（ホームページ専用） */
+.direction-tab-navigation {
     display: flex;
     gap: 0.5rem;
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
     padding: 0.5rem;
     border-radius: 16px;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     overflow-x: auto;
 }
 
-/* タブボタン */
-.tab-button {
+/* 上行・下行タブボタン（ホームページ専用） */
+.direction-tab-navigation .tab-button {
     padding: 0.75rem 1.5rem;
     background: transparent;
     border: none;
     color: rgba(255, 255, 255, 0.7);
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: 700;
     cursor: pointer;
     border-radius: 12px;
@@ -2755,13 +2755,19 @@ body::before {
     justify-content: center;
 }
 
-.tab-button:hover {
+.direction-tab-navigation .tab-button i,
+.direction-tab-navigation .tab-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+.direction-tab-navigation .tab-button:hover {
     background: rgba(255, 255, 255, 0.1);
     color: white;
 }
 
 /* 上行モード（青・不透明・枠線） */
-.tab-button[data-direction="ascending"].active {
+.direction-tab-navigation .tab-button[data-direction="ascending"].active {
     background: rgba(59, 130, 246, 0.2);
     border: 2px solid rgba(59, 130, 246, 0.5);
     color: white;
@@ -2769,7 +2775,7 @@ body::before {
 }
 
 /* 下行モード（赤・不透明・枠線） */
-.tab-button[data-direction="descending"].active {
+.direction-tab-navigation .tab-button[data-direction="descending"].active {
     background: rgba(239, 68, 68, 0.2);
     border: 2px solid rgba(239, 68, 68, 0.5);
     color: white;

@@ -8894,3 +8894,21 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-14 10:18:39] コミット: feat: ホームページに上行・下行タブナビゲーション実装完了
+
+- 上行・下行タブの切り替え機能実装（sessionStorage統合）
+- 全トレーニングモードボタンの動的更新機能追加
+  - ランダム基音・連続チャレンジ: 「始める（上行）」⇔「始める（下行）」
+  - 12音階モード: 「上昇（上行）」⇔「上昇（下行）」など、簡潔な表記
+- ボタンの色とアイコンの自動切り替え（青⇔赤）
+- 仕様書更新: 上行・下行と上昇・下降の違いを明確化
+
+主要な変更:
+- 新規作成: /js/home-direction-tabs.js (DirectionTabsManager)
+- CSS追加: base.cssに上行・下行タブスタイル追加
+- HTML更新: home.htmlにタブナビゲーション追加
+- 仕様書更新: TRAINING_SPECIFICATION.md, REQUIREMENTS_SPECIFICATION.md
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

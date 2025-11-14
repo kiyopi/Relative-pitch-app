@@ -511,63 +511,69 @@ document.querySelectorAll('.tab-button').forEach(button => {
                     <h3 class="text-white font-medium mb-4">🎯 独立型タブバー（モードカードを囲わないデザイン）</h3>
                     <p class="text-white-60 mb-4">上行・下行を選択するタブバーが独立して存在し、下部のコンテンツは全幅を維持</p>
 
-                    <div class="component-grid grid-cols-1">
-                        <!-- デモ実装 -->
-                        <div class="component-item">
-                            <h4 class="text-white font-medium mb-3">✨ デモ実装</h4>
+                    <!-- デモ実装（全幅） -->
+                    <div style="margin-bottom: 2rem;">
+                        <h4 class="text-white font-medium mb-3">✨ デモ実装</h4>
 
-                            <!-- 上行・下行タブバー + 情報パネル -->
-                            <div class="direction-tabs-container">
-                                <div class="direction-info-panels">
+                        <!-- 上行・下行タブバー + 情報パネル -->
+                        <div class="direction-tabs-container">
+                            <div class="direction-selection-section">
                                     <!-- タブナビゲーション -->
-                                    <div class="tab-navigation">
+                                    <div class="direction-tab-navigation">
                                         <button class="tab-button active" data-direction="ascending">
-                                            <i data-lucide="move-up-right" style="width: 16px; height: 16px; stroke-width: 2.5;"></i>
+                                            <i data-lucide="move-up-right"></i>
                                             <span>上行モード</span>
                                         </button>
                                         <button class="tab-button" data-direction="descending">
-                                            <i data-lucide="move-down-right" style="width: 16px; height: 16px; stroke-width: 2.5;"></i>
+                                            <i data-lucide="move-down-right"></i>
                                             <span>下行モード</span>
                                         </button>
                                     </div>
 
-                                    <!-- 情報パネル（切り替え可能） -->
-                                    <div id="ascending-info" class="direction-info-panel active">
-                                        <h4 class="text-white text-lg" style="margin-bottom: 0.5rem; font-weight: 500;">上行モードとは</h4>
-                                        <p class="text-white-70 leading-relaxed" style="margin-bottom: 0.5rem;">基音からド→レ→ミ→ファ→ソ→ラ→シ→ドと発声して練習します</p>
-                                        <div class="flex items-center gap-2">
-                                            <i data-lucide="lightbulb" class="text-blue-300" style="width: 16px; height: 16px;"></i>
-                                            <p class="text-blue-200 text-sm">初心者におすすめ・自然な音階感覚を養います</p>
+                                    <div class="direction-info-panels">
+
+                                        <!-- 情報パネル（切り替え可能） -->
+                                        <div id="ascending-info" class="direction-info-panel active">
+                                            <h4 class="text-white text-lg" style="margin-bottom: 0.5rem; font-weight: 500;">上行モードとは</h4>
+                                            <p class="text-white-70 leading-relaxed" style="margin-bottom: 0.5rem;">基音からド→レ→ミ→ファ→ソ→ラ→シ→ド（オクターブ上）と発声して練習します</p>
+                                            <div class="flex items-center gap-2">
+                                                <i data-lucide="lightbulb" class="text-blue-300" style="width: 16px; height: 16px;"></i>
+                                                <p class="text-blue-200 text-sm">初心者におすすめ・自然な音階感覚を養います</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div id="descending-info" class="direction-info-panel">
-                                        <h4 class="text-white text-lg" style="margin-bottom: 0.5rem; font-weight: 500;">下行モードとは</h4>
-                                        <p class="text-white-70 leading-relaxed" style="margin-bottom: 0.5rem;">基音からド→シ→ラ→ソ→ファ→ミ→レ→ドと発声して練習します</p>
-                                        <div class="flex items-center gap-2">
-                                            <i data-lucide="lightbulb" class="text-orange-300" style="width: 16px; height: 16px;"></i>
-                                            <p class="text-orange-200 text-sm">上級者向け・より高度な音感トレーニング</p>
+                                        <div id="descending-info" class="direction-info-panel">
+                                            <h4 class="text-white text-lg" style="margin-bottom: 0.5rem; font-weight: 500;">下行モードとは</h4>
+                                            <p class="text-white-70 leading-relaxed" style="margin-bottom: 0.5rem;">基音からド→シ→ラ→ソ→ファ→ミ→レ→ド（オクターブ下）と発声して練習します</p>
+                                            <div class="flex items-center gap-2">
+                                                <i data-lucide="lightbulb" class="text-red-300" style="width: 16px; height: 16px;"></i>
+                                                <p class="text-red-200 text-sm">より高度な音程コントロール・実用的な歌唱訓練</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- モードカード例（全幅維持） -->
-                            <div class="modes-grid-demo">
-                                <div class="glass-card">
-                                    <h4 class="text-white font-medium">ランダム基音</h4>
-                                    <p class="text-white-60 text-sm">8セッション</p>
-                                </div>
-                                <div class="glass-card">
-                                    <h4 class="text-white font-medium">連続チャレンジ</h4>
-                                    <p class="text-white-60 text-sm">12セッション</p>
-                                </div>
-                                <div class="glass-card">
-                                    <h4 class="text-white font-medium">12音階</h4>
-                                    <p class="text-white-60 text-sm">12-24セッション</p>
-                                </div>
+                        <!-- モードカード例（全幅維持） -->
+                        <div class="modes-grid-demo" style="margin-top: 1rem;">
+                            <div class="glass-card">
+                                <h4 class="text-white font-medium">ランダム基音</h4>
+                                <p class="text-white-60 text-sm">8セッション</p>
                             </div>
+                            <div class="glass-card">
+                                <h4 class="text-white font-medium">連続チャレンジ</h4>
+                                <p class="text-white-60 text-sm">12セッション</p>
+                            </div>
+                            <div class="glass-card">
+                                <h4 class="text-white font-medium">12音階</h4>
+                                <p class="text-white-60 text-sm">12-24セッション</p>
+                            </div>
+                        </div>
+                    </div>
 
-                            <!-- コード例 -->
+                    <!-- コード例 -->
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
                             <div class="code-sample">
                                 <h5 class="text-white font-medium mb-2">HTML</h5>
                                 <pre class="code-block">&lt;!-- 上行・下行タブバー --&gt;
