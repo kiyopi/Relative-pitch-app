@@ -39,6 +39,7 @@ export class StepIndicator extends BaseComponent {
             icon.setAttribute('data-lucide', step.icon);
             icon.style.width = '24px';
             icon.style.height = '24px';
+            // Note: Lucide initialization is handled by BaseComponent's mount()
 
             const label = document.createElement('p');
             label.className = 'text-xs text-white-60 mt-2';

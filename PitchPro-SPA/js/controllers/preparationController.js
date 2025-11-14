@@ -102,7 +102,7 @@ function showRedirectMessage(info) {
         `;
         // Lucideアイコンを再描画
         if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
+            if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
         }
     }
 }

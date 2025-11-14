@@ -75,7 +75,7 @@ export class BaseComponent {
     afterRender() {
         // Lucideアイコンの初期化
         if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
+            if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
         }
     }
 

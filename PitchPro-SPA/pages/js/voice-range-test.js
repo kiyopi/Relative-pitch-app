@@ -32,7 +32,7 @@ let VoiceRangeTestController;
 async function initializeDemo() {
     // Lucideアイコン初期化
     if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+        if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
         console.log('✅ Lucideアイコン初期化完了（voice-range-test-demo）');
     }
 
@@ -116,40 +116,40 @@ function updateMicStatus(status) {
             case 'standby':
                 micContainer.classList.add('standby');
                 if (micIcon) {
-                    micIcon.setAttribute('data-lucide', 'mic');
-                    lucide.createIcons(); // Lucideアイコンを再描画
+                    if (typeof window.updateLucideIcon === 'function') window.updateLucideIcon(micIcon.parentElement, 'mic');
+                    if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true }); // Lucideアイコンを再描画
                 }
                 console.log('🎤 マイクステータス: 待機中');
                 break;
             case 'recording':
                 micContainer.classList.add('recording');
                 if (micIcon) {
-                    micIcon.setAttribute('data-lucide', 'mic');
-                    lucide.createIcons(); // Lucideアイコンを再描画
+                    if (typeof window.updateLucideIcon === 'function') window.updateLucideIcon(micIcon.parentElement, 'mic');
+                    if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true }); // Lucideアイコンを再描画
                 }
                 console.log('🎤 マイクステータス: 録音中（赤エフェクト）');
                 break;
             case 'interval':
                 micContainer.classList.add('interval');
                 if (micIcon) {
-                    micIcon.setAttribute('data-lucide', 'mic');
-                    lucide.createIcons(); // Lucideアイコンを再描画
+                    if (typeof window.updateLucideIcon === 'function') window.updateLucideIcon(micIcon.parentElement, 'mic');
+                    if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true }); // Lucideアイコンを再描画
                 }
                 console.log('🎤 マイクステータス: インターバル（青エフェクト）');
                 break;
             case 'muted':
                 micContainer.classList.add('muted');
                 if (micIcon) {
-                    micIcon.setAttribute('data-lucide', 'mic-off');
-                    lucide.createIcons(); // Lucideアイコンを再描画
+                    if (typeof window.updateLucideIcon === 'function') window.updateLucideIcon(micIcon.parentElement, 'mic-off');
+                    if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true }); // Lucideアイコンを再描画
                 }
                 console.log('🎤 マイクステータス: ミュート中');
                 break;
             default:
                 micContainer.classList.add('standby');
                 if (micIcon) {
-                    micIcon.setAttribute('data-lucide', 'mic');
-                    lucide.createIcons(); // Lucideアイコンを再描画
+                    if (typeof window.updateLucideIcon === 'function') window.updateLucideIcon(micIcon.parentElement, 'mic');
+                    if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true }); // Lucideアイコンを再描画
                 }
                 console.log('🎤 マイクステータス: デフォルト（待機中）');
         }
@@ -474,7 +474,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     // Lucideアイコン初期化
-    lucide.createIcons();
+    if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
 
     // 注意: マイク許可は preparation-pitchpro-cycle.js で処理される
 
@@ -1329,7 +1329,7 @@ function displayVoiceRangeResults(results) {
 
     // 🎵 v3.1.22追加: 動的に生成したLucideアイコンを初期化
     if (typeof lucide !== 'undefined' && lucide.createIcons) {
-        lucide.createIcons();
+        if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
     }
 
     // 💾 音域データをlocalStorageに保存
@@ -2009,7 +2009,7 @@ function updateBadgeForFailure() {
         badge.style.border = 'none';
     }
 
-    lucide.createIcons();
+    if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
 }
 
 // バッジのエラー表示
@@ -2027,7 +2027,7 @@ function updateBadgeForError() {
         badge.classList.add('failure');
     }
 
-    lucide.createIcons();
+    if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
 }
 
 // 高音測定失敗時の処理

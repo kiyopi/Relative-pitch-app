@@ -120,7 +120,7 @@ class LoadingComponent {
                 if (typeof window.initializeLucideIcons === 'function') {
                     window.initializeLucideIcons({ immediate: true });
                 } else if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
+                    if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
                 }
             }
         } else {

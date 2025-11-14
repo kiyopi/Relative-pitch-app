@@ -337,7 +337,7 @@ export async function initializeTrainingPage() {
 
         // 初期状態（HTMLと同じアイコン）
         newButton.innerHTML = '<i data-lucide="volume-2" style="width: 24px; height: 24px;"></i><span>基音スタート</span>';
-        lucide.createIcons();
+        if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
 
         newButton.addEventListener('click', () => {
             console.log('🎯 ボタンクリック検出');
@@ -360,13 +360,13 @@ export async function initializeTrainingPage() {
 function waitForLucide() {
     return new Promise((resolve) => {
         if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
+            if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
             resolve();
         } else {
             const interval = setInterval(() => {
                 if (typeof lucide !== 'undefined') {
                     clearInterval(interval);
-                    lucide.createIcons();
+                    if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
                     resolve();
                 }
             }, 100);
@@ -574,7 +574,7 @@ async function startTraining() {
         if (!pitchShifter || !pitchShifter.isInitialized) {
             console.log('⏳ 初回クリック - PitchShifter初期化開始');
             playButton.innerHTML = '<i data-lucide="loader" style="width: 24px; height: 24px;"></i><span>初期化中...</span>';
-            lucide.createIcons();
+            if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
 
             await initializePitchShifter();
             console.log('✅ 初期化完了！次回から即座に再生されます');
@@ -582,7 +582,7 @@ async function startTraining() {
 
         // 再生開始
         playButton.innerHTML = '<i data-lucide="volume-2" style="width: 24px; height: 24px;"></i><span>再生中...</span>';
-        lucide.createIcons();
+        if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
 
         if (statusText) {
             statusText.textContent = '基音を再生中...';
@@ -680,7 +680,7 @@ async function startTraining() {
         playButton.disabled = false;
         playButton.classList.remove('btn-disabled');
         playButton.innerHTML = '<i data-lucide="alert-circle" style="width: 24px; height: 24px;"></i><span>エラー - 再試行</span>';
-        lucide.createIcons();
+        if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
         if (statusText) {
             statusText.textContent = 'エラーが発生しました';
         }
@@ -984,7 +984,7 @@ function handleSessionComplete() {
                     playButton.innerHTML = '<i data-lucide="loader" style="width: 24px; height: 24px;"></i><span>準備中...</span>';
                     playButton.disabled = true;
                     playButton.classList.add('btn-disabled');
-                    lucide.createIcons();
+                    if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
                 }
 
                 // UIをリセット
@@ -1074,7 +1074,7 @@ function handleSessionComplete() {
         startTraining();
     });
 
-    lucide.createIcons();
+    if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
 }
 
 export function resetTrainingPageFlag() {
