@@ -283,9 +283,13 @@ const ModeController = {
             }
         }
 
-        // Lucideアイコンを再描画
-        if (typeof lucide !== 'undefined') {
+        // Lucideアイコンを再描画（統合初期化関数を使用）
+        if (typeof window.initializeLucideIcons === 'function') {
+            window.initializeLucideIcons({ immediate: true });
+            console.log('✅ Lucideアイコン再初期化完了');
+        } else if (typeof lucide !== 'undefined') {
             lucide.createIcons();
+            console.log('✅ Lucideアイコン再初期化完了（フォールバック）');
         }
 
         return true;
