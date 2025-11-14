@@ -401,14 +401,22 @@ function initializeModeUI() {
     if (pageTitle) {
         let titleText = config.title;
 
-        // 12音階モードの場合、方向を追加
+        // 音階方向（上行・下行）を追加
+        const scaleDirection = sessionStorage.getItem('trainingDirection') || 'ascending';
+        const scaleDirectionLabel = scaleDirection === 'ascending' ? '上行' : '下行';
+
+        // 12音階モードの場合、基音方向も追加
         if (currentMode === '12tone' && window.currentTrainingDirection) {
-            const directionLabels = {
-                'ascending': '（上昇）',
-                'descending': '（下降）',
-                'both': '（両方向）'
+            const chromaticDirectionLabels = {
+                'ascending': '上昇',
+                'descending': '下降',
+                'both': '両方向'
             };
-            titleText += ` ${directionLabels[window.currentTrainingDirection] || ''}`;
+            const chromaticLabel = chromaticDirectionLabels[window.currentTrainingDirection] || '';
+            titleText += ` ${chromaticLabel}・${scaleDirectionLabel}`;
+        } else {
+            // ランダム基音・連続チャレンジモードの場合、音階方向のみ
+            titleText += ` ${scaleDirectionLabel}`;
         }
 
         pageTitle.textContent = titleText;
