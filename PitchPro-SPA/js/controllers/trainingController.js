@@ -74,6 +74,44 @@ function updateDoremiGuide(intervals) {
     console.log(`🎵 ドレミガイド更新: ${intervals.join('→')}`);
 }
 
+/**
+ * 音階方向・基音方向のバッジを動的に生成
+ * @param {string} scaleDirection - 音階方向 'ascending' | 'descending'
+ * @param {string|null} chromaticDirection - 基音方向 'up' | 'down' | 'both' | null (12音階モードのみ)
+ */
+function updateDirectionBadges(scaleDirection, chromaticDirection = null) {
+    const container = document.getElementById('direction-badges-container');
+    if (!container) {
+        console.warn('⚠️ direction-badges-container要素が見つかりません');
+        return;
+    }
+
+    // 既存のバッジを全削除
+    container.innerHTML = '';
+
+    // 音階方向バッジ（常に表示）
+    const scaleBadge = document.createElement('span');
+    scaleBadge.className = `direction-badge ${scaleDirection}`;
+    scaleBadge.textContent = scaleDirection === 'ascending' ? '上行' : '下行';
+    container.appendChild(scaleBadge);
+
+    // 基音方向バッジ（12音階モードのみ）
+    if (chromaticDirection) {
+        const chromaticBadge = document.createElement('span');
+        chromaticBadge.className = `direction-badge chromatic-${chromaticDirection}`;
+        
+        let badgeText = '';
+        if (chromaticDirection === 'up') badgeText = '上昇';
+        else if (chromaticDirection === 'down') badgeText = '下降';
+        else if (chromaticDirection === 'both') badgeText = '両方';
+        
+        chromaticBadge.textContent = badgeText;
+        container.appendChild(chromaticBadge);
+    }
+
+    console.log(`🏷️ バッジ更新: 音階=${scaleDirection}, 基音=${chromaticDirection || 'なし'}`);
+}
+
 // トレーニングモード管理
 let currentMode = 'random'; // 'random' | 'continuous' | '12tone'
 let voiceRangeData = null; // 音域データ
@@ -146,8 +184,10 @@ export async function initializeTrainingPage() {
     }, 100);
 
     // 12音階モード方向をグローバル変数に保存
+    let chromaticDirectionForBadge = null;
     if (currentMode === '12tone' && directionParam) {
         window.currentTrainingDirection = directionParam;
+        chromaticDirectionForBadge = directionParam;
         console.log(`✅ 12音階モード方向: ${directionParam}`);
 
         // 両方向の場合はmaxSessionsを24に変更
@@ -159,6 +199,11 @@ export async function initializeTrainingPage() {
             console.log(`✅ 12音階モード片方向: maxSessions=12に設定`);
         }
     }
+
+    // 音階方向・基音方向バッジを更新（DOM読み込み後に実行）
+    setTimeout(() => {
+        updateDirectionBadges(currentScaleDirection, chromaticDirectionForBadge);
+    }, 100);
 
     // レッスンID生成（トレーニング全体で1つのレッスンID）
     // sessionStorageから復元を試みる（個別結果画面からの戻り対応）
@@ -1590,6 +1635,14 @@ function selectSequentialMode(availableNotes, maxSessions) {
 
     const selectedNotes = [];
     const chromaticNotes = availableNotes.slice(0, 12); // 最初の12音（クロマチック）
+    const actualCount = chromaticNotes.length;
+
+    // 【修正】preparationページで音域チェック済み（ユーザー確認済み）のため、
+    // ここでは警告ログのみ表示し、自動拡張ロジックに委ねる
+    if (actualCount < 12) {
+        console.warn(`⚠️ [12音階モード] 利用可能な基音が${actualCount}音しかありません`);
+        console.warn(`💡 一部の音が発声困難な可能性がありますが、ユーザー確認済みで続行します`);
+    }
 
     if (maxSessions === 12) {
         // 片方向（上昇 or 下降）

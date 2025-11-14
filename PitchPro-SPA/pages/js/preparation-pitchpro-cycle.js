@@ -1264,6 +1264,17 @@ function setupMicPermissionFlow() {
             console.log('🚀 トレーニング開始ボタン（音域設定済み表示）がクリックされました');
 
             try {
+                // 【新規追加】モード情報を先に取得
+                const redirectInfo = window.preparationRedirectInfo;
+                const mode = redirectInfo?.mode || 'random';
+
+                // 【新規追加】12音階モード用音域チェック
+                const canContinue = await check12ToneVoiceRange(mode);
+                if (!canContinue) {
+                    console.log('⚠️ ユーザーが音域テストをやり直すことを選択');
+                    return; // トレーニング開始を中断
+                }
+
                 // 音域データ確認済みフラグ
                 localStorage.setItem('rangeDataConfirmed', 'true');
                 localStorage.setItem('step1CompletedViaExistingData', 'true');
@@ -1273,9 +1284,6 @@ function setupMicPermissionFlow() {
                 console.log('📌 PitchProリソースを保持（MediaStream再利用のため）');
 
                 // 【修正v4.0.5】トレーニング開始時にsessionStorageをクリア（中断レッスン復元防止）
-                const redirectInfo = window.preparationRedirectInfo;
-                const mode = redirectInfo?.mode || 'random';
-
                 if (mode === 'random') {
                     // ランダムモード：sessionStorageをクリア
                     if (window.SessionManager) {
@@ -1502,13 +1510,20 @@ function setupMicPermissionFlow() {
         completeRangeTestBtn.addEventListener('click', async () => {
             console.log('🚀 トレーニング開始ボタン（音域テスト完了後）がクリックされました');
 
+            // 【新規追加】モード情報を先に取得
+            const redirectInfo = window.preparationRedirectInfo;
+            const mode = redirectInfo?.mode || 'random';
+
+            // 【新規追加】12音階モード用音域チェック
+            const canContinue = await check12ToneVoiceRange(mode);
+            if (!canContinue) {
+                console.log('⚠️ ユーザーが音域テストをやり直すことを選択');
+                return; // トレーニング開始を中断
+            }
+
             // 【変更】PitchProリソースは破棄せずMediaStreamを保持
             // trainingページで同じMediaStreamを再利用し、マイク許可を再要求しない
             console.log('📌 PitchProリソースを保持（MediaStream再利用のため）');
-
-            // 【localStorage統合】トレーニング開始時にセッションデータをクリア（ランダムモードのみ）
-            const redirectInfo = window.preparationRedirectInfo;
-            const mode = redirectInfo?.mode || 'random';
 
             if (mode === 'random') {
                 // ランダムモード：毎回セッションデータをクリア
@@ -1680,6 +1695,187 @@ async function checkAndDisplayExistingRangeData() {
     }
 
     console.log('🎉 音域設定済み表示の初期表示完了');
+}
+
+/**
+ * 12音階モード用音域チェック
+ * 2オクターブ未満の場合、ユーザーに確認ダイアログを表示
+ * @param {string} mode - トレーニングモード
+ * @returns {Promise<boolean>} true: 続行, false: キャンセル
+ */
+async function check12ToneVoiceRange(mode) {
+    // 12音階モード以外はチェックスキップ
+    if (mode !== '12tone') {
+        return true;
+    }
+
+    // 「今後表示しない」設定を確認
+    const skipWarning = localStorage.getItem('skip12ToneVoiceRangeWarning');
+    if (skipWarning === 'true') {
+        console.log('✅ [12音階モード] 音域警告スキップ（ユーザー設定）');
+        return true;
+    }
+
+    // 音域データ取得
+    let voiceRangeData = null;
+    try {
+        if (typeof DataManager !== 'undefined' && DataManager.getVoiceRangeData) {
+            voiceRangeData = DataManager.getVoiceRangeData();
+        }
+        if (!voiceRangeData) {
+            const localData = localStorage.getItem('voiceRangeData');
+            if (localData) {
+                voiceRangeData = JSON.parse(localData);
+            }
+        }
+    } catch (error) {
+        console.error('❌ 音域データ取得エラー:', error);
+        return true; // データ取得失敗時は続行
+    }
+
+    if (!voiceRangeData || !voiceRangeData.results) {
+        console.warn('⚠️ [12音階モード] 音域データなし - チェックスキップ');
+        return true;
+    }
+
+    // オクターブ数を計算
+    const { lowFreq, highFreq } = voiceRangeData.results;
+    const octaveRange = Math.log2(highFreq / lowFreq);
+
+    console.log(`🔍 [12音階モード] 音域チェック: ${octaveRange.toFixed(2)}オクターブ`);
+
+    // 2.0オクターブ以上なら問題なし
+    if (octaveRange >= 2.0) {
+        console.log('✅ [12音階モード] 音域OK: 2.0オクターブ以上');
+        return true;
+    }
+
+    // 2.0オクターブ未満 - 警告ダイアログを表示
+    console.warn(`⚠️ [12音階モード] 音域不足: ${octaveRange.toFixed(2)}オクターブ（推奨: 2.0オクターブ以上）`);
+
+    return showVoiceRangeWarningDialog(octaveRange);
+}
+
+/**
+ * 音域不足警告ダイアログを表示
+ * @param {number} octaveRange - 現在のオクターブ数
+ * @returns {Promise<boolean>} true: 続行, false: キャンセル
+ */
+function showVoiceRangeWarningDialog(octaveRange) {
+    return new Promise((resolve) => {
+        // ダイアログHTML生成（ランク詳細ポップオーバースタイル準拠）
+        const dialogHTML = `
+            <div id="voice-range-warning-dialog" class="modal-overlay" style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(15, 23, 42, 0.4);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+            ">
+                <div style="
+                    max-width: 500px;
+                    margin: 20px;
+                    padding: 24px;
+                    background: rgba(30, 41, 59, 0.95);
+                    border: 1px solid rgba(148, 163, 184, 0.2);
+                    border-radius: 12px;
+                    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+                ">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <i data-lucide="alert-triangle" style="width: 32px; height: 32px; color: #fbbf24; flex-shrink: 0;"></i>
+                        <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">音域が不足しています</h3>
+                    </div>
+                    
+                    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                        <div style="color: #fca5a5; font-size: 0.875rem; margin-bottom: 8px;">
+                            <strong>現在の音域:</strong> ${octaveRange.toFixed(2)}オクターブ
+                        </div>
+                        <div style="color: #fca5a5; font-size: 0.875rem;">
+                            <strong>推奨音域:</strong> 2.0オクターブ以上
+                        </div>
+                    </div>
+                    
+                    <p style="color: rgba(255, 255, 255, 0.8); font-size: 0.875rem; line-height: 1.5; margin-bottom: 16px;">
+                        12音階トレーニングには12音が必要ですが、現在の音域では不足しています。<br>
+                        不足分は高音域から自動的に追加されますが、一部の音が発声困難な可能性があります。<br>
+                        <strong style="color: #fbbf24;">このままトレーニングを開始しますか？</strong>
+                    </p>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: rgba(255, 255, 255, 0.8); font-size: 0.875rem;">
+                            <input type="checkbox" id="skip-warning-checkbox" style="width: 16px; height: 16px; cursor: pointer;">
+                            <span>今後この警告を表示しない</span>
+                        </label>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px;">
+                        <button id="retest-voice-range-btn" class="btn btn-outline" style="flex: 1;">
+                            <i data-lucide="rotate-ccw" style="width: 20px; height: 20px;"></i>
+                            <span>音域テストをやり直す</span>
+                        </button>
+                        <button id="continue-anyway-btn" class="btn btn-primary" style="flex: 1;">
+                            <i data-lucide="arrow-right" style="width: 20px; height: 20px;"></i>
+                            <span>このまま開始</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // ダイアログをDOMに追加
+        const dialogContainer = document.createElement('div');
+        dialogContainer.innerHTML = dialogHTML;
+        document.body.appendChild(dialogContainer);
+
+        // Lucideアイコン初期化
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        // ボタンイベント設定
+        const retestBtn = document.getElementById('retest-voice-range-btn');
+        const continueBtn = document.getElementById('continue-anyway-btn');
+        const skipCheckbox = document.getElementById('skip-warning-checkbox');
+
+        retestBtn.addEventListener('click', () => {
+            // 「今後表示しない」設定を保存
+            if (skipCheckbox.checked) {
+                localStorage.setItem('skip12ToneVoiceRangeWarning', 'true');
+                console.log('✅ 音域警告スキップ設定を保存');
+            }
+            
+            // ダイアログを削除
+            document.body.removeChild(dialogContainer);
+            
+            // 準備ページの音域テストセクションへ移動
+            const rangeTestSection = document.getElementById('range-test-section');
+            if (rangeTestSection) {
+                rangeTestSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            
+            resolve(false); // キャンセル
+        });
+
+        continueBtn.addEventListener('click', () => {
+            // 「今後表示しない」設定を保存
+            if (skipCheckbox.checked) {
+                localStorage.setItem('skip12ToneVoiceRangeWarning', 'true');
+                console.log('✅ 音域警告スキップ設定を保存');
+            }
+            
+            // ダイアログを削除
+            document.body.removeChild(dialogContainer);
+            
+            resolve(true); // 続行
+        });
+    });
 }
 
 /**
