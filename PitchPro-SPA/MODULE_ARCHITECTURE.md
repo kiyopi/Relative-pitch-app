@@ -1,8 +1,18 @@
 # PitchPro-SPA モジュールアーキテクチャドキュメント
 
 **作成日**: 2025-11-09
-**バージョン**: 1.0.0
+**最終更新**: 2025-11-14
+**バージョン**: 1.1.0
 **目的**: 全JavaScriptモジュールの役割・依存関係・モジュール化候補の管理
+
+## 📝 **更新履歴**
+
+### v1.1.0 (2025-11-14)
+- ✅ **ModeController v2.0.0実装完了**
+  - モード管理統合モジュール追加
+  - タイトル表示ロジックの一元管理
+  - trainingController.js 63行削減
+  - 新モード追加時の修正箇所を最小化
 
 ---
 
@@ -44,6 +54,10 @@
 | `js/data-manager.js` | localStorage統一管理 | `window.DataManager` | ✅ 安定 |
 | `js/evaluation-calculator.js` | 動的グレード計算 | `window.EvaluationCalculator` | ✅ 安定 |
 | `js/controllers/session-data-recorder.js` | セッションデータ記録 | `window.SessionDataRecorder` | ✅ 安定 |
+| `js/mode-controller.js` | **モード定義・UI表示統一管理** | `window.ModeController` | ✅ **v2.0.0実装完了** |
+
+**モジュール化の成功例**:
+- ✅ `mode-controller.js` - v2.0.0で実装完了、タイトル表示ロジック集約、約63行削減
 
 ---
 
@@ -118,7 +132,56 @@ window.DeviceDetector = {
 
 ---
 
-#### **2. 基音選定モジュール**
+#### **2. モード管理統合モジュール** ✅ **v2.0.0実装完了**
+
+**実装内容**:
+- ✅ `/js/mode-controller.js` 作成完了
+- ✅ モード定義の一元管理（色・アイコン・名称）
+- ✅ タイトル生成関数（`generatePageTitle`）
+- ✅ ページヘッダー統一更新関数（`updatePageHeader`）
+- ✅ trainingController.js約63行削減
+
+**実装済みAPI**:
+```javascript
+window.ModeController = {
+    getMode(modeId),                        // モード設定取得
+    getSessionsPerLesson(modeId, options),  // セッション数取得
+    getModeName(modeId, useShortName),      // モード名取得
+    generatePageTitle(modeId, options),     // タイトル生成
+    updatePageHeader(modeId, options)       // UI一括更新
+};
+```
+
+**モード定義（Single Source of Truth）**:
+```javascript
+modes: {
+    'random': {
+        name: 'ランダム基音モード',
+        icon: 'shuffle',
+        colors: {
+            iconBg: 'gradient-catalog-green',
+            subtitle: 'text-green-200'
+        },
+        // ...
+    },
+    // continuous, 12tone...
+}
+```
+
+**影響範囲**:
+- ✅ `trainingController.js` - タイトル表示ロジック集約（83行→20行）
+- ✅ `results-overview-controller.js` - ページヘッダー統一更新
+- ✅ `records-controller.js` - レッスンカード表示でも活用可能
+
+**効果**:
+- ✅ タイトル表示ロジックの一元管理完了（重複コード削減）
+- ✅ 新モード追加時の修正箇所を最小化（1箇所のみ）
+- ✅ ホームページmode-iconカラーとの完全統一
+- ✅ 全ページで一貫したUI体験
+
+---
+
+#### **3. 基音選定モジュール**
 **現状の問題**:
 - `trainingController.js`に基音選定ロジックが集中（800行以上）
 - 3つのモード別ロジック + 音域データ処理が複雑化
