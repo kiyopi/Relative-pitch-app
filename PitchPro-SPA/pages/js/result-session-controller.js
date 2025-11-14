@@ -68,8 +68,8 @@ async function initializeResultSessionPage() {
     }
 
     // Lucideアイコン再初期化
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+    if (typeof window.initializeLucideIcons === 'function') {
+        window.initializeLucideIcons({ immediate: true });
     }
 }
 
@@ -289,8 +289,8 @@ function displayEvaluationDistribution(pitchErrors, outlierCount = 0) {
     `;
 
     // Lucideアイコン再初期化
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+    if (typeof window.initializeLucideIcons === 'function') {
+        window.initializeLucideIcons({ immediate: true });
     }
 }
 
@@ -355,8 +355,8 @@ function displayAccuracyBadge(avgError) {
     message.textContent = evaluation.message;
 
     // Lucideアイコン再初期化
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+    if (typeof window.initializeLucideIcons === 'function') {
+        window.initializeLucideIcons({ immediate: true });
     }
 }
 
@@ -419,8 +419,8 @@ function displayDetailedAnalysis(pitchErrors, outlierThreshold) {
     });
 
     // Lucideアイコン再初期化
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+    if (typeof window.initializeLucideIcons === 'function') {
+        window.initializeLucideIcons({ immediate: true });
     }
 }
 
@@ -491,8 +491,8 @@ function updateNextSessionButton(sessionNumber) {
     });
 
     // Lucideアイコン再初期化
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+    if (typeof window.initializeLucideIcons === 'function') {
+        window.initializeLucideIcons({ immediate: true });
     }
 }
 
@@ -579,8 +579,8 @@ function displayOutlierNotice(outlierFiltered, outlierCount) {
     `;
 
     // Lucideアイコン再初期化
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+    if (typeof window.initializeLucideIcons === 'function') {
+        window.initializeLucideIcons({ immediate: true });
     }
 }
 
@@ -619,8 +619,8 @@ function displayOutlierExplanation(outlierFiltered, outlierCount, outlierThresho
         `;
 
         // Lucideアイコン再初期化
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
+        if (typeof window.initializeLucideIcons === 'function') {
+            window.initializeLucideIcons({ immediate: true });
         }
     } else {
         explanationContainer.innerHTML = '';

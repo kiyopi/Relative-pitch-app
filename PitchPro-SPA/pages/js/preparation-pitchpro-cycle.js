@@ -487,7 +487,7 @@ class PitchProCycleManager {
                     if (this.uiElements.requestMicBtn) {
                         this.uiElements.requestMicBtn.disabled = false;
                         this.uiElements.requestMicBtn.innerHTML = '<i data-lucide="mic" style="width: 24px; height: 24px;"></i><span>マイク許可</span>';
-                        lucide.createIcons();
+                        window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
                     }
                 }
             }, 1000);
@@ -498,7 +498,7 @@ class PitchProCycleManager {
         if (this.uiElements.requestMicBtn) {
             this.uiElements.requestMicBtn.disabled = false;
             this.uiElements.requestMicBtn.innerHTML = '<i data-lucide="alert-circle" style="width: 24px; height: 24px;"></i><span>エラー - 再試行</span>';
-            lucide.createIcons();
+            window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
         }
     }
 
@@ -561,7 +561,7 @@ class PitchProCycleManager {
             voiceInstructionIcon.style.backgroundColor = '#22c55e'; // 緑色背景
             voiceInstructionIcon.style.borderRadius = '50%';
 
-            // 🔧 修正: lucide.createIcons()を呼ばない（全体の再初期化を避ける）
+            // 🔧 修正: window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true })を呼ばない（全体の再初期化を避ける）
             // 代わりに上記でSVGを直接挿入済み
             console.log('✅ voice-instruction-icon を成功状態に更新（緑背景＋チェックマーク）');
         }
@@ -657,7 +657,7 @@ class PitchProCycleManager {
 
                 // Lucideアイコン初期化（音量調整セクションのアイコン用）
                 if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
+                    window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
                     console.log('✅ Lucideアイコン初期化完了（音量調整セクション）');
                 }
 
@@ -937,14 +937,14 @@ window.initializePreparationPitchProCycle = async function() {
     // 注意: Lucideアイコン初期化はrouter.jsで既に実行されているため、
     // ここで再度実行すると非表示要素（hidden）内のアイコンが正しく処理されない問題が発生する。
     // そのため、ここでのLucide初期化は削除。
-    // 必要に応じて、個別の要素表示時にlucide.createIcons()を呼び出すこと。
+    // 必要に応じて、個別の要素表示時にwindow.initializeLucideIcons && window.initializeLucideIcons({ immediate: true })を呼び出すこと。
     // ========================================================================
 
     /*
     // 元のコード（デバッグ完了後に戻す）
     // Lucideアイコン初期化（最優先）
     if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+        window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
         console.log('✅ Lucideアイコン初期化完了');
     } else {
         console.warn('⚠️ Lucideライブラリが読み込まれていません');
@@ -979,7 +979,7 @@ window.initializePreparationPitchProCycle = async function() {
         if (requestMicBtn) {
             requestMicBtn.innerHTML = '<i data-lucide="alert-circle" style="width: 24px; height: 24px;"></i><span>初期化失敗 - 詳細はコンソールを確認</span>';
             if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
+                window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
             }
         }
 
@@ -1057,7 +1057,7 @@ function setupMicPermissionFlow() {
             // ボタンを無効化してローディング表示
             requestMicBtn.disabled = true;
             requestMicBtn.innerHTML = '<i data-lucide="loader" style="width: 24px; height: 24px;"></i><span>許可を待っています...</span>';
-            if (typeof lucide !== 'undefined') lucide.createIcons();
+            if (typeof lucide !== 'undefined') window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
 
             // PitchProサイクル管理を使う場合
             if (typeof pitchProCycleManager !== 'undefined' && pitchProCycleManager && pitchProCycleManager.audioDetector) {
@@ -1138,7 +1138,7 @@ function setupMicPermissionFlow() {
             // エラー表示
             requestMicBtn.disabled = false;
             requestMicBtn.innerHTML = '<i data-lucide="alert-circle" style="width: 24px; height: 24px;"></i><span>許可に失敗 - 再試行</span>';
-            if (typeof lucide !== 'undefined') lucide.createIcons();
+            if (typeof lucide !== 'undefined') window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
 
             alert(`マイク許可エラー: ${error.message}`);
         }
@@ -1190,7 +1190,7 @@ function setupMicPermissionFlow() {
 
                     // Lucideアイコン初期化（mic-status-containerのアイコン表示確保）
                     if (typeof lucide !== 'undefined') {
-                        lucide.createIcons();
+                        window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
                         console.log('✅ Lucideアイコン初期化完了（音域テストセクション表示時）');
                     }
                 }
@@ -1243,7 +1243,7 @@ function setupMicPermissionFlow() {
 
                     // Lucideアイコン初期化（mic-status-containerのアイコン表示確保）
                     if (typeof lucide !== 'undefined') {
-                        lucide.createIcons();
+                        window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
                         console.log('✅ Lucideアイコン初期化完了（音域テストセクション表示時）');
                     }
                 }
@@ -1347,7 +1347,7 @@ function setupMicPermissionFlow() {
 
                     // Lucideアイコン初期化（mic-status-containerのアイコン表示確保）
                     if (typeof lucide !== 'undefined') {
-                        lucide.createIcons();
+                        window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
                         console.log('✅ Lucideアイコン初期化完了（音域テストセクション表示時）');
                     }
                 }
@@ -1688,7 +1688,7 @@ async function checkAndDisplayExistingRangeData() {
     await new Promise(resolve => setTimeout(resolve, 100));
 
     if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+        window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
         console.log('✅ Lucideアイコン再初期化完了');
     } else {
         console.warn('⚠️ Lucideライブラリが見つかりません');
@@ -1836,7 +1836,7 @@ function showVoiceRangeWarningDialog(octaveRange) {
 
         // Lucideアイコン初期化
         if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
+            window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
         }
 
         // ボタンイベント設定
@@ -1906,7 +1906,7 @@ function updateMicButtonState(state) {
             requestMicBtn.innerHTML = '<i data-lucide="mic" style="width: 24px; height: 24px;"></i><span>マイクを許可</span>';
     }
 
-    lucide.createIcons();
+    window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
 }
 
 /**
@@ -1925,7 +1925,7 @@ function setupVolumeAdjustmentControls() {
 
         testBaseNoteBtn.disabled = false;
         if (icon) {
-            icon.setAttribute('data-lucide', 'volume-2');
+            window.updateLucideIcon && window.updateLucideIcon(icon, 'volume-2');
         }
         if (text) {
             text.textContent = '基音を試聴';
@@ -1933,7 +1933,7 @@ function setupVolumeAdjustmentControls() {
 
         // Lucideアイコンを更新
         if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
+            window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
         }
         console.log('🔄 基音試聴ボタンの状態をリセット');
 
@@ -1988,12 +1988,12 @@ function setupVolumeAdjustmentControls() {
                 const originalText = text.textContent;
 
                 btn.disabled = true;
-                icon.setAttribute('data-lucide', 'loader-2');
+                window.updateLucideIcon && window.updateLucideIcon(icon, 'loader-2');
                 text.textContent = '再生中...';
 
                 // Lucideアイコンを更新
                 if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
+                    window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
                 }
 
                 // C4 (261.6Hz) を再生
@@ -2009,7 +2009,7 @@ function setupVolumeAdjustmentControls() {
 
                     btn.disabled = false;
                     if (currentIcon) {
-                        currentIcon.setAttribute('data-lucide', originalIconName);
+                        window.updateLucideIcon && window.updateLucideIcon(currentIcon, originalIconName);
                     }
                     if (currentText) {
                         currentText.textContent = originalText;
@@ -2017,7 +2017,7 @@ function setupVolumeAdjustmentControls() {
 
                     // Lucideアイコンを更新
                     if (typeof lucide !== 'undefined') {
-                        lucide.createIcons();
+                        window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
                     }
 
                     // フォーカスを外す（Lucide再初期化でフォーカスが戻る可能性があるため）
@@ -2040,13 +2040,13 @@ function setupVolumeAdjustmentControls() {
 
                 btn.disabled = false;
                 if (icon) {
-                    icon.setAttribute('data-lucide', 'volume-2');
+                    window.updateLucideIcon && window.updateLucideIcon(icon, 'volume-2');
                 }
                 if (text) {
                     text.textContent = '基音を試聴';
                 }
                 if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
+                    window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
                 }
 
                 // フォーカスを外す

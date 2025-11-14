@@ -21,9 +21,9 @@
         // イベントリスナー登録
         registerEventListeners();
 
-        // Lucideアイコン初期化
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
+        // Lucideアイコン初期化（統合初期化関数を使用）
+        if (typeof window.initializeLucideIcons === 'function') {
+            window.initializeLucideIcons({ immediate: true });
         }
 
         console.log('✅ 設定ページ初期化完了');

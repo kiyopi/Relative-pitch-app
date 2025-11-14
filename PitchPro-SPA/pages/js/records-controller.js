@@ -58,9 +58,6 @@ window.initRecords = async function() {
         if (typeof window.initializeLucideIcons === 'function') {
             window.initializeLucideIcons({ immediate: true });
             console.log('[Records] Lucide icons initialized');
-        } else if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-            console.log('[Records] Lucide icons initialized (fallback)');
         }
     } catch (error) {
         console.error('[Records] 初期化エラー:', error);
@@ -340,7 +337,7 @@ async function displayStatistics(stats) {
         container.appendChild(modeCard);
     });
 
-    // Lucideアイコン再初期化
+    // Lucideアイコン再初期化（統合初期化関数を使用）
     if (typeof window.initializeLucideIcons === 'function') {
         window.initializeLucideIcons({ immediate: true });
     }
@@ -371,6 +368,11 @@ async function displaySessionList(sessions) {
         container.appendChild(lessonCard);
         // 次のフレームまで待機（レンダリングを段階的に実行）
         await new Promise(resolve => setTimeout(resolve, 0));
+    }
+
+    // 全カード追加後にLucideアイコンを一括初期化
+    if (typeof window.initializeLucideIcons === 'function') {
+        window.initializeLucideIcons({ immediate: true });
     }
 }
 
@@ -676,11 +678,6 @@ function createLessonCard(lesson) {
         </div>
     `;
 
-    // Lucideアイコン初期化
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
-
     return card;
 }
 
@@ -775,11 +772,6 @@ function createSessionCard(session) {
             </div>
         </div>
     `;
-
-    // Lucideアイコン再初期化
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
 
     return card;
 }

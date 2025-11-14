@@ -103,15 +103,16 @@ class DirectionTabsManager {
                 // テキスト更新
                 textSpan.textContent = isAscending ? '始める（上行）' : '始める（下行）';
 
-                // アイコン更新
-                if (iconElement && iconElement.tagName === 'svg') {
-                    const newIcon = document.createElement('i');
-                    newIcon.setAttribute('data-lucide', isAscending ? 'move-up-right' : 'move-down-right');
-                    newIcon.style.width = '24px';
-                    newIcon.style.height = '24px';
-                    iconElement.replaceWith(newIcon);
-                } else if (iconElement) {
-                    iconElement.setAttribute('data-lucide', isAscending ? 'move-up-right' : 'move-down-right');
+                // アイコン更新（統一関数を使用）
+                if (iconElement) {
+                    const iconName = isAscending ? 'move-up-right' : 'move-down-right';
+                    const iconWrapper = iconElement.parentElement;
+                    if (typeof window.updateLucideIcon === 'function') {
+                        window.updateLucideIcon(iconWrapper, iconName, {
+                            width: '24px',
+                            height: '24px'
+                        });
+                    }
                 }
 
                 // 色更更新
@@ -144,15 +145,17 @@ class DirectionTabsManager {
 
                 textSpan.textContent = isAscending ? `${modeText}（上行）` : `${modeText}（下行）`;
 
-                // アイコン更新処理（Lucide再初期化のため）
-                if (iconElement && iconElement.tagName === 'svg') {
+                // アイコン更新処理（統一関数を使用）
+                if (iconElement) {
                     const originalIcon = chromaticDir === 'ascending' ? 'trending-up' :
                                        chromaticDir === 'descending' ? 'trending-down' : 'repeat';
-                    const newIcon = document.createElement('i');
-                    newIcon.setAttribute('data-lucide', originalIcon);
-                    newIcon.style.width = '20px';
-                    newIcon.style.height = '20px';
-                    iconElement.replaceWith(newIcon);
+                    const iconWrapper = iconElement.parentElement;
+                    if (typeof window.updateLucideIcon === 'function') {
+                        window.updateLucideIcon(iconWrapper, originalIcon, {
+                            width: '20px',
+                            height: '20px'
+                        });
+                    }
                 }
 
                 // 色更新
