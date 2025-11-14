@@ -1256,13 +1256,13 @@ function displayVoiceRangeResults(results) {
             const octaves = parseFloat(results.octaves);
 
             if (octaves >= 1.5 && octaves < 2.0) {
-                // 🎵 1.5～2.0オクターブ: 8音不足の明確な警告
+                // 🎵 1.5～2.0オクターブ: 音域不足の明確な警告（全モード共通）
                 detailsEl.innerHTML = `
                     <div class="warning-alert">
                         <i data-lucide="alert-triangle" style="color: #f59e0b; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
                         <div>
                             <p class="alert-title">音域不足の警告 (${results.octaves}オクターブ)</p>
-                            <p>ランダム基音モードには2.0オクターブ（8音）が推奨されますが、現在の音域では不足しています。</p>
+                            <p>すべてのトレーニングモードには2.0オクターブが推奨されますが、現在の音域では不足しています。</p>
                             <p class="alert-note"><strong>注意:</strong> トレーニング中、一部の基音では1オクターブ上の音が測定音域を超える場合があります。無理のない範囲で発声してください。再測定で音域を広げることをおすすめします。</p>
                         </div>
                     </div>

@@ -103,7 +103,7 @@ function updateDirectionBadges(scaleDirection, chromaticDirection = null) {
         let badgeText = '';
         if (chromaticDirection === 'up') badgeText = '上昇';
         else if (chromaticDirection === 'down') badgeText = '下降';
-        else if (chromaticDirection === 'both') badgeText = '両方';
+        else if (chromaticDirection === 'both') badgeText = '両方向';
         
         chromaticBadge.textContent = badgeText;
         container.appendChild(chromaticBadge);
@@ -1637,40 +1637,41 @@ function selectSequentialMode(availableNotes, maxSessions) {
     const chromaticNotes = availableNotes.slice(0, 12); // 最初の12音（クロマチック）
     const actualCount = chromaticNotes.length;
 
-    // 【修正】preparationページで音域チェック済み（ユーザー確認済み）のため、
-    // ここでは警告ログのみ表示し、自動拡張ロジックに委ねる
+    // getAvailableNotes()で既に12音確保されているはず（音域不足時は高音域から自動追加）
     if (actualCount < 12) {
-        console.warn(`⚠️ [12音階モード] 利用可能な基音が${actualCount}音しかありません`);
-        console.warn(`💡 一部の音が発声困難な可能性がありますが、ユーザー確認済みで続行します`);
+        console.error(`❌ [12音階モード] 致命的エラー: 12音確保に失敗（実際: ${actualCount}音）`);
+        console.error(`   → getAvailableNotes()の自動拡張ロジックを確認してください`);
+    } else {
+        console.log(`✅ [12音階モード] クロマチック12音確保完了: ${chromaticNotes.map(n => n.note).join(' → ')}`);
     }
 
     if (maxSessions === 12) {
-        // 片方向（上昇 or 下降）
+        // 片方向（上昇 or 下降）- 常に12セッション
         const direction = window.currentTrainingDirection;
         if (direction === 'descending') {
-            // 下降: B → C
+            // 下降: B → C（12セッション）
             for (let i = 11; i >= 0; i--) {
                 selectedNotes.push(chromaticNotes[i]);
             }
-            console.log(`🔽 下降モード: ${selectedNotes.map(n => n.note).join(' → ')}`);
+            console.log(`🔽 下降モード（12セッション）: ${selectedNotes.map(n => n.note).join(' → ')}`);
         } else {
-            // 上昇: C → B
+            // 上昇: C → B（12セッション）
             for (let i = 0; i < 12; i++) {
                 selectedNotes.push(chromaticNotes[i]);
             }
-            console.log(`🔼 上昇モード: ${selectedNotes.map(n => n.note).join(' → ')}`);
+            console.log(`🔼 上昇モード（12セッション）: ${selectedNotes.map(n => n.note).join(' → ')}`);
         }
     } else if (maxSessions === 24) {
-        // 両方向: 上昇12 + 下降12
-        // 上昇: C → B
+        // 両方向: 上昇12 + 下降12 - 常に24セッション
+        // 上昇: C → B（12セッション）
         for (let i = 0; i < 12; i++) {
             selectedNotes.push(chromaticNotes[i]);
         }
-        // 下降: B → C
+        // 下降: B → C（12セッション）
         for (let i = 11; i >= 0; i--) {
             selectedNotes.push(chromaticNotes[i]);
         }
-        console.log(`🔼🔽 両方向モード: 上昇12 + 下降12`);
+        console.log(`🔼🔽 両方向モード（24セッション）: 上昇12 + 下降12`);
         console.log(`  上昇: ${selectedNotes.slice(0, 12).map(n => n.note).join(' → ')}`);
         console.log(`  下降: ${selectedNotes.slice(12, 24).map(n => n.note).join(' → ')}`);
     } else {

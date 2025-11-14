@@ -62,11 +62,27 @@ class DirectionTabsManager {
             });
         });
 
-        // 初期表示時もボタンを更新
+        // 初期表示時: sessionStorageから復元
         const currentDirection = sessionStorage.getItem('trainingDirection') || 'ascending';
+
+        // タブUIを復元
+        directionTabs.forEach(t => t.classList.remove('active'));
+        directionPanels.forEach(p => p.classList.remove('active'));
+
+        const activeTab = document.querySelector(`.tab-button[data-direction="${currentDirection}"]`);
+        const activePanel = document.getElementById(`${currentDirection}-info`);
+
+        if (activeTab) {
+            activeTab.classList.add('active');
+        }
+        if (activePanel) {
+            activePanel.classList.add('active');
+        }
+
+        // ボタンを更新
         this.updateTrainingButtons(currentDirection);
 
-        console.log('✅ [HOME] Direction tabs initialized');
+        console.log(`✅ [HOME] Direction tabs initialized - restored to: ${currentDirection}`);
     }
 
     updateTrainingButtons(direction) {
