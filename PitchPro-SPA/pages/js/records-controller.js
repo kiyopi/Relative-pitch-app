@@ -1,8 +1,13 @@
 /**
  * トレーニング記録ページコントローラー
  *
- * @version 2.0.0
+ * @version 2.1.0
+ * @date 2025-11-14
  * @description トレーニング履歴の表示・統計計算・グラフ描画
+ * @changelog
+ *   v2.1.0 (2025-11-14) - repairIncorrectLessonIds()修復機能を無効化
+ *                         理由: SessionManager導入後はバグ発生せず、正常データを誤統合するリスクを回避
+ *   v2.0.1 (2025-11-14) - sessionStorage.clear()をviewLessonDetail()に追加
  *
  * 【責任範囲】
  * - トレーニングセッション履歴の読み込みと表示
@@ -35,7 +40,7 @@ if (typeof window.accuracyChartInstance === 'undefined') {
  * トレーニング記録ページの初期化（SPA対応）
  */
 window.initRecords = async function() {
-    console.log('📊 [Records] トレーニング記録ページ初期化開始');
+    console.log('📊 [Records] トレーニング記録ページ初期化開始 v2.1.0 (2025-11-14)');
 
     try {
         // DOMの準備が完了するまで待機（SPAでのDOM挿入完了を保証）
@@ -379,10 +384,26 @@ async function displaySessionList(sessions) {
 /**
  * 誤ったlessonIdを持つセッションを検出・修復
  * （startTraining()が毎回lessonIdを生成していたバグで作成されたデータ対応）
+ *
+ * 【v2.1.0】修復機能を無効化
+ * 理由:
+ *   1. SessionManager導入後はlessonIdバグは発生しない（trainingController.js 252行目で初回のみ生成）
+ *   2. 全データにlessonIdが存在する（migrateOldSessions()で旧データも変換済み）
+ *   3. 修復関数が正常データを誤判定（独立した複数レッスンを1つに統合してしまう）
+ *   4. 将来の仕様変更時にも誤動作のリスクがある
+ *
  * @param {Array} sessions - セッション配列
  * @returns {Array} 修復済みセッション配列
  */
 window.repairIncorrectLessonIds = function repairIncorrectLessonIds(sessions) {
+    console.log('ℹ️ [Repair] lessonId修復機能は無効化されています（SessionManager導入済み）');
+    console.log('   理由: 正常なデータを誤って統合するリスクを回避');
+
+    // 修復せずにそのまま返す
+    return sessions;
+
+    /* ===== 以下、無効化されたコード（参照用に保持） =====
+
     console.log('🔍 [Repair] lessonId修復チェック開始');
 
     // sessionIdでソート（連続セッションを検出するため）
@@ -465,6 +486,8 @@ window.repairIncorrectLessonIds = function repairIncorrectLessonIds(sessions) {
     }
 
     return sessions;
+
+    ===== 無効化されたコード終了 ===== */
 }
 
 /**
@@ -690,6 +713,10 @@ function viewLessonDetail(lesson) {
     console.log('🔍 [viewLessonDetail] lessonId:', lesson.lessonId);
     console.log('🔍 [viewLessonDetail] sessions数:', lesson.sessions?.length);
     console.log('🔍 [viewLessonDetail] セッションのlessonId:', lesson.sessions?.map(s => s.lessonId));
+
+    // sessionStorageをクリア（古いlessonIdが残らないように）
+    sessionStorage.clear();
+    console.log('🗑️ [viewLessonDetail] sessionStorageをクリアしました');
 
     // 総合評価ページへ遷移（モード + 音階方向 + lessonId + トレーニング記録からの遷移フラグ付き）
     window.NavigationManager.navigate('results-overview', {
