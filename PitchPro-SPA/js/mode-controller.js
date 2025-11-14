@@ -253,8 +253,23 @@ const ModeController = {
         }
 
         // アイコンを更新
-        const modeIcon = iconWrapper?.querySelector('i[data-lucide]');
-        if (modeIcon) {
+        // Lucide初期化後はi要素がsvgに置き換わるため、両方を試す
+        let modeIcon = iconWrapper?.querySelector('i[data-lucide]');
+        if (!modeIcon) {
+            // svgが既に存在する場合は削除して新しいi要素を作成
+            const existingSvg = iconWrapper?.querySelector('svg');
+            if (existingSvg && iconWrapper) {
+                existingSvg.remove();
+                modeIcon = document.createElement('i');
+                modeIcon.setAttribute('data-lucide', mode.icon);
+                modeIcon.className = 'text-white';
+                modeIcon.setAttribute('data-stroke-width', '2');
+                modeIcon.style.width = '36px';
+                modeIcon.style.height = '36px';
+                iconWrapper.appendChild(modeIcon);
+                console.log(`✅ アイコン再作成: ${mode.icon}`);
+            }
+        } else {
             modeIcon.setAttribute('data-lucide', mode.icon);
             console.log(`✅ アイコン更新: ${mode.icon}`);
         }
