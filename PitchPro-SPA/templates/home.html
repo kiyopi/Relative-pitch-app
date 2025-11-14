@@ -30,9 +30,41 @@
     </div>
 </div>
 
+<!-- Direction Selection Tabs -->
+<section class="direction-selection-section">
+    <div class="tab-navigation">
+        <button class="tab-button active" data-direction="ascending" id="ascending-tab">
+            <i data-lucide="move-up-right" style="width: 16px; height: 16px; stroke-width: 2.5;"></i>
+            <span>上行モード</span>
+        </button>
+        <button class="tab-button" data-direction="descending" id="descending-tab">
+            <i data-lucide="move-down-right" style="width: 16px; height: 16px; stroke-width: 2.5;"></i>
+            <span>下行モード</span>
+        </button>
+    </div>
+
+    <div class="direction-info-panels">
+        <div id="ascending-info" class="direction-info-panel active">
+            <h4 class="text-white text-lg" style="margin-bottom: 0.5rem; font-weight: 500;">上行モードとは</h4>
+            <p class="text-white-70 leading-relaxed" style="margin-bottom: 0.5rem;">基音からド→レ→ミ→ファ→ソ→ラ→シ→ド（オクターブ上）と発声して練習します</p>
+            <div class="flex items-center gap-2">
+                <i data-lucide="lightbulb" class="text-blue-300" style="width: 16px; height: 16px;"></i>
+                <p class="text-blue-200 text-sm">初心者におすすめ・自然な音階感覚を養います</p>
+            </div>
+        </div>
+        <div id="descending-info" class="direction-info-panel">
+            <h4 class="text-white text-lg" style="margin-bottom: 0.5rem; font-weight: 500;">下行モードとは</h4>
+            <p class="text-white-70 leading-relaxed" style="margin-bottom: 0.5rem;">基音からド→シ→ラ→ソ→ファ→ミ→レ→ド（オクターブ下）と発声して練習します</p>
+            <div class="flex items-center gap-2">
+                <i data-lucide="lightbulb" class="text-red-300" style="width: 16px; height: 16px;"></i>
+                <p class="text-red-200 text-sm">より高度な音程コントロール・実用的な歌唱訓練</p>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Training Modes -->
 <section class="hero-section">
-    <h2 class="text-3xl font-bold text-white mb-8 text-center">トレーニングモードを選択</h2>
     <div class="modes-grid">
         <!-- ランダム基音モード -->
         <div class="mode-card beginner" data-mode="random">
@@ -155,15 +187,15 @@
             <div class="card-footer">
                 <div class="flex flex-col gap-2">
                     <button class="btn btn-primary" data-route="preparation" data-mode="12tone" data-direction="ascending" data-session="1">
-                        <span>上昇モード</span>
+                        <span>上昇（上行）</span>
                         <i data-lucide="trending-up" style="width: 20px; height: 20px;"></i>
                     </button>
                     <button class="btn btn-primary" data-route="preparation" data-mode="12tone" data-direction="descending" data-session="1">
-                        <span>下降モード</span>
+                        <span>下降（上行）</span>
                         <i data-lucide="trending-down" style="width: 20px; height: 20px;"></i>
                     </button>
                     <button class="btn btn-primary" data-route="preparation" data-mode="12tone" data-direction="both" data-session="1">
-                        <span>両方向モード（24回）</span>
+                        <span>両方向24回（上行）</span>
                         <i data-lucide="repeat" style="width: 20px; height: 20px;"></i>
                     </button>
                 </div>
@@ -211,7 +243,6 @@
     </div>
 </section>
 
-<!-- Theory Section -->
 <section class="theory-section">
     <div class="theory-card">
         <div class="theory-icon">

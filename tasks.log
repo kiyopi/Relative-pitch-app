@@ -8843,3 +8843,54 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-13 17:07:14] コミット: refactor: records-controller.jsのインラインスタイル操作をCSSクラス化
+
+- 直接スタイル操作（style.display）をCSSクラス切り替えに変更
+- .hiddenクラスを活用した宣言的な状態管理に統一
+- HTMLの初期状態をCSSクラスで明示的に管理
+
+【修正箇所】
+- records.html: インラインstyle属性を削除、.hiddenクラスで初期状態管理
+  - #chart-section: style="display: none" → class="hidden"
+  - #sessions-content: style="display: none" → class="hidden"
+  - #no-data-message: style="display: none" → class="hidden"
+  - #action-buttons-section: style="display: none" → class="hidden"
+
+- records-controller.js: 4箇所のスタイル操作を修正
+  1. データあり時の表示制御（Line 107-127）
+     - noDataMessage.style.setProperty('display', 'none', 'important') → classList.add('hidden')
+     - chartSection.style.display = 'block' → classList.remove('hidden')
+     - actionButtons.style.display = 'block' → classList.remove('hidden')
+     - sessionsContent.style.display = 'block' → classList.remove('hidden')
+
+  2. データなし時の表示制御（Line 917-943）
+     - sessionsContent.style.display = 'none' → classList.add('hidden')
+     - noDataMessage.style.display = 'flex' → classList.remove('hidden')
+     - chartSection.style.display = 'none' → classList.add('hidden')
+     - actionButtons.style.display = 'block' → classList.remove('hidden')
+
+【改善効果】
+- インラインスタイル操作: 7箇所削除
+- CSSクラス切り替え: 8箇所追加（より宣言的）
+- HTMLクリーンアップ: 4要素のインラインstyle削除
+- 保守性向上: スタイルロジックとビジネスロジックの分離
+- CSS優先度問題の解消: !important不要
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-13 22:19:15] コミット: feat: UIカタログに上行・下行モード切り替えタブを実装
+
+- results-premium-analysis.htmlのタブナビゲーションスタイルを採用
+- 2つのタブで上行モード・下行モードを切り替え可能に
+- アクティブタブに青（上行）・赤（下行）の枠線付き背景を実装
+- 説明パネルに下半分からのグラデーション消失効果を追加
+- タブ文字を太字（font-weight: 700）、タイトルをミディアム（500）に設定
+- Lucideアイコン（move-up-right/move-down-right）を使用、線の太さ2.5に調整
+- 全体的な余白を最適化（コンパクトな配置）
+- 絵文字をLucideのlightbulbアイコンに置き換え
+- DirectionTabsManagerクラスでタブ切り替えを実装
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
