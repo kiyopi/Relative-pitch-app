@@ -381,90 +381,19 @@ function initializeModeUI() {
     const config = modeConfig[currentMode];
     console.log(`📋 現在のモード: ${config.title}`);
 
-    // モード別アイコン設定
-    const modeIcons = {
-        'random': 'shuffle',
-        'continuous': 'zap',
-        '12tone': 'music'
-    };
+    // 音階方向を取得
+    const scaleDirection = sessionStorage.getItem('trainingDirection') || 'ascending';
 
-    // モード別色設定（ホームページのmode-iconと統一）
-    const modeColors = {
-        'random': {
-            iconBg: 'gradient-catalog-green',
-            subtitle: 'text-green-200'
-        },
-        'continuous': {
-            iconBg: 'gradient-catalog-orange',
-            subtitle: 'text-orange-200'
-        },
-        '12tone': {
-            iconBg: 'gradient-catalog-purple',
-            subtitle: 'text-purple-200'
-        }
-    };
-
-    // アイコン背景色を更新
-    const iconWrapper = document.querySelector('.page-header-icon');
-    if (iconWrapper) {
-        // 既存のグラデーションクラスを削除
-        iconWrapper.classList.remove('gradient-catalog-green', 'gradient-catalog-orange', 'gradient-catalog-purple');
-        // 新しいグラデーションクラスを追加
-        const colorConfig = modeColors[currentMode] || modeColors['random'];
-        iconWrapper.classList.add(colorConfig.iconBg);
-        console.log(`✅ アイコン背景色更新: ${colorConfig.iconBg}`);
+    // ModeControllerでページヘッダーを一括更新
+    if (window.ModeController) {
+        window.ModeController.updatePageHeader(currentMode, {
+            chromaticDirection: window.currentTrainingDirection, // 12音階モードの基音方向
+            scaleDirection: scaleDirection,
+            subtitleText: sessionManager.getProgressDetailText() // サブタイトルテキスト
+        });
+    } else {
+        console.error('❌ ModeControllerが見つかりません');
     }
-
-    // アイコンを更新
-    const modeIcon = document.getElementById('training-mode-icon');
-    if (modeIcon) {
-        const iconName = modeIcons[currentMode] || 'shuffle';
-        modeIcon.setAttribute('data-lucide', iconName);
-        console.log(`✅ アイコン更新: ${iconName}`);
-    }
-
-    // ページタイトルを更新
-    const pageTitle = document.getElementById('training-mode-title');
-    if (pageTitle) {
-        let titleText = config.title;
-
-        // 音階方向（上行・下行）を追加
-        const scaleDirection = sessionStorage.getItem('trainingDirection') || 'ascending';
-        const scaleDirectionLabel = scaleDirection === 'ascending' ? '上行' : '下行';
-
-        // 12音階モードの場合、基音方向も追加
-        if (currentMode === '12tone' && window.currentTrainingDirection) {
-            const chromaticDirectionLabels = {
-                'ascending': '上昇',
-                'descending': '下降',
-                'both': '両方向'
-            };
-            const chromaticLabel = chromaticDirectionLabels[window.currentTrainingDirection] || '';
-            titleText += ` ${chromaticLabel}・${scaleDirectionLabel}`;
-        } else {
-            // ランダム基音・連続チャレンジモードの場合、音階方向のみ
-            titleText += ` ${scaleDirectionLabel}`;
-        }
-
-        pageTitle.textContent = titleText;
-        console.log(`✅ タイトル更新: ${titleText}`);
-    }
-
-    // ページサブタイトルを更新
-    const pageSubtitle = document.querySelector('.page-subtitle');
-    if (pageSubtitle) {
-        // サブタイトルの色を更新
-        pageSubtitle.classList.remove('text-green-200', 'text-orange-200', 'text-purple-200');
-        const colorConfig = modeColors[currentMode] || modeColors['random'];
-        pageSubtitle.classList.add(colorConfig.subtitle);
-        console.log(`✅ サブタイトル色更新: ${colorConfig.subtitle}`);
-
-        // 【修正v4.0.0】SessionManager統合: 重複コード削減
-        pageSubtitle.textContent = sessionManager.getProgressDetailText();
-    }
-
-    // アイコンを再描画
-    lucide.createIcons();
 }
 
 /**

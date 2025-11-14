@@ -269,17 +269,41 @@ function loadAllSessionData() {
 function updateOverviewUI(evaluation, sessionData, fromRecords = false, scaleDirection = null) {
     console.log('🎨 UI更新開始:', evaluation);
 
-    // モード名更新
-    const modeTitleEl = document.getElementById('main-mode-title');
-    if (modeTitleEl) {
-        modeTitleEl.textContent = evaluation.modeInfo.name;
+    // セッションデータから基音方向（chromaticDirection）を取得（12音階モード用）
+    const chromaticDirection = sessionData && sessionData.length > 0
+        ? sessionData[0].chromaticDirection
+        : null;
+
+    // 音階方向が指定されていない場合、セッションデータから取得
+    if (!scaleDirection && sessionData && sessionData.length > 0) {
+        scaleDirection = sessionData[0].scaleDirection || 'ascending';
     }
 
-    // サブタイトル更新（トレーニング記録からの遷移時は日時表示を保持）
-    const subtitleEl = document.querySelector('.page-subtitle');
-    if (subtitleEl && !subtitleEl.classList.contains('records-view-date')) {
+    // ModeControllerでページヘッダーを一括更新
+    if (window.ModeController) {
         const totalNotes = evaluation.metrics.raw.totalNotes;
-        subtitleEl.textContent = `${sessionData.length}セッション (${totalNotes}音) の総合評価`;
+        const subtitleText = `${sessionData.length}セッション (${totalNotes}音) の総合評価`;
+
+        window.ModeController.updatePageHeader(evaluation.modeInfo.id, {
+            chromaticDirection: chromaticDirection,
+            scaleDirection: scaleDirection,
+            subtitleText: fromRecords ? null : subtitleText // トレーニング記録からの遷移時は日時表示を保持
+        });
+    } else {
+        console.error('❌ ModeControllerが見つかりません');
+
+        // フォールバック: 従来の方法でモード名更新
+        const modeTitleEl = document.getElementById('main-mode-title');
+        if (modeTitleEl) {
+            modeTitleEl.textContent = evaluation.modeInfo.name;
+        }
+
+        // サブタイトル更新（トレーニング記録からの遷移時は日時表示を保持）
+        const subtitleEl = document.querySelector('.page-subtitle');
+        if (subtitleEl && !subtitleEl.classList.contains('records-view-date')) {
+            const totalNotes = evaluation.metrics.raw.totalNotes;
+            subtitleEl.textContent = `${sessionData.length}セッション (${totalNotes}音) の総合評価`;
+        }
     }
 
     // グレードアイコン更新
