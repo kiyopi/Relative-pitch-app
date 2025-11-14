@@ -252,26 +252,11 @@ const ModeController = {
             console.log(`✅ アイコン背景色更新: ${mode.colors.iconBg}`);
         }
 
-        // アイコンを更新
-        // Lucide初期化後はi要素がsvgに置き換わるため、両方を試す
-        let modeIcon = iconWrapper?.querySelector('i[data-lucide]');
-        if (!modeIcon) {
-            // svgが既に存在する場合は削除して新しいi要素を作成
-            const existingSvg = iconWrapper?.querySelector('svg');
-            if (existingSvg && iconWrapper) {
-                existingSvg.remove();
-                modeIcon = document.createElement('i');
-                modeIcon.setAttribute('data-lucide', mode.icon);
-                modeIcon.className = 'text-white';
-                modeIcon.setAttribute('data-stroke-width', '2');
-                modeIcon.style.width = '36px';
-                modeIcon.style.height = '36px';
-                iconWrapper.appendChild(modeIcon);
-                console.log(`✅ アイコン再作成: ${mode.icon}`);
-            }
+        // アイコンを更新（統一関数を使用）
+        if (iconWrapper && typeof window.updateLucideIcon === 'function') {
+            window.updateLucideIcon(iconWrapper, mode.icon);
         } else {
-            modeIcon.setAttribute('data-lucide', mode.icon);
-            console.log(`✅ アイコン更新: ${mode.icon}`);
+            console.warn('⚠️ updateLucideIcon関数が見つかりません');
         }
 
         // ページタイトルを更新
@@ -298,15 +283,7 @@ const ModeController = {
             }
         }
 
-        // Lucideアイコンを再描画（統合初期化関数を使用）
-        if (typeof window.initializeLucideIcons === 'function') {
-            window.initializeLucideIcons({ immediate: true });
-            console.log('✅ Lucideアイコン再初期化完了');
-        } else if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-            console.log('✅ Lucideアイコン再初期化完了（フォールバック）');
-        }
-
+        // Lucideアイコンは updateLucideIcon() 内で自動的に再初期化される
         return true;
     }
 };
