@@ -1296,8 +1296,21 @@ function setupMicPermissionFlow() {
                 const finalSession = redirectInfo?.session || window.preparationRedirectInfo?.session || null;
                 const finalDirection = redirectInfo?.direction || window.preparationRedirectInfo?.direction || null;
 
-                console.log(`📍 モード情報を保持して遷移: mode=${finalMode}, session=${finalSession || 'なし'}, direction=${finalDirection || 'なし'}`);
-                NavigationManager.navigateToTraining(finalMode, finalSession, finalDirection);
+                // 上行・下行の方向をsessionStorageから取得
+                const scaleDirection = sessionStorage.getItem('trainingDirection') || 'ascending';
+
+                console.log(`📍 モード情報を保持して遷移: mode=${finalMode}, session=${finalSession || 'なし'}, direction=${finalDirection || 'なし'}, scaleDirection=${scaleDirection}`);
+
+                // NavigationManagerではなく、直接URLを構築してscaleDirectionを追加
+                NavigationManager.setNormalTransition();
+                NavigationManager.removeBrowserBackPrevention();
+
+                const params = new URLSearchParams({ mode: finalMode });
+                if (finalSession) params.set('session', finalSession);
+                if (finalDirection) params.set('direction', finalDirection);
+                params.set('scaleDirection', scaleDirection); // 上行・下行パラメータを追加
+
+                window.location.hash = `training?${params.toString()}`;
 
             } catch (error) {
                 console.error('❌ トレーニング開始処理エラー:', error);
@@ -1544,8 +1557,21 @@ function setupMicPermissionFlow() {
             const finalSession = redirectInfo?.session || window.preparationRedirectInfo?.session || null;
             const finalDirection = redirectInfo?.direction || window.preparationRedirectInfo?.direction || null;
 
-            console.log(`📍 モード情報を保持して遷移: mode=${finalMode}, session=${finalSession || 'なし'}, direction=${finalDirection || 'なし'}`);
-            NavigationManager.navigateToTraining(finalMode, finalSession, finalDirection);
+            // 上行・下行の方向をsessionStorageから取得
+            const scaleDirection = sessionStorage.getItem('trainingDirection') || 'ascending';
+
+            console.log(`📍 モード情報を保持して遷移: mode=${finalMode}, session=${finalSession || 'なし'}, direction=${finalDirection || 'なし'}, scaleDirection=${scaleDirection}`);
+
+            // 直接URLを構築してscaleDirectionを追加
+            NavigationManager.setNormalTransition();
+            NavigationManager.removeBrowserBackPrevention();
+
+            const params = new URLSearchParams({ mode: finalMode });
+            if (finalSession) params.set('session', finalSession);
+            if (finalDirection) params.set('direction', finalDirection);
+            params.set('scaleDirection', scaleDirection);
+
+            window.location.hash = `training?${params.toString()}`;
         });
     }
 

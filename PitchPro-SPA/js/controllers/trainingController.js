@@ -25,8 +25,54 @@ let currentScaleDirection = 'ascending';  // 現在の音階方向（'ascending'
 let sessionManager = null;       // セッション管理専門クラス
 
 // 相対音程（ドレミ...）と半音ステップの対応
-const intervals = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド'];
-const semitoneSteps = [0, 2, 4, 5, 7, 9, 11, 12]; // ド=0, レ=+2半音, ミ=+4半音...
+// 【下行モード対応】音階方向に応じて動的に変更されるため let に変更
+let intervals = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド'];
+let semitoneSteps = [0, 2, 4, 5, 7, 9, 11, 12]; // ド=0, レ=+2半音, ミ=+4半音...
+
+/**
+ * 音階方向に応じた音階ステップを生成
+ * @param {string} direction - 'ascending' または 'descending'
+ * @returns {Object} { intervals: string[], semitoneSteps: number[] }
+ */
+function getScaleSteps(direction) {
+    if (direction === 'descending') {
+        return {
+            intervals: ['ド', 'シ', 'ラ', 'ソ', 'ファ', 'ミ', 'レ', 'ド'],
+            semitoneSteps: [0, -2, -4, -5, -7, -9, -11, -12]
+        };
+    } else {
+        return {
+            intervals: ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド'],
+            semitoneSteps: [0, 2, 4, 5, 7, 9, 11, 12]
+        };
+    }
+}
+
+/**
+ * ドレミガイドのHTMLを動的に生成
+ * @param {string[]} intervals - 音程名の配列 ['ド', 'レ', 'ミ', ...] または ['ド', 'シ', 'ラ', ...]
+ */
+function updateDoremiGuide(intervals) {
+    const noteCirclesContainer = document.querySelector('.note-circles');
+    if (!noteCirclesContainer) {
+        console.warn('⚠️ .note-circles要素が見つかりません');
+        return;
+    }
+
+    // 既存のnote-circleを全削除
+    noteCirclesContainer.innerHTML = '';
+
+    // 新しいnote-circleを生成
+    intervals.forEach((noteName, index) => {
+        const noteCircle = document.createElement('div');
+        noteCircle.className = 'note-circle';
+        noteCircle.setAttribute('data-note', noteName);
+        noteCircle.textContent = noteName;
+        noteCirclesContainer.appendChild(noteCircle);
+    });
+
+    console.log(`🎵 ドレミガイド更新: ${intervals.join('→')}`);
+}
 
 // トレーニングモード管理
 let currentMode = 'random'; // 'random' | 'continuous' | '12tone'
@@ -82,8 +128,22 @@ export async function initializeTrainingPage() {
     }
 
     // 音階方向の設定
-    currentScaleDirection = scaleDirectionParam || 'ascending';
-    console.log(`✅ 音階方向設定: ${currentScaleDirection}`);
+    // まずURLパラメータをチェック、なければsessionStorageから取得
+    const scaleDirectionFromStorage = sessionStorage.getItem('trainingDirection');
+    currentScaleDirection = scaleDirectionParam || scaleDirectionFromStorage || 'ascending';
+    console.log(`✅ 音階方向設定: ${currentScaleDirection} (URLパラメータ: ${scaleDirectionParam}, sessionStorage: ${scaleDirectionFromStorage})`);
+
+    // 音階ステップの動的生成
+    const scaleSteps = getScaleSteps(currentScaleDirection);
+    intervals = scaleSteps.intervals;
+    semitoneSteps = scaleSteps.semitoneSteps;
+    console.log(`🎵 音階ステップ設定: ${intervals.join('→')}`);
+    console.log(`🎵 半音ステップ: ${semitoneSteps.join(', ')}`);
+
+    // ドレミガイドを更新（DOM読み込み後に実行）
+    setTimeout(() => {
+        updateDoremiGuide(intervals);
+    }, 100);
 
     // 12音階モード方向をグローバル変数に保存
     if (currentMode === '12tone' && directionParam) {
@@ -728,7 +788,9 @@ async function startDoremiGuide() {
 
         // 期待される周波数を計算してログ出力
         const expectedFreq = baseNoteInfo.frequency * Math.pow(2, semitoneSteps[i] / 12);
-        console.log(`🎵 音程: ${intervals[i]} (+${semitoneSteps[i]}半音, 期待: ${expectedFreq.toFixed(1)}Hz)`);
+        const semitoneDiff = semitoneSteps[i];
+        const sign = semitoneDiff >= 0 ? '+' : '';
+        console.log(`🎵 音程: ${intervals[i]} (${sign}${semitoneDiff}半音, 期待: ${expectedFreq.toFixed(1)}Hz)`);
 
         // ユーザーの発声時間を確保（700ms間隔）
         await new Promise(resolve => setTimeout(resolve, 700));
@@ -1114,17 +1176,32 @@ function getAvailableNotes() {
 
     console.log(`🎤 使用する音域: ${lowFreq.toFixed(1)}Hz - ${highFreq.toFixed(1)}Hz (${(Math.log2(highFreq / lowFreq)).toFixed(2)}オクターブ)`);
     console.log(`🎵 PitchShifter音符範囲: ${allNotes[0].note} (${allNotes[0].frequency.toFixed(1)}Hz) - ${allNotes[allNotes.length - 1].note} (${allNotes[allNotes.length - 1].frequency.toFixed(1)}Hz)`);
-    console.log(`📐 基音として使える範囲: ${lowFreq.toFixed(1)}Hz - ${(highFreq / 2).toFixed(1)}Hz (基音+1オクターブが${highFreq.toFixed(1)}Hzに収まる)`);
-    console.log(`📐 基音範囲のオクターブ数: ${(Math.log2((highFreq / 2) / lowFreq)).toFixed(2)}オクターブ`);
 
-    // 音域内の音符のみをフィルタリング（基音+1オクターブが収まる範囲）
+    if (currentScaleDirection === 'descending') {
+        console.log(`📐 基音として使える範囲（下行モード）: ${(lowFreq * 2).toFixed(1)}Hz - ${highFreq.toFixed(1)}Hz (基音-1オクターブが${lowFreq.toFixed(1)}Hzに収まる)`);
+        console.log(`📐 基音範囲のオクターブ数: ${(Math.log2(highFreq / (lowFreq * 2))).toFixed(2)}オクターブ`);
+    } else {
+        console.log(`📐 基音として使える範囲（上行モード）: ${lowFreq.toFixed(1)}Hz - ${(highFreq / 2).toFixed(1)}Hz (基音+1オクターブが${highFreq.toFixed(1)}Hzに収まる)`);
+        console.log(`📐 基音範囲のオクターブ数: ${(Math.log2((highFreq / 2) / lowFreq)).toFixed(2)}オクターブ`);
+    }
+
+    // 音域内の音符のみをフィルタリング（音階方向に応じて範囲を調整）
     let availableNotes = allNotes.filter(note => {
-        const topFreq = note.frequency * 2; // 基音+1オクターブ
-        const isInRange = note.frequency >= lowFreq && topFreq <= highFreq;
-        return isInRange;
+        if (currentScaleDirection === 'descending') {
+            // 下行モード: 基音-1オクターブが音域内に収まる
+            const bottomFreq = note.frequency / 2; // 基音-1オクターブ
+            const isInRange = bottomFreq >= lowFreq && note.frequency <= highFreq;
+            return isInRange;
+        } else {
+            // 上行モード: 基音+1オクターブが音域内に収まる
+            const topFreq = note.frequency * 2; // 基音+1オクターブ
+            const isInRange = note.frequency >= lowFreq && topFreq <= highFreq;
+            return isInRange;
+        }
     });
 
-    console.log(`🎵 理想的な基音（基音+1オクターブが完全に音域内）: ${availableNotes.length}音`);
+    const directionText = currentScaleDirection === 'descending' ? '基音-1オクターブ' : '基音+1オクターブ';
+    console.log(`🎵 理想的な基音（${directionText}が完全に音域内）: ${availableNotes.length}音`);
     if (availableNotes.length > 0) {
         console.log(`   範囲: ${availableNotes[0].note} (${availableNotes[0].frequency.toFixed(1)}Hz) - ${availableNotes[availableNotes.length - 1].note} (${availableNotes[availableNotes.length - 1].frequency.toFixed(1)}Hz)`);
     }
