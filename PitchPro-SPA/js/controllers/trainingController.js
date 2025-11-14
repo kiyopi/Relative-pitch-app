@@ -388,6 +388,33 @@ function initializeModeUI() {
         '12tone': 'music'
     };
 
+    // モード別色設定（ホームページのmode-iconと統一）
+    const modeColors = {
+        'random': {
+            iconBg: 'gradient-catalog-green',
+            subtitle: 'text-green-200'
+        },
+        'continuous': {
+            iconBg: 'gradient-catalog-orange',
+            subtitle: 'text-orange-200'
+        },
+        '12tone': {
+            iconBg: 'gradient-catalog-purple',
+            subtitle: 'text-purple-200'
+        }
+    };
+
+    // アイコン背景色を更新
+    const iconWrapper = document.querySelector('.page-header-icon');
+    if (iconWrapper) {
+        // 既存のグラデーションクラスを削除
+        iconWrapper.classList.remove('gradient-catalog-green', 'gradient-catalog-orange', 'gradient-catalog-purple');
+        // 新しいグラデーションクラスを追加
+        const colorConfig = modeColors[currentMode] || modeColors['random'];
+        iconWrapper.classList.add(colorConfig.iconBg);
+        console.log(`✅ アイコン背景色更新: ${colorConfig.iconBg}`);
+    }
+
     // アイコンを更新
     const modeIcon = document.getElementById('training-mode-icon');
     if (modeIcon) {
@@ -426,6 +453,12 @@ function initializeModeUI() {
     // ページサブタイトルを更新
     const pageSubtitle = document.querySelector('.page-subtitle');
     if (pageSubtitle) {
+        // サブタイトルの色を更新
+        pageSubtitle.classList.remove('text-green-200', 'text-orange-200', 'text-purple-200');
+        const colorConfig = modeColors[currentMode] || modeColors['random'];
+        pageSubtitle.classList.add(colorConfig.subtitle);
+        console.log(`✅ サブタイトル色更新: ${colorConfig.subtitle}`);
+
         // 【修正v4.0.0】SessionManager統合: 重複コード削減
         pageSubtitle.textContent = sessionManager.getProgressDetailText();
     }
