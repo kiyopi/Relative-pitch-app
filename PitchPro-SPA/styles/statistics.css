@@ -934,6 +934,28 @@
   white-space: nowrap;
 }
 
+.stat-item-value-stacked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  white-space: normal;
+}
+
+.stat-item-date {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-white);
+  line-height: 1.2;
+}
+
+.stat-item-elapsed {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-white-60);
+  line-height: 1.2;
+}
+
 /* 下段：4つの数値カード（PC版：1行4カード / モバイル版：2×2グリッド） */
 .stats-cards-grid {
   display: grid;
@@ -998,6 +1020,14 @@
 
   .stat-item-value {
     font-size: 1.25rem;
+  }
+
+  .stat-item-date {
+    font-size: 1rem;
+  }
+
+  .stat-item-elapsed {
+    font-size: 0.75rem;
   }
 
   .stats-cards-grid {

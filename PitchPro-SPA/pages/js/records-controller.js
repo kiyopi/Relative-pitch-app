@@ -1,10 +1,13 @@
 /**
  * トレーニング記録ページコントローラー
  *
- * @version 2.5.0
+ * @version 2.5.1
  * @date 2025-11-15
  * @description トレーニング履歴の表示・統計計算・グラフ描画
  * @changelog
+ *   v2.5.1 (2025-11-15) - 開始日を2段表示に変更（横幅対策）
+ *                         1段目：2025/11/10（1.125rem）
+ *                         2段目：5日経過（0.8125rem、薄い色）
  *   v2.5.0 (2025-11-15) - 上段統計項目のレイアウト完全リニューアル
  *                         サブタイトル+アイコン+数値の1行形式に統一
  *                         「総トレーニング日数」「開始日 (経過日数)」「継続トレーニング日数」
@@ -459,20 +462,24 @@ async function displayStatistics(stats) {
     // 総トレーニング日数
     document.getElementById('training-days-number').textContent = `${stats.trainingDays}日`;
 
-    // 開始日 (経過日数を含む)
-    let startInfo = '-';
+    // 開始日と経過日数（2段表示）
     if (stats.firstTrainingDate) {
         const firstDate = stats.firstTrainingDate instanceof Date
             ? stats.firstTrainingDate
             : new Date(stats.firstTrainingDate);
 
         if (!isNaN(firstDate.getTime())) {
-            // 「2025/11/10 (5日経過)」形式
             const dateStr = `${firstDate.getFullYear()}/${firstDate.getMonth() + 1}/${firstDate.getDate()}`;
-            startInfo = `${dateStr} (${stats.daysSinceStart}日経過)`;
+            document.getElementById('training-start-date').textContent = dateStr;
+            document.getElementById('training-days-elapsed').textContent = `${stats.daysSinceStart}日経過`;
+        } else {
+            document.getElementById('training-start-date').textContent = '-';
+            document.getElementById('training-days-elapsed').textContent = '';
         }
+    } else {
+        document.getElementById('training-start-date').textContent = '-';
+        document.getElementById('training-days-elapsed').textContent = '';
     }
-    document.getElementById('training-start-info').textContent = startInfo;
 
     // 継続トレーニング日数
     document.getElementById('streak-days').textContent = `${stats.streak}日`;
@@ -511,7 +518,7 @@ async function displayStatistics(stats) {
         valueEl.className = gradeColor;
     }
 
-    console.log(`📊 [Display] 上段: ${stats.trainingDays}日, ${startInfo}, 連続${stats.streak}日`);
+    console.log(`📊 [Display] 上段: ${stats.trainingDays}日, 開始日, 連続${stats.streak}日`);
     console.log(`📊 [Display] 数値カード: レッスン=${stats.totalLessons}, セッション=${stats.totalSessions}, 総時間=${stats.totalDurationFormatted}, 平均誤差=±${stats.overallAvgError}¢ (${grade})`);
 
     // Lucideアイコン再初期化（統合初期化関数を使用）

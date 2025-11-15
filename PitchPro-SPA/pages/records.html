@@ -49,7 +49,10 @@
                     <div class="stat-item">
                         <div class="stat-item-subtitle">開始日</div>
                         <i data-lucide="calendar" class="text-purple-300" style="width: 20px; height: 20px;"></i>
-                        <div class="stat-item-value" id="training-start-info">-</div>
+                        <div class="stat-item-value stat-item-value-stacked">
+                            <div class="stat-item-date" id="training-start-date">-</div>
+                            <div class="stat-item-elapsed" id="training-days-elapsed">-</div>
+                        </div>
                     </div>
 
                     <!-- 継続トレーニング日数 -->
@@ -187,7 +190,7 @@
 <script src="js/components/DistributionChart.js"></script>
 
 <!-- Records Page Controller -->
-<script src="pages/js/records-controller.js?v=20251115010" onload="initRecordsPage()"></script>
+<script src="pages/js/records-controller.js?v=20251115011" onload="initRecordsPage()"></script>
 <script>
     // SPA対応：ページ読み込み完了後に初期化
     async function initRecordsPage() {

@@ -9859,3 +9859,16 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 00:15:23] コミット: refactor: 上段統計項目のレイアウトを完全リニューアル
+
+- 1行形式に統一：サブタイトル + アイコン + 数値
+- 項目名を変更：
+  - 総トレーニング日数（アイコン + 数値）
+  - 開始日（2025/11/10 (5日経過)の形式）
+  - 継続トレーニング日数（アイコン + 数値）
+- サブタイトルは下段と同じ色・サイズ（#93c5fd、0.9375rem）
+- モバイル対応：文字サイズ縮小、gapとpadding調整
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
