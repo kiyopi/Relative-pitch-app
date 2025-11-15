@@ -2962,7 +2962,7 @@ body::before {
   padding: 0.75rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--text-white-60);
-  font-size: 0.875rem;
+  font-size: 1rem; /* 14px → 16px */
   font-weight: 500;
 }
 
@@ -2970,7 +2970,7 @@ body::before {
   padding: 0.75rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   color: var(--text-white);
-  font-size: 0.875rem;
+  font-size: 1rem; /* 14px → 16px */
 }
 
 .mode-stats-table td:nth-child(2),
@@ -3014,14 +3014,14 @@ body::before {
   color: var(--text-white);
   font-weight: 500;
   margin-bottom: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 1rem; /* 14px → 16px */
 }
 
 .mode-stat-item .mode-stats-row {
   display: flex;
   justify-content: space-around;
   gap: 1rem;
-  font-size: 0.875rem;
+  font-size: 1rem; /* 14px → 16px */
 }
 
 .mode-stat-item .mode-stats-row > span {

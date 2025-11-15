@@ -9449,3 +9449,18 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 17:14:21] コミット: fix: premium-analysis.cssの.mode-stat-itemをスコープ限定
+
+問題:
+- premium-analysis.cssの.mode-stat-itemがグローバルに定義されていた
+- base.cssより後に読み込まれるため、トレーニング記録ページの.mode-stat-itemを上書き
+- 結果: background: rgba(255, 255, 255, 0.03)が適用され、うっすらと白くなっていた
+
+修正:
+- .mode-stat-item → .mode-stats-grid .mode-stat-item
+- プレミアム分析ページ専用にスコープ限定
+- トレーニング記録ページではbase.cssの定義（background: transparent）が正しく適用される
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
