@@ -1,10 +1,12 @@
 /**
  * トレーニング記録ページコントローラー
  *
- * @version 2.2.0
+ * @version 2.3.0
  * @date 2025-11-15
  * @description トレーニング履歴の表示・統計計算・グラフ描画
  * @changelog
+ *   v2.3.0 (2025-11-15) - 統計セクションの表記統一
+ *                         すべて「数値」+「ラベル」形式に統一（連続0日 → 0 + 連続日数）
  *   v2.2.0 (2025-11-15) - 統計セクションのレイアウト変更
  *                         上段を横並び3項目に変更（累計日数/開始日/連続記録）
  *   v2.1.0 (2025-11-14) - repairIncorrectLessonIds()修復機能を無効化
@@ -458,7 +460,7 @@ async function displayStatistics(stats) {
         document.getElementById('days-since-start').textContent = '';
     }
 
-    // 連続記録
+    // 連続記録（数値のみ）
     document.getElementById('streak-count').textContent = stats.streak;
 
     // 4つの数値カード
