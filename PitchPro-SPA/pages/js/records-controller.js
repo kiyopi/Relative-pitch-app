@@ -1,10 +1,13 @@
 /**
  * トレーニング記録ページコントローラー
  *
- * @version 2.5.1
+ * @version 2.5.2
  * @date 2025-11-15
  * @description トレーニング履歴の表示・統計計算・グラフ描画
  * @changelog
+ *   v2.5.2 (2025-11-15) - 総レッスン時間の計算バグを修正
+ *                         session.durationがミリ秒単位であることを考慮
+ *                         ミリ秒→秒に変換してから時間計算
  *   v2.5.1 (2025-11-15) - 開始日を2段表示に変更（横幅対策）
  *                         1段目：2025/11/10（1.125rem）
  *                         2段目：5日経過（0.8125rem、薄い色）
@@ -304,14 +307,15 @@ function calculateStatistics(sessions) {
     const totalLessons = lessons.length;
     const totalSessions = sessions.length;
 
-    // 総トレーニング時間（秒 → 時間・分形式）
-    const totalDurationSeconds = sessions.reduce((sum, session) => {
+    // 総トレーニング時間（ミリ秒 → 時間・分形式）
+    const totalDurationMilliseconds = sessions.reduce((sum, session) => {
         return sum + (session.duration || 0);
     }, 0);
+    const totalDurationSeconds = Math.floor(totalDurationMilliseconds / 1000);
     const totalHours = Math.floor(totalDurationSeconds / 3600);
     const totalMinutes = Math.round((totalDurationSeconds % 3600) / 60);
-    const totalDurationFormatted = totalHours > 0 
-        ? `${totalHours}h${totalMinutes}m` 
+    const totalDurationFormatted = totalHours > 0
+        ? `${totalHours}h${totalMinutes}m`
         : `${totalMinutes}m`;
 
     // 全体の平均誤差（全レッスンの平均誤差を集計）
