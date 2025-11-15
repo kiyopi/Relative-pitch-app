@@ -9851,3 +9851,11 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 23:45:00] コミット: fix: 総平均誤差のアイコンと数字を横一列に配置
+
+- .stat-valueにflexboxプロパティを追加（display: flex, align-items: center）
+- アイコンと数値が横並びで中央揃えになるように修正
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
