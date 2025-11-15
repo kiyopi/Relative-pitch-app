@@ -1,7 +1,7 @@
 /**
  * statistics.css
  * 統計・分析・記録ページ統合スタイル
- * Version: 2.4.3
+ * Version: 2.4.4
  *
  * 対応ページ:
  * - プレミアム分析ページ (premium-analysis.html)
@@ -18,10 +18,10 @@
  * - セクション1: トレーニング統計
  * - セクション3: モード別統計
  *
- * v2.4.3 更新内容（2025-11-15）:
- * - 上段・下段カードのパディングを統一: 1rem（PC・モバイル共通）
- * - 上段: 0.75rem → 1rem
- * - 下段: 1.5rem 1rem → 1rem
+ * v2.4.4 更新内容（2025-11-15）:
+ * - .stat-valueのmargin-bottomを元に戻す: 0 → 0.5rem
+ * - .stat-cardのgapを削除（flexboxのgapではなくmarginで管理）
+ * - 数値とラベルの間隔を適切に確保
  */
 
 /* ================================================================
@@ -957,7 +957,6 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 0.25rem;
 }
 
 .stat-card:hover {
@@ -970,7 +969,7 @@
   font-size: 1.5rem;
   font-weight: 800;
   color: var(--text-white);
-  margin-bottom: 0;
+  margin-bottom: 0.5rem;
   line-height: 1;
   letter-spacing: -0.02em;
 }
@@ -1011,12 +1010,11 @@
   .stat-card {
     padding: 1rem;
     border-radius: 10px;
-    gap: 0.25rem;
   }
 
   .stat-value {
     font-size: 1.5rem;
-    margin-bottom: 0;
+    margin-bottom: 0.5rem;
   }
 
   .stat-label {
