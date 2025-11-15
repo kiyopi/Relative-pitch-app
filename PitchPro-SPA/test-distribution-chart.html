@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DistributionChart テスト</title>
+
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="styles/base.css?v=20251115">
+    <link rel="stylesheet" href="styles/results.css?v=20251115">
+
+    <!-- Lucideアイコン -->
+    <script src="https://unpkg.com/lucide@0.263.0/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <div class="container" style="max-width: 800px; margin: 0 auto; padding: 2rem;">
+        <h1 class="text-3xl font-bold text-white mb-6">DistributionChart コンポーネントテスト</h1>
+
+        <!-- テスト1: 基本表示（説明あり・トレンドなし） -->
+        <section class="glass-card">
+            <h2 class="heading-md">
+                <i data-lucide="bar-chart-3" class="text-blue-300"></i>
+                <span>テスト1: 基本表示</span>
+            </h2>
+            <div id="test-basic"></div>
+        </section>
+
+        <!-- テスト2: ヘルプボタン表示 -->
+        <section class="glass-card">
+            <div class="section-header-row">
+                <h2 class="heading-md">
+                    <i data-lucide="help-circle" class="text-blue-300"></i>
+                    <span>テスト2: ヘルプボタン表示</span>
+                </h2>
+                <div id="help-button-container" class="section-header-help"></div>
+            </div>
+            <div id="test-with-help"></div>
+        </section>
+
+        <!-- テスト3: トレンド表示（改善中） -->
+        <section class="glass-card">
+            <h2 class="heading-md">
+                <i data-lucide="trending-up" class="text-green-300"></i>
+                <span>テスト3: 改善トレンド表示</span>
+            </h2>
+            <div id="test-trend-improving"></div>
+        </section>
+
+        <!-- テスト4: トレンド表示（悪化） -->
+        <section class="glass-card">
+            <h2 class="heading-md">
+                <i data-lucide="trending-down" class="text-orange-300"></i>
+                <span>テスト4: 悪化トレンド表示</span>
+            </h2>
+            <div id="test-trend-declining"></div>
+        </section>
+
+        <!-- テスト5: データなし -->
+        <section class="glass-card">
+            <h2 class="heading-md">
+                <i data-lucide="inbox" class="text-white-60"></i>
+                <span>テスト5: データなし</span>
+            </h2>
+            <div id="test-no-data"></div>
+        </section>
+
+        <!-- テスト6: アニメーションなし -->
+        <section class="glass-card">
+            <h2 class="heading-md">
+                <i data-lucide="zap-off" class="text-white-60"></i>
+                <span>テスト6: アニメーションなし</span>
+            </h2>
+            <div id="test-no-animation"></div>
+        </section>
+    </div>
+
+    <!-- スクリプト -->
+    <script src="js/lucide-init.js"></script>
+    <script src="js/evaluation-calculator.js"></script>
+    <script src="js/components/DistributionChart.js"></script>
+
+    <script>
+        // テストデータ生成
+        function generateTestSessionData(sessionCount = 10) {
+            const sessions = [];
+            const now = Date.now();
+
+            for (let i = 0; i < sessionCount; i++) {
+                const pitchErrors = [];
+                const sessionDate = now - (sessionCount - i) * 24 * 60 * 60 * 1000; // 1日ずつ過去に
+
+                // 8音のエラーデータを生成
+                for (let j = 0; j < 8; j++) {
+                    const errorInCents = (Math.random() - 0.5) * 100; // -50 ~ +50cents
+                    pitchErrors.push({ errorInCents });
+                }
+
+                sessions.push({
+                    lessonId: `lesson_${sessionDate}_random_up_asc`,
+                    startTime: sessionDate,
+                    pitchErrors
+                });
+            }
+
+            return sessions;
+        }
+
+        // 改善傾向データ生成
+        function generateImprovingData() {
+            const sessions = [];
+            const now = Date.now();
+
+            for (let i = 0; i < 20; i++) {
+                const pitchErrors = [];
+                const sessionDate = now - (20 - i) * 24 * 60 * 60 * 1000;
+
+                // 過去1週間（最新7セッション）は精度が向上
+                const isRecent = i >= 13;
+                const errorRange = isRecent ? 30 : 50; // 最近の方が誤差が小さい
+
+                for (let j = 0; j < 8; j++) {
+                    const errorInCents = (Math.random() - 0.5) * errorRange;
+                    pitchErrors.push({ errorInCents });
+                }
+
+                sessions.push({
+                    lessonId: `lesson_${sessionDate}_random_up_asc`,
+                    startTime: sessionDate,
+                    pitchErrors
+                });
+            }
+
+            return sessions;
+        }
+
+        // 悪化傾向データ生成
+        function generateDecliningData() {
+            const sessions = [];
+            const now = Date.now();
+
+            for (let i = 0; i < 20; i++) {
+                const pitchErrors = [];
+                const sessionDate = now - (20 - i) * 24 * 60 * 60 * 1000;
+
+                // 過去1週間（最新7セッション）は精度が悪化
+                const isRecent = i >= 13;
+                const errorRange = isRecent ? 70 : 40; // 最近の方が誤差が大きい
+
+                for (let j = 0; j < 8; j++) {
+                    const errorInCents = (Math.random() - 0.5) * errorRange;
+                    pitchErrors.push({ errorInCents });
+                }
+
+                sessions.push({
+                    lessonId: `lesson_${sessionDate}_random_up_asc`,
+                    startTime: sessionDate,
+                    pitchErrors
+                });
+            }
+
+            return sessions;
+        }
+
+        // テスト実行
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🧪 DistributionChart テスト開始');
+
+            // テスト1: 基本表示
+            const basicData = generateTestSessionData(10);
+            window.DistributionChart.render({
+                containerId: 'test-basic',
+                sessionData: basicData,
+                showTrend: false,
+                animate: true,
+                showDescription: true
+            });
+
+            // テスト2: ヘルプボタン表示
+            // 見出し行にヘルプボタンを挿入
+            const helpButtonContainer = document.getElementById('help-button-container');
+            helpButtonContainer.innerHTML = window.DistributionChart.getHelpButton('test-with-help');
+
+            window.DistributionChart.render({
+                containerId: 'test-with-help',
+                sessionData: basicData,
+                showTrend: false,
+                animate: true,
+                showDescription: true,
+                showHelpButton: true  // ポップオーバー生成フラグ
+            });
+
+            // テスト3: 改善トレンド表示
+            const improvingData = generateImprovingData();
+            window.DistributionChart.render({
+                containerId: 'test-trend-improving',
+                sessionData: improvingData,
+                showTrend: true,
+                trendPeriod: 'week',
+                animate: true,
+                showDescription: true
+            });
+
+            // テスト4: 悪化トレンド表示
+            const decliningData = generateDecliningData();
+            window.DistributionChart.render({
+                containerId: 'test-trend-declining',
+                sessionData: decliningData,
+                showTrend: true,
+                trendPeriod: 'week',
+                animate: true,
+                showDescription: true
+            });
+
+            // テスト5: データなし
+            window.DistributionChart.render({
+                containerId: 'test-no-data',
+                sessionData: [],
+                showTrend: false,
+                animate: true,
+                showDescription: true
+            });
+
+            // テスト6: アニメーションなし
+            window.DistributionChart.render({
+                containerId: 'test-no-animation',
+                sessionData: basicData,
+                showTrend: false,
+                animate: false,
+                showDescription: false
+            });
+
+            console.log('✅ DistributionChart テスト完了');
+        });
+    </script>
+</body>
+</html>

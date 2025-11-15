@@ -194,9 +194,11 @@ body::before {
 /* マージン */
 .m-0 { margin: 0; }
 .mb-0 { margin-bottom: 0; }
+.mb-3 { margin-bottom: 0.75rem; }
 .mb-4 { margin-bottom: 1rem; }
 .mb-6 { margin-bottom: 1.5rem; }
 .mb-8 { margin-bottom: 2rem; }
+.mt-4 { margin-top: 1rem; }
 
 /* Flexbox */
 .flex { display: flex; }
@@ -207,6 +209,7 @@ body::before {
 .justify-around { justify-content: space-around; }
 .w-full { width: 100%; }
 .flex-1 { flex: 1; }
+.flex-shrink-0 { flex-shrink: 0; }
 
 /* Gap */
 .gap-3 { gap: var(--space-3); }
@@ -594,8 +597,7 @@ body::before {
   line-height: 1.75rem;
   font-weight: 600;
   color: var(--text-white);
-  margin-top: 0;
-  margin-bottom: var(--space-6);
+  margin-bottom: 0.75rem;
 }
 
 
@@ -603,6 +605,21 @@ body::before {
   width: 24px;
   height: 24px;
   color: var(--text-white);
+}
+
+/* ヘルプボタン付き見出し行 */
+.section-header-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.section-header-row .heading-md {
+  margin-bottom: 0;
+}
+
+.section-header-help {
+  margin-left: auto;
 }
 
 .heading-lg {
@@ -676,10 +693,18 @@ body::before {
   .glass-card {
     padding: var(--space-6);
   }
-  
+
   .glass-card-sm {
     padding: var(--space-3);
   }
+}
+
+/* --- 改善トレンドカード --- */
+.trend-card {
+  background: rgba(255, 255, 255, 0.05);
+  /* backdrop-filter削除: 親.glass-cardと重複してiPadで白化するため */
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
 }
 
 /* --- ボタン --- */
@@ -935,10 +960,14 @@ body::before {
 /* --- プログレスバー --- */
 .progress-bar {
   width: 100%;
-  height: 10px;
-  background: rgba(255, 255, 255, 0.1);
+  height: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 5px;
   overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15),
+              0 1px 2px rgba(255, 255, 255, 0.1);
 }
 
 .progress-bar.flex {
@@ -959,6 +988,26 @@ body::before {
 .progress-fill-custom {
   height: 100%;
   border-radius: 4px;
+  background-blend-mode: overlay;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4),
+              inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+  position: relative;
+  opacity: 0.85;
+}
+
+.progress-fill-custom::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0) 50%,
+    rgba(0, 0, 0, 0.15) 100%);
+  border-radius: 4px;
+  pointer-events: none;
 }
 
 /* --- ページヘッダーアイコン --- */
@@ -1243,6 +1292,29 @@ body::before {
 .help-icon-btn:hover {
   background: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ヘルプボタン（インライン配置） */
+.help-icon-btn-inline {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.help-icon-btn-inline:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
+  transform: scale(1.1);
 }
 
 /* === bolt-new-design移植: 特化カードシステム（削除 - 下部の新定義を使用） === */
@@ -2167,14 +2239,7 @@ body::before {
   text-align: right;
 }
 
-/* マージン */
-.mt-2 {
-  margin-top: 0.5rem;
-}
-
-.mb-4 {
-  margin-bottom: 1rem;
-}
+/* マージン（重複削除 - 194-201行に統合） */
 
 /* フォントサイズ */
 .text-xs {

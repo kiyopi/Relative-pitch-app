@@ -1119,7 +1119,23 @@ color: 'purple' // 履歴・一覧系</div>
                             </h2>
                             <p class="text-white-60 text-xs">heading-lg - 大見出し・メインタイトル用</p>
                         </div>
-                        
+
+                        <!-- ヘルプボタン付き見出し -->
+                        <div>
+                            <div class="section-header-row">
+                                <h4 class="heading-md">
+                                    <i data-lucide="bar-chart-3" class="text-blue-300"></i>
+                                    <span>評価分布</span>
+                                </h4>
+                                <div class="section-header-help">
+                                    <button class="help-icon-btn-inline">
+                                        <i data-lucide="help-circle"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="text-white-60 text-xs">section-header-row - 見出しとヘルプボタンの組み合わせ</p>
+                        </div>
+
                         <!-- 使用ガイドライン -->
                         <div class="mt-6 bg-white/5 rounded-lg p-4">
                             <h4 class="text-white font-medium mb-3">💡 使用ガイドライン</h4>
@@ -1127,6 +1143,8 @@ color: 'purple' // 履歴・一覧系</div>
                                 <li>• <code class="text-blue-300">heading-sm</code>: サブセクション、項目見出し</li>
                                 <li>• <code class="text-blue-300">heading-md</code>: セクションタイトル、機能見出し</li>
                                 <li>• <code class="text-blue-300">heading-lg</code>: メインタイトル、ページ見出し</li>
+                                <li>• <code class="text-blue-300">section-header-row</code>: 見出しとヘルプボタンの組み合わせ用コンテナ</li>
+                                <li>• <code class="text-blue-300">section-header-help</code>: ヘルプボタン右寄せ配置用</li>
                                 <li>• アイコンは自動的に適切なサイズになります</li>
                                 <li>• アイコン色は <code class="text-yellow-300">text-{color}</code> で変更可能</li>
                             </ul>
@@ -1154,7 +1172,20 @@ color: 'purple' // 履歴・一覧系</div>
 &lt;h3 class="heading-md"&gt;
   &lt;i data-lucide="lightbulb" class="text-yellow-300"&gt;&lt;/i&gt;
   次のステップ
-&lt;/h3&gt;</div>
+&lt;/h3&gt;
+
+&lt;!-- ヘルプボタン付き見出し --&gt;
+&lt;div class="section-header-row"&gt;
+  &lt;h4 class="heading-md"&gt;
+    &lt;i data-lucide="bar-chart-3" class="text-blue-300"&gt;&lt;/i&gt;
+    &lt;span&gt;評価分布&lt;/span&gt;
+  &lt;/h4&gt;
+  &lt;div class="section-header-help"&gt;
+    &lt;button class="help-icon-btn-inline"&gt;
+      &lt;i data-lucide="help-circle"&gt;&lt;/i&gt;
+    &lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</div>
                             <div class="space-y-3">
                                 <h4 class="heading-sm">
                                     <i data-lucide="trophy" class="text-yellow-300"></i>
@@ -1205,6 +1236,128 @@ color: 'purple' // 履歴・一覧系</div>
                         <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
                     </div>
             </section>
+
+<!-- 評価分布・統計表示 -->
+<section id="evaluation-distribution" class="catalog-section">
+    <h2 class="text-2xl font-bold text-white mb-4">📊 評価分布・統計表示</h2>
+    <p class="text-white-70 mb-6">トレーニング成果を視覚化する評価分布バーと改善トレンドカード</p>
+
+    <!-- 評価分布バー -->
+    <div class="component-preview">
+        <h3 class="text-white font-medium mb-4">評価分布バー</h3>
+
+        <div class="glass-card" style="max-width: 600px;">
+            <h4 class="heading-md mb-3">
+                <i data-lucide="bar-chart-3" class="text-blue-300"></i>
+                <span>評価分布</span>
+            </h4>
+
+            <p class="text-sm text-white-60 mb-4">全セッションの各音の精度評価を集計した分布です。Excellentが多いほど高精度です。</p>
+
+            <!-- 評価分布バー一覧 -->
+            <div class="flex flex-col gap-3">
+                <!-- Excellent -->
+                <div class="flex items-center gap-3">
+                    <i data-lucide="trophy" class="text-yellow-300 icon-sm flex-shrink-0"></i>
+                    <div class="progress-bar flex">
+                        <div class="progress-fill-custom color-eval-gold" style="width: 37.5%;"></div>
+                    </div>
+                    <span class="text-sm text-white-60" style="min-width: 40px; text-align: right;">24</span>
+                </div>
+
+                <!-- Good -->
+                <div class="flex items-center gap-3">
+                    <i data-lucide="star" class="text-green-300 icon-sm flex-shrink-0"></i>
+                    <div class="progress-bar flex">
+                        <div class="progress-fill-custom color-eval-good" style="width: 31.2%;"></div>
+                    </div>
+                    <span class="text-sm text-white-60" style="min-width: 40px; text-align: right;">20</span>
+                </div>
+
+                <!-- Pass -->
+                <div class="flex items-center gap-3">
+                    <i data-lucide="thumbs-up" class="text-blue-300 icon-sm flex-shrink-0"></i>
+                    <div class="progress-bar flex">
+                        <div class="progress-fill-custom color-eval-pass" style="width: 18.8%;"></div>
+                    </div>
+                    <span class="text-sm text-white-60" style="min-width: 40px; text-align: right;">12</span>
+                </div>
+
+                <!-- Practice -->
+                <div class="flex items-center gap-3">
+                    <i data-lucide="alert-triangle" class="text-red-300 icon-sm flex-shrink-0"></i>
+                    <div class="progress-bar flex">
+                        <div class="progress-fill-custom color-eval-practice" style="width: 12.5%;"></div>
+                    </div>
+                    <span class="text-sm text-white-60" style="min-width: 40px; text-align: right;">8</span>
+                </div>
+            </div>
+
+            <!-- 改善トレンドカード -->
+            <div class="trend-card mt-4">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="trending-up" class="text-green-300 icon-sm flex-shrink-0"></i>
+                    <div class="flex-1">
+                        <div class="text-sm text-white-80">過去1週間の改善トレンド</div>
+                        <div class="text-xs text-white-60">A以上獲得率 +5.2%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 使用ガイドライン -->
+    <div class="component-item mt-6">
+        <h3 class="text-white font-medium mb-4">💡 使用ガイドライン</h3>
+        <div class="bg-white/5 rounded-lg p-4">
+            <ul class="text-white-70 text-sm space-y-2">
+                <li>• <strong>評価アイコン</strong>: trophy（優秀）, award（良好）, target（合格）, alert-triangle（要練習）</li>
+                <li>• <strong>アイコンサイズ</strong>: icon-sm (20px) を使用、flex-shrink-0で固定</li>
+                <li>• <strong>プログレスバー</strong>: .progress-bar.flex + .progress-fill-custom + .color-eval-{level}</li>
+                <li>• <strong>カウント表示</strong>: min-width: 40px, text-align: right で右揃え</li>
+                <li>• <strong>改善トレンド</strong>: .trend-card でiPad白化を回避</li>
+                <li>• <strong>マージン</strong>: mb-3（見出し）, mb-4（説明文・トレンドカード上）</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- コードサンプル -->
+    <div class="code-sample mt-4">&lt;!-- 評価分布バー --&gt;
+&lt;div class="glass-card"&gt;
+    &lt;h4 class="heading-md mb-3"&gt;
+        &lt;i data-lucide="bar-chart-3" class="text-blue-300"&gt;&lt;/i&gt;
+        &lt;span&gt;評価分布&lt;/span&gt;
+    &lt;/h4&gt;
+
+    &lt;p class="text-sm text-white-60 mb-4"&gt;説明文&lt;/p&gt;
+
+    &lt;div class="flex flex-col gap-3"&gt;
+        &lt;!-- Excellent --&gt;
+        &lt;div class="flex items-center gap-3"&gt;
+            &lt;i data-lucide="trophy" class="text-yellow-300 icon-sm flex-shrink-0"&gt;&lt;/i&gt;
+            &lt;div class="progress-bar flex"&gt;
+                &lt;div class="progress-fill-custom color-eval-gold" style="width: 37.5%;"&gt;&lt;/div&gt;
+            &lt;/div&gt;
+            &lt;span class="text-sm text-white-60" style="min-width: 40px; text-align: right;"&gt;24&lt;/span&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- 改善トレンドカード --&gt;
+    &lt;div class="trend-card mt-4"&gt;
+        &lt;div class="flex items-center gap-2"&gt;
+            &lt;i data-lucide="trending-up" class="text-green-300 icon-sm flex-shrink-0"&gt;&lt;/i&gt;
+            &lt;div class="flex-1"&gt;
+                &lt;div class="text-sm text-white-80"&gt;過去1週間の改善トレンド&lt;/div&gt;
+                &lt;div class="text-xs text-white-60"&gt;A以上獲得率 +5.2%&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</div>
+
+    <div style="text-align: center; margin: 1rem 0;">
+        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+    </div>
+</section>
 
             </main>
 
