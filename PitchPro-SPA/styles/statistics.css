@@ -1,7 +1,7 @@
 /**
  * statistics.css
  * 統計・分析・記録ページ統合スタイル
- * Version: 2.0.0
+ * Version: 2.1.0
  *
  * 対応ページ:
  * - プレミアム分析ページ (premium-analysis.html)
@@ -17,6 +17,11 @@
  * トレーニング記録セクション:
  * - セクション1: トレーニング統計
  * - セクション3: モード別統計
+ *
+ * v2.1.0 更新内容（2025-11-15）:
+ * - フォントサイズバランス再調整
+ *   - 累計日数: 1.5rem (PC), 1.25rem (モバイル) - 控えめに
+ *   - 数値カード: 2.5rem (PC), 2rem (モバイル) - 適切なサイズに
  */
 
 /* ================================================================
@@ -911,7 +916,7 @@
 }
 
 .training-days-number {
-  font-size: 2.5rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-white);
   line-height: 1;
@@ -976,7 +981,7 @@
 }
 
 .stat-value {
-  font-size: 4rem;
+  font-size: 2.5rem;
   font-weight: 800;
   color: var(--text-white);
   margin-bottom: 0.75rem;
@@ -1008,7 +1013,7 @@
   }
 
   .training-days-number {
-    font-size: 2rem;
+    font-size: 1.25rem;
   }
 
   .training-days-label {
@@ -1037,7 +1042,7 @@
   }
 
   .stat-value {
-    font-size: 3rem;
+    font-size: 2rem;
     margin-bottom: 0.625rem;
   }
 
