@@ -57,24 +57,28 @@
             </div>
         </section>
 
-        <!-- 成長グラフセクション（初期非表示） -->
-        <section class="glass-card hidden" id="chart-section">
+        <!-- 評価分布セクション -->
+        <section class="glass-card">
             <!-- ローディング表示 -->
-            <div class="flex flex-col items-center gap-3 py-8" id="chart-loading" style="display: flex;">
-                <i data-lucide="loader-2" class="text-green-300 animate-spin" style="width: 48px; height: 48px;"></i>
-                <p class="text-white-60">グラフを読み込み中...</p>
+            <div class="flex flex-col items-center gap-3 py-8" id="distribution-loading" style="display: flex;">
+                <i data-lucide="loader-2" class="text-purple-300 animate-spin" style="width: 48px; height: 48px;"></i>
+                <p class="text-white-60">評価分布を読み込み中...</p>
             </div>
 
-            <!-- グラフコンテンツ（初期非表示） -->
-            <div id="chart-content" style="display: none;">
-                <div class="flex items-center justify-between mb-4">
+            <!-- 評価分布コンテンツ（初期非表示） -->
+            <div id="distribution-content" style="display: none;">
+                <!-- セクション見出し（ヘルプボタン付き） -->
+                <div class="section-header-row">
                     <h4 class="heading-md">
-                        <i data-lucide="trending-up" class="text-green-300"></i>
-                        <span>精度推移グラフ</span>
+                        <i data-lucide="bar-chart-3" class="text-blue-300"></i>
+                        <span>評価分布</span>
                     </h4>
+                    <div id="distribution-help-button" class="section-header-help"></div>
                 </div>
-                <div style="height: 300px;">
-                    <canvas id="accuracyChart"></canvas>
+
+                <!-- DistributionChartコンテナ -->
+                <div id="distribution-chart-container">
+                    <!-- JavaScriptで動的生成 -->
                 </div>
             </div>
         </section>
@@ -119,6 +123,10 @@
 
     </main>
 </div>
+
+<!-- DistributionChart Dependencies -->
+<script src="js/evaluation-calculator.js"></script>
+<script src="js/components/DistributionChart.js"></script>
 
 <!-- Records Page Controller -->
 <script src="pages/js/records-controller.js?v=20251114004" onload="initRecordsPage()"></script>

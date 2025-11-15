@@ -98,13 +98,13 @@ async function loadTrainingRecords() {
         await displayStatistics(stats);
         hideLoading('stats');
 
+        // 評価分布を表示
+        await displayEvaluationDistribution(sessions);
+        hideLoading('distribution');
+
         // セッションリストを表示
         await displaySessionList(sessions);
         hideLoading('sessions');
-
-        // グラフを表示
-        await displayAccuracyChart(sessions);
-        hideLoading('chart');
 
         // データあり時の表示制御（CSSクラス使用）
         const noDataMessage = document.getElementById('no-data-message');
@@ -149,7 +149,7 @@ function hideLoading(section) {
  */
 function hideAllLoading() {
     hideLoading('stats');
-    hideLoading('chart');
+    hideLoading('distribution');
     hideLoading('sessions');
 }
 
@@ -301,6 +301,24 @@ function calculateStreak(sessions) {
     return streak;
 }
 
+/**
+ * グレード別色クラスを取得
+ * @param {string} grade - グレード（S/A/B/C/D/E/-）
+ * @returns {string} 色クラス
+ */
+function getGradeColor(grade) {
+    const gradeColors = {
+        'S': 'text-yellow-300',
+        'A': 'text-green-300',
+        'B': 'text-blue-300',
+        'C': 'text-purple-300',
+        'D': 'text-orange-300',
+        'E': 'text-red-300',
+        '-': 'text-white-60'
+    };
+    return gradeColors[grade] || 'text-white-60';
+}
+
     /**
      * 統計を表示（モード別）
      */
@@ -313,38 +331,87 @@ async function displayStatistics(stats) {
     statusEl.textContent = `総レッスン数: ${totalLessons}`;
     statusEl.className = 'text-lg text-blue-300';
 
-    // モード別統計を表示
+    // モード別統計を表示（テーブル + モバイルカード）
     const container = document.getElementById('mode-statistics');
     container.innerHTML = '';
 
-    stats.modeStats.forEach(mode => {
-        const modeCard = document.createElement('div');
-        modeCard.className = 'glass-card';
+    // デスクトップ版テーブル
+    const tableHTML = `
+        <table class="mode-stats-table">
+            <thead>
+                <tr>
+                    <th>モード</th>
+                    <th>レッスン数</th>
+                    <th>平均誤差</th>
+                    <th>最高</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${stats.modeStats.map(mode => `
+                    <tr>
+                        <td>${mode.modeName}</td>
+                        <td>${mode.lessonCount}</td>
+                        <td>±${mode.avgAccuracy}¢</td>
+                        <td class="${getGradeColor(mode.bestGrade)}">${mode.bestGrade}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
 
-        modeCard.innerHTML = `
-            <h5 class="text-white font-medium mb-3">${mode.modeName}</h5>
-            <div class="flex justify-around gap-4">
-                <div class="flex flex-col items-center">
-                    <div class="text-2xl font-bold text-blue-300">${mode.lessonCount}</div>
-                    <div class="text-white-60 text-sm">レッスン数</div>
+    // モバイル版カード
+    const mobileHTML = `
+        <div class="mode-stats-mobile">
+            ${stats.modeStats.map(mode => `
+                <div class="mode-stat-card">
+                    <div class="mode-name">${mode.modeName}</div>
+                    <div class="mode-stats-row">
+                        <span>${mode.lessonCount}回</span>
+                        <span>±${mode.avgAccuracy}¢</span>
+                        <span class="${getGradeColor(mode.bestGrade)}">${mode.bestGrade}</span>
+                    </div>
                 </div>
-                <div class="flex flex-col items-center">
-                    <div class="text-2xl font-bold text-green-300">±${mode.avgAccuracy}</div>
-                    <div class="text-white-60 text-sm">平均誤差（¢）</div>
-                </div>
-                <div class="flex flex-col items-center">
-                    <div class="text-2xl font-bold text-yellow-300">${mode.bestGrade}</div>
-                    <div class="text-white-60 text-sm">最高グレード</div>
-                </div>
-            </div>
-        `;
+            `).join('')}
+        </div>
+    `;
 
-        container.appendChild(modeCard);
-    });
+    container.innerHTML = tableHTML + mobileHTML;
 
     // Lucideアイコン再初期化（統合初期化関数を使用）
     if (typeof window.initializeLucideIcons === 'function') {
         window.initializeLucideIcons({ immediate: true });
+    }
+
+    // レンダリング完了まで待機
+    await new Promise(resolve => setTimeout(resolve, 0));
+}
+
+/**
+ * 評価分布を表示（DistributionChart統合）
+ * @param {Array} sessions - セッションデータ配列
+ */
+async function displayEvaluationDistribution(sessions) {
+    console.log('[Records] Displaying evaluation distribution...');
+
+    // ヘルプボタンをヘッダーに挿入
+    const helpButtonContainer = document.getElementById('distribution-help-button');
+    if (helpButtonContainer && window.DistributionChart) {
+        helpButtonContainer.innerHTML = window.DistributionChart.getHelpButton('distribution-chart-container');
+    }
+
+    // DistributionChartをレンダリング
+    if (window.DistributionChart) {
+        window.DistributionChart.render({
+            containerId: 'distribution-chart-container',
+            sessionData: sessions,
+            showTrend: true,
+            trendPeriod: 'week',
+            animate: true,
+            showDescription: true,
+            showHelpButton: true
+        });
+    } else {
+        console.error('[Records] DistributionChart component not loaded');
     }
 
     // レンダリング完了まで待機

@@ -962,7 +962,7 @@ body::before {
   width: 100%;
   height: 8px;
   background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(8px);
+  /* backdrop-filter削除: 親.glass-cardと重複してiPadで白化するため */
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 5px;
   overflow: hidden;
@@ -2945,3 +2945,97 @@ body::before {
 /* ================================================================
    プレミアム分析専用スタイルは premium-analysis.css に移動しました
    ================================================================ */
+
+/* ================================================================
+   モード別統計（トレーニング記録ページ）
+   ================================================================ */
+
+/* デスクトップ版テーブル */
+.mode-stats-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mode-stats-table th {
+  text-align: left;
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-white-60);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.mode-stats-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-white);
+  font-size: 0.875rem;
+}
+
+.mode-stats-table td:nth-child(2),
+.mode-stats-table td:nth-child(3) {
+  text-align: center;
+}
+
+.mode-stats-table td:nth-child(4) {
+  text-align: center;
+  font-weight: 600;
+}
+
+/* モバイル版カード */
+.mode-stats-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mode-stat-card {
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mode-stat-card .mode-name {
+  color: var(--text-white);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.mode-stat-card .mode-stats-row {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  font-size: 0.875rem;
+}
+
+.mode-stat-card .mode-stats-row > span {
+  flex: 1;
+  text-align: center;
+  color: var(--text-white-70);
+}
+
+.mode-stat-card .mode-stats-row > span:last-child {
+  font-weight: 600;
+  color: var(--text-white);
+}
+
+/* レスポンシブ切り替え */
+@media (max-width: 767px) {
+  .mode-stats-table {
+    display: none;
+  }
+  .mode-stats-mobile {
+    display: flex;
+  }
+}
+
+@media (min-width: 768px) {
+  .mode-stats-table {
+    display: table;
+  }
+  .mode-stats-mobile {
+    display: none;
+  }
+}
