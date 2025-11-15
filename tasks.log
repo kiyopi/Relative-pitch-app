@@ -9596,3 +9596,240 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 19:27:16] コミット: refactor: premium-analysis.cssをstatistics.cssにリネーム・統合
+
+【構造改善】
+- premium-analysis.css → statistics.css にリネーム
+- トレーニング記録ページのスタイルをstatistics.cssに統合
+- base.cssからトレーニング記録関連スタイル（約300行）を削除
+
+【目的】
+- ファイル責任の明確化（共通 vs 統計・分析）
+- CSS重複の解消（.stat-value等）
+- base.cssの肥大化防止（3250行 → 2947行）
+
+【変更内容】
+1. statistics.css作成（premium-analysis.cssベース）
+   - ヘッダーコメント更新（対応ページ明記）
+   - トレーニング統計（セクション1）スタイル追加
+   - モード別統計スタイル追加
+
+2. base.css整理
+   - トレーニング記録関連スタイル削除
+   - 約300行削減
+
+3. index.html更新
+   - premium-analysis.css → statistics.css
+   - base.css v20251115008
+
+4. premium-analysis.css削除
+
+【ファイル構成】
+- base.css: 共通スタイルのみ（2947行）
+- statistics.css: 統計・分析・記録ページ統合（約1187行）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 19:48:26] コミット: style: トレーニング統計のフォントサイズを再調整
+
+累計日数を控えめに、数値カードを適切なサイズに変更
+
+変更内容:
+- PC版累計日数: 2.5rem → 1.5rem（少し大きいくらい）
+- PC版数値カード: 4rem → 2.5rem（異常な大きさを修正）
+- モバイル累計日数: 2rem → 1.25rem
+- モバイル数値カード: 3rem → 2rem
+- statistics.css v2.0.0 → v2.1.0
+
+情報階層の最適化:
+- 累計日数は「少し大きいくらい」に抑える
+- 数値カードが適切なサイズで見やすくなる
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 20:02:46] コミット: refactor: トレーニング統計のレイアウトとサイズを全面改修
+
+上段を横並び3項目に変更し、フォントサイズを全体的に縮小
+
+レイアウト変更:
+- 上段を「メイン/サブ」構造から横並び3項目に変更
+- 累計トレーニング日数 / 開始日・経過日数 / 連続記録
+- すべて同じサイズで統一、視覚的バランス改善
+
+アイコンに色追加:
+- calendar-check: 青色（text-blue-300）
+- calendar: 紫色（text-purple-300）
+- flame: オレンジ色（text-orange-300）
+- アイコンサイズ統一: 28px
+
+フォントサイズ削減:
+- 上段数値: 1.25rem (PC), 1rem (モバイル)
+- 上段ラベル: 0.75rem (PC), 0.6875rem (モバイル)
+- 数値カード: 1.75rem (PC), 1.5rem (モバイル)
+
+JavaScript更新:
+- displayStatistics()を新しいHTML構造に対応
+- 開始日フォーマット変更: "10/27開始" → "10/27"
+- 経過日数表示: "（3日経過）" → "3日経過"
+
+バージョン更新:
+- statistics.css v2.1.0 → v2.2.0
+- records-controller.js v2.1.0 → v2.2.0
+- records.html controller v20251115003 → v20251115004
+- index.html statistics.css v20251115002 → v20251115003
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 20:28:41] コミット: style: トレーニング統計を横一列レイアウトに変更・サイズ統一
+
+アイコン・数値・ラベルをすべて横一列に配置し、フォントサイズを統一
+
+レイアウト変更:
+- アイコン・数値・ラベルを横一列に配置（flex-direction: row）
+- アイコン左配置、数値とラベルが横並び
+- gap: 0.5rem で適切な間隔
+
+フォントサイズ統一:
+- 数値: 1.25rem（PC・モバイル共通）
+- ラベル: 0.9375rem（.stat-labelと同じ、PC・モバイル共通）
+
+スタイル変更:
+- ラベル色: text-blue-300（すべて統一）
+- アイコン色: calendar-check/calendar（紫）、flame（オレンジ）
+
+表記統一:
+- すべて「数値」+「ラベル」形式に統一
+- 累計日数: "1" + "日間トレーニング"
+- 開始日: "10/27" + "3日経過"
+- 連続記録: "0" + "連続日数"
+
+バージョン更新:
+- statistics.css v2.2.0 → v2.3.0
+- records-controller.js v2.2.0 → v2.3.0
+- records.html controller v20251115004 → v20251115005
+- index.html statistics.css v20251115003 → v20251115004
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 20:42:54] コミット: style: トレーニング統計の数値サイズとラベル色を最終調整
+
+7つの数値を1.5remに統一し、ラベル色を適切に配置
+
+数値サイズ統一:
+- 上段3つ（累計日数/開始日/連続記録）: 1.5rem
+- 下段4つ（レッスン/セッション/総時間/平均誤差）: 1.5rem
+- PC・モバイル完全統一
+
+ラベル色の整理:
+- 下段4つのラベル: text-blue-300（#93c5fd）
+  - レッスン、セッション、総レッスン時間、平均誤差
+- 上段3つのラベル: 通常の白系（var(--text-white-70)）
+  - 日間トレーニング、3日経過、連続日数
+
+表記変更:
+- 「総時間」→「総レッスン時間」に変更
+
+バージョン更新:
+- statistics.css v2.3.0 → v2.4.0
+- records.html controller v20251115005 → v20251115006
+- index.html statistics.css v20251115004 → v20251115005
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 20:55:57] コミット: fix: アイコンの左配置を確実にするためflex-directionを明示的に指定
+
+flex-direction: row を明示的に指定してレイアウトを確定
+
+修正内容:
+- .stat-item に flex-direction: row を明示的に追加
+- .stat-item-info に flex-direction: row を明示的に追加
+- アイコン（i, svg）に flex-shrink: 0 を追加して縮小防止
+
+これにより:
+- アイコンが確実に左に配置される
+- 数値とラベルが横並びになる
+- レイアウトの一貫性が保証される
+
+バージョン更新:
+- statistics.css v2.4.0 → v2.4.1
+- index.html statistics.css v20251115005 → v20251115006
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 21:15:50] コミット: style: 上段・下段カードのパディングを統一
+
+すべてのカード内余白を1remに統一して見た目を揃える
+
+修正内容:
+- 上段カード(.stat-item): 0.75rem → 1rem
+- 下段カード(.stat-card): 1.5rem 1rem → 1rem
+- PC・モバイル共通で1remに統一
+
+効果:
+- カード内の余白が統一され、視覚的に整った
+- 上段と下段のバランスが改善
+- レスポンシブ対応も統一されたパディング
+
+バージョン更新:
+- statistics.css v2.4.2 → v2.4.3
+- index.html statistics.css v20251115006 → v20251115007
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 22:03:12] コミット: fix: 数値とラベルの間隔を元に戻す
+
+.stat-valueのmargin-bottomを0.5remに戻して適切な間隔を確保
+
+修正内容:
+- .stat-value の margin-bottom: 0 → 0.5rem
+- .stat-card の gap: 0.25rem を削除
+- PC・モバイル共通で適用
+
+理由:
+- margin-bottomを0にしたことで数値とラベルが詰まりすぎていた
+- flexboxのgapではなく、従来通りmarginで間隔を管理
+- 0.5remの間隔で視覚的に適切なバランスに
+
+バージョン更新:
+- statistics.css v2.4.3 → v2.4.4
+- index.html statistics.css v20251115007 → v20251115008
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 22:27:39] コミット: refactor: トレーニング記録用に独自クラス名を作成してCSS重複を解消
+
+.stat-label の重複を解消するため .training-stat-label を新規作成
+
+問題:
+- .stat-label が3箇所で定義されていた
+  - 585行目: プレミアム分析用
+  - 977行目: トレーニング記録用
+  - 1020行目: モバイル版
+- CSS specificity の問題で意図しないスタイルが適用されていた
+
+解決策:
+- トレーニング記録専用のクラス名を作成
+- .stat-label → .training-stat-label に変更
+- プレミアム分析の.stat-labelと完全分離
+
+変更内容:
+- CSS: .stat-label → .training-stat-label（2箇所）
+- HTML: 4つの数値カードのラベルクラスを変更
+  - レッスン、セッション、総レッスン時間、平均誤差
+
+バージョン更新:
+- statistics.css v2.4.4 → v2.5.0
+- records.html controller v20251115006 → v20251115007
+- index.html statistics.css v20251115008 → v20251115009
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

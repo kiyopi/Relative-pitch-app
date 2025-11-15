@@ -1,10 +1,12 @@
 /**
  * トレーニング記録ページコントローラー
  *
- * @version 2.3.0
+ * @version 2.3.1
  * @date 2025-11-15
  * @description トレーニング履歴の表示・統計計算・グラフ描画
  * @changelog
+ *   v2.3.1 (2025-11-15) - 開始日取得ロジック修正
+ *                         timestamp/startTime/completedAtの優先順で日付取得（Bug修正）
  *   v2.3.0 (2025-11-15) - 統計セクションの表記統一
  *                         すべて「数値」+「ラベル」形式に統一（連続0日 → 0 + 連続日数）
  *   v2.2.0 (2025-11-15) - 統計セクションのレイアウト変更
@@ -324,15 +326,26 @@ function calculateStatistics(sessions) {
     let daysSinceStart = 0;
 
     if (sessions.length > 0) {
-        // 日付をソート
-        const sortedSessions = [...sessions].sort((a, b) => a.timestamp - b.timestamp);
-        firstTrainingDate = new Date(sortedSessions[0].timestamp);
-        lastTrainingDate = new Date(sortedSessions[sortedSessions.length - 1].timestamp);
+        // 【修正v2.3.1】timestamp/startTime/completedAtの優先順で日付取得
+        const sortedSessions = [...sessions].sort((a, b) => {
+            const timeA = a.timestamp || a.startTime || a.completedAt || 0;
+            const timeB = b.timestamp || b.startTime || b.completedAt || 0;
+            return timeA - timeB;
+        });
+        
+        const firstSessionTime = sortedSessions[0].timestamp || sortedSessions[0].startTime || sortedSessions[0].completedAt;
+        const lastSessionTime = sortedSessions[sortedSessions.length - 1].timestamp || 
+                                sortedSessions[sortedSessions.length - 1].startTime || 
+                                sortedSessions[sortedSessions.length - 1].completedAt;
+        
+        firstTrainingDate = new Date(firstSessionTime);
+        lastTrainingDate = new Date(lastSessionTime);
 
         // ユニークな日付の数（実際にトレーニングした日数）
         const uniqueDates = new Set(
             sessions.map(session => {
-                const date = new Date(session.timestamp);
+                const sessionTime = session.timestamp || session.startTime || session.completedAt;
+                const date = new Date(sessionTime);
                 return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
             })
         );
