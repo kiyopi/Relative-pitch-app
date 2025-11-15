@@ -49,11 +49,6 @@
                         トレーニングを開始しましょう
                     </div>
                 </div>
-
-                <!-- モード別統計 -->
-                <div id="mode-statistics" class="flex flex-col gap-4">
-                    <!-- JavaScriptで動的生成 -->
-                </div>
             </div>
         </section>
 
@@ -78,6 +73,29 @@
 
                 <!-- DistributionChartコンテナ -->
                 <div id="distribution-chart-container">
+                    <!-- JavaScriptで動的生成 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- モード別統計セクション -->
+        <section class="glass-card">
+            <!-- ローディング表示 -->
+            <div class="flex flex-col items-center gap-3 py-8" id="mode-stats-loading" style="display: flex;">
+                <i data-lucide="loader-2" class="text-green-300 animate-spin" style="width: 48px; height: 48px;"></i>
+                <p class="text-white-60">モード別統計を読み込み中...</p>
+            </div>
+
+            <!-- モード別統計コンテンツ（初期非表示） -->
+            <div id="mode-stats-content" style="display: none;">
+                <!-- セクション見出し -->
+                <h4 class="heading-md">
+                    <i data-lucide="grid" class="text-blue-300"></i>
+                    <span>モード別統計</span>
+                </h4>
+
+                <!-- モード別統計テーブル/カード -->
+                <div id="mode-statistics">
                     <!-- JavaScriptで動的生成 -->
                 </div>
             </div>

@@ -102,6 +102,10 @@ async function loadTrainingRecords() {
         await displayEvaluationDistribution(sessions);
         hideLoading('distribution');
 
+        // モード別統計を表示
+        await displayModeStatistics(stats);
+        hideLoading('mode-stats');
+
         // セッションリストを表示
         await displaySessionList(sessions);
         hideLoading('sessions');
@@ -150,6 +154,7 @@ function hideLoading(section) {
 function hideAllLoading() {
     hideLoading('stats');
     hideLoading('distribution');
+    hideLoading('mode-stats');
     hideLoading('sessions');
 }
 
@@ -320,7 +325,7 @@ function getGradeColor(grade) {
 }
 
     /**
-     * 統計を表示（モード別）
+     * 統計を表示
      */
 async function displayStatistics(stats) {
     document.getElementById('streak-count').textContent = stats.streak;
@@ -330,6 +335,22 @@ async function displayStatistics(stats) {
     const totalLessons = stats.modeStats.reduce((sum, mode) => sum + mode.lessonCount, 0);
     statusEl.textContent = `総レッスン数: ${totalLessons}`;
     statusEl.className = 'text-lg text-blue-300';
+
+    // Lucideアイコン再初期化（統合初期化関数を使用）
+    if (typeof window.initializeLucideIcons === 'function') {
+        window.initializeLucideIcons({ immediate: true });
+    }
+
+    // レンダリング完了まで待機
+    await new Promise(resolve => setTimeout(resolve, 0));
+}
+
+/**
+ * モード別統計を表示
+ * @param {Object} stats - 統計データ
+ */
+async function displayModeStatistics(stats) {
+    console.log('[Records] Displaying mode statistics...');
 
     // モード別統計を表示（テーブル + モバイルカード）
     const container = document.getElementById('mode-statistics');
