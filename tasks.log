@@ -9417,3 +9417,21 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 17:05:54] コミット: fix: モバイル版グレード色のspecificityを強化
+
+問題: iPhoneでグレード色が表示されない（ブラウザキャッシュ問題）
+
+原因:
+- .text-yellow-300等のクラスのspecificityが低かった
+- セレクター: .text-yellow-300 (0,0,1,0)
+
+修正:
+- より高いspecificityのセレクターで色を明示的に指定
+- セレクター: .mode-stat-item .mode-stats-row > span.text-yellow-300 (0,0,4,0)
+- 6色すべて（yellow, gray, orange, green, blue, red）に対応
+
+これにより、iPhoneのブラウザキャッシュ問題でも確実に色が適用される
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

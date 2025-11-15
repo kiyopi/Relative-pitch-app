@@ -2999,6 +2999,7 @@ body::before {
 
 .mode-stat-item {
   padding: 0.75rem 0;
+  background: transparent; /* 背景を透明に（glass-cardの背景を継承） */
 }
 
 .mode-stat-item:first-child {
@@ -3030,6 +3031,7 @@ body::before {
   align-items: center;
   justify-content: center;
   gap: 0.25rem;
+  background: transparent; /* 背景を透明に */
 }
 
 /* 最初の2つのspan（回数・誤差）のみ色指定 */
