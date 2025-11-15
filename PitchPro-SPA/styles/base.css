@@ -2947,6 +2947,136 @@ body::before {
    ================================================================ */
 
 /* ================================================================
+   トレーニング統計（トレーニング記録ページ - セクション1）
+   ================================================================ */
+
+/* 上段：2カラムレイアウト（PC版）/ 縦配置（モバイル版） */
+.stats-top-section {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+/* 連続記録バッジ */
+.streak-badge {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.streak-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.streak-number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--text-white);
+  line-height: 1;
+}
+
+.streak-label {
+  color: var(--text-white-70);
+  font-size: 0.95rem;
+}
+
+/* トレーニング期間情報 */
+.training-period {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.period-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.period-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.period-text span {
+  line-height: 1.4;
+}
+
+/* 下段：4つの数値カード（PC版：1行4カード / モバイル版：2×2グリッド） */
+.stats-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--text-white);
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--text-white-60);
+}
+
+/* モバイル版レスポンシブ */
+@media (max-width: 767px) {
+  .stats-top-section {
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .streak-badge {
+    justify-content: center;
+  }
+
+  .streak-info {
+    text-align: center;
+  }
+
+  .training-period {
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .period-item {
+    width: 100%;
+  }
+
+  .stats-cards-grid {
+    /* モバイル版：2×2グリッド */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .stat-card {
+    padding: 1rem 0.75rem;
+  }
+
+  .stat-value {
+    font-size: 1.75rem;
+  }
+}
+
+/* ================================================================
    モード別統計（トレーニング記録ページ）
    ================================================================ */
 

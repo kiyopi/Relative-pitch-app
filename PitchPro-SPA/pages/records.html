@@ -36,17 +36,57 @@
                     </h4>
                 </div>
 
-                <!-- 連続記録バッジ -->
-                <div class="flex flex-col items-center gap-3 mb-6">
-                    <div class="flex items-center gap-3">
+                <!-- 上段：2カラムレイアウト（PC版）/ 縦配置（モバイル版） -->
+                <div class="stats-top-section">
+                    <!-- 左側：連続記録バッジ -->
+                    <div class="streak-badge">
                         <i data-lucide="flame" class="text-orange-300" style="width: 48px; height: 48px;"></i>
-                        <div>
-                            <div class="text-3xl font-bold text-white" id="streak-count">-</div>
-                            <div class="text-white-70">日間連続記録達成！</div>
+                        <div class="streak-info">
+                            <div class="streak-number" id="streak-count">-</div>
+                            <div class="streak-label">日間連続記録達成！</div>
                         </div>
                     </div>
-                    <div class="text-lg text-blue-300" id="improvement-status">
-                        トレーニングを開始しましょう
+
+                    <!-- 右側：トレーニング期間情報 -->
+                    <div class="training-period">
+                        <div class="period-item">
+                            <i data-lucide="calendar" class="text-blue-300" style="width: 20px; height: 20px;"></i>
+                            <div class="period-text">
+                                <span id="training-start-date" class="text-white">-</span>
+                                <span id="days-since-start" class="text-white-70"></span>
+                            </div>
+                        </div>
+                        <div class="period-item">
+                            <i data-lucide="book-open" class="text-green-300" style="width: 20px; height: 20px;"></i>
+                            <span id="training-days" class="text-white">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 下段：4つの数値カード（2×2グリッド） -->
+                <div class="stats-cards-grid">
+                    <!-- レッスン数 -->
+                    <div class="stat-card">
+                        <div class="stat-value" id="lessons-count">-</div>
+                        <div class="stat-label">レッスン</div>
+                    </div>
+
+                    <!-- セッション数 -->
+                    <div class="stat-card">
+                        <div class="stat-value" id="sessions-count">-</div>
+                        <div class="stat-label">セッション</div>
+                    </div>
+
+                    <!-- 総トレーニング時間 -->
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-duration">-</div>
+                        <div class="stat-label">総時間</div>
+                    </div>
+
+                    <!-- 平均誤差 -->
+                    <div class="stat-card">
+                        <div class="stat-value" id="average-error">-</div>
+                        <div class="stat-label">平均誤差</div>
                     </div>
                 </div>
             </div>

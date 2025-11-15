@@ -283,12 +283,78 @@ function calculateStatistics(sessions) {
 
     console.log(`📊 [Statistics] モード+方向別統計: ${modeStats.length}種類`, modeStats);
 
+    // === 追加統計データの計算 ===
+
+    // 総レッスン数・総セッション数
+    const totalLessons = lessons.length;
+    const totalSessions = sessions.length;
+
+    // 総トレーニング時間（秒 → 時間・分形式）
+    const totalDurationSeconds = sessions.reduce((sum, session) => {
+        return sum + (session.duration || 0);
+    }, 0);
+    const totalHours = Math.floor(totalDurationSeconds / 3600);
+    const totalMinutes = Math.round((totalDurationSeconds % 3600) / 60);
+    const totalDurationFormatted = totalHours > 0 
+        ? `${totalHours}h${totalMinutes}m` 
+        : `${totalMinutes}m`;
+
+    // 全体の平均誤差（全レッスンの平均誤差を集計）
+    const allAvgErrors = [];
+    lessons.forEach(lesson => {
+        try {
+            const evaluation = window.EvaluationCalculator.calculateDynamicGrade(lesson.sessions);
+            allAvgErrors.push(Math.abs(evaluation.metrics.adjusted.avgError));
+        } catch (error) {
+            // エラーは無視
+        }
+    });
+    const overallAvgError = allAvgErrors.length > 0
+        ? Math.round(allAvgErrors.reduce((a, b) => a + b, 0) / allAvgErrors.length)
+        : 0;
+
+    // トレーニング期間情報
+    let firstTrainingDate = null;
+    let lastTrainingDate = null;
+    let trainingDays = 0;
+    let daysSinceStart = 0;
+
+    if (sessions.length > 0) {
+        // 日付をソート
+        const sortedSessions = [...sessions].sort((a, b) => a.timestamp - b.timestamp);
+        firstTrainingDate = new Date(sortedSessions[0].timestamp);
+        lastTrainingDate = new Date(sortedSessions[sortedSessions.length - 1].timestamp);
+
+        // ユニークな日付の数（実際にトレーニングした日数）
+        const uniqueDates = new Set(
+            sessions.map(session => {
+                const date = new Date(session.timestamp);
+                return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+            })
+        );
+        trainingDays = uniqueDates.size;
+
+        // 開始からの経過日数
+        const today = new Date();
+        daysSinceStart = Math.floor((today - firstTrainingDate) / (1000 * 60 * 60 * 24));
+
+        console.log(`📊 [Statistics] 期間情報: 開始=${firstTrainingDate.toLocaleDateString()}, 最新=${lastTrainingDate.toLocaleDateString()}, 経過日数=${daysSinceStart}, 実トレーニング日数=${trainingDays}`);
+    }
+
     // 連続記録日数を計算
     const streak = calculateStreak(sessions);
 
     return {
         modeStats,
-        streak
+        streak,
+        totalLessons,
+        totalSessions,
+        totalDurationFormatted,
+        overallAvgError,
+        firstTrainingDate,
+        lastTrainingDate,
+        trainingDays,
+        daysSinceStart
     };
 }
 
@@ -367,13 +433,51 @@ function getGradeIcon(grade) {
      * 統計を表示
      */
 async function displayStatistics(stats) {
+    // 連続記録
     document.getElementById('streak-count').textContent = stats.streak;
 
-    // 改善状況メッセージ（全体の傾向を表示）
-    const statusEl = document.getElementById('improvement-status');
-    const totalLessons = stats.modeStats.reduce((sum, mode) => sum + mode.lessonCount, 0);
-    statusEl.textContent = `総レッスン数: ${totalLessons}`;
-    statusEl.className = 'text-lg text-blue-300';
+    // トレーニング期間情報
+    if (stats.firstTrainingDate) {
+        // Date型に確実に変換（タイムスタンプの場合も対応）
+        const firstDate = stats.firstTrainingDate instanceof Date 
+            ? stats.firstTrainingDate 
+            : new Date(stats.firstTrainingDate);
+        
+        // 有効な日付かチェック
+        if (!isNaN(firstDate.getTime())) {
+            const firstDateStr = `${firstDate.getMonth() + 1}/${firstDate.getDate()}`;
+            
+            // 開始日を表示
+            document.getElementById('training-start-date').textContent = `${firstDateStr}開始`;
+            
+            // 経過日数を表示（開始日の下に表示）
+            document.getElementById('days-since-start').textContent = `（${stats.daysSinceStart}日経過）`;
+            
+            // トレーニング日数を表示
+            document.getElementById('training-days').textContent = `${stats.trainingDays}日間トレーニング`;
+            
+            console.log(`📊 [Display] 期間情報: ${firstDateStr}開始, ${stats.daysSinceStart}日経過, ${stats.trainingDays}日間トレーニング`);
+        } else {
+            // 無効な日付の場合はフォールバック
+            console.warn('[Display] 無効な日付データ:', stats.firstTrainingDate);
+            document.getElementById('training-start-date').textContent = '-';
+            document.getElementById('days-since-start').textContent = '';
+            document.getElementById('training-days').textContent = `${stats.trainingDays}日間トレーニング`;
+        }
+    } else {
+        // データがない場合
+        document.getElementById('training-start-date').textContent = '-';
+        document.getElementById('days-since-start').textContent = '';
+        document.getElementById('training-days').textContent = '-';
+    }
+
+    // 4つの数値カード
+    document.getElementById('lessons-count').textContent = stats.totalLessons;
+    document.getElementById('sessions-count').textContent = stats.totalSessions;
+    document.getElementById('total-duration').textContent = stats.totalDurationFormatted;
+    document.getElementById('average-error').textContent = `±${stats.overallAvgError}¢`;
+
+    console.log(`📊 [Display] 数値カード: レッスン=${stats.totalLessons}, セッション=${stats.totalSessions}, 総時間=${stats.totalDurationFormatted}, 平均誤差=±${stats.overallAvgError}¢`);
 
     // Lucideアイコン再初期化（統合初期化関数を使用）
     if (typeof window.initializeLucideIcons === 'function') {

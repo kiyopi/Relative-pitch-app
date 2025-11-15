@@ -9478,3 +9478,22 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 17:23:29] コミット: fix: モード別統計テーブルのテキスト配置を統一
+
+問題:
+- ヘッダー（th）: 左寄せ
+- データ（td）: 中央寄せ
+- 配置が不統一で見づらい
+
+修正:
+- 数値列（レッスン数・平均誤差・最高グレード）のヘッダーを中央寄せに統一
+- 1列目（モード名）のみ左寄せを維持
+- th:nth-child(2,3,4)にtext-align: center追加
+
+結果:
+- ヘッダーとデータの配置が完全に一致
+- 視認性向上、見やすいテーブルに
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
