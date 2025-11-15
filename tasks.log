@@ -9403,3 +9403,17 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 16:56:50] コミット: fix: モバイル版統計のグレード色表示と余白を修正
+
+問題1: グレード色が反映されない
+- 原因: .mode-stat-item .mode-stats-row > spanで全てのspanに色を指定していた
+- 修正: :not(:last-child)で最初の2つのspan（回数・誤差）のみに色指定
+- 結果: 最後のspan（グレード）はHTMLで指定された色クラスが正しく表示される
+
+問題2: 上下マージンがない
+- 修正: .mode-stats-tableと.mode-stats-mobileにmargin-top: 1.5rem追加
+- 結果: 見出しとテーブル/カード間に適切な余白が確保される
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

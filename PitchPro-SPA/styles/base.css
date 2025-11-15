@@ -3040,7 +3040,16 @@ body::before {
 /* 最後のspan（グレード）は太字のみ、色はHTMLで指定 */
 .mode-stat-item .mode-stats-row > span:last-child {
   font-weight: 600;
+  /* 色はHTMLのクラス（text-yellow-300等）が適用される */
 }
+
+/* グレード色を確実に適用（specificityを高くする） */
+.mode-stat-item .mode-stats-row > span.text-yellow-300 { color: #fde047; }
+.mode-stat-item .mode-stats-row > span.text-gray-300 { color: #9ca3af; }
+.mode-stat-item .mode-stats-row > span.text-orange-300 { color: #fdba74; }
+.mode-stat-item .mode-stats-row > span.text-green-300 { color: #86efac; }
+.mode-stat-item .mode-stats-row > span.text-blue-300 { color: #93c5fd; }
+.mode-stat-item .mode-stats-row > span.text-red-300 { color: #fca5a5; }
 
 /* モード間の横線区切り */
 .mode-divider {
