@@ -36,29 +36,31 @@
                     </h4>
                 </div>
 
-                <!-- 上段：累計トレーニング日数を強調 -->
+                <!-- 上段：統計情報（横並び3項目） -->
                 <div class="stats-top-section">
-                    <!-- メイン：累計トレーニング日数 -->
-                    <div class="training-days-main">
-                        <i data-lucide="calendar-check" class="text-blue-300" style="width: 56px; height: 56px;"></i>
-                        <div class="training-days-info">
-                            <div class="training-days-number" id="training-days-number">-</div>
-                            <div class="training-days-label">日間トレーニング</div>
+                    <!-- 累計トレーニング日数 -->
+                    <div class="stat-item">
+                        <i data-lucide="calendar-check" class="text-blue-300" style="width: 28px; height: 28px;"></i>
+                        <div class="stat-item-info">
+                            <div class="stat-item-number" id="training-days-number">-</div>
+                            <div class="stat-item-label">日間トレーニング</div>
                         </div>
                     </div>
 
-                    <!-- サブ：補助情報 -->
-                    <div class="training-period-sub">
-                        <div class="period-sub-item">
-                            <i data-lucide="calendar" class="text-white-60" style="width: 16px; height: 16px;"></i>
-                            <div class="period-sub-text">
-                                <span id="training-start-date" class="text-white-70">-</span>
-                                <span id="days-since-start" class="text-white-60"></span>
-                            </div>
+                    <!-- 開始日・経過日数 -->
+                    <div class="stat-item">
+                        <i data-lucide="calendar" class="text-purple-300" style="width: 28px; height: 28px;"></i>
+                        <div class="stat-item-info">
+                            <div class="stat-item-number" id="training-start-date">-</div>
+                            <div class="stat-item-label" id="days-since-start"></div>
                         </div>
-                        <div class="period-sub-item">
-                            <i data-lucide="flame" class="text-white-60" style="width: 16px; height: 16px;"></i>
-                            <span class="text-white-70">連続<span id="streak-count">-</span>日</span>
+                    </div>
+
+                    <!-- 連続記録 -->
+                    <div class="stat-item">
+                        <i data-lucide="flame" class="text-orange-300" style="width: 28px; height: 28px;"></i>
+                        <div class="stat-item-info">
+                            <div class="stat-item-number">連続<span id="streak-count">-</span>日</div>
                         </div>
                     </div>
                 </div>
@@ -187,7 +189,7 @@
 <script src="js/components/DistributionChart.js"></script>
 
 <!-- Records Page Controller -->
-<script src="pages/js/records-controller.js?v=20251115003" onload="initRecordsPage()"></script>
+<script src="pages/js/records-controller.js?v=20251115004" onload="initRecordsPage()"></script>
 <script>
     // SPA対応：ページ読み込み完了後に初期化
     async function initRecordsPage() {

@@ -1,10 +1,12 @@
 /**
  * トレーニング記録ページコントローラー
  *
- * @version 2.1.0
- * @date 2025-11-14
+ * @version 2.2.0
+ * @date 2025-11-15
  * @description トレーニング履歴の表示・統計計算・グラフ描画
  * @changelog
+ *   v2.2.0 (2025-11-15) - 統計セクションのレイアウト変更
+ *                         上段を横並び3項目に変更（累計日数/開始日/連続記録）
  *   v2.1.0 (2025-11-14) - repairIncorrectLessonIds()修復機能を無効化
  *                         理由: SessionManager導入後はバグ発生せず、正常データを誤統合するリスクを回避
  *   v2.0.1 (2025-11-14) - sessionStorage.clear()をviewLessonDetail()に追加
@@ -433,19 +435,20 @@ function getGradeIcon(grade) {
      * 統計を表示
      */
 async function displayStatistics(stats) {
-    // メイン：累計トレーニング日数
+    // 累計トレーニング日数
     document.getElementById('training-days-number').textContent = stats.trainingDays;
 
-    // サブ：開始日と経過日数
+    // 開始日と経過日数
+    let firstDateStr = '-';
     if (stats.firstTrainingDate) {
-        const firstDate = stats.firstTrainingDate instanceof Date 
-            ? stats.firstTrainingDate 
+        const firstDate = stats.firstTrainingDate instanceof Date
+            ? stats.firstTrainingDate
             : new Date(stats.firstTrainingDate);
-        
+
         if (!isNaN(firstDate.getTime())) {
-            const firstDateStr = `${firstDate.getMonth() + 1}/${firstDate.getDate()}`;
-            document.getElementById('training-start-date').textContent = `${firstDateStr}開始`;
-            document.getElementById('days-since-start').textContent = `（${stats.daysSinceStart}日経過）`;
+            firstDateStr = `${firstDate.getMonth() + 1}/${firstDate.getDate()}`;
+            document.getElementById('training-start-date').textContent = firstDateStr;
+            document.getElementById('days-since-start').textContent = `${stats.daysSinceStart}日経過`;
         } else {
             document.getElementById('training-start-date').textContent = '-';
             document.getElementById('days-since-start').textContent = '';
@@ -455,7 +458,7 @@ async function displayStatistics(stats) {
         document.getElementById('days-since-start').textContent = '';
     }
 
-    // サブ：連続記録
+    // 連続記録
     document.getElementById('streak-count').textContent = stats.streak;
 
     // 4つの数値カード
@@ -464,7 +467,7 @@ async function displayStatistics(stats) {
     document.getElementById('total-duration').textContent = stats.totalDurationFormatted;
     document.getElementById('average-error').textContent = `±${stats.overallAvgError}¢`;
 
-    console.log(`📊 [Display] メイン: ${stats.trainingDays}日間トレーニング, サブ: 連続${stats.streak}日`);
+    console.log(`📊 [Display] 上段: ${stats.trainingDays}日間, ${firstDateStr}開始, 連続${stats.streak}日`);
     console.log(`📊 [Display] 数値カード: レッスン=${stats.totalLessons}, セッション=${stats.totalSessions}, 総時間=${stats.totalDurationFormatted}, 平均誤差=±${stats.overallAvgError}¢`);
 
     // Lucideアイコン再初期化（統合初期化関数を使用）

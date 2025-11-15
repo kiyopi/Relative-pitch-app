@@ -1,7 +1,7 @@
 /**
  * statistics.css
  * 統計・分析・記録ページ統合スタイル
- * Version: 2.1.0
+ * Version: 2.2.0
  *
  * 対応ページ:
  * - プレミアム分析ページ (premium-analysis.html)
@@ -18,10 +18,13 @@
  * - セクション1: トレーニング統計
  * - セクション3: モード別統計
  *
- * v2.1.0 更新内容（2025-11-15）:
- * - フォントサイズバランス再調整
- *   - 累計日数: 1.5rem (PC), 1.25rem (モバイル) - 控えめに
- *   - 数値カード: 2.5rem (PC), 2rem (モバイル) - 適切なサイズに
+ * v2.2.0 更新内容（2025-11-15）:
+ * - レイアウト変更: 上段を横並び3項目に変更
+ *   - 累計トレーニング日数 / 開始日・経過日数 / 連続記録
+ *   - すべて同じサイズで統一、アイコンに色追加
+ * - フォントサイズ削減:
+ *   - 上段数値: 1.25rem (PC), 1rem (モバイル)
+ *   - 数値カード: 1.75rem (PC), 1.5rem (モバイル)
  */
 
 /* ================================================================
@@ -894,67 +897,41 @@
 /* 上段：累計トレーニング日数を強調 */
 .stats-top-section {
   display: flex;
-  gap: 2.5rem;
+  gap: 1.5rem;
   margin-bottom: 2rem;
-  align-items: center;
+  justify-content: space-between;
 }
 
-/* メイン：累計トレーニング日数 */
-.training-days-main {
-  flex: 1.2;
+/* 統計項目（横並び3つ） */
+.stat-item {
+  flex: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-  padding: 1.25rem 0;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.training-days-info {
+.stat-item-info {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
 }
 
-.training-days-number {
-  font-size: 1.5rem;
+.stat-item-number {
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--text-white);
-  line-height: 1;
-  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
-.training-days-label {
-  color: var(--text-white-80);
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-}
-
-/* サブ：補助情報 */
-.training-period-sub {
-  flex: 0.8;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 0.5rem 0;
-}
-
-.period-sub-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.period-sub-text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-}
-
-.period-sub-item span,
-.period-sub-text span {
-  font-size: 0.8125rem;
-  line-height: 1.4;
+.stat-item-label {
+  font-size: 0.75rem;
+  color: var(--text-white-60);
+  font-weight: 500;
+  line-height: 1.3;
 }
 
 /* 下段：4つの数値カード（PC版：1行4カード / モバイル版：2×2グリッド） */
@@ -981,12 +958,12 @@
 }
 
 .stat-value {
-  font-size: 2.5rem;
+  font-size: 1.75rem;
   font-weight: 800;
   color: var(--text-white);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 
 .stat-label {
@@ -1000,33 +977,19 @@
 @media (max-width: 767px) {
   .stats-top-section {
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 0.75rem;
   }
 
-  .training-days-main {
-    justify-content: center;
-    padding: 0.75rem 0;
+  .stat-item {
+    padding: 0.625rem;
   }
 
-  .training-days-info {
-    text-align: center;
+  .stat-item-number {
+    font-size: 1rem;
   }
 
-  .training-days-number {
-    font-size: 1.25rem;
-  }
-
-  .training-days-label {
-    font-size: 0.9375rem;
-  }
-
-  .training-period-sub {
-    align-items: flex-start;
-    gap: 0.625rem;
-  }
-
-  .period-sub-item {
-    width: 100%;
+  .stat-item-label {
+    font-size: 0.6875rem;
   }
 
   .stats-cards-grid {
@@ -1037,17 +1000,17 @@
   }
 
   .stat-card {
-    padding: 1.5rem 1rem;
+    padding: 1.25rem 0.875rem;
     border-radius: 10px;
   }
 
   .stat-value {
-    font-size: 2rem;
-    margin-bottom: 0.625rem;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
   }
 
   .stat-label {
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
   }
 }
 
