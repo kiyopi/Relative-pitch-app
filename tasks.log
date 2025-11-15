@@ -9464,3 +9464,17 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 17:19:51] コミット: feat: モード別統計の文字サイズを拡大
+
+変更内容:
+- PCテーブル版: font-size: 0.875rem → 1rem (14px → 16px)
+- モバイルカード版: font-size: 0.875rem → 1rem (14px → 16px)
+- モード名・レッスン数・誤差・グレードすべてに適用
+
+効果:
+- 視認性向上（10モードの情報が見やすくなる）
+- PC・モバイル両対応で統一感のある表示
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
