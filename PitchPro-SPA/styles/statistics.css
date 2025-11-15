@@ -1,7 +1,7 @@
 /**
  * statistics.css
  * 統計・分析・記録ページ統合スタイル
- * Version: 2.4.4
+ * Version: 2.5.0
  *
  * 対応ページ:
  * - プレミアム分析ページ (premium-analysis.html)
@@ -18,10 +18,10 @@
  * - セクション1: トレーニング統計
  * - セクション3: モード別統計
  *
- * v2.4.4 更新内容（2025-11-15）:
- * - .stat-valueのmargin-bottomを元に戻す: 0 → 0.5rem
- * - .stat-cardのgapを削除（flexboxのgapではなくmarginで管理）
- * - 数値とラベルの間隔を適切に確保
+ * v2.5.0 更新内容（2025-11-15）:
+ * - クラス名重複解消: .stat-label → .training-stat-label
+ * - トレーニング記録専用のクラス名を作成
+ * - プレミアム分析の.stat-labelと完全分離
  */
 
 /* ================================================================
@@ -974,7 +974,7 @@
   letter-spacing: -0.02em;
 }
 
-.stat-label {
+.training-stat-label {
   font-size: 0.9375rem;
   color: #93c5fd;
   font-weight: 600;
@@ -1017,7 +1017,7 @@
     margin-bottom: 0.5rem;
   }
 
-  .stat-label {
+  .training-stat-label {
     font-size: 0.9375rem;
   }
 }
