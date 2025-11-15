@@ -9912,3 +9912,19 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 00:53:00] コミット: debug: 総レッスン時間0m問題の診断機能を追加
+
+- 実際のduration値をコンソールに出力（最初の3セッション）
+- durationがない場合のフォールバック処理追加
+  - startTimeとendTimeから計算
+- 合計時間もログ出力して検証可能に
+
+次のステップ:
+  ブラウザのコンソールで以下を確認:
+  - session.durationの値
+  - startTime/endTimeの値
+  - 計算された合計時間
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

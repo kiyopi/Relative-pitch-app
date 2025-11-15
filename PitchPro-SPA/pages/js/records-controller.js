@@ -1,10 +1,13 @@
 /**
  * トレーニング記録ページコントローラー
  *
- * @version 2.5.3
+ * @version 2.5.4
  * @date 2025-11-15
  * @description トレーニング履歴の表示・統計計算・グラフ描画
  * @changelog
+ *   v2.5.4 (2025-11-15) - 総レッスン時間の表示形式を改善
+ *                         1時間未満の場合は秒も表示（例：0m16s→16s、1m30s）
+ *                         1時間以上の場合は時間・分のみ（例：1h25m）
  *   v2.5.3 (2025-11-15) - 総レッスン時間計算にデバッグログとフォールバック追加
  *                         durationがない場合はstartTime/endTimeから計算
  *                         デバッグログで実際のduration値を確認可能
@@ -332,10 +335,18 @@ function calculateStatistics(sessions) {
     }, 0);
     const totalDurationSeconds = Math.floor(totalDurationMilliseconds / 1000);
     const totalHours = Math.floor(totalDurationSeconds / 3600);
-    const totalMinutes = Math.round((totalDurationSeconds % 3600) / 60);
-    const totalDurationFormatted = totalHours > 0
-        ? `${totalHours}h${totalMinutes}m`
-        : `${totalMinutes}m`;
+    const totalMinutes = Math.floor((totalDurationSeconds % 3600) / 60);
+    const totalSeconds = totalDurationSeconds % 60;
+
+    // 時間形式を構築
+    let totalDurationFormatted;
+    if (totalHours > 0) {
+        totalDurationFormatted = `${totalHours}h${totalMinutes}m`;
+    } else if (totalMinutes > 0) {
+        totalDurationFormatted = `${totalMinutes}m${totalSeconds}s`;
+    } else {
+        totalDurationFormatted = `${totalSeconds}s`;
+    }
 
     console.log(`📊 [Duration] Total: ${totalDurationMilliseconds}ms = ${totalDurationSeconds}s = ${totalDurationFormatted}`);
 
