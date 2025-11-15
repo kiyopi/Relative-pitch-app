@@ -9841,3 +9841,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 23:43:20] コミット: feat: トレーニング記録ページの統計表示を改善
+
+- 開始日を「2025/11/10」形式に変更（年を含む）
+- ラベルを変更：総レッスン数、総セッション数、総平均誤差
+- 総平均誤差にランクアイコンと色を追加（グレードに応じた視覚表現）
+- モバイル版の文字サイズを縮小（1.5rem→1.25rem、0.9375rem→0.875rem）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

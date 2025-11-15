@@ -972,6 +972,10 @@
   margin-bottom: 0.5rem;
   line-height: 1;
   letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .training-stat-label {
