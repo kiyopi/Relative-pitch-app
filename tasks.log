@@ -9368,3 +9368,26 @@ UIカタログの総合評価グレードアイコン（S〜E級）に完全準�
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 16:47:26] コミット: fix: モード別統計のモバイルレイアウトを正しく修正
+
+誤った実装（1モード1カード、縦線区切り）を修正:
+✅ 1グラスカード内に10モード全て表示
+✅ モード間は横線（<hr>）で区切る
+✅ レイアウトは修正前と同じ（.mode-name + .mode-stats-row）
+✅ グレードアイコンと色を追加（UIカタログ準拠）
+
+変更内容:
+- records-controller.js:
+  - .mode-stat-card → .mode-stat-item
+  - .mode-header等の縦線構造を削除
+  - 各モード間に<hr class="mode-divider" />追加
+  - グレード表示にアイコン追加
+
+- base.css:
+  - .mode-stat-item: 各モード項目（padding: 0.75rem 0）
+  - .mode-divider: 横線区切り（1px solid rgba）
+  - 不要なクラス削除（.mode-header, .mode-stats-grid等）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -2991,7 +2991,7 @@ body::before {
 
 /* モバイル版（1カード内に全モード、横線区切り） */
 .mode-stats-mobile {
-  display: flex;
+  display: none; /* デフォルトは非表示（PCでは表示しない） */
   flex-direction: column;
 }
 
