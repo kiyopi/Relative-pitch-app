@@ -1,10 +1,13 @@
 /**
  * トレーニング記録ページコントローラー
  *
- * @version 2.5.2
+ * @version 2.5.3
  * @date 2025-11-15
  * @description トレーニング履歴の表示・統計計算・グラフ描画
  * @changelog
+ *   v2.5.3 (2025-11-15) - 総レッスン時間計算にデバッグログとフォールバック追加
+ *                         durationがない場合はstartTime/endTimeから計算
+ *                         デバッグログで実際のduration値を確認可能
  *   v2.5.2 (2025-11-15) - 総レッスン時間の計算バグを修正
  *                         session.durationがミリ秒単位であることを考慮
  *                         ミリ秒→秒に変換してから時間計算
@@ -308,8 +311,24 @@ function calculateStatistics(sessions) {
     const totalSessions = sessions.length;
 
     // 総トレーニング時間（ミリ秒 → 時間・分形式）
-    const totalDurationMilliseconds = sessions.reduce((sum, session) => {
-        return sum + (session.duration || 0);
+    const totalDurationMilliseconds = sessions.reduce((sum, session, index) => {
+        // デバッグ: 最初の3セッションのduration値を確認
+        if (index < 3) {
+            console.log(`📊 [Duration Debug] Session ${index}:`, {
+                duration: session.duration,
+                startTime: session.startTime,
+                endTime: session.endTime,
+                calculated: session.endTime && session.startTime ? session.endTime - session.startTime : 'N/A'
+            });
+        }
+
+        // durationがない場合はstartTimeとendTimeから計算
+        let duration = session.duration;
+        if (!duration && session.startTime && session.endTime) {
+            duration = session.endTime - session.startTime;
+        }
+
+        return sum + (duration || 0);
     }, 0);
     const totalDurationSeconds = Math.floor(totalDurationMilliseconds / 1000);
     const totalHours = Math.floor(totalDurationSeconds / 3600);
@@ -317,6 +336,8 @@ function calculateStatistics(sessions) {
     const totalDurationFormatted = totalHours > 0
         ? `${totalHours}h${totalMinutes}m`
         : `${totalMinutes}m`;
+
+    console.log(`📊 [Duration] Total: ${totalDurationMilliseconds}ms = ${totalDurationSeconds}s = ${totalDurationFormatted}`);
 
     // 全体の平均誤差（全レッスンの平均誤差を集計）
     const allAvgErrors = [];

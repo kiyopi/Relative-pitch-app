@@ -9899,3 +9899,16 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 00:50:16] コミット: fix: 総レッスン時間の計算バグを修正
+
+- session.durationがミリ秒単位であることを考慮
+- ミリ秒→秒に変換してから時間計算（1000で除算）
+- これにより4h36m（誤）→数分（正）に修正
+
+原因:
+  session-data-recorder.jsでDate.now()を使用してミリ秒で保存
+  records-controller.jsで秒として扱っていたため1000倍の時間が表示
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
