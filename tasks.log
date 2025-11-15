@@ -9497,3 +9497,102 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 18:42:18] コミット: feat: トレーニング記録ページ セクション1（トレーニング統計）完全実装
+
+- calculateStatistics関数に追加データ計算を実装（レッスン数・セッション数・総時間・平均誤差・期間情報）
+- displayStatistics関数で新しいデータを表示する処理を追加
+- records.htmlにトレーニング期間情報と4つの数値カードのHTML追加
+- base.cssにレスポンシブ対応のスタイルを追加
+  - PC版: 上段2カラムレイアウト + 下段4カード横1列
+  - モバイル版: 上段縦配置 + 下段2×2グリッド
+- base.cssのバージョンを20251115004に更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 18:47:10] コミット: style: トレーニング統計セクションのデザイン改善
+
+- 連続記録の数字を大きく（3rem → PC版、2.75rem → モバイル版）
+- トレーニング期間情報の間隔を改善（gap: 1rem）
+- 数値カードのデザイン強化
+  - パディング増加（1.5rem PC版、1.25rem モバイル版）
+  - border-radius拡大（12px PC版、10px モバイル版）
+  - 背景色・ボーダー色を微調整
+  - ホバーエフェクト追加（PC版）
+  - 数値フォントサイズ増加（2.25rem PC版、2rem モバイル版）
+- letter-spacing調整で洗練された見た目に
+- base.cssバージョンを20251115005に更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 19:10:04] コミット: refactor: トレーニング統計の情報階層を最適化
+
+【デザインコンセプト変更】
+- 累計トレーニング日数を最優先表示（4rem → メイン数字）
+- 連続記録を補助情報に格下げ（0.8125rem → サブ）
+- 数値カードを大幅に拡大（3rem → より目立つ）
+
+【変更理由】
+- 連続0日を大きく表示するのは逆効果（達成感なし）
+- 毎日やる必要性より、累計実績を強調
+- 質より量にならないよう、連続記録は控えめに
+
+【実装内容】
+- HTML構造変更
+  - training-days-main: メイン表示（累計日数）
+  - training-period-sub: サブ表示（開始日・連続記録）
+- CSS変更
+  - 累計日数: 4rem（64px）PC版、3.5rem モバイル版
+  - 数値カード: 3rem（48px）PC版、2.5rem モバイル版
+  - 連続記録: 0.8125rem（13px）控えめに
+- JavaScript: displayStatistics関数を新構造に対応
+- base.cssバージョン: v20251115006
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 19:16:13] コミット: fix: トレーニング統計のフォントサイズバランスを調整
+
+【フィードバック対応】
+- 累計トレーニング日数が大きすぎる → 4rem → 2.5rem
+- 数値カードが小さすぎる → 3rem → 4rem
+
+【変更内容】
+PC版:
+- 累計トレーニング日数: 4rem → 2.5rem（若干大きい程度）
+- 数値カード: 3rem → 4rem（最も強調）
+
+モバイル版:
+- 累計トレーニング日数: 3.5rem → 2rem
+- 数値カード: 2.5rem → 3rem
+
+【情報階層】
+1. 数値カード（4rem） ← 最も重要
+2. 累計日数（2.5rem） ← 若干大きい
+3. サブ情報（0.8125rem） ← 控えめ
+
+base.cssバージョン: v20251115007
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 19:19:11] コミット: fix: premium-analysis.cssの.stat-valueをスコープ限定
+
+【問題】
+- .stat-valueがbase.cssとpremium-analysis.cssで重複
+- premium-analysis.cssが後に読み込まれ、base.cssの4remを上書き
+- トレーニング記録ページの数値カードが0.95remになってしまう
+
+【解決】
+- premium-analysis.cssの.stat-valueをスコープ限定
+- .stat-value → .premium-analysis .stat-value
+- これにより、プレミアム分析ページ内でのみ適用される
+
+【教訓】
+- 独自スタイル追加時は必ず重複確認
+- grep -r "\.クラス名" PitchPro-SPA/styles/ で全検索
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

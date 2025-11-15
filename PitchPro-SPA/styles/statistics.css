@@ -1,14 +1,22 @@
 /**
- * premium-analysis.css
- * プレミアム分析ページ専用スタイル
- * Version: 1.0.0
+ * statistics.css
+ * 統計・分析・記録ページ統合スタイル
+ * Version: 2.0.0
  *
- * 対応タブ:
+ * 対応ページ:
+ * - プレミアム分析ページ (premium-analysis.html)
+ * - トレーニング記録ページ (records.html)
+ *
+ * 対応タブ（プレミアム分析）:
  * - Tab 1: 音程精度分析
  * - Tab 2: エラーパターン分析
  * - Tab 3: 練習プラン
  * - Tab 4: 成長記録
- * - Tab 5: モード別分析（新規）
+ * - Tab 5: モード別分析
+ *
+ * トレーニング記録セクション:
+ * - セクション1: トレーニング統計
+ * - セクション3: モード別統計
  */
 
 /* ================================================================
@@ -873,4 +881,307 @@
   font-weight: 600;
   min-width: 60px;
   text-align: right;
+}
+/* ================================================================
+   トレーニング統計（トレーニング記録ページ - セクション1）
+   ================================================================ */
+
+/* 上段：累計トレーニング日数を強調 */
+.stats-top-section {
+  display: flex;
+  gap: 2.5rem;
+  margin-bottom: 2rem;
+  align-items: center;
+}
+
+/* メイン：累計トレーニング日数 */
+.training-days-main {
+  flex: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1.25rem 0;
+}
+
+.training-days-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.training-days-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-white);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.training-days-label {
+  color: var(--text-white-80);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* サブ：補助情報 */
+.training-period-sub {
+  flex: 0.8;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.period-sub-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.period-sub-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.period-sub-item span,
+.period-sub-text span {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+/* 下段：4つの数値カード（PC版：1行4カード / モバイル版：2×2グリッド） */
+.stats-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+.stat-value {
+  font-size: 4rem;
+  font-weight: 800;
+  color: var(--text-white);
+  margin-bottom: 0.75rem;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.stat-label {
+  font-size: 0.9375rem;
+  color: var(--text-white-70);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* モバイル版レスポンシブ */
+@media (max-width: 767px) {
+  .stats-top-section {
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .training-days-main {
+    justify-content: center;
+    padding: 0.75rem 0;
+  }
+
+  .training-days-info {
+    text-align: center;
+  }
+
+  .training-days-number {
+    font-size: 2rem;
+  }
+
+  .training-days-label {
+    font-size: 0.9375rem;
+  }
+
+  .training-period-sub {
+    align-items: flex-start;
+    gap: 0.625rem;
+  }
+
+  .period-sub-item {
+    width: 100%;
+  }
+
+  .stats-cards-grid {
+    /* モバイル版：2×2グリッド */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.875rem;
+    margin-top: 1.5rem;
+  }
+
+  .stat-card {
+    padding: 1.5rem 1rem;
+    border-radius: 10px;
+  }
+
+  .stat-value {
+    font-size: 3rem;
+    margin-bottom: 0.625rem;
+  }
+
+  .stat-label {
+    font-size: 0.875rem;
+  }
+}
+
+/* ================================================================
+   モード別統計（トレーニング記録ページ）
+   ================================================================ */
+
+/* デスクトップ版テーブル */
+.mode-stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem; /* 見出しとの余白 */
+}
+
+.mode-stats-table th {
+  text-align: left; /* 1列目（モード名）は左寄せ */
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-white-60);
+  font-size: 1rem; /* 14px → 16px */
+  font-weight: 500;
+}
+
+/* 数値列のヘッダーは中央寄せ */
+.mode-stats-table th:nth-child(2),
+.mode-stats-table th:nth-child(3),
+.mode-stats-table th:nth-child(4) {
+  text-align: center;
+}
+
+.mode-stats-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-white);
+  font-size: 1rem; /* 14px → 16px */
+}
+
+.mode-stats-table td:nth-child(2),
+.mode-stats-table td:nth-child(3),
+.mode-stats-table td:nth-child(4) {
+  text-align: center;
+}
+
+.mode-stats-table td:nth-child(4) {
+  font-weight: 600;
+}
+
+/* グレードセル（アイコン + テキスト） */
+.grade-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+/* モバイル版（1カード内に全モード、横線区切り） */
+.mode-stats-mobile {
+  display: none; /* デフォルトは非表示（PCでは表示しない） */
+  flex-direction: column;
+  margin-top: 1.5rem; /* 見出しとの余白 */
+}
+
+.mode-stat-item {
+  padding: 0.75rem 0;
+  background: transparent; /* 背景を透明に（glass-cardの背景を継承） */
+}
+
+.mode-stat-item:first-child {
+  padding-top: 0;
+}
+
+.mode-stat-item:last-child {
+  padding-bottom: 0;
+}
+
+.mode-stat-item .mode-name {
+  color: var(--text-white);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  font-size: 1rem; /* 14px → 16px */
+}
+
+.mode-stat-item .mode-stats-row {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  font-size: 1rem; /* 14px → 16px */
+}
+
+.mode-stat-item .mode-stats-row > span {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  background: transparent; /* 背景を透明に */
+}
+
+/* 最初の2つのspan（回数・誤差）のみ色指定 */
+.mode-stat-item .mode-stats-row > span:not(:last-child) {
+  color: var(--text-white-70);
+}
+
+/* 最後のspan（グレード）は太字のみ、色はHTMLで指定 */
+.mode-stat-item .mode-stats-row > span:last-child {
+  font-weight: 600;
+  /* 色はHTMLのクラス（text-yellow-300等）が適用される */
+}
+
+/* グレード色を確実に適用（specificityを高くする） */
+.mode-stat-item .mode-stats-row > span.text-yellow-300 { color: #fde047; }
+.mode-stat-item .mode-stats-row > span.text-gray-300 { color: #9ca3af; }
+.mode-stat-item .mode-stats-row > span.text-orange-300 { color: #fdba74; }
+.mode-stat-item .mode-stats-row > span.text-green-300 { color: #86efac; }
+.mode-stat-item .mode-stats-row > span.text-blue-300 { color: #93c5fd; }
+.mode-stat-item .mode-stats-row > span.text-red-300 { color: #fca5a5; }
+
+/* モード間の横線区切り */
+.mode-divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 0;
+}
+
+/* レスポンシブ切り替え */
+@media (max-width: 767px) {
+  .mode-stats-table {
+    display: none;
+  }
+  .mode-stats-mobile {
+    display: flex;
+  }
+}
+
+@media (min-width: 768px) {
+  .mode-stats-table {
+    display: table;
+  }
+  .mode-stats-mobile {
+    display: none;
+  }
 }
