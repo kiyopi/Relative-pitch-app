@@ -1,9 +1,12 @@
-console.log('🚀 [results-overview-controller] Script loaded - START');
+console.log('🚀 [results-overview-controller] Script loaded - START v3.6.0 (2025-11-14)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 1.1.0
+ * Version: 3.6.0
+ * Date: 2025-11-14
+ * Changelog:
+ *   v3.6.0 - fromRecords時のURLパラメータ優先、modeInfo.id→modeInfo.mode修正
  *
  * 【責任範囲】
  * - セッションデータの読み込みとフィルタリング
@@ -51,30 +54,40 @@ window.initResultsOverview = async function() {
     let lessonId = null;
     let scaleDirection = null;
 
-    // SessionManagerから取得を試みる
-    if (window.SessionManager) {
-        const sessionManager = SessionManager.getCurrent();
-        if (sessionManager) {
-            currentMode = sessionManager.getMode();
-            lessonId = sessionManager.getLessonId();
-            scaleDirection = sessionManager.getScaleDirection();
-            console.log(`✅ [SessionManager] パラメータ取得: mode=${currentMode}, lessonId=${lessonId}, scaleDirection=${scaleDirection}`);
-        }
-    }
-
-    // URLパラメータから補完（フォールバック）
+    // URLパラメータを最初に取得
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash.split('?')[1] || '');
-    if (!currentMode || currentMode === 'random') {
-        currentMode = params.get('mode') || 'random';
-    }
-    if (!lessonId) {
-        lessonId = params.get('lessonId');
-    }
-    if (!scaleDirection) {
-        scaleDirection = params.get('scaleDirection');
-    }
     const fromRecords = params.get('fromRecords') === 'true';
+
+    // トレーニング記録からの遷移時はURLパラメータを優先
+    if (fromRecords) {
+        currentMode = params.get('mode') || 'random';
+        lessonId = params.get('lessonId');
+        scaleDirection = params.get('scaleDirection');
+        console.log(`✅ [Records View] URLパラメータ優先: mode=${currentMode}, lessonId=${lessonId}, scaleDirection=${scaleDirection}`);
+    } else {
+        // SessionManagerから取得を試みる
+        if (window.SessionManager) {
+            const sessionManager = SessionManager.getCurrent();
+            if (sessionManager) {
+                currentMode = sessionManager.getMode();
+                lessonId = sessionManager.getLessonId();
+                scaleDirection = sessionManager.getScaleDirection();
+                console.log(`✅ [SessionManager] パラメータ取得: mode=${currentMode}, lessonId=${lessonId}, scaleDirection=${scaleDirection}`);
+            }
+        }
+
+        // URLパラメータから補完（フォールバック）
+        if (!currentMode || currentMode === 'random') {
+            currentMode = params.get('mode') || 'random';
+        }
+        if (!lessonId) {
+            lessonId = params.get('lessonId');
+        }
+        if (!scaleDirection) {
+            scaleDirection = params.get('scaleDirection');
+        }
+    }
     
     if (DEBUG_MODE) {
         console.log(`🔍 [DEBUG] 現在のモード: ${currentMode}`);
@@ -284,11 +297,26 @@ function updateOverviewUI(evaluation, sessionData, fromRecords = false, scaleDir
         const totalNotes = evaluation.metrics.raw.totalNotes;
         const subtitleText = `${sessionData.length}セッション (${totalNotes}音) の総合評価`;
 
-        window.ModeController.updatePageHeader(evaluation.modeInfo.id, {
+        window.ModeController.updatePageHeader(evaluation.modeInfo.mode, {
             chromaticDirection: chromaticDirection,
             scaleDirection: scaleDirection,
             subtitleText: fromRecords ? null : subtitleText // トレーニング記録からの遷移時は日時表示を保持
         });
+
+        // 総合評価カード内のモード名も更新（#main-mode-title）
+        const modeTitleEl = document.getElementById('main-mode-title');
+        console.log(`🔍 [DEBUG] #main-mode-title要素:`, modeTitleEl);
+        if (modeTitleEl) {
+            // ModeControllerと同じフォーマットでタイトルを生成
+            const titleText = window.ModeController.generatePageTitle(evaluation.modeInfo.mode, {
+                chromaticDirection: chromaticDirection,
+                scaleDirection: scaleDirection
+            });
+            modeTitleEl.textContent = titleText;
+            console.log(`✅ [main-mode-title] モード名更新: ${titleText}`);
+        } else {
+            console.error(`❌ #main-mode-title要素が見つかりません`);
+        }
     } else {
         console.error('❌ ModeControllerが見つかりません');
 
@@ -1287,34 +1315,55 @@ function handleNextStepAction(actionId) {
         // ランダム基音モード
         'next-step-random-practice': () => window.location.hash = 'training?mode=random',
         'next-step-random-upgrade': () => window.location.hash = 'training?mode=continuous',
-        'next-step-random-records': () => window.location.hash = 'records',
+        'next-step-random-records': () => {
+            sessionStorage.clear();
+            window.location.hash = 'records';
+        },
 
         // 連続チャレンジモード
         'next-step-continuous-practice': () => window.location.hash = 'training?mode=continuous',
         'next-step-continuous-upgrade': () => window.location.hash = 'training?mode=12tone&direction=ascending',
-        'next-step-continuous-records': () => window.location.hash = 'records',
+        'next-step-continuous-records': () => {
+            sessionStorage.clear();
+            window.location.hash = 'records';
+        },
 
         // 12音階モード（上昇）
         'next-step-12tone-ascending-practice': () => window.location.hash = 'training?mode=12tone&direction=ascending',
         'next-step-12tone-ascending-upgrade': () => window.location.hash = 'training?mode=12tone&direction=descending',
-        'next-step-12tone-ascending-records': () => window.location.hash = 'records',
+        'next-step-12tone-ascending-records': () => {
+            sessionStorage.clear();
+            window.location.hash = 'records';
+        },
 
         // 12音階モード（下降）
         'next-step-12tone-descending-practice': () => window.location.hash = 'training?mode=12tone&direction=descending',
         'next-step-12tone-descending-upgrade': () => window.location.hash = 'training?mode=12tone&direction=both',
-        'next-step-12tone-descending-records': () => window.location.hash = 'records',
+        'next-step-12tone-descending-records': () => {
+            sessionStorage.clear();
+            window.location.hash = 'records';
+        },
 
         // 12音階モード（両方向）
         'next-step-12tone-both-practice': () => window.location.hash = 'training?mode=12tone&direction=both',
-        'next-step-12tone-both-records': () => window.location.hash = 'records',
+        'next-step-12tone-both-records': () => {
+            sessionStorage.clear();
+            window.location.hash = 'records';
+        },
 
         // 下行モード（将来実装）
         'next-step-random-down-practice': () => window.location.hash = 'training?mode=random-down',
         'next-step-random-down-upgrade': () => window.location.hash = 'training?mode=continuous-down',
-        'next-step-random-down-records': () => window.location.hash = 'records',
+        'next-step-random-down-records': () => {
+            sessionStorage.clear();
+            window.location.hash = 'records';
+        },
 
         'next-step-continuous-down-practice': () => window.location.hash = 'training?mode=continuous-down',
-        'next-step-continuous-down-records': () => window.location.hash = 'records'
+        'next-step-continuous-down-records': () => {
+            sessionStorage.clear();
+            window.location.hash = 'records';
+        }
     };
 
     const action = actions[actionId];

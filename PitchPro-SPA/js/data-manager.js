@@ -299,35 +299,35 @@ class DataManager {
 
   /**
    * セッション履歴を取得
-   * 無料プラン: 7日以内のデータのみ表示（古いデータは非表示だが削除されない）
-   * プレミアムプラン: 全データ表示
+   * SubscriptionManagerに課金フィルターを委譲
+   *
+   * @param {string|null} mode - モードフィルター（'random', 'continuous', '12tone'）
+   * @param {number} limit - 最大取得件数
+   * @returns {Array} フィルター済みセッション配列
    */
   static getSessionHistory(mode = null, limit = 50) {
     const sessions = this.getFromStorage(this.KEYS.SESSION_DATA) || [];
     const subscriptionData = this.getSubscriptionData();
-    const isPremium = subscriptionData.premiumAccess.status === 'active';
 
-    let filteredSessions = sessions;
+    // SubscriptionManagerで課金フィルター適用
+    const filterResult = window.SubscriptionManager.filterSessionsByPlan(sessions, subscriptionData);
 
-    // 無料プランの場合、7日以内のデータのみ表示
-    if (!isPremium) {
-      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-      filteredSessions = sessions.filter(session =>
-        new Date(session.startTime) > sevenDaysAgo
-      );
-
-      if (sessions.length > filteredSessions.length) {
-        console.log(`📊 無料プラン: ${sessions.length}件中${filteredSessions.length}件を表示（7日以内のみ）`);
-        console.log(`🔒 ${sessions.length - filteredSessions.length}件は非表示（プレミアムで全データ閲覧可能）`);
-      }
-    } else {
-      console.log(`✨ プレミアム: 全${sessions.length}件を表示`);
+    // ログ出力
+    if (filterResult.message) {
+      console.log(filterResult.message);
+    }
+    if (filterResult.lockedMessage) {
+      console.log(filterResult.lockedMessage);
     }
 
+    let filteredSessions = filterResult.filteredSessions;
+
+    // モードフィルター適用
     if (mode) {
       filteredSessions = filteredSessions.filter(session => session.mode === mode);
     }
 
+    // ソート＆制限
     return filteredSessions
       .sort((a, b) => new Date(b.startTime) - new Date(a.startTime))
       .slice(0, limit);
@@ -345,14 +345,12 @@ class DataManager {
 
   /**
    * セッションデータの自動クリーンアップ
-   * 無料: データは削除しない（表示制限のみ、プレミアム再加入で復元可能）
-   * プレミアム: 容量超過時のみ削除
+   * SubscriptionManagerにクリーンアップ判定を委譲
    *
    * @returns {number} 表示可能なセッション数
    */
   static cleanupSessionData() {
     const subscriptionData = this.getSubscriptionData();
-    const isPremium = subscriptionData.premiumAccess.status === 'active';
     const sessions = this.getFromStorage(this.KEYS.SESSION_DATA) || [];
 
     if (sessions.length === 0) {
@@ -360,40 +358,26 @@ class DataManager {
       return 0;
     }
 
-    if (!isPremium) {
-      // 無料プラン: データは削除しない、表示制限のみ
-      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-      const visibleSessions = sessions.filter(session =>
-        new Date(session.startTime) > sevenDaysAgo
+    // SubscriptionManagerでクリーンアップ判定
+    const cleanupResult = window.SubscriptionManager.shouldCleanupSessions(sessions, subscriptionData);
+
+    console.log(cleanupResult.message);
+
+    // クリーンアップが必要な場合（プレミアムで容量超過）
+    if (cleanupResult.shouldCleanup && cleanupResult.reason === 'storage_exceeded') {
+      const sortedSessions = sessions.sort((a, b) =>
+        new Date(b.startTime) - new Date(a.startTime)
       );
+      const trimmedSessions = sortedSessions.slice(0, 100);
 
-      console.log(`📊 無料プラン: ${sessions.length}件保存中、${visibleSessions.length}件表示可能（7日以内）`);
-      if (sessions.length > visibleSessions.length) {
-        console.log(`🔒 ${sessions.length - visibleSessions.length}件は非表示（プレミアムで全データ閲覧可能）`);
-      }
-
-      return visibleSessions.length;
-
-    } else {
-      // プレミアムプラン: 容量チェックのみ
-      const storageUsage = this.getStorageUsage();
-
-      if (storageUsage.totalSize > 4 * 1024 * 1024) { // 4MB超過
-        // 古い順に削除（最新100件を保持）
-        const sortedSessions = sessions.sort((a, b) =>
-          new Date(b.startTime) - new Date(a.startTime)
-        );
-        const trimmedSessions = sortedSessions.slice(0, 100);
-
-        this.saveToStorage(this.KEYS.SESSION_DATA, trimmedSessions);
-        console.log(`⚠️ プレミアム: 容量超過のため${sessions.length - 100}件削除`);
-        console.log(`📊 残存セッション: 100件（最新のみ保持）`);
-        return trimmedSessions.length;
-      }
-
-      console.log(`✅ プレミアム: ${sessions.length}件保持中（容量正常: ${storageUsage.totalMB.toFixed(2)}MB / 5MB）`);
-      return sessions.length;
+      this.saveToStorage(this.KEYS.SESSION_DATA, trimmedSessions);
+      console.log(`⚠️ プレミアム: 容量超過のため${sessions.length - 100}件削除`);
+      console.log(`📊 残存セッション: 100件（最新のみ保持）`);
+      return trimmedSessions.length;
     }
+
+    // クリーンアップ不要
+    return cleanupResult.visibleSessions || sessions.length;
   }
 
   /**
@@ -415,56 +399,21 @@ class DataManager {
 
   /**
    * データ保存状況を取得（設定画面・デバッグ用）
+   * SubscriptionManagerにデータ保存情報取得を委譲
    *
    * @returns {Object} データ保存状況
    */
   static getDataRetentionInfo() {
     const subscriptionData = this.getSubscriptionData();
-    const isPremium = subscriptionData.premiumAccess.status === 'active';
     const sessions = this.getFromStorage(this.KEYS.SESSION_DATA) || [];
 
-    if (sessions.length === 0) {
-      return {
-        retentionPeriod: isPremium ? 'unlimited' : '7days',
-        oldestSession: null,
-        oldestSessionDate: null,
-        daysSinceOldest: 0,
-        totalSessions: 0,
-        visibleSessions: 0,
-        hiddenSessions: 0,
-        storageUsage: this.getStorageUsage(),
-        isPremium
-      };
-    }
+    // SubscriptionManagerでデータ保存情報取得
+    const retentionInfo = window.SubscriptionManager.getDataRetentionInfo(sessions, subscriptionData);
 
-    const sortedSessions = sessions.sort((a, b) =>
-      new Date(a.startTime) - new Date(b.startTime)
-    );
-    const oldestSession = sortedSessions[0];
-    const daysSinceOldest = Math.floor(
-      (new Date() - new Date(oldestSession.startTime)) / (1000 * 60 * 60 * 24)
-    );
-
-    // 無料プランの場合、表示可能数と非表示数を計算
-    let visibleSessions = sessions.length;
-    let hiddenSessions = 0;
-
-    if (!isPremium) {
-      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-      visibleSessions = sessions.filter(s => new Date(s.startTime) > sevenDaysAgo).length;
-      hiddenSessions = sessions.length - visibleSessions;
-    }
-
+    // storageUsageを追加
     return {
-      retentionPeriod: isPremium ? 'unlimited' : '7days',
-      oldestSession: oldestSession.startTime,
-      oldestSessionDate: new Date(oldestSession.startTime).toLocaleDateString('ja-JP'),
-      daysSinceOldest,
-      totalSessions: sessions.length,
-      visibleSessions,
-      hiddenSessions,
-      storageUsage: this.getStorageUsage(),
-      isPremium
+      ...retentionInfo,
+      storageUsage: this.getStorageUsage()
     };
   }
 
@@ -556,28 +505,16 @@ class DataManager {
 
   /**
    * モードアクセス権限チェック
+   * SubscriptionManagerにアクセス権限判定を委譲
+   *
+   * @param {string} mode - モード名（'random', 'continuous', '12tone'）
+   * @returns {Object} アクセス権限情報
    */
   static checkModeAccess(mode) {
     const subscriptionData = this.getSubscriptionData();
-    
-    // ランダム基音モードは常に無料
-    if (mode === 'random') {
-      return { hasAccess: true, reason: 'free_mode' };
-    }
-    
-    // プレミアムモードのアクセスチェック
-    if (subscriptionData.premiumAccess.status === 'active') {
-      const now = new Date();
-      const expiry = new Date(subscriptionData.premiumAccess.subscriptionEnd);
-      
-      if (now < expiry) {
-        return { hasAccess: true, reason: 'premium_active' };
-      } else {
-        return { hasAccess: false, reason: 'subscription_expired' };
-      }
-    }
-    
-    return { hasAccess: false, reason: 'premium_required' };
+
+    // SubscriptionManagerでアクセス権限チェック
+    return window.SubscriptionManager.checkModeAccess(mode, subscriptionData);
   }
 
   /**

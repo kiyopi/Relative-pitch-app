@@ -99,16 +99,31 @@ async function loadTrainingRecords() {
         hideLoading('stats');
 
         // 評価分布を表示
-        await displayEvaluationDistribution(sessions);
-        hideLoading('distribution');
+        try {
+            await displayEvaluationDistribution(sessions);
+        } catch (error) {
+            console.error('[Records] Error displaying evaluation distribution:', error);
+        } finally {
+            hideLoading('distribution');
+        }
 
         // モード別統計を表示
-        await displayModeStatistics(stats);
-        hideLoading('mode-stats');
+        try {
+            await displayModeStatistics(stats);
+        } catch (error) {
+            console.error('[Records] Error displaying mode statistics:', error);
+        } finally {
+            hideLoading('mode-stats');
+        }
 
         // セッションリストを表示
-        await displaySessionList(sessions);
-        hideLoading('sessions');
+        try {
+            await displaySessionList(sessions);
+        } catch (error) {
+            console.error('[Records] Error displaying session list:', error);
+        } finally {
+            hideLoading('sessions');
+        }
 
         // データあり時の表示制御（CSSクラス使用）
         const noDataMessage = document.getElementById('no-data-message');
@@ -144,8 +159,14 @@ async function loadTrainingRecords() {
  * @param {string} section - 'stats' | 'chart' | 'sessions'
  */
 function hideLoading(section) {
+    console.log(`[Records] hideLoading called for section: ${section}`);
     // LoadingComponentを使用して確実にローディングを非表示
-    window.LoadingComponent.toggle(section, false);
+    if (window.LoadingComponent) {
+        window.LoadingComponent.toggle(section, false);
+        console.log(`[Records] LoadingComponent.toggle(${section}, false) executed`);
+    } else {
+        console.error('[Records] LoadingComponent not found!');
+    }
 }
 
 /**
@@ -351,13 +372,21 @@ async function displayStatistics(stats) {
  */
 async function displayModeStatistics(stats) {
     console.log('[Records] Displaying mode statistics...');
+    console.log('[Records] stats.modeStats:', stats.modeStats);
 
-    // モード別統計を表示（テーブル + モバイルカード）
-    const container = document.getElementById('mode-statistics');
-    container.innerHTML = '';
+    try {
+        // モード別統計を表示（テーブル + モバイルカード）
+        const container = document.getElementById('mode-statistics');
+        if (!container) {
+            console.error('[Records] mode-statistics container not found!');
+            return;
+        }
+        console.log('[Records] mode-statistics container found');
+        
+        container.innerHTML = '';
 
-    // デスクトップ版テーブル
-    const tableHTML = `
+        // デスクトップ版テーブル
+        const tableHTML = `
         <table class="mode-stats-table">
             <thead>
                 <tr>
@@ -380,8 +409,8 @@ async function displayModeStatistics(stats) {
         </table>
     `;
 
-    // モバイル版カード
-    const mobileHTML = `
+        // モバイル版カード
+        const mobileHTML = `
         <div class="mode-stats-mobile">
             ${stats.modeStats.map(mode => `
                 <div class="mode-stat-card">
@@ -396,15 +425,21 @@ async function displayModeStatistics(stats) {
         </div>
     `;
 
-    container.innerHTML = tableHTML + mobileHTML;
+        container.innerHTML = tableHTML + mobileHTML;
+        console.log('[Records] Mode statistics HTML rendered');
 
-    // Lucideアイコン再初期化（統合初期化関数を使用）
-    if (typeof window.initializeLucideIcons === 'function') {
-        window.initializeLucideIcons({ immediate: true });
+        // Lucideアイコン再初期化（統合初期化関数を使用）
+        if (typeof window.initializeLucideIcons === 'function') {
+            window.initializeLucideIcons({ immediate: true });
+        }
+
+        // レンダリング完了まで待機
+        await new Promise(resolve => setTimeout(resolve, 0));
+        console.log('[Records] displayModeStatistics completed');
+    } catch (error) {
+        console.error('[Records] Error in displayModeStatistics:', error);
+        throw error;
     }
-
-    // レンダリング完了まで待機
-    await new Promise(resolve => setTimeout(resolve, 0));
 }
 
 /**

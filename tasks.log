@@ -8912,3 +8912,431 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-14 10:37:41] コミット: refactor: 上行・下行タブのスタイル最適化とUIカタログ統合
+
+- タブナビゲーションのクラス名を専用化（.direction-tab-navigation）
+  - premium-analysis.cssの.tab-navigationと競合回避
+- タブのフォントサイズとアイコンサイズを拡大（視認性向上）
+  - フォントサイズ: 1.1rem → 1.2rem
+  - アイコンサイズ: 16px → 20px
+- .tab-navigationのマージン調整（1rem → 0.5rem）
+- HTMLのインラインスタイル削除（CSSクラスで統一管理）
+- UIカタログのデモ実装を本番環境に完全一致
+  - 全幅表示対応
+  - 説明文を本番と同じ内容に更新
+  - 下行モードの色をオレンジ→赤に変更
+
+変更ファイル:
+- base.css: 専用クラス追加、スタイル最適化
+- home.html: クラス名更新、インラインスタイル削除
+- ui-catalog-essentials.html: デモ実装を本番に合わせて更新
+- ui-catalog.css: 重複スタイル削除、全幅表示対応
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-14 12:18:10] コミット: feat: 下行モード実装完了 - 音階方向の動的切り替えと音域フィルタリング修正
+
+主要な変更:
+- trainingController.js: 音階ステップ動的生成機能追加
+  - getScaleSteps(): 上行・下行の音階ステップを生成
+  - updateDoremiGuide(): ドレミガイドを動的に更新
+  - intervals/semitoneSteps を let に変更（動的変更対応）
+  - 音域フィルタリングバグ修正（下行モード対応）
+
+- preparation-pitchpro-cycle.js: scaleDirection URL パラメータ追加
+  - sessionStorage から trainingDirection 取得
+  - URL パラメータに scaleDirection を追加
+
+主要な機能:
+✅ 上行モード: ド→レ→ミ→ファ→ソ→ラ→シ→ド (オクターブ上)
+✅ 下行モード: ド→シ→ラ→ソ→ファ→ミ→レ→ド (オクターブ下)
+✅ ドレミガイドの動的生成
+✅ 周波数計算の正確性
+✅ セッションデータへの記録
+
+バグ修正:
+🔧 getAvailableNotes(): 下行モードでは基音-1オクターブでフィルタリング
+
+設計ドキュメント追加:
+- DESCENDING_MODE_DESIGN.md: 設計思想と実装計画
+- DESCENDING_MODE_IMPLEMENTATION_CHANGES.md: 変更箇所詳細
+
+🤖 Generated with [Claude Code](https://claude.ai/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-14 14:02:14] コミット: feat: ドレミガイドに音階方向・基音方向バッジ追加 + 12音階モード音域警告システム実装
+
+## 🎨 UI改善
+- ドレミガイドタイトル横に方向バッジ表示
+  - 音階方向（上行/下行）: 常に表示
+  - 基音方向（上昇/下降/両方）: 12音階モードのみ表示
+- バッジ色統一: 下行=赤、上行=青、上昇=オレンジ、下降=緑、両方=黄色
+
+## 🔧 12音階モード音域警告システム
+- 準備ページでトレーニング開始前に音域チェック
+- 2.0オクターブ未満の場合、警告ダイアログ表示
+- ユーザー選択:
+  - 「音域テストをやり直す」→ 音域テストセクションへ
+  - 「このまま開始」→ 自動拡張で12音確保
+- 「今後この警告を表示しない」設定対応
+- ランク詳細ポップオーバースタイル準拠のデザイン
+
+## 📝 実装詳細
+- `base.css`: .direction-badge スタイル追加（5種類）
+- `training.html`: バッジコンテナ追加
+- `trainingController.js`:
+  - updateDirectionBadges() 関数追加
+  - 12音階モード厳格エラー処理を警告ログに変更
+- `preparation-pitchpro-cycle.js`:
+  - check12ToneVoiceRange() 関数追加
+  - showVoiceRangeWarningDialog() 関数追加
+  - 2箇所のトレーニング開始ボタンに音域チェック統合
+- `VOICE_RANGE_AUTO_EXPANSION_SPECIFICATION.md`:
+  - v3.0.0: セクション12追加（警告システム仕様）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-14 16:28:07] コミット: fix: 12音階モード・音域不足処理・UI表示の包括的修正
+
+- 12音階モードセッション数仕様明確化（常に12/24セッション、音階重複なし）
+- 音域テスト警告メッセージを「全モード共通で2.0オクターブ推奨」に統一
+- ホームページ方向タブの状態保持バグ修正（sessionStorage復元追加）
+- ドレミガイドバッジ表示を「両方」→「両方向」に統一
+
+## 主な変更内容
+
+### 1. trainingController.js
+- selectSequentialMode(): 12音階モードは常に12/24セッション（音域不足でも高音域から自動追加して12音確保）
+- updateDirectionBadges(): 基音方向バッジを「両方」→「両方向」に修正
+
+### 2. voice-range-test.js
+- 警告メッセージを「ランダム基音モード」→「すべてのトレーニングモード」に変更
+- 1.5～2.0オクターブ警告を全モード共通化
+
+### 3. home-direction-tabs.js
+- initializeDirectionTabs(): sessionStorageからタブUIを復元する処理追加
+- タブとボタンの状態不一致バグを完全修正
+
+### 4. VOICE_RANGE_AUTO_EXPANSION_SPECIFICATION.md (v3.0.1 → v3.1.0)
+- Section 2.1追加: 自動拡張と重複許可の関係を詳細説明
+- Section 8.1更新: ランダム基音モードの6段階フォールバック優先順位と実際の動作例を追加
+- Section 5.1, 5.2, 7.1更新: 警告メッセージを全モード共通に統一
+- Section 12.8更新: selectSequentialMode()のセッション数仕様明確化
+
+### 5. base.css
+- CSSコメント: 「基音方向: 両方」→「基音方向: 両方向」に修正
+
+## 修正の影響範囲
+
+- ✅ 12音階モード: 音域不足でも必ず12/24セッション実行（高音域自動追加）
+- ✅ 全モード: 2.0オクターブ推奨の明確化
+- ✅ ホームページ: 方向タブ切り替え後の状態が正しく保持される
+- ✅ UI表示: 「両方向」表記の統一
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-14 16:35:05] コミット: fix: トレーニングページタイトルに音階方向を統一表示
+
+- すべてのモードでタイトルに音階方向（上行・下行）を表示
+- ランダム基音モード: 「ランダム基音モード 上行」
+- 連続チャレンジモード: 「連続チャレンジモード 下行」
+- 12音階モード: 「12音階モード 上昇・上行」（基音方向・音階方向）
+- 修正前: 12音階モードのみ基音方向を表示
+- 修正後: 全モードで音階方向を表示、12音階は基音方向も併記
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-14 16:39:55] コミット: fix: トレーニングページのアイコン色をホームページと統一
+
+- モード別にアイコン背景色とサブタイトル色を動的に設定
+- ランダム基音: 緑グラデーション (gradient-catalog-green, text-green-200)
+- 連続チャレンジ: オレンジグラデーション (gradient-catalog-orange, text-orange-200)
+- 12音階: 紫グラデーション (gradient-catalog-purple, text-purple-200)
+- ホームページのmode-iconカラーと完全統一
+- pageSubtitle再宣言エラー修正（色更新処理を統合）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-14 16:46:51] コミット: feat: ModeControllerにUI表示管理機能を追加（v2.0.0）
+
+- モード別色設定を追加（iconBg, subtitle）
+- ページタイトル生成関数を追加（generatePageTitle）
+- ページヘッダー一括更新関数を追加（updatePageHeader）
+- トレーニング・総合評価・記録ページでタイトル表示統一可能に
+
+【追加機能】
+- generatePageTitle(): モード名 + 基音方向 + 音階方向を組み立て
+- updatePageHeader(): アイコン・色・タイトル・サブタイトルを一括更新
+- colors設定: ホームページのmode-iconカラーと完全統一
+
+【影響範囲】
+- trainingController.js: タイトル生成ロジックを移行予定
+- results-overview-controller.js: タイトル表示を統一予定
+- records-controller.js: レッスンカード表示でも活用可能
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-14 16:49:13] コミット: refactor: ModeController統合によるタイトル表示ロジック集約
+
+- trainingController.js: initializeModeUI()を大幅簡略化（83行→20行）
+- results-overview-controller.js: updateOverviewUI()でModeController使用
+- タイトル・アイコン・色の管理をModeControllerに完全集約
+- 重複コード削減・保守性向上
+
+【変更内容】
+trainingController.js:
+- モード別色設定・アイコン設定・タイトル生成ロジックを削除
+- ModeController.updatePageHeader()の一括呼び出しに置き換え
+- コード量63行削減
+
+results-overview-controller.js:
+- セッションデータからchromaticDirection・scaleDirectionを自動抽出
+- ModeController.updatePageHeader()でページヘッダー統一更新
+- fromRecordsフラグ時はサブタイトル更新をスキップ（日時表示保持）
+- フォールバック処理追加（ModeController未ロード時）
+
+【効果】
+- タイトル表示ロジックの一元管理完了
+- トレーニング・総合評価・記録ページで統一的な表示
+- 将来のモード追加時の修正箇所を最小化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-14 16:55:28] コミット: docs: MODULE_ARCHITECTURE v1.1.0 - ModeController実装完了を追記
+
+- ModeController v2.0.0実装完了を記録
+- データ管理モジュールセクションに追加
+- モジュール化候補セクションに詳細記載
+- 更新履歴セクションを追加
+
+【追加内容】
+- モード管理統合モジュールの概要
+- 実装済みAPI仕様
+- Single Source of Truthのモード定義
+- 影響範囲（trainingController.js, results-overview-controller.js）
+- 効果（63行削減、一元管理、拡張性向上）
+
+【ドキュメント更新】
+- バージョン: 1.0.0 → 1.1.0
+- 最終更新日: 2025-11-14
+- 更新履歴セクション新規追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-14 16:59:11] コミット: fix: ModeController v2.0.0キャッシュクリア用バージョン更新
+
+- mode-controller.jsのバージョン番号更新（v=20251114001）
+- ブラウザキャッシュによる古いバージョン読み込みを防止
+- updatePageHeader()メソッドの確実な読み込みを保証
+
+【問題】
+- trainingController.jsで"undefined is not a function"エラー
+- window.ModeController.updatePageHeader()が見つからない
+- ブラウザキャッシュで古いv1.0.0が読み込まれていた可能性
+
+【対策】
+- バージョンクエリパラメータ更新で強制再読み込み
+- コメント更新: v1.0.0 → v2.0.0
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-14 17:02:49] コミット: fix: ModeControllerのLucideアイコン再初期化を統合関数に変更
+
+- lucide.createIcons()から統合初期化関数に変更
+- window.initializeLucideIcons({ immediate: true })使用
+- アイコン変更時の確実な再描画を保証
+
+【問題】
+- 連続チャレンジモードでアイコンがlucide-zapに更新されない
+- data-lucide属性変更後の再初期化が不十分
+
+【対策】
+- 統合初期化関数の使用で確実な再初期化
+- フォールバック処理も追加
+- バージョン更新: v=20251114002
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-14 17:13:21] コミット: fix: Lucide初期化後のSVGアイコン更新処理を修正
+
+- Lucide初期化後はi要素がsvgに置き換わる仕様に対応
+- 既存svgを削除して新しいi要素を再作成
+- data-lucide属性を設定後にLucide再初期化で正しいアイコン表示
+
+【問題】
+- 連続チャレンジモードでアイコンがzapに変わらない
+- querySelector('i[data-lucide]')がsvg置き換え後に見つからない
+- アイコン更新ログが出力されていなかった
+
+【対策】
+- i要素が見つからない場合、既存svgを削除
+- 新しいi要素を作成してdata-lucide属性を設定
+- その後Lucide再初期化で正しいアイコンをレンダリング
+- バージョン更新: v=20251114003
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-14 17:17:03] コミット: refactor: Lucideアイコン更新ロジックを統一管理（lucide-init v2.0.0）
+
+- lucide-init.jsにupdateLucideIcon()関数を追加
+- i要素→svg置き換えに完全対応した統一更新関数
+- ModeControllerで重複コードを削除し、統一関数を使用
+
+【追加機能】
+- window.updateLucideIcon(target, iconName, attributes)
+  - セレクター文字列またはDOM要素を指定
+  - i要素が存在すればdata-lucide属性を更新
+  - svgに置き換わっている場合は削除→再作成
+  - 自動的にLucide再初期化
+
+【効果】
+- アイコン更新ロジックの一元管理
+- 同じ問題の再発防止
+- ModeControllerのコード簡素化（約15行削減）
+- 全ページで統一的なアイコン更新が可能
+
+【バージョン更新】
+- lucide-init.js: v2.0.0 (v=20251114001)
+- mode-controller.js: v2.0.1 (v=20251114004)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-14 17:42:21] コミット: refactor: Lucideアイコン初期化を統一関数に移行（Phase 1完了）
+
+主要コントローラーの38箇所でLucideアイコン処理を統一関数に変更
+
+変更内容:
+- lucide.createIcons() → window.initializeLucideIcons({ immediate: true })
+- setAttribute('data-lucide') → window.updateLucideIcon()
+- 統一されたAPI使用により一貫性向上・保守性改善
+
+修正ファイル:
+- records-controller.js: 4箇所統一 + アイコン初期化タイミング修正
+- result-session-controller.js: 7箇所統一
+- settings-controller.js: 1箇所統一
+- preparation-pitchpro-cycle.js: 23箇所統一
+- home-direction-tabs.js: 3箇所統一
+
+バグ修正:
+- records-controller.js: カードDOM追加前の初期化問題を修正
+  - createLessonCard()内の個別初期化を削除
+  - displaySessionList()で全カード追加後に一括初期化
+  - 最後のカードのアイコンが表示されない問題を解決
+
+効果:
+- コードの一貫性向上
+- アイコン更新ロジックの一元管理
+- 将来的なバグ発生リスク減少
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-14 17:51:28] コミット: refactor: Lucideアイコン統一完了（Phase 2-3: 全コントローラー・コンポーネント対応）
+
+Phase 2-3で残り6ファイルのLucideアイコン処理を統一関数に移行
+
+Phase 2: テストページ・主要コントローラー（3ファイル）
+- voice-range-test.js: マイクアイコン更新を統一関数に変更
+- trainingController.js: 8箇所統一
+- preparationController.js: 1箇所統一
+
+Phase 3: コンポーネント（3ファイル）
+- loading-component.js: 1箇所統一
+- BaseComponent.js: 1箇所統一
+- StepIndicator.js: 初期生成コードにコメント追加
+
+全体統一完了:
+- 合計11ファイル、50箇所以上を統一関数に移行
+- lucide.createIcons() → window.initializeLucideIcons({ immediate: true })
+- setAttribute('data-lucide') → window.updateLucideIcon()
+
+効果:
+- アプリ全体でLucideアイコン処理が完全統一
+- コードの一貫性・保守性が大幅向上
+- 将来的な機能追加・変更が容易に
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-14 21:09:59] コミット: fix: データ修復機能の無効化とCSS specificity問題の修正
+
+主要な変更:
+- records-controller.js v2.1.0: repairIncorrectLessonIds()修復機能を無効化
+  理由: SessionManager導入後はバグ発生せず、正常データを誤統合するリスクを回避
+
+- base.css: .flex/.inline-flexの!important削除
+  理由: .hiddenクラスとのspecificity競合を解決（no-data-message表示問題）
+
+- DATA_MANAGEMENT_SPECIFICATION.md: データ修復機能廃止の詳細ドキュメント追加
+  - SessionManager導入前の問題背景
+  - 修復関数の致命的な問題（正常データの誤統合）
+  - 実際に発生した問題（10件以上→4件への統合）
+  - 廃止の3つの理由
+  - エラーハンドリング体制
+  - 今後の方針と教訓
+
+技術的詳細:
+- lessonId修復は正常な独立レッスンとバグデータの区別不可能
+- SessionManagerの導入により元のバグは構造的に発生不可能
+- CSS specificity: 両方!importantの場合、後に定義された方が優先される
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 12:59:23] コミット: feat: DistributionChartコンポーネント実装完了
+
+- DistributionChart.js実装（評価分布・改善トレンド・ヘルプボタン機能）
+- グラスモルフィズム効果をプログレスバーに統合
+- 新しいCSSパターン追加（.section-header-row、.section-header-help）
+- .heading-mdデフォルトマージン統一（0.75rem）
+- UIカタログにヘルプボタン付き見出しパターン追加
+- test-distribution-chart.html作成（6種類のテストケース）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 15:42:43] コミット: feat: トレーニング記録ページに評価分布とモード別統計テーブル実装
+
+- 評価分布セクション追加（DistributionChart統合）
+  - ヘルプボタン付き見出し実装
+  - 改善トレンド表示対応
+  - アニメーション付きプログレスバー
+- モード別統計をテーブル化
+  - デスクトップ: テーブル形式で10モード表示
+  - モバイル: カード形式で縦並び
+  - グレード別色分け対応（S=黄, A=緑, B=青等）
+- iPad白化問題対策: progress-barのbackdrop-filter削除
+- UIカタログ準拠: アイコン色をblueに統一
+- レスポンシブ対応: 768px以下でモバイルレイアウト切り替え
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 16:03:46] コミット: fix: モード別統計を独立したセクションに分離
+
+仕様書に準拠してセクション構成を修正:
+1. トレーニング統計（連続記録バッジのみ）
+2. 評価分布
+3. モード別統計（独立セクション）← 修正
+4. トレーニング履歴
+
+変更内容:
+- records.html: モード別統計セクションを新規追加
+- records-controller.js: displayModeStatistics()関数を分離
+- ローディング処理を追加（mode-stats-loading）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

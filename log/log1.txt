@@ -1,261 +1,1081 @@
-[Log] ═══════════════════════════════════════════════════ (trainingController.js, line 355)
-[Log] 🎼 [セッション 5/8] 基音セット完了 (trainingController.js, line 356)
-[Log]    現在の基音: F3 (174.6Hz) (trainingController.js, line 357)
-[Log]    選定モード: random (ランダム基音モード) (trainingController.js, line 358)
-[Log]    全基音リスト: E3 → D3 → G3 → D3 → F3 → E3 → D3 → F3 (trainingController.js, line 359)
-[Log] ═══════════════════════════════════════════════════ (trainingController.js, line 360)
-[Log]  (trainingController.js, line 361)
-[Log] Initializing mode UI... (trainingController.js, line 269)
-[Log] 📋 現在のモード: ランダム基音モード (trainingController.js, line 273)
-[Log] ✅ アイコン更新: shuffle (trainingController.js, line 287)
-[Log] ✅ タイトル更新: ランダム基音モード (trainingController.js, line 306)
-[Log] 📊 セッション進行状況: 5/8 (ランダム基音モード) (trainingController.js, line 1017)
-[Log] ✅ サブタイトル更新: セッション 5/8 実施中 (trainingController.js, line 1036)
-[Log] ✅ [NavigationManager] ページ離脱警告を有効化 (navigation-manager.js, line 391)
-[Log] ✅ ページ離脱警告を有効化（タブを閉じる・リロード対策） (trainingController.js, line 217)
-[Log] ✅ ボタン発見: –  (trainingController.js, line 223)
-<button class="btn btn-primary" id="play-base-note">…</button>
-
-<button class="btn btn-primary" id="play-base-note">…</button>
-[Log] ✅ イベントリスナー登録完了（再登録） (trainingController.js, line 237)
-[Log] TrainingController initialized (trainingController.js, line 248)
-[Log] 📍 [NavigationManager] ブラウザバック防止: ダミーエントリー追加×2 (training) (navigation-manager.js, line 489)
-[Log] 📝 [NavigationManager] 通知メッセージ: トレーニング中です。 (navigation-manager.js, line 490)
-
-ブラウザバックは無効になっています。
-ホームボタンからトップページに戻れます。
-[Log] ✅ [NavigationManager] ブラウザバック防止イベントリスナー登録完了 (training) (navigation-manager.js, line 517)
-[Log] Page loaded: training (router.js, line 142)
-[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 76)
-[Log] 🎯 ボタンクリック検出 (trainingController.js, line 234)
-[Log] 🚀 トレーニング開始 (trainingController.js, line 481)
-[Log] ⏳ 初回クリック - PitchShifter初期化開始 (trainingController.js, line 496)
-[Log] 🎹 PitchShifter初期化中（フォールバック: 直接アクセス or リダイレクト後）... (trainingController.js, line 423)
-[Log] ✅ PitchShifter利用可能: – "function" (trainingController.js, line 443)
-[Log] 📱 デバイス: pc, 音量: 8dB (trainingController.js, line 447)
-[Log] 🎹 [PitchShifter] Initializing... (reference-tones.js, line 84)
-[Log] 📦 [PitchShifter] Sample version: 2.9.0 (reference-tones.js, line 95)
-[Log] 📥 [PitchShifter] Loading audio samples... (reference-tones.js, line 115)
-[Log] ✅ [PitchShifter] Samples loaded successfully (reference-tones.js, line 106)
-[Log] ✅ [PitchShifter] Initialization complete - attack:0.02s + sustain:1.0s + release:1.5s (2.52s total) (reference-tones.js, line 118)
-[Log] ✅ PitchShifter初期化完了（フォールバック） (trainingController.js, line 457)
-[Log] ✅ AudioContext既に起動済み (state: – "running)" (trainingController.js, line 466)
-[Log] ✅ 初期化完了！次回から即座に再生されます (trainingController.js, line 501)
-[Log] 🔊 AudioContext状態確認... (state: – "running)" (trainingController.js, line 514)
-[Log]  (trainingController.js, line 541)
-[Log] 🔊🔊🔊 基音再生開始 🔊🔊🔊 (trainingController.js, line 542)
-[Log]    セッション: 5/8 (trainingController.js, line 543)
-[Log]    基音: F3 (174.6Hz) (trainingController.js, line 544)
-[Log]  (trainingController.js, line 545)
-[Log] 🔉 [PitchShifter] Mid-low adjustment: velocity 0.80 → 0.56 (reference-tones.js, line 166)
-[Log] 🎵 [PitchShifter] Playing F3 (174.61Hz) for 1s at velocity 0.56 (reference-tones.js, line 169)
-[Log] 📊 新しいセッション開始: – {sessionId: 125, lessonId: "lesson_1762947633840_random_random_ascending", mode: "random", …} (session-data-recorder.js, line 75)
-{sessionId: 125, lessonId: "lesson_1762947633840_random_random_ascending", mode: "random", chromaticDirection: "random", scaleDirection: "ascending", …}Object
-[Log]    lessonId: lesson_1762947633840_random_random_ascending (session-data-recorder.js, line 76)
-[Log]    chromaticDirection: random, scaleDirection: ascending (session-data-recorder.js, line 77)
-[Log] 📊 セッションデータ記録開始 (trainingController.js, line 575)
-[Log]    lessonId: lesson_1762947633840_random_random_ascending (trainingController.js, line 576)
-[Log]    mode: random (trainingController.js, line 577)
-[Log]    chromaticDirection: random (trainingController.js, line 578)
-[Log]    scaleDirection: ascending (trainingController.js, line 579)
-[Log] ⏱️ ドレミガイド開始インターバル開始（2.5秒） (trainingController.js, line 585)
-[Log] ⏱️ インターバル進行: 1/3 (0.83秒経過) (trainingController.js, line 627)
-[Log] 🔇 [PitchShifter] Released F3 (reference-tones.js, line 177)
-[Log] ✅ [PitchShifter] Playback completed F3 (reference-tones.js, line 179)
-[Log] ⏱️ インターバル進行: 2/3 (1.67秒経過) (trainingController.js, line 627)
-[Log] ⏱️ インターバル進行: 3/3 (2.50秒経過) (trainingController.js, line 627)
-[Log] 🎵 ドレミガイド開始 (trainingController.js, line 595)
-[Log] 🎵 ドレミガイド開始 (trainingController.js, line 646)
-[Log] 🎤 マイクをオンにします (trainingController.js, line 647)
-[Log] 🎤 AudioDetectionComponent初期化中... (trainingController.js, line 653)
-[Info] ℹ️ [PitchPro] Automatic UI updates enabled. Note: Values applied may include device-specific multipliers and may differ from callback result.volume. For precise control, set autoUpdateUI=false and handle UI manually. (pitchpro-v1.3.4.umd.js, line 203)
-[Log] 🔍 [DIAGNOSTIC] AudioManager constructor - input config: – {sampleRate: 44100, echoCancellation: false, noiseSuppression: false, …} (pitchpro-v1.3.4.umd.js, line 1)
-{sampleRate: 44100, echoCancellation: false, noiseSuppression: false, autoGainControl: false}Object
-[Log] 🔍 [DIAGNOSTIC] AudioManager constructor - final config: – {sampleRate: 44100, channelCount: 1, echoCancellation: false, …} (pitchpro-v1.3.4.umd.js, line 1)
-{sampleRate: 44100, channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: false, …}Object
-[Log] 🔍 [DIAGNOSTIC] autoGainControl value after merge: – false (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🔧 [AudioManager] PC detected - setting default sensitivity 1.7x (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 👂 [MicrophoneLifecycleManager] Event listeners setup complete (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 📱 [MicrophoneController] Device detected: – {deviceType: "PC", isIOS: false, sensitivity: 1.7, …} (pitchpro-v1.3.4.umd.js, line 127)
-{deviceType: "PC", isIOS: false, sensitivity: 1.7, noiseGate: 0.023, volumeMultiplier: 2.5, …}Object
-[Log] 🔄 [MicrophoneController] State changed: uninitialized → initializing (pitchpro-v1.3.4.umd.js, line 127)
-[Log] 🎤 [MicrophoneController] Starting initialization (pitchpro-v1.3.4.umd.js, line 127)
-[Log] 🎤 [MicrophoneLifecycleManager] Acquiring resources (refCount: 1) (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🎤 [AudioManager] Starting initialization (pitchpro-v1.3.4.umd.js, line 1)
-[Log] ✅ [AudioManager] AudioContext creation complete (pitchpro-v1.3.4.umd.js, line 1)
-[Log] ✅ [AudioManager] AudioContext resume complete (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🔍 [AudioManager] Device detection: PC – "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Safari/605.1.15" (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🔍 [AudioManager] Touch support: false (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🔍 [DIAGNOSTIC] Device specs from getPlatformSpecs(): – {deviceType: "PC", isIOS: false, sensitivity: 1.7, …} (pitchpro-v1.3.4.umd.js, line 1)
-{deviceType: "PC", isIOS: false, sensitivity: 1.7, noiseGate: 0.023, volumeMultiplier: 2.5, …}Object
-[Log] 🔍 [DIAGNOSTIC] Current this.config before constraints creation: – {sampleRate: 44100, channelCount: 1, echoCancellation: false, …} (pitchpro-v1.3.4.umd.js, line 1)
-{sampleRate: 44100, channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: false, …}Object
-[Log] 🎤 [AudioManager] Getting MediaStream with noiseSuppression settings: – {noiseSuppression: false, constraints: Object} (pitchpro-v1.3.4.umd.js, line 1)
-{noiseSuppression: false, constraints: Object}Object
-[Log] ✅ [AudioManager] MediaStream acquisition complete (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🔍 [DIAGNOSTIC] Requested noiseSuppression: – false (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🔍 [DIAGNOSTIC] Actually applied constraints: – {deviceId: {ideal: "default"}, echoCancellation: false, sampleRate: 44100, …} (pitchpro-v1.3.4.umd.js, line 1)
-{deviceId: {ideal: "default"}, echoCancellation: false, sampleRate: 44100, sampleSize: 16}Object
-[Log] 🔍 [DIAGNOSTIC] Actual MediaStream settings: – {deviceId: "C61F5A621239BA3CB4B4CB068E7B5B6D21ABE667", echoCancellation: false, sampleRate: 44100, …} (pitchpro-v1.3.4.umd.js, line 1)
-{deviceId: "C61F5A621239BA3CB4B4CB068E7B5B6D21ABE667", echoCancellation: false, sampleRate: 44100, volume: 1}Object
-[Warning] ⚠️ [DIAGNOSTIC] noiseSuppression setting mismatch! (pitchpro-v1.3.4.umd.js, line 1)
-[Warning] ⚠️ [DIAGNOSTIC] Requested: false, Applied: undefined (pitchpro-v1.3.4.umd.js, line 1)
-[Log] ✅ [DIAGNOSTIC] autoGainControl successfully disabled by browser (pitchpro-v1.3.4.umd.js, line 1)
-[Log] ✅ [AudioManager] SourceNode creation complete (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🎤 [AudioManager] MediaStream tracks: – [Object] (1) (pitchpro-v1.3.4.umd.js, line 1)
+[Log] 🔍 [NavigationManager] visibilitychange検出: – "hidden" (navigation-manager.js, line 72)
+[Log] 🔍 [NavigationManager] lastVisibilityChange更新: – 1763119315927 (navigation-manager.js, line 73)
+[Log] 🔍 [NavigationManager] 現在のURL: – "http://localhost:8000/PitchPro-SPA/#records" (navigation-manager.js, line 74)
+[Log] 🔍 [NavigationManager] performance.navigation.type: – 1 (navigation-manager.js, line 75)
+[Info] Successfully preconnected to https://fonts.googleapis.com/
+[Info] Successfully preconnected to https://fonts.gstatic.com/
+[Log] ✅ MusicTheory utility loaded (v1.0.0) (music-theory.js, line 226)
+[Log] [LoadingComponent] Loaded (loading-component.js, line 213)
+[Log] [SubscriptionManager] v1.0.0 Loaded (subscription-manager.js, line 497)
+[Log] ⚠️ テストモード: 有効 (subscription-manager.js, line 498)
+[Log] ✅ [NavigationManager] visibilitychange監視を初期化 (navigation-manager.js, line 78)
+[Log] ✅ [NavigationManager] ロード完了 (navigation-manager.js, line 573)
+[Log] ✅ ModeController初期化完了 (mode-controller.js, line 294)
+[Log] 📋 登録モード: – "random, continuous, 12tone" (mode-controller.js, line 295)
+[Log] ✅ SessionDataManager初期化完了 (session-data-manager.js, line 321)
+[Log] ✅ SessionManager初期化完了 (session-manager.js, line 406)
+[Log] 📊 SessionDataRecorder初期化: sessionCounter = 203 (session-data-recorder.js, line 28)
+[Log] ✅ PremiumAnalysisCalculator loaded (with Mode Analysis) (premium-analysis-calculator.js, line 868)
+[Log] 🚀 [premium-analysis-controller] Script loaded (premium-analysis-controller.js, line 18)
+[Log] ✅ premium-analysis-controller loaded (premium-analysis-controller.js, line 866)
+[Log] ✅ PitchProConfig loaded (pitchpro-config.js, line 173)
+[Log] PitchPro統一設定: (pitchpro-config.js, line 174)
+  - 明瞭度閾値: 40% (実用的な信頼性)
+  - 最小音量: 0.3% (ノイズ排除)
+  - FFTサイズ: 2048 (標準精度・最適パフォーマンス)
+  - 平滑化: 0.1 (最小限)
+  - 周波数範囲: 80-800Hz (人間の声 + 倍音誤検出防止)
+  - 倍音補正: 有効 (オクターブ誤認識防止)
+[Log] ✅ DeviceDetector loaded (v1.0.0 - iOS/Android/PC support) (device-detector.js, line 163)
+[Log] ✅ startVoiceRangeTest関数をグローバルスコープに公開完了 (voice-range-test.js, line 2755)
+[Log] 🔍 [Debug Router] handleRouteChange called (router.js, line 49)
+[Log] 🔍 [Debug Router] hash: – "records" (router.js, line 50)
+[Log] 🔍 [Debug Router] page: – "records" (router.js, line 51)
+[Log] Route changed to: – "records" (router.js, line 52)
+[Log] Page name: – "records" (router.js, line 53)
+[Error] Failed to load resource: the server responded with a status of 404 (File not found) (pitchpro.umd.js.map, line 0)
+[Log] 🔍 PitchPro availability check: – {PitchProExists: true, AudioDetectionComponentExists: true, windowPitchPro: true} (preparation-pitchpro-cycle.js, line 878)
+[Log] 🎵 preparation-pitchpro-cycle.js 初期化完了 (preparation-pitchpro-cycle.js, line 884)
+[Log] [Records] Controller loading... (records-controller.js, line 31)
+[Log] [Records] Controller loaded (records-controller.js, line 986)
+[Log] 📊 [Records] スクリプト読み込み完了、初期化開始 (PitchPro-SPA, line 4)
+[Log] 📊 [Records] トレーニング記録ページ初期化開始 v2.1.0 (2025-11-14) (records-controller.js, line 43)
+[Log] [Records] Loading training records... (records-controller.js, line 76)
+[Log] ⚠️ テストモード: 全62件を表示（課金フィルター無効） (data-manager.js, line 317)
+[Log] [Records] Loaded 62 sessions (records-controller.js, line 82)
+[Log] [Records] First session sample: – {sessionId: 203, lessonId: "lesson_1763113819363_continuous_random_ascending", mode: "continuous", …} (records-controller.js, line 84)
+{sessionId: 203, lessonId: "lesson_1763113819363_continuous_random_ascending", mode: "continuous", chromaticDirection: "random", scaleDirection: "ascending", …}Object
+[Log] 🔍 [Grouping] レッスングループ化開始（lessonId方式） (records-controller.js, line 550)
+[Log] 🔍 [Grouping] 総セッション数: 62 (records-controller.js, line 551)
+[Log] ℹ️ [Repair] lessonId修復機能は無効化されています（SessionManager導入済み） (records-controller.js, line 399)
+[Log]    理由: 正常なデータを誤って統合するリスクを回避 (records-controller.js, line 400)
+[Log] ✅ [Grouping] グループ化完了: 5レッスン (records-controller.js, line 596)
+[Log]    - continuous（ascending）: 12セッション [lesson_1763113819363_continuous_random_ascending] (records-controller.js, line 600)
+[Log]    - random（ascending）: 8セッション [lesson_1763110466793_random_random_ascending] (records-controller.js, line 600)
+[Log]    - 12tone（ascending）: 12セッション [lesson_1763022443439_12tone_ascending_ascending] (records-controller.js, line 600)
+[Log]    - continuous（ascending）: 12セッション [lesson_1763022244530_continuous_random_ascending] (records-controller.js, line 600)
+[Log]    - 12tone（ascending）: 18セッション [lesson_1762944635097_12tone_both_ascending] (records-controller.js, line 600)
+[Log] 📊 [Statistics] 総セッション数: 62, グループ化後レッスン数: 5 (records-controller.js, line 164)
+[Log] 📊 [Statistics] レッスン処理: モード=continuous, 音階方向=ascending, セッション数=12 (records-controller.js, line 191)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 30音除外（160¢超）、有効音: 66/96 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 34, excellenceRate: 0.344, stability: 25.6, …} (evaluation-calculator.js, line 33)
+{avgError: 34, excellenceRate: 0.344, stability: 25.6, totalNotes: 96, excellentNotes: 33, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📊 [Statistics] レッスン処理: モード=random, 音階方向=ascending, セッション数=8 (records-controller.js, line 191)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (8) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object]Array (8)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 8}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 2音除外（160¢超）、有効音: 62/64 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 33.9, excellenceRate: 0.516, stability: 30, …} (evaluation-calculator.js, line 33)
+{avgError: 33.9, excellenceRate: 0.516, stability: 30, totalNotes: 64, excellentNotes: 33, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "B", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 45, excellence: 0.5}} (evaluation-calculator.js, line 45)
+[Log] 📊 [Statistics] レッスン処理: モード=12tone, 音階方向=ascending, セッション数=12 (records-controller.js, line 191)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "12tone", name: "12音階モード", level: "上級", …} (evaluation-calculator.js, line 25)
+{mode: "12tone", name: "12音階モード", level: "上級", target: "プロフェッショナルレベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 6音除外（160¢超）、有効音: 90/96 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 35.9, excellenceRate: 0.448, stability: 24.1, …} (evaluation-calculator.js, line 33)
+{avgError: 35.9, excellenceRate: 0.448, stability: 24.1, totalNotes: 96, excellentNotes: 43, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "D", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 60, excellence: 0.35}} (evaluation-calculator.js, line 45)
+[Log] 📊 [Statistics] レッスン処理: モード=continuous, 音階方向=ascending, セッション数=12 (records-controller.js, line 191)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 6音除外（160¢超）、有効音: 90/96 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 41.2, excellenceRate: 0.385, stability: 30.3, …} (evaluation-calculator.js, line 33)
+{avgError: 41.2, excellenceRate: 0.385, stability: 30.3, totalNotes: 96, excellentNotes: 37, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "D", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 60, excellence: 0.35}} (evaluation-calculator.js, line 45)
+[Log] 📊 [Statistics] レッスン処理: モード=12tone, 音階方向=ascending, セッション数=18 (records-controller.js, line 191)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (18) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (18)
+[Log] ✅ モード検出: – {mode: "12tone", name: "12音階モード", level: "上級", …} (evaluation-calculator.js, line 25)
+{mode: "12tone", name: "12音階モード", level: "上級", target: "プロフェッショナルレベル", actualSessions: 18}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 138音除外（160¢超）、有効音: 6/144 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 74.7, excellenceRate: 0.014, stability: 56.8, …} (evaluation-calculator.js, line 33)
+{avgError: 74.7, excellenceRate: 0.014, stability: 56.8, totalNotes: 144, excellentNotes: 2, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 24, explanation: "24セッション（上級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 24, explanation: "24セッション（上級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: false}, thresholds: {avgError: 70, excellence: 0.3}} (evaluation-calculator.js, line 45)
+[Log] 📊 [Statistics] 連続チャレンジ（上行）: レッスン数=2, 平均誤差=38, 最高グレード=D (records-controller.js, line 245)
+[Log] 📊 [Statistics] ランダム基音（上行）: レッスン数=1, 平均誤差=34, 最高グレード=B (records-controller.js, line 245)
+[Log] 📊 [Statistics] 12音階（上昇・上行）: レッスン数=1, 平均誤差=36, 最高グレード=D (records-controller.js, line 245)
+[Log] 📊 [Statistics] 12音階（両方向・上行）: レッスン数=1, 平均誤差=75, 最高グレード=E (records-controller.js, line 245)
+[Log] 📊 [Statistics] モード+方向別統計: 4種類 – [Object, Object, Object, …] (4) (records-controller.js, line 258)
+[Object, Object, Object, Object]Array (4)
+[Log] [Records] Statistics: – {modeStats: Array, streak: 3} (records-controller.js, line 95)
+{modeStats: Array, streak: 3}Object
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] [Records] Lucide icons initialized (records-controller.js, line 65)
+[Log] ✅ [Records] 初期化完了 (PitchPro-SPA, line 11)
+[Log] 🔍 [Grouping] レッスングループ化開始（lessonId方式） (records-controller.js, line 550)
+[Log] 🔍 [Grouping] 総セッション数: 62 (records-controller.js, line 551)
+[Log] ℹ️ [Repair] lessonId修復機能は無効化されています（SessionManager導入済み） (records-controller.js, line 399)
+[Log]    理由: 正常なデータを誤って統合するリスクを回避 (records-controller.js, line 400)
+[Log] ✅ [Grouping] グループ化完了: 5レッスン (records-controller.js, line 596)
+[Log]    - continuous（ascending）: 12セッション [lesson_1763113819363_continuous_random_ascending] (records-controller.js, line 600)
+[Log]    - random（ascending）: 8セッション [lesson_1763110466793_random_random_ascending] (records-controller.js, line 600)
+[Log]    - 12tone（ascending）: 12セッション [lesson_1763022443439_12tone_ascending_ascending] (records-controller.js, line 600)
+[Log]    - continuous（ascending）: 12セッション [lesson_1763022244530_continuous_random_ascending] (records-controller.js, line 600)
+[Log]    - 12tone（ascending）: 18セッション [lesson_1762944635097_12tone_both_ascending] (records-controller.js, line 600)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 30音除外（160¢超）、有効音: 66/96 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 34, excellenceRate: 0.344, stability: 25.6, …} (evaluation-calculator.js, line 33)
+{avgError: 34, excellenceRate: 0.344, stability: 25.6, totalNotes: 96, excellentNotes: 33, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📍 [NavigationManager] ブラウザバック防止不要: records (navigation-manager.js, line 509)
+[Log] Page loaded: records (router.js, line 142)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (8) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object]Array (8)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 8}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 2音除外（160¢超）、有効音: 62/64 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 33.9, excellenceRate: 0.516, stability: 30, …} (evaluation-calculator.js, line 33)
+{avgError: 33.9, excellenceRate: 0.516, stability: 30, totalNotes: 64, excellentNotes: 33, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "B", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 45, excellence: 0.5}} (evaluation-calculator.js, line 45)
+[Log]  * Tone.js v15.1.22 *  (+esm, line 7)
+[Log] ✅ PitchShifter loaded globally (v2.9.0 - Optimized Envelope) (PitchPro-SPA, line 79)
+[Log] 📦 [CACHE BUSTER] Timestamp: 1761735209 (PitchPro-SPA, line 80)
+[Log] ⚙️ [ENVELOPE] attack: 0.02s, sustain: 1.0s, release: 1.5s (2.52s total), curve: linear (PitchPro-SPA, line 81)
+[Log] ✅ Tone.js v15.1.22 (stable latest) loaded globally (PitchPro-SPA, line 82)
+[Log] 📊 セッション結果ページ初期化開始 (result-session-controller.js, line 33)
+[Log] 🔍 [NavigationManager] リロード検出開始 (navigation-manager.js, line 100)
+[Log] 🔍 [NavigationManager] 最後のvisibilitychangeからの経過時間: – "1763119316111ms" (navigation-manager.js, line 107)
+[Log] ✅ [NavigationManager] visibilitychange未記録 - 長時間バックグラウンドまたは初回アクセス (navigation-manager.js, line 112)
+[Log] ✅ [NavigationManager] ページ可視状態確認 - バックグラウンドからの復帰 (navigation-manager.js, line 119)
+[Log] セッション番号: – 1 (result-session-controller.js, line 57)
+[Log] ℹ️ SessionManager: sessionStorageに復元データなし (session-manager.js, line 274)
+[Warning] ⚠️ SessionManagerからlessonId取得失敗 - 最新セッション使用 (result-session-controller.js, line 114)
+[Log] 📊 最新セッション使用: ID 203, lessonId lesson_1763113819363_continuous_random_ascending (result-session-controller.js, line 116)
+[Log] ⏭️ voice-range-test.js: preparationページ以外のため初期化スキップ (voice-range-test.js, line 419)
+[Log] 🔍 [LUCIDE] DOMContentLoaded fired - initializing icons... (lucide-init.js, line 190)
+[Log] 🔍 [Debug Router] handleRouteChange called (router.js, line 49)
+[Log] 🔍 [Debug Router] hash: – "records" (router.js, line 50)
+[Log] 🔍 [Debug Router] page: – "records" (router.js, line 51)
+[Log] Route changed to: – "records" (router.js, line 52)
+[Log] Page name: – "records" (router.js, line 53)
+[Log] 📊 UIを更新: – {sessionId: 203, lessonId: "lesson_1763113819363_continuous_random_ascending", mode: "continuous", …} (result-session-controller.js, line 151)
+{sessionId: 203, lessonId: "lesson_1763113819363_continuous_random_ascending", mode: "continuous", chromaticDirection: "random", scaleDirection: "ascending", …}Object
+[Log] 📊 pitchErrors: – [Object, Object, Object, …] (8) (result-session-controller.js, line 152)
+[Object, Object, Object, Object, Object, Object, Object, Object]Array (8)
+[Log] 📊 外れ値除外: 3音除外（180¢超）、有効音: 5/8 (result-session-controller.js, line 209)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Warning] ⚠️ #note-resultsコンテナが見つかりません (result-session-controller.js, line 369)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ℹ️ SessionManager: sessionStorageに復元データなし (session-manager.js, line 274)
+[Error] ❌ SessionManagerからlessonId取得失敗
+	updateNextSessionButton (result-session-controller.js:446)
+	updateSessionUI (result-session-controller.js:237)
+	（anonymous関数） (result-session-controller.js:64)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] 🔍 [LUCIDE-DEBUG] Found 19 elements with data-lucide attribute (lucide-init.js, line 42)
+[Log] 🎬 [LUCIDE-DEBUG] Calling lucide.createIcons()... (lucide-init.js, line 43)
+[Log] ✅ [LUCIDE] Icons initialized - Found 19 SVG elements (lucide-init.js, line 61)
+[Log] 🔍 [LUCIDE-DEBUG] First SVG computed styles: – {display: "block", width: "32px", height: "32px", …} (lucide-init.js, line 67)
+{display: "block", width: "32px", height: "32px", color: "rgb(255, 255, 255)", stroke: "rgb(255, 255, 255)", …}Object
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "12tone", name: "12音階モード", level: "上級", …} (evaluation-calculator.js, line 25)
+{mode: "12tone", name: "12音階モード", level: "上級", target: "プロフェッショナルレベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 6音除外（160¢超）、有効音: 90/96 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 35.9, excellenceRate: 0.448, stability: 24.1, …} (evaluation-calculator.js, line 33)
+{avgError: 35.9, excellenceRate: 0.448, stability: 24.1, totalNotes: 96, excellentNotes: 43, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "D", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 60, excellence: 0.35}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 6音除外（160¢超）、有効音: 90/96 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 41.2, excellenceRate: 0.385, stability: 30.3, …} (evaluation-calculator.js, line 33)
+{avgError: 41.2, excellenceRate: 0.385, stability: 30.3, totalNotes: 96, excellentNotes: 37, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "D", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 60, excellence: 0.35}} (evaluation-calculator.js, line 45)
+[Log] [Records] Controller loading... (records-controller.js, line 31)
+[Log] [Records] Controller loaded (records-controller.js, line 986)
+[Log] 📊 [Records] スクリプト読み込み完了、初期化開始 (PitchPro-SPA, line 4)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (18) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (18)
+[Log] ✅ モード検出: – {mode: "12tone", name: "12音階モード", level: "上級", …} (evaluation-calculator.js, line 25)
+{mode: "12tone", name: "12音階モード", level: "上級", target: "プロフェッショナルレベル", actualSessions: 18}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 138音除外（160¢超）、有効音: 6/144 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 74.7, excellenceRate: 0.014, stability: 56.8, …} (evaluation-calculator.js, line 33)
+{avgError: 74.7, excellenceRate: 0.014, stability: 56.8, totalNotes: 144, excellentNotes: 2, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 24, explanation: "24セッション（上級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 24, explanation: "24セッション（上級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: false}, thresholds: {avgError: 70, excellence: 0.3}} (evaluation-calculator.js, line 45)
+[Log] 📊 [Records] トレーニング記録ページ初期化開始 v2.1.0 (2025-11-14) (records-controller.js, line 43)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
 [Object]Array (1)
-[Log] ✅ [AudioManager] GainNode creation complete (sensitivity: 1.7x) (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🎤 [AudioManager] Initialization complete (refCount: 1) (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 💓 [MicrophoneLifecycleManager] Health monitoring started (1000ms interval) (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 😴 [MicrophoneLifecycleManager] Idle monitoring started (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 👁️ [MicrophoneLifecycleManager] Visibility monitoring started (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🔄 [MicrophoneController] State changed: initializing → active (pitchpro-v1.3.4.umd.js, line 127)
-[Log] 🟢 [MicrophoneLifecycleManager] Microphone activated (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🔄 [MicrophoneController] State changed: active → ready (pitchpro-v1.3.4.umd.js, line 127)
-[Log] ✅ [MicrophoneController] Initialization complete (pitchpro-v1.3.4.umd.js, line 127)
-[Log] PitchPro v1.3.4 PitchDetector created with config: – {fftSize: 2048, smoothing: 0.1, clarityThreshold: 0.4, …} (pitchpro-v1.3.4.umd.js, line 1)
-{fftSize: 2048, smoothing: 0.1, clarityThreshold: 0.4, minVolumeAbsolute: 0.023, deviceOptimization: true}Object
-[Log] 🔧 [AudioManager] Filtered Analyser created: pitch-detector-filtered-1762947682485 (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🔧 [AudioManager] Raw signal Analyser created: pitch-detector-raw-1762947682485 (pitchpro-v1.3.4.umd.js, line 1)
-[Info] 2025-11-12T11:41:22.485Z INFO [MicrophoneController] PitchDetector instance has been registered to the controller. – {component: "MicrophoneController"} (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🎯 [MicrophoneController] PitchDetector registered for unified management (pitchpro-v1.3.4.umd.js, line 127)
-[Info] 2025-11-12T11:41:22.485Z INFO [MicrophoneController] AudioDetectionComponent registered for UI control – {component: "MicrophoneController"} (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🎛️ [MicrophoneController] AudioDetectionComponent registered for UI management (pitchpro-v1.3.4.umd.js, line 127)
-[Log] 🎤 [AudioManager] Microphone sensitivity updated: 1.7x (pitchpro-v1.3.4.umd.js, line 1)
-[Log] ✅ AudioDetectionComponent初期化完了 (trainingController.js, line 667)
-[Log] ✅ [NavigationManager] AudioDetector登録完了 (navigation-manager.js, line 288)
-[Log] 🔄 UIキャッシュを再構築中... (trainingController.js, line 685)
-[Log] ✅ [AudioManager] Gain setting verified: 1.7x (expected: 1.7x) (pitchpro-v1.3.4.umd.js, line 1)
-[Log] ✅ UIキャッシュ再構築完了 (trainingController.js, line 689)
-[Info] 2025-11-12T11:41:22.586Z INFO [MicrophoneController] Starting microphone and pitch detection systems... – {component: "MicrophoneController"} (pitchpro-v1.3.4.umd.js, line 1)
-[Log] ▶️ [MicrophoneController] Starting comprehensive system startup (pitchpro-v1.3.4.umd.js, line 127)
-[Info] 2025-11-12T11:41:22.587Z INFO [MicrophoneController] Unmuting microphone via controller – {component: "MicrophoneController"} (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🔊 [AudioManager] Microphone unmuted. (pitchpro-v1.3.4.umd.js, line 1)
-[Log] ✅ [MicrophoneController] Microphone unmuted (pitchpro-v1.3.4.umd.js, line 127)
-[Info] 2025-11-12T11:41:22.588Z INFO [MicrophoneController] PitchDetector detection started successfully – {component: "MicrophoneController"} (pitchpro-v1.3.4.umd.js, line 1)
-[Log] ✅ [MicrophoneController] Pitch detection started (pitchpro-v1.3.4.umd.js, line 127)
-[Log] 🎉 [MicrophoneController] System startup completed successfully (pitchpro-v1.3.4.umd.js, line 127)
-[Log] ✅ マイクオン完了 - 音声検出開始 (trainingController.js, line 697)
-[Log] 🎵 音程: ド (+0半音, 期待: 174.6Hz) (trainingController.js, line 727)
-[Log] 🎵 音程検出: 101.8Hz (G#2), 明瞭度: 0.84, 音量: 10.1% (trainingController.js, line 757)
-[Log] ✅ インターバル完了（2.5秒） (trainingController.js, line 630)
-[Log] ✅ Step 0 (ド): 最初200ms除外後の有効データ 19件 (trainingController.js, line 813)
-[Log] 📊 音程誤差記録 [Step 0]: – {step: 0, expectedNote: "ド", expectedFrequency: 174.61, …} (session-data-recorder.js, line 113)
-{step: 0, expectedNote: "ド", expectedFrequency: 174.61, detectedFrequency: 86.56708134720425, errorInCents: -1214.7, …}Object
-[Log] 📊 Step 0 (ド) データ記録: (trainingController.js, line 832)
-[Log]    期待: 174.6Hz (trainingController.js, line 833)
-[Log]    検出: 86.6Hz (trainingController.js, line 834)
-[Log]    誤差: -1214.7¢ (trainingController.js, line 835)
-[Log] 🎵 音程: レ (+2半音, 期待: 196.0Hz) (trainingController.js, line 727)
-[Log] 🎵 音程検出: 98.5Hz (G2), 明瞭度: 1.00, 音量: 13.7% (trainingController.js, line 757)
-[Log] ✅ Step 1 (レ): 最初200ms除外後の有効データ 20件 (trainingController.js, line 813)
-[Log] 📊 音程誤差記録 [Step 1]: – {step: 1, expectedNote: "レ", expectedFrequency: 195.99309825529963, …} (session-data-recorder.js, line 113)
-{step: 1, expectedNote: "レ", expectedFrequency: 195.99309825529963, detectedFrequency: 98.85831205453863, errorInCents: -1184.8, …}Object
-[Log] 📊 Step 1 (レ) データ記録: (trainingController.js, line 832)
-[Log]    期待: 196.0Hz (trainingController.js, line 833)
-[Log]    検出: 98.9Hz (trainingController.js, line 834)
-[Log]    誤差: -1184.8¢ (trainingController.js, line 835)
-[Log] 🎵 音程: ミ (+4半音, 期待: 220.0Hz) (trainingController.js, line 727)
-[Log] 🎵 音程検出: 109.2Hz (A2), 明瞭度: 1.00, 音量: 11.6% (trainingController.js, line 757)
-[Log] ✅ Step 2 (ミ): 最初200ms除外後の有効データ 20件 (trainingController.js, line 813)
-[Log] 📊 音程誤差記録 [Step 2]: – {step: 2, expectedNote: "ミ", expectedFrequency: 219.99481452214383, …} (session-data-recorder.js, line 113)
-{step: 2, expectedNote: "ミ", expectedFrequency: 219.99481452214383, detectedFrequency: 105.19284660225962, errorInCents: -1277.3, …}Object
-[Log] 📊 Step 2 (ミ) データ記録: (trainingController.js, line 832)
-[Log]    期待: 220.0Hz (trainingController.js, line 833)
-[Log]    検出: 105.2Hz (trainingController.js, line 834)
-[Log]    誤差: -1277.3¢ (trainingController.js, line 835)
-[Log] 🎵 音程: ファ (+5半音, 期待: 233.1Hz) (trainingController.js, line 727)
-[Log] ✅ Step 3 (ファ): 最初200ms除外後の有効データ 19件 (trainingController.js, line 813)
-[Log] 📊 音程誤差記録 [Step 3]: – {step: 3, expectedNote: "ファ", expectedFrequency: 233.07638693662972, …} (session-data-recorder.js, line 113)
-{step: 3, expectedNote: "ファ", expectedFrequency: 233.07638693662972, detectedFrequency: 110.38561230580073, errorInCents: -1293.9, …}Object
-[Log] 📊 Step 3 (ファ) データ記録: (trainingController.js, line 832)
-[Log]    期待: 233.1Hz (trainingController.js, line 833)
-[Log]    検出: 110.4Hz (trainingController.js, line 834)
-[Log]    誤差: -1293.9¢ (trainingController.js, line 835)
-[Log] 🎵 音程: ソ (+7半音, 期待: 261.6Hz) (trainingController.js, line 727)
-[Log] 🎵 音程検出: 131.5Hz (C3), 明瞭度: 0.89, 音量: 11.0% (trainingController.js, line 757)
-[Log] ✅ Step 4 (ソ): 最初200ms除外後の有効データ 19件 (trainingController.js, line 813)
-[Log] 📊 音程誤差記録 [Step 4]: – {step: 4, expectedNote: "ソ", expectedFrequency: 261.6193986934374, …} (session-data-recorder.js, line 113)
-{step: 4, expectedNote: "ソ", expectedFrequency: 261.6193986934374, detectedFrequency: 126.69262735964632, errorInCents: -1255.4, …}Object
-[Log] 📊 Step 4 (ソ) データ記録: (trainingController.js, line 832)
-[Log]    期待: 261.6Hz (trainingController.js, line 833)
-[Log]    検出: 126.7Hz (trainingController.js, line 834)
-[Log]    誤差: -1255.4¢ (trainingController.js, line 835)
-[Log] 🎵 音程: ラ (+9半音, 期待: 293.7Hz) (trainingController.js, line 727)
-[Log] 🎵 音程検出: 152.3Hz (D#3), 明瞭度: 0.98, 音量: 10.9% (trainingController.js, line 757)
-[Log] ✅ Step 5 (ラ): 最初200ms除外後の有効データ 21件 (trainingController.js, line 813)
-[Log] 📊 音程誤差記録 [Step 5]: – {step: 5, expectedNote: "ラ", expectedFrequency: 293.65784613490223, …} (session-data-recorder.js, line 113)
-{step: 5, expectedNote: "ラ", expectedFrequency: 293.65784613490223, detectedFrequency: 143.28947573275343, errorInCents: -1242.2, …}Object
-[Log] 📊 Step 5 (ラ) データ記録: (trainingController.js, line 832)
-[Log]    期待: 293.7Hz (trainingController.js, line 833)
-[Log]    検出: 143.3Hz (trainingController.js, line 834)
-[Log]    誤差: -1242.2¢ (trainingController.js, line 835)
-[Log] 🎵 音程: シ (+11半音, 期待: 329.6Hz) (trainingController.js, line 727)
-[Log] ✅ Step 6 (シ): 最初200ms除外後の有効データ 15件 (trainingController.js, line 813)
-[Log] 📊 音程誤差記録 [Step 6]: – {step: 6, expectedNote: "シ", expectedFrequency: 329.619787474701, …} (session-data-recorder.js, line 113)
-{step: 6, expectedNote: "シ", expectedFrequency: 329.619787474701, detectedFrequency: 174.4975981953571, errorInCents: -1101.1, …}Object
-[Log] 📊 Step 6 (シ) データ記録: (trainingController.js, line 832)
-[Log]    期待: 329.6Hz (trainingController.js, line 833)
-[Log]    検出: 174.5Hz (trainingController.js, line 834)
-[Log]    誤差: -1101.1¢ (trainingController.js, line 835)
-[Log] 🎵 音程: ド (+12半音, 期待: 349.2Hz) (trainingController.js, line 727)
-[Log] 🎵 音程検出: 161.9Hz (E3), 明瞭度: 1.00, 音量: 10.0% (trainingController.js, line 757)
-[Log] ✅ Step 7 (ド): 最初200ms除外後の有効データ 17件 (trainingController.js, line 813)
-[Log] 📊 音程誤差記録 [Step 7]: – {step: 7, expectedNote: "ド", expectedFrequency: 349.22, …} (session-data-recorder.js, line 113)
-{step: 7, expectedNote: "ド", expectedFrequency: 349.22, detectedFrequency: 170.94033116546393, errorInCents: -1236.8, …}Object
-[Log] 📊 Step 7 (ド) データ記録: (trainingController.js, line 832)
-[Log]    期待: 349.2Hz (trainingController.js, line 833)
-[Log]    検出: 170.9Hz (trainingController.js, line 834)
-[Log]    誤差: -1236.8¢ (trainingController.js, line 835)
-[Log] ✅ トレーニング完了 (trainingController.js, line 840)
-[Log] 🔄 音量バーリセット (trainingController.js, line 856)
-[Log] ✅ セッション完了: – {sessionId: 125, lessonId: "lesson_1762947633840_random_random_ascending", mode: "random", …} (session-data-recorder.js, line 145)
-{sessionId: 125, lessonId: "lesson_1762947633840_random_random_ascending", mode: "random", chromaticDirection: "random", scaleDirection: "ascending", …}Object
-[Log] 📊 データ保存実行: モード=random, プレミアム=false (session-data-recorder.js, line 152)
-[Log] 💾 localStorageに保存します (session-data-recorder.js, line 155)
-[Log] 🔄 自動クリーンアップ実行... (data-manager.js, line 410)
-[Log] 📊 無料プラン: 100件保存中、100件表示可能（7日以内） (data-manager.js, line 370)
-[Log] ✅ セッションデータ保存完了 (総セッション数: 100) (session-data-recorder.js, line 179)
-[Log] 🧹 自動クリーンアップ実行済み (session-data-recorder.js, line 180)
-[Log] ℹ️ 無料プラン: 7日以内のデータのみ表示（プレミアムで全データ閲覧可能） (session-data-recorder.js, line 160)
-[Log] ✅ セッションデータ保存完了: – {sessionId: 125, lessonId: "lesson_1762947633840_random_random_ascending", mode: "random", …} (trainingController.js, line 862)
-{sessionId: 125, lessonId: "lesson_1762947633840_random_random_ascending", mode: "random", chromaticDirection: "random", scaleDirection: "ascending", …}Object
-[Log] 🔍 [DEBUG] レッスン別セッション数: lessonId=lesson_1762947633840_random_random_ascending, 5セッション (全体=100セッション) (trainingController.js, line 868)
-[Log] 📊 ランダムモード：セッション5の結果ページへ遷移 (trainingController.js, line 875)
-[Log] 🚀 [NavigationManager] 統一ナビゲーション: result-session – {session: 5} (navigation-manager.js, line 340)
-[Log] 🧹 [NavigationManager] PitchProクリーンアップ開始 (navigation-manager.js, line 346)
-[Log] 🛑 [NavigationManager] 音声検出停止 (navigation-manager.js, line 304)
-[Log] 🗑️ [AudioManager] Analyser removed: pitch-detector-filtered-1762947682485 (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🗑️ [AudioManager] Filter chain removed: pitch-detector-filtered-1762947682485 (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🗑️ [AudioManager] Analyser removed: pitch-detector-raw-1762947682485 (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 📉 [AudioManager] Reference count decremented: 1 (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🗑️ [MicrophoneController] Destroying controller (pitchpro-v1.3.4.umd.js, line 127)
-[Log] 🚨 [MicrophoneController] Force stopping microphone (pitchpro-v1.3.4.umd.js, line 127)
-[Log] 🚨 [MicrophoneLifecycleManager] Force release - cleaning up all resources (pitchpro-v1.3.4.umd.js, line 1)
-[Log] ⏹️ [MicrophoneLifecycleManager] All monitoring stopped (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🚨 [AudioManager] Force cleanup executed (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🧹 [AudioManager] Starting cleanup (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🛑 [AudioManager] Stopping MediaStream: 1 tracks (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🛑 [AudioManager] Track 0 stop complete (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🛑 [AudioManager] AudioContext close complete (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🔧 [AudioManager] PC detected - setting default sensitivity 1.7x (pitchpro-v1.3.4.umd.js, line 1)
-[Log] ✅ [AudioManager] Cleanup complete (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🔄 [MicrophoneController] State changed: ready → uninitialized (pitchpro-v1.3.4.umd.js, line 127)
-[Log] ✅ [MicrophoneController] Force stop complete (pitchpro-v1.3.4.umd.js, line 127)
-[Info] 2025-11-12T11:41:28.211Z INFO [MicrophoneLifecycleManager] Destroying MicrophoneLifecycleManager – {component: "MicrophoneLifecycleManager", enableDetailedLogging: false, refCount: 0, …} (pitchpro-v1.3.4.umd.js, line 1)
-{component: "MicrophoneLifecycleManager", enableDetailedLogging: false, refCount: 0, isActive: false, autoRecoveryAttempts: 0, …}Object
-[Log] ⏹️ [MicrophoneLifecycleManager] All monitoring stopped (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🚨 [MicrophoneLifecycleManager] Force release - cleaning up all resources (pitchpro-v1.3.4.umd.js, line 1)
-[Log] ⏹️ [MicrophoneLifecycleManager] All monitoring stopped (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🚨 [AudioManager] Force cleanup executed (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🧹 [AudioManager] Starting cleanup (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🔧 [AudioManager] PC detected - setting default sensitivity 1.7x (pitchpro-v1.3.4.umd.js, line 1)
-[Log] ✅ [AudioManager] Cleanup complete (pitchpro-v1.3.4.umd.js, line 1)
-[Log] 🔄 [MicrophoneController] State changed: uninitialized → ready (pitchpro-v1.3.4.umd.js, line 127)
-[Info] 2025-11-12T11:41:28.212Z INFO [MicrophoneLifecycleManager] MicrophoneLifecycleManager cleanup complete – {component: "MicrophoneLifecycleManager", enableDetailedLogging: false} (pitchpro-v1.3.4.umd.js, line 1)
-[Log] ✅ [MicrophoneController] Cleanup complete (pitchpro-v1.3.4.umd.js, line 127)
-[Log] 🗑️ [NavigationManager] AudioDetector破棄完了 - マイクストリーム解放 (navigation-manager.js, line 310)
-[Log] ✅ [NavigationManager] ページ離脱警告を無効化 (navigation-manager.js, line 401)
-[Log] ✅ [NavigationManager] popstateイベントリスナーを削除 (navigation-manager.js, line 527)
-[Log] ✅ [NavigationManager] 正常な遷移フラグを設定 (navigation-manager.js, line 84)
-[Log] ✅ [NavigationManager] 遷移完了: result-session?session=5 (navigation-manager.js, line 369)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 49.1, excellenceRate: 0.375, stability: 41, …} (evaluation-calculator.js, line 33)
+{avgError: 49.1, excellenceRate: 0.375, stability: 41, totalNotes: 8, excellentNotes: 3, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "D", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 65, excellence: 0.3}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 47.4, excellenceRate: 0.375, stability: 46.2, …} (evaluation-calculator.js, line 33)
+{avgError: 47.4, excellenceRate: 0.375, stability: 46.2, totalNotes: 8, excellentNotes: 3, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "D", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 65, excellence: 0.3}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 33.3, excellenceRate: 0.5, stability: 22.4, …} (evaluation-calculator.js, line 33)
+{avgError: 33.3, excellenceRate: 0.5, stability: 22.4, totalNotes: 8, excellentNotes: 4, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "B", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 45, excellence: 0.5}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 2音除外（160¢超）、有効音: 6/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 31.2, excellenceRate: 0.375, stability: 17.9, …} (evaluation-calculator.js, line 33)
+{avgError: 31.2, excellenceRate: 0.375, stability: 17.9, totalNotes: 8, excellentNotes: 3, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "D", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 65, excellence: 0.3}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 32.2, excellenceRate: 0.5, stability: 16.2, …} (evaluation-calculator.js, line 33)
+{avgError: 32.2, excellenceRate: 0.5, stability: 16.2, totalNotes: 8, excellentNotes: 4, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "B", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 45, excellence: 0.5}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 34.9, excellenceRate: 0.5, stability: 25.8, …} (evaluation-calculator.js, line 33)
+{avgError: 34.9, excellenceRate: 0.5, stability: 25.8, totalNotes: 8, excellentNotes: 4, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "B", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 45, excellence: 0.5}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 23.5, excellenceRate: 0.75, stability: 25.6, …} (evaluation-calculator.js, line 33)
+{avgError: 23.5, excellenceRate: 0.75, stability: 25.6, totalNotes: 8, excellentNotes: 6, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "S", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 25, excellence: 0.7}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 18.7, excellenceRate: 0.75, stability: 9.5, …} (evaluation-calculator.js, line 33)
+{avgError: 18.7, excellenceRate: 0.75, stability: 9.5, totalNotes: 8, excellentNotes: 6, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "S", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 25, excellence: 0.7}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Warning] ⚠️ すべての音が外れ値と判定されました。元の値を使用します。 (evaluation-calculator.js, line 211)
+[Log] ✅ 基本メトリクス: – {avgError: 1294.8, excellenceRate: 0, stability: 247.5, …} (evaluation-calculator.js, line 33)
+{avgError: 1294.8, excellenceRate: 0, stability: 247.5, totalNotes: 8, excellentNotes: 0, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: false}, thresholds: {avgError: 80, excellence: 0.2}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 47.2, excellenceRate: 0.125, stability: 18.2, …} (evaluation-calculator.js, line 33)
+{avgError: 47.2, excellenceRate: 0.125, stability: 18.2, totalNotes: 8, excellentNotes: 1, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: false}, thresholds: {avgError: 80, excellence: 0.2}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 1音除外（160¢超）、有効音: 7/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 21, excellenceRate: 0.75, stability: 17.7, …} (evaluation-calculator.js, line 33)
+{avgError: 21, excellenceRate: 0.75, stability: 17.7, totalNotes: 8, excellentNotes: 6, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "S", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 25, excellence: 0.7}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 56.6, excellenceRate: 0.25, stability: 25.9, …} (evaluation-calculator.js, line 33)
+{avgError: 56.6, excellenceRate: 0.25, stability: 25.9, totalNotes: 8, excellentNotes: 2, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 80, excellence: 0.2}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 1音除外（160¢超）、有効音: 7/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 33.9, excellenceRate: 0.25, stability: 15.6, …} (evaluation-calculator.js, line 33)
+{avgError: 33.9, excellenceRate: 0.25, stability: 15.6, totalNotes: 8, excellentNotes: 2, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 80, excellence: 0.2}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 1音除外（160¢超）、有効音: 7/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 29.4, excellenceRate: 0.375, stability: 20.4, …} (evaluation-calculator.js, line 33)
+{avgError: 29.4, excellenceRate: 0.375, stability: 20.4, totalNotes: 8, excellentNotes: 3, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "D", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 65, excellence: 0.3}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 6音除外（160¢超）、有効音: 2/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 8.1, excellenceRate: 0.25, stability: 4.6, …} (evaluation-calculator.js, line 33)
+{avgError: 8.1, excellenceRate: 0.25, stability: 4.6, totalNotes: 8, excellentNotes: 2, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 80, excellence: 0.2}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 6音除外（160¢超）、有効音: 2/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 51.6, excellenceRate: 0.125, stability: 34.3, …} (evaluation-calculator.js, line 33)
+{avgError: 51.6, excellenceRate: 0.125, stability: 34.3, totalNotes: 8, excellentNotes: 1, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: false}, thresholds: {avgError: 80, excellence: 0.2}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 3音除外（160¢超）、有効音: 5/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 52.5, excellenceRate: 0.125, stability: 27.2, …} (evaluation-calculator.js, line 33)
+{avgError: 52.5, excellenceRate: 0.125, stability: 27.2, totalNotes: 8, excellentNotes: 1, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: false}, thresholds: {avgError: 80, excellence: 0.2}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 26.7, excellenceRate: 0.75, stability: 26.1, …} (evaluation-calculator.js, line 33)
+{avgError: 26.7, excellenceRate: 0.75, stability: 26.1, totalNotes: 8, excellentNotes: 6, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "A", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 35, excellence: 0.6}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 1音除外（160¢超）、有効音: 7/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 23.6, excellenceRate: 0.625, stability: 18.8, …} (evaluation-calculator.js, line 33)
+{avgError: 23.6, excellenceRate: 0.625, stability: 18.8, totalNotes: 8, excellentNotes: 5, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "A", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 35, excellence: 0.6}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 3音除外（160¢超）、有効音: 5/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 13.1, excellenceRate: 0.5, stability: 11.5, …} (evaluation-calculator.js, line 33)
+{avgError: 13.1, excellenceRate: 0.5, stability: 11.5, totalNotes: 8, excellentNotes: 4, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "B", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 45, excellence: 0.5}} (evaluation-calculator.js, line 45)
+[Log] 📍 [NavigationManager] ブラウザバック防止不要: records (navigation-manager.js, line 509)
+[Log] Page loaded: records (router.js, line 142)
+[Log] [Records] Loading training records... (records-controller.js, line 76)
+[Log] ⚠️ テストモード: 全62件を表示（課金フィルター無効） (data-manager.js, line 317)
+[Log] [Records] Loaded 62 sessions (records-controller.js, line 82)
+[Log] [Records] First session sample: – {sessionId: 203, lessonId: "lesson_1763113819363_continuous_random_ascending", mode: "continuous", …} (records-controller.js, line 84)
+{sessionId: 203, lessonId: "lesson_1763113819363_continuous_random_ascending", mode: "continuous", chromaticDirection: "random", scaleDirection: "ascending", …}Object
+[Log] 🔍 [Grouping] レッスングループ化開始（lessonId方式） (records-controller.js, line 550)
+[Log] 🔍 [Grouping] 総セッション数: 62 (records-controller.js, line 551)
+[Log] ℹ️ [Repair] lessonId修復機能は無効化されています（SessionManager導入済み） (records-controller.js, line 399)
+[Log]    理由: 正常なデータを誤って統合するリスクを回避 (records-controller.js, line 400)
+[Log] ✅ [Grouping] グループ化完了: 5レッスン (records-controller.js, line 596)
+[Log]    - continuous（ascending）: 12セッション [lesson_1763113819363_continuous_random_ascending] (records-controller.js, line 600)
+[Log]    - random（ascending）: 8セッション [lesson_1763110466793_random_random_ascending] (records-controller.js, line 600)
+[Log]    - 12tone（ascending）: 12セッション [lesson_1763022443439_12tone_ascending_ascending] (records-controller.js, line 600)
+[Log]    - continuous（ascending）: 12セッション [lesson_1763022244530_continuous_random_ascending] (records-controller.js, line 600)
+[Log]    - 12tone（ascending）: 18セッション [lesson_1762944635097_12tone_both_ascending] (records-controller.js, line 600)
+[Log] 📊 [Statistics] 総セッション数: 62, グループ化後レッスン数: 5 (records-controller.js, line 164)
+[Log] 📊 [Statistics] レッスン処理: モード=continuous, 音階方向=ascending, セッション数=12 (records-controller.js, line 191)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 30音除外（160¢超）、有効音: 66/96 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 34, excellenceRate: 0.344, stability: 25.6, …} (evaluation-calculator.js, line 33)
+{avgError: 34, excellenceRate: 0.344, stability: 25.6, totalNotes: 96, excellentNotes: 33, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📊 [Statistics] レッスン処理: モード=random, 音階方向=ascending, セッション数=8 (records-controller.js, line 191)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (8) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object]Array (8)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 8}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 2音除外（160¢超）、有効音: 62/64 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 33.9, excellenceRate: 0.516, stability: 30, …} (evaluation-calculator.js, line 33)
+{avgError: 33.9, excellenceRate: 0.516, stability: 30, totalNotes: 64, excellentNotes: 33, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "B", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 45, excellence: 0.5}} (evaluation-calculator.js, line 45)
+[Log] 📊 [Statistics] レッスン処理: モード=12tone, 音階方向=ascending, セッション数=12 (records-controller.js, line 191)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "12tone", name: "12音階モード", level: "上級", …} (evaluation-calculator.js, line 25)
+{mode: "12tone", name: "12音階モード", level: "上級", target: "プロフェッショナルレベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 6音除外（160¢超）、有効音: 90/96 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 35.9, excellenceRate: 0.448, stability: 24.1, …} (evaluation-calculator.js, line 33)
+{avgError: 35.9, excellenceRate: 0.448, stability: 24.1, totalNotes: 96, excellentNotes: 43, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "D", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 60, excellence: 0.35}} (evaluation-calculator.js, line 45)
+[Log] 📊 [Statistics] レッスン処理: モード=continuous, 音階方向=ascending, セッション数=12 (records-controller.js, line 191)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 6音除外（160¢超）、有効音: 90/96 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 41.2, excellenceRate: 0.385, stability: 30.3, …} (evaluation-calculator.js, line 33)
+{avgError: 41.2, excellenceRate: 0.385, stability: 30.3, totalNotes: 96, excellentNotes: 37, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "D", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 60, excellence: 0.35}} (evaluation-calculator.js, line 45)
+[Log] 📊 [Statistics] レッスン処理: モード=12tone, 音階方向=ascending, セッション数=18 (records-controller.js, line 191)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (18) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (18)
+[Log] ✅ モード検出: – {mode: "12tone", name: "12音階モード", level: "上級", …} (evaluation-calculator.js, line 25)
+{mode: "12tone", name: "12音階モード", level: "上級", target: "プロフェッショナルレベル", actualSessions: 18}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 138音除外（160¢超）、有効音: 6/144 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 74.7, excellenceRate: 0.014, stability: 56.8, …} (evaluation-calculator.js, line 33)
+{avgError: 74.7, excellenceRate: 0.014, stability: 56.8, totalNotes: 144, excellentNotes: 2, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 24, explanation: "24セッション（上級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 24, explanation: "24セッション（上級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: false}, thresholds: {avgError: 70, excellence: 0.3}} (evaluation-calculator.js, line 45)
+[Log] 📊 [Statistics] 連続チャレンジ（上行）: レッスン数=2, 平均誤差=38, 最高グレード=D (records-controller.js, line 245)
+[Log] 📊 [Statistics] ランダム基音（上行）: レッスン数=1, 平均誤差=34, 最高グレード=B (records-controller.js, line 245)
+[Log] 📊 [Statistics] 12音階（上昇・上行）: レッスン数=1, 平均誤差=36, 最高グレード=D (records-controller.js, line 245)
+[Log] 📊 [Statistics] 12音階（両方向・上行）: レッスン数=1, 平均誤差=75, 最高グレード=E (records-controller.js, line 245)
+[Log] 📊 [Statistics] モード+方向別統計: 4種類 – [Object, Object, Object, …] (4) (records-controller.js, line 258)
+[Object, Object, Object, Object]Array (4)
+[Log] [Records] Statistics: – {modeStats: Array, streak: 3} (records-controller.js, line 95)
+{modeStats: Array, streak: 3}Object
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] [Records] Lucide icons initialized (records-controller.js, line 65)
+[Log] ✅ [Records] 初期化完了 (PitchPro-SPA, line 11)
+[Log] 🔍 [Grouping] レッスングループ化開始（lessonId方式） (records-controller.js, line 550)
+[Log] 🔍 [Grouping] 総セッション数: 62 (records-controller.js, line 551)
+[Log] ℹ️ [Repair] lessonId修復機能は無効化されています（SessionManager導入済み） (records-controller.js, line 399)
+[Log]    理由: 正常なデータを誤って統合するリスクを回避 (records-controller.js, line 400)
+[Log] ✅ [Grouping] グループ化完了: 5レッスン (records-controller.js, line 596)
+[Log]    - continuous（ascending）: 12セッション [lesson_1763113819363_continuous_random_ascending] (records-controller.js, line 600)
+[Log]    - random（ascending）: 8セッション [lesson_1763110466793_random_random_ascending] (records-controller.js, line 600)
+[Log]    - 12tone（ascending）: 12セッション [lesson_1763022443439_12tone_ascending_ascending] (records-controller.js, line 600)
+[Log]    - continuous（ascending）: 12セッション [lesson_1763022244530_continuous_random_ascending] (records-controller.js, line 600)
+[Log]    - 12tone（ascending）: 18セッション [lesson_1762944635097_12tone_both_ascending] (records-controller.js, line 600)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 30音除外（160¢超）、有効音: 66/96 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 34, excellenceRate: 0.344, stability: 25.6, …} (evaluation-calculator.js, line 33)
+{avgError: 34, excellenceRate: 0.344, stability: 25.6, totalNotes: 96, excellentNotes: 33, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (8) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object]Array (8)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 8}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 2音除外（160¢超）、有効音: 62/64 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 33.9, excellenceRate: 0.516, stability: 30, …} (evaluation-calculator.js, line 33)
+{avgError: 33.9, excellenceRate: 0.516, stability: 30, totalNotes: 64, excellentNotes: 33, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "B", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 45, excellence: 0.5}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "12tone", name: "12音階モード", level: "上級", …} (evaluation-calculator.js, line 25)
+{mode: "12tone", name: "12音階モード", level: "上級", target: "プロフェッショナルレベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 6音除外（160¢超）、有効音: 90/96 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 35.9, excellenceRate: 0.448, stability: 24.1, …} (evaluation-calculator.js, line 33)
+{avgError: 35.9, excellenceRate: 0.448, stability: 24.1, totalNotes: 96, excellentNotes: 43, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "D", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 60, excellence: 0.35}} (evaluation-calculator.js, line 45)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 6音除外（160¢超）、有効音: 90/96 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 41.2, excellenceRate: 0.385, stability: 30.3, …} (evaluation-calculator.js, line 33)
+{avgError: 41.2, excellenceRate: 0.385, stability: 30.3, totalNotes: 96, excellentNotes: 37, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "D", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 60, excellence: 0.35}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (18) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (18)
+[Log] ✅ モード検出: – {mode: "12tone", name: "12音階モード", level: "上級", …} (evaluation-calculator.js, line 25)
+{mode: "12tone", name: "12音階モード", level: "上級", target: "プロフェッショナルレベル", actualSessions: 18}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 138音除外（160¢超）、有効音: 6/144 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 74.7, excellenceRate: 0.014, stability: 56.8, …} (evaluation-calculator.js, line 33)
+{avgError: 74.7, excellenceRate: 0.014, stability: 56.8, totalNotes: 144, excellentNotes: 2, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 24, explanation: "24セッション（上級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 24, explanation: "24セッション（上級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: false}, thresholds: {avgError: 70, excellence: 0.3}} (evaluation-calculator.js, line 45)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 49.1, excellenceRate: 0.375, stability: 41, …} (evaluation-calculator.js, line 33)
+{avgError: 49.1, excellenceRate: 0.375, stability: 41, totalNotes: 8, excellentNotes: 3, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "D", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 65, excellence: 0.3}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 47.4, excellenceRate: 0.375, stability: 46.2, …} (evaluation-calculator.js, line 33)
+{avgError: 47.4, excellenceRate: 0.375, stability: 46.2, totalNotes: 8, excellentNotes: 3, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "D", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 65, excellence: 0.3}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 33.3, excellenceRate: 0.5, stability: 22.4, …} (evaluation-calculator.js, line 33)
+{avgError: 33.3, excellenceRate: 0.5, stability: 22.4, totalNotes: 8, excellentNotes: 4, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "B", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 45, excellence: 0.5}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 2音除外（160¢超）、有効音: 6/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 31.2, excellenceRate: 0.375, stability: 17.9, …} (evaluation-calculator.js, line 33)
+{avgError: 31.2, excellenceRate: 0.375, stability: 17.9, totalNotes: 8, excellentNotes: 3, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "D", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 65, excellence: 0.3}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 32.2, excellenceRate: 0.5, stability: 16.2, …} (evaluation-calculator.js, line 33)
+{avgError: 32.2, excellenceRate: 0.5, stability: 16.2, totalNotes: 8, excellentNotes: 4, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "B", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 45, excellence: 0.5}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 34.9, excellenceRate: 0.5, stability: 25.8, …} (evaluation-calculator.js, line 33)
+{avgError: 34.9, excellenceRate: 0.5, stability: 25.8, totalNotes: 8, excellentNotes: 4, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "B", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 45, excellence: 0.5}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 23.5, excellenceRate: 0.75, stability: 25.6, …} (evaluation-calculator.js, line 33)
+{avgError: 23.5, excellenceRate: 0.75, stability: 25.6, totalNotes: 8, excellentNotes: 6, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "S", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 25, excellence: 0.7}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 18.7, excellenceRate: 0.75, stability: 9.5, …} (evaluation-calculator.js, line 33)
+{avgError: 18.7, excellenceRate: 0.75, stability: 9.5, totalNotes: 8, excellentNotes: 6, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "S", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 25, excellence: 0.7}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Warning] ⚠️ すべての音が外れ値と判定されました。元の値を使用します。 (evaluation-calculator.js, line 211)
+[Log] ✅ 基本メトリクス: – {avgError: 1294.8, excellenceRate: 0, stability: 247.5, …} (evaluation-calculator.js, line 33)
+{avgError: 1294.8, excellenceRate: 0, stability: 247.5, totalNotes: 8, excellentNotes: 0, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: false}, thresholds: {avgError: 80, excellence: 0.2}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 47.2, excellenceRate: 0.125, stability: 18.2, …} (evaluation-calculator.js, line 33)
+{avgError: 47.2, excellenceRate: 0.125, stability: 18.2, totalNotes: 8, excellentNotes: 1, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: false}, thresholds: {avgError: 80, excellence: 0.2}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 1音除外（160¢超）、有効音: 7/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 21, excellenceRate: 0.75, stability: 17.7, …} (evaluation-calculator.js, line 33)
+{avgError: 21, excellenceRate: 0.75, stability: 17.7, totalNotes: 8, excellentNotes: 6, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "S", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 25, excellence: 0.7}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 56.6, excellenceRate: 0.25, stability: 25.9, …} (evaluation-calculator.js, line 33)
+{avgError: 56.6, excellenceRate: 0.25, stability: 25.9, totalNotes: 8, excellentNotes: 2, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 80, excellence: 0.2}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 1音除外（160¢超）、有効音: 7/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 33.9, excellenceRate: 0.25, stability: 15.6, …} (evaluation-calculator.js, line 33)
+{avgError: 33.9, excellenceRate: 0.25, stability: 15.6, totalNotes: 8, excellentNotes: 2, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 80, excellence: 0.2}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 1音除外（160¢超）、有効音: 7/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 29.4, excellenceRate: 0.375, stability: 20.4, …} (evaluation-calculator.js, line 33)
+{avgError: 29.4, excellenceRate: 0.375, stability: 20.4, totalNotes: 8, excellentNotes: 3, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "D", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 65, excellence: 0.3}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 6音除外（160¢超）、有効音: 2/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 8.1, excellenceRate: 0.25, stability: 4.6, …} (evaluation-calculator.js, line 33)
+{avgError: 8.1, excellenceRate: 0.25, stability: 4.6, totalNotes: 8, excellentNotes: 2, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 80, excellence: 0.2}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 6音除外（160¢超）、有効音: 2/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 51.6, excellenceRate: 0.125, stability: 34.3, …} (evaluation-calculator.js, line 33)
+{avgError: 51.6, excellenceRate: 0.125, stability: 34.3, totalNotes: 8, excellentNotes: 1, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: false}, thresholds: {avgError: 80, excellence: 0.2}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 3音除外（160¢超）、有効音: 5/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 52.5, excellenceRate: 0.125, stability: 27.2, …} (evaluation-calculator.js, line 33)
+{avgError: 52.5, excellenceRate: 0.125, stability: 27.2, totalNotes: 8, excellentNotes: 1, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: false}, thresholds: {avgError: 80, excellence: 0.2}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 0音除外（160¢超）、有効音: 8/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 26.7, excellenceRate: 0.75, stability: 26.1, …} (evaluation-calculator.js, line 33)
+{avgError: 26.7, excellenceRate: 0.75, stability: 26.1, totalNotes: 8, excellentNotes: 6, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "A", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 35, excellence: 0.6}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 1音除外（160¢超）、有効音: 7/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 23.6, excellenceRate: 0.625, stability: 18.8, …} (evaluation-calculator.js, line 33)
+{avgError: 23.6, excellenceRate: 0.625, stability: 18.8, totalNotes: 8, excellentNotes: 5, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "A", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 35, excellence: 0.6}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object] (1) (evaluation-calculator.js, line 18)
+[Object]Array (1)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 1}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 3音除外（160¢超）、有効音: 5/8 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 13.1, excellenceRate: 0.5, stability: 11.5, …} (evaluation-calculator.js, line 33)
+{avgError: 13.1, excellenceRate: 0.5, stability: 11.5, totalNotes: 8, excellentNotes: 4, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "B", achievedBy: {avgError: true, excellence: true}, thresholds: {avgError: 45, excellence: 0.5}} (evaluation-calculator.js, line 45)
+[Error] Failed to load resource: the server responded with a status of 404 (File not found) (index.js.map, line 0)
