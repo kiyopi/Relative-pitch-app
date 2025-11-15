@@ -2989,72 +2989,57 @@ body::before {
   gap: 0.375rem;
 }
 
-/* モバイル版カード */
+/* モバイル版（1カード内に全モード、横線区切り） */
 .mode-stats-mobile {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
 }
 
-.mode-stat-card {
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.mode-stat-item {
+  padding: 0.75rem 0;
 }
 
-/* モバイルカードヘッダー（モード名 + グレード） */
-.mode-stat-card .mode-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
+.mode-stat-item:first-child {
+  padding-top: 0;
 }
 
-.mode-stat-card .mode-name {
+.mode-stat-item:last-child {
+  padding-bottom: 0;
+}
+
+.mode-stat-item .mode-name {
   color: var(--text-white);
   font-weight: 500;
+  margin-bottom: 0.5rem;
   font-size: 0.875rem;
 }
 
-.mode-stat-card .mode-grade {
+.mode-stat-item .mode-stats-row {
   display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  font-weight: 600;
+  justify-content: space-around;
+  gap: 1rem;
   font-size: 0.875rem;
 }
 
-/* モバイルカード統計グリッド（線区切りレイアウト） */
-.mode-stat-card .mode-stats-grid {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.875rem;
-}
-
-.mode-stat-card .stat-item {
+.mode-stat-item .mode-stats-row > span {
   flex: 1;
+  text-align: center;
+  color: var(--text-white-70);
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 0.25rem;
 }
 
-.mode-stat-card .stat-label {
-  color: var(--text-white-60);
-  font-size: 0.75rem;
+.mode-stat-item .mode-stats-row > span:last-child {
+  font-weight: 600;
 }
 
-.mode-stat-card .stat-value {
-  color: var(--text-white);
-  font-weight: 500;
-}
-
-.mode-stat-card .stat-divider {
-  width: 1px;
-  height: 2rem;
-  background: rgba(255, 255, 255, 0.2);
-  flex-shrink: 0;
+/* モード間の横線区切り */
+.mode-divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 0;
 }
 
 /* レスポンシブ切り替え */

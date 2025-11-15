@@ -9350,3 +9350,21 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 16:40:44] コミット: feat: モード別統計にUIカタログ準拠のグレードアイコン追加
+
+UIカタログの総合評価グレードアイコン（S〜E級）に完全準拠:
+- グレード色修正: S=金, A=銀, B=銅, C=緑, D=青, E=赤
+- グレードアイコン修正: S=crown, A=medal, B=award, C=smile, D=meh, E=frown
+
+モバイルカードを線区切りレイアウトに改善（10モードの高さ削減）:
+- records-controller.js: HTML構造変更（mode-header + mode-stats-grid）
+- base.css: 新構造用CSSクラス追加
+  - .mode-header: モード名 + グレード横並び
+  - .mode-stats-grid: 線区切りグリッド
+  - .stat-item: 統計項目（ラベル + 値 縦並び）
+  - .stat-divider: 線区切り（1px縦線）
+  - .grade-cell: デスクトップテーブル用グレードセル
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

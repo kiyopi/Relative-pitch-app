@@ -432,28 +432,20 @@ async function displayModeStatistics(stats) {
         </table>
     `;
 
-        // モバイル版カード（線区切りレイアウトに改善）
+        // モバイル版カード（1カード内に全モード、横線区切り）
         const mobileHTML = `
         <div class="mode-stats-mobile">
-            ${stats.modeStats.map(mode => `
-                <div class="mode-stat-card">
-                    <div class="mode-header">
-                        <span class="mode-name">${mode.modeName}</span>
-                        <div class="mode-grade">
-                            <i data-lucide="${getGradeIcon(mode.bestGrade)}" class="${getGradeColor(mode.bestGrade)}" style="width: 16px; height: 16px;"></i>
-                            <span class="${getGradeColor(mode.bestGrade)}">${mode.bestGrade}</span>
-                        </div>
-                    </div>
-                    <div class="mode-stats-grid">
-                        <div class="stat-item">
-                            <span class="stat-label">回数</span>
-                            <span class="stat-value">${mode.lessonCount}回</span>
-                        </div>
-                        <div class="stat-divider"></div>
-                        <div class="stat-item">
-                            <span class="stat-label">誤差</span>
-                            <span class="stat-value">±${mode.avgAccuracy}¢</span>
-                        </div>
+            ${stats.modeStats.map((mode, index) => `
+                ${index > 0 ? '<hr class="mode-divider" />' : ''}
+                <div class="mode-stat-item">
+                    <div class="mode-name">${mode.modeName}</div>
+                    <div class="mode-stats-row">
+                        <span>${mode.lessonCount}回</span>
+                        <span>±${mode.avgAccuracy}¢</span>
+                        <span class="${getGradeColor(mode.bestGrade)}">
+                            <i data-lucide="${getGradeIcon(mode.bestGrade)}" style="width: 14px; height: 14px;"></i>
+                            ${mode.bestGrade}
+                        </span>
                     </div>
                 </div>
             `).join('')}
