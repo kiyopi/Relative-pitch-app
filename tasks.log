@@ -9435,3 +9435,17 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 17:10:49] コミット: fix: モバイル版統計の背景色を透明に設定
+
+問題: mode-stat-itemがうっすらと白くなっており、glass-cardの背景と色が違う
+
+原因: ブラウザのデフォルトスタイルまたは他のCSSからの影響で背景色が設定されていた可能性
+
+修正:
+- .mode-stat-itemにbackground: transparent追加
+- .mode-stat-item .mode-stats-row > spanにbackground: transparent追加
+- これにより親要素のglass-cardの背景が確実に表示される
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
