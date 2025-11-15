@@ -9391,3 +9391,15 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 16:51:33] コミット: fix: モバイル版統計のレスポンシブ切り替えを修正
+
+問題: .mode-stats-mobileがデフォルトでdisplay: flexのため、PCでもモバイル版が表示されていた
+
+修正:
+- .mode-stats-mobileのデフォルトをdisplay: noneに変更
+- @media (max-width: 767px)でdisplay: flexに切り替え
+- これによりPCではテーブル、モバイルではカードが正しく表示される
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
