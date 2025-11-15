@@ -1,7 +1,7 @@
 /**
  * statistics.css
  * 統計・分析・記録ページ統合スタイル
- * Version: 2.3.0
+ * Version: 2.4.0
  *
  * 対応ページ:
  * - プレミアム分析ページ (premium-analysis.html)
@@ -18,11 +18,11 @@
  * - セクション1: トレーニング統計
  * - セクション3: モード別統計
  *
- * v2.3.0 更新内容（2025-11-15）:
- * - レイアウト調整: アイコン・数値・ラベルをすべて横一列に配置
- * - フォントサイズ統一: 1.25rem（PC・モバイル共通）
- * - ラベルサイズ: 0.9375rem（.stat-labelと同じ）
- * - ラベル色: text-blue-300
+ * v2.4.0 更新内容（2025-11-15）:
+ * - 数値サイズ統一: 1.5rem（7つすべて、PC・モバイル共通）
+ * - 下段4つのラベル色: text-blue-300（#93c5fd）
+ * - 上段3つのラベル色: 通常の白系（var(--text-white-70)）
+ * - ラベル表記変更: 「総時間」→「総レッスン時間」
  */
 
 /* ================================================================
@@ -919,7 +919,7 @@
 }
 
 .stat-item-number {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-white);
   line-height: 1.2;
@@ -929,6 +929,7 @@
   font-size: 0.9375rem;
   font-weight: 600;
   line-height: 1.3;
+  color: var(--text-white-70);
 }
 
 /* 下段：4つの数値カード（PC版：1行4カード / モバイル版：2×2グリッド） */
@@ -955,7 +956,7 @@
 }
 
 .stat-value {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 800;
   color: var(--text-white);
   margin-bottom: 0.5rem;
@@ -965,7 +966,7 @@
 
 .stat-label {
   font-size: 0.9375rem;
-  color: var(--text-white-70);
+  color: #93c5fd;
   font-weight: 600;
   letter-spacing: 0.01em;
 }
@@ -982,7 +983,7 @@
   }
 
   .stat-item-number {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
   }
 
   .stat-item-label {
@@ -1007,7 +1008,7 @@
   }
 
   .stat-label {
-    font-size: 0.8125rem;
+    font-size: 0.9375rem;
   }
 }
 

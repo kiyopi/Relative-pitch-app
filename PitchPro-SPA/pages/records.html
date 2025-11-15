@@ -43,7 +43,7 @@
                         <i data-lucide="calendar-check" class="text-purple-300" style="width: 28px; height: 28px;"></i>
                         <div class="stat-item-info">
                             <div class="stat-item-number" id="training-days-number">-</div>
-                            <div class="stat-item-label text-blue-300">日間トレーニング</div>
+                            <div class="stat-item-label">日間トレーニング</div>
                         </div>
                     </div>
 
@@ -52,7 +52,7 @@
                         <i data-lucide="calendar" class="text-purple-300" style="width: 28px; height: 28px;"></i>
                         <div class="stat-item-info">
                             <div class="stat-item-number" id="training-start-date">-</div>
-                            <div class="stat-item-label text-blue-300" id="days-since-start"></div>
+                            <div class="stat-item-label" id="days-since-start"></div>
                         </div>
                     </div>
 
@@ -61,7 +61,7 @@
                         <i data-lucide="flame" class="text-orange-300" style="width: 28px; height: 28px;"></i>
                         <div class="stat-item-info">
                             <div class="stat-item-number" id="streak-count">-</div>
-                            <div class="stat-item-label text-blue-300">連続日数</div>
+                            <div class="stat-item-label">連続日数</div>
                         </div>
                     </div>
                 </div>
@@ -83,7 +83,7 @@
                     <!-- 総トレーニング時間 -->
                     <div class="stat-card">
                         <div class="stat-value" id="total-duration">-</div>
-                        <div class="stat-label">総時間</div>
+                        <div class="stat-label">総レッスン時間</div>
                     </div>
 
                     <!-- 平均誤差 -->
@@ -190,7 +190,7 @@
 <script src="js/components/DistributionChart.js"></script>
 
 <!-- Records Page Controller -->
-<script src="pages/js/records-controller.js?v=20251115005" onload="initRecordsPage()"></script>
+<script src="pages/js/records-controller.js?v=20251115006" onload="initRecordsPage()"></script>
 <script>
     // SPA対応：ページ読み込み完了後に初期化
     async function initRecordsPage() {
