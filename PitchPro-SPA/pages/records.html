@@ -36,29 +36,29 @@
                     </h4>
                 </div>
 
-                <!-- 上段：2カラムレイアウト（PC版）/ 縦配置（モバイル版） -->
+                <!-- 上段：累計トレーニング日数を強調 -->
                 <div class="stats-top-section">
-                    <!-- 左側：連続記録バッジ -->
-                    <div class="streak-badge">
-                        <i data-lucide="flame" class="text-orange-300" style="width: 48px; height: 48px;"></i>
-                        <div class="streak-info">
-                            <div class="streak-number" id="streak-count">-</div>
-                            <div class="streak-label">日間連続記録達成！</div>
+                    <!-- メイン：累計トレーニング日数 -->
+                    <div class="training-days-main">
+                        <i data-lucide="calendar-check" class="text-blue-300" style="width: 56px; height: 56px;"></i>
+                        <div class="training-days-info">
+                            <div class="training-days-number" id="training-days-number">-</div>
+                            <div class="training-days-label">日間トレーニング</div>
                         </div>
                     </div>
 
-                    <!-- 右側：トレーニング期間情報 -->
-                    <div class="training-period">
-                        <div class="period-item">
-                            <i data-lucide="calendar" class="text-blue-300" style="width: 20px; height: 20px;"></i>
-                            <div class="period-text">
-                                <span id="training-start-date" class="text-white">-</span>
-                                <span id="days-since-start" class="text-white-70"></span>
+                    <!-- サブ：補助情報 -->
+                    <div class="training-period-sub">
+                        <div class="period-sub-item">
+                            <i data-lucide="calendar" class="text-white-60" style="width: 16px; height: 16px;"></i>
+                            <div class="period-sub-text">
+                                <span id="training-start-date" class="text-white-70">-</span>
+                                <span id="days-since-start" class="text-white-60"></span>
                             </div>
                         </div>
-                        <div class="period-item">
-                            <i data-lucide="book-open" class="text-green-300" style="width: 20px; height: 20px;"></i>
-                            <span id="training-days" class="text-white">-</span>
+                        <div class="period-sub-item">
+                            <i data-lucide="flame" class="text-white-60" style="width: 16px; height: 16px;"></i>
+                            <span class="text-white-70">連続<span id="streak-count">-</span>日</span>
                         </div>
                     </div>
                 </div>
