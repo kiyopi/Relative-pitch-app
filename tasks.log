@@ -9883,3 +9883,11 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 00:37:07] コミット: style: 上段統計項目の要素間隔を調整
+
+- .stat-itemのgapを0.5rem→0.75remに変更
+- サブタイトルとアイコンの間隔を広げて視認性向上
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
