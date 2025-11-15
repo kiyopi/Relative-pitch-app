@@ -328,21 +328,39 @@ function calculateStreak(sessions) {
 }
 
 /**
- * グレード別色クラスを取得
+ * グレード別色クラスを取得（UIカタログ準拠）
  * @param {string} grade - グレード（S/A/B/C/D/E/-）
  * @returns {string} 色クラス
  */
 function getGradeColor(grade) {
     const gradeColors = {
-        'S': 'text-yellow-300',
-        'A': 'text-green-300',
-        'B': 'text-blue-300',
-        'C': 'text-purple-300',
-        'D': 'text-orange-300',
-        'E': 'text-red-300',
+        'S': 'text-yellow-300',  // 金色（プロレベル）
+        'A': 'text-gray-300',    // 銀色（楽器アンサンブル）
+        'B': 'text-orange-300',  // 銅色（合唱・弾き語り）
+        'C': 'text-green-300',   // 緑色（カラオケ・趣味）
+        'D': 'text-blue-300',    // 青色（練習中）
+        'E': 'text-red-300',     // 赤色（基礎から）
         '-': 'text-white-60'
     };
     return gradeColors[grade] || 'text-white-60';
+}
+
+/**
+ * グレードに対応するLucideアイコン名を返す（UIカタログ準拠）
+ * @param {string} grade - グレード文字列 (S, A, B, C, D, E, -)
+ * @returns {string} Lucideアイコン名
+ */
+function getGradeIcon(grade) {
+    const gradeIcons = {
+        'S': 'crown',           // 王冠（プロレベル）
+        'A': 'medal',           // メダル（楽器アンサンブル）
+        'B': 'award',           // トロフィー（合唱・弾き語り）
+        'C': 'smile',           // 笑顔（カラオケ・趣味）
+        'D': 'meh',             // 普通顔（練習中）
+        'E': 'frown',           // 困り顔（基礎から）
+        '-': 'minus'
+    };
+    return gradeIcons[grade] || 'minus';
 }
 
     /**
@@ -385,7 +403,7 @@ async function displayModeStatistics(stats) {
         
         container.innerHTML = '';
 
-        // デスクトップ版テーブル
+        // デスクトップ版テーブル（グレードアイコン追加）
         const tableHTML = `
         <table class="mode-stats-table">
             <thead>
@@ -402,23 +420,40 @@ async function displayModeStatistics(stats) {
                         <td>${mode.modeName}</td>
                         <td>${mode.lessonCount}</td>
                         <td>±${mode.avgAccuracy}¢</td>
-                        <td class="${getGradeColor(mode.bestGrade)}">${mode.bestGrade}</td>
+                        <td>
+                            <div class="grade-cell">
+                                <i data-lucide="${getGradeIcon(mode.bestGrade)}" class="${getGradeColor(mode.bestGrade)}" style="width: 16px; height: 16px;"></i>
+                                <span class="${getGradeColor(mode.bestGrade)}">${mode.bestGrade}</span>
+                            </div>
+                        </td>
                     </tr>
                 `).join('')}
             </tbody>
         </table>
     `;
 
-        // モバイル版カード
+        // モバイル版カード（線区切りレイアウトに改善）
         const mobileHTML = `
         <div class="mode-stats-mobile">
             ${stats.modeStats.map(mode => `
                 <div class="mode-stat-card">
-                    <div class="mode-name">${mode.modeName}</div>
-                    <div class="mode-stats-row">
-                        <span>${mode.lessonCount}回</span>
-                        <span>±${mode.avgAccuracy}¢</span>
-                        <span class="${getGradeColor(mode.bestGrade)}">${mode.bestGrade}</span>
+                    <div class="mode-header">
+                        <span class="mode-name">${mode.modeName}</span>
+                        <div class="mode-grade">
+                            <i data-lucide="${getGradeIcon(mode.bestGrade)}" class="${getGradeColor(mode.bestGrade)}" style="width: 16px; height: 16px;"></i>
+                            <span class="${getGradeColor(mode.bestGrade)}">${mode.bestGrade}</span>
+                        </div>
+                    </div>
+                    <div class="mode-stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">回数</span>
+                            <span class="stat-value">${mode.lessonCount}回</span>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                            <span class="stat-label">誤差</span>
+                            <span class="stat-value">±${mode.avgAccuracy}¢</span>
+                        </div>
                     </div>
                 </div>
             `).join('')}

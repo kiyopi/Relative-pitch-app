@@ -9340,3 +9340,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 16:12:06] コミット: fix: records-controller.jsのローディング状態問題を修正
+
+- hideLoading()にデバッグログ追加
+- displayModeStatistics()にエラーハンドリング追加
+- 各セクション表示にtry-catch-finally追加
+- エラー発生時でもhideLoading()確実実行
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

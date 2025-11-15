@@ -2982,6 +2982,13 @@ body::before {
   font-weight: 600;
 }
 
+/* グレードセル（アイコン + テキスト） */
+.grade-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
 /* モバイル版カード */
 .mode-stats-mobile {
   display: flex;
@@ -2996,29 +3003,58 @@ body::before {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* モバイルカードヘッダー（モード名 + グレード） */
+.mode-stat-card .mode-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
 .mode-stat-card .mode-name {
   color: var(--text-white);
   font-weight: 500;
-  margin-bottom: 0.5rem;
   font-size: 0.875rem;
 }
 
-.mode-stat-card .mode-stats-row {
+.mode-stat-card .mode-grade {
   display: flex;
-  justify-content: space-around;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.375rem;
+  font-weight: 600;
   font-size: 0.875rem;
 }
 
-.mode-stat-card .mode-stats-row > span {
-  flex: 1;
-  text-align: center;
-  color: var(--text-white-70);
+/* モバイルカード統計グリッド（線区切りレイアウト） */
+.mode-stat-card .mode-stats-grid {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
 }
 
-.mode-stat-card .mode-stats-row > span:last-child {
-  font-weight: 600;
+.mode-stat-card .stat-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.mode-stat-card .stat-label {
+  color: var(--text-white-60);
+  font-size: 0.75rem;
+}
+
+.mode-stat-card .stat-value {
   color: var(--text-white);
+  font-weight: 500;
+}
+
+.mode-stat-card .stat-divider {
+  width: 1px;
+  height: 2rem;
+  background: rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
 }
 
 /* レスポンシブ切り替え */
