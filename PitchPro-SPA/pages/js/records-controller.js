@@ -1,10 +1,13 @@
 /**
  * トレーニング記録ページコントローラー
  *
- * @version 2.3.1
+ * @version 2.4.0
  * @date 2025-11-15
  * @description トレーニング履歴の表示・統計計算・グラフ描画
  * @changelog
+ *   v2.4.0 (2025-11-15) - 統計表示の改善
+ *                         開始日を「2025/11/10」形式に変更
+ *                         総平均誤差にランクアイコン・色を追加
  *   v2.3.1 (2025-11-15) - 開始日取得ロジック修正
  *                         timestamp/startTime/completedAtの優先順で日付取得（Bug修正）
  *   v2.3.0 (2025-11-15) - 統計セクションの表記統一
@@ -461,7 +464,8 @@ async function displayStatistics(stats) {
             : new Date(stats.firstTrainingDate);
 
         if (!isNaN(firstDate.getTime())) {
-            firstDateStr = `${firstDate.getMonth() + 1}/${firstDate.getDate()}`;
+            // 「2025/11/10」形式に変更
+            firstDateStr = `${firstDate.getFullYear()}/${firstDate.getMonth() + 1}/${firstDate.getDate()}`;
             document.getElementById('training-start-date').textContent = firstDateStr;
             document.getElementById('days-since-start').textContent = `${stats.daysSinceStart}日経過`;
         } else {
@@ -480,10 +484,38 @@ async function displayStatistics(stats) {
     document.getElementById('lessons-count').textContent = stats.totalLessons;
     document.getElementById('sessions-count').textContent = stats.totalSessions;
     document.getElementById('total-duration').textContent = stats.totalDurationFormatted;
-    document.getElementById('average-error').textContent = `±${stats.overallAvgError}¢`;
+    
+    // 総平均誤差（ランクアイコン + 色付き）
+    // 平均誤差からランクを判定
+    let grade = '-';
+    if (stats.overallAvgError <= 15) grade = 'S';
+    else if (stats.overallAvgError <= 25) grade = 'A';
+    else if (stats.overallAvgError <= 40) grade = 'B';
+    else if (stats.overallAvgError <= 60) grade = 'C';
+    else if (stats.overallAvgError <= 90) grade = 'D';
+    else grade = 'E';
+
+    const gradeIcon = getGradeIcon(grade);
+    const gradeColor = getGradeColor(grade);
+
+    // アイコンを更新
+    const iconEl = document.getElementById('average-error-icon');
+    if (iconEl) {
+        iconEl.setAttribute('data-lucide', gradeIcon);
+        iconEl.className = gradeColor;
+        iconEl.style.width = '20px';
+        iconEl.style.height = '20px';
+    }
+
+    // 値を更新（色も適用）
+    const valueEl = document.getElementById('average-error-value');
+    if (valueEl) {
+        valueEl.textContent = `±${stats.overallAvgError}¢`;
+        valueEl.className = gradeColor;
+    }
 
     console.log(`📊 [Display] 上段: ${stats.trainingDays}日間, ${firstDateStr}開始, 連続${stats.streak}日`);
-    console.log(`📊 [Display] 数値カード: レッスン=${stats.totalLessons}, セッション=${stats.totalSessions}, 総時間=${stats.totalDurationFormatted}, 平均誤差=±${stats.overallAvgError}¢`);
+    console.log(`📊 [Display] 数値カード: レッスン=${stats.totalLessons}, セッション=${stats.totalSessions}, 総時間=${stats.totalDurationFormatted}, 平均誤差=±${stats.overallAvgError}¢ (${grade})`);
 
     // Lucideアイコン再初期化（統合初期化関数を使用）
     if (typeof window.initializeLucideIcons === 'function') {

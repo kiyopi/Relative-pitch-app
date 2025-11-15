@@ -993,11 +993,11 @@
   }
 
   .stat-item-number {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
   }
 
   .stat-item-label {
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
   }
 
   .stats-cards-grid {
@@ -1013,12 +1013,12 @@
   }
 
   .stat-value {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     margin-bottom: 0.5rem;
   }
 
   .training-stat-label {
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
   }
 }
 

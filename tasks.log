@@ -9833,3 +9833,11 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-15 23:31:06] コミット: fix: トレーニング記録ページの開始日取得ロジックを修正
+
+- timestamp/startTime/completedAtの優先順で日付を取得するように変更
+- これにより開始日が正しく表示されるようになる
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

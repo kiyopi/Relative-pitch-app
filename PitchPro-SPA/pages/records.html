@@ -71,13 +71,13 @@
                     <!-- レッスン数 -->
                     <div class="stat-card">
                         <div class="stat-value" id="lessons-count">-</div>
-                        <div class="training-stat-label">レッスン</div>
+                        <div class="training-stat-label">総レッスン数</div>
                     </div>
 
                     <!-- セッション数 -->
                     <div class="stat-card">
                         <div class="stat-value" id="sessions-count">-</div>
-                        <div class="training-stat-label">セッション</div>
+                        <div class="training-stat-label">総セッション数</div>
                     </div>
 
                     <!-- 総トレーニング時間 -->
@@ -86,10 +86,13 @@
                         <div class="training-stat-label">総レッスン時間</div>
                     </div>
 
-                    <!-- 平均誤差 -->
+                    <!-- 総平均誤差（アイコン+値） -->
                     <div class="stat-card">
-                        <div class="stat-value" id="average-error">-</div>
-                        <div class="training-stat-label">平均誤差</div>
+                        <div class="stat-value" id="average-error">
+                            <i data-lucide="minus" id="average-error-icon" class="text-white-60" style="width: 20px; height: 20px;"></i>
+                            <span id="average-error-value">-</span>
+                        </div>
+                        <div class="training-stat-label">総平均誤差</div>
                     </div>
                 </div>
             </div>
@@ -190,7 +193,7 @@
 <script src="js/components/DistributionChart.js"></script>
 
 <!-- Records Page Controller -->
-<script src="pages/js/records-controller.js?v=20251115008" onload="initRecordsPage()"></script>
+<script src="pages/js/records-controller.js?v=20251115009" onload="initRecordsPage()"></script>
 <script>
     // SPA対応：ページ読み込み完了後に初期化
     async function initRecordsPage() {
