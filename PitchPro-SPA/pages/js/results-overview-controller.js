@@ -1,11 +1,12 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v3.6.0 (2025-11-14)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.0.0 (2025-11-16)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 3.6.0
- * Date: 2025-11-14
+ * Version: 4.0.0
+ * Date: 2025-11-16
  * Changelog:
+ *   v4.0.0 - 【パフォーマンス最適化】二重初期化防止・Lucide過剰呼び出し削減（89%削減）
  *   v3.6.0 - fromRecords時のURLパラメータ優先、modeInfo.id→modeInfo.mode修正
  *
  * 【責任範囲】
@@ -33,16 +34,21 @@ console.log('🚀 [results-overview-controller] Script loaded - START v3.6.0 (20
 // デバッグモード設定（false = 詳細ログ無効化）
 const DEBUG_MODE = true;
 
+// 🛡️ 二重初期化防止フラグ
+let isResultsOverviewInitialized = false;
+
 /**
  * 総合評価ページの初期化（即座にグローバル定義）
  */
 window.initResultsOverview = async function initResultsOverview() {
-    console.log('=== 総合評価ページ初期化開始 ===');
-
-    // Lucideアイコン初期化
-    if (window.initializeLucideIcons) {
-        window.initializeLucideIcons({ immediate: true });
+    // 🛡️ 二重初期化防止ガード
+    if (isResultsOverviewInitialized) {
+        console.warn('⚠️ [results-overview] 既に初期化済み - 二重初期化を防止しました');
+        return;
     }
+
+    console.log('=== 総合評価ページ初期化開始 ===');
+    isResultsOverviewInitialized = true;
 
     // ローディング状態を表示
     LoadingComponent.toggle('stats', true);
@@ -169,12 +175,7 @@ window.initResultsOverview = async function initResultsOverview() {
         initializeCharts(sessionData);
     }
 
-    // Lucideアイコン再初期化（統合初期化関数を使用）
-    if (typeof window.initializeLucideIcons === 'function') {
-        window.initializeLucideIcons({ immediate: true });
-    }
-
-    // トレーニング記録からの遷移の場合、UI要素を調整（Lucide初期化後に実行）
+    // トレーニング記録からの遷移の場合、UI要素を調整
     if (fromRecords) {
         // DOMが完全に更新されるまで少し待機
         setTimeout(() => {
@@ -184,6 +185,12 @@ window.initResultsOverview = async function initResultsOverview() {
 
     // ローディング状態を非表示
     LoadingComponent.toggle('stats', false);
+
+    // 🎨 Lucideアイコン一括初期化（最後に1回のみ）
+    if (typeof window.initializeLucideIcons === 'function') {
+        console.log('🎨 [results-overview] Lucideアイコン一括初期化');
+        window.initializeLucideIcons({ immediate: true });
+    }
 
     console.log('=== 総合評価ページ初期化完了 ===');
 }
@@ -493,11 +500,6 @@ function displayOverallDistribution(sessionData) {
             <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">${distribution.practice}</span>
         </div>
     `;
-
-    // Lucideアイコン再初期化（統合初期化関数を使用）
-    if (typeof window.initializeLucideIcons === 'function') {
-        window.initializeLucideIcons({ immediate: true });
-    }
 }
 
 /**
@@ -580,14 +582,6 @@ function displaySessionGrid(sessionData) {
     
     container.innerHTML = finalHTML;
     console.log('📊 [displaySessionGrid] container.innerHTML設定完了');
-
-    // Lucideアイコンを初期化
-    if (typeof window.initializeLucideIcons === 'function') {
-        console.log('📊 [displaySessionGrid] Lucide初期化開始');
-        window.initializeLucideIcons({ immediate: true });
-        console.log('📊 [displaySessionGrid] Lucide初期化完了');
-    }
-    
     console.log('📊 [displaySessionGrid] 関数終了');
 }
 
@@ -742,12 +736,7 @@ window.showSessionDetail = function(sessionIndex) {
     // 【追加】外れ値説明セクション表示
     displayOutlierExplanationOverview(outlierFiltered, outlierCount, outlierThreshold);
 
-    // 8. Lucideアイコンを再初期化
-    if (typeof window.initializeLucideIcons === 'function') {
-        window.initializeLucideIcons({ immediate: true });
-    }
-
-    // 9. ナビゲーションボタンの状態を更新
+    // 8. ナビゲーションボタンの状態を更新
     updateNavigationButtons();
 }
 
@@ -1296,11 +1285,6 @@ function displayNextSteps(currentMode, evaluation, chromaticDirection = null, sc
             card.addEventListener('click', () => handleNextStepAction(actionId));
         }
     });
-
-    // Lucideアイコン再初期化
-    if (typeof window.initializeLucideIcons === 'function') {
-        window.initializeLucideIcons({ immediate: true });
-    }
 }
 
 /**
@@ -1380,10 +1364,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log('📊 [DOMContentLoaded] results-overview初期化');
 
     // Lucideアイコン初期化（統合初期化関数を使用）
-    if (typeof window.initializeLucideIcons === 'function') {
-        window.initializeLucideIcons({ immediate: true });
-    }
-
     // 総合評価ページ初期化（DOMContentLoaded経由）
     await window.initResultsOverview();
 });
@@ -1421,11 +1401,6 @@ function displayOutlierExplanationOverview(outlierFiltered, outlierCount, outlie
                 </div>
             </div>
         `;
-
-        // Lucideアイコン再初期化
-        if (typeof window.initializeLucideIcons === 'function') {
-            window.initializeLucideIcons({ immediate: true });
-        }
     } else {
         explanationContainer.innerHTML = '';
     }
@@ -1543,11 +1518,6 @@ function handleRecordsViewMode() {
         // containerの一番下に追加
         container.appendChild(backButtonWrapper);
         console.log('✅ トレーニング記録へ戻るボタンを追加');
-
-        // Lucideアイコンを再初期化
-        if (typeof window.initializeLucideIcons === 'function') {
-            window.initializeLucideIcons({ immediate: true });
-        }
     }
 }
 

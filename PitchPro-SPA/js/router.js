@@ -164,7 +164,7 @@ class SimpleRouter {
                 break;
             case 'results':
             case 'results-overview':
-                this.setupResultsOverviewEvents();
+                // HTML側のonloadで初期化されるため、ここでは何もしない
                 break;
             case 'premium-analysis':
                 this.setupPremiumAnalysisEvents();
@@ -362,64 +362,9 @@ class SimpleRouter {
         }
     }
 
-    setupResultsOverviewEvents() {
-        console.log('Setting up results-overview page events...');
-
-        // ページ初期化関数を実行（スクリプトロードを待つ）
-        setTimeout(() => {
-            console.log('🔍 [Router] Checking for initResultsOverview...');
-            if (typeof window.initResultsOverview === 'function') {
-                console.log('✅ [Router] initResultsOverview found, calling...');
-                window.initResultsOverview();
-            } else {
-                console.error('❌ [Router] initResultsOverview function not found');
-                console.log('🔍 [Router] window keys:', Object.keys(window).filter(k => k.includes('init')));
-            }
-        }, 300);
-
-        // 新しいトレーニング開始ボタン
-        const newTrainingBtn = document.getElementById('btn-new-training');
-        if (newTrainingBtn) {
-            newTrainingBtn.addEventListener('click', () => {
-                console.log('🆕 新しいトレーニング開始ボタンがクリックされました');
-
-                // 【修正】URLパラメータから現在のモードを取得
-                const hash = window.location.hash.substring(1);
-                const params = new URLSearchParams(hash.split('?')[1] || '');
-                const currentMode = params.get('mode') || 'random';
-                console.log(`🔍 [DEBUG] 現在のモード: ${currentMode}`);
-
-                // 【修正】現在のモードのセッションデータをlocalStorageからクリア
-                // 【v2.0.0】SessionDataManagerを使用して統一管理
-                if (window.SessionDataManager) {
-                    window.SessionDataManager.clearSessionsByMode(currentMode);
-                } else {
-                    console.error('❌ SessionDataManagerが見つかりません');
-                }
-
-                // SessionDataRecorderをlocalStorageと同期（重要！）
-                if (window.sessionDataRecorder) {
-                    window.sessionDataRecorder.resetSession();
-                }
-
-                // 遷移前にブラウザバック防止を解除（重要！）
-                console.log('🔧 ブラウザバック防止解除を実行します...');
-                if (window.NavigationManager) {
-                    window.NavigationManager.removeBrowserBackPrevention();
-                    console.log('✅ removeBrowserBackPrevention() 呼び出し完了');
-                } else {
-                    console.error('❌ NavigationManagerが見つかりません');
-                }
-
-                // 【修正】同じモードでtrainingページに直接遷移
-                console.log(`📍 ${currentMode}モードでtrainingへ直接遷移`);
-                NavigationManager.navigateToTraining(currentMode, null);
-            });
-            console.log('✅ 新しいトレーニング開始ボタンのイベントリスナー設定完了');
-        } else {
-            console.warn('⚠️ btn-new-training が見つかりません');
-        }
-    }
+    // setupResultsOverviewEvents() は削除されました
+    // results-overview.htmlのonloadで直接初期化されるため、Router側での初期化は不要
+    // これにより、二重初期化問題が解決されます
 
     setupPremiumAnalysisEvents() {
         console.log('Setting up premium-analysis page events...');
