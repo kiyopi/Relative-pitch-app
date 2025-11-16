@@ -10070,3 +10070,33 @@ Issue #1について:
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 13:00:28] コミット: fix: Issue #1 完全修正 - バックグラウンド復帰後のマイク許可失効に対応
+
+問題の本質:
+- iOSでバックグラウンド状態が長時間続くとマイク許可セッションが失効
+- localStorageフラグは'true'のまま残る
+- 実際のブラウザマイク許可は失われている
+- Results Overview → 次のステップ → Training時に問題発生
+
+シナリオ:
+1. 総合評価ページで待機（画面オフ）
+2. バックグラウンド状態で数分経過
+3. 復帰 → 次のステップ → Training
+4. マイク許可セッション失効
+5. 基音再生後にマイク許可ダイアログが出現
+
+修正内容:
+- startTraining()関数の最初にマイク許可確認を追加
+- getUserMedia()で実際のセッション状態を確認
+- エラー時はトレーニング開始をキャンセル
+- エラー種別に応じた適切なメッセージ表示
+
+メリット:
+- ページ読み込み時はダイアログ出ない
+- ユーザーがボタンを押した時点で確認
+- 許可済みなら即座に成功
+- セッション失効を確実に検出
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
