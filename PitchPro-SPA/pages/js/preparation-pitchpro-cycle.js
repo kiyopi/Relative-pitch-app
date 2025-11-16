@@ -931,6 +931,12 @@ window.initializePreparationPitchProCycle = async function() {
     isPlayingBaseNote = false;
     console.log('🔄 イベントリスナーフラグをリセット');
 
+    // 【修正v4.0.6】準備ページ初期化時にsessionStorageをクリア（中断レッスン復元防止）
+    if (window.SessionManager) {
+        window.SessionManager.clearSessionStorage();
+        console.log('✅ sessionStorageクリア（準備ページ初期化・新規レッスン開始）');
+    }
+
     // ========================================================================
     // ⚠️ デバッグ用: Lucide初期化を無効化（元のコードは下のコメントアウト部分）
     // ========================================================================

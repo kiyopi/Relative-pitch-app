@@ -1313,53 +1313,53 @@ function handleNextStepAction(actionId) {
 
     const actions = {
         // ランダム基音モード
-        'next-step-random-practice': () => window.location.hash = 'training?mode=random',
-        'next-step-random-upgrade': () => window.location.hash = 'training?mode=continuous',
+        'next-step-random-practice': () => window.location.hash = 'preparation?mode=random',
+        'next-step-random-upgrade': () => window.location.hash = 'preparation?mode=continuous',
         'next-step-random-records': () => {
             sessionStorage.clear();
             window.location.hash = 'records';
         },
 
         // 連続チャレンジモード
-        'next-step-continuous-practice': () => window.location.hash = 'training?mode=continuous',
-        'next-step-continuous-upgrade': () => window.location.hash = 'training?mode=12tone&direction=ascending',
+        'next-step-continuous-practice': () => window.location.hash = 'preparation?mode=continuous',
+        'next-step-continuous-upgrade': () => window.location.hash = 'preparation?mode=12tone&direction=ascending',
         'next-step-continuous-records': () => {
             sessionStorage.clear();
             window.location.hash = 'records';
         },
 
         // 12音階モード（上昇）
-        'next-step-12tone-ascending-practice': () => window.location.hash = 'training?mode=12tone&direction=ascending',
-        'next-step-12tone-ascending-upgrade': () => window.location.hash = 'training?mode=12tone&direction=descending',
+        'next-step-12tone-ascending-practice': () => window.location.hash = 'preparation?mode=12tone&direction=ascending',
+        'next-step-12tone-ascending-upgrade': () => window.location.hash = 'preparation?mode=12tone&direction=descending',
         'next-step-12tone-ascending-records': () => {
             sessionStorage.clear();
             window.location.hash = 'records';
         },
 
         // 12音階モード（下降）
-        'next-step-12tone-descending-practice': () => window.location.hash = 'training?mode=12tone&direction=descending',
-        'next-step-12tone-descending-upgrade': () => window.location.hash = 'training?mode=12tone&direction=both',
+        'next-step-12tone-descending-practice': () => window.location.hash = 'preparation?mode=12tone&direction=descending',
+        'next-step-12tone-descending-upgrade': () => window.location.hash = 'preparation?mode=12tone&direction=both',
         'next-step-12tone-descending-records': () => {
             sessionStorage.clear();
             window.location.hash = 'records';
         },
 
         // 12音階モード（両方向）
-        'next-step-12tone-both-practice': () => window.location.hash = 'training?mode=12tone&direction=both',
+        'next-step-12tone-both-practice': () => window.location.hash = 'preparation?mode=12tone&direction=both',
         'next-step-12tone-both-records': () => {
             sessionStorage.clear();
             window.location.hash = 'records';
         },
 
         // 下行モード（将来実装）
-        'next-step-random-down-practice': () => window.location.hash = 'training?mode=random-down',
-        'next-step-random-down-upgrade': () => window.location.hash = 'training?mode=continuous-down',
+        'next-step-random-down-practice': () => window.location.hash = 'preparation?mode=random-down',
+        'next-step-random-down-upgrade': () => window.location.hash = 'preparation?mode=continuous-down',
         'next-step-random-down-records': () => {
             sessionStorage.clear();
             window.location.hash = 'records';
         },
 
-        'next-step-continuous-down-practice': () => window.location.hash = 'training?mode=continuous-down',
+        'next-step-continuous-down-practice': () => window.location.hash = 'preparation?mode=continuous-down',
         'next-step-continuous-down-records': () => {
             sessionStorage.clear();
             window.location.hash = 'records';
