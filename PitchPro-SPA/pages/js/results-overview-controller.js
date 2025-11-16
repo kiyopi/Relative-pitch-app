@@ -1,11 +1,12 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.0.8 (2025-11-16)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.0.9 (2025-11-16)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.0.8
+ * Version: 4.0.9
  * Date: 2025-11-16
  * Changelog:
+ *   v4.0.9 - 【UI改善】評価分布グラフにヘルプボタン追加（DistributionChart.getHelpButton統合）
  *   v4.0.8 - 【機能統合】DistributionChartコンポーネントを総合評価分布表示に統合
  *   v4.0.7 - 【バグ修正】セッション詳細のナビゲーションボタンイベントリスナー追加
  *   v4.0.6 - 【バグ修正】セッション切り替え時のLucide初期化追加、ヘルプボタンイベントリスナー実装
@@ -475,12 +476,20 @@ function displayOverallDistribution(sessionData) {
         return;
     }
 
+    // ヘルプボタンを挿入
+    const helpButtonContainer = document.getElementById('distribution-help-button-container');
+    if (helpButtonContainer && typeof window.DistributionChart.getHelpButton === 'function') {
+        helpButtonContainer.innerHTML = window.DistributionChart.getHelpButton('overall-distribution-chart');
+        console.log('✅ [displayOverallDistribution] ヘルプボタン挿入完了');
+    }
+
     window.DistributionChart.render({
         containerId: 'overall-distribution-chart',
         sessionData: sessionData,
         showTrend: false,
         animate: true,
-        showDescription: false  // 説明文はHTML側で表示済み
+        showDescription: false,  // 説明文はHTML側で表示済み
+        showHelpButton: true     // ポップオーバー生成フラグ
     });
 
     console.log('✅ [displayOverallDistribution] DistributionChart.render() 完了');

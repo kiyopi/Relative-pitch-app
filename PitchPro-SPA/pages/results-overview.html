@@ -114,10 +114,13 @@
 
                 <!-- 評価分布 -->
                 <section class="glass-card">
-                    <h4 class="heading-md" style="margin-bottom: 0.75rem;">
-                        <i data-lucide="bar-chart-3" class="text-blue-300"></i>
-                        <span>評価分布</span>
-                    </h4>
+                    <div class="section-header-row">
+                        <h4 class="heading-md">
+                            <i data-lucide="bar-chart-3" class="text-blue-300"></i>
+                            <span>評価分布</span>
+                        </h4>
+                        <div id="distribution-help-button-container" class="section-header-help"></div>
+                    </div>
 
                     <p class="text-sm text-white-60" style="margin-bottom: 1rem;">全セッションの各音の精度評価を集計した分布です。Excellentが多いほど高精度です。</p>
 
@@ -449,7 +452,7 @@
     <script src="../js/components/DistributionChart.js"></script>
 
     <!-- Results Overview Page Controller -->
-    <script src="pages/js/results-overview-controller.js?v=20251116008" onload="initResultsOverviewPage()"></script>
+    <script src="pages/js/results-overview-controller.js?v=20251116009" onload="initResultsOverviewPage()"></script>
     <script>
         // SPA対応：ページ読み込み完了後に初期化
         async function initResultsOverviewPage() {
