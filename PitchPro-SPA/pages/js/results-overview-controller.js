@@ -1,11 +1,12 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.0.1 (2025-11-16)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.0.2 (2025-11-16)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.0.1
+ * Version: 4.0.2
  * Date: 2025-11-16
  * Changelog:
+ *   v4.0.2 - 【レースコンディション修正】requestAnimationFrameでDOM更新完了を待機してChart.js・Lucide初期化
  *   v4.0.1 - 【バグ修正】詳細分析セクション初期化問題を修正（window.showSessionDetail(0)を自動呼び出し）
  *   v4.0.0 - 【パフォーマンス最適化】二重初期化防止・Lucide過剰呼び出し削減（89%削減）
  *   v3.6.0 - fromRecords時のURLパラメータ優先、modeInfo.id→modeInfo.mode修正
@@ -171,29 +172,37 @@ window.initResultsOverview = async function initResultsOverview() {
     // UI更新（トレーニング記録からの遷移フラグとscaleDirectionを渡す）
     updateOverviewUI(overallEvaluation, sessionData, fromRecords, scaleDirection);
 
-    // Chart.js初期化
-    if (typeof Chart !== 'undefined') {
-        initializeCharts(sessionData);
-    }
+    // 【修正v4.0.2】DOM更新完了を待ってからChart.js・Lucide初期化を実行
+    // requestAnimationFrameでブラウザのレンダリングサイクル後に実行
+    requestAnimationFrame(() => {
+        // Chart.js初期化
+        console.log('🔍 [DEBUG] Chart型チェック:', typeof Chart);
+        if (typeof Chart !== 'undefined') {
+            console.log('📊 [initializeCharts] Chart.js初期化開始');
+            initializeCharts(sessionData);
+            console.log('✅ [initializeCharts] Chart.js初期化完了');
+        } else {
+            console.error('❌ Chart.jsが読み込まれていません');
+        }
 
-    // トレーニング記録からの遷移の場合、UI要素を調整
-    if (fromRecords) {
-        // DOMが完全に更新されるまで少し待機
-        setTimeout(() => {
-            handleRecordsViewMode();
-        }, 100);
-    }
+        // トレーニング記録からの遷移の場合、UI要素を調整
+        if (fromRecords) {
+            setTimeout(() => {
+                handleRecordsViewMode();
+            }, 100);
+        }
 
-    // ローディング状態を非表示
-    LoadingComponent.toggle('stats', false);
+        // ローディング状態を非表示
+        LoadingComponent.toggle('stats', false);
 
-    // 🎨 Lucideアイコン一括初期化（最後に1回のみ）
-    if (typeof window.initializeLucideIcons === 'function') {
-        console.log('🎨 [results-overview] Lucideアイコン一括初期化');
-        window.initializeLucideIcons({ immediate: true });
-    }
+        // 🎨 Lucideアイコン一括初期化（DOM完全更新後に実行）
+        if (typeof window.initializeLucideIcons === 'function') {
+            console.log('🎨 [results-overview] Lucideアイコン一括初期化');
+            window.initializeLucideIcons({ immediate: true });
+        }
 
-    console.log('=== 総合評価ページ初期化完了 ===');
+        console.log('=== 総合評価ページ初期化完了 ===');
+    });
 }
 
 /**
