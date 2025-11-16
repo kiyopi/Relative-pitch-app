@@ -10212,3 +10212,20 @@ SessionDataManagerに2つのフィルタリングメソッドを追加、Single 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 15:25:57] コミット: fix: results-overview.htmlにevaluation-calculator.js読み込み追加
+
+## 問題
+総合評価ページで`calculateOverallEvaluation is not defined`エラー発生
+
+## 原因
+results-overview.htmlにevaluation-calculator.jsのscriptタグが含まれていなかった
+
+## 解決
+evaluation-calculator.jsをresults-overview-controller.jsの前に読み込むように追加
+
+## 修正ファイル
+- /PitchPro-SPA/pages/results-overview.html (line 448-449)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
