@@ -1,11 +1,12 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.0.2 (2025-11-16)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.0.3 (2025-11-16)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.0.2
+ * Version: 4.0.3
  * Date: 2025-11-16
  * Changelog:
+ *   v4.0.3 - 【チラつき修正】DOMContentLoadedイベントリスナー削除（SPA環境では不要、初期表示復元によるチラつき防止）
  *   v4.0.2 - 【レースコンディション修正】requestAnimationFrameでDOM更新完了を待機してChart.js・Lucide初期化
  *   v4.0.1 - 【バグ修正】詳細分析セクション初期化問題を修正（window.showSessionDetail(0)を自動呼び出し）
  *   v4.0.0 - 【パフォーマンス最適化】二重初期化防止・Lucide過剰呼び出し削減（89%削減）
@@ -1376,15 +1377,15 @@ function handleNextStepAction(actionId) {
 }
 
 /**
- * DOMContentLoaded時の初期化（直接ページアクセス時用）
+ * 【削除v4.0.3】DOMContentLoaded時の初期化
+ * SPA環境ではHTMLの onload="initResultsOverviewPage()" で初期化されるため、
+ * このイベントリスナーは不要であり、むしろ初期表示の復元によるチラつきを引き起こす。
+ *
+ * 従来のコード:
+ * document.addEventListener('DOMContentLoaded', async function() {
+ *     await window.initResultsOverview();
+ * });
  */
-document.addEventListener('DOMContentLoaded', async function() {
-    console.log('📊 [DOMContentLoaded] results-overview初期化');
-
-    // Lucideアイコン初期化（統合初期化関数を使用）
-    // 総合評価ページ初期化（DOMContentLoaded経由）
-    await window.initResultsOverview();
-});
 
 /**
  * 外れ値説明セクションを表示（総合評価ページ用）
