@@ -281,6 +281,12 @@ export async function initializeTrainingPage() {
         throw new Error('SessionManager初期化に失敗しました');
     }
 
+    // Wait for Lucide
+    await waitForLucide();
+
+    // Load voice range data
+    loadVoiceRangeData();
+
     // 【NavigationManager統合】リロード検出 → preparationへリダイレクト
     if (NavigationManager.detectReload()) {
         console.warn('⚠️ リロード検出 - preparationへリダイレクト');
@@ -294,25 +300,6 @@ export async function initializeTrainingPage() {
         // リダイレクトエラーをスロー（router.jsで特別扱い）
         throw NavigationManager.createRedirectError();
     }
-
-    // 【修正】マイク許可チェック → localStorageフラグで確認（ダイアログなし）
-    console.log('🎤 マイク許可状態を確認中...');
-    const micPermissionGranted = localStorage.getItem('micPermissionGranted');
-
-    if (micPermissionGranted !== 'true') {
-        console.warn('⚠️ マイクテスト未完了 - 準備ページへリダイレクト');
-        alert('トレーニングを開始する前に、マイクテストを完了してください。');
-        await NavigationManager.redirectToPreparation('マイクテスト未完了');
-        throw NavigationManager.createRedirectError();
-    }
-
-    console.log('✅ マイク許可確認完了 - トレーニング開始可能');
-
-    // Wait for Lucide
-    await waitForLucide();
-
-    // Load voice range data
-    loadVoiceRangeData();
 
     // 【新規追加】音域データ必須チェック
     if (!checkVoiceRangeData()) {

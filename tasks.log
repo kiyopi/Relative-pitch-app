@@ -10020,3 +10020,23 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 12:45:29] コミット: fix: マイク許可チェックをlocalStorageフラグ確認に変更
+
+問題:
+- ページ読み込み時にgetUserMedia()を呼び出していた
+- → マイク許可ダイアログが即座に表示される
+- → ユーザーがボタンを押す前にダイアログが出る
+
+修正:
+- getUserMedia()削除 → localStorageフラグ確認に変更
+- Preparationページで設定されるmicPermissionGrantedフラグをチェック
+- フラグがない場合のみPreparationページにリダイレクト
+
+メリット:
+- ページ読み込み時にダイアログが出ない
+- Preparationを経由していない場合は確実にリダイレクト
+- ユーザー体験が大幅に向上
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
