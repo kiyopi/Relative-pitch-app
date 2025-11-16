@@ -28,7 +28,7 @@
                     </div>
                     <div class="page-header-text">
                         <h1 class="page-title">総合評価</h1>
-                        <p class="page-subtitle text-green-200">8セッション (64音) の総合評価</p>
+                        <p class="page-subtitle"><!-- JavaScriptで動的生成 --></p>
                     </div>
                 </div>
             </div>
@@ -40,7 +40,7 @@
                 <!-- 総合評価セクション -->
                 <section class="rank-section glass-card share-card">
                     <div class="rank-mode">
-                        <h3 class="mode-title" id="main-mode-title">ランダム基音モード</h3>
+                        <h3 class="mode-title" id="main-mode-title"><!-- JavaScriptで動的生成 --></h3>
                     </div>
                     <div class="rank-content-row">
                         <!-- グレードアイコン（JavaScriptで動的生成） -->
@@ -53,27 +53,27 @@
                         <!-- 統計情報 -->
                         <div class="rank-stats-row">
                             <div class="rank-stat-item">
-                                <div class="stat-value-rank grade-value" id="dynamic-grade">B</div>
+                                <div class="stat-value-rank grade-value" id="dynamic-grade"><!-- JS生成 --></div>
                                 <div class="stat-label-rank">総合グレード</div>
                             </div>
                             <div class="rank-stat-item">
-                                <div class="stat-value-rank stat-value-avg-error avg-error">±18.2¢</div>
+                                <div class="stat-value-rank stat-value-avg-error avg-error"><!-- JS生成 --></div>
                                 <div class="stat-label-rank">平均誤差（セント）</div>
                             </div>
                             <div class="rank-stat-item">
-                                <div class="stat-value-rank excellence-rate" id="excellence-rate">50%</div>
+                                <div class="stat-value-rank excellence-rate" id="excellence-rate"><!-- JS生成 --></div>
                                 <div class="stat-label-rank">優秀率（±20¢以内）</div>
                             </div>
                             <div class="rank-stat-item">
-                                <div class="stat-value-rank stat-value-session-count session-count">8</div>
+                                <div class="stat-value-rank stat-value-session-count session-count"><!-- JS生成 --></div>
                                 <div class="stat-label-rank">セッション数</div>
                             </div>
                         </div>
-                        
+
                         <!-- ランク取得メッセージ -->
                         <div class="rank-achievement-message text-center">
                             <p id="share-message" class="text-body text-white-90">
-                                B級ランク取得！グッドプレイヤー！
+                                <!-- JavaScriptで動的生成 -->
                             </p>
                         </div>
                     </div>
@@ -446,7 +446,7 @@
     </div>
 
     <!-- Results Overview Page Controller -->
-    <script src="pages/js/results-overview-controller.js?v=20251116002" onload="initResultsOverviewPage()"></script>
+    <script src="pages/js/results-overview-controller.js?v=20251116003" onload="initResultsOverviewPage()"></script>
     <script>
         // SPA対応：ページ読み込み完了後に初期化
         async function initResultsOverviewPage() {
