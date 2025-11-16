@@ -874,66 +874,12 @@ function groupSessionsIntoLessons(sessions) {
     // 旧データのマイグレーション
     const migratedSessions = migrateOldSessions(repairedSessions);
 
-    // lessonIdでグループ化
-    const lessonMap = {};
+    // 【修正v4.0.8】SessionDataManager.getCompleteLessons()を使用（一元管理）
+    const completeLessons = window.SessionDataManager
+        ? window.SessionDataManager.getCompleteLessons(migratedSessions)
+        : [];
 
-    migratedSessions.forEach(session => {
-        const lessonId = session.lessonId;
-
-        if (!lessonId) {
-            console.warn(`⚠️ [Grouping] セッション${session.sessionId}にlessonIdがありません（スキップ）`);
-            return;
-        }
-
-        if (!lessonMap[lessonId]) {
-            lessonMap[lessonId] = {
-                lessonId: lessonId,
-                mode: session.mode || 'random',
-                chromaticDirection: session.chromaticDirection || 'random',
-                scaleDirection: session.scaleDirection || 'ascending',
-                sessions: [],
-                startTime: session.startTime,
-                endTime: session.startTime
-            };
-        }
-
-        lessonMap[lessonId].sessions.push(session);
-
-        // 開始・終了時刻を更新
-        if (session.startTime < lessonMap[lessonId].startTime) {
-            lessonMap[lessonId].startTime = session.startTime;
-        }
-        if ((session.endTime || session.startTime) > lessonMap[lessonId].endTime) {
-            lessonMap[lessonId].endTime = session.endTime || session.startTime;
-        }
-    });
-
-    // レッスン配列に変換
-    const lessons = Object.values(lessonMap);
-
-    console.log(`✅ [Grouping] グループ化完了: ${lessons.length}レッスン`);
-
-    // デバッグ: レッスン情報表示
-    lessons.forEach(lesson => {
-        console.log(`   - ${lesson.mode}（${lesson.scaleDirection}）: ${lesson.sessions.length}セッション [${lesson.lessonId}]`);
-    });
-
-    // 【追加v4.0.7】不完全レッスンをフィルタリング（予期しない中断で残ったデータを除外）
-    const completeLessons = lessons.filter(lesson => {
-        const expectedSessions = window.ModeController
-            ? window.ModeController.getSessionsPerLesson(lesson.mode, {
-                direction: lesson.chromaticDirection
-            })
-            : 8; // デフォルト
-
-        const isComplete = lesson.sessions.length >= expectedSessions;
-        if (!isComplete) {
-            console.warn(`⚠️ [Filtering] 不完全レッスンを除外: ${lesson.mode}（${lesson.sessions.length}/${expectedSessions}セッション）[${lesson.lessonId}]`);
-        }
-        return isComplete;
-    });
-
-    console.log(`✅ [Filtering] 完全レッスンのみフィルタリング: ${completeLessons.length}/${lessons.length}レッスン`);
+    console.log(`✅ [Filtering] 完全レッスンのみフィルタリング: ${completeLessons.length}レッスン`);
 
     // 最新順にソート
     completeLessons.sort((a, b) => b.startTime - a.startTime);

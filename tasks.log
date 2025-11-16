@@ -10140,3 +10140,37 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 13:38:25] コミット: docs: 総合評価→準備ページ経由修正の作業ログ記録
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 14:31:57] コミット: fix: モード名表示の一元管理と不完全データフィルタリング実装（v4.0.7）
+
+- preparationController.js: リダイレクトメッセージをModeController.generatePageTitle()で完全なモード名表示（上昇・下降、上行・下行を含む）、「自動的に」文言を改善
+- results-overview-controller.js: displayNextSteps()でchromaticDirectionとscaleDirectionを分離、descriptionに完全なモード名を含める
+- records-controller.js: groupSessionsIntoLessons()で不完全レッスンをフィルタリング、ModeController.getSessionsPerLesson()で期待セッション数と比較
+
+これにより、GitHub Issue #1（総合評価→トレーニング直接遷移問題）の関連問題として、UIの一貫性向上と不完全データの適切な処理を実現
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 14:41:49] コミット: docs: v4.0.6-v4.0.7修正内容を仕様書に追記
+
+TRAINING_SPECIFICATION.md (v4.0.7):
+- Bug #11-7: 総合評価からの直接トレーニング遷移問題（v4.0.6）
+- Bug #11-8: 不完全データ表示問題（v4.0.7）
+- UI一貫性向上: モード名表示のModeController統合
+
+MODE_CONTROLLER_SPECIFICATION.md (v2.0.1):
+- UI一貫性向上のための統合使用拡大
+- preparationController.js、results-overview-controller.js、records-controller.jsでの使用箇所追加
+
+TRAINING_RECORDS_SPECIFICATION.md (v2.1.0後期):
+- 不完全データフィルタリング実装の詳細記載
+- ModeController.getSessionsPerLesson()による完了判定
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

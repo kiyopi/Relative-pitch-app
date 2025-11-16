@@ -292,6 +292,117 @@ class SessionDataManager {
     /**
      * デバッグ情報を出力
      */
+
+    // ===== フィルタリング機能（不完全データ除外） =====
+
+    /**
+     * 特定のlessonIdの完全なセッションを取得
+     * 
+     * 不完全なレッスン（期待セッション数に満たない）は空配列を返す。
+     * トレーニング記録・総合評価・詳細分析で使用。
+     *
+     * @param {string} lessonId - レッスンID
+     * @param {string} mode - モードID (random, continuous, 12tone)
+     * @param {string} chromaticDirection - 音階方向 (ascending, descending, ascending_descending)
+     * @returns {Array} 完全なセッション配列（不完全な場合は空配列）
+     *
+     * @example
+     * // 12音階上行モードのlessonが完全か確認
+     * const sessions = SessionDataManager.getCompleteSessionsByLessonId(
+     *     'lesson_123', '12tone', 'ascending'
+     * );
+     * if (sessions.length > 0) {
+     *     console.log('完全なレッスン:', sessions);
+     * }
+     */
+    static getCompleteSessionsByLessonId(lessonId, mode, chromaticDirection) {
+        if (!lessonId) {
+            console.warn('⚠️ SessionDataManager: lessonIdが未指定');
+            return [];
+        }
+
+        const allSessions = this.getAllSessions();
+        const lessonSessions = allSessions.filter(s => s.lessonId === lessonId);
+
+        // 期待セッション数を取得
+        const expectedSessions = window.ModeController
+            ? window.ModeController.getSessionsPerLesson(mode, { direction: chromaticDirection })
+            : 12; // デフォルト（12音階モード）
+
+        // 完全なレッスンのみ返す
+        if (lessonSessions.length >= expectedSessions) {
+            console.log(`✅ [SessionDataManager] 完全レッスン: ${lessonId} (${lessonSessions.length}/${expectedSessions})`);
+            return lessonSessions;
+        }
+
+        console.warn(`⚠️ [SessionDataManager] 不完全レッスン除外: ${lessonId} (${lessonSessions.length}/${expectedSessions})`);
+        return [];
+    }
+
+    /**
+     * 完全なレッスンのみをグループ化して取得
+     * 
+     * 全セッションをlessonId単位でグループ化し、不完全なレッスンを除外。
+     * トレーニング記録・詳細分析で使用。
+     *
+     * @returns {Array} 完全なレッスン配列（各要素: { lessonId, mode, sessions, ... }）
+     *
+     * @example
+     * const completeLessons = SessionDataManager.getCompleteLessons();
+     * completeLessons.forEach(lesson => {
+     *     console.log(`レッスン: ${lesson.mode}, セッション数: ${lesson.sessions.length}`);
+     * });
+     */
+    static getCompleteLessons(sessions = null) {
+        // 引数がない場合はlocalStorageから取得
+        const allSessions = sessions !== null ? sessions : this.getAllSessions();
+
+        // lessonIdでグループ化
+        const lessonMap = {};
+        allSessions.forEach(session => {
+            const lessonId = session.lessonId;
+            if (!lessonMap[lessonId]) {
+                lessonMap[lessonId] = {
+                    lessonId: lessonId,
+                    mode: session.mode,
+                    chromaticDirection: session.scaleDirection || session.chromaticDirection || 'ascending',
+                    scaleDirection: session.scaleDirection || 'ascending',
+                    startTime: session.startTime,
+                    endTime: session.endTime || session.startTime,
+                    sessions: []
+                };
+            }
+            lessonMap[lessonId].sessions.push(session);
+
+            // 開始・終了時刻を更新
+            if (session.startTime < lessonMap[lessonId].startTime) {
+                lessonMap[lessonId].startTime = session.startTime;
+            }
+            if ((session.endTime || session.startTime) > lessonMap[lessonId].endTime) {
+                lessonMap[lessonId].endTime = session.endTime || session.startTime;
+            }
+        });
+
+        // 完全なレッスンのみフィルタリング
+        const lessons = Object.values(lessonMap);
+        const completeLessons = lessons.filter(lesson => {
+            const expectedSessions = window.ModeController
+                ? window.ModeController.getSessionsPerLesson(lesson.mode, {
+                    direction: lesson.chromaticDirection
+                })
+                : 8; // デフォルト（ランダムモード）
+
+            const isComplete = lesson.sessions.length >= expectedSessions;
+            if (!isComplete) {
+                console.warn(`⚠️ [SessionDataManager] 不完全レッスン除外: ${lesson.mode}（${lesson.sessions.length}/${expectedSessions}セッション）[${lesson.lessonId}]`);
+            }
+            return isComplete;
+        });
+
+        console.log(`📊 [SessionDataManager] 全レッスン: ${lessons.length}件, 完全レッスン: ${completeLessons.length}件`);
+        return completeLessons;
+    }
+
     static debug() {
         const allSessions = this.getAllSessions();
         console.log('=== SessionDataManager Debug Info ===');

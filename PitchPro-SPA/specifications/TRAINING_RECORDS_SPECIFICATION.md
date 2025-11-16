@@ -1,9 +1,9 @@
 # トレーニング記録ページ 正式仕様書
 
-**バージョン**: 2.1.0
+**バージョン**: 2.2.0
 **作成日**: 2025-11-11
 **最終更新**: 2025-11-16
-**ステータス**: Section 1完全実装版
+**ステータス**: Section 1完全実装版、フィルタリング一元管理対応
 
 ---
 
@@ -1000,6 +1000,16 @@ function viewLessonDetail(lesson) {
 ---
 
 ## 📝 10. 変更履歴
+
+### v2.2.0 (2025-11-16) - フィルタリング一元管理対応
+- **SessionDataManager集約**: 不完全レッスンフィルタリングをSessionDataManagerに一元化
+  - **実装**: `SessionDataManager.getCompleteLessons(sessions)`を使用
+  - **修正ファイル**: `/PitchPro-SPA/pages/js/records-controller.js` (line 866-893)
+  - **利点**: トレーニング記録・総合評価・詳細分析で共通フィルタリング使用、Single Source of Truth実現
+  - **保守性向上**: フィルタリングロジック修正は1箇所のみ、一貫性保証
+  - **拡張性確保**: 将来的な詳細分析ページでも同じメソッドを使用可能
+- **関連修正**: TRAINING_SPECIFICATION.md v4.0.8 Bug #11-9の一環
+- **詳細**: SessionDataManagerに`getCompleteLessons()`と`getCompleteSessionsByLessonId()`を追加
 
 ### v2.1.0 (2025-11-16) - Section 1完全実装版
 - **トレーニング統計セクション完全実装**: 上段3項目・下段4項目の完全実装完了

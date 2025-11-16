@@ -1,10 +1,22 @@
 # トレーニング機能仕様書（SPA版）
 
-**バージョン**: 4.0.7
+**バージョン**: 4.0.8
 **作成日**: 2025-10-23
 **最終更新**: 2025-11-16
 
 **変更履歴**:
+- v4.0.8 (2025-11-16): GitHub Issue #1関連修正 - フィルタリング機能の一元管理（SessionDataManager集約）
+  - **Bug #11-9**: 総合評価の不正な値表示問題（v4.0.8）
+    - **問題**: 総合評価ページで62セッション表示、不完全レッスンのフィルタリングが機能しない
+    - **根本原因1**: `results-overview-controller.js`がSessionManagerのlessonIdをURL parameterより優先、lessonId不一致で全セッションを取得
+    - **根本原因2**: フィルタリングロジックが`records-controller.js`と`results-overview-controller.js`に分散、不完全レッスン除外が片方のみ
+    - **解決**: SessionDataManagerに2つのフィルタリングメソッド追加、Single Source of Truth実現
+      - `getCompleteSessionsByLessonId(lessonId, mode, chromaticDirection)` - 特定lessonIdの完全なセッションのみ取得
+      - `getCompleteLessons(sessions)` - 完全なレッスンのみをグループ化して取得（引数でセッション配列を受け取り可能）
+    - **修正ファイル1**: `/PitchPro-SPA/js/session-data-manager.js` (フィルタリングメソッド追加)
+    - **修正ファイル2**: `/PitchPro-SPA/pages/js/results-overview-controller.js` (URLパラメータ優先、getCompleteSessionsByLessonId使用)
+    - **修正ファイル3**: `/PitchPro-SPA/pages/js/records-controller.js` (getCompleteLessons使用、ロジック一元化)
+    - **実装**: フィルタリングロジックをSessionDataManagerに集約、トレーニング記録・総合評価・詳細分析で共通使用
 - v4.0.7 (2025-11-16): GitHub Issue #1関連修正 - モード名表示一元管理と不完全データフィルタリング
   - **Bug #11-8**: 不完全データ表示問題（v4.0.7）
     - **問題**: 予期しない中断で残った不完全レッスン（3/12セッション等）がトレーニング記録に表示される

@@ -36,56 +36,60 @@ const DEBUG_MODE = true;
 /**
  * 総合評価ページの初期化（即座にグローバル定義）
  */
-window.initResultsOverview = async function() {
-    console.log('📊 総合評価ページ初期化開始');
+window.initResultsOverview = async function initResultsOverview() {
+    console.log('=== 総合評価ページ初期化開始 ===');
 
-    // DataManagerから全セッションデータを取得
-    const allSessionData = loadAllSessionData();
+    // Lucideアイコン初期化
+    if (window.initializeLucideIcons) {
+        window.initializeLucideIcons({ immediate: true });
+    }
 
-    if (!allSessionData || allSessionData.length === 0) {
-        console.warn('⚠️ セッションデータが見つかりません。ダミーデータを表示します。');
-        showDummyOverview();
+    // ローディング状態を表示
+    LoadingComponent.toggle('stats', true);
+
+    // デバッグモード判定
+    const hash = window.location.hash;
+    const DEBUG_MODE = hash.includes('debug=true');
+
+    // 全セッションデータを取得
+    const allSessionData = window.SessionDataManager 
+        ? window.SessionDataManager.getAllSessions() 
+        : (JSON.parse(localStorage.getItem('sessionData')) || []);
+
+    console.log(`📊 全セッションデータ取得: ${allSessionData.length}セッション`);
+
+    if (allSessionData.length === 0) {
+        console.warn('⚠️ セッションデータが見つかりません');
+        LoadingComponent.toggle('stats', false);
         return;
     }
 
-    // 【v1.1.0】SessionManager優先でパラメータ取得
-    // 優先順位: SessionManager → URLパラメータ
+    // モード・lessonId・scaleDirectionの取得（優先順位：URL > SessionManager）
     let currentMode = 'random';
     let lessonId = null;
     let scaleDirection = null;
 
     // URLパラメータを最初に取得
-    const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash.split('?')[1] || '');
     const fromRecords = params.get('fromRecords') === 'true';
+    const urlLessonId = params.get('lessonId');
+    const urlMode = params.get('mode');
+    const urlScaleDirection = params.get('scaleDirection');
 
-    // トレーニング記録からの遷移時はURLパラメータを優先
-    if (fromRecords) {
-        currentMode = params.get('mode') || 'random';
-        lessonId = params.get('lessonId');
-        scaleDirection = params.get('scaleDirection');
-        console.log(`✅ [Records View] URLパラメータ優先: mode=${currentMode}, lessonId=${lessonId}, scaleDirection=${scaleDirection}`);
-    } else {
-        // SessionManagerから取得を試みる
-        if (window.SessionManager) {
-            const sessionManager = SessionManager.getCurrent();
-            if (sessionManager) {
-                currentMode = sessionManager.getMode();
-                lessonId = sessionManager.getLessonId();
-                scaleDirection = sessionManager.getScaleDirection();
-                console.log(`✅ [SessionManager] パラメータ取得: mode=${currentMode}, lessonId=${lessonId}, scaleDirection=${scaleDirection}`);
-            }
-        }
-
-        // URLパラメータから補完（フォールバック）
-        if (!currentMode || currentMode === 'random') {
-            currentMode = params.get('mode') || 'random';
-        }
-        if (!lessonId) {
-            lessonId = params.get('lessonId');
-        }
-        if (!scaleDirection) {
-            scaleDirection = params.get('scaleDirection');
+    // 【修正v4.0.8】URLパラメータを最優先（lessonIdがあれば常に優先）
+    if (urlLessonId) {
+        lessonId = urlLessonId;
+        currentMode = urlMode || 'random';
+        scaleDirection = urlScaleDirection || 'ascending';
+        console.log(`✅ [URL優先] lessonId=${lessonId}, mode=${currentMode}, scaleDirection=${scaleDirection}`);
+    } else if (window.SessionManager) {
+        // SessionManagerから取得（lessonIdがURLにない場合のみ）
+        const sessionManager = SessionManager.getCurrent();
+        if (sessionManager) {
+            currentMode = sessionManager.getMode();
+            lessonId = sessionManager.getLessonId();
+            scaleDirection = sessionManager.getScaleDirection();
+            console.log(`✅ [SessionManager] lessonId=${lessonId}, mode=${currentMode}, scaleDirection=${scaleDirection}`);
         }
     }
     
@@ -109,30 +113,30 @@ window.initResultsOverview = async function() {
     // セッションデータのフィルタリング
     let sessionData;
 
-    // 【修正v3.5.0】lessonIdがあれば常に優先（fromRecordsフラグは不要）
+    // 【修正v4.0.8】SessionDataManager.getCompleteSessionsByLessonId()を使用
     if (lessonId) {
-        // トレーニング完了時 or トレーニング記録から遷移：特定のlessonIdのセッションのみを表示
-        console.log(`🔍 [DEBUG] フィルタリング開始 - 目標lessonId: ${lessonId}`);
-        console.log(`🔍 [DEBUG] 全セッション数: ${allSessionData.length}`);
-        console.log(`🔍 [DEBUG] fromRecords: ${fromRecords}`);
-
-        sessionData = allSessionData.filter(s => s.lessonId === lessonId);
-        console.log(`✅ lessonId=${lessonId}のセッションデータ取得: ${sessionData.length}セッション`);
-
-        if (DEBUG_MODE && sessionData.length > 0) {
-            console.log('🔍 [DEBUG] フィルタリング結果の最初のセッション:', sessionData[0]);
-            console.log('🔍 [DEBUG] すべてのlessonId:', sessionData.map(s => s.lessonId));
-        }
+        console.log(`🔍 [DEBUG] 完全レッスンチェック開始 - lessonId: ${lessonId}`);
         
+        // 完全なレッスンのみ取得
+        sessionData = window.SessionDataManager
+            ? window.SessionDataManager.getCompleteSessionsByLessonId(lessonId, currentMode, scaleDirection)
+            : allSessionData.filter(s => s.lessonId === lessonId);
+
         if (sessionData.length === 0) {
-            console.warn(`⚠️ lessonId=${lessonId}のセッションが見つかりません`);
-            // フォールバック: モード+scaleDirectionでフィルタリング
-            sessionData = allSessionData.filter(s => 
-                s.mode === currentMode && 
-                (s.scaleDirection || 'ascending') === (scaleDirection || 'ascending')
-            );
-            console.log(`🔄 フォールバック: ${currentMode}モード（${scaleDirection}）のセッション=${sessionData.length}件`);
+            // 不完全レッスンまたは存在しないlessonId
+            const rawSessions = allSessionData.filter(s => s.lessonId === lessonId);
+            if (rawSessions.length > 0) {
+                console.error(`❌ 不完全レッスン: ${lessonId} (${rawSessions.length}セッション)`);
+                alert(`このレッスンは未完了です。\n正常な評価を表示できません。\n\nトレーニング記録ページに戻ります。`);
+            } else {
+                console.error(`❌ lessonIdが見つかりません: ${lessonId}`);
+                alert(`指定されたレッスンが見つかりません。\n\nトレーニング記録ページに戻ります。`);
+            }
+            window.location.hash = '#training-records';
+            return;
         }
+
+        console.log(`✅ 完全レッスン取得成功: ${sessionData.length}セッション`);
     } else if (scaleDirection) {
         // scaleDirection指定あり：モード+scaleDirectionでフィルタリング
         sessionData = allSessionData.filter(s => 
@@ -152,92 +156,49 @@ window.initResultsOverview = async function() {
     window.currentMode = currentMode;
 
     // フィルタリング後のセッションIDリストを表示（デバッグ）
-    if (DEBUG_MODE && sessionData.length > 0) {
-        const sessionIds = sessionData.map(s => `#${s.sessionId}(${s.mode})`).join(', ');
-        console.log(`🔍 [DEBUG] フィルタリング済みセッション: ${sessionIds}`);
+    if (DEBUG_MODE) {
+        console.log('🔍 [DEBUG] フィルタリング後のセッションID:', sessionData.map(s => s.sessionId));
     }
 
-    if (sessionData.length === 0) {
-        console.warn(`⚠️ ${currentMode}モードのセッションデータが見つかりません。`);
-        showDummyOverview();
-        return;
+    // ページ番号の取得
+    const pageParam = params.get('page');
+    let page = pageParam ? parseInt(pageParam, 10) : 1;
+
+    // セッション総数とページング設定
+    const totalSessions = sessionData.length;
+    const sessionsPerPage = 50;
+    const totalPages = Math.ceil(totalSessions / sessionsPerPage);
+
+    // ページ番号の検証
+    if (page < 1 || page > totalPages) {
+        console.warn(`⚠️ 無効なページ番号: ${page}（総ページ数: ${totalPages}）`);
+        page = 1;
     }
 
-    // 動的グレード計算
-    const evaluation = window.EvaluationCalculator.calculateDynamicGrade(sessionData);
-    console.log('✅ 評価結果:', evaluation);
+    // 現在のページに表示するセッションを抽出
+    const startIndex = (page - 1) * sessionsPerPage;
+    const endIndex = Math.min(startIndex + sessionsPerPage, totalSessions);
+    const currentPageSessions = sessionData.slice(startIndex, endIndex);
 
-    // UI更新（トレーニング記録からの遷移フラグとscaleDirectionを渡す）
-    updateOverviewUI(evaluation, sessionData, fromRecords, scaleDirection);
+    console.log(`📄 ページング: ${page}/${totalPages}ページ（${startIndex + 1}〜${endIndex}番目のセッション）`);
 
-    // Chart.js初期化
-    if (typeof Chart !== 'undefined') {
-        initializeCharts(sessionData);
-    }
+    // 総合評価計算
+    const overallEvaluation = calculateOverallEvaluation(currentPageSessions);
+    console.log('📊 総合評価計算完了:', overallEvaluation);
 
-    // Lucideアイコン再初期化（統合初期化関数を使用）
-    if (typeof window.initializeLucideIcons === 'function') {
-        window.initializeLucideIcons({ immediate: true });
-    }
+    // 統計情報の表示（現在のページのセッションのみ）
+    renderStatsSection(overallEvaluation, currentPageSessions);
 
-    // トレーニング記録からの遷移の場合、UI要素を調整（Lucide初期化後に実行）
-    if (fromRecords) {
-        // DOMが完全に更新されるまで少し待機
-        setTimeout(() => {
-            handleRecordsViewMode();
-        }, 100);
-    }
+    // セッション一覧の表示（現在のページのセッションのみ）
+    renderSessionList(currentPageSessions, currentMode);
 
-    // ナビゲーションボタンのイベントリスナーを追加
-    const prevBtn = document.getElementById('prev-session-btn');
-    const nextBtn = document.getElementById('next-session-btn');
+    // ページネーション表示（全セッション数を基準）
+    renderPagination(page, totalPages, currentMode);
 
-    if (prevBtn) {
-        prevBtn.addEventListener('click', window.navigateToPrevSession);
-    }
+    // ローディング状態を非表示
+    LoadingComponent.toggle('stats', false);
 
-    if (nextBtn) {
-        nextBtn.addEventListener('click', window.navigateToNextSession);
-    }
-
-    // 初回表示時は最新（最後）のセッションを表示
-    if (sessionData && sessionData.length > 0) {
-        const latestIndex = sessionData.length - 1;
-        if (DEBUG_MODE) {
-            console.log(`🔍 [DEBUG] 初回表示: インデックス ${latestIndex} (最新セッション)`);
-        }
-        window.showSessionDetail(latestIndex);
-    }
-
-    // ヘルプボタンのイベントリスナーを設定（SPAのinnerHTML挿入後に実行）
-    console.log('🔧 [initResultsOverview] Setting up help button event listeners');
-    const helpButtons = document.querySelectorAll('.help-icon-btn');
-    console.log('🔧 [initResultsOverview] Found help buttons:', helpButtons.length);
-
-    helpButtons.forEach((btn, index) => {
-        // 既存のリスナーを削除してから追加（重複防止）
-        const newBtn = btn.cloneNode(true);
-        btn.parentNode.replaceChild(newBtn, btn);
-
-        // ボタンの位置で判別（最初のボタンは総合グレード用）
-        if (index === 0) {
-            newBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🔵 Grade help button clicked');
-                toggleGradePopover();
-            });
-            console.log('✅ Grade help button listener added');
-        } else {
-            newBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🟢 Session rank help button clicked');
-                toggleSessionRankPopover();
-            });
-            console.log('✅ Session rank help button listener added');
-        }
-    });
+    console.log('=== 総合評価ページ初期化完了 ===');
 }
 
 /**
