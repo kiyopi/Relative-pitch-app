@@ -1,6 +1,6 @@
 /**
  * モード管理統合コントローラー
- * @version 2.0.0
+ * @version 2.0.1
  * @description 全トレーニングモードの定義と設定を一元管理
  *
  * 【責任範囲】
@@ -9,12 +9,18 @@
  * - モード名の統一管理
  * - 基音選択方式の定義
  * - UI表示（アイコン・色・タイトル）の統一管理 ★v2.0.0追加
+ * - 1セッション標準時間の定義 ★v2.0.1追加
  *
  * 【使用箇所】
  * - trainingController.js: トレーニング実行
- * - records-controller.js: レッスングループ化
+ * - records-controller.js: レッスングループ化、総トレーニング時間計算 ★v2.0.1更新
  * - session-data-recorder.js: セッションデータ保存
  * - results-overview-controller.js: 総合評価ページ ★v2.0.0追加
+ *
+ * 【変更履歴】
+ * v2.0.1 (2025-11-16): standardDurationPerSession追加（全モード13秒）
+ *                      純粋なトレーニング時間（基音2.5s+ガイド5.3s+発声5.6s）のみカウント
+ * v2.0.0 (2025-11-14): UI色設定追加（アイコン背景・サブタイトル色）
  */
 
 const ModeController = {
@@ -33,6 +39,8 @@ const ModeController = {
             hasRangeAdjustment: false,
             difficulty: 'beginner',
             icon: 'shuffle',
+            // 1セッションの標準時間（秒）: 基音2.5s + ガイド5.3s + 発声5.6s = 13.4s
+            standardDurationPerSession: 13,
             // UI色設定（ホームページのmode-iconと統一）
             colors: {
                 iconBg: 'gradient-catalog-green',
@@ -50,6 +58,8 @@ const ModeController = {
             hasRangeAdjustment: false,
             difficulty: 'intermediate',
             icon: 'zap',
+            // 1セッションの標準時間（秒）: 基音2.5s + ガイド5.3s + 発声5.6s = 13.4s
+            standardDurationPerSession: 13,
             colors: {
                 iconBg: 'gradient-catalog-orange',
                 subtitle: 'text-orange-200'
@@ -70,6 +80,8 @@ const ModeController = {
             hasRangeAdjustment: true,
             difficulty: 'advanced',
             icon: 'music',
+            // 1セッションの標準時間（秒）: 基音2.5s + ガイド5.3s + 発声5.6s = 13.4s
+            standardDurationPerSession: 13,
             colors: {
                 iconBg: 'gradient-catalog-purple',
                 subtitle: 'text-purple-200'

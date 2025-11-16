@@ -1,10 +1,13 @@
 /**
  * トレーニング記録ページコントローラー
  *
- * @version 2.5.4
- * @date 2025-11-15
+ * @version 2.5.5
+ * @date 2025-11-16
  * @description トレーニング履歴の表示・統計計算・グラフ描画
  * @changelog
+ *   v2.5.5 (2025-11-16) - 総レッスン時間をモード別標準時間で計算
+ *                         実際のduration値ではなく、セッション数×13秒で計算
+ *                         結果ページ閲覧時間等の待機時間を除外し、純粋なトレーニング時間のみをカウント
  *   v2.5.4 (2025-11-15) - 総レッスン時間の表示形式を改善
  *                         1時間未満の場合は秒も表示（例：0m16s→16s、1m30s）
  *                         1時間以上の場合は時間・分のみ（例：1h25m）
@@ -313,27 +316,10 @@ function calculateStatistics(sessions) {
     const totalLessons = lessons.length;
     const totalSessions = sessions.length;
 
-    // 総トレーニング時間（ミリ秒 → 時間・分形式）
-    const totalDurationMilliseconds = sessions.reduce((sum, session, index) => {
-        // デバッグ: 最初の3セッションのduration値を確認
-        if (index < 3) {
-            console.log(`📊 [Duration Debug] Session ${index}:`, {
-                duration: session.duration,
-                startTime: session.startTime,
-                endTime: session.endTime,
-                calculated: session.endTime && session.startTime ? session.endTime - session.startTime : 'N/A'
-            });
-        }
-
-        // durationがない場合はstartTimeとendTimeから計算
-        let duration = session.duration;
-        if (!duration && session.startTime && session.endTime) {
-            duration = session.endTime - session.startTime;
-        }
-
-        return sum + (duration || 0);
-    }, 0);
-    const totalDurationSeconds = Math.floor(totalDurationMilliseconds / 1000);
+    // 総トレーニング時間（モード別標準時間で計算）
+    // 1セッション = 基音2.5s + ガイド5.3s + 発声5.6s = 13秒
+    const standardDurationPerSession = 13; // 秒
+    const totalDurationSeconds = totalSessions * standardDurationPerSession;
     const totalHours = Math.floor(totalDurationSeconds / 3600);
     const totalMinutes = Math.floor((totalDurationSeconds % 3600) / 60);
     const totalSeconds = totalDurationSeconds % 60;
@@ -348,7 +334,7 @@ function calculateStatistics(sessions) {
         totalDurationFormatted = `${totalSeconds}s`;
     }
 
-    console.log(`📊 [Duration] Total: ${totalDurationMilliseconds}ms = ${totalDurationSeconds}s = ${totalDurationFormatted}`);
+    console.log(`📊 [Duration] Total: ${totalSessions}セッション × ${standardDurationPerSession}秒 = ${totalDurationSeconds}秒 (${totalDurationFormatted})`);
 
     // 全体の平均誤差（全レッスンの平均誤差を集計）
     const allAvgErrors = [];

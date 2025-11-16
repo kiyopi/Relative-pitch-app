@@ -9928,3 +9928,21 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 00:57:04] コミット: fix: 総レッスン時間の表示形式を改善（秒単位対応）
+
+- 1時間未満の場合は秒も表示
+  - 1分未満: 16s
+  - 1分以上: 1m30s
+- 1時間以上の場合は時間・分のみ表示（1h25m）
+
+問題:
+  16秒のトレーニング時間が0mと表示されていた
+  Math.round(16/60) = 0のため
+
+解決:
+  1分未満の場合は秒のみ表示
+  1分以上1時間未満の場合は分と秒を表示
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
