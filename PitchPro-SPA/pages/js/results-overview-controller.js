@@ -1,11 +1,12 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.0.4 (2025-11-16)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.0.5 (2025-11-16)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.0.4
+ * Version: 4.0.5
  * Date: 2025-11-16
  * Changelog:
+ *   v4.0.5 - 【バグ修正】次のステップ中央カードに方向情報を追加（連続・ランダムモード対応）
  *   v4.0.4 - 【デバッグログ追加】displayNextSteps関数の詳細ログ追加（中央カード表示問題調査）
  *   v4.0.3 - 【チラつき修正】DOMContentLoadedイベントリスナー削除（SPA環境では不要、初期表示復元によるチラつき防止）
  *   v4.0.2 - 【レースコンディション修正】requestAnimationFrameでDOM更新完了を待機してChart.js・Lucide初期化
@@ -1108,8 +1109,8 @@ function displayNextSteps(currentMode, evaluation, chromaticDirection = null, sc
             upgrade: {
                 icon: 'arrow-up-circle',
                 iconBg: 'linear-gradient(135deg, #10b981, #059669)',
-                title: '12音階モードに挑戦',
-                description: 'プロレベルの完璧な12音律習得を目指す',
+                title: '次のレベルに挑戦',
+                description: '12音階モードでプロレベルの完璧な習得を目指す',
                 buttonText: '12音階モードを開始',
                 actionId: 'next-step-continuous-upgrade'
             },
@@ -1288,12 +1289,24 @@ function displayNextSteps(currentMode, evaluation, chromaticDirection = null, sc
 
         // 【修正v4.0.7】descriptionに完全なモード名（上昇・下降と上行・下行を含む）を表示
         let description = card.description;
-        if (fullModeName && currentMode === '12tone') {
-            // 「12音階上昇モード」「12音階下降モード」「12音階両方向モード」を完全なモード名に置換
+
+        if (currentMode === '12tone' && fullModeName) {
+            // 12音階モード: 現在のモード名を完全なモード名に置換
             description = description.replace(/12音階(?:上昇|下降|両方向)?モード/, fullModeName);
-            console.log(`🔍 [DEBUG displayNextSteps] ${cardType}カード - Replaced description:`, description);
+            console.log(`🔍 [DEBUG displayNextSteps] ${cardType}カード - Replaced description (12tone):`, description);
+        } else if (currentMode === 'continuous' && cardType === 'upgrade') {
+            // 【修正v4.0.4】連続チャレンジモード: 次のレベル（12音階上昇モード）に方向情報を追加
+            // デフォルトで「上昇・上行」から開始
+            const nextModeName = `12音階上昇モード 上行`;
+            description = description.replace(/12音階モード/, nextModeName);
+            console.log(`🔍 [DEBUG displayNextSteps] ${cardType}カード - Replaced description (continuous→12tone):`, description);
+        } else if (currentMode === 'random' && cardType === 'upgrade') {
+            // 【修正v4.0.4】ランダム基音モード: 次のレベル（連続チャレンジモード）に方向情報を追加
+            // デフォルトで「上行」から開始
+            description = description.replace(/連続チャレンジモード/, '連続チャレンジモード 上行');
+            console.log(`🔍 [DEBUG displayNextSteps] ${cardType}カード - Replaced description (random→continuous):`, description);
         } else {
-            console.log(`🔍 [DEBUG displayNextSteps] ${cardType}カード - 置換スキップ (fullModeName: ${fullModeName}, currentMode: ${currentMode})`);
+            console.log(`🔍 [DEBUG displayNextSteps] ${cardType}カード - 置換スキップ (currentMode: ${currentMode}, cardType: ${cardType})`);
         }
 
         return `
