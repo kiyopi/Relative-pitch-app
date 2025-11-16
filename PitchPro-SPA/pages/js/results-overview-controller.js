@@ -1,11 +1,12 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.0.0 (2025-11-16)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.0.1 (2025-11-16)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.0.0
+ * Version: 4.0.1
  * Date: 2025-11-16
  * Changelog:
+ *   v4.0.1 - 【バグ修正】詳細分析セクション初期化問題を修正（window.showSessionDetail(0)を自動呼び出し）
  *   v4.0.0 - 【パフォーマンス最適化】二重初期化防止・Lucide過剰呼び出し削減（89%削減）
  *   v3.6.0 - fromRecords時のURLパラメータ優先、modeInfo.id→modeInfo.mode修正
  *
@@ -333,6 +334,14 @@ function updateOverviewUI(evaluation, sessionData, fromRecords = false, scaleDir
 
     // セッショングリッド表示
     displaySessionGrid(sessionData);
+
+    // 【修正v4.0.1】詳細分析セクションを初期化（最初のセッションを表示）
+    if (typeof window.showSessionDetail === 'function') {
+        window.showSessionDetail(0);
+        console.log('✅ [updateOverviewUI] 詳細分析セクション初期化完了（セッション1）');
+    } else {
+        console.error('❌ window.showSessionDetail関数が見つかりません');
+    }
 
     // 次のステップ表示（トレーニング記録からの遷移時はスキップ）
     if (!fromRecords) {
