@@ -1,11 +1,12 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.0.7 (2025-11-16)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.0.8 (2025-11-16)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.0.7
+ * Version: 4.0.8
  * Date: 2025-11-16
  * Changelog:
+ *   v4.0.8 - 【機能統合】DistributionChartコンポーネントを総合評価分布表示に統合
  *   v4.0.7 - 【バグ修正】セッション詳細のナビゲーションボタンイベントリスナー追加
  *   v4.0.6 - 【バグ修正】セッション切り替え時のLucide初期化追加、ヘルプボタンイベントリスナー実装
  *   v4.0.5 - 【バグ修正】次のステップ中央カードに方向情報を追加（連続・ランダムモード対応）
@@ -464,71 +465,25 @@ function updateStatistics(evaluation, sessionData) {
 }
 
 /**
- * 総合評価分布を表示
+ * 総合評価分布を表示（DistributionChartコンポーネント使用）
  */
 function displayOverallDistribution(sessionData) {
-    const distribution = {
-        excellent: 0,
-        good: 0,
-        pass: 0,
-        practice: 0
-    };
+    console.log('📊 [displayOverallDistribution] DistributionChart.render() 呼び出し開始');
 
-    let total = 0;
+    if (typeof window.DistributionChart === 'undefined') {
+        console.error('❌ DistributionChart コンポーネントが読み込まれていません');
+        return;
+    }
 
-    sessionData.forEach(session => {
-        if (!session.pitchErrors) return;
-
-        session.pitchErrors.forEach(error => {
-            const absError = Math.abs(error.errorInCents);
-            total++;
-
-            // v2.1.0: EvaluationCalculator統合評価関数を使用
-            const evaluation = window.EvaluationCalculator.evaluatePitchError(absError);
-            distribution[evaluation.level]++;
-        });
+    window.DistributionChart.render({
+        containerId: 'overall-distribution-chart',
+        sessionData: sessionData,
+        showTrend: false,
+        animate: true,
+        showDescription: false  // 説明文はHTML側で表示済み
     });
 
-    const container = document.querySelector('.glass-card .flex.flex-col.gap-3');
-    if (!container) return;
-
-    container.innerHTML = `
-        <!-- Excellent -->
-        <div class="flex items-center gap-3">
-            <i data-lucide="trophy" class="text-yellow-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
-            <div class="progress-bar flex">
-                <div class="progress-fill-custom color-eval-gold" style="width: ${(distribution.excellent / total * 100).toFixed(1)}%;"></div>
-            </div>
-            <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">${distribution.excellent}</span>
-        </div>
-
-        <!-- Good -->
-        <div class="flex items-center gap-3">
-            <i data-lucide="star" class="text-green-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
-            <div class="progress-bar flex">
-                <div class="progress-fill-custom color-eval-good" style="width: ${(distribution.good / total * 100).toFixed(1)}%;"></div>
-            </div>
-            <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">${distribution.good}</span>
-        </div>
-
-        <!-- Pass -->
-        <div class="flex items-center gap-3">
-            <i data-lucide="thumbs-up" class="text-blue-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
-            <div class="progress-bar flex">
-                <div class="progress-fill-custom color-eval-pass" style="width: ${(distribution.pass / total * 100).toFixed(1)}%;"></div>
-            </div>
-            <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">${distribution.pass}</span>
-        </div>
-
-        <!-- Practice -->
-        <div class="flex items-center gap-3">
-            <i data-lucide="alert-triangle" class="text-red-300" style="width: 20px; height: 20px; flex-shrink: 0;"></i>
-            <div class="progress-bar flex">
-                <div class="progress-fill-custom color-eval-practice" style="width: ${(distribution.practice / total * 100).toFixed(1)}%;"></div>
-            </div>
-            <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">${distribution.practice}</span>
-        </div>
-    `;
+    console.log('✅ [displayOverallDistribution] DistributionChart.render() 完了');
 }
 
 /**

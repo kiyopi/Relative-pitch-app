@@ -122,8 +122,8 @@
                     <p class="text-sm text-white-60" style="margin-bottom: 1rem;">全セッションの各音の精度評価を集計した分布です。Excellentが多いほど高精度です。</p>
 
                     <!-- 評価分布バー -->
-                    <div class="flex flex-col gap-3">
-                        <!-- JavaScriptで動的生成 -->
+                    <div id="overall-distribution-chart" class="flex flex-col gap-3">
+                        <!-- JavaScriptで動的生成（DistributionChart） -->
                     </div>
                 </section>
 
@@ -445,8 +445,11 @@
         </div>
     </div>
 
+    <!-- Distribution Chart Component -->
+    <script src="../js/components/DistributionChart.js"></script>
+
     <!-- Results Overview Page Controller -->
-    <script src="pages/js/results-overview-controller.js?v=20251116007" onload="initResultsOverviewPage()"></script>
+    <script src="pages/js/results-overview-controller.js?v=20251116008" onload="initResultsOverviewPage()"></script>
     <script>
         // SPA対応：ページ読み込み完了後に初期化
         async function initResultsOverviewPage() {
