@@ -1,8 +1,16 @@
 # ModeController仕様書
 
-**バージョン**: 2.0.0
+**バージョン**: 2.0.1
 **作成日**: 2025-11-11
-**最終更新**: 2025-11-12
+**最終更新**: 2025-11-16
+
+**変更履歴**:
+- v2.0.1 (2025-11-16): UI一貫性向上のための統合使用拡大
+  - **preparationController.js**: リダイレクトメッセージとサブタイトルで`generatePageTitle()`使用
+  - **results-overview-controller.js**: 次のステップボタンのdescriptionで`generatePageTitle()`使用
+  - **records-controller.js**: 不完全レッスンフィルタリングで`getSessionsPerLesson()`使用
+  - **効果**: モード名表示の完全な一元管理、方向情報（上昇・下降、上行・下行）の一貫性確保
+- v2.0.0 (2025-11-12): UI色設定追加、`updatePageHeader()`メソッド実装
 
 ---
 
@@ -14,9 +22,11 @@
 - `/PitchPro-SPA/js/mode-controller.js`
 
 ### 使用箇所
-- `trainingController.js`: トレーニング実行時のモード設定取得
-- `records-controller.js`: レッスングループ化時のセッション数取得
+- `trainingController.js`: トレーニング実行時のモード設定取得、ページヘッダー更新
+- `records-controller.js`: レッスングループ化時のセッション数取得、不完全レッスンフィルタリング（v2.0.1追加）
 - `session-data-recorder.js`: セッションデータ保存時のモード情報取得
+- `results-overview-controller.js`: 総合評価ページヘッダー更新、次のステップボタンラベル生成（v2.0.1追加）
+- `preparationController.js`: リダイレクトメッセージ、サブタイトル生成（v2.0.1追加）
 
 ---
 

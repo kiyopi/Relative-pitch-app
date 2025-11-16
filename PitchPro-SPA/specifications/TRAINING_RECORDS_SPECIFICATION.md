@@ -1016,6 +1016,11 @@ function viewLessonDetail(lesson) {
 - **総平均誤差表示改善**: ランクアイコン + 色付き表示
 - **バグ修正**: 開始日取得ロジック（timestamp/startTime/completedAt優先順）
 - **ModeController更新**: v2.0.1でstandardDurationPerSession追加
+- **不完全データフィルタリング実装** (v2.1.0後期):
+  - **問題**: 予期しない中断で残った不完全レッスン（3/12セッション等）が履歴に表示
+  - **解決**: `groupSessionsIntoLessons()`で完了判定を追加（line 921-941）
+  - **実装**: ModeController.getSessionsPerLesson()で期待セッション数取得、完全レッスンのみ表示
+  - **効果**: 不完全データが自動除外され、履歴の一貫性と正確性が向上
 
 ### v2.0.0 (2025-11-15)
 - **評価分布セクション追加**: DistributionChart統合、改善トレンド表示

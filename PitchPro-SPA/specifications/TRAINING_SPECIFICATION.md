@@ -1,10 +1,31 @@
 # トレーニング機能仕様書（SPA版）
 
-**バージョン**: 4.0.5
+**バージョン**: 4.0.7
 **作成日**: 2025-10-23
-**最終更新**: 2025-11-12
+**最終更新**: 2025-11-16
 
 **変更履歴**:
+- v4.0.7 (2025-11-16): GitHub Issue #1関連修正 - モード名表示一元管理と不完全データフィルタリング
+  - **Bug #11-8**: 不完全データ表示問題（v4.0.7）
+    - **問題**: 予期しない中断で残った不完全レッスン（3/12セッション等）がトレーニング記録に表示される
+    - **根本原因**: `records-controller.js`のレッスングループ化時に完了状態の検証なし
+    - **解決**: `groupSessionsIntoLessons()`で不完全レッスンをフィルタリング、完全レッスンのみ表示
+    - **修正ファイル**: `/PitchPro-SPA/pages/js/records-controller.js` (line 921-941)
+    - **実装**: `ModeController.getSessionsPerLesson()`で期待セッション数取得、実際のセッション数と比較してフィルタリング
+  - **UI一貫性向上**: モード名表示のModeController統合
+    - **問題**: 準備ページのリダイレクトメッセージ、総合評価の次のステップボタンで方向情報（上昇・下降、上行・下行）が欠落
+    - **解決**: `ModeController.generatePageTitle()`を使用した一元管理
+    - **修正ファイル**: `/PitchPro-SPA/js/controllers/preparationController.js` (line 31-108)
+    - **修正ファイル**: `/PitchPro-SPA/pages/js/results-overview-controller.js` (line 1071-1308)
+    - **実装**: chromaticDirectionとscaleDirectionを分離、完全なモード名（例: "12音階モード 下降・上行"）を表示
+- v4.0.6 (2025-11-16): GitHub Issue #1修正 - 総合評価からの準備ページ経由トレーニング開始
+  - **Bug #11-7**: 総合評価からの直接トレーニング遷移問題（v4.0.6）
+    - **問題**: 総合評価の「次のステップ」ボタンが`training?mode=...`に直接遷移、マイク許可エラー発生
+    - **根本原因**: `results-overview-controller.js`の遷移先が準備ページをバイパス、sessionStorage復元により不完全レッスンが継続
+    - **解決**: 全ての「次のステップ」ボタンを`preparation?mode=...`に変更、準備ページ初期化時にsessionStorageをクリア
+    - **修正ファイル**: `/PitchPro-SPA/pages/js/results-overview-controller.js` (line 1314-1367)
+    - **修正ファイル**: `/PitchPro-SPA/pages/js/preparation-pitchpro-cycle.js` (line 934-938)
+    - **実装**: 正しいSPAフロー（総合評価 → 準備ページ → トレーニング）を確保、リロード扱い防止
 - v4.0.5 (2025-11-12): Bug #11完全修正 - 未完了レッスン復元問題（5つの関連バグを包括的に修正）
   - **Bug #11-1**: 完了済みレッスンの誤復元（v4.0.1）
     - **問題**: トレーニング完了後、sessionStorageに残った完了済みlessonIdが復元され、1セッションで総合評価表示
