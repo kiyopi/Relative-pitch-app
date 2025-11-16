@@ -10264,3 +10264,27 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 16:04:28] コミット: refactor: calculateOverallEvaluation エイリアス関数を削除し、クラスメソッド直接呼び出しに変更
+
+## 変更内容
+1. results-overview-controller.jsで直接EvaluationCalculator.calculateDynamicGrade()を呼び出し
+2. evaluation-calculator.jsからcalculateOverallEvaluation エイリアス関数を削除
+
+## 理由
+- エイリアス関数は不要（使用箇所は1箇所のみ）
+- クラス設計に従った正しい使い方に統一
+- コードの簡潔性と保守性が向上
+
+## 安全性確認
+✅ calculateOverallEvaluationの使用箇所: 1箇所のみ（確認済み）
+✅ 引数・戻り値の互換性: 完全互換（確認済み）
+✅ 読み込み順序: 正しい（確認済み）
+✅ リスク評価: 極めて低い
+
+## 修正ファイル
+- /PitchPro-SPA/pages/js/results-overview-controller.js (line 186)
+- /PitchPro-SPA/js/evaluation-calculator.js (line 455-458削除)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
