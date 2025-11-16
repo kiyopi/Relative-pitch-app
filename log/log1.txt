@@ -1,10 +1,10 @@
 [Log] 🔍 [NavigationManager] visibilitychange検出: – "hidden" (navigation-manager.js, line 72)
-[Log] 🔍 [NavigationManager] lastVisibilityChange更新: – 1763275964362 (navigation-manager.js, line 73)
+[Log] 🔍 [NavigationManager] lastVisibilityChange更新: – 1763278696162 (navigation-manager.js, line 73)
 [Log] 🔍 [NavigationManager] 現在のURL: – "https://kiyopi.github.io/Relative-pitch-app/PitchPro-SPA/index.html#results-overview?mode=12tone&lessonId=lesson_1763254607074_12tone_descen…" (navigation-manager.js, line 74)
 "https://kiyopi.github.io/Relative-pitch-app/PitchPro-SPA/index.html#results-overview?mode=12tone&lessonId=lesson_1763254607074_12tone_descending_ascending"
 [Log] 🔍 [NavigationManager] performance.navigation.type: – 1 (navigation-manager.js, line 75)
-[Info] Successfully preconnected to https://fonts.gstatic.com/
 [Info] Successfully preconnected to https://fonts.googleapis.com/
+[Info] Successfully preconnected to https://fonts.gstatic.com/
 [Log] ✅ MusicTheory utility loaded (v1.0.0) (music-theory.js, line 226)
 [Log] [LoadingComponent] Loaded (loading-component.js, line 213)
 [Log] [SubscriptionManager] v1.0.0 Loaded (subscription-manager.js, line 497)
@@ -34,6 +34,75 @@
 [Log] 🔍 [Debug Router] page: – "results-overview" (router.js, line 51)
 [Log] Route changed to: – "results-overview?mode=12tone&lessonId=lesson_1763254607074_12tone_descending_ascending" (router.js, line 52)
 [Log] Page name: – "results-overview" (router.js, line 53)
+[Log] 🔍 PitchPro availability check: – {PitchProExists: true, AudioDetectionComponentExists: true, windowPitchPro: true} (preparation-pitchpro-cycle.js, line 878)
+[Log] 🎵 preparation-pitchpro-cycle.js 初期化完了 (preparation-pitchpro-cycle.js, line 884)
+[Info] Successfully preconnected to https://fonts.googleapis.com/
+[Info] Successfully preconnected to https://fonts.gstatic.com/
+[Error] Failed to load resource: the server responded with a status of 404 () (base.css, line 0)
+[Error] Failed to load resource: the server responded with a status of 404 () (results.css, line 0)
+[Log] 🚀 [results-overview-controller] Script loaded - START v3.6.0 (2025-11-14) (results-overview-controller.js, line 1)
+[Log] ✅ [results-overview-controller] window.initResultsOverview defined (results-overview-controller.js, line 1530)
+[Log] ✅ [results-overview-controller] window.toggleGradePopover: – "function" (results-overview-controller.js, line 1531)
+[Log] ✅ [results-overview-controller] window.toggleSessionRankPopover: – "function" (results-overview-controller.js, line 1532)
+[Log] 📊 [Results Overview] スクリプト読み込み完了、初期化開始 (index.html, line 4)
+[Log] === 総合評価ページ初期化開始 === (results-overview-controller.js, line 40)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] 📊 全セッションデータ取得: 82セッション (results-overview-controller.js, line 56)
+[Log] ✅ [URL優先] lessonId=lesson_1763254607074_12tone_descending_ascending, mode=12tone, scaleDirection=ascending (results-overview-controller.js, line 81)
+[Log] 🔍 [DEBUG] 現在のモード: 12tone (results-overview-controller.js, line 94)
+[Log] 🔍 [DEBUG] lessonId: lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 95)
+[Log] 🔍 [DEBUG] scaleDirection: ascending (results-overview-controller.js, line 96)
+[Log] 🔍 [DEBUG] トレーニング記録から遷移: false (results-overview-controller.js, line 97)
+[Log] 🔍 [DEBUG] URL hash: #results-overview?mode=12tone&lessonId=lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 98)
+[Log] 📊 [DEBUG] モード別セッション数: – {random: 8, continuous: 12, 12tone: 62} (results-overview-controller.js, line 107)
+[Log] 🔍 [DEBUG] 完全レッスンチェック開始 - lessonId: lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 115)
+[Log] ✅ [SessionDataManager] 完全レッスン: lesson_1763254607074_12tone_descending_ascending (12/12) (session-data-manager.js, line 334)
+[Log] ✅ 完全レッスン取得成功: 12セッション (results-overview-controller.js, line 136)
+[Log] 🔍 [DEBUG] フィルタリング後のセッションID: – [57, 58, 59, …] (12) (results-overview-controller.js, line 157)
+[57, 58, 59, 60, 61, 62, 63, 64, 65, 66, …]Array (12)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "12tone", name: "12音階モード", level: "上級", …} (evaluation-calculator.js, line 25)
+{mode: "12tone", name: "12音階モード", level: "上級", target: "プロフェッショナルレベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 56音除外（160¢超）、有効音: 40/96 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 36.5, excellenceRate: 0.208, stability: 27.4, …} (evaluation-calculator.js, line 33)
+{avgError: 36.5, excellenceRate: 0.208, stability: 27.4, totalNotes: 96, excellentNotes: 20, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: false}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📊 総合評価計算完了: – {grade: "E", modeInfo: Object, deviceInfo: Object, …} (results-overview-controller.js, line 162)
+{grade: "E", modeInfo: Object, deviceInfo: Object, metrics: Object, thresholdInfo: Object, …}Object
+[Log] 🎨 UI更新開始: – {grade: "E", modeInfo: Object, deviceInfo: Object, …} (results-overview-controller.js, line 231)
+{grade: "E", modeInfo: Object, deviceInfo: Object, metrics: Object, thresholdInfo: Object, …}Object
+[Log] 🎨 [ModeController] ページヘッダー更新: 12tone – {chromaticDirection: "descending", scaleDirection: "ascending", subtitleText: "12セッション (96音) の総合評価"} (mode-controller.js, line 253)
+[Log] ✅ アイコン背景色更新: gradient-catalog-purple (mode-controller.js, line 264)
+[Log] 🗑️ [LUCIDE-UPDATE] Removed existing svg element (lucide-init.js, line 159)
+[Log] ✅ [LUCIDE-UPDATE] Created new i element: music (lucide-init.js, line 170)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ✅ タイトル更新: 12音階モード 下降・上行 (mode-controller.js, line 279)
+[Log] ✅ サブタイトル色更新: text-purple-200 (mode-controller.js, line 289)
+[Log] ✅ サブタイトルテキスト更新: 12セッション (96音) の総合評価 (mode-controller.js, line 294)
+[Log] 🔍 [DEBUG] #main-mode-title要素: –  (results-overview-controller.js, line 256)
+<h3 class="mode-title" id="main-mode-title">12音階モード 下降・上行</h3>
+
+<h3 class="mode-title" id="main-mode-title">12音階モード 下降・上行</h3>
+[Log] ✅ [main-mode-title] モード名更新: 12音階モード 下降・上行 (results-overview-controller.js, line 264)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] 📊 [displaySessionGrid] 関数開始 (results-overview-controller.js, line 507)
+[Log] 📊 [displaySessionGrid] container要素: –  (results-overview-controller.js, line 509)
+<div id="session-grid-container">…</div>
+
+<div id="session-grid-container">…</div>
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] === 総合評価ページ初期化完了 === (results-overview-controller.js, line 188)
+[Log] ✅ [Results Overview] 初期化完了 (index.html, line 11)
 [Log]  * Tone.js v15.1.22 *  (+esm, line 7)
 [Log] ✅ PitchShifter loaded globally (v2.9.0 - Optimized Envelope) (index.html, line 79)
 [Log] 📦 [CACHE BUSTER] Timestamp: 1761735209 (index.html, line 80)
@@ -41,20 +110,70 @@
 [Log] ✅ Tone.js v15.1.22 (stable latest) loaded globally (index.html, line 82)
 [Log] ⏭️ voice-range-test.js: preparationページ以外のため初期化スキップ (voice-range-test.js, line 419)
 [Log] 🔍 [LUCIDE] DOMContentLoaded fired - initializing icons... (lucide-init.js, line 190)
+[Log] 📊 [DOMContentLoaded] results-overview初期化 (results-overview-controller.js, line 1351)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] === 総合評価ページ初期化開始 === (results-overview-controller.js, line 40)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] 📊 全セッションデータ取得: 82セッション (results-overview-controller.js, line 56)
+[Log] ✅ [URL優先] lessonId=lesson_1763254607074_12tone_descending_ascending, mode=12tone, scaleDirection=ascending (results-overview-controller.js, line 81)
+[Log] 🔍 [DEBUG] 現在のモード: 12tone (results-overview-controller.js, line 94)
+[Log] 🔍 [DEBUG] lessonId: lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 95)
+[Log] 🔍 [DEBUG] scaleDirection: ascending (results-overview-controller.js, line 96)
+[Log] 🔍 [DEBUG] トレーニング記録から遷移: false (results-overview-controller.js, line 97)
+[Log] 🔍 [DEBUG] URL hash: #results-overview?mode=12tone&lessonId=lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 98)
+[Log] 📊 [DEBUG] モード別セッション数: – {random: 8, continuous: 12, 12tone: 62} (results-overview-controller.js, line 107)
+[Log] 🔍 [DEBUG] 完全レッスンチェック開始 - lessonId: lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 115)
+[Log] ✅ [SessionDataManager] 完全レッスン: lesson_1763254607074_12tone_descending_ascending (12/12) (session-data-manager.js, line 334)
+[Log] ✅ 完全レッスン取得成功: 12セッション (results-overview-controller.js, line 136)
+[Log] 🔍 [DEBUG] フィルタリング後のセッションID: – [57, 58, 59, …] (12) (results-overview-controller.js, line 157)
+[57, 58, 59, 60, 61, 62, 63, 64, 65, 66, …]Array (12)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "12tone", name: "12音階モード", level: "上級", …} (evaluation-calculator.js, line 25)
+{mode: "12tone", name: "12音階モード", level: "上級", target: "プロフェッショナルレベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 56音除外（160¢超）、有効音: 40/96 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 36.5, excellenceRate: 0.208, stability: 27.4, …} (evaluation-calculator.js, line 33)
+{avgError: 36.5, excellenceRate: 0.208, stability: 27.4, totalNotes: 96, excellentNotes: 20, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: false}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📊 総合評価計算完了: – {grade: "E", modeInfo: Object, deviceInfo: Object, …} (results-overview-controller.js, line 162)
+{grade: "E", modeInfo: Object, deviceInfo: Object, metrics: Object, thresholdInfo: Object, …}Object
+[Log] 🎨 UI更新開始: – {grade: "E", modeInfo: Object, deviceInfo: Object, …} (results-overview-controller.js, line 231)
+{grade: "E", modeInfo: Object, deviceInfo: Object, metrics: Object, thresholdInfo: Object, …}Object
+[Log] 🎨 [ModeController] ページヘッダー更新: 12tone – {chromaticDirection: "descending", scaleDirection: "ascending", subtitleText: "12セッション (96音) の総合評価"} (mode-controller.js, line 253)
+[Log] ✅ アイコン背景色更新: gradient-catalog-purple (mode-controller.js, line 264)
+[Log] 🗑️ [LUCIDE-UPDATE] Removed existing svg element (lucide-init.js, line 159)
+[Log] ✅ [LUCIDE-UPDATE] Created new i element: music (lucide-init.js, line 170)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ✅ タイトル更新: 12音階モード 下降・上行 (mode-controller.js, line 279)
+[Log] ✅ サブタイトル色更新: text-purple-200 (mode-controller.js, line 289)
+[Log] ✅ サブタイトルテキスト更新: 12セッション (96音) の総合評価 (mode-controller.js, line 294)
+[Log] 🔍 [DEBUG] #main-mode-title要素: –  (results-overview-controller.js, line 256)
+<h3 class="mode-title" id="main-mode-title">12音階モード 下降・上行</h3>
+
+<h3 class="mode-title" id="main-mode-title">12音階モード 下降・上行</h3>
+[Log] ✅ [main-mode-title] モード名更新: 12音階モード 下降・上行 (results-overview-controller.js, line 264)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] 📊 [displaySessionGrid] 関数開始 (results-overview-controller.js, line 507)
+[Log] 📊 [displaySessionGrid] container要素: –  (results-overview-controller.js, line 509)
+<div id="session-grid-container">…</div>
+
+<div id="session-grid-container">…</div>
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] === 総合評価ページ初期化完了 === (results-overview-controller.js, line 188)
 [Log] 🔍 [Debug Router] handleRouteChange called (router.js, line 49)
 [Log] 🔍 [Debug Router] hash: – "results-overview?mode=12tone&lessonId=lesson_1763254607074_12tone_descending_ascending" (router.js, line 50)
 [Log] 🔍 [Debug Router] page: – "results-overview" (router.js, line 51)
 [Log] Route changed to: – "results-overview?mode=12tone&lessonId=lesson_1763254607074_12tone_descending_ascending" (router.js, line 52)
 [Log] Page name: – "results-overview" (router.js, line 53)
-[Log] 🔍 PitchPro availability check: – {PitchProExists: true, AudioDetectionComponentExists: true, windowPitchPro: true} (preparation-pitchpro-cycle.js, line 878)
-[Log] 🎵 preparation-pitchpro-cycle.js 初期化完了 (preparation-pitchpro-cycle.js, line 884)
-[Info] Successfully preconnected to https://fonts.googleapis.com/
-[Info] Successfully preconnected to https://fonts.gstatic.com/
-[Log] 🔍 [LUCIDE-DEBUG] Found 39 elements with data-lucide attribute (lucide-init.js, line 42)
-[Log] 🎬 [LUCIDE-DEBUG] Calling lucide.createIcons()... (lucide-init.js, line 43)
-[Log] ✅ [LUCIDE] Icons initialized - Found 39 SVG elements (lucide-init.js, line 61)
-[Log] 🔍 [LUCIDE-DEBUG] First SVG computed styles: – {display: "block", width: "32px", height: "32px", …} (lucide-init.js, line 67)
-{display: "block", width: "32px", height: "32px", color: "rgb(255, 255, 255)", stroke: "rgb(255, 255, 255)", …}Object
 [Log] Setting up results-overview page events... (router.js, line 366)
 [Warning] ⚠️ btn-new-training が見つかりません (router.js, line 420)
 [Log] 📍 [NavigationManager] ブラウザバック防止: ダミーエントリー追加×2 (results-overview) (navigation-manager.js, line 524)
@@ -64,9 +183,78 @@
 ホームボタンまたは「新しいトレーニングを始める」ボタンをご利用ください。
 [Log] ✅ [NavigationManager] ブラウザバック防止イベントリスナー登録完了 (results-overview) (navigation-manager.js, line 552)
 [Log] Page loaded: results-overview (router.js, line 142)
+[Log] 🔍 [LUCIDE-DEBUG] Found 39 elements with data-lucide attribute (lucide-init.js, line 42)
+[Log] 🎬 [LUCIDE-DEBUG] Calling lucide.createIcons()... (lucide-init.js, line 43)
+[Log] ✅ [LUCIDE] Icons initialized - Found 39 SVG elements (lucide-init.js, line 61)
+[Log] 🔍 [LUCIDE-DEBUG] First SVG computed styles: – {display: "block", width: "32px", height: "32px", …} (lucide-init.js, line 67)
+{display: "block", width: "32px", height: "32px", color: "rgb(255, 255, 255)", stroke: "rgb(255, 255, 255)", …}Object
 [Info] Successfully preconnected to https://fonts.googleapis.com/
 [Info] Successfully preconnected to https://fonts.gstatic.com/
-[Error] SyntaxError: Can't create duplicate variable: 'EvaluationCalculator' (x2)
+[Error] Failed to load resource: the server responded with a status of 404 () (base.css, line 0)
+[Error] Failed to load resource: the server responded with a status of 404 () (results.css, line 0)
+[Error] SyntaxError: Can't create duplicate variable: 'DEBUG_MODE'
+[Log] 📊 [Results Overview] スクリプト読み込み完了、初期化開始 (index.html, line 4)
+[Log] === 総合評価ページ初期化開始 === (results-overview-controller.js, line 40)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] 📊 全セッションデータ取得: 82セッション (results-overview-controller.js, line 56)
+[Log] ✅ [URL優先] lessonId=lesson_1763254607074_12tone_descending_ascending, mode=12tone, scaleDirection=ascending (results-overview-controller.js, line 81)
+[Log] 🔍 [DEBUG] 現在のモード: 12tone (results-overview-controller.js, line 94)
+[Log] 🔍 [DEBUG] lessonId: lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 95)
+[Log] 🔍 [DEBUG] scaleDirection: ascending (results-overview-controller.js, line 96)
+[Log] 🔍 [DEBUG] トレーニング記録から遷移: false (results-overview-controller.js, line 97)
+[Log] 🔍 [DEBUG] URL hash: #results-overview?mode=12tone&lessonId=lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 98)
+[Log] 📊 [DEBUG] モード別セッション数: – {random: 8, continuous: 12, 12tone: 62} (results-overview-controller.js, line 107)
+[Log] 🔍 [DEBUG] 完全レッスンチェック開始 - lessonId: lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 115)
+[Log] ✅ [SessionDataManager] 完全レッスン: lesson_1763254607074_12tone_descending_ascending (12/12) (session-data-manager.js, line 334)
+[Log] ✅ 完全レッスン取得成功: 12セッション (results-overview-controller.js, line 136)
+[Log] 🔍 [DEBUG] フィルタリング後のセッションID: – [57, 58, 59, …] (12) (results-overview-controller.js, line 157)
+[57, 58, 59, 60, 61, 62, 63, 64, 65, 66, …]Array (12)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "12tone", name: "12音階モード", level: "上級", …} (evaluation-calculator.js, line 25)
+{mode: "12tone", name: "12音階モード", level: "上級", target: "プロフェッショナルレベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 56音除外（160¢超）、有効音: 40/96 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 36.5, excellenceRate: 0.208, stability: 27.4, …} (evaluation-calculator.js, line 33)
+{avgError: 36.5, excellenceRate: 0.208, stability: 27.4, totalNotes: 96, excellentNotes: 20, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: false}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📊 総合評価計算完了: – {grade: "E", modeInfo: Object, deviceInfo: Object, …} (results-overview-controller.js, line 162)
+{grade: "E", modeInfo: Object, deviceInfo: Object, metrics: Object, thresholdInfo: Object, …}Object
+[Log] 🎨 UI更新開始: – {grade: "E", modeInfo: Object, deviceInfo: Object, …} (results-overview-controller.js, line 231)
+{grade: "E", modeInfo: Object, deviceInfo: Object, metrics: Object, thresholdInfo: Object, …}Object
+[Log] 🎨 [ModeController] ページヘッダー更新: 12tone – {chromaticDirection: "descending", scaleDirection: "ascending", subtitleText: "12セッション (96音) の総合評価"} (mode-controller.js, line 253)
+[Log] ✅ アイコン背景色更新: gradient-catalog-purple (mode-controller.js, line 264)
+[Log] 🗑️ [LUCIDE-UPDATE] Removed existing svg element (lucide-init.js, line 159)
+[Log] ✅ [LUCIDE-UPDATE] Created new i element: music (lucide-init.js, line 170)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ✅ タイトル更新: 12音階モード 下降・上行 (mode-controller.js, line 279)
+[Log] ✅ サブタイトル色更新: text-purple-200 (mode-controller.js, line 289)
+[Log] ✅ サブタイトルテキスト更新: 12セッション (96音) の総合評価 (mode-controller.js, line 294)
+[Log] 🔍 [DEBUG] #main-mode-title要素: –  (results-overview-controller.js, line 256)
+<h3 class="mode-title" id="main-mode-title">12音階モード 下降・上行</h3>
+
+<h3 class="mode-title" id="main-mode-title">12音階モード 下降・上行</h3>
+[Log] ✅ [main-mode-title] モード名更新: 12音階モード 下降・上行 (results-overview-controller.js, line 264)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] 📊 [displaySessionGrid] 関数開始 (results-overview-controller.js, line 507)
+[Log] 📊 [displaySessionGrid] container要素: –  (results-overview-controller.js, line 509)
+<div id="session-grid-container">…</div>
+
+<div id="session-grid-container">…</div>
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] === 総合評価ページ初期化完了 === (results-overview-controller.js, line 188)
+[Log] ✅ [Results Overview] 初期化完了 (index.html, line 11)
+[Error] Failed to load resource: the server responded with a status of 404 () (+esm, line 0)
+[Error] Failed to load resource: the server responded with a status of 404 () (+esm, line 0)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
 [Log] Setting up results-overview page events... (router.js, line 366)
 [Warning] ⚠️ btn-new-training が見つかりません (router.js, line 420)
 [Log] 🔄 [NavigationManager] 既存のpopstateハンドラを削除 (navigation-manager.js, line 516)
@@ -77,64 +265,126 @@
 ホームボタンまたは「新しいトレーニングを始める」ボタンをご利用ください。
 [Log] ✅ [NavigationManager] ブラウザバック防止イベントリスナー登録完了 (results-overview) (navigation-manager.js, line 552)
 [Log] Page loaded: results-overview (router.js, line 142)
-[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79, x2)
-[Error] Failed to load resource: the server responded with a status of 404 () (results.css, line 0)
-[Error] Failed to load resource: the server responded with a status of 404 () (results.css, line 0)
-[Error] Failed to load resource: the server responded with a status of 404 () (base.css, line 0)
-[Error] Failed to load resource: the server responded with a status of 404 () (base.css, line 0)
-[Log] 🚀 [results-overview-controller] Script loaded - START v3.6.0 (2025-11-14) (results-overview-controller.js, line 1)
-[Log] ✅ [results-overview-controller] window.initResultsOverview defined (results-overview-controller.js, line 1538)
-[Log] ✅ [results-overview-controller] window.toggleGradePopover: – "function" (results-overview-controller.js, line 1539)
-[Log] ✅ [results-overview-controller] window.toggleSessionRankPopover: – "function" (results-overview-controller.js, line 1540)
-[Log] 📊 [Results Overview] スクリプト読み込み完了、初期化開始 (index.html, line 4)
-[Error] SyntaxError: Can't create duplicate variable: 'DEBUG_MODE'
-[Log] 📊 [Results Overview] スクリプト読み込み完了、初期化開始 (index.html, line 4)
-[Log] === 総合評価ページ初期化開始 === (results-overview-controller.js, line 40)
+[Error] Failed to load resource: the server responded with a status of 404 () (+esm, line 0)
 [Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
-[Log] 📊 全セッションデータ取得: 82セッション (results-overview-controller.js, line 59)
-[Log] ✅ [URL優先] lessonId=lesson_1763254607074_12tone_descending_ascending, mode=12tone, scaleDirection=ascending (results-overview-controller.js, line 84)
-[Log] 🔍 [DEBUG] 完全レッスンチェック開始 - lessonId: lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 118)
-[Log] ✅ [SessionDataManager] 完全レッスン: lesson_1763254607074_12tone_descending_ascending (12/12) (session-data-manager.js, line 334)
-[Log] ✅ 完全レッスン取得成功: 12セッション (results-overview-controller.js, line 139)
-[Log] 📄 ページング: 1/1ページ（1〜12番目のセッション） (results-overview-controller.js, line 183)
-[Log] === 総合評価ページ初期化開始 === (results-overview-controller.js, line 40)
-[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
-[Log] 📊 全セッションデータ取得: 82セッション (results-overview-controller.js, line 59)
-[Log] ✅ [URL優先] lessonId=lesson_1763254607074_12tone_descending_ascending, mode=12tone, scaleDirection=ascending (results-overview-controller.js, line 84)
-[Log] 🔍 [DEBUG] 完全レッスンチェック開始 - lessonId: lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 118)
-[Log] ✅ [SessionDataManager] 完全レッスン: lesson_1763254607074_12tone_descending_ascending (12/12) (session-data-manager.js, line 334)
-[Log] ✅ 完全レッスン取得成功: 12セッション (results-overview-controller.js, line 139)
-[Log] 📄 ページング: 1/1ページ（1〜12番目のセッション） (results-overview-controller.js, line 183)
-[Error] Unhandled Promise Rejection: ReferenceError: Can't find variable: calculateOverallEvaluation
-	（anonymous関数） (スクリプト要素2:10)
 [Log] 🔍 [Router] Checking for initResultsOverview... (router.js, line 370)
 [Log] ✅ [Router] initResultsOverview found, calling... (router.js, line 372)
 [Log] === 総合評価ページ初期化開始 === (results-overview-controller.js, line 40)
 [Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
-[Log] 📊 全セッションデータ取得: 82セッション (results-overview-controller.js, line 59)
-[Log] ✅ [URL優先] lessonId=lesson_1763254607074_12tone_descending_ascending, mode=12tone, scaleDirection=ascending (results-overview-controller.js, line 84)
-[Log] 🔍 [DEBUG] 完全レッスンチェック開始 - lessonId: lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 118)
+[Log] 📊 全セッションデータ取得: 82セッション (results-overview-controller.js, line 56)
+[Log] ✅ [URL優先] lessonId=lesson_1763254607074_12tone_descending_ascending, mode=12tone, scaleDirection=ascending (results-overview-controller.js, line 81)
+[Log] 🔍 [DEBUG] 現在のモード: 12tone (results-overview-controller.js, line 94)
+[Log] 🔍 [DEBUG] lessonId: lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 95)
+[Log] 🔍 [DEBUG] scaleDirection: ascending (results-overview-controller.js, line 96)
+[Log] 🔍 [DEBUG] トレーニング記録から遷移: false (results-overview-controller.js, line 97)
+[Log] 🔍 [DEBUG] URL hash: #results-overview?mode=12tone&lessonId=lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 98)
+[Log] 📊 [DEBUG] モード別セッション数: – {random: 8, continuous: 12, 12tone: 62} (results-overview-controller.js, line 107)
+[Log] 🔍 [DEBUG] 完全レッスンチェック開始 - lessonId: lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 115)
 [Log] ✅ [SessionDataManager] 完全レッスン: lesson_1763254607074_12tone_descending_ascending (12/12) (session-data-manager.js, line 334)
-[Log] ✅ 完全レッスン取得成功: 12セッション (results-overview-controller.js, line 139)
-[Log] 📄 ページング: 1/1ページ（1〜12番目のセッション） (results-overview-controller.js, line 183)
-[Error] Unhandled Promise Rejection: ReferenceError: Can't find variable: calculateOverallEvaluation
-	（anonymous関数） (results-overview-controller.js:186)
-	initResultsOverview (results-overview-controller.js:39)
-	（anonymous関数） (router.js:373)
+[Log] ✅ 完全レッスン取得成功: 12セッション (results-overview-controller.js, line 136)
+[Log] 🔍 [DEBUG] フィルタリング後のセッションID: – [57, 58, 59, …] (12) (results-overview-controller.js, line 157)
+[57, 58, 59, 60, 61, 62, 63, 64, 65, 66, …]Array (12)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "12tone", name: "12音階モード", level: "上級", …} (evaluation-calculator.js, line 25)
+{mode: "12tone", name: "12音階モード", level: "上級", target: "プロフェッショナルレベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 56音除外（160¢超）、有効音: 40/96 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 36.5, excellenceRate: 0.208, stability: 27.4, …} (evaluation-calculator.js, line 33)
+{avgError: 36.5, excellenceRate: 0.208, stability: 27.4, totalNotes: 96, excellentNotes: 20, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: false}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📊 総合評価計算完了: – {grade: "E", modeInfo: Object, deviceInfo: Object, …} (results-overview-controller.js, line 162)
+{grade: "E", modeInfo: Object, deviceInfo: Object, metrics: Object, thresholdInfo: Object, …}Object
+[Log] 🎨 UI更新開始: – {grade: "E", modeInfo: Object, deviceInfo: Object, …} (results-overview-controller.js, line 231)
+{grade: "E", modeInfo: Object, deviceInfo: Object, metrics: Object, thresholdInfo: Object, …}Object
+[Log] 🎨 [ModeController] ページヘッダー更新: 12tone – {chromaticDirection: "descending", scaleDirection: "ascending", subtitleText: "12セッション (96音) の総合評価"} (mode-controller.js, line 253)
+[Log] ✅ アイコン背景色更新: gradient-catalog-purple (mode-controller.js, line 264)
+[Log] 🗑️ [LUCIDE-UPDATE] Removed existing svg element (lucide-init.js, line 159)
+[Log] ✅ [LUCIDE-UPDATE] Created new i element: music (lucide-init.js, line 170)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ✅ タイトル更新: 12音階モード 下降・上行 (mode-controller.js, line 279)
+[Log] ✅ サブタイトル色更新: text-purple-200 (mode-controller.js, line 289)
+[Log] ✅ サブタイトルテキスト更新: 12セッション (96音) の総合評価 (mode-controller.js, line 294)
+[Log] 🔍 [DEBUG] #main-mode-title要素: –  (results-overview-controller.js, line 256)
+<h3 class="mode-title" id="main-mode-title">12音階モード 下降・上行</h3>
+
+<h3 class="mode-title" id="main-mode-title">12音階モード 下降・上行</h3>
+[Log] ✅ [main-mode-title] モード名更新: 12音階モード 下降・上行 (results-overview-controller.js, line 264)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] 📊 [displaySessionGrid] 関数開始 (results-overview-controller.js, line 507)
+[Log] 📊 [displaySessionGrid] container要素: –  (results-overview-controller.js, line 509)
+<div id="session-grid-container">…</div>
+
+<div id="session-grid-container">…</div>
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] === 総合評価ページ初期化完了 === (results-overview-controller.js, line 188)
 [Log] 🔍 [Router] Checking for initResultsOverview... (router.js, line 370)
 [Log] ✅ [Router] initResultsOverview found, calling... (router.js, line 372)
 [Log] === 総合評価ページ初期化開始 === (results-overview-controller.js, line 40)
 [Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
-[Log] 📊 全セッションデータ取得: 82セッション (results-overview-controller.js, line 59)
-[Log] ✅ [URL優先] lessonId=lesson_1763254607074_12tone_descending_ascending, mode=12tone, scaleDirection=ascending (results-overview-controller.js, line 84)
-[Log] 🔍 [DEBUG] 完全レッスンチェック開始 - lessonId: lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 118)
+[Log] 📊 全セッションデータ取得: 82セッション (results-overview-controller.js, line 56)
+[Log] ✅ [URL優先] lessonId=lesson_1763254607074_12tone_descending_ascending, mode=12tone, scaleDirection=ascending (results-overview-controller.js, line 81)
+[Log] 🔍 [DEBUG] 現在のモード: 12tone (results-overview-controller.js, line 94)
+[Log] 🔍 [DEBUG] lessonId: lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 95)
+[Log] 🔍 [DEBUG] scaleDirection: ascending (results-overview-controller.js, line 96)
+[Log] 🔍 [DEBUG] トレーニング記録から遷移: false (results-overview-controller.js, line 97)
+[Log] 🔍 [DEBUG] URL hash: #results-overview?mode=12tone&lessonId=lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 98)
+[Log] 📊 [DEBUG] モード別セッション数: – {random: 8, continuous: 12, 12tone: 62} (results-overview-controller.js, line 107)
+[Log] 🔍 [DEBUG] 完全レッスンチェック開始 - lessonId: lesson_1763254607074_12tone_descending_ascending (results-overview-controller.js, line 115)
 [Log] ✅ [SessionDataManager] 完全レッスン: lesson_1763254607074_12tone_descending_ascending (12/12) (session-data-manager.js, line 334)
-[Log] ✅ 完全レッスン取得成功: 12セッション (results-overview-controller.js, line 139)
-[Log] 📄 ページング: 1/1ページ（1〜12番目のセッション） (results-overview-controller.js, line 183)
-[Error] Unhandled Promise Rejection: ReferenceError: Can't find variable: calculateOverallEvaluation
-	（anonymous関数） (results-overview-controller.js:186)
-	initResultsOverview (results-overview-controller.js:39)
-	（anonymous関数） (router.js:373)
+[Log] ✅ 完全レッスン取得成功: 12セッション (results-overview-controller.js, line 136)
+[Log] 🔍 [DEBUG] フィルタリング後のセッションID: – [57, 58, 59, …] (12) (results-overview-controller.js, line 157)
+[57, 58, 59, 60, 61, 62, 63, 64, 65, 66, …]Array (12)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "12tone", name: "12音階モード", level: "上級", …} (evaluation-calculator.js, line 25)
+{mode: "12tone", name: "12音階モード", level: "上級", target: "プロフェッショナルレベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] 📊 外れ値閾値: 160¢（基準150¢ + デバイス誤差10¢） (evaluation-calculator.js, line 197)
+[Log] 📊 外れ値除外: 56音除外（160¢超）、有効音: 40/96 (evaluation-calculator.js, line 207)
+[Log] ✅ 基本メトリクス: – {avgError: 36.5, excellenceRate: 0.208, stability: 27.4, …} (evaluation-calculator.js, line 33)
+{avgError: 36.5, excellenceRate: 0.208, stability: 27.4, totalNotes: 96, excellentNotes: 20, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: true, excellence: false}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📊 総合評価計算完了: – {grade: "E", modeInfo: Object, deviceInfo: Object, …} (results-overview-controller.js, line 162)
+{grade: "E", modeInfo: Object, deviceInfo: Object, metrics: Object, thresholdInfo: Object, …}Object
+[Log] 🎨 UI更新開始: – {grade: "E", modeInfo: Object, deviceInfo: Object, …} (results-overview-controller.js, line 231)
+{grade: "E", modeInfo: Object, deviceInfo: Object, metrics: Object, thresholdInfo: Object, …}Object
+[Log] 🎨 [ModeController] ページヘッダー更新: 12tone – {chromaticDirection: "descending", scaleDirection: "ascending", subtitleText: "12セッション (96音) の総合評価"} (mode-controller.js, line 253)
+[Log] ✅ アイコン背景色更新: gradient-catalog-purple (mode-controller.js, line 264)
+[Log] 🗑️ [LUCIDE-UPDATE] Removed existing svg element (lucide-init.js, line 159)
+[Log] ✅ [LUCIDE-UPDATE] Created new i element: music (lucide-init.js, line 170)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ✅ タイトル更新: 12音階モード 下降・上行 (mode-controller.js, line 279)
+[Log] ✅ サブタイトル色更新: text-purple-200 (mode-controller.js, line 289)
+[Log] ✅ サブタイトルテキスト更新: 12セッション (96音) の総合評価 (mode-controller.js, line 294)
+[Log] 🔍 [DEBUG] #main-mode-title要素: –  (results-overview-controller.js, line 256)
+<h3 class="mode-title" id="main-mode-title">12音階モード 下降・上行</h3>
+
+<h3 class="mode-title" id="main-mode-title">12音階モード 下降・上行</h3>
+[Log] ✅ [main-mode-title] モード名更新: 12音階モード 下降・上行 (results-overview-controller.js, line 264)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] 📊 [displaySessionGrid] 関数開始 (results-overview-controller.js, line 507)
+[Log] 📊 [displaySessionGrid] container要素: –  (results-overview-controller.js, line 509)
+<div id="session-grid-container">…</div>
+
+<div id="session-grid-container">…</div>
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] === 総合評価ページ初期化完了 === (results-overview-controller.js, line 188)
 [Error] Failed to load resource: the server responded with a status of 404 () (index.js.map, line 0)
 [Error] Failed to load resource: the server responded with a status of 404 () (pitchpro.umd.js.map, line 0)
 [Warning] The resource https://kiyopi.github.io/npm/tslib@2.8.1/+esm was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it wasn't preloaded for nothing.

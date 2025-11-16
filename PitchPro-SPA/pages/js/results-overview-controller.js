@@ -505,6 +505,9 @@ function displayOverallDistribution(sessionData) {
  */
 function displaySessionGrid(sessionData) {
     console.log('📊 [displaySessionGrid] 関数開始');
+    console.log('📊 [displaySessionGrid] sessionData:', sessionData);
+    console.log('📊 [displaySessionGrid] sessionData.length:', sessionData.length);
+    
     const container = document.getElementById('session-grid-container');
     console.log('📊 [displaySessionGrid] container要素:', container);
     if (!container) {
@@ -514,30 +517,42 @@ function displaySessionGrid(sessionData) {
 
     // セッション数に応じたグリッドクラスを決定
     const sessionCount = sessionData.length;
+    console.log('📊 [displaySessionGrid] sessionCount:', sessionCount);
+    
     let gridClass = 'sessions-grid-8';
     if (sessionCount === 12) gridClass = 'sessions-grid-12';
     else if (sessionCount === 24) gridClass = 'sessions-grid-24';
+    console.log('📊 [displaySessionGrid] gridClass:', gridClass);
 
+    console.log('📊 [displaySessionGrid] map処理開始...');
     const sessionBoxes = sessionData.map((session, index) => {
+        console.log(`📊 [displaySessionGrid] セッション ${index + 1} 処理開始`);
+        
         // 【追加】外れ値を除外した平均誤差を計算（固定閾値180¢）
         const errors = session.pitchErrors
             ? session.pitchErrors.map(e => Math.abs(e.errorInCents))
             : [];
+        console.log(`📊 [displaySessionGrid] セッション ${index + 1} errors:`, errors);
 
         const outlierThreshold = 180; // 全デバイス共通の固定閾値
 
         const validErrors = errors.filter(e => e <= outlierThreshold);
         const outlierCount = errors.length - validErrors.length;
+        console.log(`📊 [displaySessionGrid] セッション ${index + 1} validErrors:`, validErrors.length, 'outliers:', outlierCount);
 
         const avgError = validErrors.length > 0
             ? validErrors.reduce((sum, e) => sum + e, 0) / validErrors.length
             : errors.reduce((sum, e) => sum + e, 0) / errors.length;
+        console.log(`📊 [displaySessionGrid] セッション ${index + 1} avgError:`, avgError);
 
         // 統合評価関数を使用（v2.1.0: EvaluationCalculator統合）
         const evaluation = window.EvaluationCalculator.evaluateAverageError(avgError);
+        console.log(`📊 [displaySessionGrid] セッション ${index + 1} evaluation:`, evaluation);
+        
         const badgeClass = `session-${evaluation.level}`;
+        console.log(`📊 [displaySessionGrid] セッション ${index + 1} badgeClass:`, badgeClass);
 
-        return `
+        const html = `
             <div class="session-box ${badgeClass}"
                  data-session-index="${index}"
                  data-outlier-count="${outlierCount}"
@@ -548,18 +563,32 @@ function displaySessionGrid(sessionData) {
                 </div>
             </div>
         `;
+        console.log(`📊 [displaySessionGrid] セッション ${index + 1} HTML生成完了`);
+        return html;
     }).join('');
 
-    container.innerHTML = `
+    console.log('📊 [displaySessionGrid] map処理完了');
+    console.log('📊 [displaySessionGrid] sessionBoxes.length:', sessionBoxes.length);
+    console.log('📊 [displaySessionGrid] sessionBoxes (最初の100文字):', sessionBoxes.substring(0, 100));
+
+    const finalHTML = `
         <div class="${gridClass}">
             ${sessionBoxes}
         </div>
     `;
+    console.log('📊 [displaySessionGrid] finalHTML (最初の200文字):', finalHTML.substring(0, 200));
+    
+    container.innerHTML = finalHTML;
+    console.log('📊 [displaySessionGrid] container.innerHTML設定完了');
 
     // Lucideアイコンを初期化
     if (typeof window.initializeLucideIcons === 'function') {
+        console.log('📊 [displaySessionGrid] Lucide初期化開始');
         window.initializeLucideIcons({ immediate: true });
+        console.log('📊 [displaySessionGrid] Lucide初期化完了');
     }
+    
+    console.log('📊 [displaySessionGrid] 関数終了');
 }
 
 /**

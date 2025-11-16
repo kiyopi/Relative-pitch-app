@@ -10288,3 +10288,60 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 16:06:21] コミット: docs: エイリアス関数削除を仕様書に記録
+
+## 更新内容
+1. RESULTS_OVERVIEW_SPECIFICATION.md v1.3.0に更新
+2. TRAINING_SPECIFICATION.md v4.0.9に更新
+
+## 追記内容
+- calculateOverallEvaluationエイリアス関数削除のリファクタリング記録
+- クラスメソッド直接呼び出しへの変更
+- 安全性確認結果（使用箇所1箇所、完全互換性、リスク極めて低い）
+
+## 更新ファイル
+- /PitchPro-SPA/specifications/RESULTS_OVERVIEW_SPECIFICATION.md (v1.3.0)
+- /PitchPro-SPA/specifications/TRAINING_SPECIFICATION.md (v4.0.9)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 16:27:33] コミット: fix: results-overview-controller.js の未定義関数エラーを修正（Bug #11-10）
+
+## 問題
+- 総合評価ページで `renderStatsSection()` 等の未定義関数エラー
+- iPhone実機テストで判明（キャッシュクリア後に発生）
+
+## 原因
+d410f40コミットでページング機能の中途半端な実装：
+- render関数群（renderStatsSection, renderSessionList, renderPagination）を定義せずに呼び出し
+- 正常動作していた `updateOverviewUI()` を削除
+
+## 解決策
+1. DEBUG_MODE重複定義削除（line 50-52）
+2. ページング機能削除、updateOverviewUI()復元（line 160-188）
+3. d410f40の良い変更は保持：
+   - URLパラメータ優先ロジック
+   - SessionDataManager.getCompleteSessionsByLessonId()使用
+   - 完全レッスンチェック
+
+## 修正ファイル
+- `/PitchPro-SPA/pages/js/results-overview-controller.js`
+- `/PitchPro-SPA/specifications/RESULTS_OVERVIEW_SPECIFICATION.md` (v1.4.0, v1.5.0)
+- `/PitchPro-SPA/specifications/TRAINING_SPECIFICATION.md` (v4.0.9更新)
+
+## 影響範囲
+- 総合評価ページのみ
+- session-data-manager.js、records-controller.jsの良い変更は維持
+- revert不要、手動修正で安全に対応
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 16:37:16] コミット: debug: displaySessionGrid デバッグログ追加
+
+session-grid-container が見つかるか確認するためのログを追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
