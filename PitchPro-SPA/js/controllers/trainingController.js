@@ -570,6 +570,47 @@ async function startTraining() {
     playButton.classList.add('btn-disabled');
 
     try {
+        // 【追加】マイク許可確認（バックグラウンド復帰後のセッション失効対策）
+        console.log('🎤 マイク許可状態を確認中...');
+        playButton.innerHTML = '<i data-lucide="loader" style="width: 24px; height: 24px;"></i><span>マイク確認中...</span>';
+        if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
+
+        try {
+            // 実際にgetUserMedia()で確認（セッション失効を検出）
+            const stream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                }
+            });
+
+            // 許可確認成功 - すぐに停止（AudioDetectionComponentが後で再取得）
+            stream.getTracks().forEach(track => track.stop());
+            console.log('✅ マイク許可確認完了');
+
+        } catch (error) {
+            // マイク許可エラー
+            console.error('❌ マイク許可エラー:', error);
+            playButton.disabled = false;
+            playButton.classList.remove('btn-disabled');
+            playButton.innerHTML = '<i data-lucide="volume-2" style="width: 24px; height: 24px;"></i><span>基音スタート</span>';
+            if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
+
+            if (statusText) {
+                statusText.textContent = 'マイク許可が必要です';
+            }
+
+            // エラー種別に応じたメッセージ
+            if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+                alert('マイクの使用が拒否されています。\nブラウザの設定でマイクを許可してから、再度お試しください。');
+            } else {
+                alert('マイクの使用許可が必要です。\n準備ページでマイクテストを完了してから、再度お試しください。');
+            }
+
+            return; // トレーニング開始をキャンセル
+        }
+
         // 初回クリック時はPitchShifter初期化を実行
         if (!pitchShifter || !pitchShifter.isInitialized) {
             console.log('⏳ 初回クリック - PitchShifter初期化開始');

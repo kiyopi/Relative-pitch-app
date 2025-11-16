@@ -10040,3 +10040,33 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 12:54:07] コミット: fix: trainingController.jsの初期化順序を正しく修正
+
+問題:
+- マイク許可チェックをリロード検出より先に実行していた
+- これによりリロード時にpreparationへリダイレクトされない致命的バグ
+- チェックの優先順位が間違っていた
+
+修正内容:
+- マイク許可チェックを完全削除
+- 正しい初期化順序に戻す:
+  1. SessionManager初期化
+  2. Lucide待機
+  3. 音域データ読み込み
+  4. リロード検出（最優先）
+  5. 音域データ検証（次優先）
+  6. モード別初期化処理
+
+SPA設計の本来の意図:
+- preparationページでマイク許可取得
+- trainingページはpreparation経由が前提
+- リロード時は必ずpreparationへリダイレクト
+
+Issue #1について:
+- Results Overviewに到達する時点でpreparation経由済み
+- localStorageにmicPermissionGranted保存済み
+- trainingController.jsでのマイク許可チェックは不要
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
