@@ -47,11 +47,8 @@ window.initResultsOverview = async function initResultsOverview() {
     // ローディング状態を表示
     LoadingComponent.toggle('stats', true);
 
-    // デバッグモード判定
-    const hash = window.location.hash;
-    const DEBUG_MODE = hash.includes('debug=true');
-
     // 全セッションデータを取得
+    const hash = window.location.hash;
     const allSessionData = window.SessionDataManager 
         ? window.SessionDataManager.getAllSessions() 
         : (JSON.parse(localStorage.getItem('sessionData')) || []);
@@ -160,40 +157,30 @@ window.initResultsOverview = async function initResultsOverview() {
         console.log('🔍 [DEBUG] フィルタリング後のセッションID:', sessionData.map(s => s.sessionId));
     }
 
-    // ページ番号の取得
-    const pageParam = params.get('page');
-    let page = pageParam ? parseInt(pageParam, 10) : 1;
-
-    // セッション総数とページング設定
-    const totalSessions = sessionData.length;
-    const sessionsPerPage = 50;
-    const totalPages = Math.ceil(totalSessions / sessionsPerPage);
-
-    // ページ番号の検証
-    if (page < 1 || page > totalPages) {
-        console.warn(`⚠️ 無効なページ番号: ${page}（総ページ数: ${totalPages}）`);
-        page = 1;
-    }
-
-    // 現在のページに表示するセッションを抽出
-    const startIndex = (page - 1) * sessionsPerPage;
-    const endIndex = Math.min(startIndex + sessionsPerPage, totalSessions);
-    const currentPageSessions = sessionData.slice(startIndex, endIndex);
-
-    console.log(`📄 ページング: ${page}/${totalPages}ページ（${startIndex + 1}〜${endIndex}番目のセッション）`);
-
-    // 総合評価計算
-    const overallEvaluation = EvaluationCalculator.calculateDynamicGrade(currentPageSessions);
+    // 総合評価計算（2ea4305の修正を維持）
+    const overallEvaluation = EvaluationCalculator.calculateDynamicGrade(sessionData);
     console.log('📊 総合評価計算完了:', overallEvaluation);
 
-    // 統計情報の表示（現在のページのセッションのみ）
-    renderStatsSection(overallEvaluation, currentPageSessions);
+    // UI更新（トレーニング記録からの遷移フラグとscaleDirectionを渡す）
+    updateOverviewUI(overallEvaluation, sessionData, fromRecords, scaleDirection);
 
-    // セッション一覧の表示（現在のページのセッションのみ）
-    renderSessionList(currentPageSessions, currentMode);
+    // Chart.js初期化
+    if (typeof Chart !== 'undefined') {
+        initializeCharts(sessionData);
+    }
 
-    // ページネーション表示（全セッション数を基準）
-    renderPagination(page, totalPages, currentMode);
+    // Lucideアイコン再初期化（統合初期化関数を使用）
+    if (typeof window.initializeLucideIcons === 'function') {
+        window.initializeLucideIcons({ immediate: true });
+    }
+
+    // トレーニング記録からの遷移の場合、UI要素を調整（Lucide初期化後に実行）
+    if (fromRecords) {
+        // DOMが完全に更新されるまで少し待機
+        setTimeout(() => {
+            handleRecordsViewMode();
+        }, 100);
+    }
 
     // ローディング状態を非表示
     LoadingComponent.toggle('stats', false);

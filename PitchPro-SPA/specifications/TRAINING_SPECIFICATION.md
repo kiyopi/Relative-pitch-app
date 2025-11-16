@@ -5,12 +5,21 @@
 **最終更新**: 2025-11-16
 
 **変更履歴**:
-- v4.0.9 (2025-11-16): GitHub Issue #1関連修正 - コードクリーンアップ（エイリアス関数削除）
-  - **Refactoring**: 評価計算処理のリファクタリング
+- v4.0.9 (2025-11-16): GitHub Issue #1関連修正 - 未定義関数エラー修正とコードクリーンアップ
+  - **Bug #11-10**: 総合評価ページ未定義関数エラー（v4.0.9）
+    - **問題**: `results-overview-controller.js`で`renderStatsSection()`等の未定義関数エラー、総合評価ページ表示不可
+    - **原因**: d410f40でページング機能の中途半端な実装（render関数群を定義せずに呼び出し）
+    - **解決**: ページング機能を削除、正常動作していた`updateOverviewUI()`に復元
+    - **修正ファイル**: `/PitchPro-SPA/pages/js/results-overview-controller.js` (line 50-52, 160-188)
+    - **修正内容1**: DEBUG_MODE重複定義削除（line 50-52）
+    - **修正内容2**: renderStatsSection等削除、updateOverviewUI復元（line 160-188）
+    - **保持される変更**: URLパラメータ優先、SessionDataManager使用、完全レッスンチェックは維持
+    - **関連仕様書**: RESULTS_OVERVIEW_SPECIFICATION.md v1.5.0
+  - **Refactoring**: 評価計算処理のリファクタリング（エイリアス関数削除）
     - **問題**: `calculateOverallEvaluation()`エイリアス関数が不要に存在
     - **原因**: 緊急対応時に互換性のため作成したが、使用箇所は1箇所のみ
     - **解決**: エイリアス関数を削除し、`EvaluationCalculator.calculateDynamicGrade()`を直接呼び出し
-    - **修正ファイル1**: `/PitchPro-SPA/pages/js/results-overview-controller.js` (line 186)
+    - **修正ファイル1**: `/PitchPro-SPA/pages/js/results-overview-controller.js` (line 161)
     - **修正ファイル2**: `/PitchPro-SPA/js/evaluation-calculator.js` (エイリアス関数削除)
     - **効果**: コードの簡潔性向上、クラス設計に従った正しい実装に統一
     - **安全性確認**: 使用箇所1箇所のみ、完全互換性、リスク極めて低い

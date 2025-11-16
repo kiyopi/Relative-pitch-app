@@ -1,15 +1,30 @@
 # 総合評価ページ仕様書
 
 **作成日**: 2025-11-09
-**バージョン**: 1.3.0
+**バージョン**: 1.5.0
 **最終更新日**: 2025-11-16
 
 **変更履歴**:
+- v1.5.0 (2025-11-16): 未定義関数エラー修正（Bug #11-10）
+  - **問題**: d410f40で追加された`renderStatsSection()`等の関数が未定義、総合評価ページ表示エラー
+  - **原因**: ページング機能の中途半端な実装（render関数群を定義せずに呼び出し）
+  - **解決**: ページング機能を削除、正常動作していた`updateOverviewUI()`に復元
+  - **修正ファイル**: `/PitchPro-SPA/pages/js/results-overview-controller.js` (line 50-52, 160-188)
+  - **修正内容1**: DEBUG_MODE重複定義削除（line 50-52）
+  - **修正内容2**: renderStatsSection等削除、updateOverviewUI復元（line 160-188）
+  - **保持される変更**: URLパラメータ優先、SessionDataManager使用、完全レッスンチェックは維持
+  - **関連仕様書**: TRAINING_SPECIFICATION.md v4.0.9
+- v1.4.0 (2025-11-16): フィルタリング機能一元管理対応（Bug #11-9の一環）
+  - **URLパラメータ優先ロジック**: SessionManagerより常にURLパラメータを優先（lessonId不一致問題解決）
+  - **完全レッスンチェック**: `SessionDataManager.getCompleteSessionsByLessonId()`使用、不完全レッスン除外
+  - **不完全レッスン処理**: 期待セッション数未満のレッスンはアラート表示後training-recordsに戻る
+  - **修正ファイル**: `/PitchPro-SPA/pages/js/results-overview-controller.js` (line 72-136)
+  - **関連修正**: TRAINING_SPECIFICATION.md v4.0.8、TRAINING_RECORDS_SPECIFICATION.md v2.2.0
 - v1.3.0 (2025-11-16): 評価計算処理のリファクタリング
   - **calculateOverallEvaluationエイリアス関数削除**: 不要なラッパー関数を削除
   - **クラスメソッド直接呼び出しに変更**: `EvaluationCalculator.calculateDynamicGrade()`を直接使用
   - **コード簡潔性向上**: クラス設計に従った正しい実装に統一
-  - **修正ファイル**: `/PitchPro-SPA/pages/js/results-overview-controller.js` (line 186)
+  - **修正ファイル**: `/PitchPro-SPA/pages/js/results-overview-controller.js` (line 161)
   - **関連修正**: `/PitchPro-SPA/js/evaluation-calculator.js` (エイリアス関数削除)
   - **安全性確認**: 使用箇所1箇所のみ、完全互換性、リスク極めて低い
 - v1.2.0 (2025-11-12): 12音階モード次のステップ進行パス追加
