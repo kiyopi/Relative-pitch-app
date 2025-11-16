@@ -10108,3 +10108,35 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 13:05:59] コミット: docs: 作業ログ更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 13:38:05] コミット: fix: 総合評価ページから準備ページ経由でトレーニング開始に修正
+
+問題:
+- 総合評価ページの「次のステップ」ボタンが直接trainingに遷移
+- 準備ページを経由しないためマイク許可未取得
+- sessionStorageに残った未完了レッスンが復元される
+- マイク許可エラーでトレーニング開始不可
+
+修正内容:
+1. preparation-pitchpro-cycle.js:
+   - 初期化時にsessionStorageをクリア（v4.0.6）
+   - 準備ページに遷移時は常に新規レッスンとして開始
+
+2. results-overview-controller.js:
+   - 全ての「次のステップ」をpreparation経由に変更
+   - training?mode=... → preparation?mode=...
+   - 10個のアクションすべて修正
+
+効果:
+- 総合評価 → 準備ページ → トレーニングの正しいフロー確立
+- マイク許可・音域テスト確認の徹底
+- 未完了レッスン復元問題の完全解決
+- SPA設計思想に準拠
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
