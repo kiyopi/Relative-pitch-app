@@ -451,8 +451,3 @@ class EvaluationCalculator {
 
 // グローバル公開
 window.EvaluationCalculator = EvaluationCalculator;
-
-// 互換性のためのエイリアス関数（results-overview-controller.js用）
-window.calculateOverallEvaluation = function(sessionData) {
-  return EvaluationCalculator.calculateDynamicGrade(sessionData);
-};

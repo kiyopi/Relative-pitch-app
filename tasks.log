@@ -10243,3 +10243,24 @@ SPAではindex.htmlから読み込まれるため、相対パス「../」が間�
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 15:55:06] コミット: fix: evaluation-calculator二重読み込み修正と互換性関数追加
+
+## 問題
+1. evaluation-calculator.jsが二重読み込み（index.html + results-overview.html）
+2. calculateOverallEvaluation関数が見つからないエラー
+
+## 原因
+1. SPAなのでindex.htmlで読み込まれたスクリプトは全ページで有効なのに、results-overview.htmlでも読み込んでいた
+2. evaluation-calculator.jsはEvaluationCalculatorクラスで実装されているが、results-overview-controller.jsはcalculateOverallEvaluation関数を呼び出していた
+
+## 解決
+1. results-overview.htmlからevaluation-calculator.jsの読み込みを削除（index.htmlで既に読み込み済み）
+2. evaluation-calculator.jsにcalculateOverallEvaluation互換性関数を追加
+
+## 修正ファイル
+- /PitchPro-SPA/pages/results-overview.html（二重読み込み削除）
+- /PitchPro-SPA/js/evaluation-calculator.js（互換性関数追加）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

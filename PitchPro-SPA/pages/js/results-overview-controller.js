@@ -183,7 +183,7 @@ window.initResultsOverview = async function initResultsOverview() {
     console.log(`📄 ページング: ${page}/${totalPages}ページ（${startIndex + 1}〜${endIndex}番目のセッション）`);
 
     // 総合評価計算
-    const overallEvaluation = calculateOverallEvaluation(currentPageSessions);
+    const overallEvaluation = EvaluationCalculator.calculateDynamicGrade(currentPageSessions);
     console.log('📊 総合評価計算完了:', overallEvaluation);
 
     // 統計情報の表示（現在のページのセッションのみ）
