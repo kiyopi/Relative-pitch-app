@@ -1,11 +1,12 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.0.3 (2025-11-16)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.0.4 (2025-11-16)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.0.3
+ * Version: 4.0.4
  * Date: 2025-11-16
  * Changelog:
+ *   v4.0.4 - 【デバッグログ追加】displayNextSteps関数の詳細ログ追加（中央カード表示問題調査）
  *   v4.0.3 - 【チラつき修正】DOMContentLoadedイベントリスナー削除（SPA環境では不要、初期表示復元によるチラつき防止）
  *   v4.0.2 - 【レースコンディション修正】requestAnimationFrameでDOM更新完了を待機してChart.js・Lucide初期化
  *   v4.0.1 - 【バグ修正】詳細分析セクション初期化問題を修正（window.showSessionDetail(0)を自動呼び出し）
@@ -1059,6 +1060,8 @@ window.copyShareText = function(event) {
  * @param {string} scaleDirection - 音階方向（ascending, descending）
  */
 function displayNextSteps(currentMode, evaluation, chromaticDirection = null, scaleDirection = 'ascending') {
+    console.log('🔍 [DEBUG displayNextSteps] Parameters:', { currentMode, evaluation, chromaticDirection, scaleDirection });
+
     const container = document.getElementById('next-steps-container');
     if (!container) return;
 
@@ -1259,7 +1262,9 @@ function displayNextSteps(currentMode, evaluation, chromaticDirection = null, sc
     if (currentMode === '12tone' && chromaticDirection) {
         modeKey = `12tone-${chromaticDirection}`;
     }
+    console.log('🔍 [DEBUG displayNextSteps] modeKey:', modeKey);
     const config = nextStepsConfig[modeKey] || nextStepsConfig['random'];
+    console.log('🔍 [DEBUG displayNextSteps] config:', config);
 
     // ModeControllerで完全なモード名を生成（description表示用）
     let fullModeName = '';
@@ -1268,6 +1273,9 @@ function displayNextSteps(currentMode, evaluation, chromaticDirection = null, sc
             chromaticDirection: chromaticDirection,
             scaleDirection: scaleDirection
         });
+        console.log('🔍 [DEBUG displayNextSteps] fullModeName:', fullModeName);
+    } else {
+        console.error('❌ [DEBUG displayNextSteps] ModeController が見つかりません');
     }
 
     // 3つのカードを生成
@@ -1276,11 +1284,16 @@ function displayNextSteps(currentMode, evaluation, chromaticDirection = null, sc
         const card = config[cardType];
         const disabledClass = card.disabled ? 'disabled' : '';
 
+        console.log(`🔍 [DEBUG displayNextSteps] ${cardType}カード - Original description:`, card.description);
+
         // 【修正v4.0.7】descriptionに完全なモード名（上昇・下降と上行・下行を含む）を表示
         let description = card.description;
         if (fullModeName && currentMode === '12tone') {
             // 「12音階上昇モード」「12音階下降モード」「12音階両方向モード」を完全なモード名に置換
             description = description.replace(/12音階(?:上昇|下降|両方向)?モード/, fullModeName);
+            console.log(`🔍 [DEBUG displayNextSteps] ${cardType}カード - Replaced description:`, description);
+        } else {
+            console.log(`🔍 [DEBUG displayNextSteps] ${cardType}カード - 置換スキップ (fullModeName: ${fullModeName}, currentMode: ${currentMode})`);
         }
 
         return `
