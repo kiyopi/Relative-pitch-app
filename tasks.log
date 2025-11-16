@@ -9967,3 +9967,20 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 12:20:05] コミット: fix: マイク許可チェックを準備ページリダイレクト方式に修正
+
+Issue #1の修正アプローチを変更:
+- トレーニングページでマイク許可を要求する代わりに、準備ページへリダイレクト
+- これによりマイク許可ダイアログでユーザーインタラクションが中断される問題を根本解決
+
+変更内容:
+- initializeTrainingPage(): マイク許可チェック追加、未許可時は準備ページへリダイレクト
+- startTraining(): マイク許可チェックコードを完全削除
+
+SPA設計思想:
+- 準備ページ: マイク許可取得（マイクテスト完了）
+- トレーニングページ: マイク許可済みが前提
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
