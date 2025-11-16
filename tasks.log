@@ -9946,3 +9946,24 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 11:45:30] コミット: feat: トレーニング記録ページ Section 1完全実装
+
+- **総レッスン時間計算方法変更**: モード別標準時間（13秒/セッション）で計算
+  - 理由: 結果ページ閲覧時間等の待機時間を除外、純粋なトレーニング時間のみカウント
+  - 1セッション標準時間: 基音2.5s + ガイド5.3s + 発声5.6s = 13秒
+- **ModeController更新**: v2.0.1でstandardDurationPerSession追加
+- **records-controller更新**: v2.5.5で総レッスン時間計算ロジック変更
+- **仕様書更新**: TRAINING_RECORDS_SPECIFICATION v2.1.0
+  - デザイン哲学（累積達成重視・統一感優先）
+  - CSS設計詳細化（統計項目・数値カード）
+  - 完全な変更履歴
+
+**マージ内容**:
+- issue #1修正: トレーニング開始前のマイク許可チェック追加
+- ポップオーバーUI改善
+- iPadガラス効果重複修正
+- 音域テスト統合機能
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

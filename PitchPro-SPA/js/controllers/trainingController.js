@@ -139,7 +139,7 @@ const modeConfig = {
     }
 };
 
-export async function initializeTrainingPage() {
+async function initializeTrainingPage() {
     console.log('TrainingController initializing...');
 
     // 【デバッグ】現在のURL確認
@@ -293,6 +293,45 @@ export async function initializeTrainingPage() {
 
         // リダイレクトエラーをスロー（router.jsで特別扱い）
         throw NavigationManager.createRedirectError();
+    }
+
+    // 【追加】マイク許可チェック → 未許可なら準備ページへリダイレクト
+    console.log('🎤 マイク許可状態を確認中...');
+    try {
+        const permissions = await navigator.permissions.query({ name: 'microphone' });
+        console.log(`🎤 マイク許可状態: ${permissions.state}`);
+
+        if (permissions.state === 'denied') {
+            console.warn('⚠️ マイク許可が拒否されています - 準備ページへリダイレクト');
+            alert('マイクの使用が拒否されています。\nブラウザの設定でマイクを許可してから、再度お試しください。');
+            await NavigationManager.redirectToPreparation('マイク許可拒否');
+            throw NavigationManager.createRedirectError();
+        } else if (permissions.state === 'prompt') {
+            console.warn('⚠️ マイク許可が未取得です - 準備ページへリダイレクト');
+            alert('トレーニングを開始する前に、マイクテストを完了してください。');
+            await NavigationManager.redirectToPreparation('マイク許可未取得');
+            throw NavigationManager.createRedirectError();
+        }
+
+        console.log('✅ マイク許可確認完了 - トレーニング開始可能');
+    } catch (error) {
+        // permissions APIが使えない環境（Safari等）の場合
+        if (error.name === 'TypeError' || error.message.includes('permissions')) {
+            console.warn('⚠️ Permissions APIが使えません - getUserMediaで直接チェックします');
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                stream.getTracks().forEach(track => track.stop());
+                console.log('✅ マイク許可確認完了（getUserMedia）');
+            } catch (micError) {
+                console.error('❌ マイク許可エラー:', micError);
+                alert('トレーニングを開始する前に、マイクテストを完了してください。');
+                await NavigationManager.redirectToPreparation('マイク許可エラー');
+                throw NavigationManager.createRedirectError();
+            }
+        } else {
+            throw error; // NavigationManager.createRedirectError()の場合は再スロー
+        }
     }
 
     // Wait for Lucide
@@ -570,41 +609,6 @@ async function startTraining() {
     playButton.classList.add('btn-disabled');
 
     try {
-        // 【追加】マイク許可の確認・要求を基音再生前に実施
-        console.log('🎤 マイク許可状態を確認中...');
-        playButton.innerHTML = '<i data-lucide="loader" style="width: 24px; height: 24px;"></i><span>マイク確認中...</span>';
-        lucide.createIcons();
-
-        try {
-            // マイク許可を要求（まだ許可されていない場合はダイアログが表示される）
-            const stream = await navigator.mediaDevices.getUserMedia({
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    autoGainControl: true
-                }
-            });
-
-            // 許可取得成功 - ストリームは後でAudioDetectionComponentが再取得するので、ここで停止
-            stream.getTracks().forEach(track => track.stop());
-            console.log('✅ マイク許可確認完了');
-
-        } catch (error) {
-            // マイク許可が拒否された場合
-            console.error('❌ マイク許可エラー:', error);
-            playButton.disabled = false;
-            playButton.classList.remove('btn-disabled');
-            playButton.innerHTML = '<i data-lucide="volume-2" style="width: 24px; height: 24px;"></i><span>基音スタート</span>';
-            lucide.createIcons();
-
-            if (statusText) {
-                statusText.textContent = 'マイク許可が必要です';
-            }
-
-            alert('マイクの使用許可が必要です。\nブラウザの設定でマイクを許可してください。');
-            return;
-        }
-
         // 初回クリック時はPitchShifter初期化を実行
         if (!pitchShifter || !pitchShifter.isInitialized) {
             console.log('⏳ 初回クリック - PitchShifter初期化開始');
