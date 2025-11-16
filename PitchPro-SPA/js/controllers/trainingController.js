@@ -139,7 +139,7 @@ const modeConfig = {
     }
 };
 
-async function initializeTrainingPage() {
+export async function initializeTrainingPage() {
     console.log('TrainingController initializing...');
 
     // 【デバッグ】現在のURL確認

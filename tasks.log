@@ -9984,3 +9984,22 @@ SPA設計思想:
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 12:30:44] コミット: fix: マイク許可チェックをgetUserMedia()直接確認方式に修正
+
+問題:
+- Permissions APIのstate='prompt'で即座にリダイレクトしていた
+- 既に許可済みでもprompt状態になるケースがあり、誤判定していた
+
+修正内容:
+- Permissions API削除、getUserMedia()で直接確認する方式に変更
+- 実際にマイクアクセスを試みて、成功すれば許可済みと判定
+- エラー種別に応じた適切なメッセージとリダイレクト処理
+
+エラーハンドリング:
+- NotAllowedError: マイク許可拒否
+- NotFoundError: マイクデバイス未検出
+- その他: マイクテスト未完了として準備ページへ
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
