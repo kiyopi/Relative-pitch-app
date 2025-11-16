@@ -10003,3 +10003,20 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 12:35:47] コミット: fix: initializeTrainingPage関数のexportキーワード追加
+
+問題:
+- initializeTrainingPageがexportされておらず、router.jsから呼び出せない
+- TypeError: initializeTrainingPage is not a functionエラー発生
+- トレーニングページ読み込み失敗 → ホームにフォールバック
+
+原因:
+- mcp__serena__replace_symbol_bodyで関数本体を置き換えた際、
+  関数宣言からexportキーワードが消失
+
+修正:
+- async function → export async function に修正
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

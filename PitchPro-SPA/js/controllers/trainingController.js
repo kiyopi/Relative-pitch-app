@@ -295,42 +295,18 @@ export async function initializeTrainingPage() {
         throw NavigationManager.createRedirectError();
     }
 
-    // 【修正】マイク許可チェック → 実際にgetUserMedia()で確認
+    // 【修正】マイク許可チェック → localStorageフラグで確認（ダイアログなし）
     console.log('🎤 マイク許可状態を確認中...');
-    try {
-        // getUserMedia()で直接確認（最も確実な方法）
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-            audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true
-            }
-        });
-        
-        // 許可取得成功 - すぐに停止
-        stream.getTracks().forEach(track => track.stop());
-        console.log('✅ マイク許可確認完了 - トレーニング開始可能');
-        
-    } catch (error) {
-        console.error('❌ マイク許可エラー:', error);
-        
-        // エラー種別に応じた処理
-        if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-            // 明示的に拒否された場合
-            alert('マイクの使用が拒否されています。\nブラウザの設定でマイクを許可してから、再度お試しください。');
-            await NavigationManager.redirectToPreparation('マイク許可拒否');
-        } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
-            // マイクデバイスが見つからない場合
-            alert('マイクデバイスが見つかりません。\nマイクを接続してから、再度お試しください。');
-            await NavigationManager.redirectToPreparation('マイクデバイス未検出');
-        } else {
-            // その他のエラー（準備ページでマイクテストを実施）
-            alert('トレーニングを開始する前に、マイクテストを完了してください。');
-            await NavigationManager.redirectToPreparation('マイク許可エラー');
-        }
-        
+    const micPermissionGranted = localStorage.getItem('micPermissionGranted');
+
+    if (micPermissionGranted !== 'true') {
+        console.warn('⚠️ マイクテスト未完了 - 準備ページへリダイレクト');
+        alert('トレーニングを開始する前に、マイクテストを完了してください。');
+        await NavigationManager.redirectToPreparation('マイクテスト未完了');
         throw NavigationManager.createRedirectError();
     }
+
+    console.log('✅ マイク許可確認完了 - トレーニング開始可能');
 
     // Wait for Lucide
     await waitForLucide();
