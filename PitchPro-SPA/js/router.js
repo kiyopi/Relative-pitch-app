@@ -8,7 +8,7 @@ class SimpleRouter {
         this.routes = {
             'home': 'templates/home.html',
             'preparation': 'templates/preparation.html',
-            'training': 'pages/training.html',
+            'training': 'pages/training.html?v=20251116002',
             'result-session': 'pages/result-session.html',
             'records': 'pages/records.html',
             'results': 'pages/results-overview.html',

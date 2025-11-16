@@ -820,6 +820,24 @@ body::before {
   height: 24px;
 }
 
+/* --- ボタン状態管理（innerHTML排除・タイミング完璧化） --- */
+/* すべての状態を非表示（デフォルト） */
+.btn-state {
+  display: none;
+}
+
+/* data-state属性に応じて対応する状態のみ表示 */
+.btn[data-state="idle"] .btn-state-idle,
+.btn[data-state="init"] .btn-state-init,
+.btn[data-state="mic"] .btn-state-mic,
+.btn[data-state="playing"] .btn-state-playing,
+.btn[data-state="error"] .btn-state-error,
+.btn[data-state="retry"] .btn-state-retry {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* btn-largeクラスは削除 - 統一されたボタンサイズを使用 */
 
 .btn-primary {
