@@ -1,70 +1,515 @@
-<div id="distribution-content" style="display: block;">
-                <!-- セクション見出し（ヘルプボタン付き） -->
-                <div class="section-header-row">
-                    <h4 class="heading-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="bar-chart-3" class="lucide lucide-bar-chart-3 text-purple-300"><path d="M3 3v18h18"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg>
-                        <span>評価分布</span>
-                    </h4>
-                    <div id="distribution-help-button" class="section-header-help">
-            <button class="help-icon-btn-inline" onclick="window.DistributionChart.togglePopover('distribution-chart-container-popover')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="help-circle" style="width: 16px; height: 16px;" class="lucide lucide-help-circle"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>
-            </button>
-        </div>
-                </div>
-
-                <!-- DistributionChartコンテナ -->
-                <div id="distribution-chart-container">
-            <p class="text-sm text-white-60 mb-4">全セッションの各音の精度評価を集計した分布です。Excellentが多いほど高精度です。</p>
-
-            <!-- 評価分布バー -->
-            <div class="flex flex-col gap-3">
-                <!-- Excellent -->
-                <div class="flex items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="trophy" class="lucide lucide-trophy text-yellow-300" style="width: 20px; height: 20px; flex-shrink: 0;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
-                    <div class="progress-bar flex">
-                        <div class="distribution-bar progress-fill-custom color-eval-gold" data-width="50.0" style="width: 50%; transition: width 0.8s ease-out;"></div>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="app-header" style="display: none;">
+                <div class="header-brand">
+                    <div class="header-icon-wrapper">
+                        <div class="header-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="music" class="lucide lucide-music icon-lg text-white"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                        </div>
                     </div>
-                    <span class="text-sm text-white-60" style="min-width: 40px; text-align: right;">8</span>
-                </div>
-
-                <!-- Good -->
-                <div class="flex items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" class="lucide lucide-star text-green-300" style="width: 20px; height: 20px; flex-shrink: 0;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                    <div class="progress-bar flex">
-                        <div class="distribution-bar progress-fill-custom color-eval-good" data-width="18.8" style="width: 18.8%; transition: width 0.8s ease-out;"></div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-white">8va相対音感トレーニング</h1>
+                        <p class="text-purple-200">あなたの音感を科学的に向上させましょう</p>
                     </div>
-                    <span class="text-sm text-white-60" style="min-width: 40px; text-align: right;">3</span>
                 </div>
+                <!-- モバイル用ハンバーガーメニュー -->
+                <button class="menu-toggle" id="menu-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="menu" class="lucide lucide-menu icon-md"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+                </button>
+                
+                <!-- PC用ナビゲーション -->
+                <nav class="header-nav" id="header-nav">
+                    <button class="nav-button" onclick="location.hash='records'" title="トレーニング記録を見る">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="history" class="lucide lucide-history icon-md"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>
+                        <span class="nav-text">記録</span>
+                    </button>
+                    <button class="nav-button" onclick="location.hash='premium-analysis'" title="詳細分析">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="bar-chart-3" class="lucide lucide-bar-chart-3 icon-md"><path d="M3 3v18h18"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg>
+                        <span class="nav-text">詳細分析</span>
+                    </button>
+                    <button class="nav-button" onclick="location.hash='settings'" title="設定・データ管理">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="settings" class="lucide lucide-settings icon-md"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        <span class="nav-text">設定</span>
+                    </button>
+                    <button class="nav-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="share" class="lucide lucide-share icon-md"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" x2="12" y1="2" y2="15"></line></svg>
+                        <span class="nav-text">共有</span>
+                    </button>
+                </nav>
+        </header>
 
-                <!-- Pass -->
-                <div class="flex items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="thumbs-up" class="lucide lucide-thumbs-up text-blue-300" style="width: 20px; height: 20px; flex-shrink: 0;"><path d="M7 10v12"></path><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"></path></svg>
-                    <div class="progress-bar flex">
-                        <div class="distribution-bar progress-fill-custom color-eval-pass" data-width="6.3" style="width: 6.3%; transition: width 0.8s ease-out;"></div>
+        <!-- Main Content Container for SPA -->
+        <main id="app-root" class="wide-main"><!-- SPA用テンプレート: result-session
+     このファイルはindex.htmlのrouter.jsから読み込まれます。
+     スクリプトタグは不要（index.htmlで既に読み込み済み）
+-->
+<div class="container container-result-session">
+        <!-- ヘッダー -->
+        <header class="page-header">
+                <div class="page-header-content">
+                    <div class="page-header-icon-wrapper">
+                        <div class="page-header-icon gradient-catalog-blue">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="check-circle" class="lucide lucide-check-circle text-white" data-stroke-width="2" style="width: 36px; height: 36px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        </div>
                     </div>
-                    <span class="text-sm text-white-60" style="min-width: 40px; text-align: right;">1</span>
+                    <div class="page-header-text">
+                        <h1 class="page-title">セッション 3 完了！</h1>
+                        <p class="page-subtitle text-green-200">基音 F2 - 8音の評価結果</p>
+                    </div>
                 </div>
+            </header>
 
-                <!-- Practice -->
-                <div class="flex items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-triangle" class="lucide lucide-alert-triangle text-red-300" style="width: 20px; height: 20px; flex-shrink: 0;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
-                    <div class="progress-bar flex">
-                        <div class="distribution-bar progress-fill-custom color-eval-practice" data-width="25.0" style="width: 25%; transition: width 0.8s ease-out;"></div>
+        <!-- メインコンテンツ -->
+        <main class="narrow-main">
+            <!-- 進行バー -->
+            <div class="progress-section progress-section-training">
+                <div class="flex items-center gap-4">
+                    <div class="progress-bar with-margin">
+                        <div class="progress-fill gradient-catalog-blue" style="width: 37.5%;"></div>
                     </div>
-                    <span class="text-sm text-white-60" style="min-width: 40px; text-align: right;">4</span>
+                    <div class="session-badge">セッション 3/8</div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <button class="btn btn-primary btn-next-session"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-right" style="width: 24px; height: 24px;" class="lucide lucide-arrow-right"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg><span>次の基音へ</span></button>
                 </div>
             </div>
 
-            
-                <div class="trend-card mt-4">
-                    <div class="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="minus" class="lucide lucide-minus text-blue-300" style="width: 20px; height: 20px; flex-shrink: 0;"><path d="M5 12h14"></path></svg>
-                        <div class="flex-1">
-                            <div class="text-sm text-white-80">過去1週間の改善トレンド</div>
-                            <div class="text-xs text-white-60">A以上獲得率 0%</div>
+            <!-- セッション概要 -->
+            <div class="glass-card">
+                <div class="score-section">
+                    <div class="score-grid">
+                        <!-- 基音表示（左） -->
+                        <div class="base-note-section">
+                            <div class="score-base-note text-white" id="session-base-note">F2</div>
+                            <p class="text-body-green">基音</p>
+                        </div>
+
+                        <!-- トロフィーアイコン（中央・JavaScriptで動的生成） -->
+                        <div class="trophy-section flex flex-col items-center text-center justify-end">
+                            <div class="accuracy-badge relative accuracy-badge-pass">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="thumbs-up" class="lucide lucide-thumbs-up text-blue-300 accuracy-icon"><path d="M7 10v12"></path><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"></path></svg>
+        <!-- ヘルプボタン -->
+        <button class="rank-info-btn help-btn-position" onclick="toggleRankPopover()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="help-circle" class="lucide lucide-help-circle text-white icon-help"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>
+        </button>
+        <!-- 精度ランク説明ポップオーバー -->
+        <div id="rank-popover" class="rank-popover">
+            <button class="popover-close-btn" onclick="toggleRankPopover()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="x" class="lucide lucide-x icon-help"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+            </button>
+            <h4 class="popover-title">精度ランク</h4>
+            <div class="rank-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="trophy" class="lucide lucide-trophy text-yellow-300 icon-md shrink-0"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+                <div>
+                    <div class="rank-name rank-name-excellent">Excellent</div>
+                    <div class="rank-range">±15セント以内</div>
+                </div>
+            </div>
+            <div class="rank-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" class="lucide lucide-star text-green-300 icon-md shrink-0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                <div>
+                    <div class="rank-name rank-name-good">Good</div>
+                    <div class="rank-range">15～25セント</div>
+                </div>
+            </div>
+            <div class="rank-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="thumbs-up" class="lucide lucide-thumbs-up text-blue-300 icon-md shrink-0"><path d="M7 10v12"></path><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"></path></svg>
+                <div>
+                    <div class="rank-name rank-name-pass">Pass</div>
+                    <div class="rank-range">25～40セント</div>
+                </div>
+            </div>
+            <div class="rank-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-triangle" class="lucide lucide-alert-triangle text-red-300 icon-md shrink-0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+                <div>
+                    <div class="rank-name rank-name-practice">Practice</div>
+                    <div class="rank-range">40セント以上</div>
+                </div>
+            </div>
+        </div>
+    </div>
+                            <p class="text-sub-title mt-4">合格ライン達成！</p>
+                        </div>
+
+                        <!-- 平均誤差（右） -->
+                        <div class="error-section">
+                            <div class="score-average text-white" id="average-error">±41.0¢</div>
+                            <p class="text-body-green">セッション平均誤差</p>
                         </div>
                     </div>
                 </div>
-            
-        </div>
+                
+                <!-- 評価分布見出し -->
+                <h3 class="text-xl font-medium text-white mb-4 text-center">評価分布</h3>
+                
+                <!-- 評価分布バー -->
+                <div class="flex flex-col gap-3 px-4">
+        <!-- Excellent -->
+        <div class="flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="trophy" class="lucide lucide-trophy text-yellow-300 icon-help shrink-0"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+            <div class="progress-bar flex">
+                <div class="progress-fill-custom color-eval-gold" style="width: 25%;"></div>
             </div>
+            <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">2</span>
+        </div>
+
+        <!-- Good -->
+        <div class="flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" class="lucide lucide-star text-green-300 icon-help shrink-0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            <div class="progress-bar flex">
+                <div class="progress-fill-custom color-eval-good" style="width: 12.5%;"></div>
+            </div>
+            <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">1</span>
+        </div>
+
+        <!-- Pass -->
+        <div class="flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="thumbs-up" class="lucide lucide-thumbs-up text-blue-300 icon-help shrink-0"><path d="M7 10v12"></path><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"></path></svg>
+            <div class="progress-bar flex">
+                <div class="progress-fill-custom color-eval-pass" style="width: 25%;"></div>
+            </div>
+            <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">2</span>
+        </div>
+
+        <!-- Practice -->
+        <div class="flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-triangle" class="lucide lucide-alert-triangle text-red-300 icon-help shrink-0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+            <div class="progress-bar flex">
+                <div class="progress-fill-custom color-eval-practice" style="width: 37.5%;"></div>
+            </div>
+            <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">3</span>
+        </div>
+    </div>
+            </div>
+
+            <!-- 詳細分析 -->
+            <div class="glass-card">
+                <h3 class="heading-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="microscope" style="width: 24px; height: 24px;" class="lucide lucide-microscope"><path d="M6 18h8"></path><path d="M3 22h18"></path><path d="M14 22a7 7 0 1 0 0-14h-1"></path><path d="M9 14h2"></path><path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"></path><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"></path></svg>
+                    <span>詳細分析</span>
+                </h3>
+                <div class="space-y-2" id="note-results"><div class="note-result-item">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div>
+                        <div class="text-sub-title">ド</div>
+                    </div>
+                    <div>
+                        <div class="text-body">目標 87Hz</div>
+                        <div class="text-body">実音 87Hz</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="text-pitch-deviation-minus">-0.3¢</div>
+                    <div class="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="trophy" class="lucide lucide-trophy text-yellow-300" style="width: 28px; height: 28px; "><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div><div class="note-result-item">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div>
+                        <div class="text-sub-title">レ</div>
+                    </div>
+                    <div>
+                        <div class="text-body">目標 98Hz</div>
+                        <div class="text-body">実音 96Hz</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="text-pitch-deviation-minus">-37.1¢</div>
+                    <div class="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="thumbs-up" class="lucide lucide-thumbs-up text-blue-300" style="width: 28px; height: 28px; transform: translateY(-2px) translateX(2px);"><path d="M7 10v12"></path><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div><div class="note-result-item">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div>
+                        <div class="text-sub-title">ミ</div>
+                    </div>
+                    <div>
+                        <div class="text-body">目標 110Hz</div>
+                        <div class="text-body">実音 112Hz</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="text-pitch-deviation-plus">+36¢</div>
+                    <div class="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="thumbs-up" class="lucide lucide-thumbs-up text-blue-300" style="width: 28px; height: 28px; transform: translateY(-2px) translateX(2px);"><path d="M7 10v12"></path><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div><div class="note-result-item">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div>
+                        <div class="text-sub-title">ファ</div>
+                    </div>
+                    <div>
+                        <div class="text-body">目標 117Hz</div>
+                        <div class="text-body">実音 115Hz</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="text-pitch-deviation-minus">-26.2¢</div>
+                    <div class="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="star" class="lucide lucide-star text-green-300" style="width: 28px; height: 28px; "><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    </div>
+                </div>
+            </div>
+        </div><div class="note-result-item">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div>
+                        <div class="text-sub-title">ソ</div>
+                    </div>
+                    <div>
+                        <div class="text-body">目標 131Hz</div>
+                        <div class="text-body">実音 131Hz</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="text-pitch-deviation-minus">-2.7¢</div>
+                    <div class="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="trophy" class="lucide lucide-trophy text-yellow-300" style="width: 28px; height: 28px; "><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div><div class="note-result-item">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div>
+                        <div class="text-sub-title">ラ</div>
+                    </div>
+                    <div>
+                        <div class="text-body">目標 147Hz</div>
+                        <div class="text-body">実音 155Hz</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="text-pitch-deviation-plus">+96¢</div>
+                    <div class="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-triangle" class="lucide lucide-alert-triangle text-red-300" style="width: 28px; height: 28px; "><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div><div class="note-result-item">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div>
+                        <div class="text-sub-title">シ</div>
+                    </div>
+                    <div>
+                        <div class="text-body">目標 165Hz</div>
+                        <div class="text-body">実音 172Hz</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="text-pitch-deviation-plus">+73.7¢</div>
+                    <div class="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-triangle" class="lucide lucide-alert-triangle text-red-300" style="width: 28px; height: 28px; "><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div><div class="note-result-item">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div>
+                        <div class="text-sub-title">ド</div>
+                    </div>
+                    <div>
+                        <div class="text-body">目標 175Hz</div>
+                        <div class="text-body">実音 180Hz</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="text-pitch-deviation-plus">+55.6¢</div>
+                    <div class="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="alert-triangle" class="lucide lucide-alert-triangle text-red-300" style="width: 28px; height: 28px; "><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div></div>
+            </div><div id="outlier-explanation-container"></div>
+
+            <!-- Action Buttons -->
+            <section class="action-buttons">
+                <button class="btn btn-primary btn-next-session"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-right" style="width: 24px; height: 24px;" class="lucide lucide-arrow-right"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg><span>次の基音へ</span></button>
+            </section>
+        </main>
+    </div> <!-- container end --></main>
+        
+        <!-- Footer -->
+        <footer class="footer-base">
+            <!-- ナビゲーションボタン（トップページ以外で表示） -->
+            <div class="footer-nav" id="footer-nav" style="display: flex;">
+                <button class="btn btn-outline" onclick="handleFooterHomeButtonClick()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="home" class="lucide lucide-home"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    <span>ホームに戻る</span>
+                </button>
+            </div>
+
+            <p class="footer-copyright">© 2024 8va相対音感トレーニングアプリ</p>
+            <p class="footer-tagline">音楽の新しい扉を開こう</p>
+        </footer>
+    </div>
+
+    <!-- Lucideアイコン統合初期化・更新システム v2.0.0 -->
+    <script src="js/lucide-init.js?v=20251114001"></script>
+
+    <!-- SPA Router -->
+    <script src="js/router.js?v=20251110002"></script>
+
+    <!-- Home Page Direction Tabs -->
+    <script src="js/home-direction-tabs.js?v=20251113011"></script>
+
+    <!-- メニュー開閉スクリプト -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const headerNav = document.getElementById('header-nav');
+            
+            menuToggle.addEventListener('click', function() {
+                headerNav.classList.toggle('active');
+                // アイコン切り替え
+                const icon = menuToggle.querySelector('i');
+                if (icon) {
+                    if (headerNav.classList.contains('active')) {
+                        icon.setAttribute('data-lucide', 'x');
+                    } else {
+                        icon.setAttribute('data-lucide', 'menu');
+                    }
+                    // 統合初期化関数を使用（即座実行モード）
+                    if (typeof window.initializeLucideIcons === 'function') {
+                        window.initializeLucideIcons({ immediate: true });
+                    }
+                }
+            });
+            
+            // 外側クリックで閉じる
+            document.addEventListener('click', function(event) {
+                if (!menuToggle.contains(event.target) && !headerNav.contains(event.target)) {
+                    headerNav.classList.remove('active');
+                    const icon = menuToggle.querySelector('i');
+                    if (icon) {
+                        icon.setAttribute('data-lucide', 'menu');
+                        // 統合初期化関数を使用（即座実行モード）
+                        if (typeof window.initializeLucideIcons === 'function') {
+                            window.initializeLucideIcons({ immediate: true });
+                        }
+                    }
+                }
+            });
+        });
+
+        /**
+         * フッター「ホームに戻る」ボタンのクリックハンドラー
+         * 準備・トレーニングページでは確認ダイアログを表示
+         */
+        function handleFooterHomeButtonClick() {
+            const currentPage = window.router ? window.router.currentPage : '';
+
+            // 準備フェーズ・トレーニングページでは確認ダイアログ
+            if (currentPage === 'preparation' || currentPage === 'training') {
+                const message = currentPage === 'preparation'
+                    ? '音域テストを中断してホームに戻りますか？'
+                    : 'トレーニング中です。\nホームに戻ると進行中のデータが失われます。\n本当にホームに戻りますか？';
+
+                if (confirm(message)) {
+                    // 【修正v4.0.4】トレーニング中断時は未完了レッスンデータを削除
+                    if (currentPage === 'training') {
+                        cleanupIncompleteLesson();
+                    }
+
+                    // NavigationManagerを使用して安全に遷移
+                    if (window.NavigationManager) {
+                        NavigationManager.navigate('home');
+                    } else {
+                        window.location.hash = 'home';
+                    }
+                }
+            } else {
+                // その他のページは確認なしで遷移
+                if (window.NavigationManager) {
+                    NavigationManager.navigate('home');
+                } else {
+                    window.location.hash = 'home';
+                }
+            }
+        }
+
+        /**
+         * 未完了レッスンのデータをクリーンアップ
+         * トレーニング中断時に呼び出される
+         */
+        function cleanupIncompleteLesson() {
+            try {
+                const currentLessonId = sessionStorage.getItem('currentLessonId');
+                if (!currentLessonId) {
+                    console.log('ℹ️ currentLessonIdなし - クリーンアップ不要');
+                    return;
+                }
+
+                // localStorage から現在のlessonIdのセッションを削除
+                // 【v2.0.0】SessionDataManagerを使用して統一管理
+                const deletedCount = window.SessionDataManager
+                    ? window.SessionDataManager.clearSessionsByLessonId(currentLessonId)
+                    : 0;
+
+                if (!window.SessionDataManager) {
+                    console.error('❌ SessionDataManagerが見つかりません');
+                }
+
+                // sessionStorageをクリア
+                SessionManager.clearSessionStorage();
+
+                console.log('✅ 未完了レッスンのクリーンアップ完了');
+            } catch (error) {
+                console.error('❌ クリーンアップエラー:', error);
+            }
+        }
+    </script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+
+</body>

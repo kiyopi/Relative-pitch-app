@@ -64,13 +64,17 @@
                     </div>
                 </div>
                 
-                <!-- 評価分布見出し -->
-                <h3 class="text-xl font-medium text-white mb-4 text-center">評価分布</h3>
-                
-                <!-- 評価分布バー -->
-                <div class="flex flex-col gap-3 px-4">
-                    <!-- JavaScriptで動的生成 -->
+                <!-- 評価分布セクション -->
+                <div class="section-header-row">
+                    <h3 class="heading-md">
+                        <i data-lucide="bar-chart-3" class="text-blue-300"></i>
+                        <span>評価分布</span>
+                    </h3>
+                    <div id="session-distribution-help-button-container" class="section-header-help"></div>
                 </div>
+
+                <!-- 評価分布チャート（DistributionChartコンポーネントで生成） -->
+                <div id="session-distribution-chart"></div>
             </div>
 
             <!-- 詳細分析 -->

@@ -238,60 +238,41 @@ function updateSessionUI(sessionData, sessionNumber) {
 }
 
 /**
- * 評価分布を表示（v2.0.0: EvaluationCalculator統合）
+ * 評価分布を表示（v3.0.0: DistributionChart統合、ヘルプボタン対応）
  * @param {Array} pitchErrors - 音程誤差データ（外れ値除外済み）
  * @param {number} outlierCount - 除外された外れ値の数
  */
 function displayEvaluationDistribution(pitchErrors, outlierCount = 0) {
-    // 統合評価関数を使用
-    const distribution = EvaluationCalculator.calculateDistribution(pitchErrors);
-    const total = pitchErrors.length;
-    const container = document.querySelector('.flex.flex-col.gap-3.px-4');
+    console.log('📊 [displayEvaluationDistribution] DistributionChart.render() 呼び出し開始');
 
-    if (!container) return;
-
-    container.innerHTML = `
-        <!-- Excellent -->
-        <div class="flex items-center gap-3">
-            <i data-lucide="trophy" class="text-yellow-300 icon-help shrink-0"></i>
-            <div class="progress-bar flex">
-                <div class="progress-fill-custom color-eval-gold" style="width: ${(distribution.excellent / total * 100)}%;"></div>
-            </div>
-            <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">${distribution.excellent}</span>
-        </div>
-
-        <!-- Good -->
-        <div class="flex items-center gap-3">
-            <i data-lucide="star" class="text-green-300 icon-help shrink-0"></i>
-            <div class="progress-bar flex">
-                <div class="progress-fill-custom color-eval-good" style="width: ${(distribution.good / total * 100)}%;"></div>
-            </div>
-            <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">${distribution.good}</span>
-        </div>
-
-        <!-- Pass -->
-        <div class="flex items-center gap-3">
-            <i data-lucide="thumbs-up" class="text-blue-300 icon-help shrink-0"></i>
-            <div class="progress-bar flex">
-                <div class="progress-fill-custom color-eval-pass" style="width: ${(distribution.pass / total * 100)}%;"></div>
-            </div>
-            <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">${distribution.pass}</span>
-        </div>
-
-        <!-- Practice -->
-        <div class="flex items-center gap-3">
-            <i data-lucide="alert-triangle" class="text-red-300 icon-help shrink-0"></i>
-            <div class="progress-bar flex">
-                <div class="progress-fill-custom color-eval-practice" style="width: ${(distribution.practice / total * 100)}%;"></div>
-            </div>
-            <span class="text-sm text-white-60" style="min-width: 20px; text-align: right;">${distribution.practice}</span>
-        </div>
-    `;
-
-    // Lucideアイコン再初期化
-    if (typeof window.initializeLucideIcons === 'function') {
-        window.initializeLucideIcons({ immediate: true });
+    if (typeof window.DistributionChart === 'undefined') {
+        console.error('❌ DistributionChart コンポーネントが読み込まれていません');
+        return;
     }
+
+    // セッションデータ形式に変換（DistributionChartは複数セッション対応）
+    const sessionData = [{
+        pitchErrors: pitchErrors.map(error => ({ errorInCents: error.errorInCents }))
+    }];
+
+    // ヘルプボタンを挿入
+    const helpButtonContainer = document.getElementById('session-distribution-help-button-container');
+    if (helpButtonContainer && typeof window.DistributionChart.getHelpButton === 'function') {
+        helpButtonContainer.innerHTML = window.DistributionChart.getHelpButton('session-distribution-chart');
+        console.log('✅ [displayEvaluationDistribution] ヘルプボタン挿入完了');
+    }
+
+    // DistributionChartで評価分布を表示
+    window.DistributionChart.render({
+        containerId: 'session-distribution-chart',
+        sessionData: sessionData,
+        showTrend: false,
+        animate: true,
+        showDescription: true,   // 説明文を表示
+        showHelpButton: true     // ポップオーバー生成フラグ
+    });
+
+    console.log('✅ [displayEvaluationDistribution] DistributionChart.render() 完了');
 }
 
 /**
