@@ -570,6 +570,41 @@ async function startTraining() {
     playButton.classList.add('btn-disabled');
 
     try {
+        // 【追加】マイク許可の確認・要求を基音再生前に実施
+        console.log('🎤 マイク許可状態を確認中...');
+        playButton.innerHTML = '<i data-lucide="loader" style="width: 24px; height: 24px;"></i><span>マイク確認中...</span>';
+        lucide.createIcons();
+
+        try {
+            // マイク許可を要求（まだ許可されていない場合はダイアログが表示される）
+            const stream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                }
+            });
+
+            // 許可取得成功 - ストリームは後でAudioDetectionComponentが再取得するので、ここで停止
+            stream.getTracks().forEach(track => track.stop());
+            console.log('✅ マイク許可確認完了');
+
+        } catch (error) {
+            // マイク許可が拒否された場合
+            console.error('❌ マイク許可エラー:', error);
+            playButton.disabled = false;
+            playButton.classList.remove('btn-disabled');
+            playButton.innerHTML = '<i data-lucide="volume-2" style="width: 24px; height: 24px;"></i><span>基音スタート</span>';
+            lucide.createIcons();
+
+            if (statusText) {
+                statusText.textContent = 'マイク許可が必要です';
+            }
+
+            alert('マイクの使用許可が必要です。\nブラウザの設定でマイクを許可してください。');
+            return;
+        }
+
         // 初回クリック時はPitchShifter初期化を実行
         if (!pitchShifter || !pitchShifter.isInitialized) {
             console.log('⏳ 初回クリック - PitchShifter初期化開始');
