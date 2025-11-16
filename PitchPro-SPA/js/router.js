@@ -30,13 +30,17 @@ class SimpleRouter {
 
         // リスナー設定
         window.addEventListener('hashchange', () => this.handleRouteChange());
-        window.addEventListener('DOMContentLoaded', () => this.handleRouteChange());
+
+        // 【削除v2025-11-16】DOMContentLoadedイベントリスナー
+        // 理由: constructor実行時に即座にhandleRouteChange()を呼び出しているため、
+        // DOMContentLoadedでの再実行は不要であり、二重読み込みの原因となる
+        // window.addEventListener('DOMContentLoaded', () => this.handleRouteChange());
 
         // 【重要】pagehideイベントでのクリーンアップは削除
         // 理由: タブ切り替えでもpagehideが発火し、ブラウザバック防止が解除されてしまう
         // SPAではhashchangeイベント（ページ遷移時）でのクリーンアップで十分
 
-        // 初期表示
+        // 初期表示（即座に実行）
         this.handleRouteChange();
     }
 
