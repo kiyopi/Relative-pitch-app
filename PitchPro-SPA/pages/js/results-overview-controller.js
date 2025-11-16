@@ -504,8 +504,13 @@ function displayOverallDistribution(sessionData) {
  * セッショングリッドを表示（UIカタログパターン準拠）
  */
 function displaySessionGrid(sessionData) {
+    console.log('📊 [displaySessionGrid] 関数開始');
     const container = document.getElementById('session-grid-container');
-    if (!container) return;
+    console.log('📊 [displaySessionGrid] container要素:', container);
+    if (!container) {
+        console.error('❌ session-grid-container が見つかりません');
+        return;
+    }
 
     // セッション数に応じたグリッドクラスを決定
     const sessionCount = sessionData.length;
