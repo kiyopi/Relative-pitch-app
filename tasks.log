@@ -10229,3 +10229,17 @@ evaluation-calculator.jsをresults-overview-controller.jsの前に読み込む�
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 15:32:05] コミット: fix: evaluation-calculator.jsのパス修正（SPA対応）
+
+## 問題
+evaluation-calculator.jsが404エラー（../js/evaluation-calculator.js）
+
+## 原因
+SPAではindex.htmlから読み込まれるため、相対パス「../」が間違っていた
+
+## 解決
+パスを「js/evaluation-calculator.js」に修正（index.htmlからの相対パス）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
