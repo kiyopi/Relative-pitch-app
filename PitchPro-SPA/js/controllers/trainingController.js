@@ -2,10 +2,15 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: 2025-10-26-007 - 連続モード12音強制確保（音域不足時は高音側から追加）
+ * 🔥 VERSION: v4.0.8 (2025-11-16) - リファクタリング後の音量・タイミング・アイコン問題修正
+ *
+ * 【v4.0.8修正内容】
+ * - 音量リセット問題修正: グローバルインスタンス使用時、準備フェーズの音量設定を維持
+ * - Lucide初期化最適化: innerHTML後に統一関数を使用（Safari互換性保証、6箇所）
+ * - タイミング最適化: ドレミガイド開始タイミングのコメントを正確に修正
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: 2025-10-26-007 LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.8 (2025-11-16) LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
@@ -337,6 +342,7 @@ export async function initializeTrainingPage() {
 
         // 初期状態（HTMLと同じアイコン）
         newButton.innerHTML = '<i data-lucide="volume-2" style="width: 24px; height: 24px;"></i><span>基音スタート</span>';
+        // 【v4.0.8】Lucide初期化はページロード時のみ実行（ラグ削減）
         if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
 
         newButton.addEventListener('click', () => {
@@ -476,11 +482,9 @@ async function initializePitchShifter() {
         console.log('✅ Using global PitchShifter instance (initialized from home page)');
         pitchShifter = window.pitchShifterInstance;
 
-        // デバイス別音量設定を適用（グローバルインスタンスの音量を更新）
-        const deviceVolume = getDeviceVolume();
-        const deviceType = getDeviceType();
-        console.log(`🔊 音量更新: ${deviceType}用に${deviceVolume}dBに設定`);
-        pitchShifter.setVolume(deviceVolume);
+        // 【v4.0.8修正】グローバルインスタンスは準備フェーズで音量調整済み
+        // ユーザーの音量スライダー設定を尊重するため、setVolume()を呼ばない
+        console.log('🔊 準備フェーズの音量設定を維持（ユーザー調整を尊重）');
 
         return pitchShifter;
     }
@@ -573,7 +577,10 @@ async function startTraining() {
         // 【追加】マイク許可確認（バックグラウンド復帰後のセッション失効対策）
         console.log('🎤 マイク許可状態を確認中...');
         playButton.innerHTML = '<i data-lucide="loader" style="width: 24px; height: 24px;"></i><span>マイク確認中...</span>';
-        if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
+        // 【v4.0.8修正】innerHTML後はLucide初期化必須（統一関数を使用）
+        if (typeof window.initializeLucideIcons === 'function') {
+            window.initializeLucideIcons({ immediate: true });
+        }
 
         try {
             // 実際にgetUserMedia()で確認（セッション失効を検出）
@@ -595,7 +602,10 @@ async function startTraining() {
             playButton.disabled = false;
             playButton.classList.remove('btn-disabled');
             playButton.innerHTML = '<i data-lucide="volume-2" style="width: 24px; height: 24px;"></i><span>基音スタート</span>';
-            if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
+            // 【v4.0.8修正】innerHTML後はLucide初期化必須（統一関数を使用）
+            if (typeof window.initializeLucideIcons === 'function') {
+                window.initializeLucideIcons({ immediate: true });
+            }
 
             if (statusText) {
                 statusText.textContent = 'マイク許可が必要です';
@@ -615,7 +625,10 @@ async function startTraining() {
         if (!pitchShifter || !pitchShifter.isInitialized) {
             console.log('⏳ 初回クリック - PitchShifter初期化開始');
             playButton.innerHTML = '<i data-lucide="loader" style="width: 24px; height: 24px;"></i><span>初期化中...</span>';
-            if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
+            // 【v4.0.8修正】innerHTML後はLucide初期化必須（統一関数を使用）
+            if (typeof window.initializeLucideIcons === 'function') {
+                window.initializeLucideIcons({ immediate: true });
+            }
 
             await initializePitchShifter();
             console.log('✅ 初期化完了！次回から即座に再生されます');
@@ -623,7 +636,10 @@ async function startTraining() {
 
         // 再生開始
         playButton.innerHTML = '<i data-lucide="volume-2" style="width: 24px; height: 24px;"></i><span>再生中...</span>';
-        if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
+        // 【v4.0.8修正】innerHTML後はLucide初期化必須（統一関数を使用）
+        if (typeof window.initializeLucideIcons === 'function') {
+            window.initializeLucideIcons({ immediate: true });
+        }
 
         if (statusText) {
             statusText.textContent = '基音を再生中...';
@@ -705,7 +721,9 @@ async function startTraining() {
         console.log('⏱️ ドレミガイド開始インターバル開始（2.5秒）');
         startIntervalCountdown(progressSquares);
 
-        // 2.5秒後（基音2秒 + 0.5秒待機）にドレミガイド開始
+        // 【v4.0.8】2.5秒後にドレミガイド開始
+        // 基音総再生時間: attack(0.02s) + sustain(1.0s) + release(2.5s) = 3.52s
+        // ドレミガイド開始時は基音のreleaseフェーズ中（自然な音の重なり）
         setTimeout(() => {
             // ボタンはドレミガイド完了まで無効のまま（重要！）
             // handleSessionComplete()で結果ページへ遷移するため、ここでは有効化しない
@@ -721,7 +739,10 @@ async function startTraining() {
         playButton.disabled = false;
         playButton.classList.remove('btn-disabled');
         playButton.innerHTML = '<i data-lucide="alert-circle" style="width: 24px; height: 24px;"></i><span>エラー - 再試行</span>';
-        if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
+        // 【v4.0.8修正】innerHTML後はLucide初期化必須（統一関数を使用）
+        if (typeof window.initializeLucideIcons === 'function') {
+            window.initializeLucideIcons({ immediate: true });
+        }
         if (statusText) {
             statusText.textContent = 'エラーが発生しました';
         }
@@ -1025,7 +1046,10 @@ function handleSessionComplete() {
                     playButton.innerHTML = '<i data-lucide="loader" style="width: 24px; height: 24px;"></i><span>準備中...</span>';
                     playButton.disabled = true;
                     playButton.classList.add('btn-disabled');
-                    if (typeof window.initializeLucideIcons === 'function') window.initializeLucideIcons({ immediate: true });
+                    // 【v4.0.8修正】innerHTML後はLucide初期化必須（統一関数を使用）
+                    if (typeof window.initializeLucideIcons === 'function') {
+                        window.initializeLucideIcons({ immediate: true });
+                    }
                 }
 
                 // UIをリセット
