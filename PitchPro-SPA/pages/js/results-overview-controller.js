@@ -1,11 +1,12 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.0.6 (2025-11-16)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.0.7 (2025-11-16)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.0.6
+ * Version: 4.0.7
  * Date: 2025-11-16
  * Changelog:
+ *   v4.0.7 - 【バグ修正】セッション詳細のナビゲーションボタンイベントリスナー追加
  *   v4.0.6 - 【バグ修正】セッション切り替え時のLucide初期化追加、ヘルプボタンイベントリスナー実装
  *   v4.0.5 - 【バグ修正】次のステップ中央カードに方向情報を追加（連続・ランダムモード対応）
  *   v4.0.4 - 【デバッグログ追加】displayNextSteps関数の詳細ログ追加（中央カード表示問題調査）
@@ -207,6 +208,9 @@ window.initResultsOverview = async function initResultsOverview() {
 
         // 【修正v4.0.6】ポップオーバーイベントリスナーを初期化
         setupPopoverListeners();
+
+        // 【修正v4.0.7】ナビゲーションボタンイベントリスナーを初期化
+        setupNavigationListeners();
 
         console.log('=== 総合評価ページ初期化完了 ===');
     });
@@ -1538,6 +1542,36 @@ function setupPopoverListeners() {
 
     document.addEventListener('click', window.popoverClickHandler);
     console.log('✅ [setupPopoverListeners] ポップオーバーイベントリスナー登録完了');
+}
+
+/**
+ * 【修正v4.0.7】ナビゲーションボタンのイベントリスナーを設定
+ * SPA対応のため、initResultsOverview()で初期化
+ */
+function setupNavigationListeners() {
+    const prevBtn = document.getElementById('prev-session-btn');
+    const nextBtn = document.getElementById('next-session-btn');
+
+    // 既存のリスナーを削除（重複防止）
+    if (prevBtn) {
+        const newPrevBtn = prevBtn.cloneNode(true);
+        prevBtn.parentNode.replaceChild(newPrevBtn, prevBtn);
+        newPrevBtn.addEventListener('click', function() {
+            console.log('⬅️ [Navigation] 前のセッションへ移動');
+            window.navigateToPrevSession();
+        });
+    }
+
+    if (nextBtn) {
+        const newNextBtn = nextBtn.cloneNode(true);
+        nextBtn.parentNode.replaceChild(newNextBtn, nextBtn);
+        newNextBtn.addEventListener('click', function() {
+            console.log('➡️ [Navigation] 次のセッションへ移動');
+            window.navigateToNextSession();
+        });
+    }
+
+    console.log('✅ [setupNavigationListeners] ナビゲーションボタンイベントリスナー登録完了');
 }
 
 /**
