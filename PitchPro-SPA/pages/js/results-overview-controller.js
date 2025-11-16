@@ -381,8 +381,8 @@ function updateOverviewUI(evaluation, sessionData, fromRecords = false, scaleDir
 
     // 次のステップ表示（トレーニング記録からの遷移時はスキップ）
     if (!fromRecords) {
-        // 12音階モードの場合はscaleDirectionパラメータを使用
-        displayNextSteps(currentMode, evaluation, scaleDirection);
+        // 【修正v4.0.7】chromaticDirectionとscaleDirectionの両方を渡す
+        displayNextSteps(currentMode, evaluation, chromaticDirection, scaleDirection);
     }
 }
 
@@ -1065,9 +1065,10 @@ window.copyShareText = function(event) {
  * 次のステップを表示
  * @param {string} currentMode - 現在のモード（random, continuous, 12tone等）
  * @param {object} evaluation - 評価結果（将来の拡張用、現在未使用）
- * @param {string} direction - 12音階モードの方向（ascending, descending, both）
+ * @param {string} chromaticDirection - 12音階モードの基音方向（ascending, descending, both）
+ * @param {string} scaleDirection - 音階方向（ascending, descending）
  */
-function displayNextSteps(currentMode, evaluation, direction = null) {
+function displayNextSteps(currentMode, evaluation, chromaticDirection = null, scaleDirection = 'ascending') {
     const container = document.getElementById('next-steps-container');
     if (!container) return;
 
@@ -1263,12 +1264,21 @@ function displayNextSteps(currentMode, evaluation, direction = null) {
         }
     };
 
-    // 現在のモードの設定を取得（12音階モードはdirectionも考慮）
+    // 【修正v4.0.7】現在のモードの設定を取得（12音階モードはchromaticDirectionで判定）
     let modeKey = currentMode;
-    if (currentMode === '12tone' && direction) {
-        modeKey = `12tone-${direction}`;
+    if (currentMode === '12tone' && chromaticDirection) {
+        modeKey = `12tone-${chromaticDirection}`;
     }
     const config = nextStepsConfig[modeKey] || nextStepsConfig['random'];
+
+    // ModeControllerで完全なモード名を生成（description表示用）
+    let fullModeName = '';
+    if (window.ModeController) {
+        fullModeName = window.ModeController.generatePageTitle(currentMode, {
+            chromaticDirection: chromaticDirection,
+            scaleDirection: scaleDirection
+        });
+    }
 
     // 3つのカードを生成
     const cards = ['practice', 'upgrade', 'records'];
@@ -1276,13 +1286,20 @@ function displayNextSteps(currentMode, evaluation, direction = null) {
         const card = config[cardType];
         const disabledClass = card.disabled ? 'disabled' : '';
 
+        // 【修正v4.0.7】descriptionに完全なモード名（上昇・下降と上行・下行を含む）を表示
+        let description = card.description;
+        if (fullModeName && currentMode === '12tone') {
+            // 「12音階上昇モード」「12音階下降モード」「12音階両方向モード」を完全なモード名に置換
+            description = description.replace(/12音階(?:上昇|下降|両方向)?モード/, fullModeName);
+        }
+
         return `
             <div class="next-step-card ${disabledClass}" ${card.actionId ? `data-action-id="${card.actionId}"` : ''}>
                 <div class="next-step-card-icon" style="background: ${card.iconBg};">
                     <i data-lucide="${card.icon}" class="text-white" style="width: 24px; height: 24px;"></i>
                 </div>
                 <h3 class="next-step-card-title">${card.title}</h3>
-                <p class="next-step-card-description">${card.description}</p>
+                <p class="next-step-card-description">${description}</p>
                 <button class="btn ${card.disabled ? 'btn-outline' : 'btn-primary'}" ${card.disabled ? 'disabled' : ''}>
                     ${card.buttonText}
                 </button>

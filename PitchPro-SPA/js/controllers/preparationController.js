@@ -37,7 +37,8 @@ function getRedirectInfo(urlParams) {
     return {
         redirect: urlParams.redirect,
         mode: urlParams.mode,
-        session: urlParams.session
+        session: urlParams.session,
+        direction: urlParams.direction // 【追加v4.0.7】12音階モード方向パラメータ
     };
 }
 
@@ -50,22 +51,13 @@ function updateModeSubtitle(mode, direction = null) {
     const subtitleElement = document.getElementById('preparation-mode-subtitle');
     if (!subtitleElement) return;
 
-    const modeSubtitles = {
-        'random': 'ランダム基音モード',
-        'continuous': '連続チャレンジモード',
-        '12tone': '12音階モード'
-    };
-
-    let subtitle = modeSubtitles[mode] || 'トレーニングモード';
-
-    // 12音階モードの場合、方向を追加
-    if (mode === '12tone' && direction) {
-        const directionLabels = {
-            'ascending': '（上昇）',
-            'descending': '（下降）',
-            'both': '（両方向）'
-        };
-        subtitle += ` ${directionLabels[direction] || ''}`;
+    // 【修正v4.0.7】ModeControllerを使用してモード名を生成（direction情報を含む完全なタイトル）
+    let subtitle = 'トレーニングモード';
+    if (window.ModeController) {
+        subtitle = window.ModeController.generatePageTitle(mode, {
+            chromaticDirection: direction,
+            scaleDirection: 'ascending' // デフォルト（上行モード）
+        });
     }
 
     subtitleElement.textContent = subtitle;
@@ -77,12 +69,14 @@ function updateModeSubtitle(mode, direction = null) {
  * @param {Object} info - リダイレクト情報
  */
 function showRedirectMessage(info) {
-    const modeNames = {
-        'random': 'ランダム基音トレーニング',
-        'continuous': '連続チャレンジモード',
-        '12tone': '12音階モード'
-    };
-    const modeName = modeNames[info.mode] || 'トレーニング';
+    // 【修正v4.0.7】ModeControllerを使用してモード名を生成（direction情報を含む完全なタイトル）
+    let modeName = 'トレーニング';
+    if (window.ModeController) {
+        modeName = window.ModeController.generatePageTitle(info.mode, {
+            chromaticDirection: info.direction,
+            scaleDirection: 'ascending' // デフォルト（上行モード）
+        });
+    }
 
     // UI にメッセージを表示
     const messageContainer = document.getElementById('redirect-message');
@@ -94,7 +88,7 @@ function showRedirectMessage(info) {
                     <div>
                         <div style="color: #93c5fd; font-weight: 600;">${modeName}</div>
                         <div style="color: #93c5fd; font-size: 14px; margin-top: 4px;">
-                            準備完了後、自動的にトレーニングに移動します
+                            準備完了後、トレーニングページに移動します
                         </div>
                     </div>
                 </div>

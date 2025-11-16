@@ -918,10 +918,27 @@ function groupSessionsIntoLessons(sessions) {
         console.log(`   - ${lesson.mode}（${lesson.scaleDirection}）: ${lesson.sessions.length}セッション [${lesson.lessonId}]`);
     });
 
-    // 最新順にソート
-    lessons.sort((a, b) => b.startTime - a.startTime);
+    // 【追加v4.0.7】不完全レッスンをフィルタリング（予期しない中断で残ったデータを除外）
+    const completeLessons = lessons.filter(lesson => {
+        const expectedSessions = window.ModeController
+            ? window.ModeController.getSessionsPerLesson(lesson.mode, {
+                direction: lesson.chromaticDirection
+            })
+            : 8; // デフォルト
 
-    return lessons;
+        const isComplete = lesson.sessions.length >= expectedSessions;
+        if (!isComplete) {
+            console.warn(`⚠️ [Filtering] 不完全レッスンを除外: ${lesson.mode}（${lesson.sessions.length}/${expectedSessions}セッション）[${lesson.lessonId}]`);
+        }
+        return isComplete;
+    });
+
+    console.log(`✅ [Filtering] 完全レッスンのみフィルタリング: ${completeLessons.length}/${lessons.length}レッスン`);
+
+    // 最新順にソート
+    completeLessons.sort((a, b) => b.startTime - a.startTime);
+
+    return completeLessons;
 }
 
 /**
