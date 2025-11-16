@@ -1,11 +1,12 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.0.5 (2025-11-16)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.0.6 (2025-11-16)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.0.5
+ * Version: 4.0.6
  * Date: 2025-11-16
  * Changelog:
+ *   v4.0.6 - 【バグ修正】セッション切り替え時のLucide初期化追加、ヘルプボタンイベントリスナー実装
  *   v4.0.5 - 【バグ修正】次のステップ中央カードに方向情報を追加（連続・ランダムモード対応）
  *   v4.0.4 - 【デバッグログ追加】displayNextSteps関数の詳細ログ追加（中央カード表示問題調査）
  *   v4.0.3 - 【チラつき修正】DOMContentLoadedイベントリスナー削除（SPA環境では不要、初期表示復元によるチラつき防止）
@@ -203,6 +204,9 @@ window.initResultsOverview = async function initResultsOverview() {
             console.log('🎨 [results-overview] Lucideアイコン一括初期化');
             window.initializeLucideIcons({ immediate: true });
         }
+
+        // 【修正v4.0.6】ポップオーバーイベントリスナーを初期化
+        setupPopoverListeners();
 
         console.log('=== 総合評価ページ初期化完了 ===');
     });
@@ -759,6 +763,12 @@ window.showSessionDetail = function(sessionIndex) {
 
     // 8. ナビゲーションボタンの状態を更新
     updateNavigationButtons();
+
+    // 9. 【修正v4.0.6】Lucideアイコン初期化（セッション切り替え時にアイコンを表示）
+    if (typeof window.initializeLucideIcons === 'function') {
+        window.initializeLucideIcons({ immediate: true });
+        console.log('🎨 [showSessionDetail] Lucideアイコン初期化完了');
+    }
 }
 
 /**
@@ -1481,16 +1491,42 @@ function toggleSessionRankPopover() {
     }
 }
 
-// ポップオーバー外クリックで閉じる（DOMContentLoaded後に登録）
-document.addEventListener('DOMContentLoaded', function() {
-    document.addEventListener('click', function(event) {
+/**
+ * 【削除v4.0.3→修正v4.0.6】ポップオーバーイベントリスナーをSPA対応に変更
+ * DOMContentLoadedではなく、initResultsOverview()で初期化
+ * ヘルプボタンのクリックイベントも追加
+ */
+function setupPopoverListeners() {
+    // 既存のリスナーを削除（重複防止）
+    if (window.popoverClickHandler) {
+        document.removeEventListener('click', window.popoverClickHandler);
+    }
+
+    // ヘルプボタンクリック＆ポップオーバー外クリックで閉じる
+    window.popoverClickHandler = function(event) {
         const gradePopover = document.getElementById('grade-popover');
         const sessionRankPopover = document.getElementById('session-rank-popover');
         const helpBtn = event.target.closest('.help-icon-btn, .rank-info-btn');
         const popoverContent = event.target.closest('.rank-popover');
 
-        // ヘルプボタンまたはポップオーバー内クリックは無視
-        if (!helpBtn && !popoverContent) {
+        // ヘルプボタンクリック時：ポップオーバーをトグル
+        if (helpBtn) {
+            event.stopPropagation();
+
+            // どのポップオーバーを開くか判定
+            const isSessionDetail = helpBtn.closest('.rank-grid-center');
+            if (isSessionDetail && sessionRankPopover) {
+                sessionRankPopover.classList.toggle('show');
+                console.log('🎨 [Help Button] セッション詳細ヘルプをトグル');
+            } else if (gradePopover) {
+                gradePopover.classList.toggle('show');
+                console.log('🎨 [Help Button] グレードヘルプをトグル');
+            }
+            return;
+        }
+
+        // ポップオーバー外クリック：すべて閉じる
+        if (!popoverContent) {
             if (gradePopover && gradePopover.classList.contains('show')) {
                 gradePopover.classList.remove('show');
             }
@@ -1498,8 +1534,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 sessionRankPopover.classList.remove('show');
             }
         }
-    });
-});
+    };
+
+    document.addEventListener('click', window.popoverClickHandler);
+    console.log('✅ [setupPopoverListeners] ポップオーバーイベントリスナー登録完了');
+}
 
 /**
  * トレーニング記録からの遷移時のUI調整
