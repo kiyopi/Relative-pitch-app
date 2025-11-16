@@ -10174,3 +10174,41 @@ TRAINING_RECORDS_SPECIFICATION.md (v2.1.0後期):
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 14:57:34] コミット: fix: 総合評価の不正な値表示問題を修正 - フィルタリング機能一元管理
+
+[Bug #11-9] 総合評価ページで62セッション表示問題を解決
+
+## 問題
+- 総合評価ページで不完全レッスンが表示される（62セッション表示）
+- フィルタリングロジックが分散（records-controller.js と results-overview-controller.js）
+- URLパラメータよりSessionManagerのlessonIdが優先され、lessonId不一致
+
+## 解決策
+SessionDataManagerに2つのフィルタリングメソッドを追加、Single Source of Truth実現：
+
+1. **SessionDataManager拡張**
+   - `getCompleteSessionsByLessonId(lessonId, mode, chromaticDirection)` - 特定lessonIdの完全なセッションのみ取得
+   - `getCompleteLessons(sessions)` - 完全なレッスンのみをグループ化して取得
+
+2. **results-overview-controller.js修正**
+   - URLパラメータのlessonIdを最優先（SessionManagerより優先）
+   - `getCompleteSessionsByLessonId()`を使用、不完全レッスンは除外してtraining-recordsページに戻る
+
+3. **records-controller.js修正**
+   - `getCompleteLessons(migratedSessions)`を使用、フィルタリングロジックを一元化
+
+## 効果
+- トレーニング記録・総合評価・詳細分析で共通フィルタリング使用
+- 保守性向上（フィルタリングロジック修正は1箇所のみ）
+- 拡張性確保（将来的な詳細分析ページでも使用可能）
+
+## 修正ファイル
+- /PitchPro-SPA/js/session-data-manager.js（フィルタリングメソッド追加）
+- /PitchPro-SPA/pages/js/results-overview-controller.js（v4.0.8）
+- /PitchPro-SPA/pages/js/records-controller.js（v4.0.8）
+- /PitchPro-SPA/specifications/TRAINING_SPECIFICATION.md（v4.0.8）
+- /PitchPro-SPA/specifications/TRAINING_RECORDS_SPECIFICATION.md（v2.2.0）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
