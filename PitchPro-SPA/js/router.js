@@ -329,38 +329,156 @@ class SimpleRouter {
     }
 
     /**
-     * 複数の依存関係を待機
-     * @param {Array<string>} dependencies - 依存ライブラリ名の配列
-     * @returns {Promise<boolean>} すべて準備完了でtrue、タイムアウトでfalse
+     * 【Phase 2】汎用待機ヘルパー（中断対応）
+     *
+     * @param {Function} checkFn - チェック関数（trueを返すまで待機）
+     * @param {Object} options - オプション
+     * @param {number} options.maxAttempts - 最大試行回数（デフォルト: 50）
+     * @param {number} options.interval - チェック間隔（ms、デフォルト: 100）
+     * @param {AbortSignal} options.signal - 中断シグナル
+     * @param {string} options.errorMessage - タイムアウト時のエラーメッセージ
+     * @returns {Promise<boolean>} 成功でtrue、タイムアウトでfalse
+     * @throws {Error} 中断時に'Aborted'エラーをthrow
      */
-    async waitForDependencies(dependencies) {
-        const results = await Promise.all(
-            dependencies.map(dep => this.waitForDependency(dep))
-        );
-        return results.every(result => result === true);
-    }
+    async waitWithAbort(checkFn, options = {}) {
+        const {
+            maxAttempts = 50,
+            interval = 100,
+            signal = null,
+            errorMessage = 'Timeout'
+        } = options;
 
-    /**
-     * 単一の依存関係を待機
-     * @param {string} dependency - 依存ライブラリ名
-     * @returns {Promise<boolean>} 準備完了でtrue、タイムアウトでfalse
-     */
-    async waitForDependency(dependency) {
-        const checkFunction = this.getDependencyCheckFunction(dependency);
-        const maxAttempts = 50; // 5秒（100ms × 50回）
         let attempts = 0;
 
         while (attempts < maxAttempts) {
-            if (checkFunction()) {
-                console.log(`✅ [Router] Dependency ready: ${dependency}`);
+            // 中断シグナルをチェック
+            if (signal?.aborted) {
+                throw new Error('Aborted');
+            }
+
+            if (checkFn()) {
                 return true;
             }
-            await new Promise(resolve => setTimeout(resolve, 100));
+
+            await new Promise(resolve => setTimeout(resolve, interval));
             attempts++;
         }
 
-        console.error(`❌ [Router] Dependency timeout: ${dependency}`);
+        // タイムアウト
+        console.warn(`⚠️ [Router] ${errorMessage}`);
         return false;
+    }
+
+    /**
+     * 【Phase 2】グローバル初期化関数の読み込みを待機
+     *
+     * @param {string} functionName - 関数名
+     * @param {AbortSignal} signal - 中断シグナル
+     * @returns {Promise<boolean>} 成功でtrue、失敗でfalse
+     * @throws {Error} 中断時に'Aborted'エラーをthrow
+     */
+    async waitForGlobalFunction(functionName, signal) {
+        console.log(`⏳ [Router] Waiting for global function: ${functionName}`);
+
+        try {
+            const success = await this.waitWithAbort(
+                () => typeof window[functionName] === 'function',
+                {
+                    maxAttempts: 50,
+                    interval: 100,
+                    signal,
+                    errorMessage: `Global function "${functionName}" not loaded after 5000ms`
+                }
+            );
+
+            if (success) {
+                console.log(`✅ [Router] Global function ${functionName} loaded`);
+            } else {
+                console.error(`❌ [Router] Timeout waiting for ${functionName}`);
+            }
+
+            return success;
+
+        } catch (error) {
+            if (error.message === 'Aborted') {
+                throw error; // 上位で処理
+            }
+            console.error(`❌ [Router] Error waiting for ${functionName}:`, error);
+            return false;
+        }
+    }
+
+    /**
+     * 【Phase 2】複数の依存関係を並列待機（早期失敗検出）
+     *
+     * @param {string[]} dependencies - 依存ライブラリ名の配列
+     * @param {AbortSignal} signal - 中断シグナル
+     * @throws {Error} いずれかの依存関係が失敗した場合
+     */
+    async waitForDependencies(dependencies, signal) {
+        if (!dependencies || dependencies.length === 0) {
+            return;
+        }
+
+        console.log(`⏳ [Router] Waiting for dependencies: ${dependencies.join(', ')}`);
+
+        // Promise.allSettledで並列待機（早期失敗検出）
+        const results = await Promise.allSettled(
+            dependencies.map(dep => this.waitForDependency(dep, signal))
+        );
+
+        // 失敗した依存関係を抽出
+        const failedDeps = results
+            .map((r, i) => ({ result: r, dep: dependencies[i] }))
+            .filter(({ result }) => result.status === 'rejected' || result.value === false)
+            .map(({ dep }) => dep);
+
+        if (failedDeps.length > 0) {
+            throw new Error(`Failed to load dependencies: ${failedDeps.join(', ')}`);
+        }
+
+        console.log(`✅ [Router] All dependencies loaded`);
+    }
+
+    /**
+     * 【Phase 2】単一の依存関係を待機（中断対応版）
+     *
+     * @param {string} dependency - 依存ライブラリ名
+     * @param {AbortSignal} signal - 中断シグナル
+     * @returns {Promise<boolean>} 準備完了でtrue、タイムアウトでfalse
+     * @throws {Error} 中断時に'Aborted'エラーをthrow
+     */
+    async waitForDependency(dependency, signal) {
+        console.log(`⏳ [Router] Waiting for dependency: ${dependency}`);
+
+        const checkFunction = this.getDependencyCheckFunction(dependency);
+
+        try {
+            const success = await this.waitWithAbort(
+                checkFunction,
+                {
+                    maxAttempts: 50,
+                    interval: 100,
+                    signal,
+                    errorMessage: `Dependency "${dependency}" not loaded after 5000ms`
+                }
+            );
+
+            if (success) {
+                console.log(`✅ [Router] Dependency ${dependency} loaded`);
+            } else {
+                console.error(`❌ [Router] Timeout waiting for ${dependency}`);
+            }
+
+            return success;
+
+        } catch (error) {
+            if (error.message === 'Aborted') {
+                throw error;
+            }
+            console.error(`❌ [Router] Error waiting for ${dependency}:`, error);
+            return false;
+        }
     }
 
     /**
