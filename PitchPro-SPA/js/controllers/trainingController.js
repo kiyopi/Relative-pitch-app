@@ -2,12 +2,13 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: v4.0.16 (2025-11-16) - インターバルバー色改善
+ * 🔥 VERSION: v4.0.17 (2025-11-16) - 消えた時の背景を音量バー風に改善
  *
- * 【v4.0.16修正内容】
- * - 音量バースタイル流用: 濃い青グラデーションで視認性向上
- * - gradient-catalog-blue適用: linear-gradient(135deg, #3b82f6, #1d4ed8)
- * - 統一感向上: 音量バーとインターバルバーのスタイルを統一
+ * 【v4.0.17修正内容】
+ * - 消えた時の背景改善: 音量バー背景と同じスタイルに変更
+ * - background: rgba(255, 255, 255, 0.12) + border: rgba(255, 255, 255, 0.15)
+ * - opacity: 0.3 → 1.0で視認性向上
+ * - 青バーは元の#60a5faに戻す
  *
  * 【v4.0.15修正内容】
  * - レイアウトずれ修正: border追加時の高さ変化を防止
@@ -52,7 +53,7 @@
  * - タイミング最適化: ドレミガイド開始タイミングのコメントを正確に修正
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.16 (2025-11-16) LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.17 (2025-11-16) LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
