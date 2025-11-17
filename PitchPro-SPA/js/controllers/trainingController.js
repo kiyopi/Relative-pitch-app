@@ -2,7 +2,13 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: v4.0.12 (2025-11-16) - 同期処理の安定性確認
+ * 🔥 VERSION: v4.0.13 (2025-11-16) - インターバルカウントダウンをCSS Animation化
+ *
+ * 【v4.0.13修正内容】
+ * - CSS Animation化: 基音再生中のDOM操作を完全排除（残りブチ音対策）
+ * - setInterval削除: 833ms間隔の4回のDOM操作を完全削除
+ * - iPhone/PC挙動統一: アニメーションリセット処理でデバイス間の差異を解消
+ * - レスポンス最適化: 基音再生前に1回のみDOM操作、再生中は完全にCSS任せ
  *
  * 【v4.0.12修正内容】
  * - 非同期処理検証: 非同期化による効果なし・潜在的リスクあり
@@ -31,7 +37,7 @@
  * - タイミング最適化: ドレミガイド開始タイミングのコメントを正確に修正
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.12 (2025-11-16) LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.13 (2025-11-16) LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
@@ -711,27 +717,40 @@ async function startTraining() {
     }
 }
 
+// 【v4.0.13】CSS Animation方式: 基音再生中のDOM操作を完全排除
 // インターバルカウントダウン（2.5秒間、3ブロック）
 function startIntervalCountdown(squares) {
-    // すべての四角をリセット
-    squares.forEach(sq => sq.classList.remove('consumed'));
+    if (squares.length === 0) return;
 
-    // 最初の3個のみ使用（2.5秒で3個完了、各約0.83秒）
+    // 親要素を取得
+    const progressSquaresContainer = squares[0].parentElement;
+    if (!progressSquaresContainer) return;
+
+    // 1. リセット: アニメーションクラスを削除（即座にリセット）
+    progressSquaresContainer.classList.remove('countdown-active');
+
+    // 2. 各squareにanimation-delay設定（0ms, 833ms, 1666ms）
     const blocksToUse = 3;
-    const intervalDuration = 2500; // 2.5秒
-    const blockInterval = intervalDuration / blocksToUse; // 約833ms
+    const blockInterval = 833; // 約833ms
 
-    let count = 0;
-    const intervalTimer = setInterval(() => {
-        if (count < blocksToUse) {
-            squares[count].classList.add('consumed');
-            count++;
-            console.log(`⏱️ インターバル進行: ${count}/${blocksToUse} (${(count * blockInterval / 1000).toFixed(2)}秒経過)`);
-        } else {
-            clearInterval(intervalTimer);
-            console.log('✅ インターバル完了（2.5秒）');
+    squares.forEach((sq, index) => {
+        if (index < blocksToUse) {
+            sq.style.animationDelay = `${index * blockInterval}ms`;
         }
-    }, blockInterval); // 約833ms間隔
+    });
+
+    // 3. 次のフレームでアニメーション開始（1回のDOM操作のみ）
+    // requestAnimationFrameで確実にリセット後にアニメーション開始
+    requestAnimationFrame(() => {
+        progressSquaresContainer.classList.add('countdown-active');
+        console.log('⏱️ インターバルカウントダウン開始（CSS Animation）');
+        console.log('   0ms: 1個目 | 833ms: 2個目 | 1666ms: 3個目');
+    });
+
+    // 4. 2.5秒後に完了ログ出力（視覚確認用）
+    setTimeout(() => {
+        console.log('✅ インターバル完了（2.5秒）- CSS Animation方式');
+    }, 2500);
 }
 
 // ドレミガイド開始
