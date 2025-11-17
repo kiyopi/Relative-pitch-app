@@ -14,7 +14,6 @@ class PitchProCycleManager {
         // 単一インスタンス管理
         this.audioDetector = null;
         this.currentPhase = 'uninitialized'; // uninitialized, initialized, started, reset, abandoned
-        this.deviceSpecs = null;
 
         // UI要素キャッシュ（v1.3.1キャッシュベース管理）
         this.uiElements = {
@@ -49,10 +48,6 @@ class PitchProCycleManager {
      */
     async initialize() {
         try {
-
-            // デバイス検出（iPadOS 13+対応）
-            this.deviceSpecs = this.detectDeviceWithSpecs();
-
             // UI要素キャッシュ（v1.3.1キャッシュベース管理）
             this.cacheUIElements();
 
@@ -288,47 +283,6 @@ class PitchProCycleManager {
     }
 
     // ===== サポートメソッド =====
-
-    /**
-     * デバイス検出（iPadOS 13+対応）
-     */
-    detectDeviceWithSpecs() {
-        const userAgent = navigator.userAgent;
-
-        const isIPhone = /iPhone/.test(userAgent);
-        const isIPad = /iPad/.test(userAgent);
-        const isIPadOS = /Macintosh/.test(userAgent) && 'ontouchend' in document;
-        const hasIOSNavigator = /iPad|iPhone|iPod/.test(userAgent);
-        const hasIOSPlatform = /iPad|iPhone|iPod/.test(navigator.userAgent || '');
-
-        const isIOS = isIPhone || isIPad || isIPadOS || hasIOSNavigator || hasIOSPlatform;
-
-        let deviceType = 'PC';
-        let sensitivityMultiplier = 2.5;
-        let volumeBarScale = 4.0;
-
-        if (isIPhone) {
-            deviceType = 'iPhone';
-            sensitivityMultiplier = 3.5;
-            volumeBarScale = 4.5;
-        } else if (isIPad || isIPadOS) {
-            deviceType = 'iPad';
-            sensitivityMultiplier = 5.0;
-            volumeBarScale = 7.0;
-        } else if (isIOS) {
-            deviceType = 'iOS Device';
-            sensitivityMultiplier = 3.5;
-            volumeBarScale = 4.5;
-        }
-
-        return {
-            deviceType,
-            sensitivityMultiplier,
-            volumeBarScale,
-            isIOS,
-            debugInfo: { userAgent, detectionMethods: { isIPhone, isIPad, isIPadOS, hasIOSNavigator, hasIOSPlatform } }
-        };
-    }
 
     /**
      * UI要素キャッシュ（v1.3.1キャッシュベース管理）
