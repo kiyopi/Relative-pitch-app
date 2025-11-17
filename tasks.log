@@ -11205,3 +11205,25 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 18:30:12] コミット: fix(training): scriptタグのパス修正（SPA対応）
+
+問題:
+- trainingController.jsが404エラーで読み込めない
+- ❌ [Router] Init function "initializeTrainingPage" not found
+
+原因:
+- SPAではHTMLテンプレートがindex.htmlに読み込まれる
+- scriptタグのパスはindex.htmlを基準にする必要がある
+- 従来のパス: ../js/controllers/trainingController.js (training.html基準)
+- これはSPAでは動作しない
+
+修正:
+- training.html: ../js/... → js/... に変更
+- router.js: キャッシュバスター v20251117001 → v20251117002
+- index.html: router.jsキャッシュバスター更新
+
+これでtrainingController.jsが正しく読み込まれ、基音再生ボタンが動作するはず
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

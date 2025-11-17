@@ -7,7 +7,7 @@ class SimpleRouter {
     constructor() {
         this.routes = {
             'home': 'templates/home.html',
-            'preparation': 'templates/preparation.html',
+            'preparation': 'templates/preparation.html?v=20251117001',
             'training': 'pages/training.html?v=20251117002',
             'result-session': 'pages/result-session.html',
             'records': 'pages/records.html',
@@ -452,46 +452,6 @@ class SimpleRouter {
 
         } catch (error) {
             console.warn('⚠️ PitchShifter初期化エラー（バックグラウンド）:', error);
-        }
-    }
-
-    async setupPreparationEvents(fullHash = '') {
-        try {
-            console.log('Setting up preparation page events with dynamic import...');
-            console.log('Full hash:', fullHash);
-
-            // 動的にpreparationControllerをインポート（キャッシュバスター追加）
-            const { initializePreparationPage } = await import(`./controllers/preparationController.js?v=${Date.now()}`);
-
-            // コントローラーの初期化関数を実行
-            await initializePreparationPage();
-
-        } catch (error) {
-            console.error('Error setting up preparation page events:', error);
-            throw error;
-        }
-    }
-
-    async setupTrainingEvents(fullHash = '') {
-        try {
-            console.log('Setting up training page events with dynamic import...');
-            console.log('Full hash:', fullHash);
-
-            // 動的にtrainingControllerをインポート（キャッシュバスター追加）
-            // 🔥 強制リロード: タイムスタンプ + ランダム値でキャッシュ完全無効化
-            const { initializeTrainingPage } = await import(`./controllers/trainingController.js?v=${Date.now()}&r=${Math.random()}`);
-
-            // コントローラーの初期化関数を実行
-            await initializeTrainingPage();
-
-        } catch (error) {
-            // リダイレクトエラーは無視（意図的なリダイレクト）
-            if (error.isRedirect) {
-                console.log('✅ リダイレクト処理完了:', error.message);
-                return;
-            }
-            console.error('Error setting up training page events:', error);
-            throw error;
         }
     }
 

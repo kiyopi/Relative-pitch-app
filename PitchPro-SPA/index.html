@@ -57,12 +57,6 @@
 
     <!-- 音域テスト正規版（SPA対応・条件付き初期化） -->
     <script src="pages/js/voice-range-test.js?v=1762761450"></script>
-    <!-- タイムスタンプ方式でキャッシュを強制無効化 -->
-    <script>
-        const script = document.createElement('script');
-        script.src = `pages/js/preparation-pitchpro-cycle.js?t=${Date.now()}`;
-        document.head.appendChild(script);
-    </script>
 
     <!-- Tone.js Library (Required for PitchShifter) -->
     <script type="importmap">
@@ -152,7 +146,7 @@
     <script src="js/lucide-init.js?v=20251117002"></script>
 
     <!-- SPA Router -->
-    <script src="js/router.js?v=20251117002"></script>
+    <script src="js/router.js?v=20251117003"></script>
 
     <!-- Home Page Direction Tabs -->
     <script src="js/home-direction-tabs.js?v=20251113011"></script>
