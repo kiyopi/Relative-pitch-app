@@ -843,10 +843,8 @@ async function startDoremiGuide() {
                 audioDetector = window.globalAudioDetector;
                 window.audioDetector = audioDetector;
 
-                // NavigationManagerに登録
-                if (window.NavigationManager) {
-                    window.NavigationManager.registerAudioDetector(audioDetector);
-                }
+                // 【v4.0.5修正】再利用時はregister不要
+                // NavigationManagerは既に保持しているため、registerすると既存を破棄してしまう
                 reusedSource = 'globalAudioDetector';
             } else {
                 console.warn('⚠️ [Phase2] window.globalAudioDetector異常または検証失敗');
@@ -879,9 +877,11 @@ async function startDoremiGuide() {
             // グローバルに公開（Router cleanup用）
             window.audioDetector = audioDetector;
 
-            // NavigationManagerに登録（遷移時の自動破棄のため）
+            // 【v4.0.5修正】新規作成時のみNavigationManagerに登録
+            // 既存AudioDetectorの破棄を避けるため、新規作成時のみregister
             if (window.NavigationManager) {
                 window.NavigationManager.registerAudioDetector(audioDetector);
+                console.log('✅ [v4.0.5] 新規作成AudioDetectorをNavigationManagerに登録');
             }
 
             // コールバック設定
