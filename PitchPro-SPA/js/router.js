@@ -253,6 +253,14 @@ class SimpleRouter {
 
             // 4. グローバル初期化関数の実行
             if (config.init) {
+                // 4.1. 初期化関数の読み込みを待機（scriptタグの実行完了を待つ）
+                console.log(`⏳ [Router] Waiting for init function: ${config.init}`);
+                let attempts = 0;
+                while (typeof window[config.init] !== 'function' && attempts < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+
                 const initFunction = window[config.init];
 
                 if (typeof initFunction === 'function') {

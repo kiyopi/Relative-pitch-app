@@ -11227,3 +11227,66 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 18:48:26] コミット: refactor(spa-init): Phase 2完全実装 - 統一初期化パターンへの完全移行
+
+設計ドキュメント準拠の修正:
+- preparation/trainingページを統一初期化パターンに完全移行
+- Phase 1の残存コードを削除し、Phase 2設計に統一
+
+## 修正内容
+
+### 1. preparationページの統一化
+- ❌ 削除: index.htmlの動的読み込み（古いパターン）
+- ✅ 追加: preparation.htmlにscriptタグ（統一パターン）
+- 理由: trainingと同じパターンに統一
+
+### 2. 不要なコードの削除
+- ❌ 削除: router.js setupPreparationEvents() (458-473行)
+- ❌ 削除: router.js setupTrainingEvents() (475-496行)
+- 理由: pageConfigs設定ベースで自動処理されるため不要
+
+### 3. キャッシュバスター更新
+- preparation.html: v20251117001 追加
+- router.js: v20251117003 に更新
+
+## 設計原則（Phase 2）
+
+すべてのページは以下の統一パターン:
+
+**HTMLテンプレート**:
+```html
+<!-- onload属性なし、シンプルなscriptタグのみ -->
+<script src="pages/js/controller.js"></script>
+```
+
+**pageConfigs設定**:
+```javascript
+'preparation': {
+    init: 'initializePreparationPitchProCycle',
+    dependencies: ['PitchPro']
+}
+```
+
+**Router自動処理**:
+- 依存関係確認 → グローバル関数呼び出し → 初期化完了
+
+## 削除されたコード（38行）
+
+- setupPreparationEvents(): 16行
+- setupTrainingEvents(): 22行
+- index.html動的読み込み: 5行
+
+## 成果
+
+✅ 全ページが統一初期化パターンに移行完了
+✅ デッドコード完全削除
+✅ 保守性向上（新規ページ追加が3ステップで完了）
+✅ 設計ドキュメント完全準拠
+
+関連:
+- Serenaメモリ: PERM-unified-page-initialization-design-20251117-1540
+- 設計ドキュメント: SPA_INITIALIZATION_COMPREHENSIVE_SOLUTION.md
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
