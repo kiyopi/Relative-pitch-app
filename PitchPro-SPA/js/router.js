@@ -31,7 +31,7 @@ class SimpleRouter {
          */
         this.pageConfigs = {
             'home': {
-                init: null,
+                init: null,  // setupHomeEvents()で特別処理（setupPageEvents内で直接呼び出し）
                 dependencies: []
             },
             'preparation': {
@@ -216,6 +216,13 @@ class SimpleRouter {
      */
     async setupPageEvents(page, fullHash) {
         try {
+            // homeページは特別処理（Routerクラスのメソッドを直接使用）
+            if (page === 'home') {
+                this.setupHomeEvents();
+                this.preventBrowserBack(page);
+                return;
+            }
+
             // 1. ページ設定を取得
             const config = this.pageConfigs[page];
 

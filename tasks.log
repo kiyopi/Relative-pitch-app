@@ -11041,3 +11041,17 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 15:53:57] コミット: refactor(router): 統一ページ初期化システム実装 (Phase 1/4)
+
+- pageConfigs設定レジストリを追加（8ページ統一管理）
+- 統一setupPageEvents()メソッドを実装（設定ベース）
+- 依存関係待機システム実装（Chart.js, DistributionChart, PitchPro対応）
+- 二重初期化防止機能追加（initializedPagesフラグ管理）
+- cleanupCurrentPage()に初期化フラグリセット追加
+
+Phase 1: router.js基盤構築完了
+次期: Phase 2で各ページのHTML修正予定
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
