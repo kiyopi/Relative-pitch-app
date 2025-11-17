@@ -10929,3 +10929,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 13:25:24] コミット: fix(training): PCの初期音量を+8dBから+5dBに削減してブチ音対策 (v4.0.18)
+
+- デバイス音量設定を+8dBから+5dBに変更（37.5%削減）
+- ブチ音（クリック音）の原因として初期音量が高すぎる可能性に対応
+- device-detector.js v1.0.1に更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

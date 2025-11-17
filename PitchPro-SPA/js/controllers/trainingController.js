@@ -2,7 +2,12 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: v4.0.17 (2025-11-16) - 消えた時の背景を音量バー風に改善
+ * 🔥 VERSION: v4.0.19 (2025-11-17) - 不要コード削除（setupHomeButton関数）
+ *
+ * 【v4.0.19修正内容】
+ * - setupHomeButton関数削除: index.htmlのhandleFooterHomeButtonClick()で代替済み
+ * - data-state属性削除: ボタン状態管理をdisabled制御のみに統一（v4.0.10で対応済み）
+ * - コード整理: 基音再生時の負担軽減で不要になったコードの完全削除
  *
  * 【v4.0.17修正内容】
  * - 消えた時の背景改善: 音量バー背景と同じスタイルに変更
@@ -53,7 +58,7 @@
  * - タイミング最適化: ドレミガイド開始タイミングのコメントを正確に修正
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.17 (2025-11-16) LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.19 (2025-11-17) LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
@@ -382,9 +387,6 @@ export async function initializeTrainingPage() {
         // 古いイベントリスナーを削除してから新規登録
         const newButton = playButton.cloneNode(true);
         playButton.parentNode.replaceChild(newButton, playButton);
-
-        // 【v4.0.9】初期状態（data-state属性で管理）
-        newButton.setAttribute('data-state', 'idle');
 
         newButton.addEventListener('click', () => {
             console.log('🎯 ボタンクリック検出');
@@ -1115,7 +1117,6 @@ function handleSessionComplete() {
 
     // 【v4.0.9】ボタンを「もう一度」に変更 - innerHTML排除・タイミング完璧化
     const button = document.getElementById('play-base-note');
-    button.setAttribute('data-state', 'retry');
     button.disabled = false;
     button.classList.remove('btn-disabled');
 
@@ -1718,50 +1719,9 @@ function selectSequentialMode(availableNotes, maxSessions) {
 
     return selectedNotes;
 }
-// 【削除】古い実装（selectNoteFromZone, selectNoteWithDistance, selectBaseNote）は削除しました
+// 【削除】古い実装（selectNoteFromZone, selectNoteWithDistance, selectBaseNote, setupHomeButton）は削除しました
 // 新しい実装（selectAllBaseNotesForMode）を使用してください
-/**
- * ホームボタンに確認ダイアログを追加
- * トレーニング中のデータ損失を防止
- */
-function setupHomeButton() {
-    const homeBtn = document.getElementById('btn-home-training');
-    if (!homeBtn) {
-        console.warn('⚠️ ホームボタンが見つかりません (id: btn-home-training)');
-        return;
-    }
-
-    homeBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-
-        const confirmed = confirm(
-            'トレーニング中です。\n' +
-            'ホームに戻ると進行中のデータが失われます。\n' +
-            '本当にホームに戻りますか？'
-        );
-
-        if (confirmed) {
-            // レッスンID・音階方向をリセット（中断時）
-            currentLessonId = null;
-            currentScaleDirection = 'ascending';
-            sessionStorage.removeItem('currentLessonId'); // sessionStorageもクリア
-            console.log('🔄 トレーニング中断: currentLessonId・currentScaleDirectionをリセット（sessionStorageもクリア）');
-
-            // 【統一ナビゲーション】NavigationManager.navigate()を使用
-            // NavigationManagerが自動的にaudioDetector破棄、beforeunload/popstate無効化を実行
-            if (window.NavigationManager) {
-                window.NavigationManager.navigate('home');
-            } else {
-                window.location.hash = 'home';
-            }
-            console.log('🏠 ユーザーがホームへの移動を承認');
-        } else {
-            console.log('🚫 ホームへの移動をキャンセル');
-        }
-    });
-
-    console.log('✅ ホームボタンに確認ダイアログを設定');
-}
+// ホームボタンはindex.htmlのhandleFooterHomeButtonClick()で管理されています
 
 /**
  * ブラウザバック防止はrouter.jsでグローバルに管理されています
