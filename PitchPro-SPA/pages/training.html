@@ -38,42 +38,9 @@
                     </div>
                     
                     <div class="base-note-control">
-                        <button class="btn btn-primary" id="play-base-note" data-state="idle">
-                            <!-- アイドル状態（デフォルト表示） -->
-                            <span class="btn-state btn-state-idle">
-                                <i data-lucide="volume-2" style="width: 24px; height: 24px;"></i>
-                                <span>基音スタート</span>
-                            </span>
-
-                            <!-- 初期化中 -->
-                            <span class="btn-state btn-state-init">
-                                <i data-lucide="loader" style="width: 24px; height: 24px;"></i>
-                                <span>初期化中...</span>
-                            </span>
-
-                            <!-- マイク確認中 -->
-                            <span class="btn-state btn-state-mic">
-                                <i data-lucide="loader" style="width: 24px; height: 24px;"></i>
-                                <span>マイク確認中...</span>
-                            </span>
-
-                            <!-- 再生中 -->
-                            <span class="btn-state btn-state-playing">
-                                <i data-lucide="volume-2" style="width: 24px; height: 24px;"></i>
-                                <span>再生中...</span>
-                            </span>
-
-                            <!-- エラー -->
-                            <span class="btn-state btn-state-error">
-                                <i data-lucide="alert-circle" style="width: 24px; height: 24px;"></i>
-                                <span>エラー - 再試行</span>
-                            </span>
-
-                            <!-- もう一度（連続・12音階モード完了時） -->
-                            <span class="btn-state btn-state-retry">
-                                <i data-lucide="refresh-cw" style="width: 24px; height: 24px;"></i>
-                                <span>もう一度</span>
-                            </span>
+                        <button class="btn btn-primary" id="play-base-note">
+                            <i data-lucide="play-circle" style="width: 20px; height: 20px;"></i>
+                            <span>基音を再生</span>
                         </button>
                         
                         <!-- プログレス四角（ボタンと横並び） -->

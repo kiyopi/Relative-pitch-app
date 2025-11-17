@@ -2,7 +2,13 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: v4.0.19 (2025-11-17) - 不要コード削除（setupHomeButton関数）
+ * 🔥 VERSION: v4.0.20 (2025-11-17) - ボタンテキスト状態表示の実装
+ *
+ * 【v4.0.20修正内容】
+ * - ボタンテキスト変更実装: 「基音を再生」→「再生中...」→「準備中...」（連続・12音階のみ）
+ * - HTMLシンプル化: 複雑なdata-state構造を削除、シンプルなspan要素のみ
+ * - 最軽量実装: textContentのみ使用、Lucideアイコン更新なし、DOM操作最小限
+ * - ブチ音対策完了後の実装: PC音量削減（v4.0.18）により基音再生中の変更が安全に
  *
  * 【v4.0.19修正内容】
  * - setupHomeButton関数削除: index.htmlのhandleFooterHomeButtonClick()で代替済み
@@ -58,7 +64,7 @@
  * - タイミング最適化: ドレミガイド開始タイミングのコメントを正確に修正
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.19 (2025-11-17) LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.20 (2025-11-17) LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
@@ -612,9 +618,15 @@ async function startTraining() {
 
     if (!playButton) return;
 
-    // ボタン無効化
+    // ボタン無効化 + テキスト変更
     playButton.disabled = true;
     playButton.classList.add('btn-disabled');
+
+    // 【v4.0.20】ボタンテキストを「再生中...」に変更
+    const buttonText = playButton.querySelector('span');
+    if (buttonText) {
+        buttonText.textContent = '再生中...';
+    }
 
     try {
         // 【v4.0.11】getUserMedia()削除 - レスポンス速度改善
@@ -1044,6 +1056,12 @@ function handleSessionComplete() {
                     // 【v4.0.10】DOM操作完全排除 - ブチ音対策
                     playButton.disabled = true;
                     playButton.classList.add('btn-disabled');
+
+                    // 【v4.0.20】ボタンテキストを「準備中...」に変更
+                    const buttonText = playButton.querySelector('span');
+                    if (buttonText) {
+                        buttonText.textContent = '準備中...';
+                    }
                 }
 
                 // UIをリセット

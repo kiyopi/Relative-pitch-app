@@ -10938,3 +10938,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 13:39:39] コミット: refactor(training): 不要コード削除とクリーンアップ (v4.0.19)
+
+- setupHomeButton関数削除: index.htmlのhandleFooterHomeButtonClick()で代替済み
+- data-state属性削除済み確認: v4.0.10でボタン状態管理をdisabled制御のみに統一
+- 基音再生時の負担軽減で不要になったコードの完全削除
+
+v4.0.9/v4.0.10/v4.0.13での最適化により不要になったコードを整理
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
