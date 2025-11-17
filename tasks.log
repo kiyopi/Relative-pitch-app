@@ -11393,3 +11393,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 19:48:00] コミット: feat(router): Phase 3 - setupPageEvents完全実装
+
+- setupPageEvents()をPhase 2のヘルパー活用で完全書き換え
+- waitForGlobalFunction()を使用して初期化関数の待機を統一
+- AbortSignal対応で中断可能な初期化フロー実装
+- エラーハンドリングの改善（中断エラーと通常エラーを分離）
+- 依存関係待機でPhase 2のwaitForDependencies()を正しく使用
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

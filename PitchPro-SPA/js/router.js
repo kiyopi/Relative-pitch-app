@@ -18,16 +18,17 @@ class SimpleRouter {
         };
 
         /**
-         * ページ初期化設定レジストリ
+         * 【Phase 4】ページ初期化設定レジストリ（設定ベース・クリーンアップ統合）
          *
          * 【新規ページ追加方法】
-         * 1. pageConfigsに設定を追加
+         * 1. pageConfigsに設定を追加（init, dependencies, cleanup）
          * 2. コントローラーでwindow.initXXXを公開
          * 3. 以上で完了（setupPageEventsのswitch-case不要）
          *
          * @property {string} init - グローバル初期化関数名
          * @property {Array<string>} dependencies - 依存ライブラリ（'Chart', 'DistributionChart', 'PitchPro'）
          * @property {boolean} preventDoubleInit - 二重初期化防止フラグ
+         * @property {Function} cleanup - クリーンアップ関数（オプション）
          */
         this.pageConfigs = {
             'home': {
@@ -36,11 +37,66 @@ class SimpleRouter {
             },
             'preparation': {
                 init: 'initializePreparationPitchProCycle',
-                dependencies: ['PitchPro']
+                dependencies: ['PitchPro'],
+                cleanup: async () => {
+                    console.log('🧹 [Router] Cleaning up preparation page...');
+
+                    // PitchProリソースのクリーンアップ
+                    if (typeof window.preparationManager !== 'undefined' && window.preparationManager) {
+                        await window.preparationManager.cleanupPitchPro();
+                    }
+
+                    // 初期化フラグをリセット
+                    if (typeof window.resetPreparationPageFlag === 'function') {
+                        window.resetPreparationPageFlag();
+                        console.log('✅ [Router] Preparation page flag reset');
+                    }
+                }
             },
             'training': {
                 init: 'initializeTrainingPage',
-                dependencies: ['PitchPro']
+                dependencies: ['PitchPro'],
+                cleanup: async () => {
+                    console.log('🧹 [Router] Cleaning up training page...');
+
+                    // 音声検出停止
+                    if (window.audioDetector) {
+                        console.log('🛑 [Router] Stopping AudioDetector...');
+                        window.audioDetector.stopDetection();
+                    }
+
+                    // マイクストリーム明示的解放
+                    if (window.audioStream) {
+                        console.log('🎤 [Router] Releasing microphone stream...');
+                        window.audioStream.getTracks().forEach(track => track.stop());
+                        window.audioStream = null;
+                    }
+
+                    // PitchShifter停止
+                    if (window.pitchShifterInstance) {
+                        console.log('🎹 [Router] Stopping PitchShifter...');
+                        if (typeof window.pitchShifterInstance.dispose === 'function') {
+                            window.pitchShifterInstance.dispose();
+                        }
+                        window.pitchShifterInstance = null;
+                    }
+
+                    // セッションデータ処理
+                    if (window.sessionDataRecorder) {
+                        const currentSession = window.sessionDataRecorder.getCurrentSession();
+                        if (currentSession && !currentSession.completed) {
+                            console.warn('⚠️ [Router] Incomplete session - data will be discarded');
+                        }
+                    }
+
+                    // 初期化フラグリセット
+                    if (typeof window.resetTrainingPageFlag === 'function') {
+                        window.resetTrainingPageFlag();
+                        console.log('✅ [Router] Training page flag reset');
+                    }
+
+                    console.log('✅ [Router] Training page cleanup complete');
+                }
             },
             'result-session': {
                 init: 'initializeResultSessionPage',
@@ -661,84 +717,37 @@ class SimpleRouter {
     }
 
     // 現在のページのクリーンアップ
+    /**
+     * 【Phase 4】現在のページのクリーンアップ（設定ベース実装）
+     *
+     * pageConfigsに定義されたクリーンアップ関数を実行し、
+     * preventDoubleInitフラグのリセットを統一的に処理
+     */
     async cleanupCurrentPage() {
         try {
             // ブラウザバック防止を自動解除（グローバル管理）
             this.removeBrowserBackPrevention();
 
-            // preparationページからの離脱時のクリーンアップ
-            if (this.currentPage === 'preparation') {
-                console.log('Cleaning up preparation page resources...');
-
-                // PitchProリソースのクリーンアップ
-                if (typeof window.preparationManager !== 'undefined' && window.preparationManager) {
-                    await window.preparationManager.cleanupPitchPro();
-                }
-
-                // 初期化フラグをリセット
-                if (typeof window.resetPreparationPageFlag === 'function') {
-                    window.resetPreparationPageFlag();
-                    console.log('Preparation page flag reset');
-                }
+            if (!this.currentPage) {
+                return;
             }
 
-            // trainingページからの離脱時のクリーンアップ
-            if (this.currentPage === 'training') {
-                console.log('Cleaning up training page resources...');
-
-                // 音声検出停止
-                if (window.audioDetector) {
-                    console.log('🛑 AudioDetector停止中...');
-                    window.audioDetector.stopDetection();
-                }
-
-                // マイクストリーム明示的解放
-                if (window.audioStream) {
-                    console.log('🎤 マイクストリーム解放中...');
-                    window.audioStream.getTracks().forEach(track => track.stop());
-                    window.audioStream = null;
-                }
-
-                // PitchShifter停止（メソッドが存在する場合）
-                if (window.pitchShifterInstance) {
-                    console.log('🎹 PitchShifter停止中...');
-                    if (typeof window.pitchShifterInstance.dispose === 'function') {
-                        window.pitchShifterInstance.dispose();
-                    }
-                    window.pitchShifterInstance = null;
-                }
-
-                // セッションデータ処理
-                // ※リロード後の一時的な離脱の場合はリセットしない
-                // （NavigationManager.isResumingAfterReload()で判定されるため、ここではリセット不要）
-                if (window.sessionDataRecorder) {
-                    const currentSession = window.sessionDataRecorder.getCurrentSession();
-                    if (currentSession && !currentSession.completed) {
-                        console.warn('⚠️ 未完了セッションあり - 途中データは破棄されます');
-                    }
-                    // resetSession()は呼ばない（sessionCounterを保持）
-                    // window.sessionDataRecorder.resetSession();
-                }
-
-                // 初期化フラグリセット
-                if (typeof window.resetTrainingPageFlag === 'function') {
-                    window.resetTrainingPageFlag();
-                    console.log('Training page flag reset');
-                }
-
-                console.log('✅ Training page cleanup complete');
-            }
-
-            // 【v2.0.0追加】二重初期化防止フラグのリセット
-            // preventDoubleInitが有効なページ（results-overview等）の初期化フラグをクリア
+            // 【Phase 4】設定ベースのクリーンアップ実行
             const config = this.pageConfigs[this.currentPage];
-            if (config && config.preventDoubleInit && this.initializedPages.has(this.currentPage)) {
+
+            if (config?.cleanup) {
+                console.log(`🧹 [Router] Running cleanup for: ${this.currentPage}`);
+                await config.cleanup();
+            }
+
+            // 【Phase 4】二重初期化防止フラグのリセット
+            if (config?.preventDoubleInit && this.initializedPages.has(this.currentPage)) {
                 this.initializedPages.delete(this.currentPage);
                 console.log(`🔄 [Router] Reset initialization flag for: ${this.currentPage}`);
             }
 
         } catch (error) {
-            console.warn('Page cleanup error:', error);
+            console.warn(`⚠️ [Router] Cleanup error for ${this.currentPage}:`, error);
             // クリーンアップエラーは警告レベルで続行
         }
     }
