@@ -794,47 +794,15 @@ class PitchProCycleManager {
                 return;
             }
 
-            // デバイス検出（router.jsと同じロジック）
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            const isIPhone = /iPhone/.test(userAgent);
-            const isIPad = /iPad/.test(userAgent);
-            const isMacintoshWithTouch = /Macintosh/.test(userAgent) && 'ontouchend' in document;
-            const isIOSUserAgent = /iPad|iPhone|iPod/.test(userAgent);
-            const isIOSPlatform = /iPad|iPhone|iPod/.test(navigator.platform || '');
-            const isIOS = isIPhone || isIPad || isMacintoshWithTouch || isIOSUserAgent || isIOSPlatform;
-
-            // デバイスタイプ判定
-            let deviceType = 'pc';
-            if (isIPhone) {
-                deviceType = 'iphone';
-            } else if (isIPad || isMacintoshWithTouch) {
-                deviceType = 'ipad';
-            } else if (isIOS) {
-                const screenWidth = window.screen.width;
-                const screenHeight = window.screen.height;
-                const maxDimension = Math.max(screenWidth, screenHeight);
-                const minDimension = Math.min(screenWidth, screenHeight);
-
-                if (maxDimension >= 768 || (maxDimension >= 700 && minDimension >= 500)) {
-                    deviceType = 'ipad';
-                } else {
-                    deviceType = 'iphone';
-                }
-            }
-
-            const volumeSettings = {
-                pc: +8,
-                iphone: +18,
-                ipad: +20
-            };
-            const deviceVolume = volumeSettings[deviceType] || +8;
-
-            console.log(`📱 デバイス: ${deviceType}, 音量: ${deviceVolume}dB`);
+            // DeviceDetectorから音量設定を取得（統一設定）
+            const deviceVolume = window.DeviceDetector?.getDeviceVolume() || -6;
+            const deviceType = window.DeviceDetector?.getDeviceType() || 'pc';
+            console.log(`🔊 PitchShifter音量: ${deviceVolume}dB (デバイス: ${deviceType}, DeviceDetector統一設定)`);
 
             // 新規作成または再作成
             // ⚠️ IMPORTANT: attack/release値を変更する場合は、以下の2箇所も同時に変更すること
             // 1. /js/core/reference-tones.js (line 67, 69)
-            // 2. /js/router.js (line 267-268)
+            // 2. /js/router.js (line 439-440)
             window.pitchShifterInstance = new window.PitchShifter({
                 baseUrl: 'audio/piano/',
                 attack: 0.02,
@@ -2060,29 +2028,19 @@ function setupVolumeAdjustmentControls() {
             // PitchShifterの音量を調整
             if (window.pitchShifterInstance && window.pitchShifterInstance.isInitialized) {
                 // 音量調整範囲: 50%（中央）= 基準音量、0%（左端）= -30dB、100%（右端）= +30dB
-                // 50% = baseVolume（デフォルト・最適値）
+                // 50% = baseVolume（DeviceDetector統一設定）
                 // 100% = baseVolume + 30dB
                 // 0% = baseVolume - 30dB
 
-                // 現在のデバイス別基準音量を取得（router.jsと同じロジック）
-                const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-                const isIPhone = /iPhone/.test(userAgent);
-                const isIPad = /iPad/.test(userAgent);
-                const isMacintoshWithTouch = /Macintosh/.test(userAgent) && 'ontouchend' in document;
-
-                let baseVolume = +8; // PC default
-                if (isIPhone) {
-                    baseVolume = +18;
-                } else if (isIPad || isMacintoshWithTouch) {
-                    baseVolume = +20;
-                }
+                // DeviceDetectorから基準音量を取得（統一設定）
+                const baseVolume = window.DeviceDetector?.getDeviceVolume() || -6;
 
                 // パーセンテージに応じて音量を調整（50%が基準）
                 const volumeOffset = (volumePercent - 50) * 0.6; // 50%差で±30dB
                 const targetVolume = baseVolume + volumeOffset;
 
                 window.pitchShifterInstance.setVolume(targetVolume);
-                console.log(`🔊 音量調整: ${volumePercent}% (${targetVolume.toFixed(1)}dB, 基準${baseVolume}dB)`);
+                console.log(`🔊 音量調整: ${volumePercent}% (${targetVolume.toFixed(1)}dB, 基準${baseVolume}dB, DeviceDetector統一設定)`);
             }
         });
         console.log('✅ 音量スライダーのイベントリスナー設定完了');

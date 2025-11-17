@@ -425,51 +425,15 @@ class SimpleRouter {
                 return;
             }
 
-            // デバイス検出（PitchPro実装準拠）
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
-            // 複数の判定方法を組み合わせた包括的な検出（PitchPro方式）
-            const isIPhone = /iPhone/.test(userAgent);
-            const isIPad = /iPad/.test(userAgent);
-            const isMacintoshWithTouch = /Macintosh/.test(userAgent) && 'ontouchend' in document;
-            const isIOSUserAgent = /iPad|iPhone|iPod/.test(userAgent);
-            const isIOSPlatform = /iPad|iPhone|iPod/.test(navigator.platform || '');
-            const isIOS = isIPhone || isIPad || isMacintoshWithTouch || isIOSUserAgent || isIOSPlatform;
-
-            // デバイスタイプ判定
-            let deviceType = 'pc';
-            if (isIPhone) {
-                deviceType = 'iphone';
-            } else if (isIPad || isMacintoshWithTouch) {
-                deviceType = 'ipad';
-            } else if (isIOS) {
-                // スクリーンサイズで判定（PitchPro方式）
-                const screenWidth = window.screen.width;
-                const screenHeight = window.screen.height;
-                const maxDimension = Math.max(screenWidth, screenHeight);
-                const minDimension = Math.min(screenWidth, screenHeight);
-
-                // iPad判定: 長辺768px以上、または長辺700px以上かつ短辺500px以上
-                if (maxDimension >= 768 || (maxDimension >= 700 && minDimension >= 500)) {
-                    deviceType = 'ipad';
-                } else {
-                    deviceType = 'iphone';
-                }
-            }
-
-            const volumeSettings = {
-                pc: +8,      // +8dB: デバイス音量50%時に最適化
-                iphone: +18, // +18dB: デバイス音量50%時に最適化
-                ipad: +20    // +20dB: デバイス音量50%時に最適化（Tone.js推奨上限）
-            };
-            const deviceVolume = volumeSettings[deviceType] || +8;
-
-            console.log(`📱 デバイス: ${deviceType}, 音量: ${deviceVolume}dB`);
+            // DeviceDetectorから音量設定を取得（統一設定）
+            const deviceVolume = window.DeviceDetector?.getDeviceVolume() || -6;
+            const deviceType = window.DeviceDetector?.getDeviceType() || 'pc';
+            console.log(`🔊 PitchShifter音量: ${deviceVolume}dB (デバイス: ${deviceType}, DeviceDetector統一設定)`);
 
             // 新規作成
             // ⚠️ IMPORTANT: attack/release値を変更する場合は、以下の2箇所も同時に変更すること
             // 1. /js/core/reference-tones.js (line 67, 69)
-            // 2. /pages/js/preparation-pitchpro-cycle.js (line 839-840)
+            // 2. /pages/js/preparation-pitchpro-cycle.js (line 808-809)
             window.pitchShifterInstance = new window.PitchShifter({
                 baseUrl: 'audio/piano/',
                 attack: 0.02,
