@@ -10604,3 +10604,328 @@ v4.0.9 - 【UI改善】評価分布グラフにヘルプボタン追加（Distri
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 20:08:19] コミット: feat(result-session): セッション評価の評価分布グラフにヘルプボタン追加
+
+v4.0.10 - 【UI改善】DistributionChartコンポーネント統合・ヘルプボタン対応
+
+変更内容:
+- result-session.html: 評価分布セクションをsection-header-rowレイアウトに変更
+- ヘルプボタンコンテナ（session-distribution-help-button-container）追加
+- result-session-controller.js: displayEvaluationDistribution()をDistributionChart.render()に移行
+- index.html: DistributionChart.jsコンポーネントの読み込み追加
+- 説明文表示（showDescription: true）設定
+
+実装パターン:
+- results-overviewページと同じヘルプボタン実装パターンを適用
+- DistributionChart.getHelpButton()でヘルプボタン挿入
+- showHelpButton: trueでポップオーバー生成
+- セッションデータ形式への変換処理実装
+
+効果:
+- 評価分布グラフの見出し右側にヘルプボタン表示
+- クリックで精度ランク説明ポップオーバー表示
+- 説明文「全セッションの各音の精度評価を集計した分布です」表示
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-16 22:24:27] コミット: fix(training): リファクタリング後の音量・タイミング・アイコン問題修正 (v4.0.8)
+
+- 音量リセット問題修正: 準備フェーズのユーザー音量設定を維持
+- Lucide初期化最適化: innerHTML後に統一関数を使用（Safari互換性保証、6箇所）
+- タイミング最適化: ドレミガイド開始タイミングのコメントを正確に修正
+
+## 詳細な変更内容
+
+### trainingController.js (v4.0.8)
+1. **音量リセット問題の修正（line 479-487）**
+   - 問題: グローバルインスタンス使用時、setVolume()で準備フェーズの音量をリセット
+   - 修正: setVolume()呼び出しを削除し、ユーザー調整を尊重
+
+2. **Lucide初期化の統一（6箇所）**
+   - 問題: innerHTML後にlucide.createIcons()を直接呼び出し
+   - 修正: window.initializeLucideIcons({ immediate: true })に置き換え
+   - 効果: Safari互換性保証、統一関数による一貫性確保
+
+3. **タイミングコメントの修正（line 712-714）**
+   - 問題: 基音再生時間のコメントが不正確
+   - 修正: attack(0.02s) + sustain(1.0s) + release(2.5s) = 3.52sと正確に記載
+
+### CODE_QUALITY_AUDIT_AND_FIX_PLAN.md
+- 問題1を1-A（静的HTML過剰初期化）と1-B（innerHTML動的挿入）に分類
+- trainingController.jsの完了を記録（✅ 2025-11-16）
+- 実装チェックリストと進捗記録を更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 00:50:11] コミット: fix(training): レスポンス速度劇的改善・ブチ音87.5%削減 (v4.0.8-v4.0.11)
+
+リファクタリング後に発生した音量リセット・ブチ音・レスポンス遅延の
+包括的な修正を実施。最終的にgetUserMedia()削除により根本解決。
+
+## v4.0.8: 音量リセット問題修正
+- グローバルインスタンス使用時、準備フェーズの音量設定を維持
+- setVolume()呼び出しを削除し、ユーザー調整を尊重
+
+## v4.0.9-v4.0.10: DOM操作排除試行
+- innerHTML → data-state属性による状態管理を試行
+- setAttribute()もDOM再計算を引き起こし、効果限定的
+- 基音再生中の全DOM操作を削除
+
+## v4.0.11: getUserMedia()削除（根本解決）
+- リファクタリングで追加されたgetUserMedia()呼び出しを削除
+- ボタン押下から基音再生までの遅延を完全解消
+- マイク許可は準備ページで確認済み、AudioDetectionComponent初期化時に自動検出
+
+## 実装詳細
+
+### trainingController.js
+- Line 581-620: getUserMedia()確認処理を完全削除
+- Line 350: 初期状態のみdata-state属性使用（基音再生前）
+- Line 1094: もう一度ボタンのみdata-state使用（基音再生後）
+- 基音再生中の全DOM操作（innerHTML/setAttribute/textContent）を削除
+
+### training.html
+- ボタン状態をHTML側で事前定義（6状態: idle/init/mic/playing/error/retry）
+- data-state属性による状態切り替え設計（結果的に未使用）
+
+### base.css
+- .btn-state スタイル追加（data-state属性対応）
+- 状態別表示制御CSS実装
+
+### キャッシュバスター更新
+- index.html: base.css v20251116003
+- router.js: training.html v20251116002
+
+## 成果
+
+### レスポンス速度
+- ✅ 遅延完全解消（リファクタリング前の高速レスポンスに復帰）
+- getUserMedia()削除により500ms-1秒の遅延を排除
+
+### ブチ音
+- ✅ 87.5%削減（8音中1回のみ、PCのみ発生）
+- モバイル（iPhone/iPad）: 完全解消
+- 原因: Tone.jsオーディオレンダリングとDOM操作/getUserMedia()の競合
+
+### 音量設定
+- ✅ 準備フェーズの音量調整が正しく維持される
+
+## 技術的知見
+
+1. **getUserMedia()は重い**: ハードウェアアクセスで500ms-1秒の遅延
+2. **DOM操作とTone.js競合**: setAttribute()でもCSS再計算が発生しブチ音の原因
+3. **シンプルな実装が最適**: リファクタリング前の実装に戻すことで解決
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 09:51:29] コミット: fix(training): 非同期処理検証後、同期処理に戻す (v4.0.12)
+
+【v4.0.12修正内容】
+- 非同期処理検証: audioDetector.stopDetection()を並列実行テスト
+- 結果: 体感速度に変化なし、潜在的な競合リスクあり
+- 同期処理に戻す: AudioDetectorの状態管理の安定性を優先
+- 処理順序保証: stopDetection完了 → 基音再生 → 2.5秒待機 → startDetection
+
+【技術的判断理由】
+- stopDetection()は数ミリ秒の処理で非同期化の効果なし
+- 競合状態（Race Condition）のリスク回避
+- エラーハンドリングの明確性向上
+- AudioDetectorの内部状態の一貫性保証
+
+修正ファイル:
+- trainingController.js (Line 5-10, 647-657)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 10:08:07] コミット: feat(training): インターバルカウントダウンをCSS Animation化 (v4.0.13)
+
+【v4.0.13修正内容】
+- CSS Animation化: 基音再生中のDOM操作を完全排除（残りブチ音対策）
+- setInterval削除: 833ms間隔の4回のDOM操作を完全削除
+- iPhone/PC挙動統一: アニメーションリセット処理でデバイス間の差異を解消
+- レスポンス最適化: 基音再生前に1回のみDOM操作、再生中は完全にCSS任せ
+
+【技術的詳細】
+■ 問題の発見
+- 基音再生中にsetIntervalで833ms間隔で4回のDOM操作（classList.add）
+- このDOM操作がTone.jsのオーディオレンダリングと競合しブチ音の原因
+- iPhoneとPCで次セッション開始時の挙動が異なる問題
+
+■ 解決策
+- CSS @keyframes square-consumeアニメーション実装
+- animation-delay（0ms, 833ms, 1666ms）で各squareの開始タイミング制御
+- requestAnimationFrame + classList.add('countdown-active')で1回のみDOM操作
+- classList.remove('countdown-active')で確実にリセット → デバイス間挙動統一
+
+■ 期待効果
+- 基音再生中のDOM操作: 4回 → 0回（完全排除）
+- PC環境での残り1/8のブチ音をさらに削減
+- iPhone/PC両デバイスで一貫した動作
+
+修正ファイル:
+- training.css (Line 726-767): CSS Animation定義
+- trainingController.js (Line 5-11, 40, 714-748): setInterval削除、CSS方式実装
+- index.html (Line 16): キャッシュバスター更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 10:42:52] コミット: fix(training): インターバル表示改善・連続セッション対応 (v4.0.14)
+
+【v4.0.14修正内容】
+- インターバルバー色修正: 濃い青に戻して視認性向上（opacity: 0.3 → 1.0）
+- 連続セッション対応: ドレミガイド終了時にインターバルを確実にリセット
+- アニメーション方向修正: 濃い青 → 薄い白の正しい方向に修正
+
+【問題点】
+1. インターバルバーが薄くて見にくい
+   - 原因: デフォルトでopacity: 0.3を設定していた
+   - 修正: opacity: 1.0に変更、アニメーション方向も修正
+
+2. 連続チャレンジで次セッションに進むときインターバルがリセットされない
+   - 原因: handleSessionComplete()でインターバルリセット処理がなかった
+   - 修正: countdown-activeクラスを削除してリセット
+
+【技術的詳細】
+■ training.css修正
+- .progress-square: opacity: 0.3 → 1.0（デフォルトで濃い青）
+- @keyframes square-consume:
+  - from: opacity: 1.0（濃い青）
+  - to: opacity: 0.3（薄い白）
+
+■ trainingController.js修正
+- handleSessionComplete()に追加（Line 1037-1042）:
+  - progressSquaresContainer.classList.remove('countdown-active')
+  - 連続チャレンジで次セッション開始前に確実にリセット
+
+修正ファイル:
+- training.css (Line 739, 751-759): 色とアニメーション方向修正
+- trainingController.js (Line 5-10, 45, 1037-1042): リセット処理追加
+- index.html (Line 16): キャッシュバスター更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 10:52:43] コミット: fix(training): インターバルバーのレイアウトずれ修正 (v4.0.15)
+
+【v4.0.15修正内容】
+- レイアウトずれ修正: border追加時の高さ変化を防止
+- box-sizing設定: borderを含めて高さ10pxに統一
+- 常時border確保: transparent borderで高さを一定に保つ
+
+【問題点】
+- バーがある時と消えた時のレイアウトの高さが異なる
+- リセット時に背景の色なし字のベース（consumed状態）の方が高い
+- その分上にずれる
+
+【原因分析】
+- アニメーション完了後に`border: 1px solid`が追加される
+- これにより要素の高さが10px → 12px（上下1pxずつ）に増える
+- リセット時にborderが消えて10pxに戻るのでレイアウトがずれる
+
+【解決策】
+■ training.css修正
+1. デフォルトで透明なborderを設定
+   - border: 1px solid transparent;
+   - box-sizing: border-box; /* borderを含めて10pxに */
+
+2. アニメーションではborder-colorのみ変更
+   - from: border-color: transparent;
+   - to: border-color: rgba(255, 255, 255, 0.2);
+
+3. 旧方式（.consumed）も同様に修正
+   - border → border-colorに変更
+
+■ 期待効果
+- 常に高さ10px（border込み）で一定
+- リセット時のレイアウトずれが完全解消
+- アニメーションは正常に動作
+
+修正ファイル:
+- training.css (Line 734-770): border常設、box-sizing追加
+- trainingController.js (Line 5-10, 50): バージョン更新
+- index.html (Line 16): キャッシュバスター更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 10:59:48] コミット: feat(training): 音量バースタイルをインターバルバーに流用 (v4.0.16)
+
+【v4.0.16修正内容】
+- 音量バースタイル流用: 濃い青グラデーションで視認性向上
+- gradient-catalog-blue適用: linear-gradient(135deg, #3b82f6, #1d4ed8)
+- 統一感向上: 音量バーとインターバルバーのスタイルを統一
+
+【問題点】
+- インターバルバーの背景色が薄すぎる（#60a5fa単色）
+- 音量バーは濃い青グラデーションで見やすい
+- スタイルの統一感がない
+
+【解決策】
+■ training.css修正
+- .progress-square:
+  - background: #60a5fa → linear-gradient(135deg, #3b82f6, #1d4ed8)
+  - 音量バーと同じgradient-catalog-blueを適用
+
+- @keyframes square-consume:
+  - from部分も同じグラデーションに変更
+  - 濃い青グラデーション → 薄い白への変化を維持
+
+■ 期待効果
+- 視認性向上: 濃い青グラデーションではっきり見える
+- 統一感: 音量バーとインターバルバーが同じスタイル
+- UX改善: 一貫したビジュアルデザイン
+
+修正ファイル:
+- training.css (Line 737, 755): グラデーション適用
+- trainingController.js (Line 5-10, 55): バージョン更新
+- index.html (Line 16): キャッシュバスター更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 11:05:35] コミット: fix(training): 消えた時の背景を音量バー風に改善 (v4.0.17)
+
+【v4.0.17修正内容】
+- 消えた時の背景改善: 音量バー背景と同じスタイルに変更
+- background: rgba(255, 255, 255, 0.12) + border: rgba(255, 255, 255, 0.15)
+- opacity: 0.3 → 1.0で視認性向上
+- 青バーは元の#60a5faに戻す
+
+【問題点】
+- v4.0.16で濃い青グラデーションにしたが、これは誤解だった
+- 実際のニーズ: 消えた時（consumed状態）の背景が薄すぎる
+- 現状: rgba(255, 255, 255, 0.1) + opacity: 0.3で非常に薄い
+
+【解決策】
+■ training.css修正
+1. 青バーを元に戻す
+   - background: linear-gradient(...) → #60a5fa
+
+2. 消えた時の背景を音量バー風に
+   - background: rgba(255, 255, 255, 0.12) ← 音量バー背景と同じ
+   - border-color: rgba(255, 255, 255, 0.15) ← 音量バー背景と同じ
+   - opacity: 0.3 → 1.0 ← しっかり見える
+
+3. レイアウトずれは発生しない
+   - border: 1px solid transparent; で常にborder確保
+   - box-sizing: border-box; でborder込み10px
+   - border-colorの変更のみなので高さは一定
+
+■ 期待効果
+- 視認性向上: 消えた時の背景がしっかり見える
+- 統一感: 音量バー背景と同じスタイル
+- レイアウト安定: リセット時もずれない
+
+修正ファイル:
+- training.css (Line 737, 755-761): 背景色・opacity修正
+- trainingController.js (Line 5-11, 56): バージョン更新
+- index.html (Line 16): キャッシュバスター更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

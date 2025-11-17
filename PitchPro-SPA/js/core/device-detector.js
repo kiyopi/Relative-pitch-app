@@ -6,8 +6,8 @@
  * - iPadOS 13+の"Macintosh"偽装対策
  * - デバイス別最適化設定（音量・感度）
  *
- * @version 1.0.0
- * @date 2025-11-09
+ * @version 1.0.1
+ * @date 2025-11-17
  * @dependencies なし
  * @usedBy trainingController.js, preparation-pitchpro-cycle.js
  */
@@ -100,12 +100,12 @@
         getDeviceVolume() {
             const device = this.getDeviceType();
             const volumeSettings = {
-                pc: +8,        // +8dB: デバイス音量50%時に最適化
+                pc: +5,        // +5dB: ブチ音対策で音量削減（+8dBから37.5%削減）
                 iphone: +18,   // +18dB: デバイス音量50%時に最適化
                 ipad: +20,     // +20dB: デバイス音量50%時に最適化（Tone.js推奨上限）
                 android: +18   // +18dB: iPhoneと同等の設定（実機テスト後に調整推奨）
             };
-            return volumeSettings[device] || +8;
+            return volumeSettings[device] || +5;
         },
 
         /**
