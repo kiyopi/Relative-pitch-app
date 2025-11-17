@@ -11290,3 +11290,106 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 18:51:20] コミット: fix(router): init関数の読み込み待機を追加
+
+問題:
+- preparationページで「Init function not found」エラー
+- scriptタグは実行されるが、init関数定義が間に合わない
+
+原因:
+- SPAでinnerHTMLによるscriptタグ実行は非同期
+- setupPageEventsがinit関数の読み込み完了を待たずに実行
+- dependencies待機はあるが、init関数自体の待機がなかった
+
+修正:
+- setupPageEvents()にinit関数の読み込み待機を追加
+- window[config.init]がfunctionになるまで最大5秒待機
+- 既存のdependencies待機と同じパターン
+
+実装詳細:
+- Line 256-262: init関数待機ループ追加
+- 100ms間隔で最大50回（5秒）チェック
+- タイムアウト時はエラーメッセージ表示
+
+これで全ページの初期化が安定します。
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 19:33:19] コミット: docs(router-phase2): 設計分析レポートと完全仕様書v2.0を作成
+
+- PERM-router-phase2-design-problems-analysis-20251117-1700
+  - 10個の設計問題を体系的に分析
+  - Critical: 5件、High: 3件、Medium: 2件
+  - 各問題の詳細な改善策を提案
+  - 優先度マトリクスと工数見積もり（13時間）
+
+- PERM-router-phase2-unified-init-spec-v2-20251117-1715
+  - Phase 2統一初期化システムの完全仕様書v2.0
+  - 5層アーキテクチャ設計
+  - 競合状態防止、中断可能待機、設定ベースクリーンアップ
+  - 実装工数: 12時間（7フェーズ）
+
+- TEMP-router-phase2-redesign-session-20251117-1730
+  - 再設計セッションの作業経緯記録
+  - ユーザー指摘による包括的検証の経緯
+  - 設計の進化プロセス
+
+次期作業: Phase 1から順次実装開始（セーフティネット作成後）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 19:37:54] コミット: refactor(router): Phase 1実装 - 遷移制御メカニズム
+
+競合状態の完全防止機能を実装:
+
+【追加したプロパティ】
+- isNavigating: 遷移中フラグ
+- currentNavigationId: 遷移ID管理
+- navigationAbortController: AbortController
+
+【handleRouteChange()の改善】
+- 遷移中の場合、前の遷移を中断
+- navigationIdで遷移の追跡
+- AbortSignalを全ての非同期処理に渡す
+- 中断検出時の適切なログ出力
+
+【loadPage()の改善】
+- signalパラメータを追加
+- 中断可能な処理フローに対応
+
+【解決した問題】
+- 問題1: 競合状態（Race Condition）による初期化の衝突
+- ユーザーが連続してページ遷移した場合でも安全に処理
+
+テスト: 基本遷移・連続遷移の動作確認が必要
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 19:41:29] コミット: refactor(router): Phase 2実装 - 依存関係管理システム
+
+統一的な待機インターフェースを実装:
+
+【追加したメソッド】
+- waitWithAbort(): 汎用待機ヘルパー（中断対応）
+- waitForGlobalFunction(): 初期化関数の待機
+- waitForDependencies(): 複数依存関係の並列待機（早期失敗検出）
+- waitForDependency(): 単一依存関係の待機（中断対応版）
+
+【改善内容】
+- AbortSignalによる中断可能な待機処理
+- Promise.allSettledで早期失敗検出
+- 失敗した依存関係のみを抽出して詳細エラー表示
+- 統一的なログフォーマット
+
+【解決した問題】
+- 問題6: 依存関係待機の非効率性（1つ失敗しても全て待機）
+- 問題8: ページ遷移中断時のリソースリーク
+
+テスト: 依存関係待機・中断処理の動作確認が必要
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

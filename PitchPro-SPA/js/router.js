@@ -242,18 +242,20 @@ class SimpleRouter {
     }
 
     /**
-     * 統一ページ初期化メソッド（v2.0.0 - 設定ベース実装）
+     * 【Phase 3】統一ページ初期化メソッド（v2.0.0 - 設定ベース実装）
      *
      * 【動作概要】
      * 1. pageConfigsから設定を読み込み
-     * 2. 依存ライブラリの読み込みを待機
-     * 3. グローバル初期化関数を実行
-     * 4. 二重初期化を防止
+     * 2. 依存ライブラリの読み込みを待機（中断対応）
+     * 3. グローバル初期化関数の読み込みを待機（Phase 2ヘルパー使用）
+     * 4. 初期化関数を実行
+     * 5. 二重初期化を防止
      *
      * @param {string} page - ページ識別子
      * @param {string} fullHash - フルハッシュURL
+     * @param {AbortSignal} signal - 中断シグナル
      */
-    async setupPageEvents(page, fullHash) {
+    async setupPageEvents(page, fullHash, signal = null) {
         try {
             // homeページは特別処理（Routerクラスのメソッドを直接使用）
             if (page === 'home') {
@@ -278,52 +280,52 @@ class SimpleRouter {
                 return;
             }
 
-            // 3. 依存関係の待機
+            // 3. 依存関係の待機（Phase 2の新実装を使用）
             if (config.dependencies && config.dependencies.length > 0) {
-                console.log(`⏳ [Router] Waiting for dependencies: ${config.dependencies.join(', ')}`);
-                const dependenciesReady = await this.waitForDependencies(config.dependencies);
-
-                if (!dependenciesReady) {
-                    this.showInitializationError(page, config.dependencies);
-                    this.preventBrowserBack(page);
-                    return;
+                try {
+                    await this.waitForDependencies(config.dependencies, signal);
+                } catch (error) {
+                    // 中断の場合はthrow、それ以外はエラー処理
+                    if (error.message === 'Aborted') {
+                        throw error;
+                    }
+                    throw new Error(`Dependencies failed: ${error.message}`);
                 }
             }
 
-            // 4. グローバル初期化関数の実行
+            // 4. グローバル初期化関数の待機と実行
             if (config.init) {
-                // 4.1. 初期化関数の読み込みを待機（scriptタグの実行完了を待つ）
-                console.log(`⏳ [Router] Waiting for init function: ${config.init}`);
-                let attempts = 0;
-                while (typeof window[config.init] !== 'function' && attempts < 50) {
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    attempts++;
+                // 4.1. 初期化関数の読み込みを待機（Phase 2のヘルパー使用）
+                const success = await this.waitForGlobalFunction(config.init, signal);
+
+                if (!success) {
+                    throw new Error(`Initialization function not found: ${config.init}`);
                 }
 
+                // 4.2. 初期化関数を実行
                 const initFunction = window[config.init];
+                console.log(`🎯 [Router] Initializing page "${page}" with ${config.init}()`);
+                await initFunction(fullHash);
 
-                if (typeof initFunction === 'function') {
-                    console.log(`🎯 [Router] Initializing page "${page}" with ${config.init}()`);
-                    await initFunction(fullHash);
-
-                    // 初期化済みフラグを設定
-                    if (config.preventDoubleInit) {
-                        this.initializedPages.add(page);
-                    }
-                } else {
-                    console.error(`❌ [Router] Init function "${config.init}" not found for page "${page}"`);
+                // 4.3. 初期化済みフラグを設定
+                if (config.preventDoubleInit) {
+                    this.initializedPages.add(page);
                 }
-            } else {
-                // 初期化関数なし（homeページ等）
-                console.log(`ℹ️ [Router] Page "${page}" has no init function`);
             }
 
             // 5. ブラウザバック防止を自動設定
             this.preventBrowserBack(page);
 
         } catch (error) {
+            // 中断エラーはそのままthrow
+            if (error.message === 'Aborted') {
+                console.log(`ℹ️ [Router] Page initialization aborted: ${page}`);
+                throw error;
+            }
+
+            // その他のエラーは処理
             console.error(`❌ [Router] Error initializing page "${page}":`, error);
-            this.showInitializationError(page, config?.dependencies || []);
+            this.showInitializationError(page, error);
             this.preventBrowserBack(page);
         }
     }
