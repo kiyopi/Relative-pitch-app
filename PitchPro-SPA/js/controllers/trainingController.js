@@ -817,6 +817,9 @@ async function startDoremiGuide() {
             await audioDetector.initialize();
             console.log('✅ AudioDetectionComponent初期化完了');
 
+            // グローバルに公開（Router cleanup用）
+            window.audioDetector = audioDetector;
+
             // NavigationManagerに登録（遷移時の自動破棄のため）
             if (window.NavigationManager) {
                 window.NavigationManager.registerAudioDetector(audioDetector);
@@ -849,6 +852,22 @@ async function startDoremiGuide() {
 
     } catch (error) {
         console.error('❌ AudioDetectionComponent初期化失敗:', error);
+
+        // マイクバッジをエラー状態に
+        if (micBadge) {
+            micBadge.classList.remove('measuring');
+        }
+
+        // エラーメッセージ表示
+        alert('マイクの初期化に失敗しました。\n\nマイクの権限を確認してページを再読み込みしてください。');
+        return; // トレーニングを中断
+    }
+
+    // 【重要】audioDetectorが正常に動作しているか確認
+    if (!audioDetector || !window.audioDetector) {
+        console.error('❌ audioDetectorが初期化されていません');
+        alert('音声検出システムの初期化に失敗しました。\n\nページを再読み込みしてください。');
+        return;
     }
 
     // ドレミガイド進行（ユーザーが基音をもとに発声、アプリは音を鳴らさない）
@@ -896,10 +915,17 @@ async function startDoremiGuide() {
 
 // リアルタイム音程更新ハンドラ
 let lastPitchLog = null;
+let lastCallbackLog = null; // コールバック呼び出し確認用
 let pitchDataBuffer = []; // 各ステップの音程データを一時保存
 function handlePitchUpdate(result) {
     // AudioDetectionComponentからのresultは直接PitchProの形式
     // result: { frequency, clarity, volume, note }
+
+    // 【デバッグ】コールバックが呼ばれていることを確認（3秒に1回）
+    if (!lastCallbackLog || Date.now() - lastCallbackLog > 3000) {
+        console.log(`🔔 [DEBUG] handlePitchUpdate called - frequency: ${result.frequency?.toFixed(1) || 'null'}, clarity: ${result.clarity?.toFixed(2) || 'null'}, volume: ${(result.volume * 100).toFixed(1)}%`);
+        lastCallbackLog = Date.now();
+    }
 
     // 音量バーは autoUpdateUI: true により自動更新される
 
