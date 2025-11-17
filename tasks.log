@@ -10964,3 +10964,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 14:11:09] コミット: fix(preparation): 基音視聴ボタンのLucide二重初期化エラー修正
+
+- updateLucideIcon()後のinitializeLucideIcons()呼び出しを削除
+- 二重初期化によるInvalid targetエラーを解消
+- 3箇所の不要な初期化を削除（再生前・再生後・エラー時）
+
+updateLucideIconが既にアイコンを更新するため、追加の初期化は不要
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

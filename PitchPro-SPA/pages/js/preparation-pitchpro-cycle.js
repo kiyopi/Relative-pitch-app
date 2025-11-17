@@ -1937,10 +1937,6 @@ function setupVolumeAdjustmentControls() {
             text.textContent = '基音を試聴';
         }
 
-        // Lucideアイコンを更新
-        if (typeof lucide !== 'undefined') {
-            window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
-        }
         console.log('🔄 基音試聴ボタンの状態をリセット');
 
         // イベントリスナー設定
