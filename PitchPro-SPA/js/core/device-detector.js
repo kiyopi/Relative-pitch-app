@@ -100,12 +100,12 @@
         getDeviceVolume() {
             const device = this.getDeviceType();
             const volumeSettings = {
-                pc: -10,       // -10dB: PC環境での音割れ防止（-6dBデフォルトでも音割れ発生のため）
+                pc: -15,       // -15dB: PC環境での適切な音量（Mac音量50%環境での最適値）
                 iphone: +18,   // +18dB: デバイス音量50%時に最適化
                 ipad: +20,     // +20dB: デバイス音量50%時に最適化（Tone.js推奨上限）
                 android: +18   // +18dB: iPhoneと同等の設定（実機テスト後に調整推奨）
             };
-            return volumeSettings[device] || -10;
+            return volumeSettings[device] || -15;
         },
 
         /**
