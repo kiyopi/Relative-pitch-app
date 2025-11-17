@@ -1997,11 +1997,6 @@ function setupVolumeAdjustmentControls() {
                 window.updateLucideIcon && window.updateLucideIcon(icon, 'loader-2');
                 text.textContent = '再生中...';
 
-                // Lucideアイコンを更新
-                if (typeof lucide !== 'undefined') {
-                    window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
-                }
-
                 // C4 (261.6Hz) を再生
                 console.log('▶️ C4音を再生開始...');
                 await window.pitchShifterInstance.playNote("C4", 1.0);
@@ -2021,12 +2016,7 @@ function setupVolumeAdjustmentControls() {
                         currentText.textContent = originalText;
                     }
 
-                    // Lucideアイコンを更新
-                    if (typeof lucide !== 'undefined') {
-                        window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
-                    }
-
-                    // フォーカスを外す（Lucide再初期化でフォーカスが戻る可能性があるため）
+                    // フォーカスを外す
                     btn.blur();
 
                     // 再生中フラグを下ろす
@@ -2050,9 +2040,6 @@ function setupVolumeAdjustmentControls() {
                 }
                 if (text) {
                     text.textContent = '基音を試聴';
-                }
-                if (typeof lucide !== 'undefined') {
-                    window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
                 }
 
                 // フォーカスを外す

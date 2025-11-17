@@ -10949,3 +10949,18 @@ v4.0.9/v4.0.10/v4.0.13での最適化により不要になったコードを整�
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 14:06:30] コミット: feat(training): ボタンテキスト状態表示の実装 (v4.0.20)
+
+- ボタンテキスト変更: 「基音を再生」→「再生中...」→「準備中...」（連続・12音階のみ）
+- HTMLシンプル化: 複雑なdata-state構造を削除、シンプルなspan要素のみ
+- 最軽量実装: textContentのみ使用、Lucideアイコン更新なし、DOM操作最小限
+- ブチ音対策完了後の安全な実装: PC音量削減（v4.0.18）により可能に
+
+【実装箇所】
+- startTraining(): 「再生中...」に変更
+- handleSessionComplete(): 連続・12音階モードで「準備中...」に変更
+- 自動継続: startTraining()が自動的に「再生中...」に変更
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
