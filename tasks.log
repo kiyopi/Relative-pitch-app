@@ -11072,3 +11072,30 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 16:07:47] コミット: refactor(pages): SPA統一初期化システムに移行 (Phase 2/4)
+
+settings-controller.js:
+- DOMContentLoaded初期化コードを削除
+- window.initSettings公開でRouter統一システムに対応
+
+records.html:
+- onload属性を削除
+- インラインinitRecordsPage()関数を削除
+- window.initRecordsはcontroller側で既に公開済み
+
+results-overview.html:
+- onload属性を削除
+- インラインinitResultsOverviewPage()関数を削除
+- 二重初期化防止機能が有効化（router.js preventDoubleInit: true）
+
+premium-analysis.html:
+- 確認: 既にSPA対応済み、修正不要
+
+これにより全8ページがRouter統一初期化システムに統合完了
+
+Phase 2: 各ページHTML修正完了
+次期: Phase 3で動作テスト実施予定
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
