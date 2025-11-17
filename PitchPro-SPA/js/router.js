@@ -17,6 +17,57 @@ class SimpleRouter {
             'settings': 'pages/settings.html'
         };
 
+        /**
+         * ページ初期化設定レジストリ
+         *
+         * 【新規ページ追加方法】
+         * 1. pageConfigsに設定を追加
+         * 2. コントローラーでwindow.initXXXを公開
+         * 3. 以上で完了（setupPageEventsのswitch-case不要）
+         *
+         * @property {string} init - グローバル初期化関数名
+         * @property {Array<string>} dependencies - 依存ライブラリ（'Chart', 'DistributionChart', 'PitchPro'）
+         * @property {boolean} preventDoubleInit - 二重初期化防止フラグ
+         */
+        this.pageConfigs = {
+            'home': {
+                init: null,
+                dependencies: []
+            },
+            'preparation': {
+                init: 'initializePreparationPitchProCycle',
+                dependencies: ['PitchPro']
+            },
+            'training': {
+                init: 'initializeTrainingPage',
+                dependencies: ['PitchPro']
+            },
+            'result-session': {
+                init: 'initializeResultSessionPage',
+                dependencies: []
+            },
+            'results-overview': {
+                init: 'initResultsOverview',
+                dependencies: ['Chart', 'DistributionChart'],
+                preventDoubleInit: true
+            },
+            'records': {
+                init: 'initRecords',
+                dependencies: ['Chart', 'DistributionChart']
+            },
+            'premium-analysis': {
+                init: 'initPremiumAnalysis',
+                dependencies: ['Chart']
+            },
+            'settings': {
+                init: 'initSettings',
+                dependencies: []
+            }
+        };
+
+        // 初期化済みフラグ管理（二重初期化防止用）
+        this.initializedPages = new Set();
+
         this.appRoot = document.getElementById('app-root');
         this.currentPage = null; // 現在のページを追跡
         this.init();
@@ -151,34 +202,159 @@ class SimpleRouter {
         }
     }
 
+    /**
+     * 統一ページ初期化メソッド（v2.0.0 - 設定ベース実装）
+     *
+     * 【動作概要】
+     * 1. pageConfigsから設定を読み込み
+     * 2. 依存ライブラリの読み込みを待機
+     * 3. グローバル初期化関数を実行
+     * 4. 二重初期化を防止
+     *
+     * @param {string} page - ページ識別子
+     * @param {string} fullHash - フルハッシュURL
+     */
     async setupPageEvents(page, fullHash) {
-        // ページ固有のイベントリスナー設定
-        switch (page) {
-            case 'home':
-                this.setupHomeEvents();
-                break;
-            case 'preparation':
-                await this.setupPreparationEvents(fullHash);
-                break;
-            case 'training':
-                await this.setupTrainingEvents(fullHash);
-                break;
-            case 'result-session':
-                await this.setupResultSessionEvents(fullHash);
-                break;
-            case 'results':
-            case 'results-overview':
-                // HTML側のonloadで初期化されるため、ここでは何もしない
-                break;
-            case 'premium-analysis':
-                this.setupPremiumAnalysisEvents();
-                break;
-            default:
-                break;
+        try {
+            // 1. ページ設定を取得
+            const config = this.pageConfigs[page];
+
+            if (!config) {
+                console.warn(`⚠️ [Router] No config found for page: ${page}`);
+                this.preventBrowserBack(page);
+                return;
+            }
+
+            // 2. 二重初期化チェック
+            if (config.preventDoubleInit && this.initializedPages.has(page)) {
+                console.log(`✅ [Router] Page "${page}" already initialized, skipping`);
+                this.preventBrowserBack(page);
+                return;
+            }
+
+            // 3. 依存関係の待機
+            if (config.dependencies && config.dependencies.length > 0) {
+                console.log(`⏳ [Router] Waiting for dependencies: ${config.dependencies.join(', ')}`);
+                const dependenciesReady = await this.waitForDependencies(config.dependencies);
+
+                if (!dependenciesReady) {
+                    this.showInitializationError(page, config.dependencies);
+                    this.preventBrowserBack(page);
+                    return;
+                }
+            }
+
+            // 4. グローバル初期化関数の実行
+            if (config.init) {
+                const initFunction = window[config.init];
+
+                if (typeof initFunction === 'function') {
+                    console.log(`🎯 [Router] Initializing page "${page}" with ${config.init}()`);
+                    await initFunction(fullHash);
+
+                    // 初期化済みフラグを設定
+                    if (config.preventDoubleInit) {
+                        this.initializedPages.add(page);
+                    }
+                } else {
+                    console.error(`❌ [Router] Init function "${config.init}" not found for page "${page}"`);
+                }
+            } else {
+                // 初期化関数なし（homeページ等）
+                console.log(`ℹ️ [Router] Page "${page}" has no init function`);
+            }
+
+            // 5. ブラウザバック防止を自動設定
+            this.preventBrowserBack(page);
+
+        } catch (error) {
+            console.error(`❌ [Router] Error initializing page "${page}":`, error);
+            this.showInitializationError(page, config?.dependencies || []);
+            this.preventBrowserBack(page);
+        }
+    }
+
+    /**
+     * 複数の依存関係を待機
+     * @param {Array<string>} dependencies - 依存ライブラリ名の配列
+     * @returns {Promise<boolean>} すべて準備完了でtrue、タイムアウトでfalse
+     */
+    async waitForDependencies(dependencies) {
+        const results = await Promise.all(
+            dependencies.map(dep => this.waitForDependency(dep))
+        );
+        return results.every(result => result === true);
+    }
+
+    /**
+     * 単一の依存関係を待機
+     * @param {string} dependency - 依存ライブラリ名
+     * @returns {Promise<boolean>} 準備完了でtrue、タイムアウトでfalse
+     */
+    async waitForDependency(dependency) {
+        const checkFunction = this.getDependencyCheckFunction(dependency);
+        const maxAttempts = 50; // 5秒（100ms × 50回）
+        let attempts = 0;
+
+        while (attempts < maxAttempts) {
+            if (checkFunction()) {
+                console.log(`✅ [Router] Dependency ready: ${dependency}`);
+                return true;
+            }
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
         }
 
-        // ブラウザバック防止を自動設定（グローバル管理）
-        this.preventBrowserBack(page);
+        console.error(`❌ [Router] Dependency timeout: ${dependency}`);
+        return false;
+    }
+
+    /**
+     * 依存関係のチェック関数を取得
+     * @param {string} dependency - 依存ライブラリ名
+     * @returns {Function} チェック関数
+     */
+    getDependencyCheckFunction(dependency) {
+        switch (dependency) {
+            case 'Chart':
+                return () => typeof window.Chart !== 'undefined';
+            case 'DistributionChart':
+                return () => typeof window.DistributionChart !== 'undefined';
+            case 'PitchPro':
+                return () => typeof window.PitchPro !== 'undefined';
+            default:
+                console.warn(`⚠️ [Router] Unknown dependency: ${dependency}`);
+                return () => true; // 未知の依存関係は常にtrueを返す
+        }
+    }
+
+    /**
+     * 初期化エラー表示
+     * @param {string} page - ページ識別子
+     * @param {Array<string>} dependencies - 失敗した依存関係
+     */
+    showInitializationError(page, dependencies) {
+        console.error(`❌ [Router] Failed to initialize page: ${page}`);
+        console.error(`❌ [Router] Missing dependencies: ${dependencies.join(', ')}`);
+
+        // ユーザーへのエラーメッセージ表示（オプション）
+        const appRoot = document.getElementById('app-root');
+        if (appRoot && dependencies.length > 0) {
+            const errorHTML = `
+                <div style="padding: 2rem; text-align: center; color: var(--color-error, #ef4444);">
+                    <h3>ページの読み込みに失敗しました</h3>
+                    <p>必要なライブラリの読み込みに時間がかかっています。</p>
+                    <p>ページを再読み込みしてください。</p>
+                    <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--color-primary, #8b5cf6); color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        再読み込み
+                    </button>
+                </div>
+            `;
+            // 既存コンテンツの下にエラーを追加（既存コンテンツは保持）
+            const errorDiv = document.createElement('div');
+            errorDiv.innerHTML = errorHTML;
+            appRoot.appendChild(errorDiv);
+        }
     }
 
     setupHomeEvents() {
@@ -453,6 +629,14 @@ class SimpleRouter {
                 }
 
                 console.log('✅ Training page cleanup complete');
+            }
+
+            // 【v2.0.0追加】二重初期化防止フラグのリセット
+            // preventDoubleInitが有効なページ（results-overview等）の初期化フラグをクリア
+            const config = this.pageConfigs[this.currentPage];
+            if (config && config.preventDoubleInit && this.initializedPages.has(this.currentPage)) {
+                this.initializedPages.delete(this.currentPage);
+                console.log(`🔄 [Router] Reset initialization flag for: ${this.currentPage}`);
             }
 
         } catch (error) {
