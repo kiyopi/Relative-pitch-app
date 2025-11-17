@@ -11404,3 +11404,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 19:52:58] コミット: feat(router): Phase 4 - クリーンアップ管理実装
+
+- pageConfigsにクリーンアップ関数を追加（preparation, training）
+- cleanupCurrentPage()を設定ベース実装に完全書き換え
+- if文による個別処理を統一的なconfig.cleanup()呼び出しに置換
+- preventDoubleInitフラグのクリーンアップを統合管理
+- コード重複を削減し保守性を大幅に向上
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

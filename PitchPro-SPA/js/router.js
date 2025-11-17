@@ -559,32 +559,75 @@ class SimpleRouter {
     }
 
     /**
-     * 初期化エラー表示
+     * 【Phase 5】初期化エラー表示（エラー分類対応）
+     *
      * @param {string} page - ページ識別子
-     * @param {Array<string>} dependencies - 失敗した依存関係
+     * @param {Error|string} error - エラーオブジェクトまたはエラーメッセージ
      */
-    showInitializationError(page, dependencies) {
+    showInitializationError(page, error) {
         console.error(`❌ [Router] Failed to initialize page: ${page}`);
-        console.error(`❌ [Router] Missing dependencies: ${dependencies.join(', ')}`);
+        console.error(`❌ [Router] Error details:`, error);
 
-        // ユーザーへのエラーメッセージ表示（オプション）
+        // エラーメッセージを分類
+        let errorType = 'unknown';
+        let errorMessage = '';
+        let technicalDetails = '';
+
+        if (error instanceof Error) {
+            if (error.message.includes('Dependencies failed')) {
+                errorType = 'dependencies';
+                const match = error.message.match(/Dependencies failed: (.+)/);
+                errorMessage = match ? match[1] : error.message;
+                technicalDetails = '必要なライブラリの読み込みに失敗しました';
+            } else if (error.message.includes('Initialization function not found')) {
+                errorType = 'init_function';
+                const match = error.message.match(/Initialization function not found: (.+)/);
+                const functionName = match ? match[1] : '不明';
+                errorMessage = functionName;
+                technicalDetails = `初期化関数 ${functionName}() が見つかりませんでした`;
+            } else {
+                errorType = 'general';
+                errorMessage = error.message;
+                technicalDetails = 'ページの初期化中にエラーが発生しました';
+            }
+        } else if (typeof error === 'string') {
+            errorMessage = error;
+            technicalDetails = 'ページの初期化中にエラーが発生しました';
+        }
+
+        // ユーザー向けエラーUI表示
         const appRoot = document.getElementById('app-root');
-        if (appRoot && dependencies.length > 0) {
+        if (appRoot) {
             const errorHTML = `
-                <div style="padding: 2rem; text-align: center; color: var(--color-error, #ef4444);">
-                    <h3>ページの読み込みに失敗しました</h3>
-                    <p>必要なライブラリの読み込みに時間がかかっています。</p>
-                    <p>ページを再読み込みしてください。</p>
-                    <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--color-primary, #8b5cf6); color: white; border: none; border-radius: 4px; cursor: pointer;">
-                        再読み込み
-                    </button>
+                <div style="padding: 2rem; max-width: 600px; margin: 2rem auto; text-align: center;">
+                    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 2rem;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+                        <h3 style="color: var(--color-error, #ef4444); margin-bottom: 1rem;">ページの読み込みに失敗しました</h3>
+                        <p style="color: var(--color-text-secondary, #9ca3af); margin-bottom: 1rem;">${technicalDetails}</p>
+                        ${errorMessage ? `<p style="color: var(--color-text-muted, #6b7280); font-size: 0.875rem; margin-bottom: 1.5rem;">エラー詳細: ${errorMessage}</p>` : ''}
+                        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                            <button onclick="window.router.navigateToHome()" style="padding: 0.75rem 1.5rem; background: var(--color-primary, #8b5cf6); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                                ホームに戻る
+                            </button>
+                            <button onclick="location.reload()" style="padding: 0.75rem 1.5rem; background: transparent; color: var(--color-primary, #8b5cf6); border: 2px solid var(--color-primary, #8b5cf6); border-radius: 6px; cursor: pointer; font-weight: 500;">
+                                ページを再読み込み
+                            </button>
+                        </div>
+                    </div>
                 </div>
             `;
-            // 既存コンテンツの下にエラーを追加（既存コンテンツは保持）
-            const errorDiv = document.createElement('div');
-            errorDiv.innerHTML = errorHTML;
-            appRoot.appendChild(errorDiv);
+
+            // 既存コンテンツをクリアしてエラーを表示
+            appRoot.innerHTML = errorHTML;
         }
+    }
+
+    /**
+     * 【Phase 5】ホームに戻るナビゲーション
+     */
+    navigateToHome() {
+        console.log('🏠 [Router] Navigating to home...');
+        window.location.hash = 'home';
     }
 
     setupHomeEvents() {
