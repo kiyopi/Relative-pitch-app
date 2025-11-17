@@ -68,6 +68,11 @@ class SimpleRouter {
         // 初期化済みフラグ管理（二重初期化防止用）
         this.initializedPages = new Set();
 
+        // 【Phase 1追加】遷移制御フラグ（競合状態防止）
+        this.isNavigating = false;
+        this.currentNavigationId = 0;
+        this.navigationAbortController = null;
+
         this.appRoot = document.getElementById('app-root');
         this.currentPage = null; // 現在のページを追跡
         this.init();
@@ -98,33 +103,67 @@ class SimpleRouter {
     async handleRouteChange() {
         // URLハッシュから現在のページを取得
         const hash = window.location.hash.substring(1) || 'home';
-
-        // クエリパラメータを分離してページ名のみを取得
         const page = hash.split('?')[0];
-        console.log('🔍 [Debug Router] handleRouteChange called');
-        console.log('🔍 [Debug Router] hash:', hash);
-        console.log('🔍 [Debug Router] page:', page);
-        console.log('Route changed to:', hash);
-        console.log('Page name:', page);
+
+        console.log(`📍 [Router] Route change requested: ${hash}`);
+
+        // 【Phase 1】既に遷移中の場合は前の遷移を中断
+        if (this.isNavigating) {
+            console.warn(`⚠️ [Router] Navigation in progress, aborting previous navigation`);
+            if (this.navigationAbortController) {
+                this.navigationAbortController.abort();
+            }
+        }
+
+        // 【Phase 1】新しい遷移を開始
+        this.isNavigating = true;
+        this.currentNavigationId++;
+        const navigationId = this.currentNavigationId;
+        this.navigationAbortController = new AbortController();
+        const signal = this.navigationAbortController.signal;
+
+        console.log(`🚀 [Router] Starting navigation ${navigationId} to: ${page}`);
 
         try {
-            // 現在のページのクリーンアップ
+            // クリーンアップ
             await this.cleanupCurrentPage();
 
-            await this.loadPage(page, hash);
+            // 【Phase 1】中断されていないか確認
+            if (navigationId !== this.currentNavigationId) {
+                console.log(`ℹ️ [Router] Navigation ${navigationId} was superseded`);
+                return;
+            }
+
+            // ページロード（signalを渡す）
+            await this.loadPage(page, hash, signal);
+
+            console.log(`✅ [Router] Navigation ${navigationId} completed successfully`);
+
         } catch (error) {
-            console.error('Route loading error:', error);
-            // エラー時はホームページを表示
-            await this.loadPage('home');
+            if (error.name === 'AbortError' || error.message === 'Aborted') {
+                console.log(`ℹ️ [Router] Navigation ${navigationId} was aborted`);
+            } else {
+                console.error(`❌ [Router] Navigation ${navigationId} failed:`, error);
+
+                // エラー時はホームページにフォールバック
+                try {
+                    await this.loadPage('home', '', signal);
+                } catch (fallbackError) {
+                    console.error(`❌ [Router] Fallback to home failed:`, fallbackError);
+                }
+            }
+        } finally {
+            // 【Phase 1】遷移完了フラグをリセット
+            this.isNavigating = false;
         }
     }
 
-    async loadPage(page, fullHash = '') {
+    async loadPage(page, fullHash = '', signal = null) {
         const templatePath = this.routes[page];
 
         if (!templatePath) {
             console.warn(`Route not found: ${page}, loading home`);
-            await this.loadPage('home');
+            await this.loadPage('home', '', signal);
             return;
         }
 
@@ -188,13 +227,13 @@ class SimpleRouter {
                 console.warn('⚠️ [Router] initializeLucideIcons function not found');
             }
 
-            // 6. ページ固有のイベントリスナーを設定
-            await this.setupPageEvents(page, fullHash);
+            // 6. ページ固有のイベントリスナーを設定（signalを渡す）
+            await this.setupPageEvents(page, fullHash, signal);
 
             // 7. 現在のページを更新
             this.currentPage = page;
 
-            console.log(`Page loaded: ${page}`);
+            console.log(`✅ [Router] Page loaded: ${page}`);
 
         } catch (error) {
             console.error(`Error loading page ${page}:`, error);
