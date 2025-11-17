@@ -426,8 +426,8 @@ class SimpleRouter {
             }
 
             // DeviceDetectorから音量設定を取得（統一設定）
-            const deviceVolume = window.DeviceDetector?.getDeviceVolume() || -6;
-            const deviceType = window.DeviceDetector?.getDeviceType() || 'pc';
+            const deviceVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
+            const deviceType = window.DeviceDetector?.getDeviceType() ?? 'pc';
             console.log(`🔊 PitchShifter音量: ${deviceVolume}dB (デバイス: ${deviceType}, DeviceDetector統一設定)`);
 
             // 新規作成

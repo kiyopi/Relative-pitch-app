@@ -749,8 +749,8 @@ class PitchProCycleManager {
             }
 
             // DeviceDetectorから音量設定を取得（統一設定）
-            const deviceVolume = window.DeviceDetector?.getDeviceVolume() || -6;
-            const deviceType = window.DeviceDetector?.getDeviceType() || 'pc';
+            const deviceVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
+            const deviceType = window.DeviceDetector?.getDeviceType() ?? 'pc';
             console.log(`🔊 PitchShifter音量: ${deviceVolume}dB (デバイス: ${deviceType}, DeviceDetector統一設定)`);
 
             // 新規作成または再作成
@@ -1987,7 +1987,7 @@ function setupVolumeAdjustmentControls() {
                 // 0% = baseVolume - 30dB
 
                 // DeviceDetectorから基準音量を取得（統一設定）
-                const baseVolume = window.DeviceDetector?.getDeviceVolume() || -6;
+                const baseVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
 
                 // パーセンテージに応じて音量を調整（50%が基準）
                 const volumeOffset = (volumePercent - 50) * 0.6; // 50%差で±30dB
