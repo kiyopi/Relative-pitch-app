@@ -799,9 +799,15 @@ async function startDoremiGuide() {
 
     // AudioDetectionComponent初期化または再開
     try {
-        if (!audioDetector) {
-            // 初回セッション: 新規作成
-            console.log('🎤 AudioDetectionComponent初期化中...');
+        // 【重要】グローバル参照もチェックして、破棄済みの場合は新規作成
+        // NavigationManagerやRouter cleanupでwindow.audioDetectorがnullになっている場合
+        if (!audioDetector || !window.audioDetector) {
+            // 新規作成（初回セッション or 前回破棄済み）
+            if (!audioDetector) {
+                console.log('🎤 AudioDetectionComponent初期化中（初回セッション）...');
+            } else {
+                console.log('🎤 AudioDetectionComponent再作成中（前回破棄済み）...');
+            }
 
             // 統一設定モジュールを使用（倍音補正・周波数範囲を統一管理）
             audioDetector = new window.PitchPro.AudioDetectionComponent(
@@ -842,8 +848,8 @@ async function startDoremiGuide() {
             });
             console.log('✅ UIキャッシュ再構築完了');
         } else {
-            // 2回目以降: 既存のAudioDetectorを再開
-            console.log('🎤 既存のAudioDetectorを再開');
+            // 2回目以降: 既存のAudioDetectorを再開（同一セッション内の再開始）
+            console.log('🎤 既存のAudioDetectorを再開（同一セッション内）');
         }
 
         // 音声検出開始（初回も2回目以降も実行）

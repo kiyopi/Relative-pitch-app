@@ -59,10 +59,18 @@ class SimpleRouter {
                 cleanup: async () => {
                     console.log('🧹 [Router] Cleaning up training page...');
 
-                    // 音声検出停止
+                    // 音声検出停止（NavigationManagerが既に実行している場合はスキップ）
+                    // ⚠️ 重要: training → result-session遷移はNavigationManagerが管理
+                    // training → home等の遷移はRouterが管理
                     if (window.audioDetector) {
                         console.log('🛑 [Router] Stopping AudioDetector...');
-                        window.audioDetector.stopDetection();
+                        try {
+                            window.audioDetector.stopDetection();
+                        } catch (error) {
+                            console.warn('⚠️ [Router] AudioDetector already stopped:', error);
+                        }
+                        // 参照をクリア（NavigationManagerが破棄済みの可能性があるため）
+                        window.audioDetector = null;
                     }
 
                     // マイクストリーム明示的解放
