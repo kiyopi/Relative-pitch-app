@@ -11189,3 +11189,19 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 18:26:48] コミット: fix(cache): ブラウザキャッシュ問題修正 - キャッシュバスター値更新
+
+- router.js内training.htmlキャッシュバスター: v20251116002 → v20251117001
+- index.html内router.jsキャッシュバスター: v20251110002 → v20251117001
+- 修正したtraining.htmlのscriptタグが正しく読み込まれるように対応
+
+問題:
+- training.htmlにscriptタグを追加したが、古いキャッシュが読み込まれていた
+- initializeTrainingPageが見つからないエラーが継続
+
+解決:
+- キャッシュバスター値を更新し、ブラウザに最新ファイルを読み込ませる
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
