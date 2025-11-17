@@ -446,38 +446,18 @@ class NavigationManager {
         // 現在のページを取得
         const currentPage = window.location.hash.split('?')[0].substring(1);
 
-        // 1. 【改善v4.0.0】AudioDetector管理 - トレーニングフロー内では保持
-        //    → トレーニングフロー内: stopDetection()のみ実行してMediaStream保持
+        // 1. 【改善v4.0.1】AudioDetector管理 - トレーニングフロー内では完全保持
+        //    → トレーニングフロー内: 何もしない（各ページControllerが管理）
         //    → トレーニングフロー外: destroy()を実行してMediaStream完全解放
         if (this.currentAudioDetector) {
             const isTraining = this.isTrainingFlow(currentPage, page);
 
             if (isTraining) {
-                // トレーニングフロー内の遷移: MediaStream保持
-                console.log('🔄 [NavigationManager] トレーニングフロー内遷移: MediaStream保持');
+                // トレーニングフロー内の遷移: AudioDetectorをそのまま保持
+                // 音声検出の開始/停止は各ページのControllerが管理
+                console.log('🔄 [NavigationManager] トレーニングフロー内遷移: AudioDetector保持');
+                console.log('📝 [NavigationManager] 音声検出管理は各ページControllerに委譲');
 
-                // AudioDetectorの状態を検証
-                const verification = this.verifyAudioDetectorState(this.currentAudioDetector);
-                console.log('🔍 [NavigationManager] AudioDetector状態:', verification);
-
-                if (verification.canReuse) {
-                    // 健全な状態: 音声検出のみ停止（MediaStream保持）
-                    try {
-                        this.currentAudioDetector.stopDetection();
-                        console.log('⏸️ [NavigationManager] 音声検出停止 - MediaStream保持');
-                    } catch (error) {
-                        console.warn('⚠️ [NavigationManager] stopDetection()エラー:', error);
-                    }
-                } else {
-                    // 異常状態: 破棄して次ページで再作成
-                    console.warn(`⚠️ [NavigationManager] AudioDetector異常検出: ${verification.reason}`);
-                    this._destroyAudioDetector(this.currentAudioDetector);
-                    this.currentAudioDetector = null;
-                    // globalAudioDetectorもクリア
-                    if (window.globalAudioDetector) {
-                        window.globalAudioDetector = null;
-                    }
-                }
             } else {
                 // トレーニングフロー外の遷移: MediaStream完全解放
                 console.log('🧹 [NavigationManager] トレーニングフロー外遷移: MediaStream破棄');
