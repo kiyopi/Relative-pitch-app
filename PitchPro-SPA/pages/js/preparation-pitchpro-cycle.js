@@ -490,12 +490,23 @@ class PitchProCycleManager {
     async showDetectionSuccess() {
         console.log('🎉 showDetectionSuccess実行開始');
 
-        // 【v4.0.3改善】AudioDetectorは継続してtrainingに引き継ぐ
-        // UIのみリセットし、MediaStreamは保持（trainingページで再利用）
+        // 【v4.0.4改善】AudioDetectorは継続してtrainingに引き継ぐ
+        // UIリセット + マイクミュートでMediaStream保持しつつ処理最小化
         if (this.audioDetector) {
             this.audioDetector.resetDisplayElements(); // PitchPro標準メソッドでUIリセット
             this.state.detectionActive = false; // 内部状態のみ更新
             console.log('🔄 UI要素リセット完了（AudioDetectorはtrainingに引き継ぎ）');
+
+            // 【v4.0.4追加】マイクをミュートして不要な音声処理を停止
+            // MediaStreamは保持されるが、入力が無効化されるため処理が最小化される
+            if (this.audioDetector.microphoneController) {
+                try {
+                    this.audioDetector.microphoneController.mute();
+                    console.log('🔇 マイクをミュート（MediaStream保持、処理最小化）');
+                } catch (error) {
+                    console.warn('⚠️ マイクミュートエラー（無視して続行）:', error);
+                }
+            }
         }
 
         // 🎵 UI状態更新：voice-instruction成功状態に変更

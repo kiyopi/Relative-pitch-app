@@ -923,6 +923,17 @@ async function startDoremiGuide() {
             });
         }
 
+        // 【v4.0.4追加】preparationでミュートされたマイクを再有効化
+        // preparationページ完了時にmute()されているため、ここでunmute()が必要
+        if (audioDetector.microphoneController && reusedSource) {
+            try {
+                audioDetector.microphoneController.unmute();
+                console.log('🔊 マイクのミュート解除（preparationから引き継ぎ）');
+            } catch (error) {
+                console.warn('⚠️ マイクアンミュートエラー（無視して続行）:', error);
+            }
+        }
+
         // 音声検出開始（初回も2回目以降も実行）
         await audioDetector.startDetection();
         console.log('✅ マイクオン完了 - 音声検出開始');
