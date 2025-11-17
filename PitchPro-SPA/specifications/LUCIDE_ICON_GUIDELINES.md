@@ -362,6 +362,186 @@ if (config.customSvg && grade === 'S') {
 
 ---
 
+## 🔧 統合初期化システム（2025-11-17追加）
+
+### lucide-init.js v2.0.1の実装
+
+#### 概要
+全ページで使用する統一されたLucideアイコン初期化・更新システム。Safari互換性対応とSVGElement型認識を完全実装。
+
+#### コアヘルパー関数
+
+**resolveTargetElement関数**:
+```javascript
+/**
+ * セレクター文字列またはDOM要素からターゲット要素を解決
+ * HTMLElementとSVGElementの両方に対応
+ */
+function resolveTargetElement(target) {
+    if (typeof target === 'string') {
+        return document.querySelector(target);
+    } else if (target instanceof Element) {
+        // Element型（HTMLElement・SVGElement両方に対応）
+        return target;
+    } else {
+        console.error('❌ [LUCIDE] Invalid target type:', target);
+        return null;
+    }
+}
+```
+
+#### 重要な設計原則
+
+**型チェックの統一**:
+- `instanceof HTMLElement` ❌ - SVGElementを認識しない
+- `instanceof Element` ✅ - HTMLElement・SVGElement両方に対応
+
+**理由**:
+```
+Element (基底クラス)
+├── HTMLElement (HTML要素)
+└── SVGElement (SVG要素) ← HTMLElementを継承していない
+```
+
+Lucide初期化後、`<i data-lucide="...">` は `<svg>` に変換される。`querySelector('svg')` は `SVGElement` を返すため、`instanceof Element` が必須。
+
+#### 初期化パターン
+
+**パターン1: innerHTML使用時**
+```javascript
+// innerHTML でアイコンを挿入
+btn.innerHTML = '<i data-lucide="mic"></i><span>マイク許可</span>';
+
+// 必須: 初期化を呼び出す
+window.initializeLucideIcons({ immediate: true });
+```
+
+**パターン2: updateLucideIcon使用時**
+```javascript
+// ✅ これだけで完結（初期化は内部で自動実行）
+window.updateLucideIcon(icon, 'volume-2');
+
+// ❌ 二重初期化エラー（不要な呼び出し）
+window.initializeLucideIcons({ immediate: true });
+```
+
+#### よくある二重初期化エラー
+
+**症状**:
+```
+❌ [LUCIDE-UPDATE] Invalid target: <svg>...</svg><svg>...</svg>
+```
+
+**原因**:
+```javascript
+// ❌ 間違ったパターン
+window.updateLucideIcon && window.updateLucideIcon(icon, 'volume-2');
+if (typeof lucide !== 'undefined') {
+    window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
+}
+```
+
+**解決**:
+```javascript
+// ✅ 正しいパターン
+window.updateLucideIcon && window.updateLucideIcon(icon, 'volume-2');
+// updateLucideIconが内部で初期化するため、追加呼び出し不要
+```
+
+#### 使用方法
+
+**基本的な初期化**:
+```javascript
+// ページ読み込み・遷移時（DOM準備を待つ）
+window.initializeLucideIcons();
+
+// メニュー切り替え等（即座に実行）
+window.initializeLucideIcons({ immediate: true });
+
+// デバッグモード（詳細ログ出力）
+window.initializeLucideIcons({ debug: true });
+```
+
+**アイコン動的更新**:
+```javascript
+// セレクター文字列で指定
+window.updateLucideIcon('#my-icon', 'volume-2');
+
+// DOM要素を直接渡す（SVGElementにも対応）
+const icon = document.querySelector('svg');
+window.updateLucideIcon(icon, 'volume-2');
+
+// 属性カスタマイズ
+window.updateLucideIcon('#my-icon', 'volume-2', {
+    className: 'text-blue-300',
+    strokeWidth: '2',
+    width: '24px',
+    height: '24px'
+});
+```
+
+#### トラブルシューティング
+
+**エラー1: SVGElement型認識失敗**
+```
+❌ [LUCIDE-UPDATE] Invalid target: <svg>...</svg>
+```
+**対処**: `instanceof Element` を使用（HTMLElementではなく）
+
+**エラー2: 二重初期化**
+```
+❌ [LUCIDE-UPDATE] Invalid target: <svg>...</svg><svg>...</svg>
+```
+**対処**: `updateLucideIcon` 後の `initializeLucideIcons` 呼び出しを削除
+
+**エラー3: Safari互換性エラー**
+```
+TypeError: Right side of assignment cannot be destructured
+```
+**対処**: Lucideバージョンを `@latest` → `@0.263.0` に変更
+
+---
+
+## 🎵 アイコン名の統一規則（2025-11-17追加）
+
+### 基音再生ボタンのアイコン統一
+
+#### 変更履歴
+- **準備ページ**: `volume-2`（基音を試聴）
+- **トレーニングページ**: `play-circle` → `volume-2`（基音を再生）に統一
+
+#### 統一理由
+1. 準備ページとトレーニングページの視覚的一貫性
+2. 「音を出す」という機能の明確な表現
+3. ユーザー体験の向上
+
+#### 実装
+```html
+<!-- 準備ページ: 基音を試聴 -->
+<button class="base-note-button" id="test-base-note-btn">
+    <i data-lucide="volume-2" style="width: 24px; height: 24px;"></i>
+    <span>基音を試聴</span>
+</button>
+
+<!-- トレーニングページ: 基音を再生 -->
+<button class="btn btn-primary" id="play-base-note">
+    <i data-lucide="volume-2" style="width: 20px; height: 20px;"></i>
+    <span>基音を再生</span>
+</button>
+```
+
+#### よく使うアイコンの用途別推奨
+
+| アイコン名 | 用途 | サイズ | 使用箇所 |
+|---|---|---|---|
+| `volume-2` | 音再生・基音 | 20-24px | 準備・トレーニングページ |
+| `mic` | マイク関連 | 20px | マイク許可ボタン |
+| `music-2` | 音楽・トレーニング | 48px | セクションヘッダー |
+| `play-circle` | 一般的な再生 | 32px | 汎用再生ボタン |
+| `chevron-left/right` | ナビゲーション | 24px | 前へ/次へボタン |
+
+---
+
 ## ⚠️ 最重要事項
 
 **UIカタログに記載されている実装が絶対的な基準です。**
@@ -374,3 +554,5 @@ if (config.customSvg && grade === 'S') {
 - 2025-08-23: 初版作成（UIカタログ準拠の重要性を明記）
 - 2025-10-24: バージョン管理セクション追加（Safari互換性・アイコン名非互換性対応）
 - 2025-11-06: カスタムSVGアイコン仕様追加（S級crown最新デザイン実装）
+- 2025-11-17: 統合初期化システム追加（lucide-init.js v2.0.1・型チェック統一・二重初期化対策）
+- 2025-11-17: アイコン名統一規則追加（基音再生ボタンvolume-2統一）

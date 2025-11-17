@@ -10999,3 +10999,20 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 14:21:43] コミット: fix(lucide): updateLucideIconでSVG要素を正しく認識するよう修正
+
+- instanceof HTMLElement → instanceof Element に変更
+- SVGElement（Lucide変換後のアイコン）を正しく処理可能に
+- Invalid target エラーを完全解消
+
+【問題】
+- updateLucideIconがSVG要素を受け取るとエラー
+- HTMLElementはSVGElementを継承していない
+- ❌ [LUCIDE-UPDATE] Invalid target: <svg>...</svg>
+
+【解決】
+- Element型チェックでHTMLElement・SVGElement両方に対応
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

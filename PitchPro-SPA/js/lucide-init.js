@@ -2,7 +2,7 @@
  * Lucideアイコン統合初期化・更新モジュール
  * 全ページで使用する統一初期化関数・動的更新関数
  *
- * @version 2.0.0
+ * @version 2.0.1
  *
  * 使用方法:
  * - ページ読み込み・遷移: window.initializeLucideIcons()
@@ -105,10 +105,31 @@ window.initializeLucideIcons = function(options = {}) {
 };
 
 /**
+ * セレクター文字列またはDOM要素からターゲット要素を解決
+ * HTMLElementとSVGElementの両方に対応
+ *
+ * @param {string|Element} target - セレクター文字列またはDOM要素
+ * @returns {Element|null} 解決された要素、エラー時はnull
+ */
+function resolveTargetElement(target) {
+    if (typeof target === 'string') {
+        // 文字列の場合はセレクターとして処理
+        return document.querySelector(target);
+    } else if (target instanceof Element) {
+        // Element型（HTMLElement・SVGElement両方に対応）
+        return target;
+    } else {
+        // 無効な型
+        console.error('❌ [LUCIDE] Invalid target type:', target);
+        return null;
+    }
+}
+
+/**
  * Lucideアイコンを動的に更新する関数
  * Lucide初期化後にi要素がsvgに置き換わっている場合にも対応
  *
- * @param {string|HTMLElement} target - セレクター文字列またはDOM要素
+ * @param {string|Element} target - セレクター文字列またはDOM要素
  * @param {string} iconName - 新しいアイコン名（例: 'zap', 'shuffle', 'music'）
  * @param {Object} attributes - アイコン属性（オプション）
  * @param {string} attributes.className - CSSクラス（デフォルト: 'text-white'）
@@ -127,17 +148,8 @@ window.updateLucideIcon = function(target, iconName, attributes = {}) {
     };
     const attrs = { ...defaultAttrs, ...attributes };
 
-    // ターゲット要素を取得
-    let container;
-    if (typeof target === 'string') {
-        container = document.querySelector(target);
-    } else if (target instanceof Element) {
-        // Element型をチェック（HTMLElement, SVGElement両方に対応）
-        container = target;
-    } else {
-        console.error('❌ [LUCIDE-UPDATE] Invalid target:', target);
-        return false;
-    }
+    // ヘルパー関数で型チェックを統一処理
+    const container = resolveTargetElement(target);
 
     if (!container) {
         console.error('❌ [LUCIDE-UPDATE] Target element not found:', target);

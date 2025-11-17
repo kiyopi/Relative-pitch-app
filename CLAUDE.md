@@ -37,6 +37,110 @@
 - **最新実装**: PitchPro v1.3.3/v1.3.4統合完了、Phase 1-2完全実装完了
 - **次期タスク**: Phase 5（UI・マーケティング調整）またはPhase 3（分析機能統合）
 
+---
+
+## 🎯 **2025-11-17 重要更新: 統一ページ初期化システム設計**
+
+### **背景と問題**
+総合評価ページ（results-overview）でトレーニング完了後の自動表示時に、Lucideアイコン・Chart.jsグラフが表示されない不安定な問題が発生。調査の結果、4種類の初期化パターンが混在していることが判明。
+
+### **調査結果**
+
+| 初期化パターン | 対象ページ | 問題 |
+|---|---|---|
+| **A: Router管理** ✅ | home, preparation, training, result-session | 正しいSPA対応 |
+| **B: onload属性** ❌ | results-overview, records | innerHTML不安定 |
+| **C: DOMContentLoaded** ❌ | settings | SPA遷移時に発火しない |
+| **D: setTimeout** ⚠️ | premium-analysis | 環境依存・遅いデバイスで失敗 |
+
+### **影響範囲確認結果（すべて安全）**
+- ✅ NavigationManager: 影響なし（独立したシングルトン）
+- ✅ マイク管理: 影響なし（修正対象ページで未使用）
+- ✅ リロード・ダイレクトアクセス: すべて安定動作保証
+- ✅ グローバルマネージャー: すべて影響なし
+- ✅ コアシステム: すべて影響なし
+
+### **採用アプローチ: アプローチA「軽量統一パターン」**
+
+**核心的アイデア**: router.jsに設定ベースの統一初期化システムを構築
+
+```javascript
+// 設定レジストリで全ページを管理
+this.pageConfigs = {
+    'results-overview': {
+        init: 'initResultsOverview',
+        dependencies: ['Chart', 'DistributionChart'],
+        preventDoubleInit: true
+    }
+    // 全8ページを統一的に定義
+};
+
+// 統一的な初期化フロー
+async setupPageEvents(page) {
+    // 1. 設定取得 → 2. 依存関係待機 → 3. 初期化実行
+}
+```
+
+### **実装計画（推定8-10時間）**
+
+#### **ブランチ戦略**
+```
+feature/modular-spa-architecture（現在のブランチ）
+  ↓ 調査成果をコミット
+  ↓ 新ブランチ作成
+refactor/unified-page-initialization
+  ↓ フェーズ1-4実装
+  ↓ PR作成
+feature/modular-spa-architecture へマージ
+```
+
+#### **フェーズ1: router.js基盤構築（2-3時間）**
+- pageConfigs設定レジストリ追加（全8ページ定義）
+- 統一setupPageEvents()メソッド実装
+- 依存関係待機ヘルパー実装（waitForDependencies等）
+- 二重初期化防止機能追加
+- cleanupCurrentPageに初期化フラグリセット追加
+
+#### **フェーズ2: コントローラー統一化（3-4時間）**
+- **settings** (10分): DOMContentLoaded削除、window.initSettings公開
+- **records** (15分): HTML onload削除、依存関係管理に移行
+- **results-overview** (20分): HTML onload削除、二重初期化防止活用
+- **premium-analysis** (15分): setTimeout削除、依存関係チェックに移行
+- **その他** (15分): 既存の正しいページを確認
+
+#### **フェーズ3: テスト・検証（2時間）**
+- 全8ページでSPA遷移・リロード・ダイレクトアクセステスト
+- 依存関係待機機能テスト
+- 二重初期化防止テスト
+
+#### **フェーズ4: ドキュメント化（1時間）**
+- `ROUTER_PAGE_INITIALIZATION_GUIDE.md` 作成
+- 新規ページ追加方法（3ステップ）
+- トラブルシューティングガイド
+
+### **長期的メリット**
+
+1. **新規ページ追加が劇的に簡単**: pageConfigsに1エントリ追加 + コントローラーでwindow.initXXX公開するだけ
+2. **デバッグが容易**: 統一ログフォーマットで問題特定が簡単
+3. **エラーハンドリング統一**: すべてのページで同じエラー処理
+4. **依存関係の可視化**: 設定を見るだけで依存ライブラリが明確
+5. **保守性向上**: コード重複を排除、一箇所で全体管理
+
+### **関連ドキュメント**
+- **Serenaメモリ**: `PERM-unified-page-initialization-design-20251117-1540`
+- **調査レポート**: `/PitchPro-SPA/specifications/SPA_INITIALIZATION_ANALYSIS_REPORT.md`
+- **歴史的背景**: `/PitchPro-SPA/specifications/SPA_INITIALIZATION_HISTORY_ANALYSIS.md`
+- **包括的解決策**: `/PitchPro-SPA/specifications/SPA_INITIALIZATION_COMPREHENSIVE_SOLUTION.md`
+
+### **重要な設計思想**
+- すべてのページ初期化はrouter.jsの統一システムで管理
+- 設定ベースで宣言的に定義
+- 依存関係は明示的に待機
+- 二重初期化は自動防止
+- エラーは統一的にハンドリング
+
+---
+
 ### ⚠️ **注意すべきこと（最重要）**
 1. **🚨 インライン記述禁止**: HTMLのstyle属性、JavaScriptでのインラインCSS絶対禁止（例外: Lucideアイコンサイズ、プログレスバー幅のみ）
 2. **📋 作業開始前必須チェック**: UIカタログ→base.css→類似実装の順で確認（新規CSS作成前）
