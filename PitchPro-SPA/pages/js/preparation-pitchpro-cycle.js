@@ -3,6 +3,10 @@
 
 // Lucide初期化はDOMContentLoadedイベント内で実行（HTMLが読み込まれた後）
 
+// ===== グローバル変数 =====
+let micPermissionListenerAdded = false; // マイク許可ボタンのイベントリスナー重複防止フラグ
+let isPlayingBaseNote = false; // 基音再生中フラグ（連続クリック防止）
+
 // ===== PitchProサイクル管理システム =====
 
 /**
@@ -961,8 +965,6 @@ if (typeof document !== 'undefined') {
  * マイク許可フローセットアップ
  * PitchProサイクル: 初期化 → スタート の流れ
  */
-let micPermissionListenerAdded = false; // イベントリスナー重複防止フラグ
-
 function setupMicPermissionFlow() {
     console.log('🔧 setupMicPermissionFlow開始');
     const requestMicBtn = document.getElementById('request-mic-btn');
@@ -1858,8 +1860,6 @@ function updateMicButtonState(state) {
 /**
  * 音量調整コントロール設定
  */
-let isPlayingBaseNote = false; // 基音再生中フラグ（連続クリック防止）
-
 function setupVolumeAdjustmentControls() {
     console.log('🔊 音量調整コントロール設定開始');
 

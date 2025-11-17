@@ -224,6 +224,11 @@ export async function initializeTrainingPage() {
         currentMode = 'random';
     }
 
+    // 【v4.0.6追加】SPA環境でのグローバル変数リセット
+    // 前回のトレーニングセッションのlessonIdが残っている場合があるため、必ずnullにリセット
+    currentLessonId = null;
+    console.log('🔄 currentLessonIdをリセット（SPA環境対策）');
+
     // 音階方向の設定
     // まずURLパラメータをチェック、なければsessionStorageから取得
     const scaleDirectionFromStorage = sessionStorage.getItem('trainingDirection');

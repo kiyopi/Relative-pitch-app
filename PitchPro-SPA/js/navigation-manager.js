@@ -364,21 +364,46 @@ class NavigationManager {
                 };
             }
 
-            // 4. MediaStream 健全性チェック
+            // 4. MediaStream 健全性チェック（v4.0.7改善: mute状態を考慮）
             const health = audioDetector.microphoneController?.checkHealth();
+            const isMuted = audioDetector.microphoneController?.isMuted();
 
-            if (!health || !health.isHealthy) {
+            // 【v4.0.9修正】プロパティ名を"isHealthy"→"healthy"に修正
+            // PitchProのcheckHealth()は"healthy"プロパティを返す（"isHealthy"ではない）
+            console.log('🔍 [v4.0.9] Health Check Details:', {
+                healthy: health?.healthy,
+                isMuted: isMuted,
+                mediaStreamActive: health?.mediaStreamActive,
+                audioContextState: health?.audioContextState,
+                trackStates: health?.trackStates
+            });
+
+            // 【v4.0.7重要】mute状態でもMediaStreamが有効なら再利用可能
+            // preparation完了時にmute()されているため、mute=trueでもhealthyと判定する
+            if (!health || (!health.healthy && !isMuted)) {
+                console.warn(`⚠️ [v4.0.9] MediaStream unhealthy detected:`, {
+                    hasHealth: !!health,
+                    healthy: health?.healthy,
+                    isMuted: isMuted,
+                    mediaStreamActive: health?.mediaStreamActive,
+                    trackStates: health?.trackStates
+                });
                 return {
                     isValid: false,
-                    reason: 'MediaStream unhealthy',
+                    reason: `MediaStream unhealthy (muted: ${isMuted})`,
                     canReuse: false
                 };
+            }
+
+            // mute状態の場合は警告ログのみ
+            if (isMuted) {
+                console.log('ℹ️ [NavigationManager] AudioDetector is muted but MediaStream is valid - reusable');
             }
 
             // 5. すべてのチェック通過
             return {
                 isValid: true,
-                reason: 'AudioDetector is healthy and ready',
+                reason: isMuted ? 'AudioDetector is muted but healthy' : 'AudioDetector is healthy and ready',
                 canReuse: true
             };
 
