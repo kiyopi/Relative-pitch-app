@@ -680,19 +680,30 @@ async function startTraining() {
         console.log(`   基音: ${baseNoteInfo.note} (${baseNoteInfo.frequency.toFixed(1)}Hz)`);
         console.log('');
 
-        // 【v4.0.12】同期処理: AudioDetectorの状態管理の安定性を優先
-        // stopDetection完了を待ってから基音再生を開始（処理順序を保証）
-        if (audioDetector) {
-            console.log('🎤 基音再生前にマイク検出を一時停止');
+        // 【v4.0.2改善】基音再生中はマイクをミュート（MediaStream保持）
+        // stopDetection()ではなくmute()を使用してMediaStreamトラックを保持
+        if (audioDetector && audioDetector.microphoneController) {
+            console.log('🎤 基音再生前にマイクをミュート（MediaStream保持）');
             try {
-                await audioDetector.stopDetection();
-                console.log('✅ マイク検出停止完了（MediaStreamは保持）');
+                audioDetector.microphoneController.mute();
+                console.log('✅ マイクミュート完了 - MediaStreamは健全');
             } catch (error) {
-                console.warn('⚠️ マイク停止エラー（無視して続行）:', error);
+                console.warn('⚠️ マイクミュートエラー（無視して続行）:', error);
             }
         }
 
         await pitchShifter.playNote(baseNoteInfo.note, 1.0);
+
+        // 基音再生後にマイクのミュートを解除
+        if (audioDetector && audioDetector.microphoneController) {
+            console.log('🔊 基音再生完了 - マイクのミュートを解除');
+            try {
+                audioDetector.microphoneController.unmute();
+                console.log('✅ マイクアンミュート完了');
+            } catch (error) {
+                console.warn('⚠️ マイクアンミュートエラー（無視して続行）:', error);
+            }
+        }
 
         // セッションデータ記録開始
         if (window.sessionDataRecorder) {
