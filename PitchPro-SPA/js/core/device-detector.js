@@ -100,12 +100,12 @@
         getDeviceVolume() {
             const device = this.getDeviceType();
             const volumeSettings = {
-                pc: +2,        // +2dB: ブチ音対策で音量削減（+8dBから75%削減、+5dBからさらに40%削減）
+                pc: 0,         // 0dB: Tone.jsデフォルト音量（+8dBから100%削減、ブチ音完全対策）
                 iphone: +18,   // +18dB: デバイス音量50%時に最適化
                 ipad: +20,     // +20dB: デバイス音量50%時に最適化（Tone.js推奨上限）
                 android: +18   // +18dB: iPhoneと同等の設定（実機テスト後に調整推奨）
             };
-            return volumeSettings[device] || +2;
+            return volumeSettings[device] || 0;
         },
 
         /**
