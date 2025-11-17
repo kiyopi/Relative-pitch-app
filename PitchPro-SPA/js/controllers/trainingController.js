@@ -1170,6 +1170,7 @@ export function resetTrainingPageFlag() {
 }
 
 // グローバルに公開（router.jsから呼び出し可能にする）
+window.initializeTrainingPage = initializeTrainingPage;
 window.resetTrainingPageFlag = resetTrainingPageFlag;
 
 // Page Visibilityハンドラーは削除
