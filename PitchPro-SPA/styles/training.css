@@ -734,7 +734,7 @@
 .progress-square {
   flex: 1;
   height: 10px;
-  background: #60a5fa;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8); /* 音量バーと同じグラデーション */
   border-radius: 2px;
   opacity: 1;
   transition: none;
@@ -752,7 +752,7 @@
 @keyframes square-consume {
   from {
     opacity: 1;
-    background: #60a5fa;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8); /* 音量バーと同じグラデーション */
     border-color: transparent;
   }
   to {
