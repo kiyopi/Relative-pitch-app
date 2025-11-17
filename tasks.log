@@ -11055,3 +11055,20 @@ Phase 1: router.js基盤構築完了
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 16:03:07] コミット: fix(router): homeページ初期化の欠落を修正
+
+レビューで発見された問題:
+- homeページのsetupHomeEvents()が呼ばれていなかった
+- トレーニング開始ボタン等のイベントが設定されない問題
+
+修正内容:
+- setupPageEvents()の冒頭でhomeページを特別処理
+- setupHomeEvents()を直接呼び出すように修正
+- pageConfigsにコメント追加で意図を明確化
+
+理由: homeページはRouterクラスのメソッドを直接使用するため
+設定ベースの統一処理から除外が必要
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -190,20 +190,5 @@
 <script src="js/components/DistributionChart.js"></script>
 
 <!-- Records Page Controller -->
-<script src="pages/js/records-controller.js?v=20251115014" onload="initRecordsPage()"></script>
-<script>
-    // SPA対応：ページ読み込み完了後に初期化
-    async function initRecordsPage() {
-        console.log('📊 [Records] スクリプト読み込み完了、初期化開始');
-
-        // DOMが完全に準備されるまで待機
-        await new Promise(resolve => setTimeout(resolve, 0));
-
-        if (typeof window.initRecords === 'function') {
-            await window.initRecords();
-            console.log('✅ [Records] 初期化完了');
-        } else {
-            console.error('❌ [Records] initRecords関数が見つかりません');
-        }
-    }
-</script>
+<!-- 【v2.0.0】Router統一初期化システムに対応 - onload属性削除 -->
+<script src="pages/js/records-controller.js?v=20251115014"></script>

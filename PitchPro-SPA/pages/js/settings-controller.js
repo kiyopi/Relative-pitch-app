@@ -273,11 +273,8 @@
         }
     }
 
-    // ページ読み込み時に初期化
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeSettingsPage);
-    } else {
-        initializeSettingsPage();
-    }
+    // 【v2.0.0】Router統一初期化システムに対応
+    // window.initSettingsとして公開（router.jsから呼び出される）
+    window.initSettings = initializeSettingsPage;
 
 })();
