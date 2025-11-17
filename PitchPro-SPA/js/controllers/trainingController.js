@@ -2,7 +2,12 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: v4.0.13 (2025-11-16) - インターバルカウントダウンをCSS Animation化
+ * 🔥 VERSION: v4.0.14 (2025-11-16) - インターバル表示改善
+ *
+ * 【v4.0.14修正内容】
+ * - インターバルバー色修正: 濃い青に戻して視認性向上（opacity: 0.3 → 1.0）
+ * - 連続セッション対応: ドレミガイド終了時にインターバルを確実にリセット
+ * - アニメーション方向修正: 濃い青 → 薄い白の正しい方向に修正
  *
  * 【v4.0.13修正内容】
  * - CSS Animation化: 基音再生中のDOM操作を完全排除（残りブチ音対策）
@@ -37,7 +42,7 @@
  * - タイミング最適化: ドレミガイド開始タイミングのコメントを正確に修正
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.13 (2025-11-16) LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.14 (2025-11-16) LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
@@ -1033,6 +1038,13 @@ function handleSessionComplete() {
                 circles.forEach(circle => {
                     circle.classList.remove('current', 'completed');
                 });
+
+                // 【v4.0.14】インターバルカウントダウンをリセット（連続チャレンジ用）
+                const progressSquares = document.querySelectorAll('#progress-squares .progress-square');
+                if (progressSquares.length > 0 && progressSquares[0].parentElement) {
+                    progressSquares[0].parentElement.classList.remove('countdown-active');
+                    console.log('🔄 インターバルカウントダウンリセット（次セッション準備）');
+                }
 
                 // セッション進行状況UIを更新
                 updateSessionProgressUI();
