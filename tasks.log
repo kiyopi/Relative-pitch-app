@@ -11136,3 +11136,56 @@ Phase 3テスト中に発見・修正
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 17:55:51] コミット: fix(audio): PC基音音量を-6dBに設定（最適値確定）
+
+- 0dBでは音割れが発生
+- 以前「+5dBで正常」と思われていたのは||バグで実際-6dBだった
+- -6dBがPC環境での適切な音量と判明
+- reference-tones.jsのデフォルト値と一致
+
+音量変更履歴:
++8dB（ブチ音）→ +5dB（||バグで-6dB実行）→ 0dB（音割れ）→ -6dB（正常）
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 18:02:30] コミット: fix(audio): PC基音音量を-10dBに設定（音割れ対策）
+
+- -6dB（デフォルト）でも音割れが発生
+- -10dBに設定して音割れを防止
+- 原因調査: 音量スライダーは未使用、Tone.js設定も正常
+- 推測: PCシステム音量が高い、またはスピーカー増幅の可能性
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 18:06:29] コミット: fix(audio): PC基音音量を-15dBに設定（最適値）
+
+- -10dBでも若干大きかったため-15dBに調整
+- Mac音量50%環境での最適値として確定
+- デフォルト-6dBから-21dB削減（約88%削減）
+
+音量調整履歴:
++8dB（ブチ音）→ -6dB（音割れ）→ -10dB（改善）→ -15dB（最適）
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 18:15:54] コミット: fix(audio): PC基音音量を-12dBに設定（デフォルトの倍）
+
+- -15dBから-12dBに調整
+- デフォルト-6dBの倍の値として設定
+- Mac音量50%環境での様子見
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 18:18:53] コミット: fix(training): trainingController.jsのscriptタグを追加
+
+- training.htmlにtrainingController.jsが読み込まれていなかった
+- initializeTrainingPageが見つからないエラーの根本原因
+- scriptタグを追加して修正
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
