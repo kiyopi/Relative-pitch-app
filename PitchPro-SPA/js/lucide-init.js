@@ -131,7 +131,8 @@ window.updateLucideIcon = function(target, iconName, attributes = {}) {
     let container;
     if (typeof target === 'string') {
         container = document.querySelector(target);
-    } else if (target instanceof HTMLElement) {
+    } else if (target instanceof Element) {
+        // Element型をチェック（HTMLElement, SVGElement両方に対応）
         container = target;
     } else {
         console.error('❌ [LUCIDE-UPDATE] Invalid target:', target);
