@@ -11117,3 +11117,22 @@ Phase 3: テスト計画準備完了
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 16:24:33] コミット: fix(init): settings/recordsコントローラーをindex.htmlで事前読み込み
+
+問題:
+- settingsページで "initSettings not found" エラー発生
+- テンプレート内のscriptタグが実行されるタイミング問題
+
+修正内容:
+- index.htmlにsettings-controller.jsとrecords-controller.jsを追加
+- settings.html/records.htmlの重複scriptタグをコメントアウト
+- 他のコントローラー（result-session, premium-analysis）と同じ読み込み方式に統一
+
+これにより全ページコントローラーがindex.htmlで事前読み込みされ、
+Router統一初期化システムが正しく動作するようになる
+
+Phase 3テスト中に発見・修正
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
