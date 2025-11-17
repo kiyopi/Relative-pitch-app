@@ -10975,3 +10975,16 @@ updateLucideIconが既にアイコンを更新するため、追加の初期化�
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-17 14:13:22] コミット: fix(preparation): 基音試聴ボタンリセット時のLucide二重初期化修正
+
+- リセット時（Line 1940-1943）の不要なinitializeLucideIcons削除
+- updateLucideIcon使用時は初期化不要（SVG要素を直接更新）
+- これで全4箇所のupdateLucideIcon呼び出しが統一された
+
+【統一パターン】
+- innerHTML使用時: initializeLucideIcons必要
+- updateLucideIcon使用時: initializeLucideIcons不要
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

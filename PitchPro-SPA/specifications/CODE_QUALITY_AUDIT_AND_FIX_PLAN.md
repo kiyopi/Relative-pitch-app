@@ -126,6 +126,41 @@ if (typeof window.initializeLucideIcons === 'function') {
 
 ---
 
+#### 問題1-C: updateLucideIcon使用時の二重初期化（Fixed - 2025-11-17）
+
+**症状**:
+- `updateLucideIcon()`でアイコン更新後に`initializeLucideIcons()`を呼び出し
+- 既にSVG要素になっているアイコンを再度初期化しようとしてエラー
+- `❌ [LUCIDE-UPDATE] Invalid target: <svg>...</svg><svg>...</svg>`
+
+**発見箇所**:
+
+| ファイル | 箇所 | 修正内容 | 状態 |
+|---|---|---|---|
+| `preparation-pitchpro-cycle.js` | **4箇所** | 不要な`initializeLucideIcons()`削除 | ✅完了 |
+
+**修正箇所詳細**:
+- Line 1940-1943: 基音試聴ボタンリセット時
+- Line 1997-2003: 再生前
+- Line 2013-2027: 再生後
+- Line 2039-2046: エラー時
+
+**統一パターン確立**:
+
+```javascript
+// ✅ パターン1: innerHTML使用時（初期化必要）
+btn.innerHTML = '<i data-lucide="mic"></i><span>マイク許可</span>';
+window.initializeLucideIcons({ immediate: true }); // 必要
+
+// ✅ パターン2: updateLucideIcon使用時（初期化不要）
+window.updateLucideIcon(icon, 'volume-2');
+// initializeLucideIconsは不要 - updateLucideIconが直接SVG更新
+```
+
+**修正完了**: 2025-11-17（コミット: 62a5635）
+
+---
+
 ### 問題2: 二重初期化パターン（Critical）
 **影響度**: 🔴 高 | **緊急度**: 🔴 高
 
