@@ -2,7 +2,12 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: v4.0.11 (2025-11-16) - getUserMedia()削除・レスポンス速度改善
+ * 🔥 VERSION: v4.0.12 (2025-11-16) - 同期処理の安定性確認
+ *
+ * 【v4.0.12修正内容】
+ * - 非同期処理検証: 非同期化による効果なし・潜在的リスクあり
+ * - 同期処理に戻す: AudioDetectorの状態管理の安定性を優先
+ * - 処理順序保証: stopDetection完了後に基音再生、2.5秒後にstartDetection
  *
  * 【v4.0.11修正内容】
  * - getUserMedia()削除: リファクタリング前の実装に戻し、レスポンス速度を改善
@@ -26,7 +31,7 @@
  * - タイミング最適化: ドレミガイド開始タイミングのコメントを正確に修正
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.11 (2025-11-16) LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.12 (2025-11-16) LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
@@ -639,11 +644,12 @@ async function startTraining() {
         console.log(`   基音: ${baseNoteInfo.note} (${baseNoteInfo.frequency.toFixed(1)}Hz)`);
         console.log('');
 
-        // 【追加】基音再生前にマイク検出を一時停止（MediaStreamは保持）
+        // 【v4.0.12】同期処理: AudioDetectorの状態管理の安定性を優先
+        // stopDetection完了を待ってから基音再生を開始（処理順序を保証）
         if (audioDetector) {
             console.log('🎤 基音再生前にマイク検出を一時停止');
             try {
-                audioDetector.stopDetection();
+                await audioDetector.stopDetection();
                 console.log('✅ マイク検出停止完了（MediaStreamは保持）');
             } catch (error) {
                 console.warn('⚠️ マイク停止エラー（無視して続行）:', error);
