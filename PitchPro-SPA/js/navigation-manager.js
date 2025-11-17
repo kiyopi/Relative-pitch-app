@@ -294,6 +294,105 @@ class NavigationManager {
     }
 
     /**
+     * 遷移がトレーニングフロー内かどうか判定
+     *
+     * @param {string} from - 遷移元ページ
+     * @param {string} to - 遷移先ページ
+     * @returns {boolean} true: フロー内（MediaStream保持）, false: フロー外（破棄）
+     */
+    static isTrainingFlow(from, to) {
+        // トレーニングフロー内の遷移パターン
+        const trainingFlowPatterns = [
+            ['training', 'result-session'],      // セッション完了
+            ['result-session', 'training'],      // 次のセッション
+            ['preparation', 'training'],         // 準備完了
+            ['result-session', 'results-overview'], // 8セッション完了
+        ];
+
+        return trainingFlowPatterns.some(
+            ([source, dest]) => from === source && to === dest
+        );
+    }
+
+    /**
+     * AudioDetectorの状態を検証
+     * PitchProの組み込みメソッドを活用
+     *
+     * @param {Object} audioDetector - AudioDetectionComponent instance
+     * @returns {Object} { isValid: boolean, reason: string, canReuse: boolean }
+     */
+    static verifyAudioDetectorState(audioDetector) {
+        if (!audioDetector) {
+            return {
+                isValid: false,
+                reason: 'audioDetector is null',
+                canReuse: false
+            };
+        }
+
+        try {
+            // 1. AudioDetectionComponent の状態取得
+            const status = audioDetector.getStatus();
+
+            if (!status) {
+                return {
+                    isValid: false,
+                    reason: 'getStatus() returned null',
+                    canReuse: false
+                };
+            }
+
+            // 2. MicrophoneController の状態確認
+            const micStatus = status.micControllerStatus;
+
+            if (!micStatus) {
+                return {
+                    isValid: false,
+                    reason: 'MicrophoneController not initialized',
+                    canReuse: false
+                };
+            }
+
+            // 3. MicrophoneController.isReady チェック
+            const isReady = micStatus.isReady;
+
+            if (!isReady) {
+                return {
+                    isValid: false,
+                    reason: `MicrophoneController not ready (state: ${micStatus.state})`,
+                    canReuse: false
+                };
+            }
+
+            // 4. MediaStream 健全性チェック
+            const health = audioDetector.microphoneController?.checkHealth();
+
+            if (!health || !health.isHealthy) {
+                return {
+                    isValid: false,
+                    reason: 'MediaStream unhealthy',
+                    canReuse: false
+                };
+            }
+
+            // 5. すべてのチェック通過
+            return {
+                isValid: true,
+                reason: 'AudioDetector is healthy and ready',
+                canReuse: true
+            };
+
+        } catch (error) {
+            console.error('❌ [NavigationManager] State verification error:', error);
+            return {
+                isValid: false,
+                reason: `Verification error: ${error.message}`,
+                canReuse: false
+            };
+        }
+    }
+
+    /**
      * AudioDetectorの破棄（内部メソッド）
      * PitchPro警告アラート発火を防止し、popstateイベント問題を根本解決
      *
@@ -344,13 +443,53 @@ class NavigationManager {
     static navigate(page, params = {}) {
         console.log(`🚀 [NavigationManager] 統一ナビゲーション: ${page}`, params);
 
-        // 1. 【最優先】PitchProリソース破棄
-        //    → 警告アラート発火を防止
-        //    → popstateイベント発火の根本原因排除
+        // 現在のページを取得
+        const currentPage = window.location.hash.split('?')[0].substring(1);
+
+        // 1. 【改善v4.0.0】AudioDetector管理 - トレーニングフロー内では保持
+        //    → トレーニングフロー内: stopDetection()のみ実行してMediaStream保持
+        //    → トレーニングフロー外: destroy()を実行してMediaStream完全解放
         if (this.currentAudioDetector) {
-            console.log('🧹 [NavigationManager] PitchProクリーンアップ開始');
-            this._destroyAudioDetector(this.currentAudioDetector);
-            this.currentAudioDetector = null;
+            const isTraining = this.isTrainingFlow(currentPage, page);
+
+            if (isTraining) {
+                // トレーニングフロー内の遷移: MediaStream保持
+                console.log('🔄 [NavigationManager] トレーニングフロー内遷移: MediaStream保持');
+
+                // AudioDetectorの状態を検証
+                const verification = this.verifyAudioDetectorState(this.currentAudioDetector);
+                console.log('🔍 [NavigationManager] AudioDetector状態:', verification);
+
+                if (verification.canReuse) {
+                    // 健全な状態: 音声検出のみ停止（MediaStream保持）
+                    try {
+                        this.currentAudioDetector.stopDetection();
+                        console.log('⏸️ [NavigationManager] 音声検出停止 - MediaStream保持');
+                    } catch (error) {
+                        console.warn('⚠️ [NavigationManager] stopDetection()エラー:', error);
+                    }
+                } else {
+                    // 異常状態: 破棄して次ページで再作成
+                    console.warn(`⚠️ [NavigationManager] AudioDetector異常検出: ${verification.reason}`);
+                    this._destroyAudioDetector(this.currentAudioDetector);
+                    this.currentAudioDetector = null;
+                    // globalAudioDetectorもクリア
+                    if (window.globalAudioDetector) {
+                        window.globalAudioDetector = null;
+                    }
+                }
+            } else {
+                // トレーニングフロー外の遷移: MediaStream完全解放
+                console.log('🧹 [NavigationManager] トレーニングフロー外遷移: MediaStream破棄');
+                this._destroyAudioDetector(this.currentAudioDetector);
+                this.currentAudioDetector = null;
+
+                // globalAudioDetectorもクリア
+                if (window.globalAudioDetector) {
+                    window.globalAudioDetector = null;
+                    console.log('🗑️ [NavigationManager] globalAudioDetectorクリア');
+                }
+            }
         }
 
         // 2. beforeunload/popstateを無効化
@@ -364,7 +503,6 @@ class NavigationManager {
 
         // 4. 【追加v3.1.0】途中離脱時のsessionStorageクリーンアップ
         //    trainingページからの遷移で、遷移先がトレーニング継続に関係ない場合はクリア
-        const currentPage = window.location.hash.split('?')[0].substring(1);
         if (currentPage === 'training') {
             // トレーニング継続に必要なページ以外への遷移時はcurrentLessonIdをクリア
             const shouldPreserveLesson =
@@ -524,8 +662,32 @@ class NavigationManager {
         console.log(`📍 [NavigationManager] ブラウザバック防止: ダミーエントリー追加×2 (${page})`);
         console.log(`📝 [NavigationManager] 通知メッセージ: ${message}`);
 
-        // popstateハンドラーを定義（許可リスト対応 + ダイアログ通知）
+        // popstateハンドラーを定義（許可リスト対応 + ダイアログ通知 + PitchPro警告検出）
         this.popStateHandler = () => {
+            // 【v4.0.0追加】PitchPro警告アラート検出
+            // 万一、バックグラウンド長時間放置等でPitchProが警告を出した場合のフォールバック
+            if (this.currentAudioDetector) {
+                const verification = this.verifyAudioDetectorState(this.currentAudioDetector);
+
+                if (!verification.isValid) {
+                    console.error('🚨 [NavigationManager] PitchPro警告検出: AudioDetector異常', verification);
+                    console.warn(`⚠️ [NavigationManager] 異常理由: ${verification.reason}`);
+
+                    // 異常状態のAudioDetectorを破棄
+                    this._destroyAudioDetector(this.currentAudioDetector);
+                    this.currentAudioDetector = null;
+
+                    // globalAudioDetectorもクリア
+                    if (window.globalAudioDetector) {
+                        window.globalAudioDetector = null;
+                    }
+
+                    console.log('🔄 [NavigationManager] 次ページでAudioDetector再作成が必要');
+                } else {
+                    console.log('✅ [NavigationManager] AudioDetector健全性確認完了');
+                }
+            }
+
             const newHash = window.location.hash.substring(1);
             const newPage = newHash.split('?')[0];
 

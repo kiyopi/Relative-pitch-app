@@ -1034,9 +1034,18 @@ function setupMicPermissionFlow() {
                         console.log('✅ 音声テストセクションを表示');
                     }
 
-                    // AudioDetectionComponentインスタンスをグローバルに共有（将来のStep2連携用）
+                    // 【Phase3改善】AudioDetectionComponentインスタンスをグローバルに共有（将来のStep2連携用）
                     window.globalAudioDetector = pitchProCycleManager.audioDetector;
+                    window.audioDetector = pitchProCycleManager.audioDetector;
                     console.log('✅ globalAudioDetectorをStep2連携用に設定');
+
+                    // 【Phase3追加】NavigationManagerに登録（MediaStream保持のため）
+                    if (window.NavigationManager) {
+                        window.NavigationManager.registerAudioDetector(pitchProCycleManager.audioDetector);
+                        console.log('✅ NavigationManagerにAudioDetectorを登録');
+                    } else {
+                        console.warn('⚠️ NavigationManagerが見つかりません');
+                    }
 
                 } catch (initError) {
                     console.warn('⚠️ AudioDetectionComponent初期化エラー:', initError);

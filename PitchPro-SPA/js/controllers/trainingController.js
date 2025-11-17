@@ -799,15 +799,57 @@ async function startDoremiGuide() {
 
     // AudioDetectionComponent初期化または再開
     try {
-        // 【重要】グローバル参照もチェックして、破棄済みの場合は新規作成
-        // NavigationManagerやRouter cleanupでwindow.audioDetectorがnullになっている場合
-        if (!audioDetector || !window.audioDetector) {
-            // 新規作成（初回セッション or 前回破棄済み）
-            if (!audioDetector) {
-                console.log('🎤 AudioDetectionComponent初期化中（初回セッション）...');
+        // 【v4.0.0改善】3段階の優先順位でAudioDetector取得
+        // 1. NavigationManager.currentAudioDetectorが健全 → 再利用
+        // 2. window.globalAudioDetectorが健全 → 再利用
+        // 3. 新規作成
+
+        let shouldCreateNew = false;
+        let reusedSource = null;
+
+        // 優先度1: NavigationManager.currentAudioDetectorをチェック
+        if (window.NavigationManager?.currentAudioDetector) {
+            const verification = window.NavigationManager.verifyAudioDetectorState(
+                window.NavigationManager.currentAudioDetector
+            );
+
+            if (verification.canReuse) {
+                console.log('✅ [Phase2] NavigationManager.currentAudioDetectorを再利用');
+                audioDetector = window.NavigationManager.currentAudioDetector;
+                window.audioDetector = audioDetector;
+                reusedSource = 'NavigationManager';
             } else {
-                console.log('🎤 AudioDetectionComponent再作成中（前回破棄済み）...');
+                console.warn(`⚠️ [Phase2] NavigationManager.currentAudioDetector異常: ${verification.reason}`);
+                shouldCreateNew = true;
             }
+        }
+        // 優先度2: window.globalAudioDetectorをチェック
+        else if (window.globalAudioDetector) {
+            const verification = window.NavigationManager?.verifyAudioDetectorState(window.globalAudioDetector);
+
+            if (verification && verification.canReuse) {
+                console.log('✅ [Phase2] window.globalAudioDetectorを再利用');
+                audioDetector = window.globalAudioDetector;
+                window.audioDetector = audioDetector;
+
+                // NavigationManagerに登録
+                if (window.NavigationManager) {
+                    window.NavigationManager.registerAudioDetector(audioDetector);
+                }
+                reusedSource = 'globalAudioDetector';
+            } else {
+                console.warn('⚠️ [Phase2] window.globalAudioDetector異常または検証失敗');
+                shouldCreateNew = true;
+            }
+        }
+        // 優先度3: 新規作成
+        else {
+            shouldCreateNew = true;
+        }
+
+        // 新規作成が必要な場合
+        if (shouldCreateNew) {
+            console.log('🎤 [Phase2] AudioDetectionComponent新規作成');
 
             // 統一設定モジュールを使用（倍音補正・周波数範囲を統一管理）
             audioDetector = new window.PitchPro.AudioDetectionComponent(
@@ -848,8 +890,26 @@ async function startDoremiGuide() {
             });
             console.log('✅ UIキャッシュ再構築完了');
         } else {
-            // 2回目以降: 既存のAudioDetectorを再開（同一セッション内の再開始）
-            console.log('🎤 既存のAudioDetectorを再開（同一セッション内）');
+            // 再利用の場合: UIセレクターを更新
+            console.log(`🔄 [Phase2] AudioDetectorを再利用（ソース: ${reusedSource}）`);
+            console.log('🔄 UIセレクターを更新中...');
+            await audioDetector.updateSelectors({
+                volumeBarSelector: '.mic-recognition-section .progress-fill',
+                volumeTextSelector: null,
+                frequencySelector: null,
+                noteSelector: null
+            });
+            console.log('✅ UIセレクター更新完了');
+
+            // コールバック設定（再利用でも必要）
+            audioDetector.setCallbacks({
+                onPitchUpdate: (result) => {
+                    handlePitchUpdate(result);
+                },
+                onError: (context, error) => {
+                    console.error(`❌ AudioDetection Error [${context}]:`, error);
+                }
+            });
         }
 
         // 音声検出開始（初回も2回目以降も実行）
