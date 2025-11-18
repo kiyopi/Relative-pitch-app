@@ -325,7 +325,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto;
+  margin: 0 auto 0.75rem auto;
   color: rgba(255, 255, 255, 0.4);
   transition: all 0.3s ease;
 }
