@@ -12035,3 +12035,36 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-18 17:58:48] コミット: fix(training): 12音階下行モードの音域自動拡張を修正
+
+下行モードで音域不足時に12音確保できずクラッシュする問題を解決
+
+【問題の原因】
+- 音域自動拡張ロジックが常に高音側への拡張のみを試行
+- 下行モードでは最高音が音域上限に近いため、拡張候補が0音
+- 例: 415.3Hz～416.0Hz間（0.7Hzギャップ）で探索→候補なし
+
+【実装した修正】
+- 方向別の拡張ロジック実装:
+  * 上行モード: 高音側に拡張（従来通り）
+  * 下行モード: 低音側に拡張（新規実装）
+- 下行モード拡張ロジック:
+  * 最低音より低い音を探索
+  * 基音-1オクターブが音域下限に収まる条件を適用
+  * 配列の先頭に挿入して音程順序を維持
+- 拡張失敗時の詳細ログ追加
+
+【修正ファイル】
+- trainingController.js (v4.0.20 → v4.0.21)
+  * getAvailableNotes()関数の拡張ロジック改修
+  * 方向別分岐処理を追加（Lines 1437-1483）
+- training.html: キャッシュバージョン更新
+
+【効果】
+- 1.92オクターブの音域でも12音階下行モードが起動可能
+- A#3 (233.1Hz) より下のA3 (220.0Hz) を自動追加
+- 12音確保により配列範囲外アクセスエラーを解消
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
