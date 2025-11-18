@@ -1,12 +1,13 @@
 /**
  * モード管理統合コントローラー
- * @version 2.0.1
+ * @version 2.1.0
  * @description 全トレーニングモードの定義と設定を一元管理
  *
  * 【責任範囲】
  * - モード定義の一元管理
  * - セッション数の動的計算
  * - モード名の統一管理
+ * - 方向別表示名の管理（12音階モード） ★v2.1.0追加
  * - 基音選択方式の定義
  * - UI表示（アイコン・色・タイトル）の統一管理 ★v2.0.0追加
  * - 1セッション標準時間の定義 ★v2.0.1追加
@@ -16,8 +17,11 @@
  * - records-controller.js: レッスングループ化、総トレーニング時間計算 ★v2.0.1更新
  * - session-data-recorder.js: セッションデータ保存
  * - results-overview-controller.js: 総合評価ページ ★v2.0.0追加
+ * - preparation-pitchpro-cycle.js: 準備ページサブタイトル表示 ★v2.1.0追加
  *
  * 【変更履歴】
+ * v2.1.0 (2025-11-18): getDisplayName()メソッド追加
+ *                      12音階モードの方向別表示名を一元管理（上昇/下降/両方向）
  * v2.0.1 (2025-11-16): standardDurationPerSession追加（全モード13秒）
  *                      純粋なトレーニング時間（基音2.5s+ガイド5.3s+発声5.6s）のみカウント
  * v2.0.0 (2025-11-14): UI色設定追加（アイコン背景・サブタイトル色）
@@ -149,6 +153,27 @@ const ModeController = {
     getModeName(modeId, useShortName = false) {
         const mode = this.getMode(modeId);
         return useShortName ? mode.shortName : mode.name;
+    },
+
+    /**
+     * モード表示名を取得（方向パラメータ対応）
+     * @param {string} modeId - モードID
+     * @param {object} options - オプション設定（direction等）
+     * @returns {string} 表示名
+     */
+    getDisplayName(modeId, options = {}) {
+        const mode = this.getMode(modeId);
+
+        // 12音階モードの場合は方向別の表示名を返す
+        if (modeId === '12tone' && options.direction && mode.directions) {
+            const directionInfo = mode.directions[options.direction];
+            if (directionInfo) {
+                return `12音階${directionInfo.name}モード`;
+            }
+        }
+
+        // その他のモードは通常のモード名を返す
+        return mode.name;
     },
 
     /**

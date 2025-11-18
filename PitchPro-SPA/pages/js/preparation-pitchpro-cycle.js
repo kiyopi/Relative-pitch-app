@@ -890,17 +890,13 @@ window.initializePreparationPitchProCycle = async function() {
     console.log('🔍 [preparation] モードパラメータ:', modeParam);
     console.log('🔍 [preparation] 方向パラメータ:', directionParam);
 
-    // ModeControllerでモード情報を取得
+    // ModeControllerでモード表示名を取得
     if (window.ModeController) {
-        const modeInfo = window.ModeController.getMode(modeParam);
-        if (modeInfo) {
-            const subtitle = document.getElementById('preparation-mode-subtitle');
-            if (subtitle) {
-                subtitle.textContent = `${modeInfo.name}の準備中`;
-                console.log(`✅ サブタイトル更新: ${modeInfo.name}の準備中`);
-            }
-        } else {
-            console.warn(`⚠️ モード情報が見つかりません: ${modeParam}`);
+        const displayName = window.ModeController.getDisplayName(modeParam, { direction: directionParam });
+        const subtitle = document.getElementById('preparation-mode-subtitle');
+        if (subtitle) {
+            subtitle.textContent = `${displayName}の準備中`;
+            console.log(`✅ サブタイトル更新: ${displayName}の準備中`);
         }
     } else {
         console.warn('⚠️ ModeControllerが利用できません');

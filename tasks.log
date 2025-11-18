@@ -12100,3 +12100,31 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-18 20:34:02] コミット: docs(spec): 音域自動拡張仕様書に下行モード対応を追記
+
+VOICE_RANGE_AUTO_EXPANSION_SPECIFICATION.md v3.2.0に更新
+
+【追加内容】
+Section 4.2: 方向別拡張アルゴリズム実装
+- 上行モード: 高音側に拡張（従来ロジック）
+- 下行モード: 低音側に拡張（v3.2.0新規）
+- 両方向とも10%余裕を持たせる設計
+
+Section 4.3.2: 下行モード拡張例追加
+- 実例: 1.92オクターブで11音 → 12音に拡張
+- F#3を低音側に追加（基音-1オクターブが音域外）
+
+Section 4.3.3: 10%余裕の設計理由追加
+- 厳密な条件では候補が見つからない問題
+- 拡張候補範囲を3-4倍に拡大（7.4Hz → 26.26Hz）
+
+Section 10.1: 技術的制約を両方向対応に更新
+- 上行/下行モード別の拡張方向を明記
+- 基音順序維持の実装詳細を追加
+
+改訂履歴: v3.2.0追加（2025-11-18）
+- trainingController.js v4.0.21-v4.0.22の実装を文書化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
