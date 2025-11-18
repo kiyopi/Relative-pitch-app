@@ -158,12 +158,12 @@ function updateDirectionBadges(scaleDirection, chromaticDirection = null) {
     if (chromaticDirection) {
         const chromaticBadge = document.createElement('span');
         chromaticBadge.className = `direction-badge chromatic-${chromaticDirection}`;
-        
+
         let badgeText = '';
-        if (chromaticDirection === 'up') badgeText = '上昇';
-        else if (chromaticDirection === 'down') badgeText = '下降';
+        if (chromaticDirection === 'up' || chromaticDirection === 'ascending') badgeText = '上昇';
+        else if (chromaticDirection === 'down' || chromaticDirection === 'descending') badgeText = '下降';
         else if (chromaticDirection === 'both') badgeText = '両方向';
-        
+
         chromaticBadge.textContent = badgeText;
         container.appendChild(chromaticBadge);
     }

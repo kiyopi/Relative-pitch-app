@@ -11948,3 +11948,30 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-18 17:23:14] コミット: fix(loading): results-overview二重初期化フラグリセット処理追加
+
+問題：
+- 総合評価ページで3セクション（評価分布・誤差推移・セッション一覧）が永久にローディング状態で固定
+- 原因：SPA遷移時に二重初期化防止フラグ（isResultsOverviewInitialized）がリセットされず、2回目以降の訪問時にinitResultsOverview()が早期returnしていた
+
+修正内容：
+1. results-overview-controller.js v4.1.0
+   - window.resetResultsOverviewInitialization()関数を追加
+   - 初期化フラグをfalseにリセット
+
+2. router.js v202511181200
+   - results-overviewのpageConfigにcleanup関数を追加
+   - ページ離脱時にresetResultsOverviewInitialization()を自動呼び出し
+
+3. index.html
+   - results-overview-controller.js: v20251118005
+   - router.js: v202511181200
+   - キャッシュクリア用にバージョン番号更新
+
+影響範囲：
+- 総合評価ページのSPA遷移時の初期化処理のみ
+- 他ページへの影響なし
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
