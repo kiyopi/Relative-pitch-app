@@ -1,11 +1,12 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.2.0 (2025-11-18)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.3.0 (2025-11-18)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.2.0
+ * Version: 4.3.0
  * Date: 2025-11-18
  * Changelog:
+ *   v4.3.0 - 【根本修正】NavigationManager.navigate()統合（preparationPageActiveフラグ自動設定、ブラウザバック完全解決）
  *   v4.2.0 - 【重要修正】次のステップボタンにdirectionパラメータ追加（ブラウザバック問題を解決）
  *   v4.1.0 - 【バグ修正】二重初期化防止フラグのリセット処理追加（SPA遷移時の3セクションローディング固定問題を解決）
  *   v4.0.9 - 【UI改善】評価分布グラフにヘルプボタン追加（DistributionChart.getHelpButton統合）
@@ -1352,39 +1353,93 @@ function handleNextStepAction(actionId) {
 
     const actions = {
         // ランダム基音モード
-        'next-step-random-practice': () => window.location.hash = `preparation?mode=random&direction=${currentScaleDirection}`,
-        'next-step-random-upgrade': () => window.location.hash = `preparation?mode=continuous&direction=${currentScaleDirection}`,
+        'next-step-random-practice': () => {
+            if (window.NavigationManager) {
+                NavigationManager.navigate('preparation', { mode: 'random', direction: currentScaleDirection });
+            } else {
+                window.location.hash = `preparation?mode=random&direction=${currentScaleDirection}`;
+            }
+        },
+        'next-step-random-upgrade': () => {
+            if (window.NavigationManager) {
+                NavigationManager.navigate('preparation', { mode: 'continuous', direction: currentScaleDirection });
+            } else {
+                window.location.hash = `preparation?mode=continuous&direction=${currentScaleDirection}`;
+            }
+        },
         'next-step-random-records': () => {
             sessionStorage.clear();
             window.location.hash = 'records';
         },
 
         // 連続チャレンジモード
-        'next-step-continuous-practice': () => window.location.hash = `preparation?mode=continuous&direction=${currentScaleDirection}`,
-        'next-step-continuous-upgrade': () => window.location.hash = `preparation?mode=12tone&direction=ascending`,
+        'next-step-continuous-practice': () => {
+            if (window.NavigationManager) {
+                NavigationManager.navigate('preparation', { mode: 'continuous', direction: currentScaleDirection });
+            } else {
+                window.location.hash = `preparation?mode=continuous&direction=${currentScaleDirection}`;
+            }
+        },
+        'next-step-continuous-upgrade': () => {
+            if (window.NavigationManager) {
+                NavigationManager.navigate('preparation', { mode: '12tone', direction: 'ascending' });
+            } else {
+                window.location.hash = `preparation?mode=12tone&direction=ascending`;
+            }
+        },
         'next-step-continuous-records': () => {
             sessionStorage.clear();
             window.location.hash = 'records';
         },
 
         // 12音階モード（上昇）
-        'next-step-12tone-ascending-practice': () => window.location.hash = 'preparation?mode=12tone&direction=ascending',
-        'next-step-12tone-ascending-upgrade': () => window.location.hash = 'preparation?mode=12tone&direction=descending',
+        'next-step-12tone-ascending-practice': () => {
+            if (window.NavigationManager) {
+                NavigationManager.navigate('preparation', { mode: '12tone', direction: 'ascending' });
+            } else {
+                window.location.hash = 'preparation?mode=12tone&direction=ascending';
+            }
+        },
+        'next-step-12tone-ascending-upgrade': () => {
+            if (window.NavigationManager) {
+                NavigationManager.navigate('preparation', { mode: '12tone', direction: 'descending' });
+            } else {
+                window.location.hash = 'preparation?mode=12tone&direction=descending';
+            }
+        },
         'next-step-12tone-ascending-records': () => {
             sessionStorage.clear();
             window.location.hash = 'records';
         },
 
         // 12音階モード（下降）
-        'next-step-12tone-descending-practice': () => window.location.hash = 'preparation?mode=12tone&direction=descending',
-        'next-step-12tone-descending-upgrade': () => window.location.hash = 'preparation?mode=12tone&direction=both',
+        'next-step-12tone-descending-practice': () => {
+            if (window.NavigationManager) {
+                NavigationManager.navigate('preparation', { mode: '12tone', direction: 'descending' });
+            } else {
+                window.location.hash = 'preparation?mode=12tone&direction=descending';
+            }
+        },
+        'next-step-12tone-descending-upgrade': () => {
+            if (window.NavigationManager) {
+                NavigationManager.navigate('preparation', { mode: '12tone', direction: 'both' });
+            } else {
+                window.location.hash = 'preparation?mode=12tone&direction=both';
+            }
+        },
         'next-step-12tone-descending-records': () => {
             sessionStorage.clear();
             window.location.hash = 'records';
         },
 
         // 12音階モード（両方向）
-        'next-step-12tone-both-practice': () => window.location.hash = 'preparation?mode=12tone&direction=both',
+        'next-step-12tone-both-practice': () => {
+            if (window.NavigationManager) {
+                NavigationManager.navigate('preparation', { mode: '12tone', direction: 'both' });
+            } else {
+                window.location.hash = 'preparation?mode=12tone&direction=both';
+            }
+        },
         'next-step-12tone-both-records': () => {
             sessionStorage.clear();
             window.location.hash = 'records';
