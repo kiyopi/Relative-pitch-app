@@ -1938,14 +1938,16 @@ body::before {
 }
 
 /* 基音方向: 上昇 */
-.direction-badge.chromatic-up {
+.direction-badge.chromatic-up,
+.direction-badge.chromatic-ascending {
   background: rgba(245, 158, 11, 0.15);
   color: #fbbf24;
   border-color: rgba(245, 158, 11, 0.3);
 }
 
 /* 基音方向: 下降 */
-.direction-badge.chromatic-down {
+.direction-badge.chromatic-down,
+.direction-badge.chromatic-descending {
   background: rgba(34, 197, 94, 0.15);
   color: #86efac;
   border-color: rgba(34, 197, 94, 0.3);

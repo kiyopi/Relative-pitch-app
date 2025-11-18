@@ -11975,3 +11975,31 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-18 17:39:06] コミット: fix(training): ドレミガイドバッジで基音方向が空表示される問題を修正
+
+問題：
+- 12音階モード 下降・上行で、2つ目のバッジ（基音方向）のテキストが空表示
+- 例: <span class="direction-badge chromatic-descending"></span>
+
+原因：
+- URLパラメータで direction=descending が渡される
+- しかし updateDirectionBadges() は 'up', 'down', 'both' しかチェックしていない
+- 'ascending', 'descending' の値に対応していなかった
+
+修正内容：
+1. trainingController.js
+   - updateDirectionBadges() 関数を修正
+   - 'ascending' → '上昇' を追加
+   - 'descending' → '下降' を追加
+
+2. training.html
+   - trainingController.js: v202511181215
+   - キャッシュクリア用にバージョン番号更新
+
+影響範囲：
+- 12音階モードのドレミガイドバッジ表示のみ
+- 他モードへの影響なし
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
