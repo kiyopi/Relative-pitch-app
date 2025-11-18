@@ -1,6 +1,6 @@
 # ナビゲーション・リソース管理仕様書
 
-**バージョン**: 3.4.0
+**バージョン**: 4.3.0
 **作成日**: 2025-10-22
 **最終更新**: 2025-11-18
 **対象**: PitchPro-SPA（8va相対音感トレーニングアプリ）
@@ -1855,10 +1855,171 @@ function handleNextStepAction(actionId) {
 
 ---
 
+### v4.3.0: NavigationManager.navigate() API統合による根本的修正（2025-11-18解決）
+
+#### 問題の概要
+
+**症状**: v4.2.0で`direction`パラメータを追加したにも関わらず、連続チャレンジモード → 12音階モードの遷移で依然としてブラウザバックのような動作が発生。
+
+**ユーザーからのフィードバック**:
+> 「連続チャレンジで総合評価の次のステップの12音階ボタンでブラウザバック発生
+> ここは自動で遷移するので違う対応が必要かもしれませんね」
+
+#### 根本原因の発見
+
+v4.2.0の修正では**パラメータの完全性**のみを解決したが、**真の問題**が残っていた：
+
+```javascript
+// v4.2.0の実装（問題は解決していない）
+'next-step-continuous-upgrade': () => window.location.hash = `preparation?mode=12tone&direction=ascending`
+// ✅ direction パラメータは追加されている
+// ❌ しかしpreparationPageActiveフラグが設定されない
+```
+
+**NavigationManagerのダイレクトアクセス検出ロジック**（navigation-manager.js:313-327）:
+```javascript
+// Direct access detection for preparation page
+if (page === 'preparation' && config?.directAccessRedirectTo) {
+    const wasPreparationActive = sessionStorage.getItem('preparationPageActive') === 'true';
+    if (!wasPreparationActive) {
+        console.log('⚠️ [NavigationManager] preparationページへのダイレクトアクセス検出');
+
+        if (config.directAccessMessage) {
+            alert(config.directAccessMessage);
+        }
+
+        window.location.hash = config.directAccessRedirectTo;
+        return { shouldContinue: false, reason: 'direct-access-preparation' };
+    }
+}
+```
+
+**判明した事実**:
+1. `window.location.hash`で直接遷移しても`preparationPageActive`フラグは設定されない
+2. NavigationManagerは`preparationPageActive`フラグの有無でダイレクトアクセスを判定
+3. フラグが存在しない → ダイレクトアクセスと誤検出 → ホームへリダイレクト
+4. `direction`パラメータの有無は**副次的な問題**だった
+
+#### 解決策
+
+**実装内容（results-overview-controller.js v4.3.0）**:
+
+**NavigationManager.navigate() APIの正しい使用**:
+
+```javascript
+function handleNextStepAction(actionId) {
+    console.log('🎯 Next step action:', actionId);
+    console.log('🔍 [DEBUG] Using currentScaleDirection:', currentScaleDirection);
+
+    const actions = {
+        // ✅ NavigationManager.navigate()を使用（フラグ自動設定）
+        'next-step-random-practice': () => {
+            if (window.NavigationManager) {
+                NavigationManager.navigate('preparation', { mode: 'random', direction: currentScaleDirection });
+            } else {
+                // フォールバック（NavigationManager未定義時）
+                window.location.hash = `preparation?mode=random&direction=${currentScaleDirection}`;
+            }
+        },
+        'next-step-random-upgrade': () => {
+            if (window.NavigationManager) {
+                NavigationManager.navigate('preparation', { mode: 'continuous', direction: currentScaleDirection });
+            } else {
+                window.location.hash = `preparation?mode=continuous&direction=${currentScaleDirection}`;
+            }
+        },
+        'next-step-continuous-practice': () => {
+            if (window.NavigationManager) {
+                NavigationManager.navigate('preparation', { mode: 'continuous', direction: currentScaleDirection });
+            } else {
+                window.location.hash = `preparation?mode=continuous&direction=${currentScaleDirection}`;
+            }
+        },
+        'next-step-continuous-upgrade': () => {
+            if (window.NavigationManager) {
+                NavigationManager.navigate('preparation', { mode: '12tone', direction: 'ascending' });
+            } else {
+                window.location.hash = `preparation?mode=12tone&direction=ascending`;
+            }
+        },
+        // ... 他の12tone系アクションも同様に修正 ...
+    };
+
+    // ... 残りの処理 ...
+}
+```
+
+**NavigationManager.navigate()の内部処理**（navigation-manager.js:705-748）:
+```javascript
+static navigate(page, params = {}) {
+    console.log(`🚀 [NavigationManager] 統一ナビゲーション: ${page}`, params);
+
+    // ... AudioDetector管理 ...
+
+    // ✅ 正常遷移フラグを自動設定（重要！）
+    if (page === 'training') {
+        this.setNormalTransition();
+    } else if (page === 'result-session') {
+        this.setNormalTransitionToResultSession();
+    } else if (page === 'preparation') {
+        this.setNormalTransitionToPreparation();  // ← preparationPageActiveフラグ設定！
+    }
+
+    // ... 残りのナビゲーション処理 ...
+}
+```
+
+**setNormalTransitionToPreparation()の実装**（navigation-manager.js:122-125）:
+```javascript
+static setNormalTransitionToPreparation() {
+    sessionStorage.setItem(this.KEYS.NORMAL_TRANSITION_PREPARATION, 'true');
+    console.log('✅ [NavigationManager] 正常な遷移フラグを設定（preparation）');
+}
+```
+
+#### 修正の効果
+
+| 修正前（v4.2.0） | 修正後（v4.3.0） |
+|---|---|
+| `window.location.hash` 直接操作 | `NavigationManager.navigate()` 統一API |
+| `preparationPageActive` フラグ未設定 | フラグ自動設定（line 747） |
+| ダイレクトアクセス誤検出 | 正規遷移として正しく認識 |
+| ホームへリダイレクト | preparationページへ正常遷移 |
+
+#### 重要な教訓
+
+1. **API設計の本質理解**: パラメータの完全性だけでなく、正しいAPIを使用することが重要
+2. **NavigationManager統合の目的**: 単なる便利関数ではなく、正しい遷移フロー（フラグ設定）を保証するための設計
+3. **症状と原因の区別**: `direction`パラメータ不足は**症状**、真の原因は**フラグ未設定**だった
+4. **段階的修正の価値**: v4.2.0でパラメータを追加したことで、根本原因が明確になった
+5. **防御的プログラミング**: NavigationManager未定義時のフォールバック処理でアプリの堅牢性を確保
+
+#### 対象アクション（全9個を修正）
+
+- ✅ `next-step-random-practice`
+- ✅ `next-step-random-upgrade`
+- ✅ `next-step-continuous-practice`
+- ✅ `next-step-continuous-upgrade`
+- ✅ `next-step-12tone-ascending-practice`
+- ✅ `next-step-12tone-ascending-upgrade`
+- ✅ `next-step-12tone-descending-practice`
+- ✅ `next-step-12tone-descending-upgrade`
+- ✅ `next-step-12tone-both-practice`
+
+---
+
 ## 改訂履歴
 
 | バージョン | 日付 | 変更内容 | 担当者 |
 |-----------|------|---------|--------|
+| 4.3.0 | 2025-11-18 | NavigationManager.navigate() API統合による根本的修正 | Claude |
+|  |  | - ✅ results-overview-controller.js v4.3.0: window.location.hash → NavigationManager.navigate()へ全面移行 |  |
+|  |  | - ✅ preparationPageActiveフラグ自動設定によりダイレクトアクセス誤検出を完全解決 |  |
+|  |  | - ✅ 全9個の「次のステップ」アクションでNavigationManager統合API使用 |  |
+|  |  | - ✅ NavigationManager未定義時のフォールバック処理追加（防御的プログラミング） |  |
+|  |  | - ✅ 根本原因: window.location.hashがpreparationPageActiveフラグを設定しない |  |
+|  |  | - ✅ 解決: NavigationManager.navigate()がフラグを自動設定（line 747） |  |
+|  |  | - ✅ v4.2.0での「directionパラメータ不足」は副次的問題、真の原因は「フラグ未設定」だった |  |
 | 3.4.0 | 2025-11-18 | 総合評価ページからの遷移パラメータ不足によるダイレクトアクセス誤検出問題を解決 | Claude |
 |  |  | - ✅ results-overview-controller.js v4.2.0: 次のステップボタンにdirectionパラメータ追加 |  |
 |  |  | - ✅ currentScaleDirectionグローバル変数追加（displayNextSteps関数で設定） |  |
