@@ -1,8 +1,8 @@
 # 音域不足時の自動拡張と警告システム仕様書
 
-**バージョン**: 3.1.0
+**バージョン**: 3.2.0
 **作成日**: 2025-11-10
-**最終更新日**: 2025-11-14
+**最終更新日**: 2025-11-18
 **対象システム**: 音域テスト・トレーニングモード基音選定
 
 ---
@@ -86,7 +86,7 @@ if (octaves < 1.0) {
 - **実装日**: 2025-11-10
 - **バージョン**: v3.0.0
 
-### 4.2 拡張アルゴリズム
+### 4.2 拡張アルゴリズム（v3.2.0更新: 方向別拡張対応）
 
 ```javascript
 // モード別必要音数チェック
@@ -101,19 +101,43 @@ if (currentMode === 'random') {
 // 音域不足の場合は自動拡張
 if (requiredNotes > 0 && availableNotes.length < requiredNotes) {
     const neededNotes = requiredNotes - availableNotes.length;
+    let notesToAdd = [];
 
-    // 音域上限側から追加
-    const higherNotes = allNotes.filter(note =>
-        note.frequency > highestAvailableNote.frequency &&
-        note.frequency <= highFreq  // 基音自体は音域内
-    );
+    if (currentScaleDirection === 'descending') {
+        // 【下行モード】低音側に拡張（v3.2.0新規）
+        const lowestAvailableNote = availableNotes[0];
 
-    const notesToAdd = higherNotes.slice(0, neededNotes);
-    availableNotes = [...availableNotes, ...notesToAdd];
+        // 音域下限側から追加（10%余裕を持たせる）
+        const lowerNotes = allNotes.filter(note =>
+            note.frequency < lowestAvailableNote.frequency &&
+            note.frequency / 2 >= lowFreq * 0.9  // 基音-1オクターブが音域下限の90%以上
+        );
+
+        // 必要な分だけ追加（低い音から順に）
+        notesToAdd = lowerNotes.slice(-neededNotes);
+
+        // 低音側に追加するため、配列の先頭に挿入
+        availableNotes = [...notesToAdd, ...availableNotes];
+    } else {
+        // 【上行モード】高音側に拡張（従来ロジック）
+        const highestAvailableNote = availableNotes[availableNotes.length - 1];
+
+        // 音域上限側から追加（10%余裕を持たせる）
+        const higherNotes = allNotes.filter(note =>
+            note.frequency > highestAvailableNote.frequency &&
+            note.frequency * 2 <= highFreq * 1.1  // 基音+1オクターブが音域上限の110%以下
+        );
+
+        // 必要な分だけ追加
+        notesToAdd = higherNotes.slice(0, neededNotes);
+        availableNotes = [...availableNotes, ...notesToAdd];
+    }
 }
 ```
 
 ### 4.3 拡張例
+
+#### 4.3.1 上行モード拡張例
 
 **ケース: F-E（1.9オクターブ）→ 6音**
 
@@ -123,13 +147,49 @@ if (requiredNotes > 0 && availableNotes.length < requiredNotes) {
 | 理想的な基音 | G2, A2, B2, C3, D3, E3 = **6音** |
 | 必要音数 | 8音（ランダム基音モード） |
 | 不足数 | 2音 |
-| **自動追加** | **F3, G3** |
+| **自動追加** | **F3, G3**（高音側に拡張） |
 | 最終基音リスト | G2, A2, B2, C3, D3, E3, **F3, G3** = 8音 |
 
 **注意点**:
 - F3を基音にすると、1オクターブ上のF4 (349.2Hz)が音域上限E4 (329.6Hz)を超える
 - G3を基音にすると、1オクターブ上のG4 (392.0Hz)が音域上限E4 (329.6Hz)を超える
 - → ユーザーに事前警告必須
+
+#### 4.3.2 下行モード拡張例（v3.2.0新規）
+
+**ケース: G2-F4（1.92オクターブ、12音階下行モード）→ 11音**
+
+| 項目 | 内容 |
+|------|------|
+| 測定音域 | 94.3Hz - 357.4Hz (1.92オクターブ) |
+| 理想的な基音 | G3 (196.0Hz) - F4 (349.2Hz) = **11音** |
+| 必要音数 | 12音（12音階モード） |
+| 不足数 | 1音 |
+| **拡張条件** | `note.frequency / 2 >= 94.3 * 0.9` (84.87Hz以上) |
+| **候補音** | F#3 (185.0Hz) → 185.0 / 2 = 92.5Hz ✅ |
+|  | F3 (174.6Hz) → 174.6 / 2 = 87.3Hz ✅ |
+| **自動追加** | **F#3**（低音側に拡張、1音のみ必要） |
+| 最終基音リスト | **F#3**, G3, G#3, A3, A#3, B3, C4, C#4, D4, D#4, E4, F4 = 12音 |
+
+**注意点**:
+- F#3を基音にすると、1オクターブ下のF#2 (92.5Hz)が音域下限94.3Hzを若干下回る
+- 10%余裕により拡張可能（92.5Hz ≥ 84.87Hz）
+- → ユーザーに事前警告必須
+
+#### 4.3.3 10%余裕の設計理由（v3.2.0）
+
+**問題**:
+- 厳密な条件（`note.frequency / 2 >= lowFreq`）では拡張候補が見つからないケースが頻発
+- 例: 188.6Hz ～ 196.0Hzの範囲（わずか7.4Hz）に半音階の音が存在しない
+
+**解決策**:
+- 上行モード: `note.frequency * 2 <= highFreq * 1.1` （音域上限の110%まで許容）
+- 下行モード: `note.frequency / 2 >= lowFreq * 0.9` （音域下限の90%まで許容）
+
+**効果**:
+- 拡張候補範囲が約3-4倍に拡大（7.4Hz → 26.26Hz）
+- 音域不足時でも確実に必要な音数を確保可能
+- ユーザー体験の向上（音域外の音でも発声可能な範囲内）
 
 ---
 
@@ -483,9 +543,13 @@ selectAllBaseNotesForMode()
 ## 10. 既知の制約・注意事項
 
 ### 10.1 技術的制約
-- **音域上限側からのみ拡張**: 低音側の拡張は実装していない（低音は出しづらいため）
-- **基音自体は音域内**: 追加する基音自体は音域内に収める（1オクターブ上が音域外になる可能性）
-- **白鍵のみ対応**: ランダム基音モードは白鍵のみを使用
+
+#### v3.2.0更新: 方向別拡張対応
+- **上行モード**: 音域上限側に拡張（基音+1オクターブが音域外になる可能性）
+- **下行モード**: 音域下限側に拡張（基音-1オクターブが音域外になる可能性）
+- **10%余裕**: 両方向とも10%の余裕を持たせて拡張（確実な音数確保のため）
+- **基音順序維持**: 下行モード拡張時は配列先頭に挿入して音程順序を保持
+- **白鍵のみ対応**: ランダム基音モードは白鍵のみを使用（連続・12音階は全音対応）
 
 ### 10.2 ユーザー体験上の注意
 - **無理な発声を強制しない**: 警告を明示し、ユーザーに選択肢を提供
@@ -775,6 +839,7 @@ if (actualCount < 12) {
 
 | バージョン | 日付 | 変更内容 |
 |------------|------|----------|
+| 3.2.0 | 2025-11-18 | **下行モード対応**: Section 4.2更新（方向別拡張ロジック実装）、Section 4.3.2追加（下行モード拡張例）、Section 4.3.3追加（10%余裕の設計理由）、Section 10.1更新（両方向対応を明記）。12音階下行モードで音域不足時に12音確保できずクラッシュする問題を解決（trainingController.js v4.0.21-v4.0.22）|
 | 3.1.0 | 2025-11-14 | Section 2.1追加: 自動拡張と重複許可の関係を詳細説明。Section 8.1更新: ランダム基音モードの6段階フォールバック優先順位と実際の動作例を追加 |
 | 3.0.2 | 2025-11-14 | 警告メッセージを「全モード共通で2.0オクターブ推奨」に統一（Section 5.1, 5.2, 7.1更新） |
 | 3.0.1 | 2025-11-14 | セクション12.8更新: selectSequentialMode()のセッション数仕様明確化（常に12/24セッション、音域不足でも音階重複なし） |
