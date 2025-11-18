@@ -21,7 +21,10 @@
  *
  * 【変更履歴】
  * v2.1.0 (2025-11-18): getDisplayName()メソッド追加
- *                      12音階モードの方向別表示名を一元管理（上昇/下降/両方向）
+ *                      全モードで方向別表示名を一元管理（上行/下行）
+ *                      - ランダム基音: "ランダム基音上行モード", "ランダム基音下行モード"
+ *                      - 連続チャレンジ: "連続チャレンジ上行モード", "連続チャレンジ下行モード"
+ *                      - 12音階: "12音階上昇モード", "12音階下降モード", "12音階両方向モード"
  * v2.0.1 (2025-11-16): standardDurationPerSession追加（全モード13秒）
  *                      純粋なトレーニング時間（基音2.5s+ガイド5.3s+発声5.6s）のみカウント
  * v2.0.0 (2025-11-14): UI色設定追加（アイコン背景・サブタイトル色）
@@ -49,6 +52,11 @@ const ModeController = {
             colors: {
                 iconBg: 'gradient-catalog-green',
                 subtitle: 'text-green-200'
+            },
+            // 方向別表示名（v2.1.0追加）
+            directions: {
+                'ascending': { name: '上行' },
+                'descending': { name: '下行' }
             }
         },
         'continuous': {
@@ -67,6 +75,11 @@ const ModeController = {
             colors: {
                 iconBg: 'gradient-catalog-orange',
                 subtitle: 'text-orange-200'
+            },
+            // 方向別表示名（v2.1.0追加）
+            directions: {
+                'ascending': { name: '上行' },
+                'descending': { name: '下行' }
             }
         },
         '12tone': {
@@ -164,15 +177,22 @@ const ModeController = {
     getDisplayName(modeId, options = {}) {
         const mode = this.getMode(modeId);
 
-        // 12音階モードの場合は方向別の表示名を返す
-        if (modeId === '12tone' && options.direction && mode.directions) {
+        // 方向パラメータがある場合は方向別の表示名を返す
+        if (options.direction && mode.directions) {
             const directionInfo = mode.directions[options.direction];
             if (directionInfo) {
-                return `12音階${directionInfo.name}モード`;
+                // モード別の表示名生成
+                if (modeId === '12tone') {
+                    return `12音階${directionInfo.name}モード`;
+                } else if (modeId === 'random') {
+                    return `ランダム基音${directionInfo.name}モード`;
+                } else if (modeId === 'continuous') {
+                    return `連続チャレンジ${directionInfo.name}モード`;
+                }
             }
         }
 
-        // その他のモードは通常のモード名を返す
+        // 方向パラメータがない場合は通常のモード名を返す
         return mode.name;
     },
 

@@ -12128,3 +12128,41 @@ Section 10.1: 技術的制約を両方向対応に更新
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-18 20:45:08] コミット: refactor(mode): 12音階モードの方向別表示名をModeControllerに集約
+
+ModeController v2.1.0: getDisplayName()メソッド追加
+
+【問題】
+- 準備ページで12音階モードのサブタイトルが常に「12音階モードの準備中」
+- 方向別（上行/下行/両方向）の表示名が反映されない
+- 表示名ロジックがpreparation-pitchpro-cycle.jsに分散
+
+【実装した改善】
+ModeController.getDisplayName(modeId, options)メソッド追加:
+- 既存のdirectionsオブジェクトを活用
+- 12音階モード: 方向別表示名を自動生成
+  * ascending → "12音階上昇モード"
+  * descending → "12音階下降モード"
+  * both → "12音階両方向モード"
+- その他のモード: 通常のモード名を返す
+
+preparation-pitchpro-cycle.js簡素化:
+- 19行の複雑なロジック → 8行に短縮
+- ModeController.getDisplayName()を呼び出すだけ
+
+【効果】
+- 表示名管理の一元化（Single Source of Truth）
+- コードの保守性向上（変更箇所が1箇所に集約）
+- 将来の拡張性向上（他のモードでも方向別表示が容易）
+
+【修正ファイル】
+- mode-controller.js (v2.0.1 → v2.1.0)
+  * getDisplayName()メソッド追加
+- preparation-pitchpro-cycle.js (v202511180024 → v202511181250)
+  * ModeController.getDisplayName()使用に変更
+- index.html: mode-controller.jsバージョン更新
+- preparation.html: キャッシュバージョン更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
