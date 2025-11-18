@@ -1,11 +1,12 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.0.9 (2025-11-16)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.1.0 (2025-11-18)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.0.9
- * Date: 2025-11-16
+ * Version: 4.1.0
+ * Date: 2025-11-18
  * Changelog:
+ *   v4.1.0 - 【バグ修正】二重初期化防止フラグのリセット処理追加（SPA遷移時の3セクションローディング固定問題を解決）
  *   v4.0.9 - 【UI改善】評価分布グラフにヘルプボタン追加（DistributionChart.getHelpButton統合）
  *   v4.0.8 - 【機能統合】DistributionChartコンポーネントを総合評価分布表示に統合
  *   v4.0.7 - 【バグ修正】セッション詳細のナビゲーションボタンイベントリスナー追加
@@ -45,6 +46,14 @@ const DEBUG_MODE = true;
 
 // 🛡️ 二重初期化防止フラグ
 let isResultsOverviewInitialized = false;
+
+/**
+ * 初期化フラグをリセット（router.jsのクリーンアップから呼び出される）
+ */
+window.resetResultsOverviewInitialization = function() {
+    isResultsOverviewInitialized = false;
+    console.log('🔄 [results-overview] Initialization flag reset');
+};
 
 /**
  * 総合評価ページの初期化（即座にグローバル定義）

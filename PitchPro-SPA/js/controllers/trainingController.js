@@ -351,20 +351,6 @@ export async function initializeTrainingPage() {
     // Load voice range data
     loadVoiceRangeData();
 
-    // 【NavigationManager統合】リロード検出 → preparationへリダイレクト
-    if (NavigationManager.detectReload()) {
-        console.warn('⚠️ リロード検出 - preparationへリダイレクト');
-
-        // ユーザーに説明を表示
-        NavigationManager.showReloadDialog();
-
-        // preparationへリダイレクト（自動的にbeforeunload/popstate無効化）
-        await NavigationManager.redirectToPreparation('リロード検出');
-
-        // リダイレクトエラーをスロー（router.jsで特別扱い）
-        throw NavigationManager.createRedirectError();
-    }
-
     // 【新規追加】音域データ必須チェック
     if (!checkVoiceRangeData()) {
         console.error('❌ 音域データが設定されていません');
@@ -384,11 +370,9 @@ export async function initializeTrainingPage() {
     // Update session progress UI
     updateSessionProgressUI();
 
-    // 【ハイブリッド方式】ページ離脱警告を有効化（タブを閉じる・リロード対策）
-    if (window.NavigationManager) {
-        window.NavigationManager.enableNavigationWarning();
-        console.log('✅ ページ離脱警告を有効化（タブを閉じる・リロード対策）');
-    }
+    // 【v4.3.0削除】beforeunload警告を削除（リロード時のUX改善）
+    // ダイレクトアクセス検出により、マイク許可問題は根本解決済み
+    // リロード時はアプリのアラートのみ表示（ダイアログ1つでスムーズ）
 
     // Setup button (常に再登録)
     const playButton = document.getElementById('play-base-note');
@@ -685,30 +669,22 @@ async function startTraining() {
         console.log(`   基音: ${baseNoteInfo.note} (${baseNoteInfo.frequency.toFixed(1)}Hz)`);
         console.log('');
 
-        // 【v4.0.2改善】基音再生中はマイクをミュート（MediaStream保持）
-        // stopDetection()ではなくmute()を使用してMediaStreamトラックを保持
-        if (audioDetector && audioDetector.microphoneController) {
-            console.log('🎤 基音再生前にマイクをミュート（MediaStream保持）');
+        // 【v4.1.2改善】基音再生中は検出を停止（MediaStream保持）
+        // mute()だけでは検出ループが継続し、BLOCKEDログが大量出力される問題に対応
+        if (audioDetector) {
+            console.log('🎤 基音再生前に検出を停止（MediaStream保持）');
             try {
-                audioDetector.microphoneController.mute();
-                console.log('✅ マイクミュート完了 - MediaStreamは健全');
+                audioDetector.stopDetection();
+                console.log('⏹️ 検出停止完了 - MediaStreamは健全');
             } catch (error) {
-                console.warn('⚠️ マイクミュートエラー（無視して続行）:', error);
+                console.warn('⚠️ stopDetection()エラー（無視して続行）:', error);
             }
         }
 
         await pitchShifter.playNote(baseNoteInfo.note, 1.0);
 
-        // 基音再生後にマイクのミュートを解除
-        if (audioDetector && audioDetector.microphoneController) {
-            console.log('🔊 基音再生完了 - マイクのミュートを解除');
-            try {
-                audioDetector.microphoneController.unmute();
-                console.log('✅ マイクアンミュート完了');
-            } catch (error) {
-                console.warn('⚠️ マイクアンミュートエラー（無視して続行）:', error);
-            }
-        }
+        // 【v4.2.2改善】基音再生後はマイクオフのまま（ドレミガイド開始時にオン）
+        // 基音の音を拾わないようにするため
 
         // セッションデータ記録開始
         if (window.sessionDataRecorder) {
@@ -741,7 +717,14 @@ async function startTraining() {
         // 【v4.0.8】2.5秒後にドレミガイド開始
         // 基音総再生時間: attack(0.02s) + sustain(1.0s) + release(2.5s) = 3.52s
         // ドレミガイド開始時は基音のreleaseフェーズ中（自然な音の重なり）
-        setTimeout(() => {
+        setTimeout(async () => {
+            // 【v4.2.2追加】ドレミガイド開始時にマイクオン（基音の音を拾わないため）
+            if (audioDetector) {
+                console.log('🔊 ドレミガイド開始 - マイクオン');
+                await audioDetector.startDetection();
+                console.log('▶️ マイク検出開始完了');
+            }
+
             // ボタンはドレミガイド完了まで無効のまま（重要！）
             // handleSessionComplete()で結果ページへ遷移するため、ここでは有効化しない
             if (statusText) {
@@ -940,6 +923,7 @@ async function startDoremiGuide() {
         }
 
         // 音声検出開始（初回も2回目以降も実行）
+        // 【v4.2.0改善】PitchPro v1.3.5で冪等性対応済み - 状態チェック不要
         await audioDetector.startDetection();
         console.log('✅ マイクオン完了 - 音声検出開始');
 
@@ -1114,6 +1098,12 @@ function handleSessionComplete() {
     // 【変更】audioDetectorのクリーンアップはNavigationManagerが自動実行
     // NavigationManager.navigate()で遷移時に自動的にstopDetection() + destroy()が呼ばれる
     // これにより、PitchPro警告アラート発火とpopstateイベント問題を根本解決
+
+    // 【v4.2.1追加】セッション完了時に検出を停止（準備中の音量バー動作を防止）
+    if (audioDetector) {
+        audioDetector.stopDetection();
+        console.log('⏹️ セッション完了 - 検出停止');
+    }
 
     // マイクバッジを通常状態に戻す
     const micBadge = document.getElementById('mic-badge');

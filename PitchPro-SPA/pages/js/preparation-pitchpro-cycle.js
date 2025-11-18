@@ -76,7 +76,7 @@ class PitchProCycleManager {
 
                     // preparation固有設定
                     deviceOptimization: true,
-                    debug: true
+                    debug: false  // 【v4.1.3】本番環境ではデバッグログを無効化
                 })
             );
 
@@ -110,6 +110,21 @@ class PitchProCycleManager {
      */
     async startAudioDetection(mode = 'audiotest') {
         try {
+
+            // 【v4.1.1追加】AudioDetectorがmute状態の場合はunmute()を呼ぶ
+            // preparationページ再訪問時（総合評価→次のステップなど）にmute状態が残っている問題に対応
+            if (this.audioDetector && this.audioDetector.microphoneController) {
+                const isMuted = this.audioDetector.microphoneController.isMuted();
+                if (isMuted) {
+                    console.log('🔊 [v4.1.1] AudioDetectorがmute状態のため、unmute()を実行');
+                    try {
+                        this.audioDetector.microphoneController.unmute();
+                        console.log('✅ AudioDetector unmute完了');
+                    } catch (unmuteError) {
+                        console.warn('⚠️ unmute()エラー（続行）:', unmuteError);
+                    }
+                }
+            }
 
             // 既に開始されている場合は、一度停止してからリスタート
             if (this.currentPhase === 'started' || this.state.detectionActive) {
@@ -164,6 +179,7 @@ class PitchProCycleManager {
             console.log('✅ コールバック再設定完了（updateSelectors後）');
 
             // 検出開始
+            // 【v4.2.0改善】PitchPro v1.3.5で冪等性対応済み - 状態チェック不要
             await this.audioDetector.startDetection();
             console.log('✅ 検出開始完了');
 
@@ -494,22 +510,21 @@ class PitchProCycleManager {
     async showDetectionSuccess() {
         console.log('🎉 showDetectionSuccess実行開始');
 
-        // 【v4.0.4改善】AudioDetectorは継続してtrainingに引き継ぐ
-        // UIリセット + マイクミュートでMediaStream保持しつつ処理最小化
+        // 【v4.1.2改善】AudioDetectorは継続してtrainingに引き継ぐ
+        // stopDetection()で検出ループを停止、MediaStreamは保持される
         if (this.audioDetector) {
             this.audioDetector.resetDisplayElements(); // PitchPro標準メソッドでUIリセット
             this.state.detectionActive = false; // 内部状態のみ更新
             console.log('🔄 UI要素リセット完了（AudioDetectorはtrainingに引き継ぎ）');
 
-            // 【v4.0.4追加】マイクをミュートして不要な音声処理を停止
-            // MediaStreamは保持されるが、入力が無効化されるため処理が最小化される
-            if (this.audioDetector.microphoneController) {
-                try {
-                    this.audioDetector.microphoneController.mute();
-                    console.log('🔇 マイクをミュート（MediaStream保持、処理最小化）');
-                } catch (error) {
-                    console.warn('⚠️ マイクミュートエラー（無視して続行）:', error);
-                }
+            // 【v4.1.2修正】stopDetection()で検出ループを完全停止（MediaStream保持）
+            // PitchDetector.stopDetection()はMediaStreamに触れず、検出ループのみ停止
+            // mute()だけでは検出ループが継続し、BLOCKEDログが大量出力される問題に対応
+            try {
+                this.audioDetector.stopDetection();
+                console.log('⏹️ AudioDetector検出停止（MediaStream保持、state: ready）');
+            } catch (error) {
+                console.warn('⚠️ stopDetection()エラー（無視して続行）:', error);
             }
         }
 
@@ -865,6 +880,38 @@ window.initializePreparationPitchProCycle = async function() {
     micPermissionListenerAdded = false;
     isPlayingBaseNote = false;
     console.log('🔄 イベントリスナーフラグをリセット');
+
+    // 【v4.1.0追加】URLパラメータからモード情報を取得してUI更新
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash.split('?')[1] || '');
+    const modeParam = params.get('mode') || 'random';
+    const directionParam = params.get('direction');
+
+    console.log('🔍 [preparation] モードパラメータ:', modeParam);
+    console.log('🔍 [preparation] 方向パラメータ:', directionParam);
+
+    // ModeControllerでモード情報を取得
+    if (window.ModeController) {
+        const modeInfo = window.ModeController.getMode(modeParam);
+        if (modeInfo) {
+            const subtitle = document.getElementById('preparation-mode-subtitle');
+            if (subtitle) {
+                subtitle.textContent = `${modeInfo.name}の準備中`;
+                console.log(`✅ サブタイトル更新: ${modeInfo.name}の準備中`);
+            }
+        } else {
+            console.warn(`⚠️ モード情報が見つかりません: ${modeParam}`);
+        }
+    } else {
+        console.warn('⚠️ ModeControllerが利用できません');
+    }
+
+    // 【v4.1.0追加】モード情報をグローバル変数に保存（トレーニング遷移時に使用）
+    window.preparationRedirectInfo = {
+        mode: modeParam,
+        direction: directionParam
+    };
+    console.log('✅ preparationRedirectInfo保存:', window.preparationRedirectInfo);
 
     // 【修正v4.0.6】準備ページ初期化時にsessionStorageをクリア（中断レッスン復元防止）
     if (window.SessionManager) {
@@ -1257,16 +1304,8 @@ function setupMicPermissionFlow() {
 
                 console.log(`📍 モード情報を保持して遷移: mode=${finalMode}, session=${finalSession || 'なし'}, direction=${finalDirection || 'なし'}, scaleDirection=${scaleDirection}`);
 
-                // NavigationManagerではなく、直接URLを構築してscaleDirectionを追加
-                NavigationManager.setNormalTransition();
-                NavigationManager.removeBrowserBackPrevention();
-
-                const params = new URLSearchParams({ mode: finalMode });
-                if (finalSession) params.set('session', finalSession);
-                if (finalDirection) params.set('direction', finalDirection);
-                params.set('scaleDirection', scaleDirection); // 上行・下行パラメータを追加
-
-                window.location.hash = `training?${params.toString()}`;
+                // 【v4.2.3修正】NavigationManager統一メソッド使用（beforeunload自動無効化）
+                NavigationManager.navigateToTraining(finalMode, finalSession, finalDirection, scaleDirection);
 
             } catch (error) {
                 console.error('❌ トレーニング開始処理エラー:', error);

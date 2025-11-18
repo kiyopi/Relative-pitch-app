@@ -112,7 +112,15 @@ class SimpleRouter {
             'results-overview': {
                 init: 'initResultsOverview',
                 dependencies: ['Chart', 'DistributionChart'],
-                preventDoubleInit: true
+                preventDoubleInit: true,
+                cleanup: async () => {
+                    console.log('🧹 [Router] Cleaning up results-overview page...');
+                    // Reset controller's initialization flag
+                    if (window.resetResultsOverviewInitialization) {
+                        window.resetResultsOverviewInitialization();
+                    }
+                    console.log('✅ [Router] Results-overview cleanup complete');
+                }
             },
             'records': {
                 init: 'initRecords',

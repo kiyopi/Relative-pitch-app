@@ -1,7 +1,7 @@
 # PitchPro-SPA 仕様書ディレクトリ
 
-**最終更新日**: 2025-11-09
-**バージョン**: 2.4.0
+**最終更新日**: 2025-11-18
+**バージョン**: 2.5.0
 
 ## 📋 概要
 
@@ -197,6 +197,39 @@
 - `/PitchPro-SPA/index.html`（v1.3.2参照）
 - `/PitchPro-SPA/pages/js/preparation-pitchpro-cycle.js`（v2.0.0: アプリ側コード削除済み）
 
+### 11. ナビゲーション リロード検出仕様書
+**ファイル**: `NAVIGATION_RELOAD_DETECTION_SPECIFICATION.md`
+**バージョン**: 2.0.0
+**最終更新**: 2025-11-18（2フラグシステム統一完了）
+
+**内容**:
+- ✅ **v2.0.0 (2025-11-18)**: 2フラグシステムへの統一完了
+  - preparationページとtrainingページの統一設計
+  - 1フラグシステムの設計上の問題解決
+  - 役割分離による明確な責任境界
+- 2フラグシステム設計パターン
+  - 一時的遷移証明フラグ（`normalTransitionToXxx`）
+  - 永続的ページ状態フラグ（`xxxPageActive`）
+  - フラグライフサイクル管理
+- リロード検出とダイレクトアクセス防止
+  - モード情報の維持（random/continuous/12tone）
+  - 準備ページでのマイク許可再要求防止
+  - アプリ側ダイアログによるユーザー通知
+- NavigationManager統一API
+  - `setNormalTransitionToPreparation()`
+  - `setNormalTransitionToTraining()`
+  - `checkPageAccess()` 統一アクセス制御
+- 実装パターンとフロー図
+  - 正常遷移フロー（5ステップ）
+  - リロード検出フロー（3ステップ）
+  - ダイレクトアクセス検出フロー（3ステップ）
+- テストシナリオ（5パターン）
+- トラブルシューティングガイド
+
+**対象実装**:
+- `/PitchPro-SPA/js/navigation-manager.js`（v4.3.2）
+- `/PitchPro-SPA/js/router.js`（v4.3.2対応）
+
 ## 📚 参照情報
 
 ### 関連ドキュメント
@@ -259,6 +292,15 @@ PitchPro-SPA/
 - [x] 有料プラン機能仕様書（完了・新規作成）
 
 ### 更新履歴
+
+#### 2025-11-18 (v2.5.0)
+- `NAVIGATION_RELOAD_DETECTION_SPECIFICATION.md` v2.0.0 新規作成・追加
+- リロード検出・ダイレクトアクセス防止の2フラグシステム統一を文書化
+- preparationページとtrainingページの統一設計パターンを確立
+- 1フラグシステムの設計上の問題と解決策を記録
+- NavigationManager統一API仕様を文書化
+- 実装パターン・フロー図・テストシナリオ5パターンを記録
+- README.mdを v2.5.0 にアップデート
 
 #### 2025-11-09 (v2.4.0)
 - `MICROPHONE_BACKGROUND_RESILIENCE.md` v2.0.0にアップデート
