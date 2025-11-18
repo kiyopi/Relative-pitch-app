@@ -1,11 +1,12 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.1.0 (2025-11-18)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.2.0 (2025-11-18)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.1.0
+ * Version: 4.2.0
  * Date: 2025-11-18
  * Changelog:
+ *   v4.2.0 - 【重要修正】次のステップボタンにdirectionパラメータ追加（ブラウザバック問題を解決）
  *   v4.1.0 - 【バグ修正】二重初期化防止フラグのリセット処理追加（SPA遷移時の3セクションローディング固定問題を解決）
  *   v4.0.9 - 【UI改善】評価分布グラフにヘルプボタン追加（DistributionChart.getHelpButton統合）
  *   v4.0.8 - 【機能統合】DistributionChartコンポーネントを総合評価分布表示に統合
@@ -46,6 +47,9 @@ const DEBUG_MODE = true;
 
 // 🛡️ 二重初期化防止フラグ
 let isResultsOverviewInitialized = false;
+
+// 🌐 現在のscaleDirection保持用グローバル変数
+let currentScaleDirection = 'ascending';
 
 /**
  * 初期化フラグをリセット（router.jsのクリーンアップから呼び出される）
@@ -1065,6 +1069,10 @@ window.copyShareText = function(event) {
 function displayNextSteps(currentMode, evaluation, chromaticDirection = null, scaleDirection = 'ascending') {
     console.log('🔍 [DEBUG displayNextSteps] Parameters:', { currentMode, evaluation, chromaticDirection, scaleDirection });
 
+    // グローバル変数に保存（handleNextStepActionで使用）
+    currentScaleDirection = scaleDirection;
+    console.log('🔍 [DEBUG] currentScaleDirection set to:', currentScaleDirection);
+
     const container = document.getElementById('next-steps-container');
     if (!container) return;
 
@@ -1340,19 +1348,20 @@ function displayNextSteps(currentMode, evaluation, chromaticDirection = null, sc
  */
 function handleNextStepAction(actionId) {
     console.log('🎯 Next step action:', actionId);
+    console.log('🔍 [DEBUG] Using currentScaleDirection:', currentScaleDirection);
 
     const actions = {
         // ランダム基音モード
-        'next-step-random-practice': () => window.location.hash = 'preparation?mode=random',
-        'next-step-random-upgrade': () => window.location.hash = 'preparation?mode=continuous',
+        'next-step-random-practice': () => window.location.hash = `preparation?mode=random&direction=${currentScaleDirection}`,
+        'next-step-random-upgrade': () => window.location.hash = `preparation?mode=continuous&direction=${currentScaleDirection}`,
         'next-step-random-records': () => {
             sessionStorage.clear();
             window.location.hash = 'records';
         },
 
         // 連続チャレンジモード
-        'next-step-continuous-practice': () => window.location.hash = 'preparation?mode=continuous',
-        'next-step-continuous-upgrade': () => window.location.hash = 'preparation?mode=12tone&direction=ascending',
+        'next-step-continuous-practice': () => window.location.hash = `preparation?mode=continuous&direction=${currentScaleDirection}`,
+        'next-step-continuous-upgrade': () => window.location.hash = `preparation?mode=12tone&direction=ascending`,
         'next-step-continuous-records': () => {
             sessionStorage.clear();
             window.location.hash = 'records';
