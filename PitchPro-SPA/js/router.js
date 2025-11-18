@@ -11,7 +11,6 @@ class SimpleRouter {
             'training': 'pages/training.html?v=20251117002',
             'result-session': 'pages/result-session.html',
             'records': 'pages/records.html',
-            'results': 'pages/results-overview.html',
             'results-overview': 'pages/results-overview.html',
             'premium-analysis': 'pages/premium-analysis.html',
             'settings': 'pages/settings.html'
@@ -231,6 +230,24 @@ class SimpleRouter {
             return;
         }
 
+        // 【v4.3.1】統一アクセス制御チェック
+        // ダイレクトアクセス・リロード検出を統一的に処理
+        const accessCheck = await NavigationManager.checkPageAccess(page);
+        if (!accessCheck.shouldContinue) {
+            console.log(`🔄 [Router] Page access blocked: ${accessCheck.reason}`);
+            return; // リダイレクト済み、初期化中断
+        }
+
+        const config = NavigationManager.PAGE_CONFIG[page];
+
+        // 【v4.3.0】フラグ設定（初期化開始マーク）
+        // ⚠️ 重要: このフラグは初期化成功時に削除しない（リロード検出のため残す）
+        // フラグ削除タイミング: 正常遷移時・リロード検出時・ページ離脱時・エラー時のみ
+        if (config?.preventReload) {
+            sessionStorage.setItem(page + 'PageActive', 'true');
+            console.log(`🏁 [Router] ${page}PageActiveフラグを設定（初期化開始）`);
+        }
+
         try {
             // 1. HTMLテンプレートを読み込み（キャッシュ回避）
             const response = await fetch(`${templatePath}?v=${Date.now()}`);
@@ -300,6 +317,12 @@ class SimpleRouter {
             console.log(`✅ [Router] Page loaded: ${page}`);
 
         } catch (error) {
+            // 【v4.3.0】エラー時もフラグ削除
+            if (config?.preventReload) {
+                sessionStorage.removeItem(page + 'PageActive');
+                console.log(`⚠️ [Router] ${page}PageActiveフラグを削除（エラー発生）`);
+            }
+
             console.error(`Error loading page ${page}:`, error);
             throw error;
         }
@@ -661,6 +684,12 @@ class SimpleRouter {
                     NavigationManager.navigateToTraining(mode, session);
                 } else {
                     // training以外のルート（preparation等）
+
+                    // 【v4.3.2】preparationページへの正常な遷移フラグ設定
+                    if (route === 'preparation') {
+                        NavigationManager.setNormalTransitionToPreparation();
+                    }
+
                     let hash = route;
                     if (mode || session || direction) {
                         const params = new URLSearchParams();
@@ -795,6 +824,12 @@ class SimpleRouter {
             if (config?.preventDoubleInit && this.initializedPages.has(this.currentPage)) {
                 this.initializedPages.delete(this.currentPage);
                 console.log(`🔄 [Router] Reset initialization flag for: ${this.currentPage}`);
+            }
+
+            // 【v4.3.1】preparationPageActiveフラグのクリーンアップ
+            if (this.currentPage === 'preparation') {
+                sessionStorage.removeItem('preparationPageActive');
+                console.log('🔄 [Router] preparationPageActiveフラグを削除（ページ離脱）');
             }
 
         } catch (error) {

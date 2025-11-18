@@ -44,8 +44,31 @@
  * - result-session・results-overview・training以外への遷移時にcurrentLessonIdを自動削除
  * - これにより、途中離脱後の新規トレーニングで古いlessonIdが使用される問題を解決
  *
- * @version 3.1.0
- * @date 2025-11-13
+ * 【v4.2.3更新】
+ * - detectReload()のチェック順序を修正（normalTransitionフラグを最優先に変更）
+ * - preparation → trainingの正常な遷移で誤ってリロード判定される問題を修正
+ * - normalTransition検出時にtrainingPageActiveフラグもクリアするように改善
+ *
+ * 【v4.3.1更新】
+ * - popstateハンドラーでの許可された遷移時にnormalTransitionフラグを設定
+ * - preparation → trainingの遷移がpopstateイベント経由の場合も正常に動作するように修正
+ *
+ * 【v4.3.2更新】
+ * - result-sessionページに2フラグシステムを完全適用
+ * - normalTransitionToResultSession専用フラグ追加
+ * - checkPageAccess()にresult-session完全チェック追加
+ * - ランダム基音モードでのリロード時マイク許可放棄問題を解決
+ * - ドレミガイド進行中のマイク許可ダイアログ表示によるレッスン破綻を防止
+ *
+ * 【v4.3.3更新】
+ * - 'results'エイリアス削除（'results-overview'のみに統一）
+ * - results-overviewにダイレクトアクセス制御追加
+ * - 未使用コード削除（showReloadDialog, redirectTo）
+ * - PAGE_CONFIG・ALLOWED_TRANSITIONSから'results'削除
+ * - コードベースのクリーンアップ完了（47行削減）
+ *
+ * @version 4.3.3
+ * @date 2025-11-18
  */
 
 class NavigationManager {
@@ -54,6 +77,8 @@ class NavigationManager {
      */
     static KEYS = {
         NORMAL_TRANSITION: 'normalTransitionToTraining',
+        NORMAL_TRANSITION_PREPARATION: 'normalTransitionToPreparation',
+        NORMAL_TRANSITION_RESULT_SESSION: 'normalTransitionToResultSession',
         REDIRECT_COMPLETED: 'reloadRedirected'
     };
 
@@ -86,23 +111,90 @@ class NavigationManager {
      */
     static setNormalTransition() {
         sessionStorage.setItem(this.KEYS.NORMAL_TRANSITION, 'true');
-        console.log('✅ [NavigationManager] 正常な遷移フラグを設定');
+        console.log('✅ [NavigationManager] 正常な遷移フラグを設定（training）');
     }
 
     /**
-     * リロード検出
+     * preparationページへの正常な遷移フラグを設定
      *
-     * 【重要】trainingController の initializeTrainingPage() で最初に呼び出す
+     * 【重要】この関数を呼び出さずにpreparationへ遷移すると、リロードとして誤検出される
+     */
+    static setNormalTransitionToPreparation() {
+        sessionStorage.setItem(this.KEYS.NORMAL_TRANSITION_PREPARATION, 'true');
+        console.log('✅ [NavigationManager] 正常な遷移フラグを設定（preparation）');
+    }
+
+    /**
+     * result-sessionページへの正常な遷移フラグを設定
      *
+     * 【重要】この関数を呼び出さずにresult-sessionへ遷移すると、リロードとして誤検出される
+     */
+    static setNormalTransitionToResultSession() {
+        sessionStorage.setItem(this.KEYS.NORMAL_TRANSITION_RESULT_SESSION, 'true');
+        console.log('✅ [NavigationManager] 正常な遷移フラグを設定（result-session）');
+    }
+
+    /**
+     * 【v4.3.0】リロード検出（汎用化）
+     *
+     * 【重要】router.js の loadPage() で最初に呼び出す
+     *
+     * @param {string|null} page - ページ名（省略時は後方互換性モード）
      * @returns {boolean} true: リロード検出, false: 正常な遷移
      */
-    static detectReload() {
-        console.log('🔍 [NavigationManager] リロード検出開始');
+    static detectReload(page = null) {
+        console.log(`🔍 [NavigationManager] リロード検出開始 (page: ${page || 'なし'})`);
 
         // 0. visibilitychange監視を初期化（初回のみ）
         this.initVisibilityTracking();
 
-        // 1. ウィンドウ切り替え誤検出を防止（1秒以内のvisibilitychangeは除外）
+        // 1. 正常な遷移フラグをチェック（最優先）
+        // preparation → training 等の正常な遷移を最初に除外
+        const normalTransition = sessionStorage.getItem(this.KEYS.NORMAL_TRANSITION);
+        console.log('🔍 [NavigationManager] normalTransition フラグ:', normalTransition);
+        if (normalTransition === 'true') {
+            sessionStorage.removeItem(this.KEYS.NORMAL_TRANSITION);
+
+            // 正常な遷移なので、ページアクティブフラグもクリア
+            if (page) {
+                sessionStorage.removeItem(page + 'PageActive');
+                console.log(`✅ [NavigationManager] ${page}PageActiveフラグをクリア（正常な遷移）`);
+            }
+            // 後方互換性: trainingPageActiveもクリア
+            sessionStorage.removeItem('trainingPageActive');
+
+            console.log('✅ [NavigationManager] 正常な遷移を検出');
+            return false;
+        }
+
+        // 2. リダイレクト済みフラグをチェック（2回目の検出を防止）
+        const alreadyRedirected = sessionStorage.getItem(this.KEYS.REDIRECT_COMPLETED);
+        if (alreadyRedirected === 'true') {
+            console.log('✅ [NavigationManager] リダイレクト済み - 2回目の検出をスキップ');
+            sessionStorage.removeItem(this.KEYS.REDIRECT_COMPLETED);
+            return false;
+        }
+
+        // 3. 【v4.3.0拡張】ページアクティブフラグチェック（動的）
+        // ページが前回アクティブだった = リロードまたはクラッシュ
+        if (page) {
+            const wasPageActive = sessionStorage.getItem(page + 'PageActive');
+            if (wasPageActive === 'true') {
+                console.log(`⚠️ [v4.3.0] ${page}PageActiveフラグ検出 - リロード確定`);
+                sessionStorage.removeItem(page + 'PageActive');
+                return true;  // リロード検出
+            }
+        }
+
+        // 後方互換性: trainingPageActiveもチェック
+        const wasTrainingActive = sessionStorage.getItem('trainingPageActive');
+        if (wasTrainingActive === 'true') {
+            console.log('⚠️ [後方互換] trainingPageActiveフラグ検出 - リロード確定');
+            sessionStorage.removeItem('trainingPageActive');
+            return true;  // リロード検出
+        }
+
+        // 4. ウィンドウ切り替え誤検出を防止（1秒以内のvisibilitychangeは除外）
         const timeSinceVisibilityChange = Date.now() - this.lastVisibilityChange;
         console.log('🔍 [NavigationManager] 最後のvisibilitychangeからの経過時間:', timeSinceVisibilityChange + 'ms');
 
@@ -121,24 +213,7 @@ class NavigationManager {
             }
         }
 
-        // 2. リダイレクト済みフラグをチェック（2回目の検出を防止）
-        const alreadyRedirected = sessionStorage.getItem(this.KEYS.REDIRECT_COMPLETED);
-        if (alreadyRedirected === 'true') {
-            console.log('✅ [NavigationManager] リダイレクト済み - 2回目の検出をスキップ');
-            sessionStorage.removeItem(this.KEYS.REDIRECT_COMPLETED);
-            return false;
-        }
-
-        // 3. 正常な遷移フラグをチェック（preparation → training 等）
-        const normalTransition = sessionStorage.getItem(this.KEYS.NORMAL_TRANSITION);
-        console.log('🔍 [NavigationManager] normalTransition フラグ:', normalTransition);
-        if (normalTransition === 'true') {
-            sessionStorage.removeItem(this.KEYS.NORMAL_TRANSITION);
-            console.log('✅ [NavigationManager] 正常な遷移を検出');
-            return false;
-        }
-
-        // 4. Navigation Timing API v2（モダンAPI優先）
+        // 5. Navigation Timing API v2（モダンAPI優先）
         const navEntries = performance.getEntriesByType('navigation');
         console.log('🔍 [NavigationManager] Navigation Timing API v2:', navEntries);
         if (navEntries.length > 0) {
@@ -154,7 +229,7 @@ class NavigationManager {
             }
         }
 
-        // 5. フォールバック: 古いAPI（非推奨だが念のため）
+        // 6. フォールバック: 古いAPI（非推奨だが念のため）
         if (performance.navigation && performance.navigation.type === 1) {
             console.log('⚠️ [NavigationManager] リロード検出（古いAPI・フォールバック）: type === 1');
             sessionStorage.setItem(this.KEYS.REDIRECT_COMPLETED, 'true');
@@ -166,49 +241,222 @@ class NavigationManager {
     }
 
     /**
-     * リロード検出時のダイアログ表示
+     * 【v4.3.0】ダイレクトアクセス検出（準備ページ経由が必要かチェック）
+     *
+     * トレーニングページ・セッション評価ページは必ず準備ページ経由でアクセスさせる
+     * ブックマークからの直接アクセスを検出し、準備ページにリダイレクトする
+     *
+     * 【重要】マイク許可が必須のため、準備ページ経由を強制
+     * - ダイレクトアクセス → マイク許可なし → 基音再生時にダイアログ → セッション破綻
+     *
+     * @param {string} page - チェック対象のページ名
+     * @returns {boolean} true: 準備ページ経由が必要, false: 直接アクセス可能
      */
-    static showReloadDialog() {
-        alert('リロードが検出されました。マイク設定のため準備ページに移動します。');
+    static requiresPreparation(page) {
+        // トレーニング・セッション評価以外は準備不要
+        if (page !== 'training' && page !== 'result-session') {
+            return false;
+        }
+
+        console.log(`🔍 [NavigationManager] ${page}へのアクセス経路チェック開始`);
+
+        // 1. 正常な遷移フラグチェック（最優先）
+        const hasNormalTransition = sessionStorage.getItem(this.KEYS.NORMAL_TRANSITION) === 'true';
+        if (hasNormalTransition) {
+            console.log('✅ [NavigationManager] 正常な遷移フラグ検出 - 準備ページ経由済み');
+            return false;  // 準備ページを経由している
+        }
+
+        // 2. ページアクティブフラグチェック（リロード検出と重複しないように）
+        const wasPageActive = sessionStorage.getItem(page + 'PageActive') === 'true';
+        if (wasPageActive) {
+            console.log('✅ [NavigationManager] ページアクティブフラグ検出 - リロード検出で処理');
+            return false;  // リロード検出で処理される
+        }
+
+        // 3. ダイレクトアクセス検出
+        console.log(`⚠️ [NavigationManager] ${page}へのダイレクトアクセス検出 - 準備ページ経由が必要`);
+        return true;
     }
 
     /**
-     * preparationページへリダイレクト（モード情報保持）
+     * 【v4.3.1】ページアクセス制御の統一チェック
      *
-     * 【自動処理】
-     * - PitchProリソース自動破棄（警告アラート防止）
-     * - beforeunloadハンドラーを自動的に無効化
-     * - popstateハンドラーを自動的に削除
-     * - ダイアログなしで安全にリダイレクト
+     * ダイレクトアクセス検出・リロード検出を統一的に処理し、
+     * 必要に応じてリダイレクトを実行する
+     *
+     * router.jsから呼び出される統一エントリーポイント
+     *
+     * @param {string} page - チェック対象のページ名
+     * @returns {Promise<Object>} { shouldContinue: boolean, reason: string }
+     *   - shouldContinue: true = ページ初期化を続行, false = リダイレクト済み（初期化中断）
+     *   - reason: 中断理由（'direct-access-preparation', 'direct-access-training', 'reload', 'continue'）
+     */
+    static async checkPageAccess(page) {
+        const config = this.PAGE_CONFIG[page];
+
+        // 0. preparationページの正常な遷移フラグをチェック（最優先）
+        if (page === 'preparation') {
+            const normalTransition = sessionStorage.getItem(this.KEYS.NORMAL_TRANSITION_PREPARATION);
+            if (normalTransition === 'true') {
+                sessionStorage.removeItem(this.KEYS.NORMAL_TRANSITION_PREPARATION);
+                console.log('✅ [NavigationManager] 正常な遷移検出（preparation）');
+
+                // 正常な遷移なので preparationPageActive フラグを設定
+                sessionStorage.setItem('preparationPageActive', 'true');
+                console.log('✅ [NavigationManager] preparationPageActiveフラグを設定（正常な遷移）');
+
+                return { shouldContinue: true, reason: 'continue' };
+            }
+        }
+
+        // 1. preparationページのダイレクトアクセス検出
+        // （normalTransitionフラグがない場合のみここに到達）
+        if (page === 'preparation' && config?.directAccessRedirectTo) {
+            const wasPreparationActive = sessionStorage.getItem('preparationPageActive') === 'true';
+            if (!wasPreparationActive) {
+                console.log('⚠️ [NavigationManager] preparationページへのダイレクトアクセス検出');
+
+                if (config.directAccessMessage) {
+                    alert(config.directAccessMessage);
+                }
+
+                window.location.hash = config.directAccessRedirectTo;
+                return { shouldContinue: false, reason: 'direct-access-preparation' };
+            }
+        }
+
+        // 1-2. result-sessionページの正常な遷移フラグをチェック（最優先）
+        if (page === 'result-session') {
+            const normalTransition = sessionStorage.getItem(this.KEYS.NORMAL_TRANSITION_RESULT_SESSION);
+            if (normalTransition === 'true') {
+                sessionStorage.removeItem(this.KEYS.NORMAL_TRANSITION_RESULT_SESSION);
+                console.log('✅ [NavigationManager] 正常な遷移検出（result-session）');
+
+                // 正常な遷移なので resultSessionPageActive フラグを設定
+                sessionStorage.setItem('resultSessionPageActive', 'true');
+                console.log('✅ [NavigationManager] resultSessionPageActiveフラグを設定（正常な遷移）');
+
+                return { shouldContinue: true, reason: 'continue' };
+            }
+        }
+
+        // 1-3. result-sessionページのダイレクトアクセス検出
+        // （normalTransitionフラグがない場合のみここに到達）
+        if (page === 'result-session' && config?.directAccessRedirectTo) {
+            const wasResultSessionActive = sessionStorage.getItem('resultSessionPageActive') === 'true';
+            if (!wasResultSessionActive) {
+                console.log('⚠️ [NavigationManager] result-sessionページへのダイレクトアクセス検出');
+
+                if (config.directAccessMessage) {
+                    alert(config.directAccessMessage);
+                }
+
+                await this.redirectToPreparation('result-sessionページへのダイレクトアクセス検出');
+                return { shouldContinue: false, reason: 'direct-access-result-session' };
+            }
+        }
+
+        // 1-4. results-overviewページのダイレクトアクセス検出
+        if (page === 'results-overview' && config?.directAccessRedirectTo) {
+            // 正常な遷移経路チェック：training完了 or result-session完了
+            const hasCompletedTraining = sessionStorage.getItem('trainingPageActive') === 'true';
+            const hasCompletedResultSession = sessionStorage.getItem('resultSessionPageActive') === 'true';
+
+            if (!hasCompletedTraining && !hasCompletedResultSession) {
+                console.log('⚠️ [NavigationManager] results-overviewページへのダイレクトアクセス検出');
+
+                if (config.directAccessMessage) {
+                    alert(config.directAccessMessage);
+                }
+
+                window.location.hash = config.directAccessRedirectTo;
+                return { shouldContinue: false, reason: 'direct-access-results-overview' };
+            }
+        }
+
+        // 2. trainingページのダイレクトアクセス検出
+        if (this.requiresPreparation(page)) {
+            alert('トレーニングページは準備ページから開始してください。\nマイク設定のため準備ページに移動します。');
+            await this.redirectToPreparation('ダイレクトアクセス検出');
+            return { shouldContinue: false, reason: 'direct-access-training' };
+        }
+
+        // 3. リロード検出
+        if (config?.preventReload && this.detectReload(page)) {
+            if (config.reloadMessage) {
+                alert(config.reloadMessage);
+            }
+
+            const redirectTo = config.reloadRedirectTo || 'home';
+            if (redirectTo === 'preparation') {
+                await this.redirectToPreparation('リロード検出');
+            } else {
+                window.location.hash = redirectTo;
+            }
+            return { shouldContinue: false, reason: 'reload' };
+        }
+
+        // 4. すべてのチェックをパス - 初期化続行
+        return { shouldContinue: true, reason: 'continue' };
+    }
+
+    /**
+     * 【v4.3.0】preparationページへリダイレクト（モード情報保持）
      *
      * @param {string} reason - リダイレクトの理由（ログ用）
      * @param {string|null} mode - モード（省略時はURLから取得）
      * @param {string|null} session - セッション番号（省略可）
      */
     static async redirectToPreparation(reason = '', mode = null, session = null) {
-        console.log(`🔄 [NavigationManager] preparationへリダイレクト: ${reason}`);
+        // モード情報が指定されていない場合、sessionStorage → URLの順で取得
+        if (!mode) {
+            // 1. sessionStorageから取得（最優先・リロード時に正確なモード保持）
+            mode = sessionStorage.getItem('currentMode');
+            console.log(`🔍 [NavigationManager] sessionStorage.currentMode: ${mode}`);
 
-        // 【自動処理1】PitchProリソース破棄
+            // 2. sessionStorageになければURLから取得
+            if (!mode) {
+                const hash = window.location.hash.substring(1);
+                const params = new URLSearchParams(hash.split('?')[1] || '');
+                mode = params.get('mode');
+                console.log(`🔍 [NavigationManager] URLパラメータ.mode: ${mode}`);
+            }
+
+            // 3. それでもなければデフォルト
+            if (!mode) {
+                mode = 'random';
+                console.log(`🔍 [NavigationManager] デフォルトモード使用: ${mode}`);
+            }
+        }
+
+        // セッション番号も同様に取得
+        if (!session) {
+            session = sessionStorage.getItem('currentSession') || '';
+            if (!session) {
+                const hash = window.location.hash.substring(1);
+                const params = new URLSearchParams(hash.split('?')[1] || '');
+                session = params.get('session') || '';
+            }
+        }
+
+        console.log(`🔄 [NavigationManager] preparationへリダイレクト: ${reason} (mode: ${mode}, session: ${session})`);
+
+        // PitchProリソース破棄・ナビゲーション制約解除
         if (this.currentAudioDetector) {
             console.log('🧹 [NavigationManager] PitchProクリーンアップ開始');
             this._destroyAudioDetector(this.currentAudioDetector);
             this.currentAudioDetector = null;
         }
 
-        // 【自動処理2】beforeunload/popstateを無効化（ダイアログ防止）
         this.disableNavigationWarning();
         this.removeBrowserBackPrevention();
         console.log('✅ [NavigationManager] ナビゲーション制約を自動解除');
 
-        // モード情報が指定されていない場合、URLから取得
-        if (!mode) {
-            const hash = window.location.hash.substring(1);
-            const params = new URLSearchParams(hash.split('?')[1] || '');
-            mode = params.get('mode') || 'random';
-            session = params.get('session') || '';
-        }
+        // 【v4.3.2】正常な遷移フラグを設定（リダイレクト先での正常な遷移として扱う）
+        this.setNormalTransitionToPreparation();
 
-        // preparationへリダイレクト（モード情報を保持）
+        // preparationへリダイレクト（redirect='training'パラメータ追加）
         const redirectParams = new URLSearchParams({
             redirect: 'training',
             mode: mode
@@ -229,9 +477,10 @@ class NavigationManager {
      * @param {string|null} mode - モード（省略時はパラメータなし）
      * @param {string|null} session - セッション番号（省略可）
      * @param {string|null} direction - 12音階モード方向（'ascending' | 'descending'）
+     * @param {string|null} scaleDirection - 音階の上行・下行方向（'ascending' | 'descending'）
      */
-    static navigateToTraining(mode = null, session = null, direction = null) {
-        console.log(`🚀 [NavigationManager] trainingへ遷移: mode=${mode || 'なし'}, session=${session || 'なし'}, direction=${direction || 'なし'}`);
+    static navigateToTraining(mode = null, session = null, direction = null, scaleDirection = null) {
+        console.log(`🚀 [NavigationManager] trainingへ遷移: mode=${mode || 'なし'}, session=${session || 'なし'}, direction=${direction || 'なし'}, scaleDirection=${scaleDirection || 'なし'}`);
 
         // 正常な遷移フラグを自動設定
         this.setNormalTransition();
@@ -242,6 +491,7 @@ class NavigationManager {
             const params = new URLSearchParams({ mode });
             if (session) params.set('session', session);
             if (direction) params.set('direction', direction); // 12音階モード方向パラメータ追加
+            if (scaleDirection) params.set('scaleDirection', scaleDirection); // 上行・下行方向パラメータ追加
             targetHash = `training?${params.toString()}`;
         } else {
             targetHash = 'training';
@@ -251,19 +501,6 @@ class NavigationManager {
 
         // safeNavigateを使用してpopstate/beforeunloadを回避
         this.safeNavigate(targetHash);
-    }
-
-    /**
-     * リダイレクトエラーを生成
-     *
-     * router.js で特別処理するためのエラーオブジェクト
-     *
-     * @returns {Error} リダイレクト用エラー
-     */
-    static createRedirectError() {
-        const error = new Error('REDIRECT_TO_PREPARATION');
-        error.isRedirect = true;
-        return error;
     }
 
     // ==========================================
@@ -501,9 +738,13 @@ class NavigationManager {
         this.disableNavigationWarning();
         this.removeBrowserBackPrevention();
 
-        // 3. 正常な遷移フラグを設定（training, result-session への遷移）
-        if (page === 'training' || page === 'result-session') {
+        // 3. 正常な遷移フラグを設定（各ページ専用フラグ）
+        if (page === 'training') {
             this.setNormalTransition();
+        } else if (page === 'result-session') {
+            this.setNormalTransitionToResultSession();
+        } else if (page === 'preparation') {
+            this.setNormalTransitionToPreparation();
         }
 
         // 4. 【追加v3.1.0】途中離脱時のsessionStorageクリーンアップ
@@ -599,39 +840,50 @@ class NavigationManager {
      * 許可された遷移先のマップ（ダイアログを表示しない遷移）
      *
      * 【重要】このマップは「ブラウザバック防止対象ページ」からの正当な遷移のみを定義
-     * - ブラウザバック防止対象: preparation, training, result-session, results, results-overview
+     * - ブラウザバック防止対象: preparation, training, result-session, results-overview
      * - 非対象ページ（home, records等）は定義不要（ブラウザバック自由）
      */
     static allowedTransitions = new Map([
         ['preparation', ['training', 'home']],
         ['training', ['result-session', 'results-overview', 'home']],
-        ['result-session', ['training', 'results', 'results-overview', 'home']],
-        ['results', ['home', 'preparation', 'records']],
+        ['result-session', ['training', 'results-overview', 'home']],
         ['results-overview', ['home', 'preparation', 'records', 'training']]
     ]);
 
     /**
-     * ブラウザバック防止が必要なページの設定
+     * 【v4.3.0拡張】ページ制御設定（ブラウザバック防止・リロード検出）
      */
     static PAGE_CONFIG = {
         'preparation': {
             preventBackNavigation: true,
+            preventReload: true,  // リロード不可（マイク設定・音域テストリセット防止）
+            reloadRedirectTo: 'home',  // リロード時のリダイレクト先
+            reloadMessage: 'リロードが検出されました。準備を最初からやり直すためホームページに移動します。',
+            directAccessRedirectTo: 'home',  // ダイレクトアクセス時のリダイレクト先
+            directAccessMessage: '準備ページには正しいフローでアクセスしてください。ホームページに移動します。',
             backPreventionMessage: 'トレーニング準備中です。\n\nブラウザバックは無効になっています。\nホームボタンからトップページに戻れます。'
         },
         'training': {
             preventBackNavigation: true,
+            preventReload: true,  // リロード不可（マイク設定リセット防止）
+            reloadRedirectTo: 'preparation',  // リロード時のリダイレクト先
+            reloadMessage: 'リロードが検出されました。マイク設定のため準備ページに移動します。',
             backPreventionMessage: 'トレーニング中です。\n\nブラウザバックは無効になっています。\nホームボタンからトップページに戻れます。'
         },
         'result-session': {
             preventBackNavigation: true,
+            preventReload: true,  // リロード不可（マイク許可リセット防止・次セッション破綻防止）
+            reloadRedirectTo: 'preparation',  // リロード時のリダイレクト先
+            reloadMessage: 'リロードが検出されました。マイク設定のため準備ページに移動します。',
+            directAccessRedirectTo: 'preparation',  // ダイレクトアクセス時のリダイレクト先
+            directAccessMessage: 'セッション評価ページには正しいフローでアクセスしてください。準備ページに移動します。',
             backPreventionMessage: 'セッション評価中です。\n\nブラウザバックは無効になっています。\n「次の基音へ」ボタンまたはホームボタンをご利用ください。'
-        },
-        'results': {
-            preventBackNavigation: true,
-            backPreventionMessage: '総合評価画面です。\n\nブラウザバックは無効になっています。\nホームボタンまたは「新しいトレーニングを始める」ボタンをご利用ください。'
         },
         'results-overview': {
             preventBackNavigation: true,
+            preventReload: false,  // リロード可能（評価データは保存済み）
+            directAccessRedirectTo: 'home',  // ダイレクトアクセス時のリダイレクト先
+            directAccessMessage: '総合評価ページには正しいフローでアクセスしてください。ホームページに移動します。',
             backPreventionMessage: '総合評価画面です。\n\nブラウザバックは無効になっています。\nホームボタンまたは「新しいトレーニングを始める」ボタンをご利用ください。'
         }
     };
@@ -700,6 +952,14 @@ class NavigationManager {
             const allowedPages = this.allowedTransitions.get(page) || [];
             if (allowedPages.includes(newPage)) {
                 console.log(`✅ [NavigationManager] 許可された遷移: ${page} → ${newPage}`);
+
+                // 【v4.3.0追加】training/result-sessionへの遷移時はnormalTransitionフラグを設定
+                // popstateによる遷移でもrequiresPreparation()が正常に動作するように
+                if (newPage === 'training' || newPage === 'result-session') {
+                    this.setNormalTransition();
+                    console.log(`✅ [NavigationManager] normalTransitionフラグ設定 (popstate: ${page} → ${newPage})`);
+                }
+
                 return; // ダイアログを表示せずに遷移を許可
             }
 
