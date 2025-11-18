@@ -1,8 +1,8 @@
 # ナビゲーション・リソース管理仕様書
 
-**バージョン**: 3.3.0
+**バージョン**: 3.4.0
 **作成日**: 2025-10-22
-**最終更新**: 2025-11-13
+**最終更新**: 2025-11-18
 **対象**: PitchPro-SPA（8va相対音感トレーニングアプリ）
 
 ---
@@ -1778,10 +1778,94 @@ NavigationManager.detectReload()
 
 ---
 
+## 既知の問題と解決策
+
+### v3.4.0: 総合評価ページからの遷移パラメータ不足問題（2025-11-18解決）
+
+#### 問題の概要
+
+**症状**: 総合評価ページの「次のステップ」ボタン（例：連続チャレンジを開始）をクリックすると、ブラウザバックのように見える動作が発生。実際はNavigationManagerがダイレクトアクセスとして誤検出し、ホームへ強制リダイレクトしていた。
+
+#### 根本原因
+
+```javascript
+// 問題のあったコード（results-overview-controller.js v4.1.0以前）
+'next-step-random-upgrade': () => window.location.hash = 'preparation?mode=continuous'
+// ❌ direction パラメータが欠落
+```
+
+1. `direction`パラメータが欠落したURL（`preparation?mode=continuous`）で遷移
+2. NavigationManagerが「ダイレクトアクセス」として検出
+3. `isDirectAccessToPreparation()`がtrueを返す
+4. ホームへ強制リダイレクト
+
+**ログの流れ**:
+```
+Line 229: ✅ [NavigationManager] 許可された遷移: results-overview → preparation
+Line 230: 📍 [Router] Route change requested: preparation?mode=continuous
+Line 238: ⚠️ [NavigationManager] preparationページへのダイレクトアクセス検出
+Line 239: 🔄 [Router] Page access blocked: direct-access-preparation
+Line 243: 📍 [Router] Route change requested: home
+```
+
+#### 解決策
+
+**実装内容（results-overview-controller.js v4.2.0）**:
+
+```javascript
+// グローバル変数として現在の方向を保持
+let currentScaleDirection = 'ascending';
+
+function displayNextSteps(currentMode, evaluation, chromaticDirection = null, scaleDirection = 'ascending') {
+    // グローバル変数に保存（handleNextStepActionで使用）
+    currentScaleDirection = scaleDirection;
+    console.log('🔍 [DEBUG] currentScaleDirection set to:', currentScaleDirection);
+
+    // ... 残りの処理 ...
+}
+
+function handleNextStepAction(actionId) {
+    console.log('🎯 Next step action:', actionId);
+    console.log('🔍 [DEBUG] Using currentScaleDirection:', currentScaleDirection);
+
+    const actions = {
+        // ✅ direction パラメータを追加
+        'next-step-random-practice': () => window.location.hash = `preparation?mode=random&direction=${currentScaleDirection}`,
+        'next-step-random-upgrade': () => window.location.hash = `preparation?mode=continuous&direction=${currentScaleDirection}`,
+        'next-step-continuous-practice': () => window.location.hash = `preparation?mode=continuous&direction=${currentScaleDirection}`,
+        // ... 他のアクション ...
+    };
+
+    // ... 残りの処理 ...
+}
+```
+
+#### 重要な教訓
+
+1. **パラメータ完全性**: NavigationManagerは`direction`パラメータの有無でダイレクトアクセスを判定
+2. **正規遷移の要件**: 正規遷移として認識されるには、必要な全てのパラメータを含める必要がある
+3. **グローバル状態管理**: 複数の関数間で共有する必要がある状態は、適切にグローバル変数で管理
+
+#### 対象ボタン
+
+- ✅ ランダム基音モード → 「同じモードで再挑戦」
+- ✅ ランダム基音モード → 「連続チャレンジを開始」
+- ✅ 連続チャレンジモード → 「同じモードで再挑戦」
+- ✅ 連続チャレンジモード → 「12音階モードに挑戦」（既に実装済み）
+
+---
+
 ## 改訂履歴
 
 | バージョン | 日付 | 変更内容 | 担当者 |
 |-----------|------|---------|--------|
+| 3.4.0 | 2025-11-18 | 総合評価ページからの遷移パラメータ不足によるダイレクトアクセス誤検出問題を解決 | Claude |
+|  |  | - ✅ results-overview-controller.js v4.2.0: 次のステップボタンにdirectionパラメータ追加 |  |
+|  |  | - ✅ currentScaleDirectionグローバル変数追加（displayNextSteps関数で設定） |  |
+|  |  | - ✅ handleNextStepAction関数で全ての遷移URLに&direction=${currentScaleDirection}を追加 |  |
+|  |  | - ✅ NavigationManagerのダイレクトアクセス誤検出を防止（正規遷移として認識） |  |
+|  |  | - ✅ 問題: 「preparation?mode=continuous」のような不完全URLでブロック → ホーム強制リダイレクト |  |
+|  |  | - ✅ 解決: 現在のscaleDirection（ascending/descending）を全ての遷移URLに含める |  |
 | 3.3.0 | 2025-11-13 | ブラウザバック防止システムの最適化と設計思想明確化 | Claude |
 |  |  | - ✅ preparation ページをPAGE_CONFIGに追加（マイク管理中のブラウザバック防止） |  |
 |  |  | - ✅ allowedTransitions から records エントリを削除（非防止対象ページの除外） |  |
