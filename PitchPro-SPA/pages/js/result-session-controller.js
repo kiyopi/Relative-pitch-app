@@ -1,9 +1,12 @@
 /**
  * セッション結果ページコントローラー
- * @version 2.5.1
+ * @version 2.5.2
  * @lastUpdate 2025-11-18
  *
  * 変更履歴:
+ * - 2.5.2: ローディング表示実装
+ *   - LoadingComponent.toggle()追加
+ *   - セッション結果読み込み中の視覚的フィードバック実装
  * - 2.5.1: Bug修正 - displayEvaluationDistribution関数名の衝突解決
  *   - records-controller.jsと関数名が重複していた問題を修正
  *   - 関数名をdisplaySessionEvaluationDistribution()に変更
