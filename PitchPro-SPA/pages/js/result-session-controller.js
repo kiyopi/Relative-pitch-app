@@ -1,9 +1,18 @@
 /**
  * セッション結果ページコントローラー
- * @version 2.4.0
- * @lastUpdate 2025-11-13
+ * @version 2.5.1
+ * @lastUpdate 2025-11-18
  *
  * 変更履歴:
+ * - 2.5.1: Bug修正 - displayEvaluationDistribution関数名の衝突解決
+ *   - records-controller.jsと関数名が重複していた問題を修正
+ *   - 関数名をdisplaySessionEvaluationDistribution()に変更
+ *   - グラフが表示されない問題を解決
+ * - 2.5.0: 2フラグシステム統一 - preparation/trainingと同じアクセス制御
+ *   - checkPageAccess()による統一的なリロード検出・ダイレクトアクセス防止
+ *   - normalTransitionToResultSession + resultSessionPageActive の2フラグ運用
+ *   - リロード時のマイク許可放棄 → 次セッションでのダイアログ出現問題を解決
+ *   - ドレミガイド進行中のマイク許可ダイアログ表示によるレッスン破綻を防止
  * - 2.4.0: SessionManager統合 - 統一的なlessonId管理
  *   - SessionManager.getCurrent()でグローバルインスタンスから取得
  *   - sessionStorageへの直接アクセスをSessionManager経由に変更
@@ -32,22 +41,11 @@
 async function initializeResultSessionPage() {
     console.log('📊 セッション結果ページ初期化開始');
 
-    // 【v2.3.0復活・v2.4.0 SessionManager統合】リロード検出を再度有効化（trainingページと統一）
-    // 理由:
-    // - 「次の基音へ」ボタンでtrainingページに遷移する際、マイク許可が必要
-    // - リロード後はマイク許可が外れるため、preparationページでの再取得が必須
-    // - SessionManager経由でlessonIdをクリア（統一的な管理）
-    if (window.NavigationManager && NavigationManager.detectReload()) {
-        console.warn('⚠️ result-sessionページでリロード検出: データ削除してpreparationへリダイレクト');
-
-        // SessionManager経由でクリア（グローバルインスタンス + sessionStorage）
-        if (window.SessionManager) {
-            SessionManager.clearCurrent();
-        }
-
-        await NavigationManager.redirectToPreparation('result-sessionページでリロード検出');
-        return;
-    }
+    // 【v2.5.0】アクセス制御はrouter.jsで実行済み
+    // 2フラグシステム: normalTransitionToResultSession + resultSessionPageActive
+    // - router.js の checkPageAccess() で既にリロード検出・ダイレクトアクセス防止済み
+    // - ここで再度呼ぶと、normalTransitionフラグが削除済みのため誤検出する
+    // - 従って、コントローラー側では checkPageAccess() を呼ばない
 
     // URLハッシュからセッション番号を取得
     const hash = window.location.hash.substring(1); // '#'を削除
@@ -222,7 +220,7 @@ function updateSessionUI(sessionData, sessionNumber) {
 
     // 評価分布計算・表示（外れ値除外）
     const validPitchErrors = sessionData.pitchErrors.filter(e => Math.abs(e.errorInCents) <= outlierThreshold);
-    displayEvaluationDistribution(validPitchErrors, outlierCount);
+    displaySessionEvaluationDistribution(validPitchErrors, outlierCount);
 
     // 精度ランク表示
     displayAccuracyBadge(Math.abs(avgError));
@@ -238,12 +236,12 @@ function updateSessionUI(sessionData, sessionNumber) {
 }
 
 /**
- * 評価分布を表示（v3.0.0: DistributionChart統合、ヘルプボタン対応）
+ * セッション評価分布を表示（v3.0.0: DistributionChart統合、ヘルプボタン対応）
  * @param {Array} pitchErrors - 音程誤差データ（外れ値除外済み）
  * @param {number} outlierCount - 除外された外れ値の数
  */
-function displayEvaluationDistribution(pitchErrors, outlierCount = 0) {
-    console.log('📊 [displayEvaluationDistribution] DistributionChart.render() 呼び出し開始');
+function displaySessionEvaluationDistribution(pitchErrors, outlierCount = 0) {
+    console.log('📊 [displaySessionEvaluationDistribution] DistributionChart.render() 呼び出し開始');
 
     if (typeof window.DistributionChart === 'undefined') {
         console.error('❌ DistributionChart コンポーネントが読み込まれていません');
@@ -272,7 +270,7 @@ function displayEvaluationDistribution(pitchErrors, outlierCount = 0) {
         showHelpButton: true     // ポップオーバー生成フラグ
     });
 
-    console.log('✅ [displayEvaluationDistribution] DistributionChart.render() 完了');
+    console.log('✅ [displaySessionEvaluationDistribution] DistributionChart.render() 完了');
 }
 
 /**
