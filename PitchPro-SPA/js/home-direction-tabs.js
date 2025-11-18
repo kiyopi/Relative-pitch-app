@@ -2,6 +2,11 @@
  * home-direction-tabs.js
  * ホームページの上行・下行タブナビゲーション管理
  * 注意: data-direction属性を持つタブのみを対象（詳細分析のdata-tabタブとは干渉しない）
+ *
+ * @version v202511181300
+ * 【v202511181300修正内容】
+ * - ランダム基音・連続チャレンジのボタンにdata-direction属性を動的追加
+ * - 準備ページ遷移時に方向パラメータが正しく渡されるように修正
  */
 
 // 上行・下行タブナビゲーション初期化
@@ -100,6 +105,9 @@ class DirectionTabsManager {
             }
 
             if (textSpan) {
+                // data-direction属性を動的に設定
+                button.setAttribute('data-direction', direction);
+
                 // テキスト更新
                 textSpan.textContent = isAscending ? '始める（上行）' : '始める（下行）';
 

@@ -12166,3 +12166,41 @@ preparation-pitchpro-cycle.js簡素化:
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-18 20:49:31] コミット: feat(mode): 全モードで方向別表示名に対応
+
+ランダム基音・連続チャレンジモードにも方向別表示名を追加
+
+【実装内容】
+ModeController v2.1.0更新:
+- ランダム基音モードにdirectionsオブジェクト追加
+- 連続チャレンジモードにdirectionsオブジェクト追加
+- getDisplayName()メソッドを全モード対応に拡張
+
+【表示名の統一化】
+全モードで方向別表示名をサポート:
+- ランダム基音:
+  * ascending → "ランダム基音上行モードの準備中"
+  * descending → "ランダム基音下行モードの準備中"
+- 連続チャレンジ:
+  * ascending → "連続チャレンジ上行モードの準備中"
+  * descending → "連続チャレンジ下行モードの準備中"
+- 12音階:
+  * ascending → "12音階上昇モードの準備中"
+  * descending → "12音階下降モードの準備中"
+  * both → "12音階両方向モードの準備中"
+
+【設計思想】
+- 各モードのdirectionsオブジェクトで方向情報を定義
+- getDisplayName()で統一的に処理（Single Source of Truth）
+- モード別のロジック分岐は最小限に抑制
+- 将来の拡張性を確保
+
+【修正ファイル】
+- mode-controller.js (v2.1.0)
+  * random, continuousモードにdirectionsオブジェクト追加
+  * getDisplayName()を全モード対応に拡張
+  * 変更履歴を更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
