@@ -493,6 +493,11 @@ function displayOverallDistribution(sessionData) {
     });
 
     console.log('✅ [displayOverallDistribution] DistributionChart.render() 完了');
+
+    // ローディング非表示・コンテンツ表示
+    if (window.LoadingComponent) {
+        window.LoadingComponent.toggle('distribution', false);
+    }
 }
 
 /**
@@ -576,6 +581,11 @@ function displaySessionGrid(sessionData) {
     container.innerHTML = finalHTML;
     console.log('📊 [displaySessionGrid] container.innerHTML設定完了');
     console.log('📊 [displaySessionGrid] 関数終了');
+
+    // ローディング非表示・コンテンツ表示
+    if (window.LoadingComponent) {
+        window.LoadingComponent.toggle('sessions', false);
+    }
 }
 
 /**
@@ -958,6 +968,11 @@ function initializeCharts(sessionData) {
             }
         }
     });
+
+    // ローディング非表示・コンテンツ表示
+    if (window.LoadingComponent) {
+        window.LoadingComponent.toggle('chart', false);
+    }
 }
 
 /**

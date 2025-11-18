@@ -233,6 +233,11 @@ function updateSessionUI(sessionData, sessionNumber) {
 
     // 次のセッションボタン更新
     updateNextSessionButton(sessionNumber);
+
+    // ローディング非表示・コンテンツ表示
+    if (window.LoadingComponent) {
+        window.LoadingComponent.toggle('session-result', false);
+    }
 }
 
 /**

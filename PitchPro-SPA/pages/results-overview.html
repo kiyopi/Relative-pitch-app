@@ -122,11 +122,20 @@
                         <div id="distribution-help-button-container" class="section-header-help"></div>
                     </div>
 
-                    <p class="text-sm text-white-60" style="margin-bottom: 1rem;">全セッションの各音の精度評価を集計した分布です。Excellentが多いほど高精度です。</p>
+                    <!-- ローディング表示 -->
+                    <div class="flex flex-col items-center gap-3 py-8" id="distribution-loading" style="display: flex;">
+                        <i data-lucide="loader-2" class="text-blue-300 animate-spin" style="width: 48px; height: 48px;"></i>
+                        <p class="text-white-60">評価分布を読み込み中...</p>
+                    </div>
 
-                    <!-- 評価分布バー -->
-                    <div id="overall-distribution-chart" class="flex flex-col gap-3">
-                        <!-- JavaScriptで動的生成（DistributionChart） -->
+                    <!-- コンテンツ -->
+                    <div id="distribution-content" style="display: none;">
+                        <p class="text-sm text-white-60" style="margin-bottom: 1rem;">全セッションの各音の精度評価を集計した分布です。Excellentが多いほど高精度です。</p>
+
+                        <!-- 評価分布バー -->
+                        <div id="overall-distribution-chart" class="flex flex-col gap-3">
+                            <!-- JavaScriptで動的生成（DistributionChart） -->
+                        </div>
                     </div>
                 </section>
 
@@ -136,8 +145,18 @@
                         <i data-lucide="trending-up" style="width: 24px; height: 24px;"></i>
                         <span>誤差推移</span>
                     </h2>
-                    <div class="chart-container">
-                        <canvas id="error-trend-chart"></canvas>
+
+                    <!-- ローディング表示 -->
+                    <div class="flex flex-col items-center gap-3 py-8" id="chart-loading" style="display: flex;">
+                        <i data-lucide="loader-2" class="text-blue-300 animate-spin" style="width: 48px; height: 48px;"></i>
+                        <p class="text-white-60">グラフを読み込み中...</p>
+                    </div>
+
+                    <!-- コンテンツ -->
+                    <div id="chart-content" style="display: none;">
+                        <div class="chart-container">
+                            <canvas id="error-trend-chart"></canvas>
+                        </div>
                     </div>
                 </section>
 
@@ -147,8 +166,18 @@
                         <i data-lucide="grid" style="width: 24px; height: 24px;"></i>
                         <span>セッション一覧</span>
                     </h2>
-                    <div id="session-grid-container">
-                        <!-- JavaScriptで動的生成 -->
+
+                    <!-- ローディング表示 -->
+                    <div class="flex flex-col items-center gap-3 py-8" id="sessions-loading" style="display: flex;">
+                        <i data-lucide="loader-2" class="text-blue-300 animate-spin" style="width: 48px; height: 48px;"></i>
+                        <p class="text-white-60">セッション一覧を読み込み中...</p>
+                    </div>
+
+                    <!-- コンテンツ -->
+                    <div id="sessions-content" style="display: none;">
+                        <div id="session-grid-container">
+                            <!-- JavaScriptで動的生成 -->
+                        </div>
                     </div>
                 </section>
 
