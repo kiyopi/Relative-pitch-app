@@ -12003,3 +12003,35 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-18 17:43:58] コミット: fix(css): ドレミガイドの基音方向バッジにスタイルを適用
+
+問題：
+- 12音階モードで基音方向バッジ（下降）が白枠+背景なしで表示される
+- 他のバッジ（上行、上昇、両方向など）と異なるスタイル
+
+原因：
+- HTMLで生成されるクラス: chromatic-descending
+- CSSで定義されているクラス: chromatic-up, chromatic-down, chromatic-both
+- chromatic-ascending, chromatic-descending のスタイルが未定義
+
+修正内容：
+1. base.css
+   - .direction-badge.chromatic-ascending を chromatic-up と同じスタイルに追加（オレンジ色）
+   - .direction-badge.chromatic-descending を chromatic-down と同じスタイルに追加（緑色）
+
+2. index.html
+   - base.css: v20251118006
+   - キャッシュクリア用にバージョン番号更新
+
+スタイル詳細：
+- chromatic-up/ascending（上昇）: オレンジ色（rgba(245, 158, 11, 0.15））
+- chromatic-down/descending（下降）: 緑色（rgba(34, 197, 94, 0.15））
+- chromatic-both（両方向）: 黄色（rgba(234, 179, 8, 0.15））
+
+影響範囲：
+- 12音階モードのドレミガイドバッジ表示のみ
+- 他要素への影響なし
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

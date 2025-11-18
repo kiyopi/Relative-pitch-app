@@ -2,7 +2,13 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: v4.0.20 (2025-11-17) - ボタンテキスト状態表示の実装
+ * 🔥 VERSION: v4.0.21 (2025-11-18) - 音域自動拡張の方向性修正
+ *
+ * 【v4.0.21修正内容】
+ * - 下行モード音域拡張修正: 低音側への拡張ロジック実装（従来は高音側のみ）
+ * - 拡張方向の適正化: 上行モードは高音側、下行モードは低音側に拡張
+ * - 12音階下行モード修正: 音域不足時に12音確保できずクラッシュする問題を解決
+ * - 拡張失敗時の詳細ログ追加: 音域・方向情報を明示的に出力
  *
  * 【v4.0.20修正内容】
  * - ボタンテキスト変更実装: 「基音を再生」→「再生中...」→「準備中...」（連続・12音階のみ）
@@ -1432,25 +1438,62 @@ function getAvailableNotes() {
         console.warn(`   推奨: 2.0オクターブ以上の音域（現在: ${(Math.log2(highFreq / lowFreq)).toFixed(2)}オクターブ）`);
         console.warn(`   ※ テスト期間中のため、音域不足でも${requiredNotes}音確保を優先`);
 
-        // 音域内の基音のうち、最高音を見つける
-        const highestAvailableNote = availableNotes[availableNotes.length - 1];
+        let notesToAdd = [];
 
-        // 全音符リストから、最高基音より上の音を取得
-        // 基音自体は音域内に収めるが、基音+1オクターブは音域外にはみ出すことを許容
-        const higherNotes = allNotes.filter(note =>
-            note.frequency > highestAvailableNote.frequency &&
-            note.frequency <= highFreq // 基音自体は音域内に収める
-        );
+        if (currentScaleDirection === 'descending') {
+            // 【下行モード】低音側に拡張
+            const lowestAvailableNote = availableNotes[0];
 
-        console.log(`   候補: ${higherNotes.length}音 (${higherNotes.map(n => n.note).join(', ')})`);
+            // 全音符リストから、最低基音より下の音を取得
+            // 基音-1オクターブが音域下限に収まるように調整
+            const lowerNotes = allNotes.filter(note =>
+                note.frequency < lowestAvailableNote.frequency &&
+                note.frequency / 2 >= lowFreq // 基音-1オクターブが音域下限に収まる
+            );
 
-        // 必要な分だけ追加
-        const notesToAdd = higherNotes.slice(0, neededNotes);
-        availableNotes = [...availableNotes, ...notesToAdd];
+            console.log(`   候補（低音側拡張）: ${lowerNotes.length}音 (${lowerNotes.map(n => n.note).join(', ')})`);
 
-        console.log(`✅ ${requiredNotes}音確保完了: ${availableNotes.map(n => n.note).join(', ')}`);
-        console.log(`   ※ 追加された${neededNotes}音は基音+1オクターブが音域上限を若干超えますが、`);
-        console.log(`     オクターブ相対音感トレーニングとして${requiredNotes}音使用を優先します`);
+            // 必要な分だけ追加（低い音から順に）
+            notesToAdd = lowerNotes.slice(-neededNotes); // 最も高い側からneededNotes個取得
+
+            // 低音側に追加するため、配列の先頭に挿入
+            availableNotes = [...notesToAdd, ...availableNotes];
+
+            if (notesToAdd.length > 0) {
+                console.log(`✅ ${requiredNotes}音確保完了: ${availableNotes.map(n => n.note).join(', ')}`);
+                console.log(`   ※ 追加された${notesToAdd.length}音は基音-1オクターブが音域下限を若干下回りますが、`);
+                console.log(`     オクターブ相対音感トレーニングとして${requiredNotes}音使用を優先します`);
+            }
+        } else {
+            // 【上行モード】高音側に拡張（従来ロジック）
+            const highestAvailableNote = availableNotes[availableNotes.length - 1];
+
+            // 全音符リストから、最高基音より上の音を取得
+            // 基音+1オクターブが音域上限に収まるように調整
+            const higherNotes = allNotes.filter(note =>
+                note.frequency > highestAvailableNote.frequency &&
+                note.frequency * 2 <= highFreq * 1.1 // 基音+1オクターブが音域上限に収まる（10%余裕）
+            );
+
+            console.log(`   候補（高音側拡張）: ${higherNotes.length}音 (${higherNotes.map(n => n.note).join(', ')})`);
+
+            // 必要な分だけ追加
+            notesToAdd = higherNotes.slice(0, neededNotes);
+            availableNotes = [...availableNotes, ...notesToAdd];
+
+            if (notesToAdd.length > 0) {
+                console.log(`✅ ${requiredNotes}音確保完了: ${availableNotes.map(n => n.note).join(', ')}`);
+                console.log(`   ※ 追加された${notesToAdd.length}音は基音+1オクターブが音域上限を若干超えますが、`);
+                console.log(`     オクターブ相対音感トレーニングとして${requiredNotes}音使用を優先します`);
+            }
+        }
+
+        // 拡張失敗時の警告
+        if (notesToAdd.length === 0) {
+            console.error(`❌ 拡張失敗: 候補音が見つかりませんでした`);
+            console.error(`   音域: ${lowFreq.toFixed(1)}Hz - ${highFreq.toFixed(1)}Hz`);
+            console.error(`   ${currentScaleDirection === 'descending' ? '低音側' : '高音側'}に拡張できる音がありません`);
+        }
     }
 
     console.log(`🎵 最終的な利用可能基音: ${availableNotes.length}音`);
