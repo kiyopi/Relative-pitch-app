@@ -128,20 +128,20 @@ function updateTab1UI(data, brainProcessing) {
         });
     }
 
-    // 脳内処理パターン分析
+    // 音域ブロック分析
     updateBrainProcessingUI(brainProcessing);
 }
 
 /**
- * 脳内処理パターン分析のUI更新
+ * 音域ブロック分析のUI更新
  */
 function updateBrainProcessingUI(data) {
     if (!data) {
-        console.warn('⚠️ 脳内処理パターン分析データがありません');
+        console.warn('⚠️ 音域ブロック分析データがありません');
         return;
     }
 
-    // 左脳処理音
+    // Aブロック（C〜F#）
     const leftBrainAvgElement = document.getElementById('left-brain-avg');
     const leftBrainProgressElement = document.getElementById('left-brain-progress');
     const leftBrainCountElement = document.getElementById('left-brain-count');
@@ -160,7 +160,7 @@ function updateBrainProcessingUI(data) {
         leftBrainCountElement.textContent = `測定回数: ${data.leftBrain.count}`;
     }
 
-    // 両脳処理音
+    // Bブロック（G〜B）
     const bothBrainAvgElement = document.getElementById('both-brain-avg');
     const bothBrainProgressElement = document.getElementById('both-brain-progress');
     const bothBrainCountElement = document.getElementById('both-brain-count');
@@ -179,14 +179,14 @@ function updateBrainProcessingUI(data) {
         bothBrainCountElement.textContent = `測定回数: ${data.bothBrain.count}`;
     }
 
-    // 処理難易度の差
+    // ブロック間の誤差
     const difficultyValueElement = document.getElementById('brain-difficulty-value');
     const difficultyAnalysisElement = document.getElementById('brain-difficulty-analysis');
 
     if (difficultyValueElement && data.difficulty) {
         const { difference, percentage, isHarder } = data.difficulty;
         const sign = isHarder ? '+' : '';
-        difficultyValueElement.textContent = `両脳処理音は左脳処理音より ${sign}${difference}¢ (${percentage.toFixed(0)}%) ${isHarder ? '難しい' : '同等'}`;
+        difficultyValueElement.textContent = `BブロックはAブロックより ${sign}${difference}¢ (${percentage.toFixed(0)}%) ${isHarder ? '難しい' : '同等'}`;
         difficultyValueElement.style.color = isHarder ? '#f59e0b' : '#10b981';
     }
 
@@ -194,7 +194,7 @@ function updateBrainProcessingUI(data) {
         difficultyAnalysisElement.textContent = data.difficulty.analysis;
     }
 
-    // 両脳処理音の詳細分析
+    // Bブロックの詳細分析
     const notesDetailListElement = document.getElementById('brain-notes-detail-list');
     if (notesDetailListElement && data.bothBrain && data.bothBrain.noteStats) {
         notesDetailListElement.innerHTML = '';
@@ -220,7 +220,7 @@ function updateBrainProcessingUI(data) {
         });
     }
 
-    console.log('✅ 脳内処理パターン分析UI更新完了');
+    console.log('✅ 音域ブロック分析UI更新完了');
 }
 
 /**

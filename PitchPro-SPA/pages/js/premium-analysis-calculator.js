@@ -371,18 +371,19 @@ window.PremiumAnalysisCalculator = {
     },
 
     /**
-     * 脳内処理パターン分析の計算（脳内ピアノ理論）
+     * 音域ブロック分析の計算（経験則ベース）
      * @param {Array} sessionData - セッションデータ配列
-     * @returns {Object} 脳内処理パターン分析結果
+     * @returns {Object} 音域ブロック分析結果
+     * @description 経験則により、AブロックとBブロックの誤差を均等に改善することで、相対音感のさらなる向上が期待できます
      */
     calculateBrainProcessingPattern(sessionData) {
         if (!sessionData || sessionData.length === 0) {
             return null;
         }
 
-        // 脳内処理グループ定義
-        const LEFT_BRAIN_NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#'];
-        const BOTH_BRAIN_NOTES = ['G', 'G#', 'A', 'A#', 'B'];
+        // 音域ブロック定義（経験則に基づく分類）
+        const LEFT_BRAIN_NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#']; // Aブロック
+        const BOTH_BRAIN_NOTES = ['G', 'G#', 'A', 'A#', 'B']; // Bブロック
 
         // 音名正規化（B♭表記統一）
         const normalizeNoteName = (note) => {
@@ -393,11 +394,11 @@ window.PremiumAnalysisCalculator = {
             return noteMap[note] || note;
         };
 
-        // 左脳処理音データ
+        // Aブロックデータ（C〜F#）
         const leftBrainErrors = [];
         const leftBrainNotes = {};
 
-        // 両脳処理音データ
+        // Bブロックデータ（G〜B）
         const bothBrainErrors = [];
         const bothBrainNotes = {
             'G': [],
@@ -418,7 +419,7 @@ window.PremiumAnalysisCalculator = {
                 const absError = Math.abs(step.pitchError);
                 const baseNote = step.note.replace(/[0-9]/g, ''); // オクターブ番号削除
 
-                // 左脳処理音
+                // Aブロック（C〜F#）
                 if (LEFT_BRAIN_NOTES.includes(baseNote)) {
                     leftBrainErrors.push(absError);
                     if (!leftBrainNotes[baseNote]) {
@@ -426,7 +427,7 @@ window.PremiumAnalysisCalculator = {
                     }
                     leftBrainNotes[baseNote].push(absError);
                 }
-                // 両脳処理音
+                // Bブロック（G〜B）
                 else if (BOTH_BRAIN_NOTES.includes(baseNote)) {
                     bothBrainErrors.push(absError);
                     const normalizedNote = normalizeNoteName(baseNote);
@@ -443,11 +444,11 @@ window.PremiumAnalysisCalculator = {
             return errors.reduce((sum, e) => sum + e, 0) / errors.length;
         };
 
-        // 左脳処理音の統計
+        // Aブロックの統計
         const leftBrainAvg = calcAverage(leftBrainErrors);
         const leftBrainCount = leftBrainErrors.length;
 
-        // 両脳処理音の統計
+        // Bブロックの統計
         const bothBrainAvg = calcAverage(bothBrainErrors);
         const bothBrainCount = bothBrainErrors.length;
 
@@ -461,7 +462,7 @@ window.PremiumAnalysisCalculator = {
             };
         });
 
-        // 処理難易度の差
+        // ブロック間の誤差
         const difficulty = bothBrainAvg - leftBrainAvg;
         const difficultyPercentage = leftBrainAvg > 0
             ? ((difficulty / leftBrainAvg) * 100)
@@ -484,10 +485,10 @@ window.PremiumAnalysisCalculator = {
                 percentage: parseFloat(difficultyPercentage.toFixed(1)),
                 isHarder: difficulty > 0,
                 analysis: difficulty > 5
-                    ? '両脳処理音は左脳処理音より明確に難しい傾向があります。脳内ピアノ理論により予測される傾向と一致しています。'
+                    ? 'BブロックはAブロックより明確に難しい傾向があります。経験則により、両ブロックの誤差を均等に改善することで相対音感のさらなる向上が期待できます。'
                     : difficulty > 0
-                    ? '両脳処理音はやや難しい傾向が見られます。'
-                    : '両グループ間で明確な差は見られません。'
+                    ? 'Bブロックはやや難しい傾向が見られます。両ブロックをバランスよく練習しましょう。'
+                    : '両ブロック間で明確な差は見られません。バランスの良い音感が身についています。'
             }
         };
     },
