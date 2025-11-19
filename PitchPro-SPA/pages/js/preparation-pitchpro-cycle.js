@@ -1,5 +1,11 @@
-// preparation-pitchpro-cycle.js - PitchProサイクルベース実装
-// 初期化 → スタート → リセット → 放棄 のサイクル設計
+/**
+ * preparation-pitchpro-cycle.js - PitchProサイクルベース実装
+ * 初期化 → スタート → リセット → 放棄 のサイクル設計
+ *
+ * Changelog:
+ *   v1.1.0 (2025-11-19) - preparation → training遷移をNavigationManager統一API使用に変更
+ *                         AudioDetector保持のため、トレーニングフロー内遷移を正しく管理
+ */
 
 // Lucide初期化はDOMContentLoadedイベント内で実行（HTMLが読み込まれた後）
 
@@ -1560,16 +1566,18 @@ function setupMicPermissionFlow() {
 
             console.log(`📍 モード情報を保持して遷移: mode=${finalMode}, session=${finalSession || 'なし'}, direction=${finalDirection || 'なし'}, scaleDirection=${scaleDirection}`);
 
-            // 直接URLを構築してscaleDirectionを追加
-            NavigationManager.setNormalTransition();
-            NavigationManager.removeBrowserBackPrevention();
+            // NavigationManager統一API使用（AudioDetector保持のため）
+            const navParams = { mode: finalMode, scaleDirection: scaleDirection };
+            if (finalSession) navParams.session = finalSession;
+            if (finalDirection) navParams.direction = finalDirection;
 
-            const params = new URLSearchParams({ mode: finalMode });
-            if (finalSession) params.set('session', finalSession);
-            if (finalDirection) params.set('direction', finalDirection);
-            params.set('scaleDirection', scaleDirection);
-
-            window.location.hash = `training?${params.toString()}`;
+            if (window.NavigationManager) {
+                NavigationManager.navigate('training', navParams);
+            } else {
+                // フォールバック（NavigationManagerがない場合）
+                const params = new URLSearchParams(navParams);
+                window.location.hash = `training?${params.toString()}`;
+            }
         });
     }
 

@@ -1,6 +1,10 @@
 /**
  * Simple Hash Router for SPA
  * Based on vanilla JS + 自作SPA development roadmap
+ *
+ * Changelog:
+ *   v2.2.0 (2025-11-19) - preparation page cleanup改善（NavigationManager管理時はスキップ、二重破棄防止）
+ *   v2.1.0 (2025-11-19) - records page cleanup追加（AudioDetector適切な破棄、メモリリーク防止）
  */
 
 class SimpleRouter {
@@ -40,7 +44,18 @@ class SimpleRouter {
                 cleanup: async () => {
                     console.log('🧹 [Router] Cleaning up preparation page...');
 
-                    // PitchProリソースのクリーンアップ
+                    // NavigationManagerが管理している場合はスキップ（トレーニングフロー内遷移）
+                    if (window.NavigationManager?.currentAudioDetector) {
+                        console.log('✅ [Router] AudioDetectorはNavigationManagerが管理中 - cleanup スキップ');
+                        // 初期化フラグのみリセット
+                        if (typeof window.resetPreparationPageFlag === 'function') {
+                            window.resetPreparationPageFlag();
+                            console.log('✅ [Router] Preparation page flag reset');
+                        }
+                        return;
+                    }
+
+                    // NavigationManagerが管理していない場合のみクリーンアップ
                     if (typeof window.preparationManager !== 'undefined' && window.preparationManager) {
                         await window.preparationManager.cleanupPitchPro();
                     }
@@ -124,7 +139,19 @@ class SimpleRouter {
             },
             'records': {
                 init: 'initRecords',
-                dependencies: ['Chart', 'DistributionChart']
+                dependencies: ['Chart', 'DistributionChart'],
+                cleanup: async () => {
+                    console.log('🧹 [Router] Cleaning up records page...');
+                    // AudioDetectorが残っていれば破棄（recordsページはマイク不要）
+                    if (window.NavigationManager?.currentAudioDetector) {
+                        console.log('🧹 [Router] Destroying AudioDetector from records');
+                        window.NavigationManager._destroyAudioDetector(
+                            window.NavigationManager.currentAudioDetector
+                        );
+                        window.NavigationManager.currentAudioDetector = null;
+                    }
+                    console.log('✅ [Router] Records page cleanup complete');
+                }
             },
             'premium-analysis': {
                 init: 'initPremiumAnalysis',

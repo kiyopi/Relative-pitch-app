@@ -1,10 +1,11 @@
 /**
  * トレーニング記録ページコントローラー
  *
- * @version 2.5.5
- * @date 2025-11-16
+ * @version 2.5.6
+ * @date 2025-11-19
  * @description トレーニング履歴の表示・統計計算・グラフ描画
  * @changelog
+ *   v2.5.6 (2025-11-19) - viewLessonDetail()のsessionStorage.clear()削除（NavigationManagerが適切に管理）
  *   v2.5.5 (2025-11-16) - 総レッスン時間をモード別標準時間で計算
  *                         実際のduration値ではなく、セッション数×13秒で計算
  *                         結果ページ閲覧時間等の待機時間を除外し、純粋なトレーニング時間のみをカウント
@@ -995,9 +996,8 @@ function viewLessonDetail(lesson) {
     console.log('🔍 [viewLessonDetail] sessions数:', lesson.sessions?.length);
     console.log('🔍 [viewLessonDetail] セッションのlessonId:', lesson.sessions?.map(s => s.lessonId));
 
-    // sessionStorageをクリア（古いlessonIdが残らないように）
-    sessionStorage.clear();
-    console.log('🗑️ [viewLessonDetail] sessionStorageをクリアしました');
+    // NavigationManagerが適切に管理するため、sessionStorage.clear()は不要
+    // （fromRecords=trueで遷移元を識別）
 
     // 総合評価ページへ遷移（モード + 音階方向 + lessonId + トレーニング記録からの遷移フラグ付き）
     window.NavigationManager.navigate('results-overview', {
