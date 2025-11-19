@@ -911,7 +911,7 @@ window.initializePreparationPitchProCycle = async function() {
         console.log(`✅ sessionStorage更新: trainingDirection = ${directionParam}`);
     }
 
-    // ModeControllerでモード表示名を取得
+    // ModeControllerでモード表示名を取得（デフォルトで短縮形）
     if (window.ModeController) {
         const options = {};
         if (modeParam === '12tone') {

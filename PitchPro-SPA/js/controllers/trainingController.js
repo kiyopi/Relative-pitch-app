@@ -279,7 +279,7 @@ export async function initializeTrainingPage() {
     setTimeout(() => {
         updateDirectionBadges(currentScaleDirection, chromaticDirectionForBadge);
 
-        // ページタイトルを更新（ModeController使用）
+        // ページタイトルを更新（ModeController使用、デフォルトで短縮形）
         const pageTitleElement = document.getElementById('training-mode-title');
         if (pageTitleElement && window.ModeController) {
             const options = {

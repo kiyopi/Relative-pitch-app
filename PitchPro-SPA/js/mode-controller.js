@@ -1,6 +1,6 @@
 /**
  * モード管理統合コントローラー
- * @version 2.1.0
+ * @version 2.2.0
  * @description 全トレーニングモードの定義と設定を一元管理
  *
  * 【責任範囲】
@@ -8,6 +8,7 @@
  * - セッション数の動的計算
  * - モード名の統一管理
  * - 方向別表示名の管理（12音階モード） ★v2.1.0追加
+ * - 短縮名対応（モバイル改行防止） ★v2.2.0追加
  * - 基音選択方式の定義
  * - UI表示（アイコン・色・タイトル）の統一管理 ★v2.0.0追加
  * - 1セッション標準時間の定義 ★v2.0.1追加
@@ -20,6 +21,10 @@
  * - preparation-pitchpro-cycle.js: 準備ページサブタイトル表示 ★v2.1.0追加
  *
  * 【変更履歴】
+ * v2.2.0 (2025-11-19): getDisplayName()にuseShortNameパラメータ追加
+ *                      デフォルトをtrue（短縮形）に設定
+ *                      - useShortName: true  → "ランダム基音 上行" (デフォルト)
+ *                      - useShortName: false → "ランダム基音モード 上行" (明示的に指定時)
  * v2.1.0 (2025-11-18): getDisplayName()メソッド追加
  *                      全モードで方向別表示名を一元管理（上行/下行）
  *                      - ランダム基音: "ランダム基音上行モード", "ランダム基音下行モード"
@@ -171,11 +176,15 @@ const ModeController = {
     /**
      * モード表示名を取得（方向パラメータ対応）
      * @param {string} modeId - モードID
-     * @param {object} options - オプション設定（direction等）
+     * @param {object} options - オプション設定
+     * @param {string} options.scaleDirection - 音階方向（'ascending' | 'descending'）
+     * @param {string} options.direction - 12音階モード基音方向（'ascending' | 'descending' | 'both'）
+     * @param {boolean} options.useShortName - 短縮名を使用（「モード」省略）デフォルト: true
      * @returns {string} 表示名
      */
     getDisplayName(modeId, options = {}) {
         const mode = this.getMode(modeId);
+        const useShortName = options.useShortName !== undefined ? options.useShortName : true;
 
         // 音階方向のテキスト生成（上行/下行）
         const scaleDirectionText = options.scaleDirection === 'descending' ? '下行' : '上行';
@@ -184,12 +193,15 @@ const ModeController = {
         if (modeId === '12tone' && options.direction && mode.directions) {
             const directionInfo = mode.directions[options.direction];
             if (directionInfo) {
-                return `12音階${directionInfo.name}モード ${scaleDirectionText}`;
+                // useShortName時は「モード」を省略
+                const modeSuffix = useShortName ? '' : 'モード';
+                return `12音階${directionInfo.name}${modeSuffix} ${scaleDirectionText}`;
             }
         }
 
         // random/continuousモードはscaleDirectionのみ使用
-        return `${mode.name} ${scaleDirectionText}`;
+        const modeName = useShortName ? mode.shortName : mode.name;
+        return `${modeName} ${scaleDirectionText}`;
     },
 
     /**

@@ -68,22 +68,23 @@ class EvaluationCalculator {
     // totalSessionsInLessonが指定されている場合は優先使用
     const sessionCount = totalSessionsInLesson !== null ? totalSessionsInLesson : sessionData.length;
 
+    // ModeControllerからモード定義を取得
     const modeMap = {
       8: {
         mode: 'random',
-        name: 'ランダム基音モード',
+        name: window.ModeController ? window.ModeController.getModeName('random') : 'ランダム基音モード',
         level: '初級',
         target: 'カラオケ・合唱レベル'
       },
       12: {
         mode: 'continuous',
-        name: '連続チャレンジモード',
+        name: window.ModeController ? window.ModeController.getModeName('continuous') : '連続チャレンジモード',
         level: '中級',
         target: '実用的相対音感レベル'
       },
       '12tone': {
         mode: '12tone',
-        name: '12音階モード',
+        name: window.ModeController ? window.ModeController.getModeName('12tone') : '12音階モード',
         level: '上級',
         target: 'プロフェッショナルレベル'
       }
