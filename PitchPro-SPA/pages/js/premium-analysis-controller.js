@@ -58,15 +58,13 @@ window.initPremiumAnalysis = async function() {
         errorPatterns,
         growthRecords
     );
-    const modeAnalysis = window.PremiumAnalysisCalculator.calculateModeAnalysis(allSessionData);
 
     console.log('✅ 分析計算完了:', {
         intervalAccuracy,
         brainProcessing,
         errorPatterns,
         growthRecords,
-        practicePlan,
-        modeAnalysis
+        practicePlan
     });
 
     // UI更新
@@ -74,7 +72,7 @@ window.initPremiumAnalysis = async function() {
     updateTab2UI(errorPatterns);
     updateTab3UI(practicePlan);
     updateTab4UI(growthRecords);
-    updateModeAnalysisUI(modeAnalysis);
+    updateModeAnalysisUI(allSessionData);
 
     // タブ切り替え機能の初期化
     initTabSwitching();
@@ -435,206 +433,200 @@ function updateTab4UI(data) {
 }
 
 /**
- * モード別分析のUI更新
+ * モード別分析のUI更新（親モードカードアコーディオン方式）
  */
-function updateModeAnalysisUI(modeAnalysis) {
-    if (!modeAnalysis || !modeAnalysis.parentModeStats) {
-        console.warn('⚠️ モード別分析データがありません');
+function updateModeAnalysisUI(allSessionData) {
+    console.log('📊 モード別分析UI更新開始');
+
+    // モード別熟練度コンテンツ（親モードカードアコーディオン）
+    const modeMasteryElement = document.getElementById('mode-mastery-content');
+    if (!modeMasteryElement) {
+        console.warn('⚠️ #mode-mastery-content要素が見つかりません');
         return;
     }
 
-    const { parentModeStats } = modeAnalysis;
-
-    // クイックジャンプナビゲーション（モード別熟練度）
-    const modeQuickNavElement = document.getElementById('mode-quick-nav');
-    if (modeQuickNavElement) {
-        modeQuickNavElement.innerHTML = '';
-        Object.keys(parentModeStats).forEach(parentMode => {
-            const mode = parentModeStats[parentMode];
-            const colorClass = mode.color === 'blue' ? 'text-blue-300' :
-                              mode.color === 'green' ? 'text-green-300' :
-                              'text-purple-300';
-
-            modeQuickNavElement.innerHTML += `
-                <button class="mode-quick-jump-btn" onclick="document.getElementById('mode-section-${parentMode}').scrollIntoView({behavior: 'smooth'})">
-                    <i data-lucide="${mode.icon}" class="${colorClass}"></i>
-                    <span>${mode.name}</span>
-                </button>
-            `;
-        });
+    // PremiumAnalysisCalculatorのMODE_DEFINITIONSを取得
+    const MODE_DEFINITIONS = window.PremiumAnalysisCalculator.MODE_DEFINITIONS;
+    if (!MODE_DEFINITIONS || !MODE_DEFINITIONS.parentModes) {
+        console.error('❌ MODE_DEFINITIONSが見つかりません');
+        return;
     }
 
-    // モード別熟練度コンテンツ（全展開）
-    const modeMasteryElement = document.getElementById('mode-mastery-content');
-    if (modeMasteryElement) {
-        modeMasteryElement.innerHTML = '';
+    // アコーディオンコンテナ作成
+    modeMasteryElement.innerHTML = '<div class="mode-mastery-accordion"></div>';
+    const accordion = modeMasteryElement.querySelector('.mode-mastery-accordion');
 
-        Object.keys(parentModeStats).forEach(parentMode => {
-            const mode = parentModeStats[parentMode];
-            const colorClass = mode.color === 'blue' ? 'text-blue-300' :
-                              mode.color === 'green' ? 'text-green-300' :
-                              'text-purple-300';
+    // 親モード順（beginner, intermediate, advanced, weakness）
+    const parentModeKeys = ['beginner', 'intermediate', 'advanced', 'weakness'];
 
-            modeMasteryElement.innerHTML += `
-                <div class="mode-section" id="mode-section-${parentMode}">
-                    <div class="mode-section-header">
-                        <i data-lucide="${mode.icon}" class="${colorClass}"></i>
-                        <h4 class="mode-section-title">${mode.name}</h4>
-                    </div>
+    parentModeKeys.forEach(parentModeKey => {
+        const parentMode = MODE_DEFINITIONS.parentModes[parentModeKey];
+        if (!parentMode) return;
 
-                    <div class="mode-variants-list">
-                        ${mode.variants.map(variantKey => {
-                            const variant = mode.modeStats[variantKey];
-                            if (!variant || variant.totalSessions === 0) return '';
+        // 親モード統計を計算
+        const stats = window.PremiumAnalysisCalculator.calculateParentModeStats(allSessionData, parentModeKey);
 
-                            const masteryLevel = variant.masteryLevel || 0;
-                            const masteryRate = variant.masteryRate || 0;
-                            const masteryColor = masteryLevel >= 8 ? '#10b981' : masteryLevel >= 5 ? '#f59e0b' : '#ef4444';
+        // 親モードカードHTML生成
+        const cardHTML = generateParentModeCard(parentModeKey, parentMode, stats);
+        accordion.innerHTML += cardHTML;
+    });
 
-                            return `
-                                <div class="glass-card-sm">
-                                    <div class="flex items-center justify-between" style="margin-bottom: 0.75rem;">
-                                        <div class="flex items-center gap-2">
-                                            <i data-lucide="${variant.icon}" class="${colorClass}" style="width: 20px; height: 20px;"></i>
-                                            <h5 style="color: white; font-weight: 600; font-size: 0.95rem; margin: 0;">${variant.displayName}</h5>
-                                        </div>
-                                        <div style="background: rgba(255, 255, 255, 0.1); padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; font-weight: 600; color: ${masteryColor};">
-                                            Lv.${masteryLevel}
-                                        </div>
-                                    </div>
-
-                                    <div class="progress-bar" style="margin-bottom: 0.5rem;">
-                                        <div class="progress-fill gradient-catalog-${mode.color}" style="width: ${masteryRate}%;"></div>
-                                    </div>
-                                    <p style="color: #94a3b8; font-size: 0.8rem; margin: 0 0 0.75rem 0;">熟練度: ${masteryRate.toFixed(1)}%</p>
-
-                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.8rem;">
-                                        <div>
-                                            <p style="color: #94a3b8; margin: 0;">セッション数</p>
-                                            <p style="color: white; font-weight: 600; margin: 0; font-size: 1.1rem;">${variant.totalSessions}</p>
-                                        </div>
-                                        <div>
-                                            <p style="color: #94a3b8; margin: 0;">平均誤差</p>
-                                            <p style="color: ${variant.avgError < 30 ? '#10b981' : variant.avgError < 50 ? '#f59e0b' : '#ef4444'}; font-weight: 600; margin: 0; font-size: 1.1rem;">±${variant.avgError}¢</p>
-                                        </div>
-                                    </div>
-
-                                    ${variant.bestRecord ? `
-                                        <div style="margin-top: 0.75rem; padding: 0.5rem; background: rgba(16, 185, 129, 0.1); border-radius: 6px;">
-                                            <p style="color: #10b981; font-size: 0.75rem; margin: 0;">ベスト記録: ±${variant.bestRecord.error}¢</p>
-                                            <p style="color: #94a3b8; font-size: 0.7rem; margin: 0;">${variant.bestRecord.date}</p>
-                                        </div>
-                                    ` : ''}
-
-                                    ${variant.characteristics ? `
-                                        <p style="color: #cbd5e1; font-size: 0.8rem; margin: 0.75rem 0 0 0; line-height: 1.4;">
-                                            ${variant.characteristics}
-                                        </p>
-                                    ` : ''}
-                                </div>
-                            `;
-                        }).filter(html => html !== '').join('')}
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-    // クイックジャンプナビゲーション（モード別詳細統計）
-    const modeStatsQuickNavElement = document.getElementById('mode-stats-quick-nav');
-    if (modeStatsQuickNavElement) {
-        modeStatsQuickNavElement.innerHTML = '';
-        Object.keys(parentModeStats).forEach(parentMode => {
-            const mode = parentModeStats[parentMode];
-            const colorClass = mode.color === 'blue' ? 'text-blue-300' :
-                              mode.color === 'green' ? 'text-green-300' :
-                              'text-purple-300';
-
-            modeStatsQuickNavElement.innerHTML += `
-                <button class="mode-quick-jump-btn" onclick="document.getElementById('mode-stats-section-${parentMode}').scrollIntoView({behavior: 'smooth'})">
-                    <i data-lucide="${mode.icon}" class="${colorClass}"></i>
-                    <span>${mode.name}</span>
-                </button>
-            `;
-        });
-    }
-
-    // モード別詳細統計コンテンツ（全展開）
-    const modeStatsElement = document.getElementById('mode-stats-content');
-    if (modeStatsElement) {
-        modeStatsElement.innerHTML = '';
-
-        Object.keys(parentModeStats).forEach(parentMode => {
-            const mode = parentModeStats[parentMode];
-            const colorClass = mode.color === 'blue' ? 'text-blue-300' :
-                              mode.color === 'green' ? 'text-green-300' :
-                              'text-purple-300';
-
-            modeStatsElement.innerHTML += `
-                <div class="mode-stats-section" id="mode-stats-section-${parentMode}">
-                    <div class="mode-section-header">
-                        <i data-lucide="${mode.icon}" class="${colorClass}"></i>
-                        <h4 class="mode-section-title">${mode.name}</h4>
-                    </div>
-
-                    ${mode.variants.map(variantKey => {
-                        const variant = mode.modeStats[variantKey];
-                        if (!variant || variant.totalSessions === 0) return '';
-
-                        return `
-                            <div class="glass-card-sm" style="margin-bottom: 1rem;">
-                                <div class="flex items-center gap-2" style="margin-bottom: 1rem;">
-                                    <i data-lucide="${variant.icon}" class="${colorClass}" style="width: 20px; height: 20px;"></i>
-                                    <h5 style="color: white; font-weight: 600; font-size: 0.95rem; margin: 0;">${variant.displayName}</h5>
-                                </div>
-
-                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1rem;">
-                                    <div style="text-align: center; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
-                                        <p style="color: #94a3b8; font-size: 0.75rem; margin: 0 0 0.25rem 0;">総セッション数</p>
-                                        <p style="color: white; font-weight: 700; font-size: 1.5rem; margin: 0;">${variant.totalSessions}</p>
-                                    </div>
-                                    <div style="text-align: center; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
-                                        <p style="color: #94a3b8; font-size: 0.75rem; margin: 0 0 0.25rem 0;">成功率</p>
-                                        <p style="color: ${variant.successRate >= 80 ? '#10b981' : variant.successRate >= 60 ? '#f59e0b' : '#ef4444'}; font-weight: 700; font-size: 1.5rem; margin: 0;">${variant.successRate}%</p>
-                                    </div>
-                                    <div style="text-align: center; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
-                                        <p style="color: #94a3b8; font-size: 0.75rem; margin: 0 0 0.25rem 0;">平均誤差</p>
-                                        <p style="color: ${variant.avgError < 30 ? '#10b981' : variant.avgError < 50 ? '#f59e0b' : '#ef4444'}; font-weight: 700; font-size: 1.25rem; margin: 0;">±${variant.avgError}¢</p>
-                                    </div>
-                                    <div style="text-align: center; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
-                                        <p style="color: #94a3b8; font-size: 0.75rem; margin: 0 0 0.25rem 0;">熟練度</p>
-                                        <p style="color: #10b981; font-weight: 700; font-size: 1.25rem; margin: 0;">Lv.${variant.masteryLevel}</p>
-                                    </div>
-                                </div>
-
-                                ${variant.intervalStats && Object.keys(variant.intervalStats).length > 0 ? `
-                                    <div style="background: rgba(255, 255, 255, 0.05); padding: 0.75rem; border-radius: 8px;">
-                                        <h6 style="color: white; font-weight: 600; font-size: 0.85rem; margin: 0 0 0.5rem 0;">音程間隔別統計</h6>
-                                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                                            ${Object.keys(variant.intervalStats).sort((a, b) => parseInt(a) - parseInt(b)).map(interval => {
-                                                const stats = variant.intervalStats[interval];
-                                                return `
-                                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                                        <span style="color: #94a3b8; font-size: 0.75rem; min-width: 30px;">${interval}度:</span>
-                                                        <div class="progress-bar" style="flex: 1;">
-                                                            <div class="progress-fill-custom" style="width: ${Math.min(100, (100 - stats.avgError) / 100 * 100)}%; background: ${stats.avgError < 30 ? '#10b981' : stats.avgError < 50 ? '#f59e0b' : '#ef4444'};"></div>
-                                                        </div>
-                                                        <span style="color: ${stats.avgError < 30 ? '#10b981' : stats.avgError < 50 ? '#f59e0b' : '#ef4444'}; font-size: 0.75rem; font-weight: 600; min-width: 50px; text-align: right;">±${stats.avgError}¢</span>
-                                                    </div>
-                                                `;
-                                            }).join('')}
-                                        </div>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        `;
-                    }).filter(html => html !== '').join('')}
-                </div>
-            `;
-        });
-    }
+    // アコーディオン展開/折りたたみイベントを設定
+    initParentModeAccordion();
 
     console.log('✅ モード別分析UI更新完了');
+}
+
+/**
+ * 親モードカードHTML生成
+ */
+function generateParentModeCard(parentModeKey, parentMode, stats) {
+    const { name, displayName, icon, color, level } = parentMode;
+    const { totalSessions, avgError, childModes } = stats;
+
+    // データがない場合
+    if (totalSessions === 0) {
+        return `
+            <div class="parent-mode-card" data-mode="${parentModeKey}">
+                <div class="parent-mode-header" data-mode="${parentModeKey}">
+                    <div class="parent-mode-header-top">
+                        <div class="parent-mode-header-left">
+                            <span class="parent-mode-level">${level}</span>
+                            <h3 class="parent-mode-title">${displayName}</h3>
+                        </div>
+                        <i data-lucide="chevron-down" class="parent-mode-chevron"></i>
+                    </div>
+                </div>
+                <div class="parent-mode-no-data">
+                    <p class="parent-mode-no-data-title">まだデータがありません</p>
+                    <p>トレーニングを始めましょう</p>
+                </div>
+            </div>
+        `;
+    }
+
+    // 熟練度計算（暫定: 100 - avgError, 0-100%）
+    const masteryRate = Math.max(0, Math.min(100, 100 - avgError));
+    const masteryLevel = Math.floor(masteryRate / 10);
+
+    return `
+        <div class="parent-mode-card" data-mode="${parentModeKey}">
+            <div class="parent-mode-header" data-mode="${parentModeKey}">
+                <div class="parent-mode-header-top">
+                    <div class="parent-mode-header-left">
+                        <span class="parent-mode-level">${level}</span>
+                        <h3 class="parent-mode-title">${displayName}</h3>
+                    </div>
+                    <i data-lucide="chevron-down" class="parent-mode-chevron"></i>
+                </div>
+
+                <div class="parent-mode-stats">
+                    <div class="parent-mode-stat">
+                        <span class="parent-mode-stat-label">総セッション</span>
+                        <span class="parent-mode-stat-value">${totalSessions}</span>
+                    </div>
+                    <div class="parent-mode-stat">
+                        <span class="parent-mode-stat-label">平均誤差</span>
+                        <span class="parent-mode-stat-value">±${avgError}¢</span>
+                    </div>
+                    <div class="parent-mode-stat">
+                        <span class="parent-mode-stat-label">総合レベル</span>
+                        <span class="parent-mode-stat-value">Lv.${masteryLevel}</span>
+                    </div>
+                    <div class="parent-mode-stat">
+                        <span class="parent-mode-stat-label">熟練度</span>
+                        <span class="parent-mode-stat-value">${masteryRate.toFixed(0)}%</span>
+                    </div>
+                </div>
+
+                <div class="parent-mode-progress-section">
+                    <div class="parent-mode-progress-label">
+                        <span>熟練度</span>
+                        <span class="parent-mode-progress-percent">${masteryRate.toFixed(0)}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill gradient-catalog-${color}" style="width: ${masteryRate}%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mode-mastery-variants" data-mode="${parentModeKey}">
+                ${generateChildModeCards(childModes, color)}
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * 子モードカードHTML生成
+ */
+function generateChildModeCards(childModes, color) {
+    let html = '';
+
+    Object.keys(childModes).forEach(modeKey => {
+        const mode = childModes[modeKey];
+        if (!mode || mode.totalSessions === 0) return;
+
+        const { displayName, totalSessions, avgError } = mode;
+        const masteryRate = Math.max(0, Math.min(100, 100 - avgError));
+        const masteryLevel = Math.floor(masteryRate / 10);
+        const masteryColor = masteryLevel >= 8 ? '#10b981' : masteryLevel >= 5 ? '#f59e0b' : '#ef4444';
+
+        html += `
+            <div class="glass-card-sm mode-variant-item">
+                <div class="mode-variant-header">
+                    <i data-lucide="arrow-up" style="width: 18px; height: 18px;"></i>
+                    <span>${displayName}</span>
+                </div>
+
+                <div class="mode-variant-stats">
+                    <div class="variant-level" style="color: ${masteryColor};">Lv.${masteryLevel}</div>
+                    <div class="variant-rate">精度: ±${avgError}¢</div>
+                    <div class="variant-sessions">${totalSessions}セッション</div>
+                </div>
+
+                <div class="progress-bar" style="margin-top: 0.5rem;">
+                    <div class="progress-fill gradient-catalog-${color}" style="width: ${masteryRate}%;"></div>
+                </div>
+            </div>
+        `;
+    });
+
+    return html;
+}
+
+/**
+ * 親モードアコーディオンの展開/折りたたみ初期化
+ */
+function initParentModeAccordion() {
+    const headers = document.querySelectorAll('.parent-mode-header');
+
+    headers.forEach(header => {
+        header.addEventListener('click', () => {
+            const modeKey = header.getAttribute('data-mode');
+            const variantsContainer = document.querySelector(`.mode-mastery-variants[data-mode="${modeKey}"]`);
+
+            if (!variantsContainer) return;
+
+            // トグル処理
+            const isActive = header.classList.contains('active');
+
+            if (isActive) {
+                // 折りたたむ
+                header.classList.remove('active');
+                variantsContainer.classList.remove('active');
+            } else {
+                // 展開する
+                header.classList.add('active');
+                variantsContainer.classList.add('active');
+            }
+
+            // Lucideアイコン再初期化
+            if (typeof window.initializeLucideIcons === 'function') {
+                window.initializeLucideIcons({ immediate: true });
+            }
+        });
+    });
 }
 
 /**
