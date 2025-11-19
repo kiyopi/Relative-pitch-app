@@ -32,17 +32,12 @@ window.initPremiumAnalysis = async function() {
         return;
     }
 
-    // URLパラメータからモードを取得
-    const hash = window.location.hash.substring(1);
-    const params = new URLSearchParams(hash.split('?')[1] || '');
-    const currentMode = params.get('mode') || 'continuous';
-
-    // 現在のモードのセッションのみフィルタリング
-    const sessionData = allSessionData.filter(s => s.mode === currentMode);
-    console.log(`✅ セッションデータ取得: ${currentMode}モード=${sessionData.length}セッション`);
+    // 全モードのデータを使用（モード別の詳細は親モードカードで表示）
+    const sessionData = allSessionData;
+    console.log(`✅ セッションデータ取得: 全モード=${sessionData.length}セッション`);
 
     if (sessionData.length === 0) {
-        console.warn(`⚠️ ${currentMode}モードのセッションデータが見つかりません`);
+        console.warn(`⚠️ セッションデータが見つかりません`);
         showNoDataMessage();
         return;
     }
