@@ -896,9 +896,34 @@ window.initializePreparationPitchProCycle = async function() {
     console.log('🔍 [preparation] モードパラメータ:', modeParam);
     console.log('🔍 [preparation] 方向パラメータ:', directionParam);
 
+    // 【修正v4.0.6】準備ページ初期化時にsessionStorageをクリア（中断レッスン復元防止）
+    // 注意: trainingDirectionは残す（clearSessionStorageはcurrentLessonIdとcurrentModeのみクリア）
+    if (window.SessionManager) {
+        window.SessionManager.clearSessionStorage();
+        console.log('✅ sessionStorageクリア（準備ページ初期化・新規レッスン開始）');
+    }
+
+    // random/continuousモードの場合、directionParamはscaleDirection
+    // 12toneモードの場合、directionParamはchromaticDirection
+    // sessionStorageを更新（総合評価からの動線に対応）
+    if (directionParam && (modeParam === 'random' || modeParam === 'continuous')) {
+        sessionStorage.setItem('trainingDirection', directionParam);
+        console.log(`✅ sessionStorage更新: trainingDirection = ${directionParam}`);
+    }
+
     // ModeControllerでモード表示名を取得
     if (window.ModeController) {
-        const displayName = window.ModeController.getDisplayName(modeParam, { direction: directionParam });
+        const options = {};
+        if (modeParam === '12tone') {
+            // 12音階モード: directionはchromaticDirection
+            options.direction = directionParam;
+            // scaleDirectionはsessionStorageから取得
+            options.scaleDirection = sessionStorage.getItem('trainingDirection') || 'ascending';
+        } else {
+            // random/continuousモード: directionはscaleDirection
+            options.scaleDirection = directionParam || sessionStorage.getItem('trainingDirection') || 'ascending';
+        }
+        const displayName = window.ModeController.getDisplayName(modeParam, options);
         const subtitle = document.getElementById('preparation-mode-subtitle');
         if (subtitle) {
             subtitle.textContent = `${displayName}の準備中`;
@@ -914,12 +939,6 @@ window.initializePreparationPitchProCycle = async function() {
         direction: directionParam
     };
     console.log('✅ preparationRedirectInfo保存:', window.preparationRedirectInfo);
-
-    // 【修正v4.0.6】準備ページ初期化時にsessionStorageをクリア（中断レッスン復元防止）
-    if (window.SessionManager) {
-        window.SessionManager.clearSessionStorage();
-        console.log('✅ sessionStorageクリア（準備ページ初期化・新規レッスン開始）');
-    }
 
     // ========================================================================
     // ⚠️ デバッグ用: Lucide初期化を無効化（元のコードは下のコメントアウト部分）

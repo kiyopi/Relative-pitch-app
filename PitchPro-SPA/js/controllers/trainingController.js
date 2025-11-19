@@ -278,6 +278,18 @@ export async function initializeTrainingPage() {
     // 音階方向・基音方向バッジを更新（DOM読み込み後に実行）
     setTimeout(() => {
         updateDirectionBadges(currentScaleDirection, chromaticDirectionForBadge);
+
+        // ページタイトルを更新（ModeController使用）
+        const pageTitleElement = document.getElementById('training-mode-title');
+        if (pageTitleElement && window.ModeController) {
+            const options = {
+                direction: directionParam,
+                scaleDirection: currentScaleDirection
+            };
+            const displayName = window.ModeController.getDisplayName(currentMode, options);
+            pageTitleElement.textContent = displayName;
+            console.log(`✅ ページタイトル更新: ${displayName}`);
+        }
     }, 100);
 
     // レッスンID生成（トレーニング全体で1つのレッスンID）

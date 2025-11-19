@@ -177,23 +177,19 @@ const ModeController = {
     getDisplayName(modeId, options = {}) {
         const mode = this.getMode(modeId);
 
-        // 方向パラメータがある場合は方向別の表示名を返す
-        if (options.direction && mode.directions) {
+        // 音階方向のテキスト生成（上行/下行）
+        const scaleDirectionText = options.scaleDirection === 'descending' ? '下行' : '上行';
+
+        // 12音階モードのみchromaticDirectionを使用
+        if (modeId === '12tone' && options.direction && mode.directions) {
             const directionInfo = mode.directions[options.direction];
             if (directionInfo) {
-                // モード別の表示名生成
-                if (modeId === '12tone') {
-                    return `12音階${directionInfo.name}モード`;
-                } else if (modeId === 'random') {
-                    return `ランダム基音${directionInfo.name}モード`;
-                } else if (modeId === 'continuous') {
-                    return `連続チャレンジ${directionInfo.name}モード`;
-                }
+                return `12音階${directionInfo.name}モード ${scaleDirectionText}`;
             }
         }
 
-        // 方向パラメータがない場合は通常のモード名を返す
-        return mode.name;
+        // random/continuousモードはscaleDirectionのみ使用
+        return `${mode.name} ${scaleDirectionText}`;
     },
 
     /**

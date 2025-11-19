@@ -280,6 +280,30 @@ class NavigationManager {
     }
 
     /**
+     * 準備ページをスキップしてトレーニング直行できるか判定
+     *
+     * 【目的】
+     * 総合評価ページからのレッスン開始時、既にマイク許可・音域データが揃っている場合、
+     * 準備ページをスキップしてトレーニングページへ直接遷移することでUXを向上させる。
+     *
+     * 【条件】
+     * 1. マイク許可済み（localStorage: micPermissionGranted = 'true'）
+     * 2. 音域データあり（localStorage: voiceRangeData が存在）
+     *
+     * @returns {boolean} true: 準備スキップ可能, false: 準備ページ経由が必要
+     */
+    static canSkipPreparation() {
+        const micGranted = localStorage.getItem('micPermissionGranted') === 'true';
+        const voiceRangeData = localStorage.getItem('voiceRangeData');
+        const hasVoiceRange = voiceRangeData && voiceRangeData !== 'null';
+
+        const canSkip = micGranted && hasVoiceRange;
+        console.log(`🔍 [NavigationManager] 準備スキップ判定: ${canSkip} (mic: ${micGranted}, range: ${hasVoiceRange})`);
+
+        return canSkip;
+    }
+
+    /**
      * 【v4.3.1】ページアクセス制御の統一チェック
      *
      * ダイレクトアクセス検出・リロード検出を統一的に処理し、

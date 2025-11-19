@@ -1308,6 +1308,7 @@ function displayNextSteps(currentMode, evaluation, chromaticDirection = null, sc
 
         // 【修正v4.0.7】descriptionに完全なモード名（上昇・下降と上行・下行を含む）を表示
         let description = card.description;
+        let buttonText = card.buttonText;
 
         if (currentMode === '12tone' && fullModeName) {
             // 12音階モード: 現在のモード名を完全なモード名に置換
@@ -1315,17 +1316,37 @@ function displayNextSteps(currentMode, evaluation, chromaticDirection = null, sc
             console.log(`🔍 [DEBUG displayNextSteps] ${cardType}カード - Replaced description (12tone):`, description);
         } else if (currentMode === 'continuous' && cardType === 'upgrade') {
             // 【修正v4.0.4】連続チャレンジモード: 次のレベル（12音階上昇モード）に方向情報を追加
-            // デフォルトで「上昇・上行」から開始
-            const nextModeName = `12音階上昇モード 上行`;
-            description = description.replace(/12音階モード/, nextModeName);
+            // 現在のscaleDirectionを引き継ぐ
+            if (window.ModeController) {
+                const nextModeName = window.ModeController.getDisplayName('12tone', { direction: 'ascending', scaleDirection });
+                description = description.replace(/12音階モード/, nextModeName);
+                buttonText = `${nextModeName}を開始`;
+            }
             console.log(`🔍 [DEBUG displayNextSteps] ${cardType}カード - Replaced description (continuous→12tone):`, description);
+            console.log(`🔍 [DEBUG displayNextSteps] ${cardType}カード - Replaced buttonText:`, buttonText);
         } else if (currentMode === 'random' && cardType === 'upgrade') {
             // 【修正v4.0.4】ランダム基音モード: 次のレベル（連続チャレンジモード）に方向情報を追加
-            // デフォルトで「上行」から開始
-            description = description.replace(/連続チャレンジモード/, '連続チャレンジモード 上行');
+            // 現在のscaleDirectionを引き継ぐ
+            if (window.ModeController) {
+                const nextModeName = window.ModeController.getDisplayName('continuous', { scaleDirection });
+                description = description.replace(/連続チャレンジモード/, nextModeName);
+            }
             console.log(`🔍 [DEBUG displayNextSteps] ${cardType}カード - Replaced description (random→continuous):`, description);
         } else {
             console.log(`🔍 [DEBUG displayNextSteps] ${cardType}カード - 置換スキップ (currentMode: ${currentMode}, cardType: ${cardType})`);
+        }
+
+        // 【追加】12音階モードのアップグレードボタンテキストをModeControllerから生成
+        if (cardType === 'upgrade' && window.ModeController) {
+            if (modeKey === '12tone-ascending') {
+                const modeDisplayName = window.ModeController.getDisplayName('12tone', { direction: 'descending', scaleDirection });
+                buttonText = `${modeDisplayName}を開始`;
+                console.log(`🔍 [DEBUG displayNextSteps] ${cardType}カード - buttonText (12tone-ascending→descending):`, buttonText);
+            } else if (modeKey === '12tone-descending') {
+                const modeDisplayName = window.ModeController.getDisplayName('12tone', { direction: 'both', scaleDirection });
+                buttonText = `${modeDisplayName}を開始`;
+                console.log(`🔍 [DEBUG displayNextSteps] ${cardType}カード - buttonText (12tone-descending→both):`, buttonText);
+            }
         }
 
         return `
@@ -1336,7 +1357,7 @@ function displayNextSteps(currentMode, evaluation, chromaticDirection = null, sc
                 <h3 class="next-step-card-title">${card.title}</h3>
                 <p class="next-step-card-description">${description}</p>
                 <button class="btn ${card.disabled ? 'btn-outline' : 'btn-primary'}" ${card.disabled ? 'disabled' : ''}>
-                    ${card.buttonText}
+                    ${buttonText}
                 </button>
             </div>
         `;
@@ -1363,14 +1384,24 @@ function handleNextStepAction(actionId) {
         // ランダム基音モード
         'next-step-random-practice': () => {
             if (window.NavigationManager) {
-                NavigationManager.navigate('preparation', { mode: 'random', direction: currentScaleDirection });
+                const canSkip = NavigationManager.canSkipPreparation();
+                if (canSkip) {
+                    NavigationManager.navigateToTraining('random', 1, null, currentScaleDirection);
+                } else {
+                    NavigationManager.navigate('preparation', { mode: 'random', direction: currentScaleDirection });
+                }
             } else {
                 window.location.hash = `preparation?mode=random&direction=${currentScaleDirection}`;
             }
         },
         'next-step-random-upgrade': () => {
             if (window.NavigationManager) {
-                NavigationManager.navigate('preparation', { mode: 'continuous', direction: currentScaleDirection });
+                const canSkip = NavigationManager.canSkipPreparation();
+                if (canSkip) {
+                    NavigationManager.navigateToTraining('continuous', 1, null, currentScaleDirection);
+                } else {
+                    NavigationManager.navigate('preparation', { mode: 'continuous', direction: currentScaleDirection });
+                }
             } else {
                 window.location.hash = `preparation?mode=continuous&direction=${currentScaleDirection}`;
             }
@@ -1386,14 +1417,24 @@ function handleNextStepAction(actionId) {
         // 連続チャレンジモード
         'next-step-continuous-practice': () => {
             if (window.NavigationManager) {
-                NavigationManager.navigate('preparation', { mode: 'continuous', direction: currentScaleDirection });
+                const canSkip = NavigationManager.canSkipPreparation();
+                if (canSkip) {
+                    NavigationManager.navigateToTraining('continuous', 1, null, currentScaleDirection);
+                } else {
+                    NavigationManager.navigate('preparation', { mode: 'continuous', direction: currentScaleDirection });
+                }
             } else {
                 window.location.hash = `preparation?mode=continuous&direction=${currentScaleDirection}`;
             }
         },
         'next-step-continuous-upgrade': () => {
             if (window.NavigationManager) {
-                NavigationManager.navigate('preparation', { mode: '12tone', direction: 'ascending' });
+                const canSkip = NavigationManager.canSkipPreparation();
+                if (canSkip) {
+                    NavigationManager.navigateToTraining('12tone', 1, 'ascending', currentScaleDirection);
+                } else {
+                    NavigationManager.navigate('preparation', { mode: '12tone', direction: 'ascending' });
+                }
             } else {
                 window.location.hash = `preparation?mode=12tone&direction=ascending`;
             }
@@ -1409,14 +1450,24 @@ function handleNextStepAction(actionId) {
         // 12音階モード（上昇）
         'next-step-12tone-ascending-practice': () => {
             if (window.NavigationManager) {
-                NavigationManager.navigate('preparation', { mode: '12tone', direction: 'ascending' });
+                const canSkip = NavigationManager.canSkipPreparation();
+                if (canSkip) {
+                    NavigationManager.navigateToTraining('12tone', 1, 'ascending', currentScaleDirection);
+                } else {
+                    NavigationManager.navigate('preparation', { mode: '12tone', direction: 'ascending' });
+                }
             } else {
                 window.location.hash = 'preparation?mode=12tone&direction=ascending';
             }
         },
         'next-step-12tone-ascending-upgrade': () => {
             if (window.NavigationManager) {
-                NavigationManager.navigate('preparation', { mode: '12tone', direction: 'descending' });
+                const canSkip = NavigationManager.canSkipPreparation();
+                if (canSkip) {
+                    NavigationManager.navigateToTraining('12tone', 1, 'descending', currentScaleDirection);
+                } else {
+                    NavigationManager.navigate('preparation', { mode: '12tone', direction: 'descending' });
+                }
             } else {
                 window.location.hash = 'preparation?mode=12tone&direction=descending';
             }
@@ -1432,14 +1483,24 @@ function handleNextStepAction(actionId) {
         // 12音階モード（下降）
         'next-step-12tone-descending-practice': () => {
             if (window.NavigationManager) {
-                NavigationManager.navigate('preparation', { mode: '12tone', direction: 'descending' });
+                const canSkip = NavigationManager.canSkipPreparation();
+                if (canSkip) {
+                    NavigationManager.navigateToTraining('12tone', 1, 'descending', currentScaleDirection);
+                } else {
+                    NavigationManager.navigate('preparation', { mode: '12tone', direction: 'descending' });
+                }
             } else {
                 window.location.hash = 'preparation?mode=12tone&direction=descending';
             }
         },
         'next-step-12tone-descending-upgrade': () => {
             if (window.NavigationManager) {
-                NavigationManager.navigate('preparation', { mode: '12tone', direction: 'both' });
+                const canSkip = NavigationManager.canSkipPreparation();
+                if (canSkip) {
+                    NavigationManager.navigateToTraining('12tone', 1, 'both', currentScaleDirection);
+                } else {
+                    NavigationManager.navigate('preparation', { mode: '12tone', direction: 'both' });
+                }
             } else {
                 window.location.hash = 'preparation?mode=12tone&direction=both';
             }
@@ -1455,7 +1516,12 @@ function handleNextStepAction(actionId) {
         // 12音階モード（両方向）
         'next-step-12tone-both-practice': () => {
             if (window.NavigationManager) {
-                NavigationManager.navigate('preparation', { mode: '12tone', direction: 'both' });
+                const canSkip = NavigationManager.canSkipPreparation();
+                if (canSkip) {
+                    NavigationManager.navigateToTraining('12tone', 1, 'both', currentScaleDirection);
+                } else {
+                    NavigationManager.navigate('preparation', { mode: '12tone', direction: 'both' });
+                }
             } else {
                 window.location.hash = 'preparation?mode=12tone&direction=both';
             }
@@ -1471,14 +1537,24 @@ function handleNextStepAction(actionId) {
         // 下行モード（将来実装）
         'next-step-random-down-practice': () => {
             if (window.NavigationManager) {
-                NavigationManager.navigate('preparation', { mode: 'random-down', direction: 'descending' });
+                const canSkip = NavigationManager.canSkipPreparation();
+                if (canSkip) {
+                    NavigationManager.navigateToTraining('random-down', 1, null, 'descending');
+                } else {
+                    NavigationManager.navigate('preparation', { mode: 'random-down', direction: 'descending' });
+                }
             } else {
                 window.location.hash = 'preparation?mode=random-down';
             }
         },
         'next-step-random-down-upgrade': () => {
             if (window.NavigationManager) {
-                NavigationManager.navigate('preparation', { mode: 'continuous-down', direction: 'descending' });
+                const canSkip = NavigationManager.canSkipPreparation();
+                if (canSkip) {
+                    NavigationManager.navigateToTraining('continuous-down', 1, null, 'descending');
+                } else {
+                    NavigationManager.navigate('preparation', { mode: 'continuous-down', direction: 'descending' });
+                }
             } else {
                 window.location.hash = 'preparation?mode=continuous-down';
             }
@@ -1493,7 +1569,12 @@ function handleNextStepAction(actionId) {
 
         'next-step-continuous-down-practice': () => {
             if (window.NavigationManager) {
-                NavigationManager.navigate('preparation', { mode: 'continuous-down', direction: 'descending' });
+                const canSkip = NavigationManager.canSkipPreparation();
+                if (canSkip) {
+                    NavigationManager.navigateToTraining('continuous-down', 1, null, 'descending');
+                } else {
+                    NavigationManager.navigate('preparation', { mode: 'continuous-down', direction: 'descending' });
+                }
             } else {
                 window.location.hash = 'preparation?mode=continuous-down';
             }
