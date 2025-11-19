@@ -5,19 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎨 UIカタログ 詳細分析</title>
-    
+
     <!-- favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
-    
+
     <!-- スタイルシート -->
     <link rel="stylesheet" href="../PitchPro-SPA/styles/base.css">
     <link rel="stylesheet" href="ui-catalog.css">
-    
+
     <!-- フォント -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    
+
     <!-- アイコンライブラリ -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
@@ -44,11 +44,501 @@
 
             <!-- メインコンテンツエリア -->
             <main id="catalog-content">
-                
-                <!-- TODO: 詳細分析コンポーネント -->
+
+                <!-- ================================================================
+                     1. タブナビゲーション
+                     ================================================================ -->
                 <section class="catalog-section">
-                    <h2 class="text-2xl font-bold text-white mb-4">🚧 開発予定</h2>
-                    <p class="text-white-70 mb-6">詳細分析コンポーネントを準備中です。</p>
+                    <h2 class="catalog-heading">
+                        <i data-lucide="layout" class="catalog-icon"></i>
+                        <span>タブナビゲーション</span>
+                    </h2>
+                    <p class="catalog-description">詳細分析ページの4タブ切り替え</p>
+
+                    <!-- 実装例 -->
+                    <div class="code-example">
+                        <div class="catalog-tab-navigation">
+                            <button class="catalog-tab-button active">
+                                <i data-lucide="music"></i>
+                                <span>音程精度</span>
+                            </button>
+                            <button class="catalog-tab-button">
+                                <i data-lucide="alert-triangle"></i>
+                                <span>エラー分析</span>
+                            </button>
+                            <button class="catalog-tab-button">
+                                <i data-lucide="target"></i>
+                                <span>練習プラン</span>
+                            </button>
+                            <button class="catalog-tab-button">
+                                <i data-lucide="trending-up"></i>
+                                <span>成長記録</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- コードサンプル -->
+                    <div class="code-sample">
+&lt;div class="tab-navigation"&gt;
+  &lt;button class="tab-button active"&gt;
+    &lt;i data-lucide="music"&gt;&lt;/i&gt;
+    &lt;span&gt;音程精度&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;button class="tab-button"&gt;
+    &lt;i data-lucide="alert-triangle"&gt;&lt;/i&gt;
+    &lt;span&gt;エラー分析&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;button class="tab-button"&gt;
+    &lt;i data-lucide="target"&gt;&lt;/i&gt;
+    &lt;span&gt;練習プラン&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;button class="tab-button"&gt;
+    &lt;i data-lucide="trending-up"&gt;&lt;/i&gt;
+    &lt;span&gt;成長記録&lt;/span&gt;
+  &lt;/button&gt;
+&lt;/div&gt;</div>
+
+                    <!-- 使用方法 -->
+                    <div class="usage-notes">
+                        <h4>💡 使用方法</h4>
+                        <ul>
+                            <li><strong>active</strong>クラスで選択中のタブを表示</li>
+                            <li>モバイルではテキストを非表示にしてアイコンのみ表示</li>
+                            <li>横スクロール対応（-webkit-overflow-scrolling）</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- ================================================================
+                     2. 親モードカード（折りたたみ式）
+                     ================================================================ -->
+                <section class="catalog-section">
+                    <h2 class="catalog-heading">
+                        <i data-lucide="folder" class="catalog-icon"></i>
+                        <span>親モードカード（折りたたみ式）</span>
+                    </h2>
+                    <p class="catalog-description">初級・中級・上級・特別の4つの親モード表示</p>
+
+                    <!-- 実装例: 初級 -->
+                    <div class="code-example">
+                        <div class="catalog-parent-mode-card" data-level="beginner">
+                            <div class="catalog-parent-mode-header">
+                                <div class="catalog-parent-mode-header-left">
+                                    <span class="catalog-parent-mode-level">🔰</span>
+                                    <h3 class="catalog-parent-mode-title">初級: ランダム基音</h3>
+                                    <span class="catalog-parent-mode-count">(2モード)</span>
+                                </div>
+                                <div class="catalog-parent-mode-summary">
+                                    <span class="catalog-mode-summary-level">Lv.7</span>
+                                    <span class="catalog-mode-summary-rate">熟練度 70%</span>
+                                    <span class="catalog-mode-summary-sessions">128セッション</span>
+                                </div>
+                            </div>
+                            <div class="catalog-mode-summary-stats">
+                                <div class="catalog-stat-item">
+                                    <span class="catalog-stat-label">総セッション</span>
+                                    <span class="catalog-stat-value">128</span>
+                                </div>
+                                <div class="catalog-stat-item">
+                                    <span class="catalog-stat-label">平均誤差</span>
+                                    <span class="catalog-stat-value">±28¢</span>
+                                </div>
+                                <div class="catalog-stat-item">
+                                    <span class="catalog-stat-label">熟練度</span>
+                                    <span class="catalog-stat-value">70%</span>
+                                </div>
+                            </div>
+                            <button class="catalog-mode-detail-btn">
+                                <span>詳細を見る</span>
+                                <i data-lucide="chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 実装例: 中級 -->
+                    <div class="code-example" style="margin-top: 1rem;">
+                        <div class="catalog-parent-mode-card" data-level="intermediate">
+                            <div class="catalog-parent-mode-header">
+                                <div class="catalog-parent-mode-header-left">
+                                    <span class="catalog-parent-mode-level">🥉</span>
+                                    <h3 class="catalog-parent-mode-title">中級: 連続チャレンジ</h3>
+                                    <span class="catalog-parent-mode-count">(2モード)</span>
+                                </div>
+                                <div class="catalog-parent-mode-summary">
+                                    <span class="catalog-mode-summary-level">Lv.5</span>
+                                    <span class="catalog-mode-summary-rate">熟練度 50%</span>
+                                    <span class="catalog-mode-summary-sessions">64セッション</span>
+                                </div>
+                            </div>
+                            <div class="catalog-mode-summary-stats">
+                                <div class="catalog-stat-item">
+                                    <span class="catalog-stat-label">総セッション</span>
+                                    <span class="catalog-stat-value">64</span>
+                                </div>
+                                <div class="catalog-stat-item">
+                                    <span class="catalog-stat-label">平均誤差</span>
+                                    <span class="catalog-stat-value">±32¢</span>
+                                </div>
+                                <div class="catalog-stat-item">
+                                    <span class="catalog-stat-label">熟練度</span>
+                                    <span class="catalog-stat-value">50%</span>
+                                </div>
+                            </div>
+                            <button class="catalog-mode-detail-btn">
+                                <span>詳細を見る</span>
+                                <i data-lucide="chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 実装例: 上級 -->
+                    <div class="code-example" style="margin-top: 1rem;">
+                        <div class="catalog-parent-mode-card" data-level="advanced">
+                            <div class="catalog-parent-mode-header">
+                                <div class="catalog-parent-mode-header-left">
+                                    <span class="catalog-parent-mode-level">🥇</span>
+                                    <h3 class="catalog-parent-mode-title">上級: 12音階</h3>
+                                    <span class="catalog-parent-mode-count">(6モード)</span>
+                                </div>
+                                <div class="catalog-parent-mode-summary">
+                                    <span class="catalog-mode-summary-level">Lv.3</span>
+                                    <span class="catalog-mode-summary-rate">熟練度 30%</span>
+                                    <span class="catalog-mode-summary-sessions">48セッション</span>
+                                </div>
+                            </div>
+                            <div class="catalog-mode-summary-stats">
+                                <div class="catalog-stat-item">
+                                    <span class="catalog-stat-label">総セッション</span>
+                                    <span class="catalog-stat-value">48</span>
+                                </div>
+                                <div class="catalog-stat-item">
+                                    <span class="catalog-stat-label">平均誤差</span>
+                                    <span class="catalog-stat-value">±38¢</span>
+                                </div>
+                                <div class="catalog-stat-item">
+                                    <span class="catalog-stat-label">熟練度</span>
+                                    <span class="catalog-stat-value">30%</span>
+                                </div>
+                            </div>
+                            <button class="catalog-mode-detail-btn">
+                                <span>詳細を見る</span>
+                                <i data-lucide="chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 実装例: 特別（データなし状態） -->
+                    <div class="code-example" style="margin-top: 1rem;">
+                        <div class="catalog-parent-mode-card" data-level="weakness">
+                            <div class="catalog-parent-mode-header">
+                                <div class="catalog-parent-mode-header-left">
+                                    <span class="catalog-parent-mode-level">🎯</span>
+                                    <h3 class="catalog-parent-mode-title">特別: 弱点練習</h3>
+                                    <span class="catalog-parent-mode-count">(2モード)</span>
+                                </div>
+                            </div>
+                            <div class="catalog-mode-empty-state">
+                                <p>まだデータがありません</p>
+                                <p class="text-sm">トレーニングを始めましょう</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- コードサンプル -->
+                    <div class="code-sample">
+&lt;!-- 初級モード例 --&gt;
+&lt;div class="parent-mode-card" data-level="beginner"&gt;
+  &lt;div class="parent-mode-header"&gt;
+    &lt;div class="parent-mode-header-left"&gt;
+      &lt;span class="parent-mode-level"&gt;🔰&lt;/span&gt;
+      &lt;h3 class="parent-mode-title"&gt;初級: ランダム基音&lt;/h3&gt;
+      &lt;span class="parent-mode-count"&gt;(2モード)&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="parent-mode-summary"&gt;
+      &lt;span class="mode-summary-level"&gt;Lv.7&lt;/span&gt;
+      &lt;span class="mode-summary-rate"&gt;熟練度 70%&lt;/span&gt;
+      &lt;span class="mode-summary-sessions"&gt;128セッション&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="mode-summary-stats"&gt;
+    &lt;div class="stat-item"&gt;
+      &lt;span class="stat-label"&gt;総セッション&lt;/span&gt;
+      &lt;span class="stat-value"&gt;128&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="stat-item"&gt;
+      &lt;span class="stat-label"&gt;平均誤差&lt;/span&gt;
+      &lt;span class="stat-value"&gt;±28¢&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="stat-item"&gt;
+      &lt;span class="stat-label"&gt;熟練度&lt;/span&gt;
+      &lt;span class="stat-value"&gt;70%&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;button class="mode-detail-btn"&gt;
+    &lt;span&gt;詳細を見る&lt;/span&gt;
+    &lt;i data-lucide="chevron-down"&gt;&lt;/i&gt;
+  &lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- 他のレベル: data-level属性を変更 --&gt;
+&lt;!-- intermediate, advanced, weakness --&gt;</div>
+
+                    <!-- 使用方法 -->
+                    <div class="usage-notes">
+                        <h4>💡 使用方法</h4>
+                        <ul>
+                            <li><strong>data-level</strong>属性で親モードのレベルを指定（beginner/intermediate/advanced/weakness）</li>
+                            <li>各レベルごとに異なる配色が自動適用</li>
+                            <li>統計グリッドは3カラム表示（モバイルでは1カラム）</li>
+                            <li>ホバーエフェクト: translateY(-2px) + shadow強化</li>
+                        </ul>
+                    </div>
+
+                    <!-- 重要な注意点 -->
+                    <div class="warning-box">
+                        <h4>⚠️ iPadグラスカード重ねあわせ注意</h4>
+                        <p>親モードカード内に詳細セクションをネストする場合、背景透明度を下げる必要があります：</p>
+                        <code style="display: block; margin-top: 0.5rem; padding: 0.5rem; background: rgba(0,0,0,0.3); border-radius: 4px;">
+.catalog-parent-mode-card .detail-section {<br>
+&nbsp;&nbsp;background: rgba(15, 23, 42, 0.4); /* 通常の0.6より低く */<br>
+}
+                        </code>
+                    </div>
+                </section>
+
+                <!-- ================================================================
+                     3. 音程方向カード（2カラム比較）
+                     ================================================================ -->
+                <section class="catalog-section">
+                    <h2 class="catalog-heading">
+                        <i data-lucide="git-compare" class="catalog-icon"></i>
+                        <span>音程方向カード（2カラム比較）</span>
+                    </h2>
+                    <p class="catalog-description">上行・下行音程の比較表示</p>
+
+                    <!-- 実装例 -->
+                    <div class="code-example">
+                        <div class="catalog-direction-grid">
+                            <!-- 上行音程 -->
+                            <div class="catalog-direction-card">
+                                <div class="catalog-direction-header">
+                                    <i data-lucide="arrow-up" class="text-blue-300"></i>
+                                    <h4 class="catalog-direction-title">上行音程</h4>
+                                </div>
+                                <div class="catalog-direction-stats">
+                                    <div class="catalog-stat-item">
+                                        <span class="catalog-stat-label">セッション</span>
+                                        <span class="catalog-stat-value">68</span>
+                                    </div>
+                                    <div class="catalog-stat-item">
+                                        <span class="catalog-stat-label">平均誤差</span>
+                                        <span class="catalog-stat-value">±25¢</span>
+                                    </div>
+                                    <div class="catalog-stat-item">
+                                        <span class="catalog-stat-label">レベル</span>
+                                        <span class="catalog-stat-value">Lv.8</span>
+                                    </div>
+                                    <div class="catalog-stat-item">
+                                        <span class="catalog-stat-label">熟練度</span>
+                                        <span class="catalog-stat-value">80%</span>
+                                    </div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill gradient-catalog-blue" style="width: 80%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- 下行音程 -->
+                            <div class="catalog-direction-card">
+                                <div class="catalog-direction-header">
+                                    <i data-lucide="arrow-down" class="text-green-300"></i>
+                                    <h4 class="catalog-direction-title">下行音程</h4>
+                                </div>
+                                <div class="catalog-direction-stats">
+                                    <div class="catalog-stat-item">
+                                        <span class="catalog-stat-label">セッション</span>
+                                        <span class="catalog-stat-value">60</span>
+                                    </div>
+                                    <div class="catalog-stat-item">
+                                        <span class="catalog-stat-label">平均誤差</span>
+                                        <span class="catalog-stat-value">±32¢</span>
+                                    </div>
+                                    <div class="catalog-stat-item">
+                                        <span class="catalog-stat-label">レベル</span>
+                                        <span class="catalog-stat-value">Lv.6</span>
+                                    </div>
+                                    <div class="catalog-stat-item">
+                                        <span class="catalog-stat-label">熟練度</span>
+                                        <span class="catalog-stat-value">60%</span>
+                                    </div>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill gradient-catalog-green" style="width: 60%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- コードサンプル -->
+                    <div class="code-sample">
+&lt;div class="direction-grid"&gt;
+  &lt;!-- 上行音程 --&gt;
+  &lt;div class="direction-card"&gt;
+    &lt;div class="direction-header"&gt;
+      &lt;i data-lucide="arrow-up" class="text-blue-300"&gt;&lt;/i&gt;
+      &lt;h4 class="direction-title"&gt;上行音程&lt;/h4&gt;
+    &lt;/div&gt;
+    &lt;div class="direction-stats"&gt;
+      &lt;div class="stat-item"&gt;
+        &lt;span class="stat-label"&gt;セッション&lt;/span&gt;
+        &lt;span class="stat-value"&gt;68&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class="stat-item"&gt;
+        &lt;span class="stat-label"&gt;平均誤差&lt;/span&gt;
+        &lt;span class="stat-value"&gt;±25¢&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class="stat-item"&gt;
+        &lt;span class="stat-label"&gt;レベル&lt;/span&gt;
+        &lt;span class="stat-value"&gt;Lv.8&lt;/span&gt;
+      &lt;/div&gt;
+      &lt;div class="stat-item"&gt;
+        &lt;span class="stat-label"&gt;熟練度&lt;/span&gt;
+        &lt;span class="stat-value"&gt;80%&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="progress-bar"&gt;
+      &lt;div class="progress-fill gradient-catalog-blue" style="width: 80%;"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;!-- 下行音程 --&gt;
+  &lt;div class="direction-card"&gt;
+    &lt;div class="direction-header"&gt;
+      &lt;i data-lucide="arrow-down" class="text-green-300"&gt;&lt;/i&gt;
+      &lt;h4 class="direction-title"&gt;下行音程&lt;/h4&gt;
+    &lt;/div&gt;
+    &lt;div class="direction-stats"&gt;
+      &lt;!-- 同様の構造 --&gt;
+    &lt;/div&gt;
+    &lt;div class="progress-bar"&gt;
+      &lt;div class="progress-fill gradient-catalog-green" style="width: 60%;"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+
+                    <!-- 使用方法 -->
+                    <div class="usage-notes">
+                        <h4>💡 使用方法</h4>
+                        <ul>
+                            <li>2カラムグリッド（モバイルでは1カラム縦並び）</li>
+                            <li>統計項目は2カラムグリッド表示</li>
+                            <li>プログレスバーで熟練度を視覚化</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- ================================================================
+                     4. 練習プランカード（優先度別）
+                     ================================================================ -->
+                <section class="catalog-section">
+                    <h2 class="catalog-heading">
+                        <i data-lucide="clipboard-list" class="catalog-icon"></i>
+                        <span>練習プランカード（優先度別）</span>
+                    </h2>
+                    <p class="catalog-description">優先度1（緊急）・2（重要）・3（推奨）の3段階</p>
+
+                    <!-- 実装例: 優先度1 -->
+                    <div class="code-example">
+                        <div class="catalog-practice-plan-card priority-1">
+                            <h3 class="catalog-practice-plan-title priority-1">
+                                <i data-lucide="alert-circle"></i>
+                                <span>緊急: 3度音程の精度向上</span>
+                            </h3>
+                            <div class="catalog-practice-plan-meta">
+                                <strong>現在の精度:</strong> ±45¢（目標: ±30¢以下）
+                            </div>
+                            <div class="catalog-practice-plan-content">
+                                3度音程は相対音感の基礎となる重要な音程です。現在の精度が目標を大きく下回っています。
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 実装例: 優先度2 -->
+                    <div class="code-example" style="margin-top: 1rem;">
+                        <div class="catalog-practice-plan-card priority-2">
+                            <h3 class="catalog-practice-plan-title priority-2">
+                                <i data-lucide="alert-triangle"></i>
+                                <span>重要: 7度音程の安定化</span>
+                            </h3>
+                            <div class="catalog-practice-plan-meta">
+                                <strong>現在の精度:</strong> ±38¢（目標: ±25¢以下）
+                            </div>
+                            <div class="catalog-practice-plan-content">
+                                7度音程は難易度が高いですが、マスターすることで音感が大幅に向上します。
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 実装例: 優先度3 -->
+                    <div class="code-example" style="margin-top: 1rem;">
+                        <div class="catalog-practice-plan-card priority-3">
+                            <h3 class="catalog-practice-plan-title priority-3">
+                                <i data-lucide="check-circle"></i>
+                                <span>推奨: 5度音程のさらなる向上</span>
+                            </h3>
+                            <div class="catalog-practice-plan-meta">
+                                <strong>現在の精度:</strong> ±22¢（目標: ±15¢以下）
+                            </div>
+                            <div class="catalog-practice-plan-content">
+                                すでに良好な精度ですが、さらなる向上を目指しましょう。完璧に近い精度を目指すことで自信がつきます。
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- コードサンプル -->
+                    <div class="code-sample">
+&lt;!-- 優先度1（緊急） --&gt;
+&lt;div class="practice-plan-card priority-1"&gt;
+  &lt;h3 class="practice-plan-title priority-1"&gt;
+    &lt;i data-lucide="alert-circle"&gt;&lt;/i&gt;
+    &lt;span&gt;緊急: 3度音程の精度向上&lt;/span&gt;
+  &lt;/h3&gt;
+  &lt;div class="practice-plan-meta"&gt;
+    &lt;strong&gt;現在の精度:&lt;/strong&gt; ±45¢（目標: ±30¢以下）
+  &lt;/div&gt;
+  &lt;div class="practice-plan-content"&gt;
+    3度音程は相対音感の基礎となる重要な音程です。現在の精度が目標を大きく下回っています。
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- 優先度2（重要） --&gt;
+&lt;div class="practice-plan-card priority-2"&gt;
+  &lt;h3 class="practice-plan-title priority-2"&gt;
+    &lt;i data-lucide="alert-triangle"&gt;&lt;/i&gt;
+    &lt;span&gt;重要: 7度音程の安定化&lt;/span&gt;
+  &lt;/h3&gt;
+  &lt;!-- 同様の構造 --&gt;
+&lt;/div&gt;
+
+&lt;!-- 優先度3（推奨） --&gt;
+&lt;div class="practice-plan-card priority-3"&gt;
+  &lt;h3 class="practice-plan-title priority-3"&gt;
+    &lt;i data-lucide="check-circle"&gt;&lt;/i&gt;
+    &lt;span&gt;推奨: 5度音程のさらなる向上&lt;/span&gt;
+  &lt;/h3&gt;
+  &lt;!-- 同様の構造 --&gt;
+&lt;/div&gt;</div>
+
+                    <!-- 使用方法 -->
+                    <div class="usage-notes">
+                        <h4>💡 使用方法</h4>
+                        <ul>
+                            <li><strong>priority-1</strong>: 赤系配色（緊急）</li>
+                            <li><strong>priority-2</strong>: オレンジ系配色（重要）</li>
+                            <li><strong>priority-3</strong>: 緑系配色（推奨）</li>
+                            <li>各カードは背景色・ボーダー・タイトル色が優先度に応じて変化</li>
+                        </ul>
+                    </div>
                 </section>
 
             </main>
@@ -62,14 +552,364 @@
         </div>
     </div>
 
-    <!-- CSS追加 -->
+    <!-- カタログ専用CSS -->
     <style>
-        .page-header-icon-red {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
+        /* ================================================================
+           カタログ専用プレフィックス: catalog-
+           本番実装時はプレフィックスを削除して使用
+           ================================================================ */
+
+        /* === タブナビゲーション === */
+        .catalog-tab-navigation {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .catalog-tab-button {
+            flex: 1;
+            min-width: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            border: none;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .catalog-tab-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .catalog-tab-button.active {
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            color: white;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+        }
+
+        .catalog-tab-button i {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* === 親モードカード === */
+        .catalog-parent-mode-card {
+            background: linear-gradient(135deg,
+                var(--mode-color-light),
+                var(--mode-color-dark));
+            border: 2px solid var(--mode-color-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .catalog-parent-mode-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 親モード別カラー */
+        .catalog-parent-mode-card[data-level="beginner"] {
+            --mode-color-light: rgba(59, 130, 246, 0.1);
+            --mode-color-dark: rgba(37, 99, 235, 0.05);
+            --mode-color-border: rgba(59, 130, 246, 0.3);
+        }
+
+        .catalog-parent-mode-card[data-level="intermediate"] {
+            --mode-color-light: rgba(16, 185, 129, 0.1);
+            --mode-color-dark: rgba(5, 150, 105, 0.05);
+            --mode-color-border: rgba(16, 185, 129, 0.3);
+        }
+
+        .catalog-parent-mode-card[data-level="advanced"] {
+            --mode-color-light: rgba(168, 85, 247, 0.1);
+            --mode-color-dark: rgba(126, 34, 206, 0.05);
+            --mode-color-border: rgba(168, 85, 247, 0.3);
+        }
+
+        .catalog-parent-mode-card[data-level="weakness"] {
+            --mode-color-light: rgba(245, 158, 11, 0.1);
+            --mode-color-dark: rgba(217, 119, 6, 0.05);
+            --mode-color-border: rgba(245, 158, 11, 0.3);
+        }
+
+        .catalog-parent-mode-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .catalog-parent-mode-header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .catalog-parent-mode-level {
+            font-size: 1.5rem;
+        }
+
+        .catalog-parent-mode-title {
+            color: white;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .catalog-parent-mode-count {
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+
+        .catalog-parent-mode-summary {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .catalog-mode-summary-level {
+            color: #10b981;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .catalog-mode-summary-rate {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+
+        .catalog-mode-summary-sessions {
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+
+        /* 統計グリッド */
+        .catalog-mode-summary-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .catalog-stat-item {
+            text-align: center;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .catalog-stat-label {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .catalog-stat-value {
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        /* 詳細ボタン */
+        .catalog-mode-detail-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .catalog-mode-detail-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* 空状態 */
+        .catalog-mode-empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #94a3b8;
+        }
+
+        .catalog-mode-empty-state p:first-child {
+            color: #cbd5e1;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* === 音程方向カード === */
+        .catalog-direction-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .catalog-direction-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.25rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .catalog-direction-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .catalog-direction-title {
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .catalog-direction-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        /* === 練習プランカード === */
+        .catalog-practice-plan-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .catalog-practice-plan-card.priority-1 {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .catalog-practice-plan-card.priority-2 {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .catalog-practice-plan-card.priority-3 {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .catalog-practice-plan-title {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .catalog-practice-plan-title.priority-1 {
+            color: #ef4444;
+        }
+
+        .catalog-practice-plan-title.priority-2 {
+            color: #f59e0b;
+        }
+
+        .catalog-practice-plan-title.priority-3 {
+            color: #10b981;
+        }
+
+        .catalog-practice-plan-meta {
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+        }
+
+        .catalog-practice-plan-meta strong {
+            color: white;
+        }
+
+        .catalog-practice-plan-content {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        /* === レスポンシブ対応 === */
+        @media (max-width: 768px) {
+            .catalog-tab-button span {
+                display: none;
+            }
+
+            .catalog-tab-button {
+                min-width: 60px;
+                padding: 0.75rem;
+            }
+
+            .catalog-mode-summary-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .catalog-parent-mode-summary {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .catalog-direction-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* === 警告ボックス === */
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .warning-box h4 {
+            color: #f59e0b;
+            margin-bottom: 0.5rem;
+        }
+
+        .warning-box p {
+            color: #cbd5e1;
+            margin-bottom: 0.5rem;
         }
     </style>
 
     <!-- JavaScript -->
     <script src="ui-catalog.js"></script>
+    <script>
+        // Lucideアイコン初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+    </script>
 </body>
 </html>
