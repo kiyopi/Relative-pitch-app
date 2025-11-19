@@ -947,12 +947,25 @@ element.setAttribute('data-level', 'beginner');
 
 **手順**:
 1. **UIカタログを確認**: `/UI-Catalog/ui-catalog-essentials.html`
-2. **base.cssを確認**: `/PitchPro-SPA/styles/base.css`
-3. **既存スタイルを検索**:
+2. **全CSSファイルを確認**:
    ```bash
+   # 既存クラス検索（全CSSファイル対象）
    grep -r "parent-mode-card" PitchPro-SPA/styles/
    ```
+3. **ページ別CSS確認**:
+   - **base.css** (2,967行): 汎用共通スタイル（全ページ共通）
+   - **results.css** (1,341行): 結果表示ページ
+   - **training.css** (1,190行): トレーニングページ
+   - **voice-range.css** (401行): 音域テストページ
+   - **premium-analysis.css** (約850行): **詳細分析ページ専用** ⭐
+   - **records.css** (約350行): **トレーニング記録ページ専用** ⭐
 4. **重複がない場合のみ追加**
+
+**詳細分析ページ実装時の確認順序**:
+1. UIカタログ確認
+2. base.css確認（共通スタイル）
+3. **premium-analysis.css確認**（ページ専用スタイル）
+4. 他ページのCSS確認（類似実装参考）
 
 **既存の再利用可能なスタイル**:
 - `.glass-card` - 基本的なグラスカード
