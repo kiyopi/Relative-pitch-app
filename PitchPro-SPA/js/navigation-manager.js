@@ -509,6 +509,13 @@ class NavigationManager {
         // 正常な遷移フラグを自動設定
         this.setNormalTransition();
 
+        // 【v4.3.3追加】PitchShifter初期化を自動実行（バックグラウンド）
+        // トレーニング開始時に基音再生が即座にできるよう、事前に初期化
+        if (window.router && typeof window.router.initializePitchShifterBackground === 'function') {
+            window.router.initializePitchShifterBackground();
+            console.log('🎹 [NavigationManager] PitchShifter初期化開始（自動）');
+        }
+
         // 遷移先を構築
         let targetHash;
         if (mode) {

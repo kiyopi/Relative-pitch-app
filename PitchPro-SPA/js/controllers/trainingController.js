@@ -649,8 +649,19 @@ async function startTraining() {
         // 初回クリック時はPitchShifter初期化を実行
         if (!pitchShifter || !pitchShifter.isInitialized) {
             console.log('⏳ 初回クリック - PitchShifter初期化開始');
+
+            // ボタンテキストを「準備中...」に変更（初期化待ち表示）
+            if (buttonText) {
+                buttonText.textContent = '準備中...';
+            }
+
             await initializePitchShifter();
             console.log('✅ 初期化完了！次回から即座に再生されます');
+
+            // ボタンテキストを「再生中...」に戻す
+            if (buttonText) {
+                buttonText.textContent = '再生中...';
+            }
         }
 
         // 【v4.0.10】基音再生中はDOM操作を一切しない

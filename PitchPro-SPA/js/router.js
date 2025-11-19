@@ -705,7 +705,7 @@ class SimpleRouter {
                 const route = e.currentTarget.getAttribute('data-route');
                 const mode = e.currentTarget.getAttribute('data-mode');
                 const session = e.currentTarget.getAttribute('data-session');
-                const direction = e.currentTarget.getAttribute('data-direction'); // 12音階モード用
+                let direction = e.currentTarget.getAttribute('data-direction');
 
                 // トレーニングページへの遷移時のみ、PitchShifter初期化を開始
                 // 準備ページは ensurePitchShifterInitialized() で必要時に初期化するため除外
@@ -717,12 +717,36 @@ class SimpleRouter {
                 // 【NavigationManager統合】training へ直接遷移する場合
                 if (route === 'training') {
                     NavigationManager.navigateToTraining(mode, session);
-                } else {
-                    // training以外のルート（preparation等）
+                } else if (route === 'preparation') {
+                    // 【v4.3.3】準備スキップ判定を追加
+                    const canSkip = NavigationManager.canSkipPreparation();
 
-                    // 【v4.3.2】preparationページへの正常な遷移フラグ設定
-                    if (route === 'preparation') {
-                        NavigationManager.setNormalTransitionToPreparation();
+                    if (canSkip) {
+                        console.log('✅ [HOME] 準備スキップ可能 - ダイレクトトレーニング開始');
+
+                        // scaleDirectionをsessionStorageから取得（すべてのモードで共通）
+                        const scaleDirection = sessionStorage.getItem('trainingDirection') || 'ascending';
+
+                        // モード別にchromaticDirection引数を決定
+                        let chromaticDirection = null;
+                        if (mode === '12tone') {
+                            // 12音階モード: ボタンのdata-directionはchromaticDirection
+                            chromaticDirection = direction;
+                        }
+                        // random/continuousモード: chromaticDirectionはnullのまま
+
+                        // ダイレクトトレーニングに遷移（PitchShifter初期化は自動実行）
+                        NavigationManager.navigateToTraining(mode, session, chromaticDirection, scaleDirection);
+                        return;
+                    }
+
+                    // 準備スキップ不可の場合は既存処理
+                    NavigationManager.setNormalTransitionToPreparation();
+
+                    // random/continuousモードで、ボタンにdata-direction属性がない場合のフォールバック
+                    if ((mode === 'random' || mode === 'continuous') && !direction) {
+                        direction = sessionStorage.getItem('trainingDirection') || 'ascending';
+                        console.log(`⚠️ [HOME] data-direction属性がないためsessionStorageから取得: ${direction}`);
                     }
 
                     let hash = route;
@@ -730,10 +754,18 @@ class SimpleRouter {
                         const params = new URLSearchParams();
                         if (mode) params.set('mode', mode);
                         if (session) params.set('session', session);
-                        if (direction) params.set('direction', direction); // 12音階モード方向パラメータ追加
-                        // 【削除】ホームからの通常遷移では redirect パラメータ不要
-                        // redirect パラメータは総合評価ページからの遷移や
-                        // リロード時のリダイレクトなど特別なケースでのみ使用
+                        if (direction) params.set('direction', direction);
+                        hash += `?${params.toString()}`;
+                    }
+                    window.location.hash = hash;
+                } else {
+                    // その他のルート
+                    let hash = route;
+                    if (mode || session || direction) {
+                        const params = new URLSearchParams();
+                        if (mode) params.set('mode', mode);
+                        if (session) params.set('session', session);
+                        if (direction) params.set('direction', direction);
                         hash += `?${params.toString()}`;
                     }
                     window.location.hash = hash;
