@@ -1,11 +1,12 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.3.0 (2025-11-18)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.3.1 (2025-11-18)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.3.0
+ * Version: 4.3.1
  * Date: 2025-11-18
  * Changelog:
+ *   v4.3.1 - 【デバッグ】initializeCharts詳細ログ追加（誤差推移グラフ非表示問題の調査）
  *   v4.3.0 - 【根本修正】NavigationManager.navigate()統合（preparationPageActiveフラグ自動設定、ブラウザバック完全解決）
  *   v4.2.0 - 【重要修正】次のステップボタンにdirectionパラメータ追加（ブラウザバック問題を解決）
  *   v4.1.0 - 【バグ修正】二重初期化防止フラグのリセット処理追加（SPA遷移時の3セクションローディング固定問題を解決）
@@ -818,19 +819,27 @@ if (typeof window.resultsOverviewChart === 'undefined') {
 }
 
 function initializeCharts(sessionData) {
+    console.log('📊 [initializeCharts内部] 関数開始');
     const canvas = document.getElementById('error-trend-chart');
-    if (!canvas) return;
+    console.log('📊 [initializeCharts内部] canvas要素:', canvas);
+    if (!canvas) {
+        console.error('❌ [initializeCharts内部] canvas要素が見つかりません');
+        return;
+    }
 
     // 既存のChartインスタンスがあれば破棄
     if (window.resultsOverviewChart) {
+        console.log('📊 [initializeCharts内部] 既存Chart破棄');
         window.resultsOverviewChart.destroy();
         window.resultsOverviewChart = null;
     }
 
     const ctx = canvas.getContext('2d');
+    console.log('📊 [initializeCharts内部] コンテキスト取得完了');
 
     // セッション別平均誤差データ（符号付き: + = シャープ, - = フラット）
     const labels = sessionData.map((_, i) => `S${i + 1}`);
+    console.log('📊 [initializeCharts内部] labels:', labels);
     const data = sessionData.map(session => {
         if (!session.pitchErrors || session.pitchErrors.length === 0) return 0;
         // 外れ値除外（180¢超）
@@ -840,6 +849,8 @@ function initializeCharts(sessionData) {
         const sum = validErrors.reduce((s, e) => s + e.errorInCents, 0);
         return parseFloat((sum / validErrors.length).toFixed(1));
     });
+    console.log('📊 [initializeCharts内部] data:', data);
+    console.log('📊 [initializeCharts内部] Chart作成開始');
 
     window.resultsOverviewChart = new Chart(ctx, {
         type: 'line',
@@ -982,11 +993,14 @@ function initializeCharts(sessionData) {
             }
         }
     });
+    console.log('✅ [initializeCharts内部] Chart作成完了');
 
     // ローディング非表示・コンテンツ表示
     if (window.LoadingComponent) {
+        console.log('📊 [initializeCharts内部] LoadingComponent非表示');
         window.LoadingComponent.toggle('chart', false);
     }
+    console.log('✅ [initializeCharts内部] 関数終了');
 }
 
 /**
