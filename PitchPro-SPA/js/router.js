@@ -696,7 +696,7 @@ class SimpleRouter {
         window.location.hash = 'home';
     }
 
-    setupHomeEvents() {
+    async setupHomeEvents() {
         // ホームページのボタンイベント設定
         const trainingButtons = document.querySelectorAll('[data-route]');
 
@@ -718,8 +718,8 @@ class SimpleRouter {
                 if (route === 'training') {
                     NavigationManager.navigateToTraining(mode, session);
                 } else if (route === 'preparation') {
-                    // 【v4.3.3】準備スキップ判定を追加
-                    const canSkip = NavigationManager.canSkipPreparation();
+                    // 【v4.3.4】準備スキップ判定（3層防御アプローチ）
+                    const canSkip = await NavigationManager.canSkipPreparation();
 
                     if (canSkip) {
                         console.log('✅ [HOME] 準備スキップ可能 - ダイレクトトレーニング開始');

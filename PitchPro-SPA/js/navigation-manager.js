@@ -280,27 +280,62 @@ class NavigationManager {
     }
 
     /**
-     * 準備ページをスキップしてトレーニング直行できるか判定
+     * 【v4.3.4】準備ページをスキップしてトレーニング直行できるか判定（3層防御アプローチ）
      *
      * 【目的】
      * 総合評価ページからのレッスン開始時、既にマイク許可・音域データが揃っている場合、
      * 準備ページをスキップしてトレーニングページへ直接遷移することでUXを向上させる。
      *
-     * 【条件】
-     * 1. マイク許可済み（localStorage: micPermissionGranted = 'true'）
-     * 2. 音域データあり（localStorage: voiceRangeData が存在）
+     * 【安定性重視の3層防御】
+     * - Layer 1: ページリロード検出 → リロード時は必ず準備ページへ（MediaStream破棄対策）
+     * - Layer 2: localStorage確認 → 基本的なデータ存在チェック
+     * - Layer 3: Permissions API → 実際のマイク権限状態を確認
      *
-     * @returns {boolean} true: 準備スキップ可能, false: 準備ページ経由が必要
+     * 【条件（すべて満たす必要あり）】
+     * 1. ページリロードではない（performance.navigation.type !== 1）
+     * 2. マイク許可済み（localStorage: micPermissionGranted = 'true'）
+     * 3. 音域データあり（localStorage: voiceRangeData が存在）
+     * 4. 実際のマイク権限が'granted'状態（Permissions API確認）
+     *
+     * @returns {Promise<boolean>} true: 準備スキップ可能, false: 準備ページ経由が必要
      */
-    static canSkipPreparation() {
+    static async canSkipPreparation() {
+        // === Layer 1: リロード検出（最も確実な防御） ===
+        // ページリロード時はMediaStreamが破棄されるため準備必須
+        if (performance.navigation && performance.navigation.type === 1) {
+            console.log('⚠️ [NavigationManager] Layer 1: ページリロード検出 → 準備ページ必須');
+            return false;
+        }
+
+        // === Layer 2: localStorage確認（基本チェック） ===
         const micGranted = localStorage.getItem('micPermissionGranted') === 'true';
         const voiceRangeData = localStorage.getItem('voiceRangeData');
         const hasVoiceRange = voiceRangeData && voiceRangeData !== 'null';
 
-        const canSkip = micGranted && hasVoiceRange;
-        console.log(`🔍 [NavigationManager] 準備スキップ判定: ${canSkip} (mic: ${micGranted}, range: ${hasVoiceRange})`);
+        if (!micGranted || !hasVoiceRange) {
+            console.log(`⚠️ [NavigationManager] Layer 2: localStorage不足 (mic: ${micGranted}, range: ${hasVoiceRange}) → 準備ページ必須`);
+            return false;
+        }
 
-        return canSkip;
+        // === Layer 3: Permissions API（実際の権限状態確認） ===
+        try {
+            // Permissions APIでマイク権限の実際の状態を確認
+            const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
+
+            if (permissionStatus.state !== 'granted') {
+                console.log(`⚠️ [NavigationManager] Layer 3: マイク許可が失効 (state: ${permissionStatus.state}) → 準備ページ必須`);
+                return false;
+            }
+
+            // すべてのチェックをパス
+            console.log('✅ [NavigationManager] 3層すべてパス → 準備スキップ可能');
+            return true;
+
+        } catch (error) {
+            // Permissions API未サポート時は安全側に倒す
+            console.warn('⚠️ [NavigationManager] Layer 3: Permissions API未サポート → 安全のため準備ページへ', error);
+            return false;
+        }
     }
 
     /**

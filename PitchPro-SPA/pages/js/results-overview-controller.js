@@ -1382,9 +1382,9 @@ function handleNextStepAction(actionId) {
 
     const actions = {
         // ランダム基音モード
-        'next-step-random-practice': () => {
+        'next-step-random-practice': async () => {
             if (window.NavigationManager) {
-                const canSkip = NavigationManager.canSkipPreparation();
+                const canSkip = await NavigationManager.canSkipPreparation();
                 if (canSkip) {
                     NavigationManager.navigateToTraining('random', 1, null, currentScaleDirection);
                 } else {
@@ -1394,9 +1394,9 @@ function handleNextStepAction(actionId) {
                 window.location.hash = `preparation?mode=random&direction=${currentScaleDirection}`;
             }
         },
-        'next-step-random-upgrade': () => {
+        'next-step-random-upgrade': async () => {
             if (window.NavigationManager) {
-                const canSkip = NavigationManager.canSkipPreparation();
+                const canSkip = await NavigationManager.canSkipPreparation();
                 if (canSkip) {
                     NavigationManager.navigateToTraining('continuous', 1, null, currentScaleDirection);
                 } else {
@@ -1415,9 +1415,9 @@ function handleNextStepAction(actionId) {
         },
 
         // 連続チャレンジモード
-        'next-step-continuous-practice': () => {
+        'next-step-continuous-practice': async () => {
             if (window.NavigationManager) {
-                const canSkip = NavigationManager.canSkipPreparation();
+                const canSkip = await NavigationManager.canSkipPreparation();
                 if (canSkip) {
                     NavigationManager.navigateToTraining('continuous', 1, null, currentScaleDirection);
                 } else {
@@ -1427,9 +1427,9 @@ function handleNextStepAction(actionId) {
                 window.location.hash = `preparation?mode=continuous&direction=${currentScaleDirection}`;
             }
         },
-        'next-step-continuous-upgrade': () => {
+        'next-step-continuous-upgrade': async () => {
             if (window.NavigationManager) {
-                const canSkip = NavigationManager.canSkipPreparation();
+                const canSkip = await NavigationManager.canSkipPreparation();
                 if (canSkip) {
                     NavigationManager.navigateToTraining('12tone', 1, 'ascending', currentScaleDirection);
                 } else {
@@ -1448,9 +1448,9 @@ function handleNextStepAction(actionId) {
         },
 
         // 12音階モード（上昇）
-        'next-step-12tone-ascending-practice': () => {
+        'next-step-12tone-ascending-practice': async () => {
             if (window.NavigationManager) {
-                const canSkip = NavigationManager.canSkipPreparation();
+                const canSkip = await NavigationManager.canSkipPreparation();
                 if (canSkip) {
                     NavigationManager.navigateToTraining('12tone', 1, 'ascending', currentScaleDirection);
                 } else {
@@ -1460,9 +1460,9 @@ function handleNextStepAction(actionId) {
                 window.location.hash = 'preparation?mode=12tone&direction=ascending';
             }
         },
-        'next-step-12tone-ascending-upgrade': () => {
+        'next-step-12tone-ascending-upgrade': async () => {
             if (window.NavigationManager) {
-                const canSkip = NavigationManager.canSkipPreparation();
+                const canSkip = await NavigationManager.canSkipPreparation();
                 if (canSkip) {
                     NavigationManager.navigateToTraining('12tone', 1, 'descending', currentScaleDirection);
                 } else {
@@ -1481,9 +1481,9 @@ function handleNextStepAction(actionId) {
         },
 
         // 12音階モード（下降）
-        'next-step-12tone-descending-practice': () => {
+        'next-step-12tone-descending-practice': async () => {
             if (window.NavigationManager) {
-                const canSkip = NavigationManager.canSkipPreparation();
+                const canSkip = await NavigationManager.canSkipPreparation();
                 if (canSkip) {
                     NavigationManager.navigateToTraining('12tone', 1, 'descending', currentScaleDirection);
                 } else {
@@ -1493,9 +1493,9 @@ function handleNextStepAction(actionId) {
                 window.location.hash = 'preparation?mode=12tone&direction=descending';
             }
         },
-        'next-step-12tone-descending-upgrade': () => {
+        'next-step-12tone-descending-upgrade': async () => {
             if (window.NavigationManager) {
-                const canSkip = NavigationManager.canSkipPreparation();
+                const canSkip = await NavigationManager.canSkipPreparation();
                 if (canSkip) {
                     NavigationManager.navigateToTraining('12tone', 1, 'both', currentScaleDirection);
                 } else {
@@ -1514,9 +1514,9 @@ function handleNextStepAction(actionId) {
         },
 
         // 12音階モード（両方向）
-        'next-step-12tone-both-practice': () => {
+        'next-step-12tone-both-practice': async () => {
             if (window.NavigationManager) {
-                const canSkip = NavigationManager.canSkipPreparation();
+                const canSkip = await NavigationManager.canSkipPreparation();
                 if (canSkip) {
                     NavigationManager.navigateToTraining('12tone', 1, 'both', currentScaleDirection);
                 } else {
@@ -1535,9 +1535,9 @@ function handleNextStepAction(actionId) {
         },
 
         // 下行モード（将来実装）
-        'next-step-random-down-practice': () => {
+        'next-step-random-down-practice': async () => {
             if (window.NavigationManager) {
-                const canSkip = NavigationManager.canSkipPreparation();
+                const canSkip = await NavigationManager.canSkipPreparation();
                 if (canSkip) {
                     NavigationManager.navigateToTraining('random-down', 1, null, 'descending');
                 } else {
@@ -1547,9 +1547,9 @@ function handleNextStepAction(actionId) {
                 window.location.hash = 'preparation?mode=random-down';
             }
         },
-        'next-step-random-down-upgrade': () => {
+        'next-step-random-down-upgrade': async () => {
             if (window.NavigationManager) {
-                const canSkip = NavigationManager.canSkipPreparation();
+                const canSkip = await NavigationManager.canSkipPreparation();
                 if (canSkip) {
                     NavigationManager.navigateToTraining('continuous-down', 1, null, 'descending');
                 } else {
@@ -1567,9 +1567,9 @@ function handleNextStepAction(actionId) {
             }
         },
 
-        'next-step-continuous-down-practice': () => {
+        'next-step-continuous-down-practice': async () => {
             if (window.NavigationManager) {
-                const canSkip = NavigationManager.canSkipPreparation();
+                const canSkip = await NavigationManager.canSkipPreparation();
                 if (canSkip) {
                     NavigationManager.navigateToTraining('continuous-down', 1, null, 'descending');
                 } else {
