@@ -1,9 +1,12 @@
 /**
  * premium-analysis-calculator.js
  * プレミアム分析計算ロジック
- * Version: 1.0.0
+ * Version: 2.0.0
  *
  * 【責任範囲】
+ * - モード管理（MODE_DEFINITIONS）
+ * - モード正規化（normalizeSessionMode）
+ * - 親モード集計（calculateParentModeStats）
  * - Tab 1: 音程精度分析の計算
  * - Tab 2: エラーパターン分析の計算
  * - Tab 3: 練習プラン生成（ルールベース）
@@ -11,9 +14,306 @@
  *
  * 【依存関係】
  * - なし（純粋な計算ロジック）
+ *
+ * 【変更履歴】
+ * - v2.0.0: MODE_DEFINITIONS完全版追加、モード正規化・親モード集計機能追加
  */
 
+/**
+ * モード定義（10モード + 将来拡張）
+ * @constant {Object} MODE_DEFINITIONS
+ */
+const MODE_DEFINITIONS = {
+    // 親モードグループ
+    parentModes: {
+        'beginner': {
+            name: '初級: ランダム基音',
+            displayName: 'ランダム基音',
+            icon: 'shuffle',
+            color: 'blue',
+            level: '🔰',
+            modes: ['random-ascending', 'random-descending']
+        },
+        'intermediate': {
+            name: '中級: 連続チャレンジ',
+            displayName: '連続チャレンジ',
+            icon: 'zap',
+            color: 'green',
+            level: '🥉',
+            modes: ['continuous-ascending', 'continuous-descending']
+        },
+        'advanced': {
+            name: '上級: 12音階',
+            displayName: '12音階',
+            icon: 'music',
+            color: 'purple',
+            level: '🥇',
+            modes: [
+                'twelve-asc-ascending',
+                'twelve-asc-descending',
+                'twelve-desc-ascending',
+                'twelve-desc-descending',
+                'twelve-both-ascending',
+                'twelve-both-descending'
+            ],
+            // サブグループ定義（12音階のみ）
+            subgroups: {
+                'ascending-order': {
+                    name: '上昇順（C→C#→D...）',
+                    modes: ['twelve-asc-ascending', 'twelve-asc-descending']
+                },
+                'descending-order': {
+                    name: '下降順（B→B♭→A...）',
+                    modes: ['twelve-desc-ascending', 'twelve-desc-descending']
+                },
+                'both-directions': {
+                    name: '両方向24回',
+                    modes: ['twelve-both-ascending', 'twelve-both-descending']
+                }
+            }
+        },
+        'weakness': { // 将来の拡張
+            name: '特別: 弱点練習',
+            displayName: '弱点練習',
+            icon: 'target',
+            color: 'orange',
+            level: '🎯',
+            modes: ['weakness-ascending', 'weakness-descending']
+        }
+    },
+
+    // 個別モード定義
+    modes: {
+        // ランダム基音
+        'random-ascending': {
+            name: 'ランダム基音（上行）',
+            displayName: '上行音程',
+            parent: 'beginner',
+            direction: 'ascending',
+            icon: 'arrow-up'
+        },
+        'random-descending': {
+            name: 'ランダム基音（下行）',
+            displayName: '下行音程',
+            parent: 'beginner',
+            direction: 'descending',
+            icon: 'arrow-down'
+        },
+
+        // 連続チャレンジ
+        'continuous-ascending': {
+            name: '連続チャレンジ（上行）',
+            displayName: '上行音程',
+            parent: 'intermediate',
+            direction: 'ascending',
+            icon: 'arrow-up'
+        },
+        'continuous-descending': {
+            name: '連続チャレンジ（下行）',
+            displayName: '下行音程',
+            parent: 'intermediate',
+            direction: 'descending',
+            icon: 'arrow-down'
+        },
+
+        // 12音階 - 上昇順
+        'twelve-asc-ascending': {
+            name: '12音階 上昇順（上行）',
+            displayName: '上行音程',
+            parent: 'advanced',
+            subgroup: 'ascending-order',
+            direction: 'ascending',
+            icon: 'arrow-up'
+        },
+        'twelve-asc-descending': {
+            name: '12音階 上昇順（下行）',
+            displayName: '下行音程',
+            parent: 'advanced',
+            subgroup: 'ascending-order',
+            direction: 'descending',
+            icon: 'arrow-down'
+        },
+
+        // 12音階 - 下降順
+        'twelve-desc-ascending': {
+            name: '12音階 下降順（上行）',
+            displayName: '上行音程',
+            parent: 'advanced',
+            subgroup: 'descending-order',
+            direction: 'ascending',
+            icon: 'arrow-up'
+        },
+        'twelve-desc-descending': {
+            name: '12音階 下降順（下行）',
+            displayName: '下行音程',
+            parent: 'advanced',
+            subgroup: 'descending-order',
+            direction: 'descending',
+            icon: 'arrow-down'
+        },
+
+        // 12音階 - 両方向
+        'twelve-both-ascending': {
+            name: '12音階 両方向（上行）',
+            displayName: '上行音程',
+            parent: 'advanced',
+            subgroup: 'both-directions',
+            direction: 'ascending',
+            icon: 'arrow-up'
+        },
+        'twelve-both-descending': {
+            name: '12音階 両方向（下行）',
+            displayName: '下行音程',
+            parent: 'advanced',
+            subgroup: 'both-directions',
+            direction: 'descending',
+            icon: 'arrow-down'
+        },
+
+        // 弱点練習（将来）
+        'weakness-ascending': {
+            name: '弱点練習（上行）',
+            displayName: '上行音程',
+            parent: 'weakness',
+            direction: 'ascending',
+            icon: 'arrow-up'
+        },
+        'weakness-descending': {
+            name: '弱点練習（下行）',
+            displayName: '下行音程',
+            parent: 'weakness',
+            direction: 'descending',
+            icon: 'arrow-down'
+        }
+    }
+};
+
 window.PremiumAnalysisCalculator = {
+    // MODE_DEFINITIONSを外部から参照可能にする
+    MODE_DEFINITIONS: MODE_DEFINITIONS,
+
+    /**
+     * セッションデータからモードキーを正規化
+     *
+     * @param {Object} session - セッションデータ
+     * @returns {string} 正規化されたモードキー
+     *
+     * @example
+     * // ランダム基音（上行）
+     * normalizeSessionMode({ mode: 'random', scaleDirection: 'ascending' })
+     * → 'random-ascending'
+     *
+     * // 12音階 上昇順（上行）
+     * normalizeSessionMode({ mode: '12tone', chromaticDirection: 'ascending', scaleDirection: 'ascending' })
+     * → 'twelve-asc-ascending'
+     */
+    normalizeSessionMode(session) {
+        const mode = session.mode || 'random';
+        const scaleDirection = session.scaleDirection || 'ascending';
+        const chromaticDirection = session.chromaticDirection;
+
+        // 12音階の場合
+        if (mode === 'twelve' || mode === '12tone') {
+            // chromaticDirection正規化
+            let orderKey = 'asc'; // デフォルト
+            if (chromaticDirection === 'ascending') orderKey = 'asc';
+            else if (chromaticDirection === 'descending') orderKey = 'desc';
+            else if (chromaticDirection === 'both') orderKey = 'both';
+            else if (chromaticDirection === 'random') orderKey = 'asc'; // randomの場合もascとして扱う
+
+            return `twelve-${orderKey}-${scaleDirection}`;
+        }
+
+        // それ以外のモード（random, continuous, weakness）
+        return `${mode}-${scaleDirection}`;
+    },
+
+    /**
+     * 親モード別の統計を計算
+     *
+     * @param {Array} sessionData - 全セッションデータ
+     * @param {string} parentModeKey - 親モードキー ('beginner', 'intermediate', 'advanced', 'weakness')
+     * @returns {Object} 親モード統計
+     *
+     * @example
+     * calculateParentModeStats(allSessions, 'beginner')
+     * → {
+     *     name: '初級: ランダム基音',
+     *     totalSessions: 128,
+     *     avgError: 28.5,
+     *     masteryLevel: 7.2,
+     *     masteryRate: 72,
+     *     childModes: { ... }
+     *   }
+     */
+    calculateParentModeStats(sessionData, parentModeKey) {
+        const parentMode = MODE_DEFINITIONS.parentModes[parentModeKey];
+        if (!parentMode) {
+            console.error(`❌ 不明な親モードキー: ${parentModeKey}`);
+            return null;
+        }
+
+        const childModes = parentMode.modes;
+
+        // 各子モードのセッションをフィルタリング
+        const parentSessions = sessionData.filter(session => {
+            const modeKey = this.normalizeSessionMode(session);
+            return childModes.includes(modeKey);
+        });
+
+        if (parentSessions.length === 0) {
+            return {
+                name: parentMode.name,
+                displayName: parentMode.displayName,
+                icon: parentMode.icon,
+                color: parentMode.color,
+                level: parentMode.level,
+                totalSessions: 0,
+                avgError: 0,
+                masteryLevel: 0,
+                masteryRate: 0,
+                childModes: {}
+            };
+        }
+
+        // 統計計算
+        const avgError = this._calculateAverageError(parentSessions);
+        const totalSessions = parentSessions.length;
+
+        // 子モード別統計
+        const childModeStats = {};
+        childModes.forEach(modeKey => {
+            const modeSessions = sessionData.filter(session => {
+                return this.normalizeSessionMode(session) === modeKey;
+            });
+
+            if (modeSessions.length > 0) {
+                const modeAvgError = this._calculateAverageError(modeSessions);
+                childModeStats[modeKey] = {
+                    modeKey: modeKey,
+                    name: MODE_DEFINITIONS.modes[modeKey]?.name || modeKey,
+                    displayName: MODE_DEFINITIONS.modes[modeKey]?.displayName || modeKey,
+                    icon: MODE_DEFINITIONS.modes[modeKey]?.icon || 'arrow-up',
+                    totalSessions: modeSessions.length,
+                    avgError: Math.round(modeAvgError * 10) / 10
+                };
+            }
+        });
+
+        return {
+            name: parentMode.name,
+            displayName: parentMode.displayName,
+            icon: parentMode.icon,
+            color: parentMode.color,
+            level: parentMode.level,
+            totalSessions,
+            avgError: Math.round(avgError * 10) / 10,
+            masteryLevel: 0, // TODO: 熟練度レベル計算は将来実装
+            masteryRate: 0,  // TODO: 熟練度パーセント計算は将来実装
+            childModes: childModeStats
+        };
+    },
+
     /**
      * Tab 1: 音程精度分析の計算
      * @param {Array} sessionData - セッションデータ配列
