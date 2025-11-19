@@ -1,9 +1,9 @@
 # Navigation & Reload Detection Specification
 # ナビゲーション・リロード検出システム仕様書
 
-**バージョン**: 2.1.0
+**バージョン**: 2.2.0
 **作成日**: 2025-11-18
-**最終更新**: 2025-11-18
+**最終更新**: 2025-11-19
 **プロジェクト**: 8va相対音感トレーニングアプリ
 
 ---
@@ -13,12 +13,13 @@
 1. [概要](#概要)
 2. [設計思想](#設計思想)
 3. [2フラグシステム](#2フラグシステム)
-4. [NavigationManager API](#navigationmanager-api)
-5. [実装パターン](#実装パターン)
-6. [フロー図](#フロー図)
-7. [テストシナリオ](#テストシナリオ)
-8. [トラブルシューティング](#トラブルシューティング)
-9. [更新履歴](#更新履歴)
+4. [準備スキップ判定システム](#準備スキップ判定システム)
+5. [NavigationManager API](#navigationmanager-api)
+6. [実装パターン](#実装パターン)
+7. [フロー図](#フロー図)
+8. [テストシナリオ](#テストシナリオ)
+9. [トラブルシューティング](#トラブルシューティング)
+10. [更新履歴](#更新履歴)
 
 ---
 
@@ -132,6 +133,264 @@ if (wasActive) {
 // 離脱時（cleanupCurrentPage）
 sessionStorage.removeItem('preparationPageActive');
 ```
+
+---
+
+## 準備スキップ判定システム
+
+### 概要
+
+総合評価ページやホームページから、既にマイク許可・音域データが揃っている場合に準備ページをスキップしてトレーニングページへ直接遷移する機能。
+
+### 設計背景（v2.2.0で追加）
+
+#### 発見された問題（2025-11-19）
+
+**症状**:
+ホームページリロード後に「始める」ボタンを押すと、localStorageには`micPermissionGranted=true`が残っているが、実際のMediaStreamはブラウザによって破棄されている。従来の`canSkipPreparation()`はlocalStorageのみをチェックしていたため、準備スキップ判定が誤ってtrueを返し、トレーニングページで再度マイク許可ダイアログが表示される問題が発生。
+
+**根本原因**:
+```javascript
+// 従来の実装（問題あり）
+static canSkipPreparation() {
+    const micGranted = localStorage.getItem('micPermissionGranted') === 'true';
+    const hasVoiceRange = !!localStorage.getItem('voiceRangeData');
+    return micGranted && hasVoiceRange;  // ← localStorageのみで判定
+}
+```
+
+- localStorage: ページリロード後も保持される
+- MediaStream: ページリロード後は破棄される
+- 判定の不整合により、準備スキップが誤って実行される
+
+### 3層防御アプローチ（v2.2.0実装）
+
+安定性を最優先し、3つの異なる層で準備スキップ可否を判定：
+
+#### Layer 1: ページリロード検出
+```javascript
+if (performance.navigation && performance.navigation.type === 1) {
+    console.log('⚠️ Layer 1: ページリロード検出 → 準備ページ必須');
+    return false;
+}
+```
+
+**特性**:
+- **最も確実な防御**: リロード時は確実にMediaStreamが破棄される
+- **即座に判定**: 他のチェックを実行する前に早期リターン
+- **効率的**: パフォーマンスへの影響が最小
+
+#### Layer 2: localStorage確認
+```javascript
+const micGranted = localStorage.getItem('micPermissionGranted') === 'true';
+const hasVoiceRange = !!localStorage.getItem('voiceRangeData');
+
+if (!micGranted || !hasVoiceRange) {
+    console.log(`⚠️ Layer 2: localStorage不足 (mic: ${micGranted}, range: ${hasVoiceRange}) → 準備ページ必須`);
+    return false;
+}
+```
+
+**特性**:
+- **基本的なデータ存在チェック**: 最低限必要なデータの確認
+- **軽量**: 同期的な処理で高速
+- **フォールバック**: Layer 3が失敗した場合の基本判定
+
+#### Layer 3: Permissions API確認
+```javascript
+try {
+    const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
+    if (permissionStatus.state !== 'granted') {
+        console.log(`⚠️ Layer 3: マイク許可が失効 (state: ${permissionStatus.state}) → 準備ページ必須`);
+        return false;
+    }
+
+    console.log('✅ 3層すべてパス → 準備スキップ可能');
+    return true;
+} catch (error) {
+    console.warn('⚠️ Layer 3: Permissions API未サポート → 安全のため準備ページへ', error);
+    return false;
+}
+```
+
+**特性**:
+- **ブラウザの実際の権限状態を確認**: 最も信頼性の高い判定
+- **非同期処理**: async/await対応
+- **フォールバック**: API未サポート時は安全側に倒す
+
+### 実装詳細
+
+#### NavigationManager.canSkipPreparation()（v2.2.0）
+
+```javascript
+/**
+ * 【v4.3.4】準備ページをスキップしてトレーニング直行できるか判定（3層防御アプローチ）
+ *
+ * 【安定性重視の3層防御】
+ * - Layer 1: ページリロード検出 → リロード時は必ず準備ページへ（MediaStream破棄対策）
+ * - Layer 2: localStorage確認 → 基本的なデータ存在チェック
+ * - Layer 3: Permissions API → 実際のマイク権限状態を確認
+ *
+ * @returns {Promise<boolean>} true: 準備スキップ可能, false: 準備ページ経由が必要
+ */
+static async canSkipPreparation() {
+    // === Layer 1: リロード検出（最も確実な防御） ===
+    if (performance.navigation && performance.navigation.type === 1) {
+        console.log('⚠️ [NavigationManager] Layer 1: ページリロード検出 → 準備ページ必須');
+        return false;
+    }
+
+    // === Layer 2: localStorage確認（基本チェック） ===
+    const micGranted = localStorage.getItem('micPermissionGranted') === 'true';
+    const voiceRangeData = localStorage.getItem('voiceRangeData');
+    const hasVoiceRange = voiceRangeData && voiceRangeData !== 'null';
+
+    if (!micGranted || !hasVoiceRange) {
+        console.log(`⚠️ [NavigationManager] Layer 2: localStorage不足 (mic: ${micGranted}, range: ${hasVoiceRange}) → 準備ページ必須`);
+        return false;
+    }
+
+    // === Layer 3: Permissions API（実際の権限状態確認） ===
+    try {
+        const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
+
+        if (permissionStatus.state !== 'granted') {
+            console.log(`⚠️ [NavigationManager] Layer 3: マイク許可が失効 (state: ${permissionStatus.state}) → 準備ページ必須`);
+            return false;
+        }
+
+        console.log('✅ [NavigationManager] 3層すべてパス → 準備スキップ可能');
+        return true;
+
+    } catch (error) {
+        console.warn('⚠️ [NavigationManager] Layer 3: Permissions API未サポート → 安全のため準備ページへ', error);
+        return false;
+    }
+}
+```
+
+#### async/await対応（全13箇所）
+
+**router.js - setupHomeEvents()** (line 699):
+```javascript
+async setupHomeEvents() {  // ← async追加
+    trainingButtons.forEach(button => {
+        button.addEventListener('click', async (e) => {
+            // ...
+            if (route === 'preparation') {
+                const canSkip = await NavigationManager.canSkipPreparation();  // ← await追加
+                // ...
+            }
+        });
+    });
+}
+```
+
+**results-overview-controller.js** (12箇所):
+```javascript
+// 全てのnext-stepボタンハンドラ
+'next-step-random-practice': async () => {  // ← async追加
+    if (window.NavigationManager) {
+        const canSkip = await NavigationManager.canSkipPreparation();  // ← await追加
+        // ...
+    }
+}
+```
+
+### テスト結果（全5ケース成功）
+
+| # | テストケース | ページ遷移 | 3層防御動作 | 結果 |
+|---|---|---|---|---|
+| 1 | **ホームリロード→準備経由** | home → preparation | **Layer 1検出** | ✅ 成功 |
+| 2 | **準備→トレーニング** | preparation → training | 判定不要 | ✅ 成功 |
+| 3 | **総合評価→準備スキップ** | results-overview → training | **3層すべてパス** | ✅ 成功 |
+| 4 | **総合評価リロード→準備経由** | results-overview → preparation | **Layer 1検出** | ✅ 成功 |
+| 5 | **準備経由後のホーム→スキップ** | home → training | **3層すべてパス** | ✅ 成功 |
+
+#### テストケース詳細
+
+**ケース1: ホームリロード→準備経由**
+```
+ホームページをリロード
+↓
+Layer 1: performance.navigation.type === 1 検出
+↓
+⚠️ ページリロード検出 → 準備ページ必須
+↓
+準備ページへ正常遷移 ✅
+```
+
+**ケース3: 総合評価→準備スキップ**
+```
+総合評価ページ（リロードなし）
+↓
+Layer 1: リロードではない（通過）
+Layer 2: localStorage確認（通過）
+Layer 3: Permissions API（granted、通過）
+↓
+✅ 3層すべてパス → 準備スキップ可能
+↓
+トレーニングページへ直接遷移 ✅
+許可ダイアログなし ✅
+```
+
+**ケース5: 準備経由後のホーム→スキップ**
+```
+準備ページでマイク許可取得
+↓
+ホームボタンでホームへ（SPA遷移）
+  - NavigationManager: MediaStream適切に破棄
+  - localStorage: 許可状態保持
+  - Permissions API: granted保持
+↓
+連続チャレンジボタン押下
+↓
+Layer 1: リロードではない（通過）
+Layer 2: localStorage確認（通過）
+Layer 3: Permissions API（granted、通過）
+↓
+✅ 3層すべてパス → 準備スキップ可能
+↓
+トレーニングページへ直接遷移 ✅
+新規MediaStream取得（許可ダイアログなし） ✅
+```
+
+### 設計の利点
+
+1. **多層防御**: 単一の判定基準に依存しない
+2. **早期リターン**: Layer 1で最も一般的なケースを高速判定
+3. **信頼性**: Permissions APIで実際の権限状態を確認
+4. **フォールバック**: API未サポート時も安全に動作
+5. **デバッグ容易性**: 各Layerで詳細ログ出力
+
+### 制限事項
+
+#### Permissions APIの制約
+
+**確認内容**: ユーザーが過去にマイク許可を与えたかどうか
+**確認できないこと**: 現在有効なMediaStreamが存在するか
+
+**例**: 準備ページでマイク許可後にリロードした場合
+- Permissions API: `granted`（過去に許可済み）
+- MediaStream: 破棄済み（新規取得が必要）
+- 判定: Layer 1のリロード検出が必須
+
+#### Edge Case処理
+
+**準備ページでMediaStream破棄→ホーム→トレーニング**:
+```
+準備ページでMediaStream適切に破棄
+↓
+ホームへSPA遷移（リロードではない）
+↓
+3層すべてパス → 準備スキップ
+↓
+トレーニングページで新規MediaStream取得 ✅
+許可ダイアログなし（既に許可済みのため） ✅
+```
+
+**動作**: 正常（トレーニングページで自動的にMediaStream再取得）
+**理由**: ユーザーは既に許可済み、スムーズに再取得可能
 
 ---
 
@@ -701,6 +960,20 @@ sessionStorage.removeItem(page + 'PageActive');
 ---
 
 ## 更新履歴
+
+### v2.2.0 (2025-11-19)
+- **追加**: 準備スキップ判定システムの3層防御アプローチ実装
+- **追加**: `canSkipPreparation()`メソッドの完全書き換え（同期→非同期）
+- **変更**: router.js setupHomeEvents()をasync対応（line 699）
+- **変更**: results-overview-controller.js 全12箇所のnext-stepボタンをasync/await対応
+- **問題解決**: ホームリロード後の準備スキップ誤判定問題を完全解決
+  - Layer 1: `performance.navigation.type === 1`でリロード検出
+  - Layer 2: localStorage確認（micPermissionGranted + voiceRangeData）
+  - Layer 3: Permissions API確認（navigator.permissions.query）
+- **テスト**: 全5テストケース成功（リロード検出・準備スキップ・Edge Case）
+- **安定性向上**: MediaStream破棄後のリロード時に準備ページへ確実に誘導
+- **パフォーマンス**: Layer 1早期リターンにより高速判定
+- **コミット**: b9d154e "fix(navigation): 準備スキップ判定の3層防御アプローチ実装（v4.3.4）"
 
 ### v2.1.0 (2025-11-18)
 - **追加**: result-sessionページに2フラグシステムを完全適用

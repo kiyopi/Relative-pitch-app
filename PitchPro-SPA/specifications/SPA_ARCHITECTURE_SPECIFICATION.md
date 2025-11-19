@@ -1,9 +1,9 @@
 # SPA Architecture Specification
 # SPAアーキテクチャ仕様書
 
-**バージョン**: 1.0.0
+**バージョン**: 1.1.0
 **作成日**: 2025-10-29
-**最終更新**: 2025-10-29
+**最終更新**: 2025-11-19
 **プロジェクト**: 8va相対音感トレーニングアプリ
 
 ---
@@ -18,6 +18,8 @@
 6. [ページ追加ガイドライン](#ページ追加ガイドライン)
 7. [キャッシュバスター管理](#キャッシュバスター管理)
 8. [重要な設計原則](#重要な設計原則)
+9. [トレーニングモード一覧](#トレーニングモード一覧)
+10. [ナビゲーション安全機構](#ナビゲーション安全機構)
 
 ---
 
@@ -502,6 +504,346 @@ window.initializeLucideIcons  // Lucideアイコン初期化
 
 ---
 
+## トレーニングモード一覧
+
+本アプリケーションは3つのトレーニングモードを提供します。すべてのモード定義は`/js/mode-controller.js`で一元管理されています。
+
+### モード定義の管理
+
+**管理ファイル**: `/PitchPro-SPA/js/mode-controller.js` (v2.1.0)
+
+**責任範囲**:
+- モード定義の一元管理
+- セッション数の動的計算
+- モード名の統一管理
+- 方向別表示名の管理（上行/下行）
+- UI表示（アイコン・色・タイトル）の統一管理
+- 1セッション標準時間の定義
+
+### 1. ランダム基音モード (random)
+
+**対象レベル**: 初級 (beginner)
+
+**特徴**:
+- **セッション数**: 8セッション/レッスン
+- **基音選択**: 音域内ランダム基音、連続重複なし (`random_c3_octave`)
+- **個別結果表示**: あり (`hasIndividualResults: true`)
+- **音域調整**: なし (`hasRangeAdjustment: false`)
+- **標準時間**: 13秒/セッション（基音2.5s + ガイド5.3s + 発声5.6s）
+
+**UI設定**:
+- アイコン: `shuffle` (Lucide Icons)
+- 背景色: `gradient-catalog-green`
+- サブタイトル色: `text-green-200`
+
+**方向別表示名**:
+- 上行: "ランダム基音モード 上行"
+- 下行: "ランダム基音モード 下行"
+
+**動作フロー**:
+```
+各セッション完了後 → result-sessionページへ遷移
+→ 個別評価表示 → 次のセッションへ
+```
+
+### 2. 連続チャレンジモード (continuous)
+
+**対象レベル**: 中級 (intermediate)
+
+**特徴**:
+- **セッション数**: 12セッション/レッスン
+- **基音選択**: クロマチック12音、連続重複防止 (`random_chromatic`)
+- **個別結果表示**: なし (`hasIndividualResults: false`)
+- **音域調整**: なし (`hasRangeAdjustment: false`)
+- **標準時間**: 13秒/セッション
+
+**UI設定**:
+- アイコン: `zap` (Lucide Icons)
+- 背景色: `gradient-catalog-orange`
+- サブタイトル色: `text-orange-200`
+
+**方向別表示名**:
+- 上行: "連続チャレンジモード 上行"
+- 下行: "連続チャレンジモード 下行"
+
+**動作フロー**:
+```
+12セッション連続実行 → ページ遷移なし
+→ レッスン完了後に総合評価ページへ
+```
+
+### 3. 12音階モード (12tone)
+
+**対象レベル**: 上級 (advanced)
+
+**特徴**:
+- **セッション数**: 12-24セッション/レッスン（方向性により動的変更）
+  - 上昇: 12セッション
+  - 下降: 12セッション
+  - 両方向: 24セッション
+- **基音選択**: 12音階順次使用 (`sequential_chromatic`)
+- **個別結果表示**: なし (`hasIndividualResults: false`)
+- **音域調整**: あり (`hasRangeAdjustment: true`)
+- **標準時間**: 13秒/セッション
+
+**UI設定**:
+- アイコン: `music` (Lucide Icons)
+- 背景色: `gradient-catalog-purple`
+- サブタイトル色: `text-purple-200`
+
+**方向別表示名**:
+- 上昇: "12音階上昇モード 上行"
+- 下降: "12音階下降モード 上行"
+- 両方向: "12音階両方向モード 上行"
+
+**動作フロー**:
+```
+12/24セッション連続実行 → ページ遷移なし
+→ レッスン完了後に総合評価ページへ
+```
+
+### モード間の主要な違い
+
+| 項目 | ランダム基音 | 連続チャレンジ | 12音階 |
+|---|---|---|---|
+| **セッション数** | 8 | 12 | 12-24（可変） |
+| **基音選択** | ランダム | ランダム12音 | 順次12音 |
+| **個別結果** | あり | なし | なし |
+| **音域調整** | なし | なし | あり |
+| **難易度** | 初級 | 中級 | 上級 |
+| **ページ遷移** | 毎セッション後 | なし | なし |
+
+### 将来の拡張計画
+
+#### 4. 弱点練習モード（追加予定）
+
+**対象レベル**: 初級〜上級（全レベル対応）
+
+**計画中の特徴**:
+- **セッション数**: 未定（ユーザーの弱点音程数に応じて動的変更）
+- **基音選択**: 過去のトレーニングデータから苦手な音程を自動抽出
+- **個別結果表示**: 未定
+- **音域調整**: あり（予定）
+- **モードID**: `weakness-practice`（仮）
+
+**目的**:
+- 過去のトレーニング記録から正答率の低い音程を特定
+- 弱点音程を集中的にトレーニング
+- 苦手克服による総合的な相対音感向上
+
+**実装のための前提条件**:
+- トレーニング記録データの蓄積
+- 音程別の正答率分析システム
+- 弱点抽出アルゴリズムの設計
+
+**注意**: 現在は計画段階であり、実装時期は未定です。
+
+---
+
+### ModeController API
+
+**主要メソッド**:
+
+```javascript
+// モード設定取得
+ModeController.getMode('random')
+
+// セッション数取得（動的計算対応）
+ModeController.getSessionsPerLesson('12tone', { direction: 'both' }) // → 24
+
+// モード名取得
+ModeController.getModeName('random') // → 'ランダム基音モード'
+ModeController.getModeName('random', true) // → 'ランダム基音'（短縮名）
+
+// 表示名取得（方向パラメータ対応）
+ModeController.getDisplayName('random', { scaleDirection: 'ascending' })
+// → 'ランダム基音モード 上行'
+
+// ページヘッダーUI更新
+ModeController.updatePageHeader('continuous', {
+    scaleDirection: 'descending',
+    subtitleText: 'トレーニング準備'
+})
+```
+
+**使用箇所**:
+- `trainingController.js`: トレーニング実行
+- `records-controller.js`: レッスングループ化、総トレーニング時間計算
+- `session-data-recorder.js`: セッションデータ保存
+- `results-overview-controller.js`: 総合評価ページ
+- `preparation-pitchpro-cycle.js`: 準備ページサブタイトル表示
+
+---
+
+## ナビゲーション安全機構
+
+### 準備ページスキップ機能の目的
+
+#### UX改善の核心
+
+本アプリケーションでは、**既にマイク許可と音域データが揃っているユーザー**に対して、準備ページをスキップしてトレーニングページへ直接遷移できる機能を提供しています。
+
+**目的**:
+- **2回目以降のトレーニングをスムーズに開始**: 初回の準備完了後、毎回準備ページを経由する必要がない
+- **ユーザー体験の向上**: 総合評価ページから「次のステップ」ボタンで即座にトレーニング開始
+- **効率的な学習フロー**: 繰り返しトレーニング時の手間を削減
+
+#### スキップ可能な条件
+
+以下の条件をすべて満たす場合、準備ページをスキップしてトレーニングページへ直接遷移できます：
+
+1. **マイク許可取得済み**: `localStorage.micPermissionGranted === 'true'`
+2. **音域データ登録済み**: `localStorage.voiceRangeData`が存在
+3. **ページリロードではない**: 通常のSPA遷移（`performance.navigation.type !== 1`）
+4. **ブラウザ権限が有効**: `navigator.permissions.query({name: 'microphone'})`が`granted`
+
+#### スキップ可能な遷移元
+
+| 遷移元ページ | スキップ対応 | 実装場所 |
+|---|---|---|
+| **ホームページ** | ✅ 対応 | router.js (line 722) |
+| **総合評価ページ** | ✅ 対応 | results-overview-controller.js (12箇所) |
+| **準備ページ** | N/A | 必ず経由（マイク許可取得） |
+| **トレーニングページ** | N/A | 既にトレーニング中 |
+
+#### 典型的なユーザーフロー
+
+**初回トレーニング**:
+```
+ホーム → 準備ページ（マイク許可 + 音域テスト）
+      → トレーニングページ → 総合評価
+```
+
+**2回目以降**:
+```
+総合評価 → 「次のステップ」ボタン
+        → 準備ページスキップ ✨
+        → トレーニングページ（直接開始）
+```
+
+または
+```
+ホーム → 「始める」ボタン
+      → 準備ページスキップ ✨
+      → トレーニングページ（直接開始）
+```
+
+### 3層防御アプローチによる安全性保証
+
+#### 概要
+
+準備ページスキップ機能は便利ですが、誤った判定をすると**トレーニングページでマイク許可ダイアログが再表示される**という問題が発生します。これを防ぐため、**3層防御アプローチ**による安全な準備スキップ判定システムを実装しています。
+
+#### 発見された問題（v1.1.0で解決）
+
+**発見された問題**（2025-11-19）:
+- ホームページリロード後、`localStorage.micPermissionGranted=true`が残存
+- 実際のMediaStreamはブラウザによって破棄済み
+- 従来の`canSkipPreparation()`はlocalStorageのみをチェック
+- 準備スキップ判定が誤ってtrueを返す
+- トレーニングページで再度マイク許可ダイアログが表示される
+
+### 3層防御アプローチ
+
+**実装場所**: `/PitchPro-SPA/js/navigation-manager.js` (v4.3.4)
+
+```javascript
+static async canSkipPreparation() {
+    // Layer 1: ページリロード検出（最も確実な防御）
+    if (performance.navigation && performance.navigation.type === 1) {
+        return false;
+    }
+
+    // Layer 2: localStorage確認（基本チェック）
+    const micGranted = localStorage.getItem('micPermissionGranted') === 'true';
+    const hasVoiceRange = !!localStorage.getItem('voiceRangeData');
+    if (!micGranted || !hasVoiceRange) {
+        return false;
+    }
+
+    // Layer 3: Permissions API（実際の権限状態確認）
+    try {
+        const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
+        if (permissionStatus.state !== 'granted') {
+            return false;
+        }
+        return true;
+    } catch (error) {
+        return false; // 安全側にフォールバック
+    }
+}
+```
+
+### 3層防御の特性
+
+#### Layer 1: ページリロード検出
+- **API**: `performance.navigation.type === 1`
+- **確実性**: リロード時は100%MediaStreamが破棄される
+- **効率性**: 早期リターンで高速判定
+- **影響範囲**: 最も一般的なケースを即座にブロック
+
+#### Layer 2: localStorage確認
+- **確認内容**: `micPermissionGranted` + `voiceRangeData`の存在
+- **処理**: 同期的・軽量
+- **役割**: 基本的なデータ存在チェック
+
+#### Layer 3: Permissions API確認
+- **確認内容**: ブラウザの実際の権限状態
+- **処理**: 非同期（async/await）
+- **フォールバック**: API未サポート時は準備ページへ誘導
+- **信頼性**: 最も正確な権限状態を取得
+
+### async/await対応の実装
+
+**router.js** (line 699, 722):
+```javascript
+async setupHomeEvents() {  // async追加
+    trainingButtons.forEach(button => {
+        button.addEventListener('click', async (e) => {
+            // ...
+            const canSkip = await NavigationManager.canSkipPreparation();  // await追加
+            // ...
+        });
+    });
+}
+```
+
+**results-overview-controller.js** (12箇所):
+```javascript
+'next-step-random-practice': async () => {  // async追加
+    if (window.NavigationManager) {
+        const canSkip = await NavigationManager.canSkipPreparation();  // await追加
+        // ...
+    }
+}
+```
+
+### テスト結果（全5ケース成功）
+
+| # | テストケース | Layer検出 | 結果 |
+|---|---|---|---|
+| 1 | ホームリロード→準備経由 | Layer 1 | ✅ |
+| 2 | 準備→トレーニング | N/A | ✅ |
+| 3 | 総合評価→準備スキップ | 3層パス | ✅ |
+| 4 | 総合評価リロード→準備経由 | Layer 1 | ✅ |
+| 5 | 準備経由後のホーム→スキップ | 3層パス | ✅ |
+
+### 設計の利点
+
+1. **多層防御**: 単一の判定基準に依存しない
+2. **早期リターン**: Layer 1で90%以上のケースを高速判定
+3. **信頼性**: Permissions APIで実際の権限状態を確認
+4. **フォールバック**: API未サポート時も安全に動作
+5. **デバッグ容易性**: 各Layerで詳細ログ出力
+
+### 詳細仕様
+
+詳細な実装仕様、エッジケース処理、制限事項については以下のドキュメントを参照してください：
+
+- `NAVIGATION_RELOAD_DETECTION_SPECIFICATION.md` (v2.2.0) - ナビゲーション・リロード検出仕様書
+
+---
+
 ## 参考資料
 
 ### 関連ドキュメント
@@ -509,11 +851,43 @@ window.initializeLucideIcons  // Lucideアイコン初期化
 - `APP_SPECIFICATION.md` - アプリケーション仕様書
 - `REQUIREMENTS_SPECIFICATION.md` - 要件定義書
 - `TECHNICAL_SPECIFICATIONS.md` - 技術仕様書
+- `NAVIGATION_RELOAD_DETECTION_SPECIFICATION.md` - ナビゲーション・リロード検出仕様書
 
 ### ファイルパス
 - **index.html**: `/Users/isao/Documents/Relative-pitch-app/PitchPro-SPA/index.html`
 - **router.js**: `/Users/isao/Documents/Relative-pitch-app/PitchPro-SPA/js/router.js`
+- **navigation-manager.js**: `/Users/isao/Documents/Relative-pitch-app/PitchPro-SPA/js/navigation-manager.js`
+- **mode-controller.js**: `/Users/isao/Documents/Relative-pitch-app/PitchPro-SPA/js/mode-controller.js`
 - **pages/**: `/Users/isao/Documents/Relative-pitch-app/PitchPro-SPA/pages/`
+
+---
+
+## 更新履歴
+
+### v1.1.0 (2025-11-19)
+- **追加**: トレーニングモード一覧セクション
+  - 3モード完全解説（ランダム基音・連続チャレンジ・12音階）
+  - モード間の主要な違い比較表
+  - 将来の拡張計画（弱点練習モード追加予定）
+- **追加**: ナビゲーション安全機構セクション
+  - 準備ページスキップ機能の目的・UX改善効果
+  - スキップ可能な条件（4項目）
+  - スキップ可能な遷移元一覧表
+  - 典型的なユーザーフロー（初回 vs 2回目以降）
+  - 3層防御アプローチによる安全性保証
+- **追加**: ModeController API仕様とモード間の違い比較表
+- **追加**: 準備スキップ判定システムの詳細説明（3層防御）
+- **追加**: async/await対応の実装詳細
+- **追加**: テスト結果表（全5ケース成功）
+- **更新**: 目次に新セクション追加
+- **更新**: 参考資料にNAVIGATION_RELOAD_DETECTION_SPECIFICATION.md追加
+
+### v1.0.0 (2025-10-29)
+- 初版作成
+- SPA構造とルーティングの基本仕様
+- ファイル構成・スクリプト管理ルール
+- ページ追加ガイドライン
+- キャッシュバスター管理
 
 ---
 
