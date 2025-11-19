@@ -30,16 +30,16 @@ const MODE_DEFINITIONS = {
             name: '初級: ランダム基音',
             displayName: 'ランダム基音',
             icon: 'shuffle',
-            color: 'blue',
-            level: '🔰',
+            color: 'green',
+            levelIcon: 'shuffle',
             modes: ['random-ascending', 'random-descending']
         },
         'intermediate': {
             name: '中級: 連続チャレンジ',
             displayName: '連続チャレンジ',
             icon: 'zap',
-            color: 'green',
-            level: '🥉',
+            color: 'orange',
+            levelIcon: 'zap',
             modes: ['continuous-ascending', 'continuous-descending']
         },
         'advanced': {
@@ -47,7 +47,7 @@ const MODE_DEFINITIONS = {
             displayName: '12音階',
             icon: 'music',
             color: 'purple',
-            level: '🥇',
+            levelIcon: 'music',
             modes: [
                 'twelve-asc-ascending',
                 'twelve-asc-descending',
@@ -75,9 +75,9 @@ const MODE_DEFINITIONS = {
         'weakness': { // 将来の拡張
             name: '特別: 弱点練習',
             displayName: '弱点練習',
-            icon: 'target',
+            icon: 'locate-fixed',
             color: 'orange',
-            level: '🎯',
+            levelIcon: 'locate-fixed',
             modes: ['weakness-ascending', 'weakness-descending']
         }
     },
@@ -329,15 +329,15 @@ window.PremiumAnalysisCalculator = {
         const intervalErrors = { 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [] };
 
         sessionData.forEach(session => {
-            if (!session.steps || !Array.isArray(session.steps)) return;
+            if (!session.pitchErrors || !Array.isArray(session.pitchErrors)) return;
 
-            session.steps.forEach(step => {
-                if (step.pitchError !== undefined && step.pitchError !== null) {
-                    const absError = Math.abs(step.pitchError);
+            session.pitchErrors.forEach(pitchErrorData => {
+                if (pitchErrorData.errorInCents !== undefined && pitchErrorData.errorInCents !== null) {
+                    const absError = Math.abs(pitchErrorData.errorInCents);
                     allErrors.push(absError);
 
-                    // 音程間隔別に分類
-                    const interval = step.interval;
+                    // 音程間隔別に分類（step番号から音程を計算: step 0=C, step 1=D(2度), step 2=E(3度)...）
+                    const interval = pitchErrorData.step + 1;
                     if (interval >= 2 && interval <= 8) {
                         intervalErrors[interval].push(absError);
                     }
@@ -410,14 +410,14 @@ window.PremiumAnalysisCalculator = {
 
         // セッションデータから音階別エラーを収集
         sessionData.forEach(session => {
-            if (!session.steps || !Array.isArray(session.steps)) return;
+            if (!session.pitchErrors || !Array.isArray(session.pitchErrors)) return;
 
-            session.steps.forEach(step => {
-                if (step.pitchError === undefined || step.pitchError === null) return;
-                if (!step.note) return;
+            session.pitchErrors.forEach(pitchErrorData => {
+                if (pitchErrorData.errorInCents === undefined || pitchErrorData.errorInCents === null) return;
+                if (!pitchErrorData.expectedNote) return;
 
-                const absError = Math.abs(step.pitchError);
-                const baseNote = step.note.replace(/[0-9]/g, ''); // オクターブ番号削除
+                const absError = Math.abs(pitchErrorData.errorInCents);
+                const baseNote = pitchErrorData.expectedNote.replace(/[0-9]/g, ''); // オクターブ番号削除
 
                 // Aブロック（C〜F#）
                 if (LEFT_BRAIN_NOTES.includes(baseNote)) {
@@ -509,11 +509,11 @@ window.PremiumAnalysisCalculator = {
         const intervalTendency = { 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [] };
 
         sessionData.forEach(session => {
-            if (!session.steps || !Array.isArray(session.steps)) return;
+            if (!session.pitchErrors || !Array.isArray(session.pitchErrors)) return;
 
-            session.steps.forEach(step => {
-                if (step.pitchError !== undefined && step.pitchError !== null) {
-                    const error = step.pitchError;
+            session.pitchErrors.forEach(pitchErrorData => {
+                if (pitchErrorData.errorInCents !== undefined && pitchErrorData.errorInCents !== null) {
+                    const error = pitchErrorData.errorInCents;
 
                     // シャープ・フラット集計
                     if (error > 0) {
@@ -522,8 +522,8 @@ window.PremiumAnalysisCalculator = {
                         flatCount++;
                     }
 
-                    // 音程間隔別傾向
-                    const interval = step.interval;
+                    // 音程間隔別傾向（step番号から音程を計算）
+                    const interval = pitchErrorData.step + 1;
                     if (interval >= 2 && interval <= 8) {
                         intervalTendency[interval].push(error);
                     }
@@ -735,10 +735,10 @@ window.PremiumAnalysisCalculator = {
     _calculateAverageError(sessions) {
         const errors = [];
         sessions.forEach(session => {
-            if (session.steps && Array.isArray(session.steps)) {
-                session.steps.forEach(step => {
-                    if (step.pitchError !== undefined && step.pitchError !== null) {
-                        errors.push(Math.abs(step.pitchError));
+            if (session.pitchErrors && Array.isArray(session.pitchErrors)) {
+                session.pitchErrors.forEach(pitchErrorData => {
+                    if (pitchErrorData.errorInCents !== undefined && pitchErrorData.errorInCents !== null) {
+                        errors.push(Math.abs(pitchErrorData.errorInCents));
                     }
                 });
             }
@@ -752,10 +752,11 @@ window.PremiumAnalysisCalculator = {
     _getIntervalErrors(sessions, interval) {
         const errors = [];
         sessions.forEach(session => {
-            if (session.steps && Array.isArray(session.steps)) {
-                session.steps.forEach(step => {
-                    if (step.interval === interval && step.pitchError !== undefined && step.pitchError !== null) {
-                        errors.push(Math.abs(step.pitchError));
+            if (session.pitchErrors && Array.isArray(session.pitchErrors)) {
+                session.pitchErrors.forEach(pitchErrorData => {
+                    const stepInterval = pitchErrorData.step + 1;
+                    if (stepInterval === interval && pitchErrorData.errorInCents !== undefined && pitchErrorData.errorInCents !== null) {
+                        errors.push(Math.abs(pitchErrorData.errorInCents));
                     }
                 });
             }
@@ -768,25 +769,25 @@ window.PremiumAnalysisCalculator = {
      */
     _analyzeTimeSeries(sessionData) {
         // セッション内の前半・後半比較
-        const earlySteps = [];
-        const lateSteps = [];
+        const earlyErrors = [];
+        const lateErrors = [];
 
         sessionData.forEach(session => {
-            if (session.steps && session.steps.length >= 8) {
-                earlySteps.push(...session.steps.slice(0, 4));
-                lateSteps.push(...session.steps.slice(4, 8));
+            if (session.pitchErrors && session.pitchErrors.length >= 8) {
+                earlyErrors.push(...session.pitchErrors.slice(0, 4));
+                lateErrors.push(...session.pitchErrors.slice(4, 8));
             }
         });
 
-        const earlyAvg = this._calculateAverageErrorFromSteps(earlySteps);
-        const lateAvg = this._calculateAverageErrorFromSteps(lateSteps);
+        const earlyAvg = this._calculateAverageErrorFromSteps(earlyErrors);
+        const lateAvg = this._calculateAverageErrorFromSteps(lateErrors);
         const learningEffect = earlyAvg - lateAvg;
 
         // 疲労パターン（セッション内精度低下）
         const fatigueData = sessionData.map(session => {
-            if (!session.steps || session.steps.length < 8) return 0;
-            const firstHalf = session.steps.slice(0, 4);
-            const secondHalf = session.steps.slice(4, 8);
+            if (!session.pitchErrors || session.pitchErrors.length < 8) return 0;
+            const firstHalf = session.pitchErrors.slice(0, 4);
+            const secondHalf = session.pitchErrors.slice(4, 8);
             const firstAvg = this._calculateAverageErrorFromSteps(firstHalf);
             const secondAvg = this._calculateAverageErrorFromSteps(secondHalf);
             return secondAvg - firstAvg;
@@ -810,12 +811,12 @@ window.PremiumAnalysisCalculator = {
     },
 
     /**
-     * ヘルパー: ステップ配列から平均エラー計算
+     * ヘルパー: pitchErrors配列から平均エラー計算
      */
-    _calculateAverageErrorFromSteps(steps) {
-        const errors = steps
-            .filter(step => step.pitchError !== undefined && step.pitchError !== null)
-            .map(step => Math.abs(step.pitchError));
+    _calculateAverageErrorFromSteps(pitchErrors) {
+        const errors = pitchErrors
+            .filter(p => p.errorInCents !== undefined && p.errorInCents !== null)
+            .map(p => Math.abs(p.errorInCents));
         return errors.length > 0 ? errors.reduce((sum, e) => sum + e, 0) / errors.length : 0;
     },
 
@@ -962,20 +963,7 @@ window.PremiumAnalysisCalculator = {
         };
     },
 
-    // モード分析用ヘルパーメソッド
-    _calculateAverageError(sessions) {
-        const allErrors = [];
-        sessions.forEach(session => {
-            if (session.steps && Array.isArray(session.steps)) {
-                session.steps.forEach(step => {
-                    if (step.pitchError !== undefined && step.pitchError !== null) {
-                        allErrors.push(Math.abs(step.pitchError));
-                    }
-                });
-            }
-        });
-        return allErrors.length > 0 ? allErrors.reduce((sum, e) => sum + e, 0) / allErrors.length : 0;
-    },
+    // モード分析用ヘルパーメソッド（既に735行目で定義済み - このメソッドは使用されない）
 
     _calculateSuccessRate(sessions, daysAgo = null, daysRecent = null) {
         let filteredSessions = sessions;
@@ -997,10 +985,12 @@ window.PremiumAnalysisCalculator = {
         let totalSteps = 0;
 
         filteredSessions.forEach(session => {
-            if (session.steps && Array.isArray(session.steps)) {
-                session.steps.forEach(step => {
+            if (session.pitchErrors && Array.isArray(session.pitchErrors)) {
+                session.pitchErrors.forEach(pitchErrorData => {
                     totalSteps++;
-                    if (step.grade && (step.grade === 'Excellent' || step.grade === 'Good')) {
+                    // errorInCentsから評価を計算（±50セント以内をExcellent、±100セント以内をGood）
+                    const absError = Math.abs(pitchErrorData.errorInCents || 0);
+                    if (absError <= 50 || absError <= 100) {
                         successCount++;
                     }
                 });
@@ -1076,10 +1066,10 @@ window.PremiumAnalysisCalculator = {
     _findBestError(sessions) {
         let bestError = Infinity;
         sessions.forEach(session => {
-            if (session.steps && Array.isArray(session.steps)) {
-                session.steps.forEach(step => {
-                    if (step.pitchError !== undefined && step.pitchError !== null) {
-                        const absError = Math.abs(step.pitchError);
+            if (session.pitchErrors && Array.isArray(session.pitchErrors)) {
+                session.pitchErrors.forEach(pitchErrorData => {
+                    if (pitchErrorData.errorInCents !== undefined && pitchErrorData.errorInCents !== null) {
+                        const absError = Math.abs(pitchErrorData.errorInCents);
                         if (absError < bestError) {
                             bestError = absError;
                         }
@@ -1107,12 +1097,12 @@ window.PremiumAnalysisCalculator = {
         const intervalErrors = { 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [] };
 
         sessions.forEach(session => {
-            if (session.steps && Array.isArray(session.steps)) {
-                session.steps.forEach(step => {
-                    if (step.pitchError !== undefined && step.pitchError !== null && step.interval) {
-                        const interval = step.interval;
+            if (session.pitchErrors && Array.isArray(session.pitchErrors)) {
+                session.pitchErrors.forEach(pitchErrorData => {
+                    if (pitchErrorData.errorInCents !== undefined && pitchErrorData.errorInCents !== null) {
+                        const interval = pitchErrorData.step + 1;
                         if (interval >= 2 && interval <= 8) {
-                            intervalErrors[interval].push(Math.abs(step.pitchError));
+                            intervalErrors[interval].push(Math.abs(pitchErrorData.errorInCents));
                         }
                     }
                 });

@@ -469,6 +469,11 @@ function updateModeAnalysisUI(allSessionData) {
     // アコーディオン展開/折りたたみイベントを設定
     initParentModeAccordion();
 
+    // Lucideアイコン初期化
+    if (window.initializeLucideIcons) {
+        window.initializeLucideIcons({ immediate: true });
+    }
+
     console.log('✅ モード別分析UI更新完了');
 }
 
@@ -476,7 +481,7 @@ function updateModeAnalysisUI(allSessionData) {
  * 親モードカードHTML生成
  */
 function generateParentModeCard(parentModeKey, parentMode, stats) {
-    const { name, displayName, icon, color, level } = parentMode;
+    const { displayName, color, levelIcon } = parentMode;
     const { totalSessions, avgError, childModes } = stats;
 
     // データがない場合
@@ -486,7 +491,7 @@ function generateParentModeCard(parentModeKey, parentMode, stats) {
                 <div class="parent-mode-header" data-mode="${parentModeKey}">
                     <div class="parent-mode-header-top">
                         <div class="parent-mode-header-left">
-                            <span class="parent-mode-level">${level}</span>
+                            <i data-lucide="${levelIcon}" class="parent-mode-level-icon text-${color}-300" style="width: 20px; height: 20px;"></i>
                             <h3 class="parent-mode-title">${displayName}</h3>
                         </div>
                         <i data-lucide="chevron-down" class="parent-mode-chevron"></i>
@@ -509,7 +514,7 @@ function generateParentModeCard(parentModeKey, parentMode, stats) {
             <div class="parent-mode-header" data-mode="${parentModeKey}">
                 <div class="parent-mode-header-top">
                     <div class="parent-mode-header-left">
-                        <span class="parent-mode-level">${level}</span>
+                        <i data-lucide="${levelIcon}" class="parent-mode-level-icon text-${color}-300" style="width: 20px; height: 20px;"></i>
                         <h3 class="parent-mode-title">${displayName}</h3>
                     </div>
                     <i data-lucide="chevron-down" class="parent-mode-chevron"></i>

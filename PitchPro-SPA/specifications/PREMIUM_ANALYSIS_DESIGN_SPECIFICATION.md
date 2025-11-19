@@ -1,9 +1,18 @@
 # プレミアム分析ページ 設計仕様書
 
 **作成日**: 2025-11-19
-**バージョン**: 2.0.0
+**最終更新**: 2025-11-19
+**バージョン**: 2.1.0
 **対象**: `/PitchPro-SPA/pages/premium-analysis.html`
 **目的**: 拡張性を重視した詳細分析ページの包括的設計
+
+## 📝 変更履歴
+
+### v2.1.0（2025-11-19）
+- **データ構造修正**: セッションデータの構造を`steps`配列から`pitchErrors`配列に統一
+- **MODE_DEFINITIONS更新**: 絵文字（`level`）をLucideアイコン（`levelIcon`）に変更
+- **色の統一**: トップページと詳細分析のモード色を統一（beginner: green, intermediate: orange）
+- **アイコン統一**: トップページと同じLucideアイコンを使用（shuffle, zap, music, locate-fixed）
 
 ---
 
@@ -371,16 +380,16 @@ const MODE_DEFINITIONS = {
       name: '初級: ランダム基音',
       displayName: 'ランダム基音',
       icon: 'shuffle',
-      color: 'blue',
-      level: '🔰',
+      color: 'green',
+      levelIcon: 'shuffle', // Lucideアイコン名（絵文字から移行）
       modes: ['random-ascending', 'random-descending']
     },
     'intermediate': {
       name: '中級: 連続チャレンジ',
       displayName: '連続チャレンジ',
       icon: 'zap',
-      color: 'green',
-      level: '🥉',
+      color: 'orange',
+      levelIcon: 'zap', // Lucideアイコン名（絵文字から移行）
       modes: ['continuous-ascending', 'continuous-descending']
     },
     'advanced': {
@@ -388,7 +397,7 @@ const MODE_DEFINITIONS = {
       displayName: '12音階',
       icon: 'music',
       color: 'purple',
-      level: '🥇',
+      levelIcon: 'music', // Lucideアイコン名（絵文字から移行）
       modes: [
         'twelve-asc-ascending',
         'twelve-asc-descending',
@@ -416,9 +425,9 @@ const MODE_DEFINITIONS = {
     'weakness': { // 将来の拡張
       name: '特別: 弱点練習',
       displayName: '弱点練習',
-      icon: 'target',
+      icon: 'locate-fixed',
       color: 'orange',
-      level: '🎯',
+      levelIcon: 'locate-fixed', // Lucideアイコン名（絵文字から移行）
       modes: ['weakness-ascending', 'weakness-descending']
     }
   },
@@ -530,7 +539,61 @@ const MODE_DEFINITIONS = {
 };
 ```
 
-### 6.2 セッションデータの正規化
+### 6.2 セッションデータ構造
+
+**重要**: セッションデータは`pitchErrors`配列を使用（`steps`配列ではない）
+
+```javascript
+// localStorageに保存されるセッションデータの構造
+const sessionData = {
+  sessionId: 1,
+  lessonId: 'lesson_123',
+  mode: 'random',
+  chromaticDirection: 'random', // 基音進行方向
+  scaleDirection: 'ascending',  // 音階方向
+  baseNote: 'C4',
+  baseFrequency: 261.63,
+  startTime: 1700000000000,
+  endTime: 1700000060000,
+  duration: 60000,
+  completed: true,
+
+  // ★ 重要: pitchErrors配列を使用（steps配列ではない）
+  pitchErrors: [
+    {
+      step: 0,                    // ステップ番号（0-7: ド-ド）
+      expectedNote: 'C4',         // 期待される音名
+      expectedFrequency: 261.63,  // 期待される周波数（Hz）
+      detectedFrequency: 262.0,   // 検出された周波数（Hz）
+      errorInCents: 2.5,          // セント単位の誤差（±200以内）
+      clarity: 0.85,              // 明瞭度（0-1）
+      volume: 0.65,               // 音量（0-1）
+      timestamp: 1700000001000    // タイムスタンプ
+    },
+    // ... 8ステップ分
+  ]
+};
+```
+
+**データアクセスパターン**:
+```javascript
+// ✅ 正しい方法
+sessionData.forEach(session => {
+  if (!session.pitchErrors || !Array.isArray(session.pitchErrors)) return;
+
+  session.pitchErrors.forEach(pitchErrorData => {
+    const absError = Math.abs(pitchErrorData.errorInCents);
+    const interval = pitchErrorData.step + 1; // step番号から音程を計算
+    const note = pitchErrorData.expectedNote;
+  });
+});
+
+// ❌ 間違った方法（古い実装）
+// session.steps は存在しない
+// step.pitchError は存在しない
+```
+
+### 6.3 セッションデータの正規化
 
 ```javascript
 /**
@@ -552,7 +615,7 @@ function normalizeSessionMode(session) {
 }
 ```
 
-### 6.3 親モード集計
+### 6.4 親モード集計
 
 ```javascript
 /**

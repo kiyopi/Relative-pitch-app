@@ -358,6 +358,11 @@
   line-height: 1;
 }
 
+.parent-mode-level-icon {
+  flex-shrink: 0;
+  /* 色は text-{color}-300 クラスで動的に設定 */
+}
+
 .parent-mode-title {
   color: white;
   font-size: 1.1rem;
