@@ -48,11 +48,6 @@ class DistributionChart {
             session.pitchErrors.forEach(error => {
                 const absError = Math.abs(error.errorInCents);
 
-                // 800¢超は評価分布から除外（測定エラーとして扱う）
-                if (absError > 800) {
-                    return;
-                }
-
                 distribution.total++;
 
                 const evaluation = window.EvaluationCalculator.evaluatePitchError(absError);

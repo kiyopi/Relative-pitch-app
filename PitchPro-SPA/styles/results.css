@@ -242,6 +242,17 @@
     transform: translateY(-4px);
 }
 
+/* 800¢超の測定エラー用スタイル */
+.note-result-item.error-outlier {
+    background: rgba(245, 158, 11, 0.1);  /* warning-alertと同じamber背景 */
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.note-result-item.error-outlier:hover {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
 /* note-result-item内のテキストスタイル - margin-bottomを0に */
 .note-result-item .text-body,
 .note-result-item .text-pitch-deviation-plus,

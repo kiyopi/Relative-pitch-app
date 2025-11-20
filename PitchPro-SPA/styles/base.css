@@ -528,6 +528,7 @@ body::before {
 
 /* 500番台 */
 .text-gray-500 { color: #6b7280; }
+.text-amber-500 { color: #f59e0b; }  /* warning-alertと同じamber色 */
 
 /* 特殊色 */
 .text-golden-yellow { color: #ffa500; }
@@ -2965,3 +2966,78 @@ body::before {
 /* ================================================================
    プレミアム分析専用スタイルは premium-analysis.css に移動しました
    ================================================================ */
+
+/* ================================================================
+   Danger Zone（危険ゾーン）
+   ================================================================ */
+
+.danger-zone {
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(220, 38, 38, 0.1) 100%);
+}
+
+.danger-zone-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.danger-zone-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.danger-zone-info {
+    flex: 1;
+}
+
+.danger-zone-info h3 {
+    margin: 0 0 0.5rem 0;
+}
+
+.danger-zone-info p {
+    margin: 0;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:active {
+    transform: translateY(0);
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+    .danger-zone-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn-danger {
+        width: 100%;
+        justify-content: center;
+    }
+}

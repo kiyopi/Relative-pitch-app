@@ -719,7 +719,7 @@ window.showSessionDetail = function(sessionIndex) {
             if (isOutlier) {
                 evaluation = {
                     icon: 'alert-circle',
-                    color: 'text-red-400',
+                    color: 'text-amber-500',
                     label: '測定エラー'
                 };
             } else {
@@ -731,9 +731,9 @@ window.showSessionDetail = function(sessionIndex) {
             const noteElement = document.createElement('div');
             noteElement.className = 'note-result-item';
 
-            // 800¢超の場合は赤背景を追加
+            // 800¢超の場合はamber背景を追加
             if (isOutlier) {
-                noteElement.classList.add('bg-red-900', 'bg-opacity-20');
+                noteElement.classList.add('error-outlier');
             }
 
             noteElement.innerHTML = `
@@ -1642,10 +1642,10 @@ function displayOutlierExplanationOverview(outlierFiltered, outlierCount, outlie
     if (outlierFiltered) {
         explanationContainer.innerHTML = `
             <div class="warning-alert">
-                <i data-lucide="alert-circle" class="text-red-400"></i>
+                <i data-lucide="alert-circle" class="text-amber-500"></i>
                 <div>
                     <p><strong>大きな誤差について</strong></p>
-                    <p>大きな誤差が検出されました。正常に測定できなかった可能性があります。詳細分析で確認し、必要に応じてレッスン削除機能をご利用ください。</p>
+                    <p>大きな誤差が検出されました。正常に測定できなかった可能性があります。詳細分析で確認し、必要に応じてレッスン削除機能をご利用ください。削除はトレーニング記録ページのトレーニング履歴からでも行えます。</p>
                 </div>
             </div>
         `;
