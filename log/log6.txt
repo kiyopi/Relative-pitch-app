@@ -1,25 +1,33 @@
+[Log] 🔍 [NavigationManager] visibilitychange検出: – "hidden" (navigation-manager.js, line 110)
+[Log] 🔍 [NavigationManager] lastVisibilityChange更新: – 1763616024253 (navigation-manager.js, line 111)
+[Log] 🔍 [NavigationManager] 現在のURL: – "http://127.0.0.1:5500/PitchPro-SPA/index.html#records" (navigation-manager.js, line 112)
+[Log] 🔍 [NavigationManager] performance.navigation.type: – 1 (navigation-manager.js, line 113)
+[Info] Successfully preconnected to https://fonts.googleapis.com/
+[Info] Successfully preconnected to https://fonts.gstatic.com/
 [Log] ✅ MusicTheory utility loaded (v1.0.0) (music-theory.js, line 226)
 [Log] [LoadingComponent] Loaded (loading-component.js, line 213)
 [Log] [SubscriptionManager] v1.0.0 Loaded (subscription-manager.js, line 497)
 [Log] ⚠️ テストモード: 有効 (subscription-manager.js, line 498)
-[Log] ✅ [NavigationManager] visibilitychange監視を初期化 (navigation-manager.js, line 88)
-[Log] ✅ [NavigationManager] ロード完了 (navigation-manager.js, line 969)
-[Log] ✅ ModeController初期化完了 (mode-controller.js, line 306)
-[Log] 📋 登録モード: – "random, continuous, 12tone" (mode-controller.js, line 307)
+[Log] ✅ [NavigationManager] visibilitychange監視を初期化 (navigation-manager.js, line 125)
+[Log] ✅ [NavigationManager] ロード完了 (navigation-manager.js, line 1118)
+[Log] ✅ ModeController初期化完了 (mode-controller.js, line 359)
+[Log] 📋 登録モード: – "random, continuous, 12tone" (mode-controller.js, line 360)
 [Log] ✅ SessionDataManager初期化完了 (session-data-manager.js, line 432)
 [Log] ✅ SessionManager初期化完了 (session-manager.js, line 406)
-[Log] 📊 SessionDataRecorder初期化: sessionCounter = 139 (session-data-recorder.js, line 28)
-[Log] [Records] Controller loading... (records-controller.js, line 58)
-[Log] [Records] Controller loaded (records-controller.js, line 1267)
-[Log] 🚀 [results-overview-controller] Script loaded - START v4.0.9 (2025-11-16) (results-overview-controller.js, line 1)
-[Log] ✅ [results-overview-controller] window.initResultsOverview defined (results-overview-controller.js, line 1611)
-[Log] ✅ [results-overview-controller] window.toggleGradePopover: – "function" (results-overview-controller.js, line 1612)
-[Log] ✅ [results-overview-controller] window.toggleSessionRankPopover: – "function" (results-overview-controller.js, line 1613)
-[Log] ✅ PremiumAnalysisCalculator loaded (with Mode Analysis) (premium-analysis-calculator.js, line 868)
+[Log] 📊 SessionDataRecorder初期化: sessionCounter = 219 (session-data-recorder.js, line 28)
+[Log] [Records] Controller loading... (records-controller.js, line 59)
+[Log] [Records] Controller loaded (records-controller.js, line 1395)
+[Log] 🚀 [results-overview-controller] Script loaded - START v4.6.0 (2025-11-19) (results-overview-controller.js, line 1)
+[Log] ✅ [results-overview-controller] window.initResultsOverview defined (results-overview-controller.js, line 1908)
+[Log] ✅ [results-overview-controller] window.toggleGradePopover: – "function" (results-overview-controller.js, line 1909)
+[Log] ✅ [results-overview-controller] window.toggleSessionRankPopover: – "function" (results-overview-controller.js, line 1910)
+[Log] ✅ [results-overview-controller] window.confirmDeleteLesson: – "function" (results-overview-controller.js, line 1911)
+[Log] ✅ [results-overview-controller] window.deleteLesson: – "function" (results-overview-controller.js, line 1912)
+[Log] ✅ PremiumAnalysisCalculator loaded (with Mode Analysis) (premium-analysis-calculator.js, line 1159)
 [Log] 🚀 [premium-analysis-controller] Script loaded (premium-analysis-controller.js, line 18)
-[Log] ✅ premium-analysis-controller loaded (premium-analysis-controller.js, line 866)
-[Log] ✅ PitchProConfig loaded (pitchpro-config.js, line 173)
-[Log] PitchPro統一設定: (pitchpro-config.js, line 174)
+[Log] ✅ premium-analysis-controller loaded (premium-analysis-controller.js, line 858)
+[Log] ✅ PitchProConfig loaded (pitchpro-config.js, line 189)
+[Log] PitchPro統一設定: (pitchpro-config.js, line 190)
   - 明瞭度閾値: 40% (実用的な信頼性)
   - 最小音量: 0.3% (ノイズ排除)
   - FFTサイズ: 2048 (標準精度・最適パフォーマンス)
@@ -28,47 +36,317 @@
   - 倍音補正: 有効 (オクターブ誤認識防止)
 [Log] ✅ DeviceDetector loaded (v1.0.0 - iOS/Android/PC support) (device-detector.js, line 163)
 [Log] ✅ startVoiceRangeTest関数をグローバルスコープに公開完了 (voice-range-test.js, line 2755)
-[Log] 📍 [Router] Route change requested: preparation?mode=random (router.js, line 172)
-[Log] 🚀 [Router] Starting navigation 1 to: preparation (router.js, line 189)
-[Log] ⚠️ [NavigationManager] preparationページへのダイレクトアクセス検出 (navigation-manager.js, line 293)
-[Log] 🔄 [Router] Page access blocked: direct-access-preparation (router.js, line 238)
-[Log] ✅ [Router] Navigation 1 completed successfully (router.js, line 204)
-[Info] Successfully preconnected to https://fonts.googleapis.com/
-[Info] Successfully preconnected to https://fonts.gstatic.com/
-[Log] 📍 [Router] Route change requested: home (router.js, line 172)
-[Log] 🚀 [Router] Starting navigation 2 to: home (router.js, line 189)
-[Log] 📍 [NavigationManager] ブラウザバック防止不要: home (navigation-manager.js, line 873)
-[Log] ✅ [Router] Page loaded: home (router.js, line 318)
-[Log] ✅ [Router] Navigation 2 completed successfully (router.js, line 204)
-[Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] 📍 [Router] Route change requested: records (router.js, line 206)
+[Log] 🚀 [Router] Starting navigation 1 to: records (router.js, line 223)
+[Error] Failed to load resource: the server responded with a status of 404 (Not Found) (pitchpro.umd.js.map, line 0)
 [Log]  * Tone.js v15.1.22 *  (+esm, line 7)
-[Log] ✅ PitchShifter loaded globally (v2.9.0 - Optimized Envelope) (index.html, line 78)
-[Log] 📦 [CACHE BUSTER] Timestamp: 1761735209 (index.html, line 79)
-[Log] ⚙️ [ENVELOPE] attack: 0.02s, sustain: 1.0s, release: 1.5s (2.52s total), curve: linear (index.html, line 80)
-[Log] ✅ Tone.js v15.1.22 (stable latest) loaded globally (index.html, line 81)
+[Log] ✅ PitchShifter loaded globally (v2.9.0 - Optimized Envelope) (index.html, line 79)
+[Log] 📦 [CACHE BUSTER] Timestamp: 1761735209 (index.html, line 80)
+[Log] ⚙️ [ENVELOPE] attack: 0.02s, sustain: 1.0s, release: 1.5s (2.52s total), curve: linear (index.html, line 81)
+[Log] ✅ Tone.js v15.1.22 (stable latest) loaded globally (index.html, line 82)
 [Log] ⏭️ voice-range-test.js: preparationページ以外のため初期化スキップ (voice-range-test.js, line 419)
 [Log] 🔍 [LUCIDE] DOMContentLoaded fired - initializing icons... (lucide-init.js, line 203)
-[Log] 🔍 [LUCIDE-DEBUG] Found 41 elements with data-lucide attribute (lucide-init.js, line 42)
+[Error] Failed to load resource: the server responded with a status of 404 (Not Found) (index.js.map, line 0)
+[Log] 🔍 [NavigationManager] visibilitychange検出: – "visible" (navigation-manager.js, line 110)
+[Log] 🔍 [NavigationManager] lastVisibilityChange更新: – 1763619801093 (navigation-manager.js, line 111)
+[Log] 🔍 [NavigationManager] 現在のURL: – "http://127.0.0.1:5500/PitchPro-SPA/index.html#records" (navigation-manager.js, line 112)
+[Log] 🔍 [NavigationManager] performance.navigation.type: – 1 (navigation-manager.js, line 113)
+[Log] ⏳ [Router] Waiting for dependencies: Chart, DistributionChart (router.js, line 547)
+[Log] ⏳ [Router] Waiting for dependency: Chart (router.js, line 576)
+[Log] ⏳ [Router] Waiting for dependency: DistributionChart (router.js, line 576)
+[Log] ✅ [Router] Dependency Chart loaded (router.js, line 592)
+[Log] ✅ [Router] Dependency DistributionChart loaded (router.js, line 592)
+[Log] ✅ [Router] All dependencies loaded (router.js, line 564)
+[Log] ⏳ [Router] Waiting for global function: initRecords (router.js, line 505)
+[Log] ✅ [Router] Global function initRecords loaded (router.js, line 519)
+[Log] 🎯 [Router] Initializing page "records" with initRecords() (router.js, line 429)
+[Log] 📊 [Records] トレーニング記録ページ初期化開始 v2.1.0 (2025-11-14) (records-controller.js, line 71)
+[Log] 🔍 [LUCIDE-DEBUG] Found 23 elements with data-lucide attribute (lucide-init.js, line 42)
 [Log] 🎬 [LUCIDE-DEBUG] Calling lucide.createIcons()... (lucide-init.js, line 43)
-[Log] ✅ [LUCIDE] Icons initialized - Found 41 SVG elements (lucide-init.js, line 61)
-[Log] 🔍 [LUCIDE-DEBUG] First SVG computed styles: – Object (lucide-init.js, line 67)
-Object
-[Log] 🗑️ [LUCIDE-UPDATE] Removed existing svg element (lucide-init.js, line 172)
-[Log] ✅ [LUCIDE-UPDATE] Created new i element: move-up-right (lucide-init.js, line 183)
+[Log] ✅ [LUCIDE] Icons initialized - Found 23 SVG elements (lucide-init.js, line 61)
+[Log] 🔍 [LUCIDE-DEBUG] First SVG computed styles: – {display: "block", width: "32px", height: "32px", …} (lucide-init.js, line 67)
+{display: "block", width: "32px", height: "32px", color: "rgb(255, 255, 255)", stroke: "rgb(255, 255, 255)", …}Object
+[Log] [Records] Loading training records... (records-controller.js, line 104)
+[Log] ⚠️ テストモード: 全100件を表示（課金フィルター無効） (data-manager.js, line 317)
+[Log] [Records] Loaded 100 sessions (records-controller.js, line 110)
+[Log] [Records] First session sample: – {sessionId: 219, lessonId: "lesson_1763602908944_continuous_random_ascending", mode: "continuous", …} (records-controller.js, line 112)
+{sessionId: 219, lessonId: "lesson_1763602908944_continuous_random_ascending", mode: "continuous", chromaticDirection: "random", scaleDirection: "ascending", …}Object
+[Log] 🔍 [Grouping] レッスングループ化開始（lessonId方式） (records-controller.js, line 997)
+[Log] 🔍 [Grouping] 総セッション数: 100 (records-controller.js, line 998)
+[Log] ℹ️ [Repair] lessonId修復機能は無効化されています（SessionManager導入済み） (records-controller.js, line 846)
+[Log]    理由: 正常なデータを誤って統合するリスクを回避 (records-controller.js, line 847)
+[Warning] ⚠️ [SessionDataManager] 不完全レッスン除外: continuous（6/12セッション）[lesson_1763567646794_continuous_random_ascending] (session-data-manager.js, line 397)
+[Warning] ⚠️ [SessionDataManager] 不完全レッスン除外: continuous（1/12セッション）[lesson_1763554402575_continuous_ascending_ascending] (session-data-manager.js, line 397)
+[Warning] ⚠️ [SessionDataManager] 不完全レッスン除外: continuous（1/12セッション）[lesson_1763357785406_continuous_random_ascending] (session-data-manager.js, line 397)
+[Warning] ⚠️ [SessionDataManager] 不完全レッスン除外: 12tone（3/12セッション）[lesson_1763357728459_12tone_ascending_ascending] (session-data-manager.js, line 397)
+[Warning] ⚠️ [SessionDataManager] 不完全レッスン除外: random（1/8セッション）[lesson_1763357498494_random_random_ascending] (session-data-manager.js, line 397)
+[Warning] ⚠️ [SessionDataManager] 不完全レッスン除外: continuous（8/12セッション）[lesson_1763343893034_continuous_random_ascending] (session-data-manager.js, line 397)
+[Log] 📊 [SessionDataManager] 全レッスン: 12件, 完全レッスン: 6件 (session-data-manager.js, line 402)
+[Log] ✅ [Filtering] 完全レッスンのみフィルタリング: 6レッスン (records-controller.js, line 1011)
+[Log] 📊 [Statistics] 総セッション数: 100, グループ化後レッスン数: 6 (records-controller.js, line 218)
+[Log] 📊 [Statistics] レッスン処理: モード=continuous, 音階方向=ascending, セッション数=12 (records-controller.js, line 245)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] ⚠️ 警告: 20音が800¢を超えています（全96音） (evaluation-calculator.js, line 202)
+[Log] ✅ 基本メトリクス: – {avgError: 484.7, excellenceRate: 0.771, stability: 978.6, …} (evaluation-calculator.js, line 33)
+{avgError: 484.7, excellenceRate: 0.771, stability: 978.6, totalNotes: 96, excellentNotes: 74, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: true}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📊 [Statistics] レッスン処理: モード=continuous, 音階方向=ascending, セッション数=12 (records-controller.js, line 245)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] ⚠️ 警告: 82音が800¢を超えています（全96音） (evaluation-calculator.js, line 202)
+[Log] ✅ 基本メトリクス: – {avgError: 1527.7, excellenceRate: 0.063, stability: 726.2, …} (evaluation-calculator.js, line 33)
+{avgError: 1527.7, excellenceRate: 0.063, stability: 726.2, totalNotes: 96, excellentNotes: 6, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: false}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📊 [Statistics] レッスン処理: モード=continuous, 音階方向=ascending, セッション数=12 (records-controller.js, line 245)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] ⚠️ 警告: 95音が800¢を超えています（全96音） (evaluation-calculator.js, line 202)
+[Log] ✅ 基本メトリクス: – {avgError: 2464.6, excellenceRate: 0, stability: 699.2, …} (evaluation-calculator.js, line 33)
+{avgError: 2464.6, excellenceRate: 0, stability: 699.2, totalNotes: 96, excellentNotes: 0, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: false}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📊 [Statistics] レッスン処理: モード=12tone, 音階方向=ascending, セッション数=24 (records-controller.js, line 245)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (24) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (24)
+[Log] ✅ モード検出: – {mode: "12tone", name: "12音階モード", level: "上級", …} (evaluation-calculator.js, line 25)
+{mode: "12tone", name: "12音階モード", level: "上級", target: "プロフェッショナルレベル", actualSessions: 24}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] ⚠️ 警告: 187音が800¢を超えています（全192音） (evaluation-calculator.js, line 202)
+[Log] ✅ 基本メトリクス: – {avgError: 2448.8, excellenceRate: 0, stability: 740.4, …} (evaluation-calculator.js, line 33)
+{avgError: 2448.8, excellenceRate: 0, stability: 740.4, totalNotes: 192, excellentNotes: 0, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 24, explanation: "24セッション（上級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 24, explanation: "24セッション（上級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: false}, thresholds: {avgError: 70, excellence: 0.3}} (evaluation-calculator.js, line 45)
+[Log] 📊 [Statistics] レッスン処理: モード=continuous, 音階方向=ascending, セッション数=12 (records-controller.js, line 245)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] ⚠️ 警告: 92音が800¢を超えています（全96音） (evaluation-calculator.js, line 202)
+[Log] ✅ 基本メトリクス: – {avgError: 2364.2, excellenceRate: 0, stability: 769.7, …} (evaluation-calculator.js, line 33)
+{avgError: 2364.2, excellenceRate: 0, stability: 769.7, totalNotes: 96, excellentNotes: 0, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: false}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📊 [Statistics] レッスン処理: モード=random, 音階方向=ascending, セッション数=8 (records-controller.js, line 245)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (8) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object]Array (8)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 8}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] ⚠️ 警告: 63音が800¢を超えています（全64音） (evaluation-calculator.js, line 202)
+[Log] ✅ 基本メトリクス: – {avgError: 2333.5, excellenceRate: 0, stability: 754.3, …} (evaluation-calculator.js, line 33)
+{avgError: 2333.5, excellenceRate: 0, stability: 754.3, totalNotes: 64, excellentNotes: 0, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: false}, thresholds: {avgError: 80, excellence: 0.2}} (evaluation-calculator.js, line 45)
+[Log] 📊 [Statistics] 連続チャレンジ（上行）: レッスン数=4, 平均誤差=1710, 最高グレード=E (records-controller.js, line 299)
+[Log] 📊 [Statistics] 12音階（上昇・上行）: レッスン数=1, 平均誤差=2449, 最高グレード=E (records-controller.js, line 299)
+[Log] 📊 [Statistics] ランダム基音（上行）: レッスン数=1, 平均誤差=2334, 最高グレード=E (records-controller.js, line 299)
+[Log] 📊 [Statistics] モード+方向別統計: 3種類 – [Object, Object, Object] (3) (records-controller.js, line 312)
+[Object, Object, Object]Array (3)
+[Log] 📊 [Duration] Total: 100セッション × 13秒 = 1300秒 (21m40s) (records-controller.js, line 338)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] ⚠️ 警告: 20音が800¢を超えています（全96音） (evaluation-calculator.js, line 202)
+[Log] ✅ 基本メトリクス: – {avgError: 484.7, excellenceRate: 0.771, stability: 978.6, …} (evaluation-calculator.js, line 33)
+{avgError: 484.7, excellenceRate: 0.771, stability: 978.6, totalNotes: 96, excellentNotes: 74, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: true}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] ⚠️ 警告: 82音が800¢を超えています（全96音） (evaluation-calculator.js, line 202)
+[Log] ✅ 基本メトリクス: – {avgError: 1527.7, excellenceRate: 0.063, stability: 726.2, …} (evaluation-calculator.js, line 33)
+{avgError: 1527.7, excellenceRate: 0.063, stability: 726.2, totalNotes: 96, excellentNotes: 6, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: false}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] ⚠️ 警告: 95音が800¢を超えています（全96音） (evaluation-calculator.js, line 202)
+[Log] ✅ 基本メトリクス: – {avgError: 2464.6, excellenceRate: 0, stability: 699.2, …} (evaluation-calculator.js, line 33)
+{avgError: 2464.6, excellenceRate: 0, stability: 699.2, totalNotes: 96, excellentNotes: 0, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: false}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (24) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (24)
+[Log] ✅ モード検出: – {mode: "12tone", name: "12音階モード", level: "上級", …} (evaluation-calculator.js, line 25)
+{mode: "12tone", name: "12音階モード", level: "上級", target: "プロフェッショナルレベル", actualSessions: 24}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] ⚠️ 警告: 187音が800¢を超えています（全192音） (evaluation-calculator.js, line 202)
+[Log] ✅ 基本メトリクス: – {avgError: 2448.8, excellenceRate: 0, stability: 740.4, …} (evaluation-calculator.js, line 33)
+{avgError: 2448.8, excellenceRate: 0, stability: 740.4, totalNotes: 192, excellentNotes: 0, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 24, explanation: "24セッション（上級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 24, explanation: "24セッション（上級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: false}, thresholds: {avgError: 70, excellence: 0.3}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] ⚠️ 警告: 92音が800¢を超えています（全96音） (evaluation-calculator.js, line 202)
+[Log] ✅ 基本メトリクス: – {avgError: 2364.2, excellenceRate: 0, stability: 769.7, …} (evaluation-calculator.js, line 33)
+{avgError: 2364.2, excellenceRate: 0, stability: 769.7, totalNotes: 96, excellentNotes: 0, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: false}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (8) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object]Array (8)
+[Log] ✅ モード検出: – {mode: "random", name: "ランダム基音モード", level: "初級", …} (evaluation-calculator.js, line 25)
+{mode: "random", name: "ランダム基音モード", level: "初級", target: "カラオケ・合唱レベル", actualSessions: 8}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] ⚠️ 警告: 63音が800¢を超えています（全64音） (evaluation-calculator.js, line 202)
+[Log] ✅ 基本メトリクス: – {avgError: 2333.5, excellenceRate: 0, stability: 754.3, …} (evaluation-calculator.js, line 33)
+{avgError: 2333.5, excellenceRate: 0, stability: 754.3, totalNotes: 64, excellentNotes: 0, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 8, explanation: "8セッション（初級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: false}, thresholds: {avgError: 80, excellence: 0.2}} (evaluation-calculator.js, line 45)
+[Log] 📊 [Statistics] 期間情報: 開始=2025/11/17, 最新=2025/11/20, 経過日数=3, 実トレーニング日数=3 (records-controller.js, line 390)
+[Log] [Records] Statistics: – {modeStats: Array, streak: 2, totalLessons: 6, …} (records-controller.js, line 123)
+{modeStats: Array, streak: 2, totalLessons: 6, totalSessions: 100, totalDurationFormatted: "21m40s", …}Object
+[Log] 📊 [Display] 上段: 3日, 開始日, 連続2日 (records-controller.js, line 544)
+[Log] 📊 [Display] 数値カード: レッスン=6, セッション=100, 総時間=21m40s, 平均誤差=±1937¢ (E) (records-controller.js, line 545)
 [Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
-[Log] 🗑️ [LUCIDE-UPDATE] Removed existing svg element (lucide-init.js, line 172)
-[Log] ✅ [LUCIDE-UPDATE] Created new i element: move-up-right (lucide-init.js, line 183)
 [Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
-[Log] 🗑️ [LUCIDE-UPDATE] Removed existing svg element (lucide-init.js, line 172)
-[Log] ✅ [LUCIDE-UPDATE] Created new i element: trending-up (lucide-init.js, line 183)
+[Log] [Records] Lucide icons initialized (records-controller.js, line 93)
+[Log] 📍 [NavigationManager] ブラウザバック防止不要: records (navigation-manager.js, line 1022)
+[Log] ✅ [Router] Page loaded: records (router.js, line 352)
+[Log] ✅ [Router] Navigation 1 completed successfully (router.js, line 238)
 [Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
-[Log] 🗑️ [LUCIDE-UPDATE] Removed existing svg element (lucide-init.js, line 172)
-[Log] ✅ [LUCIDE-UPDATE] Created new i element: trending-down (lucide-init.js, line 183)
+[Log] [Records] hideLoading called for section: stats (records-controller.js, line 190)
+[Log] [Records] LoadingComponent.toggle(stats, false) executed (records-controller.js, line 194)
+[Log] [Records] Displaying evaluation distribution... (records-controller.js, line 646)
 [Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
-[Log] 🗑️ [LUCIDE-UPDATE] Removed existing svg element (lucide-init.js, line 172)
-[Log] ✅ [LUCIDE-UPDATE] Created new i element: repeat (lucide-init.js, line 183)
+[Log] ✅ [DistributionChart] レンダリング完了: 800件の評価データ (DistributionChart.js, line 278)
+[Log] [Records] hideLoading called for section: distribution (records-controller.js, line 190)
+[Log] [Records] LoadingComponent.toggle(distribution, false) executed (records-controller.js, line 194)
+[Log] [Records] Displaying mode statistics... (records-controller.js, line 561)
+[Log] [Records] stats.modeStats: – [Object, Object, Object] (3) (records-controller.js, line 562)
+[Object, Object, Object]Array (3)
+[Log] [Records] mode-statistics container found (records-controller.js, line 571)
+[Log] [Records] Mode statistics HTML rendered (records-controller.js, line 621)
 [Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
+[Log] [Records] displayModeStatistics completed (records-controller.js, line 634)
+[Log] [Records] hideLoading called for section: mode-stats (records-controller.js, line 190)
+[Log] [Records] LoadingComponent.toggle(mode-stats, false) executed (records-controller.js, line 194)
+[Log] 🔍 [Grouping] レッスングループ化開始（lessonId方式） (records-controller.js, line 997)
+[Log] 🔍 [Grouping] 総セッション数: 100 (records-controller.js, line 998)
+[Log] ℹ️ [Repair] lessonId修復機能は無効化されています（SessionManager導入済み） (records-controller.js, line 846)
+[Log]    理由: 正常なデータを誤って統合するリスクを回避 (records-controller.js, line 847)
+[Warning] ⚠️ [SessionDataManager] 不完全レッスン除外: continuous（6/12セッション）[lesson_1763567646794_continuous_random_ascending] (session-data-manager.js, line 397)
+[Warning] ⚠️ [SessionDataManager] 不完全レッスン除外: continuous（1/12セッション）[lesson_1763554402575_continuous_ascending_ascending] (session-data-manager.js, line 397)
+[Warning] ⚠️ [SessionDataManager] 不完全レッスン除外: continuous（1/12セッション）[lesson_1763357785406_continuous_random_ascending] (session-data-manager.js, line 397)
+[Warning] ⚠️ [SessionDataManager] 不完全レッスン除外: 12tone（3/12セッション）[lesson_1763357728459_12tone_ascending_ascending] (session-data-manager.js, line 397)
+[Warning] ⚠️ [SessionDataManager] 不完全レッスン除外: random（1/8セッション）[lesson_1763357498494_random_random_ascending] (session-data-manager.js, line 397)
+[Warning] ⚠️ [SessionDataManager] 不完全レッスン除外: continuous（8/12セッション）[lesson_1763343893034_continuous_random_ascending] (session-data-manager.js, line 397)
+[Log] 📊 [SessionDataManager] 全レッスン: 12件, 完全レッスン: 6件 (session-data-manager.js, line 402)
+[Log] ✅ [Filtering] 完全レッスンのみフィルタリング: 6レッスン (records-controller.js, line 1011)
+[Log] [Records] 総レッスン数: 6, 表示件数: 3, 表示: 3件, 残り: 3件 (records-controller.js, line 720)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] ⚠️ 警告: 20音が800¢を超えています（全96音） (evaluation-calculator.js, line 202)
+[Log] ✅ 基本メトリクス: – {avgError: 484.7, excellenceRate: 0.771, stability: 978.6, …} (evaluation-calculator.js, line 33)
+{avgError: 484.7, excellenceRate: 0.771, stability: 978.6, totalNotes: 96, excellentNotes: 74, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: true}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] ⚠️ 警告: 82音が800¢を超えています（全96音） (evaluation-calculator.js, line 202)
+[Log] ✅ 基本メトリクス: – {avgError: 1527.7, excellenceRate: 0.063, stability: 726.2, …} (evaluation-calculator.js, line 33)
+{avgError: 1527.7, excellenceRate: 0.063, stability: 726.2, totalNotes: 96, excellentNotes: 6, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: false}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
+[Log] 📊 動的グレード計算開始: – [Object, Object, Object, …] (12) (evaluation-calculator.js, line 18)
+[Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, …]Array (12)
+[Log] ✅ モード検出: – {mode: "continuous", name: "連続チャレンジモード", level: "中級", …} (evaluation-calculator.js, line 25)
+{mode: "continuous", name: "連続チャレンジモード", level: "中級", target: "実用的相対音感レベル", actualSessions: 12}Object
+[Log] ✅ デバイス品質: – {quality: "standard", factor: 1, accuracy: "±15¢", …} (evaluation-calculator.js, line 29)
+{quality: "standard", factor: 1, accuracy: "±15¢", message: "標準精度で測定中（約±15¢のデバイス誤差を含む）", sampleRate: 48000}Object
+[Log] ⚠️ 警告: 95音が800¢を超えています（全96音） (evaluation-calculator.js, line 202)
+[Log] ✅ 基本メトリクス: – {avgError: 2464.6, excellenceRate: 0, stability: 699.2, …} (evaluation-calculator.js, line 33)
+{avgError: 2464.6, excellenceRate: 0, stability: 699.2, totalNotes: 96, excellentNotes: 0, …}Object
+[Log] ✅ 調整後メトリクス: – {raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}} (evaluation-calculator.js, line 37)
+{raw: Object, adjusted: Object, adjustmentInfo: {factor: 1, quality: "standard", explanation: "標準精度で測定（デバイス誤差 ±15¢を含む）"}}Object
+[Log] ✅ モード別基準: – {thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"} (evaluation-calculator.js, line 41)
+{thresholds: Object, sessionCount: 12, explanation: "12セッション（中級）基準適用"}Object
+[Log] ✅ グレード判定: – {grade: "E", achievedBy: {avgError: false, excellence: false}, thresholds: {avgError: 75, excellence: 0.25}} (evaluation-calculator.js, line 45)
 [Log] ✅ [LUCIDE] Icons initialized (lucide-init.js, line 79)
-[Log] ✅ [HOME] Direction tabs initialized - restored to: ascending (home-direction-tabs.js, line 85)
-[Error] Failed to load resource: the server responded with a status of 404 (File not found) (index.js.map, line 0)
-[Error] Failed to load resource: the server responded with a status of 404 (File not found) (pitchpro.umd.js.map, line 0)
+[Log] [Records] hideLoading called for section: sessions (records-controller.js, line 190)
+[Log] [Records] LoadingComponent.toggle(sessions, false) executed (records-controller.js, line 194)

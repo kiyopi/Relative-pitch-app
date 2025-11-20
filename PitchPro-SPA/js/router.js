@@ -3,6 +3,7 @@
  * Based on vanilla JS + 自作SPA development roadmap
  *
  * Changelog:
+ *   v2.3.0 (2025-11-20) - training page cleanup改善（NavigationManager統合徹底化の完成）
  *   v2.2.0 (2025-11-19) - preparation page cleanup改善（NavigationManager管理時はスキップ、二重破棄防止）
  *   v2.1.0 (2025-11-19) - records page cleanup追加（AudioDetector適切な破棄、メモリリーク防止）
  */
@@ -73,8 +74,19 @@ class SimpleRouter {
                 cleanup: async () => {
                     console.log('🧹 [Router] Cleaning up training page...');
 
-                    // 音声検出停止（NavigationManagerが既に実行している場合はスキップ）
-                    // ⚠️ 重要: training → result-session遷移はNavigationManagerが管理
+                    // NavigationManagerが管理している場合はスキップ（トレーニングフロー内遷移）
+                    // training → result-session, training → results-overview は NavigationManagerが管理
+                    if (window.NavigationManager?.currentAudioDetector) {
+                        console.log('✅ [Router] AudioDetectorはNavigationManagerが管理中 - cleanup スキップ');
+                        // 初期化フラグのみリセット
+                        if (typeof window.resetTrainingPageFlag === 'function') {
+                            window.resetTrainingPageFlag();
+                            console.log('✅ [Router] Training page flag reset');
+                        }
+                        return;
+                    }
+
+                    // NavigationManagerが管理していない場合のみクリーンアップ
                     // training → home等の遷移はRouterが管理
                     if (window.audioDetector) {
                         console.log('🛑 [Router] Stopping AudioDetector...');

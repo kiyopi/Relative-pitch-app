@@ -12204,3 +12204,410 @@ ModeController v2.1.0更新:
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-19 17:45:01] コミット: feat(analysis): MODE_DEFINITIONS完全版追加とモード正規化・親モード集計機能実装
+
+- MODE_DEFINITIONS完全版追加（10モード + 将来拡張対応）
+  - 親モード4種類（beginner/intermediate/advanced/weakness）
+  - 個別モード10種類（方向・提示順序対応）
+  - 12音階サブグループ定義（上昇順・下降順・両方向）
+
+- normalizeSessionMode関数実装
+  - セッションデータからモードキーを正規化
+  - 12音階の提示順序（asc/desc/both）対応
+  - 後方互換性確保
+
+- calculateParentModeStats関数実装
+  - 親モード別統計計算
+  - 子モード別セッションフィルタリング
+  - 平均誤差・総セッション数集計
+
+Version: 2.0.0
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-19 18:12:58] コミット: feat: PitchShifter自動初期化とホーム準備スキップ実装
+
+NavigationManagerにPitchShifter自動初期化を統合し、
+ホームページ・総合評価ページからの準備スキップ機能を完全実装。
+基音再生時のブチ音問題を根本解決。
+
+主要な変更:
+- NavigationManager.navigateToTraining(): PitchShifter自動初期化追加
+  トレーニング開始時に自動的にバックグラウンド初期化を実行
+- router.js setupHomeEvents(): ホームページ準備スキップ実装
+  マイク許可・音域データ保存済みの場合、準備ページをスキップして
+  ダイレクトにトレーニング開始
+- trainingController.js: 初期化待ち表示追加
+  万が一初期化未完了の場合、ボタンテキストを「準備中...」に変更
+
+技術的改善:
+- 重複コード削除: 12箇所でPitchShifter初期化を個別実装する必要を排除
+- 保守性向上: NavigationManagerで一元管理、将来の実装でも自動適用
+- UX改善: ページ遷移中に初期化完了、基音再生が即座に可能
+- ブチ音解決: 初期化直後の不安定な状態での再生を回避
+
+動作確認済み:
+- ホーム → 準備スキップ → トレーニング（即座に基音再生）
+- 総合評価 → 準備スキップ → トレーニング（即座に基音再生）
+- 準備スキップ不可時の通常動線（既存通り動作）
+- 初期化未完了時の「準備中...」表示（フォールバック）
+
+修正箇所:
+- /PitchPro-SPA/js/navigation-manager.js (navigateToTraining)
+- /PitchPro-SPA/js/router.js (setupHomeEvents)
+- /PitchPro-SPA/js/controllers/trainingController.js (初期化待ち表示)
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-19 18:38:01] コミット: feat(premium): 親モードカードUI実装完了
+
+- premium-analysis.cssに親モードカード用スタイル追加
+- premium-analysis-controller.jsにアコーディオン機能実装
+- 4つの親モード（初級・中級・上級・弱点）カード表示対応
+- 展開/折りたたみアニメーション実装
+- iPad対応でglass-card opacity調整（0.04）
+- インラインスタイル削除、CSS class統一
+- Serenaメモリに実装詳細記録
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-19 18:49:22] コミット: fix(navigation): 準備スキップ判定の3層防御アプローチ実装（v4.3.4）
+
+## 問題
+ホームページリロード後に「始める」ボタンを押すと、localStorageは
+「micPermissionGranted=true」だが実際のMediaStreamは破棄されており、
+準備スキップ判定が誤ってtrueを返し、トレーニングページで
+マイク許可ダイアログが再表示される問題が発生。
+
+## 解決策: 3層防御アプローチ
+
+### NavigationManager.canSkipPreparation() 修正
+- **Layer 1: リロード検出** (performance.navigation.type === 1)
+  → リロード時は即座にfalseを返す（最も確実な防御）
+- **Layer 2: localStorage確認** (mic許可・音域データ)
+  → 基本的なデータ存在チェック
+- **Layer 3: Permissions API** (navigator.permissions.query)
+  → 実際のマイク権限状態を確認
+- **フォールバック**: Permissions API未サポート時は安全側に倒す
+
+### async/await対応（全13箇所）
+- router.js: setupHomeEvents() を async 化 + await 追加（1箇所）
+- results-overview-controller.js: 全next-stepボタンを async 化（12箇所）
+
+## 動作テスト結果（全3ケース成功）
+
+1. **ホームリロード→準備ページ経由**
+   - Layer 1: ページリロード検出 → 準備ページへ正常遷移 ✅
+
+2. **準備ページ→トレーニング**
+   - PitchShifterグローバルインスタンス再利用
+   - 基音再生成功（ブチ音なし） ✅
+
+3. **総合評価→準備スキップ→トレーニング**
+   - 3層すべてパス → 準備スキップ成功
+   - 12音階上昇モード正常動作 ✅
+
+## 変更ファイル
+- PitchPro-SPA/js/navigation-manager.js (lines 282-339)
+- PitchPro-SPA/js/router.js (line 699: async追加, line 722: await追加)
+- PitchPro-SPA/pages/js/results-overview-controller.js (12箇所async/await追加)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-19 19:18:50] コミット: docs(specs): 仕様書更新 - 3層防御アプローチとモード一覧の完全文書化
+
+- NAVIGATION_RELOAD_DETECTION_SPECIFICATION.md v2.2.0更新
+  - 準備スキップ判定システムの3層防御アプローチを完全文書化
+  - 問題背景・実装詳細・テスト結果（全5ケース成功）を記録
+  - Layer 1-3の詳細な仕様と設計の利点を明記
+
+- SPA_ARCHITECTURE_SPECIFICATION.md v1.1.0更新
+  - トレーニングモード一覧セクション追加（3モード完全解説）
+  - ナビゲーション安全機構セクション追加
+    - 準備ページスキップ機能の目的・UX改善効果
+    - スキップ可能な条件（4項目）と遷移元一覧表
+    - 典型的なユーザーフロー（初回 vs 2回目以降）
+    - 3層防御アプローチによる安全性保証
+  - 将来の拡張計画（弱点練習モード追加予定）を記載
+  - ModeController API仕様とモード間の違い比較表を追加
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-19 20:02:24] コミット: refactor(mode): モード名表示の短縮形をデフォルト化とハードコード削減
+
+- ModeController v2.2.0: getDisplayName()にuseShortNameパラメータ追加
+- デフォルトをtrue（短縮形）に設定し、全環境で統一表示
+- evaluation-calculator.js: MODE_DEFINITIONS重複定義をModeController使用に変更
+- trainingController.js: モバイル判定削除、デフォルト動作に統一
+- preparation-pitchpro-cycle.js: モバイル判定削除、デフォルト動作に統一
+- 表示例: "ランダム基音モード 上行" → "ランダム基音 上行"
+- 効果: モバイル改行問題解決、コード簡潔化、一元管理実現
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-19 20:38:36] コミット: refactor(premium-analysis): 脳内ピアノ理論を経験則ベースの音域ブロック分析に変更
+
+科学的根拠のない「脳内ピアノ理論」を削除し、経験則に基づく「音域ブロック分析」に変更しました。
+これにより、他アプリとの差別化を図りつつ、より穏健なアプローチで相対音感向上を支援します。
+
+【主な変更内容】
+- セクション名: 「脳内処理パターン分析」→「音域ブロック分析」
+- ブロック名: 「左脳処理音」「両脳処理音」→「Aブロック (C〜F#)」「Bブロック (G〜B)」
+- 理論的根拠: 脳内ピアノ理論の説明を削除 → 経験則ベースの説明に変更
+- 分析メッセージ: 両ブロックの誤差を均等に改善することで相対音感向上を期待
+
+【変更ファイル】
+- premium-analysis.html: UI表示テキストとセクション構造を変更、親モードアコーディオンコンテナ追加
+- premium-analysis-calculator.js: calculateBrainProcessingPattern()のコメント・説明文を経験則ベースに変更
+- premium-analysis-controller.js: UI更新関数のコメント・説明文を変更
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-19 21:38:27] コミット: fix(premium-analysis): 全モードのデータを統合表示に変更
+
+従来は連続チャレンジモードのみ表示していたが、すべてのモード（ランダム基音、連続チャレンジ、12音階）のデータを統合して分析するように変更。
+
+【変更内容】
+- モード別フィルタリングを削除
+- 全セッションデータを分析対象に変更
+- モード別の詳細は親モードカードで表示
+
+【効果】
+- ランダム基音、12音階のレッスンデータも反映
+- 最近のレッスン結果がすぐに確認可能
+- より包括的な音感分析が可能
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-19 23:25:23] コミット: fix(premium-analysis): データ構造修正・絵文字をLucideアイコンに統一・色の統一
+
+## 主な変更
+
+### 1. データ構造の修正
+- session.steps → session.pitchErrors に統一
+- step.pitchError → pitchErrorData.errorInCents に変更
+- step.interval → pitchErrorData.step + 1 で音程を計算
+- step.note → pitchErrorData.expectedNote に変更
+
+### 2. 絵文字をLucideアイコンに統一
+- MODE_DEFINITIONS の level フィールドを levelIcon に変更
+- 初級: 🔰 → shuffle
+- 中級: 🥉 → zap
+- 上級: 🥇 → music
+- 特別: 🎯 → locate-fixed
+
+### 3. 色の統一（トップページと一致）
+- beginner: blue → green
+- intermediate: green → orange
+- advanced: purple（変更なし）
+
+### 4. UI実装
+- parent-mode-level-icon スタイル追加
+- Lucideアイコン初期化処理を追加
+- text-{color}-300 クラスで動的に色を設定
+
+### 5. 仕様書更新
+- PREMIUM_ANALYSIS_DESIGN_SPECIFICATION.md を v2.1.0 に更新
+- データ構造の詳細を追加（pitchErrors配列の使用方法）
+- MODE_DEFINITIONS の変更を反映
+- 変更履歴セクションを追加
+
+## 影響範囲
+- premium-analysis-calculator.js: 全ての計算関数を修正
+- premium-analysis-controller.js: アイコン表示とLucide初期化を追加
+- premium-analysis.css: アイコンスタイルを追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-20 10:09:44] コミット: feat(navigation): PitchProエラーハンドリングとの統合によるリロード処理改善
+
+- PitchProConfig.jsにnotifications設定追加（v1.1.0）
+- training/result-sessionページでリロード時にPitchProのエラー通知を活用
+- Safariバックグラウンドリロード後の自然なUX向上（alert()削除）
+- preparationページは現状維持（マイクテスト・音域テストがあるため）
+
+主な変更:
+- pitchpro-config.js: notifications設定追加（enabled, position, theme）
+- navigation-manager.js (v4.4.0): checkPageAccess() Reactiveアプローチ導入
+- PAGE_CONFIG: training/result-sessionのreloadMessage・reloadRedirectTo削除
+
+安全性:
+- performance.navigation.typeの永続性を活用した準備スキップ機能との整合性確保
+- 次回トレーニング開始時は必ず準備ページ経由（音域データ必ず更新）
+- PitchProのErrorNotificationSystemによる適切なマイクエラー通知
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-20 11:33:33] コミット: refactor(evaluation): 外れ値戦略の根本的再設計 - 自動除外廃止・警告表示へ移行
+
+## 主要な変更
+
+### 設計思想の転換
+- 旧: システムが自動除外 → ユーザーを守る
+- 新: システムは警告のみ → ユーザーが判断・削除
+
+### 変更理由
+1. レッスン削除機能の実装により、ユーザー自身が判断可能に
+2. 下行モード追加で500¢のずれが実力として頻繁に発生
+3. 「測定エラーか実力か」の判断はユーザーが行うべき
+
+### 実装詳細
+
+**evaluation-calculator.js:**
+- 外れ値除外ロジック削除（150-180¢閾値削除）
+- すべてのデータで平均誤差・安定性を計算
+- 800¢超は警告フラグのみ（評価計算に影響なし）
+
+**results-overview-controller.js:**
+- 平均誤差計算を全データに変更（除外なし）
+- 800¢超の音を赤背景 + alert-circleアイコンで表示
+- 警告メッセージ更新: 「大きな誤差が検出されました。正常に測定できなかった可能性があります。詳細分析で確認し、必要に応じてレッスン削除機能をご利用ください。」
+
+**DistributionChart.js:**
+- 800¢超のデータを評価分布（Excellent/Good/Pass/Practice）から除外
+- 統計の純粋性を保持
+
+### 主要な設計判断
+
+1. **なぜ除外を廃止？**
+   - レッスン削除機能で対処可能
+   - データの透明性向上
+   - シンプルな実装
+
+2. **なぜ800¢閾値？**
+   - 8半音（半オクターブ以上）は明らかに異常
+   - 下行モードで500¢は実力として起こりうる
+   - データ収集後に最適化予定
+
+3. **なぜ評価分布からは除外？**
+   - 測定エラーを含めると統計が歪む
+   - 4段階評価（Excellent/Good/Pass/Practice）の明確性維持
+   - レッスンごと削除すべきデータ
+
+### データ収集と最適化
+- 800¢超の発生頻度を収集
+- モード別（上行 vs 下行）の発生率分析
+- 最適閾値の検証・調整
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-20 12:52:23] コミット: fix(ui): 800¢超エラー表示のamber色統一と評価分布への包含
+
+## 主要な変更
+
+### UI色の統一
+- 800¢超のエラー表示をamber色に統一（Practice評価の赤と区別）
+- note-result-item: amber背景 + alert-circleアイコン（amber）
+- warning-alert: amber背景 + alert-circleアイコン（amber）
+
+### 評価分布の修正
+- **重要**: 800¢超のデータも評価分布に包含（Practiceとしてカウント）
+- 外れ値自動除外廃止の設計方針に合わせて修正
+- すべてのデータを成績に反映し、ユーザーが削除機能で対処
+
+### 実装詳細
+
+**base.css:**
+- `.text-amber-500` クラス追加（#f59e0b - warning-alertと同じ色）
+
+**results.css:**
+- `.note-result-item.error-outlier` スタイル追加
+  - 背景: `rgba(245, 158, 11, 0.1)` (amber)
+  - ボーダー: `rgba(245, 158, 11, 0.2)` (amber)
+  - ホバー時に濃いamber背景
+
+**results-overview-controller.js:**
+- 800¢超のアイコン色: `text-red-400` → `text-amber-500`
+- 800¢超のクラス: `bg-red-900 bg-opacity-20` → `error-outlier`
+- warning-alertアイコン色: `text-red-400` → `text-amber-500`
+- 警告メッセージ更新: 「削除はトレーニング記録ページのトレーニング履歴からでも行えます」追加
+
+**DistributionChart.js:**
+- 800¢超の除外処理を削除
+- すべてのデータを評価分布に含める（Practice評価としてカウント）
+
+### 設計思想
+
+**色分けによる区別:**
+- Practice評価（50-800¢超）: 薄いピンク (text-red-300) + alert-triangle
+- 800¢超エラー: amber色 (text-amber-500) + alert-circle
+- アイコンの形と色で明確に区別可能
+
+**評価分布の一貫性:**
+- 平均誤差: 全データで計算（除外なし）
+- 評価分布: 全データで集計（除外なし）
+- 警告表示: 800¢超がある場合のみ表示
+- ユーザー判断: レッスン削除機能で対処
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-20 16:59:03] コミット: fix(navigation): マイク許可ダイアログ再出現問題を解決（Layer 4追加）
+
+- canSkipPreparation()に4層目の防御（AudioDetector存在・有効性確認）を追加
+- records/premium-analysis/settings/results-overview → home → modeパターンでマイク許可ダイアログが再出現する問題を解決
+- recordsページ「新しいトレーニングを開始」ボタンを削除（UXシンプル化）
+
+変更ファイル:
+- navigation-manager.js: Layer 4追加、4層防御システム完成
+- records.html: 冗長なボタンセクション削除
+- records-controller.js: 表示制御ロジック削除
+- MICROPHONE_PERMISSION_COMPREHENSIVE_CASES.md: 包括的な仕様書作成（13ケース分析）
+
+解決したケース:
+- ケース8-11: 4つの異なるページからhome経由でトレーニング開始時のマイク許可再要求を防止
+
+仕様詳細: PitchPro-SPA/specifications/MICROPHONE_PERMISSION_COMPREHENSIVE_CASES.md
+実装記録: .serena/memories/PERM-microphone-permission-layer4-implementation-20251120-1700.md
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-20 17:22:26] コミット: fix(navigation): results-overview→preparationパターン追加でデグレード解消
+
+問題:
+- 総合評価から12音階モード選択時に準備ページが表示される（デグレード）
+- 最も重要なユースケース「結果→次のモード→直接トレーニング開始」が機能しない
+
+原因:
+- isTrainingFlow()に['results-overview', 'preparation']パターンが欠落
+- results-overview → preparationがトレーニングフロー外と判定される
+- AudioDetectorが破棄される
+- Layer 4で「AudioDetector未初期化」と判定 → 準備ページ表示
+
+修正:
+- isTrainingFlow()に['results-overview', 'preparation']パターンを追加
+- AudioDetectorがトレーニングフロー内で保持される
+- canSkipPreparation() Layer 4パス → 準備スキップ → 直接トレーニング開始
+
+影響:
+- 総合評価→practice/upgradeボタンで準備スキップ可能に（期待動作）
+- AudioDetector再利用でマイク許可ダイアログなし
+- Layer 4実装の本来の目的を達成
+
+関連:
+- 前回コミット3b9db90でLayer 4追加したが、フローパターン追加を失念
+- Serenaメモリ PERM-microphone-permission-skip-analysis-20251119 で指摘済みの問題
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-20 17:29:10] コミット: chore: navigation-manager.jsのキャッシュバスター更新
+
+- isTrainingFlowパターン追加の修正を反映
+- タイムスタンプ: 1763568849 → 1763627276
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

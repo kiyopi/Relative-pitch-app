@@ -1080,6 +1080,71 @@ class DataManager {
   }
 
   /**
+   * 特定のレッスンを削除
+   *
+   * @param {string} lessonId - 削除するレッスンのID
+   * @returns {Object} { success: boolean, deletedCount: number, message: string }
+   */
+  static deleteLesson(lessonId) {
+    try {
+      if (!lessonId) {
+        return {
+          success: false,
+          deletedCount: 0,
+          message: 'レッスンIDが指定されていません'
+        };
+      }
+
+      let deletedCount = 0;
+
+      // 1. セッションデータから該当レッスンを削除
+      const sessions = this.getFromStorage(this.KEYS.SESSION_DATA) || [];
+      const filteredSessions = sessions.filter(session => session.lessonId !== lessonId);
+      const sessionDeletedCount = sessions.length - filteredSessions.length;
+
+      if (sessionDeletedCount > 0) {
+        this.saveToStorage(this.KEYS.SESSION_DATA, filteredSessions);
+        deletedCount += sessionDeletedCount;
+        console.log(`✅ セッションデータから${sessionDeletedCount}件削除`);
+      }
+
+      // 2. 総合評価データから該当レッスンを削除
+      const evaluations = this.getFromStorage(this.KEYS.OVERALL_EVALUATION) || [];
+      const filteredEvaluations = evaluations.filter(evaluation => evaluation.lessonId !== lessonId);
+      const evalDeletedCount = evaluations.length - filteredEvaluations.length;
+
+      if (evalDeletedCount > 0) {
+        this.saveToStorage(this.KEYS.OVERALL_EVALUATION, filteredEvaluations);
+        deletedCount += evalDeletedCount;
+        console.log(`✅ 総合評価データから${evalDeletedCount}件削除`);
+      }
+
+      if (deletedCount === 0) {
+        return {
+          success: false,
+          deletedCount: 0,
+          message: '指定されたレッスンIDが見つかりませんでした'
+        };
+      }
+
+      console.log(`✅ レッスン削除完了: lessonId=${lessonId}, 削除件数=${deletedCount}`);
+      return {
+        success: true,
+        deletedCount: deletedCount,
+        message: `レッスンを削除しました（${deletedCount}件のデータを削除）`
+      };
+
+    } catch (error) {
+      console.error('❌ レッスン削除失敗:', error);
+      return {
+        success: false,
+        deletedCount: 0,
+        message: `削除に失敗しました: ${error.message}`
+      };
+    }
+  }
+
+  /**
    * 音域テスト結果のみ削除
    */
   static resetVoiceRangeData() {

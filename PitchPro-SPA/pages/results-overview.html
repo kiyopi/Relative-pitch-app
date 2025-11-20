@@ -369,6 +369,31 @@
                         <p class="text-caption mt-2">月額480円 • いつでもキャンセル可能</p>
                     </div>
                 </section>
+
+                <!-- 危険ゾーン（Danger Zone） -->
+                <section class="glass-card danger-zone" id="danger-zone-section" style="display: none;">
+                    <h2 class="heading-md text-red-400">
+                        <i data-lucide="alert-triangle" style="width: 24px; height: 24px;"></i>
+                        <span>危険ゾーン</span>
+                    </h2>
+                    <p class="text-white-60 text-sm mb-4">
+                        このセクションの操作は元に戻せません。慎重に実行してください。
+                    </p>
+                    <div class="danger-zone-content">
+                        <div class="danger-zone-item">
+                            <div class="danger-zone-info">
+                                <h3 class="text-white font-semibold">このレッスンを削除</h3>
+                                <p class="text-white-60 text-sm">
+                                    このレッスンのすべてのデータ（セッション記録・総合評価）を削除します。
+                                </p>
+                            </div>
+                            <button class="btn btn-danger" onclick="confirmDeleteLesson()">
+                                <i data-lucide="trash-2"></i>
+                                <span>削除</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
         </main>
 
         <!-- 総合グレード説明ポップオーバー -->
