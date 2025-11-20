@@ -653,24 +653,22 @@ window.showSessionDetail = function(sessionIndex) {
         }
     });
 
-    // 2. 【追加】外れ値を除外した平均誤差を計算（固定閾値180¢）
+    // 2. すべてのデータで平均誤差を計算（除外なし）
     const errors = session.pitchErrors
         ? session.pitchErrors.map(e => Math.abs(e.errorInCents))
         : [];
 
-    const outlierThreshold = 180; // 全デバイス共通の固定閾値
+    const avgError = errors.length > 0
+        ? errors.reduce((sum, e) => sum + e, 0) / errors.length
+        : 0;
 
-    const validErrors = errors.filter(e => e <= outlierThreshold);
-    const outlierCount = errors.length - validErrors.length;
+    // 800¢超の警告用フラグ（評価計算には影響しない）
+    const outlierThreshold = 800;
+    const outlierCount = errors.filter(e => e > outlierThreshold).length;
     const outlierFiltered = outlierCount > 0;
 
-    let avgError;
-    if (validErrors.length > 0) {
-        avgError = validErrors.reduce((sum, e) => sum + e, 0) / validErrors.length;
-        console.log(`📊 外れ値除外: ${outlierCount}音除外（${outlierThreshold}¢超）、有効音: ${validErrors.length}/${errors.length}`);
-    } else {
-        avgError = errors.reduce((sum, e) => sum + e, 0) / errors.length;
-        console.warn('⚠️ すべての音が外れ値と判定されました。元の値を使用します。');
+    if (outlierFiltered) {
+        console.log(`⚠️ 警告: ${outlierCount}音が${outlierThreshold}¢を超えています（全${errors.length}音）`);
     }
 
     // 3. タイトルを更新
@@ -721,8 +719,8 @@ window.showSessionDetail = function(sessionIndex) {
             if (isOutlier) {
                 evaluation = {
                     icon: 'alert-circle',
-                    color: 'text-amber-400',
-                    label: '外れ値'
+                    color: 'text-red-400',
+                    label: '測定エラー'
                 };
             } else {
                 evaluation = window.EvaluationCalculator.evaluatePitchError(absError);
@@ -732,6 +730,12 @@ window.showSessionDetail = function(sessionIndex) {
 
             const noteElement = document.createElement('div');
             noteElement.className = 'note-result-item';
+
+            // 800¢超の場合は赤背景を追加
+            if (isOutlier) {
+                noteElement.classList.add('bg-red-900', 'bg-opacity-20');
+            }
+
             noteElement.innerHTML = `
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-4">
@@ -992,8 +996,13 @@ function initializeCharts(sessionData) {
     });
 
     // ローディング非表示・コンテンツ表示
+    console.log('🔍 [initializeCharts] LoadingComponent:', typeof window.LoadingComponent);
     if (window.LoadingComponent) {
+        console.log('📊 [initializeCharts] LoadingComponent.toggle("chart", false) 実行中...');
         window.LoadingComponent.toggle('chart', false);
+        console.log('✅ [initializeCharts] ローディング非表示完了');
+    } else {
+        console.error('❌ [initializeCharts] LoadingComponentが見つかりません');
     }
 }
 
@@ -1633,10 +1642,10 @@ function displayOutlierExplanationOverview(outlierFiltered, outlierCount, outlie
     if (outlierFiltered) {
         explanationContainer.innerHTML = `
             <div class="warning-alert">
-                <i data-lucide="alert-circle" class="text-amber-400"></i>
+                <i data-lucide="alert-circle" class="text-red-400"></i>
                 <div>
-                    <p><strong>外れ値について</strong></p>
-                    <p>このセッションで<strong>${outlierCount}音</strong>が外れ値として除外されました。外れ値とは<strong>${outlierThreshold}¢（約${(outlierThreshold / 100).toFixed(1)}半音）を超える大きな誤差</strong>のことです。これは測定エラーの可能性もありますが、特定の音程が本当に苦手な場合もあります。平均誤差の計算精度を保つため、これらの値は除外されていますが、詳細分析で確認することをおすすめします。</p>
+                    <p><strong>大きな誤差について</strong></p>
+                    <p>大きな誤差が検出されました。正常に測定できなかった可能性があります。詳細分析で確認し、必要に応じてレッスン削除機能をご利用ください。</p>
                 </div>
             </div>
         `;
@@ -1799,7 +1808,14 @@ function handleRecordsViewMode() {
         console.log('✅ 実行日時を表示');
     }
 
-    // トレーニング記録へ戻るボタンを追加（containerの一番下に配置）
+    // Danger Zoneセクションを表示
+    const dangerZoneSection = document.getElementById('danger-zone-section');
+    if (dangerZoneSection) {
+        dangerZoneSection.style.display = 'block';
+        console.log('✅ Danger Zoneセクションを表示');
+    }
+
+    // トレーニング記録へ戻るボタンを追加（Danger Zoneの後に配置）
     const container = document.querySelector('.container.container-results-overview');
     if (container) {
         const backButtonWrapper = document.createElement('div');
@@ -1819,11 +1835,78 @@ function handleRecordsViewMode() {
     }
 }
 
+/**
+ * レッスン削除の確認ダイアログを表示
+ */
+function confirmDeleteLesson() {
+    const lessonId = window.currentLessonId;
+    if (!lessonId) {
+        alert('レッスンIDが見つかりません');
+        return;
+    }
+
+    // 確認ダイアログ
+    const message = `このレッスンのすべてのデータを削除してもよろしいですか？\n\nレッスンID: ${lessonId}\n\nこの操作は元に戻せません。`;
+
+    if (confirm(message)) {
+        deleteLesson(lessonId);
+    }
+}
+
+/**
+ * レッスンを削除する
+ * @param {string} lessonId - 削除するレッスンID
+ */
+function deleteLesson(lessonId) {
+    try {
+        console.log(`🗑️ レッスン削除開始: ${lessonId}`);
+
+        // DataManagerで削除実行
+        const result = window.DataManager.deleteLesson(lessonId);
+
+        if (result.success) {
+            alert(result.message);
+            console.log(`✅ レッスン削除成功: ${result.deletedCount}件`);
+
+            // レコードページからの表示の場合はレコードページに戻る
+            const params = new URLSearchParams(window.location.hash.split('?')[1] || '');
+            const isFromRecords = params.get('fromRecords') === 'true';
+
+            if (isFromRecords) {
+                // レコードページに戻る
+                if (window.NavigationManager) {
+                    window.NavigationManager.navigate('records');
+                } else {
+                    window.location.hash = 'records';
+                }
+            } else {
+                // ホームページに戻る
+                if (window.NavigationManager) {
+                    window.NavigationManager.navigate('home');
+                } else {
+                    window.location.hash = 'home';
+                }
+            }
+        } else {
+            alert(`削除に失敗しました\n\n${result.message}`);
+            console.error('❌ レッスン削除失敗:', result.message);
+        }
+
+    } catch (error) {
+        alert(`削除中にエラーが発生しました\n\n${error.message}`);
+        console.error('❌ レッスン削除エラー:', error);
+    }
+}
+
 // グローバルに公開
 window.toggleGradePopover = toggleGradePopover;
 window.toggleSessionRankPopover = toggleSessionRankPopover;
+window.confirmDeleteLesson = confirmDeleteLesson;
+window.deleteLesson = deleteLesson;
 
 // グローバル関数が定義されたことを通知
 console.log('✅ [results-overview-controller] window.initResultsOverview defined');
 console.log('✅ [results-overview-controller] window.toggleGradePopover:', typeof window.toggleGradePopover);
 console.log('✅ [results-overview-controller] window.toggleSessionRankPopover:', typeof window.toggleSessionRankPopover);
+console.log('✅ [results-overview-controller] window.confirmDeleteLesson:', typeof window.confirmDeleteLesson);
+console.log('✅ [results-overview-controller] window.deleteLesson:', typeof window.deleteLesson);

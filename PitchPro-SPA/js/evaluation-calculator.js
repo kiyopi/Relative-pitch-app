@@ -190,35 +190,24 @@ class EvaluationCalculator {
       };
     }
 
-    // 【追加】外れ値フィルタリング（デバイス品質に応じた閾値）
-    // 基準値150¢ + デバイス誤差を外れ値閾値とする
-    const deviceErrorMargin = deviceInfo ? this.getDeviceErrorMargin(deviceInfo.quality) : 10;
-    const outlierThreshold = 150 + deviceErrorMargin;
+    // すべてのデータで平均誤差を計算（除外なし）
+    const avgError = totalError / totalNotes;
 
-    console.log(`📊 外れ値閾値: ${outlierThreshold}¢（基準150¢ + デバイス誤差${deviceErrorMargin}¢）`);
-
-    const validErrors = errors.filter(e => e <= outlierThreshold);
-    const outlierCount = errors.length - validErrors.length;
+    // 800¢超の警告用フラグ（評価計算には影響しない）
+    const outlierThreshold = 800;
+    const outlierCount = errors.filter(e => e > outlierThreshold).length;
     const outlierFiltered = outlierCount > 0;
 
-    // 外れ値除外後の平均誤差計算
-    let avgError;
-    if (validErrors.length > 0) {
-      avgError = validErrors.reduce((a, b) => a + b, 0) / validErrors.length;
-      console.log(`📊 外れ値除外: ${outlierCount}音除外（${outlierThreshold}¢超）、有効音: ${validErrors.length}/${errors.length}`);
-    } else {
-      // すべて外れ値の場合は元の値を使用
-      avgError = totalError / totalNotes;
-      console.warn('⚠️ すべての音が外れ値と判定されました。元の値を使用します。');
+    if (outlierFiltered) {
+      console.log(`⚠️ 警告: ${outlierCount}音が${outlierThreshold}¢を超えています（全${errors.length}音）`);
     }
 
     // 優秀音割合計算
     const excellenceRate = excellentNotes / totalNotes;
 
-    // 安定性計算（標準偏差）- 外れ値除外後のデータで計算
-    const targetErrors = validErrors.length > 0 ? validErrors : errors;
-    const mean = targetErrors.reduce((a, b) => a + b, 0) / targetErrors.length;
-    const variance = targetErrors.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / targetErrors.length;
+    // 安定性計算（標準偏差）- 全データで計算
+    const mean = errors.reduce((a, b) => a + b, 0) / errors.length;
+    const variance = errors.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / errors.length;
     const stability = Math.sqrt(variance);
 
     return {
