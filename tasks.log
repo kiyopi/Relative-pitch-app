@@ -12636,3 +12636,37 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-20 17:56:19] コミット: fix(navigation): training→results-overviewパターン追加でAudioDetector保持を完全化
+
+- isTrainingFlow()に['training', 'results-overview']パターン追加
+- 12音階モード（12-24セッション）完了時の直接遷移に対応
+- NavigationManagerによるAudioDetector破棄を防止
+
+【根本原因の完全特定】
+956ac8a（NavigationManager統合徹底化）で2つの統合漏れ：
+1. ❌ training cleanup: NavigationManagerチェックなし
+2. ❌ isTrainingFlow(): ['training', 'results-overview']パターンなし
+
+【問題の流れ】
+1. training → results-overview遷移（12音階モード完了時）
+2. isTrainingFlow()がfalseを返す（パターン未定義）
+3. NavigationManagerがAudioDetectorを破棄
+4. results-overview → preparation遷移
+5. Layer 4が「AudioDetector未初期化」検出
+6. 準備ページ強制表示（最重要ルートのデグレード）
+
+【完全な修正】
+c39b584: router.js training cleanupに統合徹底化適用
+本コミット: isTrainingFlow()に不足パターン追加
+
+【トレーニングフローパターン完全版】
+- ['training', 'result-session'] - セッション完了
+- ['result-session', 'training'] - 次のセッション
+- ['preparation', 'training'] - 準備完了
+- ['result-session', 'results-overview'] - 8セッション完了（ランダム基音）
+- ['training', 'results-overview'] - 12-24セッション完了（12音階）← NEW
+- ['results-overview', 'preparation'] - 次のモード開始
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

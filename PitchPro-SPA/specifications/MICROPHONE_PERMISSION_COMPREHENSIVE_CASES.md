@@ -2,13 +2,28 @@
 
 **作成日**: 2025-11-20
 **最終更新日**: 2025-11-20
-**バージョン**: v2.0.0
-**ステータス**: ✅ Layer 4実装完了（v4.4.0）
+**バージョン**: v3.0.0
+**ステータス**: ✅ トレーニングフローパターン完全版（v4.4.0）
 **対象問題**: records → home → continuous challenge → skip preparation → training でマイク許可ダイアログが再出現する問題
 
 ---
 
 ## 🔄 アップデート履歴
+
+### v3.0.0 (2025-11-20) - ✅ トレーニングフローパターン完全版
+**実装内容**:
+- `isTrainingFlow()`に `['results-overview', 'home']` パターン追加
+- 総合評価 → ホーム経由トレーニング再開時のマイク保持実現
+- Layer 4自動判別により、記録ページ経由とトレーニング完了経由で適切に動作
+
+**変更ファイル**:
+- `/PitchPro-SPA/js/navigation-manager.js` - Line 686追加
+- `/PitchPro-SPA/index.html` - キャッシュバスター更新
+- `/PitchPro-SPA/specifications/MICROPHONE_PERMISSION_COMPREHENSIVE_CASES.md` - v3.0.0セクション追加
+
+**実現する動作**:
+- トレーニング完了 → 総合評価 → ホーム → 再開（準備スキップ✅）
+- 記録ページ → 総合評価 → ホーム → 開始（準備必須✅）
 
 ### v2.0.0 (2025-11-20) - ✅ Layer 4実装完了
 **実装内容**:
@@ -353,6 +368,92 @@ static async canSkipPreparation() {
 - **MICROPHONE_BACKGROUND_RESILIENCE.md**: バックグラウンド遷移時のマイク権限対処
 - **PERM-microphone-permission-skip-analysis-20251119**: マイク許可スキップ機能の詳細分析
 - **NAVIGATION_HANDLING_SPECIFICATION.md**: ナビゲーション処理の完全仕様
+
+---
+
+## 🔄 v3.0.0 (2025-11-20) - トレーニングフローパターン完全版
+
+### 追加実装: results-overview → home パターン
+
+**問題の発見**:
+- 総合評価 → 記録ページ: AudioDetector破棄（意図的、正しい）
+- 総合評価 → ホーム: AudioDetector破棄（意図せず、改善必要）
+
+**実装内容**:
+```javascript
+// navigation-manager.js - isTrainingFlow()
+const trainingFlowPatterns = [
+    ['training', 'result-session'],      // セッション完了
+    ['result-session', 'training'],      // 次のセッション
+    ['preparation', 'training'],         // 準備完了
+    ['result-session', 'results-overview'], // 8セッション完了（ランダム基音）
+    ['training', 'results-overview'],    // 12-24セッション完了（12音階モード）
+    ['results-overview', 'preparation'], // 総合評価から次のモード開始
+    ['results-overview', 'home'],        // 総合評価からホーム ← NEW
+];
+```
+
+### 実現する動作フロー
+
+#### パターン1: トレーニング完了 → 総合評価 → ホーム
+```
+training → results-overview（AudioDetector保持✅）
+  ↓
+ホームボタン
+  ↓
+home（AudioDetector保持✅）
+  ↓
+トレーニング開始ボタン
+  ↓
+Layer 4: AudioDetectorあり → 準備スキップ✅
+  ↓
+トレーニング直行（マイク許可ダイアログなし）
+```
+
+#### パターン2: 記録ページ → 総合評価 → ホーム
+```
+records → results-overview（AudioDetector破棄🗑️、fromRecords=true）
+  ↓
+ホームボタン
+  ↓
+home（AudioDetectorなし）
+  ↓
+トレーニング開始ボタン
+  ↓
+Layer 4: AudioDetectorなし → 準備ページ必須❌
+  ↓
+マイク許可取得（正しい動作）
+```
+
+### Layer 4による自動判別
+
+**同じホームボタンで異なる動作を自動実現**:
+- AudioDetectorあり → 準備スキップ（ユーザー体験向上）
+- AudioDetectorなし → 準備必須（安全性確保）
+
+### トレーニングフローパターン完全版（v3.0.0）
+
+| From | To | AudioDetector | 理由 |
+|------|-----|--------------|------|
+| training | result-session | 保持✅ | セッション完了 |
+| result-session | training | 保持✅ | 次のセッション |
+| preparation | training | 保持✅ | 準備完了 |
+| result-session | results-overview | 保持✅ | 8セッション完了（ランダム基音） |
+| training | results-overview | 保持✅ | 12-24セッション完了（連続・12音階） |
+| results-overview | preparation | 保持✅ | 次のトレーニング開始 |
+| results-overview | home | 保持✅ | ホーム経由再開（NEW v3.0.0） |
+| results-overview | records | 破棄🗑️ | 参照系ページ（マイク不要） |
+| results-overview | premium-analysis | 破棄🗑️ | 参照系ページ（マイク不要） |
+| results-overview | settings | 破棄🗑️ | 参照系ページ（マイク不要） |
+
+### 変更ファイル
+- `/PitchPro-SPA/js/navigation-manager.js` - Line 686: `['results-overview', 'home']` 追加
+- `/PitchPro-SPA/index.html` - navigation-manager.js キャッシュバスター更新
+
+### 設計の意図
+1. **トレーニングフロー継続**: 総合評価後もホーム経由でスムーズに再開
+2. **メモリ効率**: 参照系ページへの遷移時は確実に破棄
+3. **Layer 4による自動判別**: 経路に応じて適切な動作を自動選択
 
 ---
 

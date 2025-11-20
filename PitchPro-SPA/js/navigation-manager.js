@@ -683,6 +683,7 @@ class NavigationManager {
             ['result-session', 'results-overview'], // 8セッション完了（ランダム基音）
             ['training', 'results-overview'],    // 12-24セッション完了（12音階モード）
             ['results-overview', 'preparation'], // 総合評価から次のモード開始（practice/upgrade）
+            ['results-overview', 'home'],        // 総合評価からホーム（マイク保持、再開時に準備スキップ）
         ];
 
         return trainingFlowPatterns.some(
