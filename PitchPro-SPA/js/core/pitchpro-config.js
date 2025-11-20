@@ -6,8 +6,8 @@
  * - オクターブ誤認識・外れ値検出の問題を防止
  * - 保守性・拡張性の向上
  *
- * @version 1.0.0
- * @date 2025-11-09
+ * @version 1.1.0
+ * @date 2025-11-20
  */
 
 (function() {
@@ -117,6 +117,22 @@
                  * - 開発時のみtrueに設定
                  */
                 debug: options.debug || false,
+
+                // ========================================
+                // 通知システム設定（PitchPro ErrorNotificationSystem）
+                // ========================================
+
+                /**
+                 * 通知表示設定
+                 * - enabled: 通知システムの有効化
+                 * - position: 通知の表示位置
+                 * - theme: 通知のテーマ
+                 */
+                notifications: {
+                    enabled: true,
+                    position: 'top-right',
+                    theme: 'dark'
+                },
 
                 // ========================================
                 // カスタム設定の上書き許可

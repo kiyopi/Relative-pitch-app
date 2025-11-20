@@ -67,8 +67,21 @@
  * - PAGE_CONFIG・ALLOWED_TRANSITIONSから'results'削除
  * - コードベースのクリーンアップ完了（47行削減）
  *
- * @version 4.3.3
- * @date 2025-11-18
+ * 【v4.3.5更新】
+ * - バックグラウンド放置セッションの古いフラグ誤検出問題を解決
+ * - navigateToTraining()で古いtrainingPageActiveフラグを予防的にクリア
+ * - 新規トレーニング開始時に「準備ページから開始してください」誤表示を防止
+ * - バックグラウンド → 新規トレーニング開始フローの安定性向上
+ *
+ * 【v4.4.0更新】
+ * - PitchProエラーハンドリングとの統合によるリロード処理改善
+ * - training/result-sessionページでリロード時にPitchProのエラー通知を活用（Reactiveアプローチ）
+ * - Safariバックグラウンドリロード後の自然なUX向上（alert()削除、PitchProに委譲）
+ * - preparationページは現状維持（マイクテスト・音域テストがあるため）
+ * - PAGE_CONFIG: training/result-sessionのreloadMessage・reloadRedirectTo削除
+ *
+ * @version 4.4.0
+ * @date 2025-11-20
  */
 
 class NavigationManager {
@@ -98,6 +111,15 @@ class NavigationManager {
                 console.log('🔍 [NavigationManager] lastVisibilityChange更新:', this.lastVisibilityChange);
                 console.log('🔍 [NavigationManager] 現在のURL:', window.location.href);
                 console.log('🔍 [NavigationManager] performance.navigation.type:', performance.navigation?.type);
+
+                // グラフ状態のデバッグログ
+                const chartLoading = document.getElementById('chart-loading');
+                const chartContent = document.getElementById('chart-content');
+                if (chartLoading && chartContent) {
+                    console.log('📊 [DEBUG] chart-loading display:', chartLoading.style.display);
+                    console.log('📊 [DEBUG] chart-content display:', chartContent.style.display);
+                    console.log('📊 [DEBUG] window.resultsOverviewChart exists:', !!window.resultsOverviewChart);
+                }
             });
             this.visibilityTrackingInitialized = true;
             console.log('✅ [NavigationManager] visibilitychange監視を初期化');
@@ -418,11 +440,26 @@ class NavigationManager {
 
         // 1-4. results-overviewページのダイレクトアクセス検出
         if (page === 'results-overview' && config?.directAccessRedirectTo) {
-            // 正常な遷移経路チェック：training完了 or result-session完了
+            // 正常な遷移経路チェック：training完了 or result-session完了 or records遷移
             const hasCompletedTraining = sessionStorage.getItem('trainingPageActive') === 'true';
             const hasCompletedResultSession = sessionStorage.getItem('resultSessionPageActive') === 'true';
 
-            if (!hasCompletedTraining && !hasCompletedResultSession) {
+            // レコードページからの遷移チェック
+            // 【デバッグ】URLハッシュ確認
+            console.log('🔍 [DEBUG] window.location.hash:', window.location.hash);
+            const hashParts = window.location.hash.split('?');
+            console.log('🔍 [DEBUG] hashParts:', hashParts);
+            const params = new URLSearchParams(hashParts[1] || '');
+            const isFromRecords = params.get('fromRecords') === 'true';
+            console.log('🔍 [DEBUG] fromRecords param:', params.get('fromRecords'), 'isFromRecords:', isFromRecords);
+            console.log('🔍 [DEBUG] hasCompletedTraining:', hasCompletedTraining);
+            console.log('🔍 [DEBUG] hasCompletedResultSession:', hasCompletedResultSession);
+
+            if (isFromRecords) {
+                console.log('✅ [NavigationManager] レコードページからの正常な遷移を検出');
+            }
+
+            if (!hasCompletedTraining && !hasCompletedResultSession && !isFromRecords) {
                 console.log('⚠️ [NavigationManager] results-overviewページへのダイレクトアクセス検出');
 
                 if (config.directAccessMessage) {
@@ -443,6 +480,16 @@ class NavigationManager {
 
         // 3. リロード検出
         if (config?.preventReload && this.detectReload(page)) {
+            // training/result-sessionページ: PitchProに任せる（Reactiveアプローチ）
+            if (page === 'training' || page === 'result-session') {
+                console.log(`⚠️ [NavigationManager] ${page}ページでリロード検出 - PitchProのエラーハンドリングに委譲`);
+                // sessionStorageフラグのみクリア
+                sessionStorage.removeItem(page + 'PageActive');
+                // ページ初期化続行 → PitchProがマイクエラーを処理
+                return { shouldContinue: true, reason: 'reload-handled-by-pitchpro' };
+            }
+
+            // preparationページ: 現状維持（マイクテスト・音域テストがあるため）
             if (config.reloadMessage) {
                 alert(config.reloadMessage);
             }
@@ -540,6 +587,15 @@ class NavigationManager {
      */
     static navigateToTraining(mode = null, session = null, direction = null, scaleDirection = null) {
         console.log(`🚀 [NavigationManager] trainingへ遷移: mode=${mode || 'なし'}, session=${session || 'なし'}, direction=${direction || 'なし'}, scaleDirection=${scaleDirection || 'なし'}`);
+
+        // 【v4.3.5】古いtrainingPageActiveフラグをクリアして誤検出防止
+        // バックグラウンドで放置されたセッションのフラグが残っている場合、
+        // 新しいトレーニング開始時にリロードとして誤検出されるため削除
+        const oldFlag = sessionStorage.getItem('trainingPageActive');
+        if (oldFlag === 'true') {
+            sessionStorage.removeItem('trainingPageActive');
+            console.log('🧹 [NavigationManager] 古いtrainingPageActiveフラグを削除（新規トレーニング開始のため）');
+        }
 
         // 正常な遷移フラグを自動設定
         this.setNormalTransition();
@@ -931,16 +987,12 @@ class NavigationManager {
         },
         'training': {
             preventBackNavigation: true,
-            preventReload: true,  // リロード不可（マイク設定リセット防止）
-            reloadRedirectTo: 'preparation',  // リロード時のリダイレクト先
-            reloadMessage: 'リロードが検出されました。マイク設定のため準備ページに移動します。',
+            preventReload: true,  // リロード検出は継続（PitchProのエラーハンドリングに委譲）
             backPreventionMessage: 'トレーニング中です。\n\nブラウザバックは無効になっています。\nホームボタンからトップページに戻れます。'
         },
         'result-session': {
             preventBackNavigation: true,
-            preventReload: true,  // リロード不可（マイク許可リセット防止・次セッション破綻防止）
-            reloadRedirectTo: 'preparation',  // リロード時のリダイレクト先
-            reloadMessage: 'リロードが検出されました。マイク設定のため準備ページに移動します。',
+            preventReload: true,  // リロード検出は継続（PitchProのエラーハンドリングに委譲）
             directAccessRedirectTo: 'preparation',  // ダイレクトアクセス時のリダイレクト先
             directAccessMessage: 'セッション評価ページには正しいフローでアクセスしてください。準備ページに移動します。',
             backPreventionMessage: 'セッション評価中です。\n\nブラウザバックは無効になっています。\n「次の基音へ」ボタンまたはホームボタンをご利用ください。'
