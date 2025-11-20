@@ -164,11 +164,6 @@ async function loadTrainingRecords() {
             chartSection.classList.remove('hidden');
         }
 
-        const actionButtons = document.getElementById('action-buttons-section');
-        if (actionButtons) {
-            actionButtons.classList.remove('hidden');
-        }
-
         // セッションコンテンツを確実に表示
         const sessionsContent = document.getElementById('sessions-content');
         if (sessionsContent) {
@@ -676,15 +671,51 @@ async function displayEvaluationDistribution(sessions) {
 async function displaySessionList(sessions) {
     const container = document.getElementById('recent-sessions');
     const countEl = document.getElementById('records-count');
+    const loadMoreContainer = document.getElementById('load-more-container');
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    const remainingCountEl = document.getElementById('remaining-count');
 
     // セッションをレッスン単位にグループ化
     const lessons = groupSessionsIntoLessons(sessions);
 
     countEl.textContent = `${lessons.length}件`;
-    container.innerHTML = '';
 
-    // 最新10件のみ表示
-    const displayLessons = lessons.slice(0, 10);
+    // ソート処理
+    const sortSelect = document.getElementById('lesson-sort-select');
+    const sortType = sortSelect ? sortSelect.value : 'newest';
+    const sortedLessons = sortLessons(lessons, sortType);
+
+    // 初期表示件数（テスト用に一時的に削減）
+    const INITIAL_DISPLAY = 3;  // TODO: テスト後に20に戻す
+    const LOAD_MORE_COUNT = 3;  // TODO: テスト後に20に戻す
+
+    // 表示件数の管理
+    let currentDisplay = INITIAL_DISPLAY;
+
+    if (loadMoreBtn) {
+        // 表示管理用の変数をボタンに保存
+        if (!loadMoreBtn.dataset.initialized) {
+            loadMoreBtn.dataset.currentDisplay = INITIAL_DISPLAY;
+            loadMoreBtn.dataset.previousSortType = sortType;
+            loadMoreBtn.dataset.initialized = 'true';
+        }
+
+        // ソート変更時のみ表示件数をリセット
+        if (loadMoreBtn.dataset.previousSortType !== sortType) {
+            loadMoreBtn.dataset.currentDisplay = INITIAL_DISPLAY;
+            loadMoreBtn.dataset.previousSortType = sortType;
+        }
+
+        currentDisplay = parseInt(loadMoreBtn.dataset.currentDisplay || INITIAL_DISPLAY);
+    }
+
+    const displayLessons = sortedLessons.slice(0, currentDisplay);
+    const remaining = sortedLessons.length - currentDisplay;
+
+    console.log(`[Records] 総レッスン数: ${sortedLessons.length}, 表示件数: ${currentDisplay}, 表示: ${displayLessons.length}件, 残り: ${remaining}件`);
+
+    // コンテナをクリア
+    container.innerHTML = '';
 
     // 非同期で段階的に表示（UX向上）
     for (const lesson of displayLessons) {
@@ -694,10 +725,102 @@ async function displaySessionList(sessions) {
         await new Promise(resolve => setTimeout(resolve, 0));
     }
 
+    // もっと見るボタンの表示制御
+    if (loadMoreContainer && remainingCountEl) {
+        if (remaining > 0) {
+            loadMoreContainer.classList.remove('hidden');
+            remainingCountEl.textContent = remaining;
+        } else {
+            loadMoreContainer.classList.add('hidden');
+        }
+    }
+
     // 全カード追加後にLucideアイコンを一括初期化
     if (typeof window.initializeLucideIcons === 'function') {
         window.initializeLucideIcons({ immediate: true });
     }
+
+    // ソート変更イベントリスナー（初回のみ設定）
+    if (sortSelect && !sortSelect.dataset.listenerAdded) {
+        sortSelect.addEventListener('change', async () => {
+            // リセット処理はdisplaySessionList内で実行される
+            await displaySessionList(sessions);
+        });
+        sortSelect.dataset.listenerAdded = 'true';
+    }
+
+    // もっと見るボタンイベントリスナー（初回のみ設定）
+    if (loadMoreBtn && !loadMoreBtn.dataset.listenerAdded) {
+        loadMoreBtn.addEventListener('click', async () => {
+            console.log('[Records] もっと見るボタンクリック');
+            const currentVal = parseInt(loadMoreBtn.dataset.currentDisplay);
+            const newDisplay = currentVal + LOAD_MORE_COUNT;
+            console.log(`[Records] 表示件数: ${currentVal} → ${newDisplay}`);
+            loadMoreBtn.dataset.currentDisplay = newDisplay;
+            await displaySessionList(sessions);
+        });
+        loadMoreBtn.dataset.listenerAdded = 'true';
+    }
+}
+
+/**
+ * レッスンをソート
+ * @param {Array} lessons - レッスン配列
+ * @param {string} sortType - ソートタイプ（newest/oldest/worst/best）
+ * @returns {Array} ソート済みレッスン配列
+ */
+function sortLessons(lessons, sortType) {
+    const sorted = [...lessons];
+
+    switch (sortType) {
+        case 'newest':
+            // 新しい順（デフォルト）
+            sorted.sort((a, b) => b.startTime - a.startTime);
+            break;
+        case 'oldest':
+            // 古い順
+            sorted.sort((a, b) => a.startTime - b.startTime);
+            break;
+        case 'worst':
+        case 'best':
+            // 成績順（グレード優先、次に平均誤差）
+            sorted.sort((a, b) => {
+                // グレード計算
+                let gradeA = '-', gradeB = '-';
+                let avgErrorA = 999, avgErrorB = 999;
+
+                try {
+                    const evalA = window.EvaluationCalculator.calculateDynamicGrade(a.sessions);
+                    gradeA = evalA.grade;
+                    avgErrorA = Math.abs(evalA.metrics.adjusted.avgError);
+                } catch (e) { /* エラー時はデフォルト値 */ }
+
+                try {
+                    const evalB = window.EvaluationCalculator.calculateDynamicGrade(b.sessions);
+                    gradeB = evalB.grade;
+                    avgErrorB = Math.abs(evalB.metrics.adjusted.avgError);
+                } catch (e) { /* エラー時はデフォルト値 */ }
+
+                // グレード順序: S > A > B > C > D > E > '-'
+                const gradeOrder = { 'S': 0, 'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, '-': 6 };
+                const gradeValueA = gradeOrder[gradeA] !== undefined ? gradeOrder[gradeA] : 6;
+                const gradeValueB = gradeOrder[gradeB] !== undefined ? gradeOrder[gradeB] : 6;
+
+                // グレードが同じ場合は平均誤差で比較
+                if (gradeValueA === gradeValueB) {
+                    return sortType === 'worst'
+                        ? avgErrorB - avgErrorA  // 誤差が大きい順
+                        : avgErrorA - avgErrorB; // 誤差が小さい順
+                }
+
+                return sortType === 'worst'
+                    ? gradeValueB - gradeValueA  // グレードが低い順
+                    : gradeValueA - gradeValueB; // グレードが高い順
+            });
+            break;
+    }
+
+    return sorted;
 }
 
 /**
@@ -1234,12 +1357,6 @@ function showNoDataMessage() {
     const chartSection = document.getElementById('chart-section');
     if (chartSection) {
         chartSection.classList.add('hidden');
-    }
-
-    // アクションボタンセクションを表示（データなし時も「新しいトレーニングを開始」ボタンを表示）
-    const actionButtons = document.getElementById('action-buttons-section');
-    if (actionButtons) {
-        actionButtons.classList.remove('hidden');
     }
 }
 

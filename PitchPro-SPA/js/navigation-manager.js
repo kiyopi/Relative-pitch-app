@@ -302,22 +302,24 @@ class NavigationManager {
     }
 
     /**
-     * 【v4.3.4】準備ページをスキップしてトレーニング直行できるか判定（3層防御アプローチ）
+     * 【v4.4.0】準備ページをスキップしてトレーニング直行できるか判定（4層防御アプローチ）
      *
      * 【目的】
      * 総合評価ページからのレッスン開始時、既にマイク許可・音域データが揃っている場合、
      * 準備ページをスキップしてトレーニングページへ直接遷移することでUXを向上させる。
      *
-     * 【安定性重視の3層防御】
+     * 【安定性重視の4層防御】
      * - Layer 1: ページリロード検出 → リロード時は必ず準備ページへ（MediaStream破棄対策）
      * - Layer 2: localStorage確認 → 基本的なデータ存在チェック
      * - Layer 3: Permissions API → 実際のマイク権限状態を確認
+     * - Layer 4: AudioDetector存在・有効性確認 → AudioDetectorが初期化済みで再利用可能かチェック
      *
      * 【条件（すべて満たす必要あり）】
      * 1. ページリロードではない（performance.navigation.type !== 1）
      * 2. マイク許可済み（localStorage: micPermissionGranted = 'true'）
      * 3. 音域データあり（localStorage: voiceRangeData が存在）
      * 4. 実際のマイク権限が'granted'状態（Permissions API確認）
+     * 5. AudioDetectorが初期化済みで健全（verifyAudioDetectorState確認）
      *
      * @returns {Promise<boolean>} true: 準備スキップ可能, false: 準備ページ経由が必要
      */
@@ -349,8 +351,21 @@ class NavigationManager {
                 return false;
             }
 
+            // === Layer 4: AudioDetector存在・有効性確認（v4.4.0追加） ===
+            // マイク許可とlocalStorageがあっても、AudioDetectorが未初期化または異常状態の場合は準備必須
+            if (!this.currentAudioDetector) {
+                console.log('⚠️ [NavigationManager] Layer 4: AudioDetector未初期化 → 準備ページ必須');
+                return false;
+            }
+
+            const verification = this.verifyAudioDetectorState(this.currentAudioDetector);
+            if (!verification.canReuse) {
+                console.log(`⚠️ [NavigationManager] Layer 4: AudioDetector異常 (${verification.reason}) → 準備ページ必須`);
+                return false;
+            }
+
             // すべてのチェックをパス
-            console.log('✅ [NavigationManager] 3層すべてパス → 準備スキップ可能');
+            console.log('✅ [NavigationManager] 4層すべてパス → 準備スキップ可能');
             return true;
 
         } catch (error) {

@@ -159,11 +159,27 @@
                         <i data-lucide="calendar" class="text-blue-300"></i>
                         <span>トレーニング履歴</span>
                     </h4>
-                    <div class="text-white-60 text-sm" id="records-count">-件</div>
+                    <div class="flex items-center gap-3">
+                        <div class="text-white-60 text-sm" id="records-count">-件</div>
+                        <select id="lesson-sort-select" class="form-select-compact">
+                            <option value="newest">新しい順</option>
+                            <option value="oldest">古い順</option>
+                            <option value="worst">成績の悪い順</option>
+                            <option value="best">成績の良い順</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="flex flex-col gap-3" id="recent-sessions">
                     <!-- JavaScriptで動的生成 -->
+                </div>
+
+                <!-- もっと見るボタン -->
+                <div class="text-center mt-4 hidden" id="load-more-container">
+                    <button id="load-more-btn" class="btn btn-outline">
+                        <i data-lucide="chevron-down" style="width: 20px; height: 20px;"></i>
+                        <span>もっと見る（残り<span id="remaining-count">0</span>件）</span>
+                    </button>
                 </div>
             </div>
 
@@ -172,14 +188,6 @@
                 <i data-lucide="inbox" class="text-white-40" style="width: 48px; height: 48px;"></i>
                 <p class="text-white-60">まだトレーニング記録がありません</p>
             </div>
-        </section>
-
-        <!-- アクションボタン（初期非表示） -->
-        <section class="action-buttons hidden" id="action-buttons-section">
-            <button onclick="window.NavigationManager.navigate('home')" class="btn btn-primary">
-                <i data-lucide="play" style="width: 24px; height: 24px;"></i>
-                <span>新しいトレーニングを開始</span>
-            </button>
         </section>
 
     </main>
