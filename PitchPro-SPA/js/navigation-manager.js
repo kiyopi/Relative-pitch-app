@@ -680,7 +680,8 @@ class NavigationManager {
             ['training', 'result-session'],      // セッション完了
             ['result-session', 'training'],      // 次のセッション
             ['preparation', 'training'],         // 準備完了
-            ['result-session', 'results-overview'], // 8セッション完了
+            ['result-session', 'results-overview'], // 8セッション完了（ランダム基音）
+            ['training', 'results-overview'],    // 12-24セッション完了（12音階モード）
             ['results-overview', 'preparation'], // 総合評価から次のモード開始（practice/upgrade）
         ];
 

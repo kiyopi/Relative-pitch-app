@@ -12611,3 +12611,28 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-20 17:45:08] コミット: fix(router): training cleanup統合徹底化の完成 (v2.3.0)
+
+- training cleanupにNavigationManagerチェック追加
+- NavigationManagerが管理している場合はcleanup スキップ
+- preparation cleanupと同じロジックを適用
+- 956ac8a（NavigationManager統合徹底化）で実装すべきだった修正
+
+【根本原因】
+- training → results-overview遷移時に無条件でAudioDetectorを破棄
+- その後 results-overview → preparation でLayer 4が未初期化検出
+- 結果: 準備ページ強制表示（最重要ルートのデグレード）
+
+【修正内容】
+- NavigationManager.currentAudioDetector存在時はcleanupスキップ
+- 初期化フラグのみリセットして早期return
+- training → home等の非トレーニングフロー遷移のみcleanup実行
+
+【影響範囲】
+- results-overview → 12音階モード → 直接トレーニング開始が正常動作
+- AudioDetectorがトレーニングフロー全体で保持される
+- マイク許可ダイアログ再出現問題の完全解決
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
