@@ -681,6 +681,7 @@ class NavigationManager {
             ['result-session', 'training'],      // 次のセッション
             ['preparation', 'training'],         // 準備完了
             ['result-session', 'results-overview'], // 8セッション完了
+            ['results-overview', 'preparation'], // 総合評価から次のモード開始（practice/upgrade）
         ];
 
         return trainingFlowPatterns.some(
