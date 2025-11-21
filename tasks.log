@@ -12767,3 +12767,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 13:34:26] コミット: perf(chart): 誤差推移グラフの初期化を高速化
+
+- requestAnimationFrameを削除し、canvas存在時は即座に初期化
+- canvas未準備時は16ms後に再試行（最大3回、50ms間隔）
+- 遅延表示・表示されない問題を解決
+- results-overview-controller.js v4.9.0
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

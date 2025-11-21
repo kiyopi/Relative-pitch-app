@@ -1,11 +1,12 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.9.0 (2025-11-21)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.9.1 (2025-11-21)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.9.0
+ * Version: 4.9.1
  * Date: 2025-11-21
  * Changelog:
+ *   v4.9.1 - 【バグ修正】削除ボタンが機能しない問題を修正（window.currentLessonIdの設定漏れ）
  *   v4.9.0 - 【高速化】Chart初期化をrequestAnimationFrameから即座実行に変更（遅延表示問題解決）
  *            - canvas存在時は即座に初期化、未準備時は16ms後に再試行（最大3回）
  *   v4.8.0 - 【エラーハンドリング】誤差推移グラフのエラーハンドリング追加（try-catch、UIエラーメッセージ表示）
@@ -128,6 +129,10 @@ window.initResultsOverview = async function initResultsOverview() {
         }
     }
     
+    // 【修正v4.9.1】lessonIdをグローバルに保存（削除機能で使用）
+    window.currentLessonId = lessonId;
+    console.log(`📝 [initResultsOverview] window.currentLessonId設定: ${lessonId}`);
+
     if (DEBUG_MODE) {
         console.log(`🔍 [DEBUG] 現在のモード: ${currentMode}`);
         console.log(`🔍 [DEBUG] lessonId: ${lessonId || 'なし（全体表示）'}`);
