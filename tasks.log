@@ -12747,3 +12747,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 13:15:27] コミット: fix(mode): タイトル表示から「モード」を省略
+
+- generatePageTitle()にuseShortNameパラメータ追加（デフォルト: true）
+- 「ランダム基音モード 上行」→「ランダム基音 上行」に変更
+- 総合評価ページのヘッダーとセクションタイトルに適用
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

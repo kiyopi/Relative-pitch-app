@@ -1,11 +1,12 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.7.0 (2025-11-20)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.8.0 (2025-11-21)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.7.0
- * Date: 2025-11-20
+ * Version: 4.8.0
+ * Date: 2025-11-21
  * Changelog:
+ *   v4.8.0 - 【エラーハンドリング】誤差推移グラフのエラーハンドリング追加（try-catch、UIエラーメッセージ表示）
  *   v4.7.0 - 【重要修正】削除ボタンセクションを常に表示（コア機能のため、トレーニング記録からの遷移時のみではなく常時表示）
  *   v4.6.0 - 【コード一貫性改善】下行モードボタン3箇所をNavigationManager.navigate()に統一
  *   v4.5.0 - 【コード一貫性改善】全recordsボタンをNavigationManager.navigate()に統一（7箇所修正）
@@ -836,18 +837,29 @@ if (typeof window.resultsOverviewChart === 'undefined') {
 
 function initializeCharts(sessionData) {
     const canvas = document.getElementById('error-trend-chart');
+
     if (!canvas) {
         console.error('❌ canvas要素が見つかりません: error-trend-chart');
+        showChartError('グラフの表示エリアが見つかりません');
         return;
     }
 
     // 既存のChartインスタンスがあれば破棄
     if (window.resultsOverviewChart) {
-        window.resultsOverviewChart.destroy();
+        try {
+            window.resultsOverviewChart.destroy();
+        } catch (e) {
+            console.warn('⚠️ 既存チャート破棄時エラー:', e);
+        }
         window.resultsOverviewChart = null;
     }
 
     const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('❌ canvas 2Dコンテキスト取得失敗');
+        showChartError('グラフの描画コンテキストを取得できません');
+        return;
+    }
 
     // セッション別平均誤差データ（符号付き: + = シャープ, - = フラット）
     const labels = sessionData.map((_, i) => `S${i + 1}`);
@@ -861,7 +873,9 @@ function initializeCharts(sessionData) {
         return parseFloat((sum / validErrors.length).toFixed(1));
     });
 
-    window.resultsOverviewChart = new Chart(ctx, {
+    // Chart作成をtry-catchで囲む
+    try {
+        window.resultsOverviewChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
@@ -1001,7 +1015,20 @@ function initializeCharts(sessionData) {
                 }
             }
         }
-    });
+        });
+
+        // Chart作成成功の検証
+        if (!window.resultsOverviewChart) {
+            throw new Error('Chartインスタンスが作成されませんでした');
+        }
+
+        console.log('✅ [initializeCharts] Chartインスタンス作成成功');
+
+    } catch (error) {
+        console.error('❌ [initializeCharts] Chart作成エラー:', error);
+        showChartError('グラフの作成に失敗しました: ' + error.message);
+        return;
+    }
 
     // ローディング非表示・コンテンツ表示
     console.log('🔍 [initializeCharts] LoadingComponent:', typeof window.LoadingComponent);
@@ -1011,6 +1038,35 @@ function initializeCharts(sessionData) {
         console.log('✅ [initializeCharts] ローディング非表示完了');
     } else {
         console.error('❌ [initializeCharts] LoadingComponentが見つかりません');
+    }
+}
+
+/**
+ * グラフエラーメッセージを表示
+ * @param {string} message - エラーメッセージ
+ */
+function showChartError(message) {
+    console.error('📊 [showChartError]', message);
+
+    // ローディングを非表示
+    if (window.LoadingComponent) {
+        window.LoadingComponent.toggle('chart', false);
+    }
+
+    // エラーメッセージをチャートコンテナに表示
+    const chartContent = document.getElementById('chart-content');
+    if (chartContent) {
+        chartContent.innerHTML = `
+            <div class="chart-error-message" style="text-align: center; padding: 2rem; color: rgba(255, 255, 255, 0.7);">
+                <i data-lucide="alert-triangle" style="width: 48px; height: 48px; margin-bottom: 1rem; color: #fbbf24;"></i>
+                <p style="margin: 0; font-size: 0.9rem;">${message}</p>
+                <p style="margin: 0.5rem 0 0 0; font-size: 0.8rem; color: rgba(255, 255, 255, 0.5);">ページを再読み込みしてお試しください</p>
+            </div>
+        `;
+        // Lucideアイコン初期化
+        if (typeof window.initializeLucideIcons === 'function') {
+            window.initializeLucideIcons({ immediate: true });
+        }
     }
 }
 
