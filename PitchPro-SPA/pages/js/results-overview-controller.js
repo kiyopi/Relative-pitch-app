@@ -1,11 +1,15 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.9.1 (2025-11-21)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.10.0 (2025-11-21)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.9.1
+ * Version: 4.10.0
  * Date: 2025-11-21
  * Changelog:
+ *   v4.10.0 - 【安定性向上】Chart初期化の信頼性大幅改善
+ *            - canvasの実描画サイズ（getBoundingClientRect）をチェック
+ *            - リトライ回数を3→10回、間隔を50→100msに延長（最大1秒待機）
+ *            - 各リトライで詳細なステータスログを出力
  *   v4.9.1 - 【バグ修正】削除ボタンが機能しない問題を修正（window.currentLessonIdの設定漏れ）
  *   v4.9.0 - 【高速化】Chart初期化をrequestAnimationFrameから即座実行に変更（遅延表示問題解決）
  *            - canvas存在時は即座に初期化、未準備時は16ms後に再試行（最大3回）
@@ -207,12 +211,30 @@ window.initResultsOverview = async function initResultsOverview() {
     // UI更新（トレーニング記録からの遷移フラグとscaleDirectionを渡す）
     updateOverviewUI(overallEvaluation, sessionData, fromRecords, scaleDirection);
 
-    // 【修正v4.9.0】Chart初期化の高速化
-    // canvas要素が存在すれば即座に初期化、なければ短いタイムアウトで再試行
-    const initChartImmediate = () => {
+    // 【修正v4.10.0】Chart初期化の安定性向上
+    // canvas要素が描画可能な状態になるまで待機してから初期化
+    const isCanvasReady = () => {
         const canvas = document.getElementById('error-trend-chart');
-        if (canvas && typeof Chart !== 'undefined') {
-            console.log('📊 [initializeCharts] Chart.js初期化開始（即座実行）');
+        if (!canvas) {
+            console.log('⏳ [Chart] canvas要素なし');
+            return false;
+        }
+        if (typeof Chart === 'undefined') {
+            console.log('⏳ [Chart] Chart.js未ロード');
+            return false;
+        }
+        // canvasが実際に描画可能なサイズを持っているか確認
+        const rect = canvas.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) {
+            console.log(`⏳ [Chart] canvas描画サイズなし: ${rect.width}x${rect.height}`);
+            return false;
+        }
+        return true;
+    };
+
+    const tryInitChart = () => {
+        if (isCanvasReady()) {
+            console.log('📊 [initializeCharts] Chart.js初期化開始');
             initializeCharts(sessionData);
             console.log('✅ [initializeCharts] Chart.js初期化完了');
             return true;
@@ -221,21 +243,24 @@ window.initResultsOverview = async function initResultsOverview() {
     };
 
     // 即座に試行
-    if (!initChartImmediate()) {
-        // canvas未準備の場合、短いタイムアウト後に再試行（最大3回）
+    if (!tryInitChart()) {
+        // canvas未準備の場合、段階的リトライ（最大10回、100ms間隔）
         let retryCount = 0;
-        const maxRetries = 3;
+        const maxRetries = 10;
+        const retryInterval = 100;
         const retryChart = () => {
             retryCount++;
-            console.log(`⏳ [initializeCharts] 再試行 ${retryCount}/${maxRetries}`);
-            if (!initChartImmediate() && retryCount < maxRetries) {
-                setTimeout(retryChart, 50);
-            } else if (retryCount >= maxRetries) {
-                console.error('❌ Chart初期化失敗: canvas要素またはChart.jsが見つかりません');
+            console.log(`⏳ [Chart] 再試行 ${retryCount}/${maxRetries}`);
+            if (tryInitChart()) {
+                console.log(`✅ [Chart] ${retryCount}回目で初期化成功`);
+            } else if (retryCount < maxRetries) {
+                setTimeout(retryChart, retryInterval);
+            } else {
+                console.error('❌ Chart初期化失敗: 最大リトライ回数到達');
                 showChartError('グラフの初期化に失敗しました');
             }
         };
-        setTimeout(retryChart, 16); // 1フレーム相当
+        setTimeout(retryChart, 50); // 最初のリトライは早めに
     }
 
     // トレーニング記録からの遷移の場合、UI要素を調整

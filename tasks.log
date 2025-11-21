@@ -12777,3 +12777,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 13:38:31] コミット: fix(delete): 総合評価の削除ボタンが機能しない問題を修正
+
+- window.currentLessonIdの設定漏れを修正
+- initResultsOverview内でlessonIdをグローバルに保存
+- results-overview-controller.js v4.9.1
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
