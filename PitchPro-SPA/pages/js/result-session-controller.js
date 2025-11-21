@@ -235,7 +235,7 @@ function updateSessionUI(sessionData, sessionNumber) {
     displayDetailedAnalysis(sessionData.pitchErrors, outlierThreshold);
 
     // 【追加】外れ値説明セクション表示（詳細分析の下）
-    displayOutlierExplanation(outlierFiltered, outlierCount, outlierThreshold);
+    displayOutlierExplanation(outlierFiltered, outlierCount);
 
     // 次のセッションボタン更新
     updateNextSessionButton(sessionNumber);
@@ -583,7 +583,7 @@ function displayOutlierNotice(outlierFiltered, outlierCount) {
 /**
  * 外れ値説明セクションを表示（詳細分析の下）
  */
-function displayOutlierExplanation(outlierFiltered, outlierCount, outlierThreshold) {
+function displayOutlierExplanation(outlierFiltered, outlierCount) {
     // 外れ値説明用のコンテナを探す
     let explanationContainer = document.getElementById('outlier-explanation-container');
 
@@ -602,14 +602,14 @@ function displayOutlierExplanation(outlierFiltered, outlierCount, outlierThresho
         }
     }
 
-    // 外れ値がある場合のみ表示
+    // 外れ値がある場合のみ表示（総合評価と統一されたスタイル）
     if (outlierFiltered) {
         explanationContainer.innerHTML = `
             <div class="warning-alert">
-                <i data-lucide="alert-circle" class="text-amber-400"></i>
+                <i data-lucide="alert-circle" class="text-amber-500"></i>
                 <div>
-                    <p><strong>外れ値について</strong></p>
-                    <p>このセッションで<strong>${outlierCount}音</strong>が外れ値として除外されました。外れ値とは<strong>${outlierThreshold}¢（約${(outlierThreshold / 100).toFixed(1)}半音）を超える大きな誤差</strong>のことです。これは測定エラーの可能性もありますが、特定の音程が本当に苦手な場合もあります。平均誤差の計算精度を保つため、これらの値は除外されていますが、詳細分析で確認することをおすすめします。</p>
+                    <p><strong>大きな誤差について</strong></p>
+                    <p>このセッションで<strong>${outlierCount}音</strong>に大きな誤差が検出されました。正常に測定できなかった可能性があります。詳細分析で確認することをおすすめします。</p>
                 </div>
             </div>
         `;

@@ -80,7 +80,21 @@
  * - preparationページは現状維持（マイクテスト・音域テストがあるため）
  * - PAGE_CONFIG: training/result-sessionのreloadMessage・reloadRedirectTo削除
  *
- * @version 4.4.0
+ * 【v4.4.1更新】
+ * - デスクトップ切り替え時のリロード誤検出問題を解決
+ * - pageActiveフラグチェック内にvisibilitychange時間確認を統合
+ * - 1秒未満 + 可視状態 = デスクトップ切り替え（誤検出防止）
+ * - 1秒以上経過 = 本当のリロード（正しく検出）
+ * - 順序変更不要で安全性確保（過去の失敗パターンを回避）
+ *
+ * 【v4.4.2更新】
+ * - preparationページリロード後のクリーンアップを徹底
+ * - preparationPageActiveフラグの確実なクリア（2段階alert()回避）
+ * - REDIRECT_COMPLETEDフラグで2回目の検出を防止
+ * - リロードメッセージの明確化（ユーザー混乱の解消）
+ * - Hybridアプローチの明確化（preparation=Preventive, training/result-session=Reactive）
+ *
+ * @version 4.4.2
  * @date 2025-11-20
  */
 
@@ -197,21 +211,44 @@ class NavigationManager {
             return false;
         }
 
-        // 3. 【v4.3.0拡張】ページアクティブフラグチェック（動的）
+        // 3. 【v4.3.6】ページアクティブフラグチェック（動的）
         // ページが前回アクティブだった = リロードまたはクラッシュ
+        // ただし、デスクトップ切り替えの誤検出を防止
         if (page) {
             const wasPageActive = sessionStorage.getItem(page + 'PageActive');
             if (wasPageActive === 'true') {
-                console.log(`⚠️ [v4.3.0] ${page}PageActiveフラグ検出 - リロード確定`);
+                // デスクトップ切り替えの可能性を確認
+                const timeSinceVisibilityChange = Date.now() - this.lastVisibilityChange;
+
+                // 1秒未満 + ページが可視状態 = デスクトップ切り替え
+                if (timeSinceVisibilityChange < 1000 && document.visibilityState === 'visible') {
+                    console.log(`✅ [NavigationManager] デスクトップ切り替え検出 - リロードではない (${timeSinceVisibilityChange}ms)`);
+                    // pageActiveフラグは保持（次回のリロード検出用）
+                    return false;
+                }
+
+                // 本当のリロード
+                console.log(`⚠️ [v4.3.6] ${page}PageActiveフラグ検出 - リロード確定 (visibilitychangeから${timeSinceVisibilityChange}ms経過)`);
                 sessionStorage.removeItem(page + 'PageActive');
                 return true;  // リロード検出
             }
         }
 
-        // 後方互換性: trainingPageActiveもチェック
+        // 後方互換性: trainingPageActiveもチェック（同様の誤検出防止ロジック適用）
         const wasTrainingActive = sessionStorage.getItem('trainingPageActive');
         if (wasTrainingActive === 'true') {
-            console.log('⚠️ [後方互換] trainingPageActiveフラグ検出 - リロード確定');
+            // デスクトップ切り替えの可能性を確認
+            const timeSinceVisibilityChange = Date.now() - this.lastVisibilityChange;
+
+            // 1秒未満 + ページが可視状態 = デスクトップ切り替え
+            if (timeSinceVisibilityChange < 1000 && document.visibilityState === 'visible') {
+                console.log(`✅ [NavigationManager] デスクトップ切り替え検出（後方互換） - リロードではない (${timeSinceVisibilityChange}ms)`);
+                // trainingPageActiveフラグは保持（次回のリロード検出用）
+                return false;
+            }
+
+            // 本当のリロード
+            console.log(`⚠️ [後方互換] trainingPageActiveフラグ検出 - リロード確定 (visibilitychangeから${timeSinceVisibilityChange}ms経過)`);
             sessionStorage.removeItem('trainingPageActive');
             return true;  // リロード検出
         }
@@ -504,10 +541,21 @@ class NavigationManager {
                 return { shouldContinue: true, reason: 'reload-handled-by-pitchpro' };
             }
 
-            // preparationページ: 現状維持（マイクテスト・音域テストがあるため）
+            // preparationページ: Preventiveアプローチ（マイクテスト・音域テストリセット）
             if (config.reloadMessage) {
                 alert(config.reloadMessage);
             }
+
+            // 【v4.4.2】preparationPageActiveフラグを確実にクリア
+            // （detectReload内で削除されているはずだが、念のため再確認）
+            if (page === 'preparation') {
+                sessionStorage.removeItem('preparationPageActive');
+                console.log('✅ [NavigationManager] preparationPageActiveフラグをクリア（リロード検出後）');
+            }
+
+            // 【v4.4.2】リダイレクト完了フラグを設定（2回目の検出を防止）
+            sessionStorage.setItem(this.KEYS.REDIRECT_COMPLETED, 'true');
+            console.log('✅ [NavigationManager] リダイレクト完了フラグを設定');
 
             const redirectTo = config.reloadRedirectTo || 'home';
             if (redirectTo === 'preparation') {
@@ -998,7 +1046,7 @@ class NavigationManager {
             preventBackNavigation: true,
             preventReload: true,  // リロード不可（マイク設定・音域テストリセット防止）
             reloadRedirectTo: 'home',  // リロード時のリダイレクト先
-            reloadMessage: 'リロードが検出されました。準備を最初からやり直すためホームページに移動します。',
+            reloadMessage: '準備ページがリロードされました。\n\nマイクテストと音域テストを最初からやり直すため、ホームページに移動します。\n\n再開する場合は、ホームから希望のモードを選択してください。',
             directAccessRedirectTo: 'home',  // ダイレクトアクセス時のリダイレクト先
             directAccessMessage: '準備ページには正しいフローでアクセスしてください。ホームページに移動します。',
             backPreventionMessage: 'トレーニング準備中です。\n\nブラウザバックは無効になっています。\nホームボタンからトップページに戻れます。'

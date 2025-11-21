@@ -12670,3 +12670,69 @@ c39b584: router.js training cleanupに統合徹底化適用
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-20 19:04:49] コミット: feat(navigation): results-overview→homeパターン追加でUX向上 (v3.0.0)
+
+- isTrainingFlow()に['results-overview', 'home']パターン追加
+- 総合評価 → ホーム経由トレーニング再開時のマイク保持実現
+- Layer 4自動判別により、2つの経路で適切に動作
+
+【実現する動作】
+パターン1: トレーニング完了経由
+  training → results-overview（AudioDetector保持）
+  → ホームボタン → home（AudioDetector保持）
+  → トレーニング開始 → Layer 4パス → 準備スキップ✅
+
+パターン2: 記録ページ経由
+  records → results-overview（AudioDetector破棄、fromRecords=true）
+  → ホームボタン → home（AudioDetectorなし）
+  → トレーニング開始 → Layer 4失敗 → 準備必須✅
+
+【Layer 4による自動判別】
+同じホームボタンで異なる動作を自動実現：
+- AudioDetectorあり: 準備スキップ（UX向上）
+- AudioDetectorなし: 準備必須（安全性確保）
+
+【トレーニングフローパターン完全版】
+1. ['training', 'result-session'] - セッション完了
+2. ['result-session', 'training'] - 次のセッション
+3. ['preparation', 'training'] - 準備完了
+4. ['result-session', 'results-overview'] - 8セッション完了（ランダム基音）
+5. ['training', 'results-overview'] - 12-24セッション完了（連続・12音階）
+6. ['results-overview', 'preparation'] - 次のトレーニング開始
+7. ['results-overview', 'home'] - ホーム経由再開 ← NEW
+
+【仕様書更新】
+- MICROPHONE_PERMISSION_COMPREHENSIVE_CASES.md v3.0.0
+- トレーニングフローパターン完全版テーブル追加
+- 2つの動作フロー図解追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 12:25:55] コミット: fix(ui): 削除ボタン常時表示とトレーニング記録モバイル最適化
+
+- results-overview-controller.js v4.7.0: 削除ボタンを常時表示に変更（コア機能のため）
+- results-overview.html: 削除ボタンセクションを縦積みレイアウトに変更（モバイル対応）
+- records-controller.js v2.6.0: レッスンカードを縦積みレイアウトに変更
+  - テキストサイズ最適化（text-xl→text-lg、text-lg→text-sm）
+  - アイコンサイズ削減（20px→18px）
+- records.html: カード間隔をgap-3→gap-2に削減（縦長スクロール軽減）
+- UIカタログに改善案を追加（改善案1・改善案2の比較）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 12:56:49] コミット: fix(ui): セッション評価の外れ値レイアウトを総合評価と統一
+
+- result-session-controller.js v2.5.3
+- 外れ値行にerror-outlierクラスを追加（amber背景表示）
+- errorInCents表示形式をtoFixed(1)に統一（例: +12.3¢）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 12:59:05] コミット: chore: キャッシュバスター更新 (result-session, records, results-overview)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
