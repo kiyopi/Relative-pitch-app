@@ -12833,3 +12833,16 @@ HTML構造改善:
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 14:09:16] コミット: refactor(chart): インラインスタイルをCSS化、UIカタログ追加
+
+- results.cssにチャート関連スタイルを追加
+  - .chart-wrapper, .chart-container
+  - .chart-loading-overlay（オーバーレイローディング）
+  - .chart-error-message（エラー表示）
+- HTMLとJSからインラインスタイルを削除
+- UIカタログ(ui-catalog-results-overall.html)にチャートセクション追加
+- icon-2xlクラスを活用（48px統一アイコンサイズ）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

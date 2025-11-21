@@ -572,11 +572,6 @@ function displayOverallDistribution(sessionData) {
     });
 
     console.log('✅ [displayOverallDistribution] DistributionChart.render() 完了');
-
-    // ローディング非表示・コンテンツ表示
-    if (window.LoadingComponent) {
-        window.LoadingComponent.toggle('distribution', false);
-    }
 }
 
 /**
