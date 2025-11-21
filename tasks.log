@@ -12820,3 +12820,16 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 14:03:33] コミット: refactor(results-overview): チャートローディングをオーバーレイ方式に変更 v4.12.0
+
+HTML構造改善:
+- canvasは常に表示状態（display:noneの問題を根本解決）
+- ローディングはcanvas上にposition:absoluteで重ねて表示
+- Chart初期化完了後にローディングオーバーレイを非表示
+
+これによりcanvasサイズが常に計算可能になり、
+グラフ表示の安定性が大幅に向上
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

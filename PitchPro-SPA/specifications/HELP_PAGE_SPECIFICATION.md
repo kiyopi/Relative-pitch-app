@@ -699,11 +699,12 @@ git push origin feature/help-page
 ### 関連ドキュメント
 - `SPA_ARCHITECTURE_SPECIFICATION.md` - SPAアーキテクチャ仕様
 - `ROUTER_PAGE_INITIALIZATION_GUIDE.md` - Router統一初期化ガイド
+- `NAVIGATION_RELOAD_DETECTION_SPECIFICATION.md` - 2フラグシステム・リロード検出仕様
 - `UI-Catalog/ui-catalog-essentials.html` - UIカタログ
 
 ### 参考ページ
 - `pages/settings.html` - 類似構成のページ
-- `pages/records.html` - glass-card使用例
+- `pages/records.html` - glass-card使用例、cleanup関数実装例（AudioDetector破棄パターン）
 
 ---
 

@@ -627,6 +627,93 @@
                     </div>
                 </section>
 
+                <!-- 📊 誤差推移チャート -->
+                <section id="error-trend-chart" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">📊 誤差推移チャート</h2>
+                    <p class="text-white-70 mb-6">セッション毎の誤差推移を可視化するグラフコンポーネント</p>
+
+                    <h3 class="text-white font-medium mb-4">チャートローディングオーバーレイ</h3>
+
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <!-- glass-card内に配置 -->
+                            <div class="glass-card">
+                                <h2 class="heading-md mb-4">
+                                    <i data-lucide="trending-up" class="icon-md"></i>
+                                    <span>誤差推移</span>
+                                </h2>
+
+                                <div class="chart-wrapper">
+                                    <!-- ローディングオーバーレイ（デモ用に表示） -->
+                                    <div class="chart-loading-overlay" id="demo-chart-loading">
+                                        <i data-lucide="loader-2" class="text-blue-300 animate-spin icon-2xl"></i>
+                                        <p class="text-white-60">グラフを読み込み中...</p>
+                                    </div>
+                                    <!-- チャートコンテナ -->
+                                    <div class="chart-container">
+                                        <div style="background: rgba(255,255,255,0.1); height: 100%; display: flex; align-items: center; justify-content: center;">
+                                            <span class="text-white-40">Chart.js グラフ表示エリア</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="code-sample">
+&lt;!-- 誤差推移チャートセクション --&gt;
+&lt;section class="glass-card"&gt;
+  &lt;h2 class="heading-md"&gt;
+    &lt;i data-lucide="trending-up" class="icon-md"&gt;&lt;/i&gt;
+    &lt;span&gt;誤差推移&lt;/span&gt;
+  &lt;/h2&gt;
+
+  &lt;div class="chart-wrapper"&gt;
+    &lt;!-- ローディングオーバーレイ --&gt;
+    &lt;div class="chart-loading-overlay" id="chart-loading"&gt;
+      &lt;i data-lucide="loader-2" class="text-blue-300 animate-spin icon-2xl"&gt;&lt;/i&gt;
+      &lt;p class="text-white-60"&gt;グラフを読み込み中...&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;!-- チャートコンテナ --&gt;
+    &lt;div class="chart-container"&gt;
+      &lt;canvas id="error-trend-chart"&gt;&lt;/canvas&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/section&gt;</div>
+                        </div>
+                    </div>
+
+                    <h3 class="text-white font-medium mb-4 mt-6">ローディング非表示後</h3>
+
+                    <div class="component-grid grid-cols-1">
+                        <div class="component-item">
+                            <div class="glass-card">
+                                <h2 class="heading-md mb-4">
+                                    <i data-lucide="trending-up" class="icon-md"></i>
+                                    <span>誤差推移</span>
+                                </h2>
+
+                                <div class="chart-wrapper">
+                                    <!-- ローディング非表示 -->
+                                    <div class="chart-loading-overlay" style="display: none;"></div>
+                                    <!-- チャートコンテナ -->
+                                    <div class="chart-container">
+                                        <div style="background: linear-gradient(135deg, rgba(59,130,246,0.3), rgba(139,92,246,0.3)); height: 100%; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+                                            <span class="text-white-60">Chart.js でグラフ表示中</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p class="text-white-60 text-sm mt-2">
+                                <strong>ポイント:</strong> canvasは常に表示状態でサイズ計算可能、ローディングはposition:absoluteで上に重ねる
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
+                    </div>
+                </section>
+
                 <!-- ⬅️➡️ 前後ナビゲーション -->
                 <section id="prev-next-navigation" class="catalog-section">
                     <h2 class="text-2xl font-bold text-white mb-4">⬅️➡️ 前後ナビゲーション</h2>

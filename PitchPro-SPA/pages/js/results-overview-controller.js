@@ -1106,10 +1106,10 @@ function showChartError(message) {
     const chartContainer = document.querySelector('.chart-container');
     if (chartContainer) {
         chartContainer.innerHTML = `
-            <div class="chart-error-message" style="text-align: center; padding: 2rem; color: rgba(255, 255, 255, 0.7);">
-                <i data-lucide="alert-triangle" style="width: 48px; height: 48px; margin-bottom: 1rem; color: #fbbf24;"></i>
-                <p style="margin: 0; font-size: 0.9rem;">${message}</p>
-                <p style="margin: 0.5rem 0 0 0; font-size: 0.8rem; color: rgba(255, 255, 255, 0.5);">ページを再読み込みしてお試しください</p>
+            <div class="chart-error-message">
+                <i data-lucide="alert-triangle" class="text-amber-400 icon-2xl mb-4"></i>
+                <p>${message}</p>
+                <p>ページを再読み込みしてお試しください</p>
             </div>
         `;
         // Lucideアイコン初期化

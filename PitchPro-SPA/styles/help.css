@@ -1,0 +1,190 @@
+/* =================================================
+   help.css - ヘルプページ専用スタイル
+   バージョン: 1.0.0
+   作成日: 2025-11-21
+   ================================================= */
+
+/* --- ステップ番号 --- */
+.help-step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    background: linear-gradient(135deg, var(--blue-400), var(--blue-600));
+    border-radius: 50%;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+}
+
+/* --- モードカード（glass-card内で使用） --- */
+.help-mode-card {
+    background: rgba(255, 255, 255, 0.05);
+    /* backdrop-filter削除: 親.glass-cardと重複してiPadで白化するため */
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+}
+
+/* --- モードアイコン --- */
+.help-mode-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: var(--radius-lg);
+}
+
+/* --- 方向アイコン --- */
+.help-direction-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: var(--radius-lg);
+}
+
+/* --- グレードリスト --- */
+.help-grade-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.help-grade-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+/* --- グレードバッジ --- */
+.help-grade-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.help-grade-badge.grade-s {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1f2937;
+}
+
+.help-grade-badge.grade-a {
+    background: linear-gradient(135deg, #a3a3a3, #737373);
+    color: white;
+}
+
+.help-grade-badge.grade-b {
+    background: linear-gradient(135deg, #fb923c, #ea580c);
+    color: white;
+}
+
+.help-grade-badge.grade-c {
+    background: linear-gradient(135deg, #4ade80, #22c55e);
+    color: #1f2937;
+}
+
+.help-grade-badge.grade-d {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    color: white;
+}
+
+/* --- FAQアコーディオン --- */
+.faq-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.faq-item {
+    background: rgba(255, 255, 255, 0.05);
+    /* backdrop-filter削除: 親.glass-cardと重複してiPadで白化するため */
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: var(--space-4);
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.faq-question:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.faq-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.faq-icon.rotated {
+    transform: rotate(180deg);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.faq-answer.open {
+    max-height: 500px;
+    padding: 0 var(--space-4) var(--space-4);
+}
+
+/* --- トラブルシューティング --- */
+.help-trouble-item {
+    background: rgba(255, 255, 255, 0.03);
+    /* backdrop-filter削除: 親.glass-cardと重複してiPadで白化するため */
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+}
+
+.help-trouble-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.help-trouble-list li {
+    position: relative;
+    padding-left: var(--space-4);
+    margin-bottom: var(--space-2);
+    color: var(--white-70);
+    font-size: 0.875rem;
+}
+
+.help-trouble-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--white-40);
+}
+
+.help-trouble-list li:last-child {
+    margin-bottom: 0;
+}

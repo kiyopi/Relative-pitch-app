@@ -1,0 +1,358 @@
+<!-- pages/help.html - ヘルプページテンプレート -->
+<!-- Version: 1.0.0 -->
+
+<!-- ページヘッダー -->
+<div class="page-header">
+    <div class="page-header-content">
+        <div class="page-header-icon-wrapper">
+            <div class="page-header-icon gradient-catalog-purple">
+                <i data-lucide="help-circle" class="text-white" data-stroke-width="2" style="width: 36px; height: 36px;"></i>
+            </div>
+        </div>
+        <div class="page-header-text">
+            <h1 class="page-title">ヘルプ</h1>
+            <p class="page-subtitle text-purple-200">使い方ガイド・よくある質問</p>
+        </div>
+    </div>
+</div>
+
+<!-- セクション1: このアプリについて -->
+<section class="glass-card">
+    <h4 class="heading-md">
+        <i data-lucide="target" class="text-green-300"></i>
+        <span>このアプリについて</span>
+    </h4>
+
+    <div class="flex flex-col gap-3">
+        <p class="text-sm text-white-70">
+            8va相対音感トレーニングは、科学的根拠に基づいた効果的な相対音感トレーニングシステムです。
+        </p>
+        <p class="text-sm text-white-70">
+            基準音（ド）を聴いて、指定された音程を正確に発声するトレーニングを繰り返すことで、
+            音程の感覚を身につけることができます。
+        </p>
+        <div class="flex flex-col gap-2 mt-2">
+            <div class="flex items-center gap-2">
+                <i data-lucide="check-circle" class="text-green-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span class="text-sm text-white-80">歌唱力の向上</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <i data-lucide="check-circle" class="text-green-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span class="text-sm text-white-80">音程精度の改善</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <i data-lucide="check-circle" class="text-green-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span class="text-sm text-white-80">楽曲理解の深化</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- セクション2: 使い方の流れ -->
+<section class="glass-card">
+    <h4 class="heading-md">
+        <i data-lucide="list-ordered" class="text-blue-300"></i>
+        <span>使い方の流れ</span>
+    </h4>
+
+    <div class="flex flex-col gap-4">
+        <div class="flex items-start gap-3">
+            <div class="help-step-number">1</div>
+            <div class="flex flex-col gap-1">
+                <h5 class="text-body font-semibold text-white">音域テスト</h5>
+                <p class="text-sm text-white-70">最初に音域テストを行い、あなたの声の範囲を測定します。</p>
+            </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+            <div class="help-step-number">2</div>
+            <div class="flex flex-col gap-1">
+                <h5 class="text-body font-semibold text-white">モード選択</h5>
+                <p class="text-sm text-white-70">レベルに合ったトレーニングモードを選択します。</p>
+            </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+            <div class="help-step-number">3</div>
+            <div class="flex flex-col gap-1">
+                <h5 class="text-body font-semibold text-white">トレーニング実行</h5>
+                <p class="text-sm text-white-70">基準音を聴いて、指定された音程を発声します。</p>
+            </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+            <div class="help-step-number">4</div>
+            <div class="flex flex-col gap-1">
+                <h5 class="text-body font-semibold text-white">結果確認</h5>
+                <p class="text-sm text-white-70">セッション終了後、評価と詳細なフィードバックを確認できます。</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- セクション3: トレーニングモード -->
+<section class="glass-card">
+    <h4 class="heading-md">
+        <i data-lucide="layers" class="text-orange-300"></i>
+        <span>トレーニングモード</span>
+    </h4>
+
+    <div class="flex flex-col gap-3">
+        <!-- ランダム基音モード -->
+        <div class="help-mode-card">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="help-mode-icon gradient-catalog-green">
+                    <i data-lucide="shuffle" class="text-white" style="width: 20px; height: 20px;"></i>
+                </div>
+                <div>
+                    <h5 class="text-body font-semibold text-white">ランダム基音</h5>
+                    <span class="text-xs text-green-300">初級 • 8セッション</span>
+                </div>
+            </div>
+            <p class="text-sm text-white-70">音域内でランダムな基準音から開始。基本的な音程感覚を養います。</p>
+        </div>
+
+        <!-- 連続チャレンジモード -->
+        <div class="help-mode-card">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="help-mode-icon gradient-catalog-blue">
+                    <i data-lucide="zap" class="text-white" style="width: 20px; height: 20px;"></i>
+                </div>
+                <div>
+                    <h5 class="text-body font-semibold text-white">連続チャレンジ</h5>
+                    <span class="text-xs text-blue-300">中級 • 12セッション連続</span>
+                </div>
+            </div>
+            <p class="text-sm text-white-70">クロマチック12音を連続で挑戦。持久力と安定性を鍛えます。</p>
+        </div>
+
+        <!-- 12音階モード -->
+        <div class="help-mode-card">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="help-mode-icon gradient-catalog-purple">
+                    <i data-lucide="trophy" class="text-white" style="width: 20px; height: 20px;"></i>
+                </div>
+                <div>
+                    <h5 class="text-body font-semibold text-white">12音階</h5>
+                    <span class="text-xs text-purple-300">上級 • S級判定</span>
+                </div>
+            </div>
+            <p class="text-sm text-white-70">全半音を順次使用する上級モード。最高評価のS級を目指します。</p>
+        </div>
+    </div>
+</section>
+
+<!-- セクション4: 評価システム -->
+<section class="glass-card">
+    <h4 class="heading-md">
+        <i data-lucide="award" class="text-yellow-300"></i>
+        <span>評価システム</span>
+    </h4>
+
+    <div class="flex flex-col gap-4">
+        <p class="text-sm text-white-70">
+            発声した音程と目標音程の差を「セント」という単位で測定します。
+            100セント = 半音1つ分の差です。
+        </p>
+
+        <div class="help-grade-list">
+            <div class="help-grade-item">
+                <span class="help-grade-badge grade-s">S</span>
+                <span class="text-sm text-white-80">プロレベル（誤差±10セント以内）</span>
+            </div>
+            <div class="help-grade-item">
+                <span class="help-grade-badge grade-a">A</span>
+                <span class="text-sm text-white-80">優秀（誤差±20セント以内）</span>
+            </div>
+            <div class="help-grade-item">
+                <span class="help-grade-badge grade-b">B</span>
+                <span class="text-sm text-white-80">良好（誤差±30セント以内）</span>
+            </div>
+            <div class="help-grade-item">
+                <span class="help-grade-badge grade-c">C</span>
+                <span class="text-sm text-white-80">合格（誤差±50セント以内）</span>
+            </div>
+            <div class="help-grade-item">
+                <span class="help-grade-badge grade-d">D</span>
+                <span class="text-sm text-white-80">要練習（誤差±50セント以上）</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- セクション5: 上行/下行モード -->
+<section class="glass-card">
+    <h4 class="heading-md">
+        <i data-lucide="trending-up" class="text-cyan-300"></i>
+        <span>上行/下行モード</span>
+    </h4>
+
+    <div class="flex flex-col gap-3">
+        <p class="text-sm text-white-70">
+            発声の方向によって、異なる音程感覚を鍛えることができます。
+        </p>
+
+        <div class="flex flex-col gap-3">
+            <div class="flex items-center gap-3">
+                <div class="help-direction-icon gradient-catalog-cyan">
+                    <i data-lucide="arrow-up" class="text-white" style="width: 20px; height: 20px;"></i>
+                </div>
+                <div>
+                    <h5 class="text-body font-semibold text-white">上行モード</h5>
+                    <p class="text-sm text-white-70">基準音から上に向かって発声</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="help-direction-icon gradient-catalog-orange">
+                    <i data-lucide="arrow-down" class="text-white" style="width: 20px; height: 20px;"></i>
+                </div>
+                <div>
+                    <h5 class="text-body font-semibold text-white">下行モード</h5>
+                    <p class="text-sm text-white-70">基準音から下に向かって発声</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- セクション6: よくある質問 -->
+<section class="glass-card">
+    <h4 class="heading-md">
+        <i data-lucide="message-circle" class="text-pink-300"></i>
+        <span>よくある質問</span>
+    </h4>
+
+    <div class="faq-accordion">
+        <!-- FAQ 1 -->
+        <div class="faq-item">
+            <button class="faq-question" data-faq="1">
+                <span>どのくらい練習すれば効果が出ますか？</span>
+                <i data-lucide="chevron-down" class="faq-icon"></i>
+            </button>
+            <div class="faq-answer" id="faq-answer-1">
+                <p class="text-sm text-white-70">
+                    個人差はありますが、毎日10〜15分程度のトレーニングを2週間続けると、
+                    多くの方が音程精度の向上を実感されています。継続が最も重要です。
+                </p>
+            </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="faq-item">
+            <button class="faq-question" data-faq="2">
+                <span>絶対音感がなくても大丈夫ですか？</span>
+                <i data-lucide="chevron-down" class="faq-icon"></i>
+            </button>
+            <div class="faq-answer" id="faq-answer-2">
+                <p class="text-sm text-white-70">
+                    はい、問題ありません。このアプリは相対音感（2つの音の関係性を認識する能力）を
+                    鍛えるもので、絶対音感は必要ありません。むしろ相対音感の方が音楽実践では重要です。
+                </p>
+            </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="faq-item">
+            <button class="faq-question" data-faq="3">
+                <span>イヤホンは必要ですか？</span>
+                <i data-lucide="chevron-down" class="faq-icon"></i>
+            </button>
+            <div class="faq-answer" id="faq-answer-3">
+                <p class="text-sm text-white-70">
+                    推奨しますが必須ではありません。イヤホンを使用すると、
+                    基準音をより正確に聴き取ることができ、周囲の雑音の影響も減らせます。
+                </p>
+            </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div class="faq-item">
+            <button class="faq-question" data-faq="4">
+                <span>評価が低いのはなぜ？</span>
+                <i data-lucide="chevron-down" class="faq-icon"></i>
+            </button>
+            <div class="faq-answer" id="faq-answer-4">
+                <p class="text-sm text-white-70">
+                    いくつかの原因が考えられます。静かな環境で練習する、マイクに近づいて発声する、
+                    はっきりと「あー」と発声するなどを試してみてください。
+                    また、最初は低い評価から始まることが普通です。継続して練習しましょう。
+                </p>
+            </div>
+        </div>
+
+        <!-- FAQ 5 -->
+        <div class="faq-item">
+            <button class="faq-question" data-faq="5">
+                <span>データは保存されますか？</span>
+                <i data-lucide="chevron-down" class="faq-icon"></i>
+            </button>
+            <div class="faq-answer" id="faq-answer-5">
+                <p class="text-sm text-white-70">
+                    はい、トレーニング記録はお使いのブラウザ内（ローカルストレージ）に保存されます。
+                    設定ページからデータのエクスポート・インポートも可能です。
+                    ブラウザのデータを削除すると記録も消えますのでご注意ください。
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- セクション7: トラブルシューティング -->
+<section class="glass-card">
+    <h4 class="heading-md">
+        <i data-lucide="wrench" class="text-red-300"></i>
+        <span>トラブルシューティング</span>
+    </h4>
+
+    <div class="flex flex-col gap-4">
+        <!-- マイクの問題 -->
+        <div class="help-trouble-item">
+            <h5 class="text-body font-semibold text-white mb-2">
+                <i data-lucide="mic-off" class="text-red-400" style="width: 16px; height: 16px; vertical-align: middle;"></i>
+                マイクが認識されない
+            </h5>
+            <ul class="help-trouble-list">
+                <li>ブラウザのマイク許可を確認してください</li>
+                <li>他のアプリがマイクを使用していないか確認してください</li>
+                <li>ページをリロードして再試行してください</li>
+                <li>別のブラウザで試してみてください</li>
+            </ul>
+        </div>
+
+        <!-- 音が鳴らない -->
+        <div class="help-trouble-item">
+            <h5 class="text-body font-semibold text-white mb-2">
+                <i data-lucide="volume-x" class="text-red-400" style="width: 16px; height: 16px; vertical-align: middle;"></i>
+                音が鳴らない
+            </h5>
+            <ul class="help-trouble-list">
+                <li>デバイスの音量を確認してください</li>
+                <li>サイレントモードになっていないか確認してください</li>
+                <li>Bluetoothイヤホンの接続状態を確認してください</li>
+            </ul>
+        </div>
+
+        <!-- 測定が不安定 -->
+        <div class="help-trouble-item">
+            <h5 class="text-body font-semibold text-white mb-2">
+                <i data-lucide="activity" class="text-red-400" style="width: 16px; height: 16px; vertical-align: middle;"></i>
+                測定が不安定
+            </h5>
+            <ul class="help-trouble-list">
+                <li>静かな環境で練習してください</li>
+                <li>マイクから20〜30cm離れて発声してください</li>
+                <li>一定の音量で「あー」と発声してください</li>
+                <li>音域テストを再実行してみてください</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- ホームに戻るボタン -->
+<div class="flex justify-center mt-4 mb-8">
+    <button class="btn btn-secondary" onclick="NavigationManager.navigate('#home')">
+        <i data-lucide="home" style="width: 18px; height: 18px;"></i>
+        <span>ホームに戻る</span>
+    </button>
+</div>
