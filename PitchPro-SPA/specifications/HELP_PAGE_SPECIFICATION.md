@@ -241,17 +241,44 @@ console.log('✅ [help] コントローラー読み込み完了');
 
 ## スタイル定義
 
-### 新規追加CSS（base.cssに追加）
+### スタイルシート構成
+
+プロジェクトのパターンに従い、**ヘルプページ専用CSSファイルを新規作成**します。
+
+| ファイル | 役割 |
+|---------|------|
+| `styles/help.css` | **新規作成** - ヘルプページ専用スタイル |
+| `styles/base.css` | 共通コンポーネント（変更なし） |
+
+### 新規作成ファイル: `styles/help.css`
 
 **⚠️ 実装前の確認事項**:
 1. base.cssに類似スタイルが存在しないか確認
 2. UIカタログに追加して動作確認
 3. iPadでの表示テスト必須
 
+### index.htmlへのCSS読み込み追加
+
+```html
+<!-- 既存のCSS読み込み -->
+<link rel="stylesheet" href="styles/base.css?v=...">
+<link rel="stylesheet" href="styles/results.css?v=...">
+<link rel="stylesheet" href="styles/training.css?v=...">
+<link rel="stylesheet" href="styles/voice-range.css?v=...">
+<link rel="stylesheet" href="styles/records.css?v=...">
+<link rel="stylesheet" href="styles/premium-analysis.css?v=...">
+<!-- 新規追加 -->
+<link rel="stylesheet" href="styles/help.css?v=20251121001">
+```
+
+### help.css 完全定義
+
 ```css
-/* =============================================
-   ヘルプページ専用スタイル
-   ============================================= */
+/* =================================================
+   help.css - ヘルプページ専用スタイル
+   バージョン: 1.0.0
+   作成日: 2025-11-21
+   ================================================= */
 
 /* --- ステップ番号 --- */
 .help-step-number {
@@ -494,13 +521,14 @@ git push origin feature/help-page
 - [ ] Lucideアイコン名のバージョン互換性確認完了
 
 ### ファイル作成
+- [ ] `styles/help.css` ヘルプページ専用スタイルシート作成
 - [ ] `pages/help.html` テンプレート作成
 - [ ] `pages/js/help-controller.js` コントローラー作成
-- [ ] base.cssにヘルプ専用スタイル追加
 
 ### 設定追加
 - [ ] router.js: routesに`'help': 'pages/help.html'`追加
 - [ ] router.js: pageConfigsにhelp設定追加
+- [ ] index.html: help.css読み込み追加
 - [ ] index.html: ナビゲーションボタン追加
 - [ ] index.html: コントローラー読み込み追加
 
