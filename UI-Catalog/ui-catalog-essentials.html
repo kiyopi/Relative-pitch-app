@@ -10,6 +10,7 @@
     
     <!-- スタイルシート -->
     <link rel="stylesheet" href="../PitchPro-SPA/styles/base.css">
+    <link rel="stylesheet" href="../PitchPro-SPA/styles/help.css">
     <link rel="stylesheet" href="ui-catalog.css">
     
     <!-- フォント -->
@@ -1570,6 +1571,110 @@ color: 'purple' // 履歴・一覧系</div>
             <li>✅ <strong>改善案1（縦積み）</strong>: モバイルで最も読みやすい、情報が明確</li>
             <li>✅ <strong>改善案2（コンパクト横並び）</strong>: 既存レイアウトを保持しつつ最適化</li>
         </ul>
+    </div>
+</section>
+
+<!-- ヘルプページ専用スタイル -->
+<section id="help-page-styles" class="catalog-section">
+    <h2 class="text-2xl font-bold text-white mb-4">❓ ヘルプページ専用スタイル</h2>
+    <p class="text-white-70 mb-6">ヘルプページで使用するアイコン+テキスト横並び、情報ボックスなどのスタイル（help.css）</p>
+
+    <!-- アイコン+テキスト横並び -->
+    <h3 class="text-xl font-bold text-white mb-3">📌 アイコン+テキスト横並び</h3>
+    <div class="glass-card mb-6">
+        <h4 class="text-white font-semibold mb-4">help-icon-text / help-icon-text-sm</h4>
+
+        <div class="flex flex-col gap-4 mb-4">
+            <!-- 16px版 -->
+            <div>
+                <p class="text-white-60 text-xs mb-2">help-icon-text（16px アイコン）</p>
+                <div class="help-icon-text">
+                    <i data-lucide="check-circle" class="text-green-400"></i>
+                    <span class="text-sm text-white-80">16pxアイコンとテキストの横並び</span>
+                </div>
+            </div>
+
+            <!-- 14px版 -->
+            <div>
+                <p class="text-white-60 text-xs mb-2">help-icon-text-sm（14px アイコン）</p>
+                <div class="help-icon-text-sm">
+                    <i data-lucide="info" class="text-blue-400"></i>
+                    <span class="text-sm text-white-70">14pxアイコンとテキストの横並び（小サイズ）</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- コード例 -->
+        <div class="code-sample">
+<pre>&lt;!-- 16px版 --&gt;
+&lt;div class="help-icon-text"&gt;
+    &lt;i data-lucide="check-circle" class="text-green-400"&gt;&lt;/i&gt;
+    &lt;span class="text-sm text-white-80"&gt;テキスト&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;!-- 14px版 --&gt;
+&lt;div class="help-icon-text-sm"&gt;
+    &lt;i data-lucide="info" class="text-blue-400"&gt;&lt;/i&gt;
+    &lt;span class="text-sm text-white-70"&gt;テキスト&lt;/span&gt;
+&lt;/div&gt;</pre>
+        </div>
+    </div>
+
+    <!-- 情報ボックス -->
+    <h3 class="text-xl font-bold text-white mb-3">📦 情報ボックス</h3>
+    <div class="glass-card mb-6">
+        <h4 class="text-white font-semibold mb-4">help-info-box</h4>
+
+        <div class="help-info-box mb-4">
+            <div class="help-icon-text-sm">
+                <i data-lucide="lightbulb" class="text-yellow-400"></i>
+                <span class="text-sm text-white-80"><strong>ポイント</strong></span>
+            </div>
+            <p class="text-sm text-white-70">
+                情報ボックス内のテキスト。背景とパディングが自動で適用されます。
+            </p>
+        </div>
+
+        <!-- コード例 -->
+        <div class="code-sample">
+<pre>&lt;div class="help-info-box"&gt;
+    &lt;div class="help-icon-text-sm"&gt;
+        &lt;i data-lucide="lightbulb" class="text-yellow-400"&gt;&lt;/i&gt;
+        &lt;span class="text-sm text-white-80"&gt;&lt;strong&gt;タイトル&lt;/strong&gt;&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;p class="text-sm text-white-70"&gt;説明テキスト&lt;/p&gt;
+&lt;/div&gt;</pre>
+        </div>
+    </div>
+
+    <!-- 無効状態 -->
+    <h3 class="text-xl font-bold text-white mb-3">🚫 無効状態（Coming Soon）</h3>
+    <div class="glass-card mb-6">
+        <h4 class="text-white font-semibold mb-4">help-mode-disabled</h4>
+
+        <div class="help-mode-card help-mode-disabled mb-4">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="help-mode-icon gradient-catalog-orange">
+                    <i data-lucide="brain" class="text-white"></i>
+                </div>
+                <div>
+                    <h5 class="text-body font-semibold text-white">弱点練習</h5>
+                    <span class="text-xs text-orange-300">次期バージョンで提供予定</span>
+                </div>
+            </div>
+            <p class="text-sm text-white-70">opacity: 0.6 が適用されます</p>
+        </div>
+
+        <!-- コード例 -->
+        <div class="code-sample">
+<pre>&lt;div class="help-mode-card help-mode-disabled"&gt;
+    &lt;!-- コンテンツ --&gt;
+&lt;/div&gt;</pre>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin: 1rem 0;">
+        <a href="#" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">↑ ページトップ</a>
     </div>
 </section>
 
