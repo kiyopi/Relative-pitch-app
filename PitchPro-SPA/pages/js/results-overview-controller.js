@@ -305,7 +305,7 @@ function updateOverviewUI(evaluation, sessionData, fromRecords = false, scaleDir
         const modeTitleEl = document.getElementById('main-mode-title');
         console.log(`🔍 [DEBUG] #main-mode-title要素:`, modeTitleEl);
         if (modeTitleEl) {
-            // ModeControllerと同じフォーマットでタイトルを生成
+            // ModeControllerでタイトルを生成（useShortName: trueがデフォルト）
             const titleText = window.ModeController.generatePageTitle(evaluation.modeInfo.mode, {
                 chromaticDirection: chromaticDirection,
                 scaleDirection: scaleDirection

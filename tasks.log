@@ -12736,3 +12736,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 13:06:17] コミット: fix(ui): セッション評価の外れ値説明文を総合評価と統一
+
+- タイトル変更: 「外れ値について」→「大きな誤差について」
+- アイコン色変更: text-amber-400 → text-amber-500
+- 説明文を簡潔化しつつセッション固有情報（外れ値個数）は保持
+- 未使用パラメータ(outlierThreshold)を削除
+- キャッシュバスター更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -267,11 +267,13 @@ const ModeController = {
      * @param {object} options - オプション設定
      * @param {string} options.chromaticDirection - 基音方向（12音階モード専用: 'ascending', 'descending', 'both'）
      * @param {string} options.scaleDirection - 音階方向（'ascending', 'descending'）
+     * @param {boolean} options.useShortName - 短縮名を使用（「モード」省略）デフォルト: true
      * @returns {string} 完全なページタイトル
      */
     generatePageTitle(modeId, options = {}) {
         const mode = this.getMode(modeId);
-        let titleText = mode.name;
+        const useShortName = options.useShortName !== undefined ? options.useShortName : true;
+        let titleText = useShortName ? mode.shortName : mode.name;
 
         const scaleDirection = options.scaleDirection || 'ascending';
         const scaleDirectionLabel = scaleDirection === 'ascending' ? '上行' : '下行';
