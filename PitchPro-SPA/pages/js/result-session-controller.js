@@ -1,9 +1,12 @@
 /**
  * セッション結果ページコントローラー
- * @version 2.5.2
- * @lastUpdate 2025-11-18
+ * @version 2.5.3
+ * @lastUpdate 2025-11-21
  *
  * 変更履歴:
+ * - 2.5.3: 外れ値レイアウトを総合評価と統一
+ *   - error-outlierクラスを追加（amber背景）
+ *   - errorInCents表示形式をtoFixed(1)に統一
  * - 2.5.2: ローディング表示実装
  *   - LoadingComponent.toggle()追加
  *   - セッション結果読み込み中の視覚的フィードバック実装
@@ -383,6 +386,12 @@ function displayDetailedAnalysis(pitchErrors, outlierThreshold) {
 
         const noteElement = document.createElement('div');
         noteElement.className = 'note-result-item';
+
+        // 外れ値の場合はamber背景を追加（総合評価と統一）
+        if (isOutlier) {
+            noteElement.classList.add('error-outlier');
+        }
+
         noteElement.innerHTML = `
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-4">
@@ -395,7 +404,7 @@ function displayDetailedAnalysis(pitchErrors, outlierThreshold) {
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <div class="${deviationClass}">${error.errorInCents >= 0 ? '+' : ''}${error.errorInCents}¢</div>
+                    <div class="${deviationClass}">${error.errorInCents >= 0 ? '+' : ''}${error.errorInCents.toFixed(1)}¢</div>
                     <div class="flex items-center justify-center">
                         <i data-lucide="${evaluation.icon}" class="${evaluation.color}" style="width: 28px; height: 28px; ${iconTransform}"></i>
                     </div>
