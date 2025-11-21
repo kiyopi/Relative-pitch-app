@@ -1,10 +1,13 @@
 /**
  * トレーニング記録ページコントローラー
  *
- * @version 2.5.6
- * @date 2025-11-19
+ * @version 2.6.0
+ * @date 2025-11-20
  * @description トレーニング履歴の表示・統計計算・グラフ描画
  * @changelog
+ *   v2.6.0 (2025-11-20) - 【モバイル最適化】レッスンカードを縦積みレイアウトに変更
+ *                         text-xl→text-lg、text-lg→text-sm、text-sm→text-xs、アイコン20px→18px
+ *                         gap-3→gap-2でカード間の縦長を軽減（モバイル表示改善）
  *   v2.5.6 (2025-11-19) - viewLessonDetail()のsessionStorage.clear()削除（NavigationManagerが適切に管理）
  *   v2.5.5 (2025-11-16) - 総レッスン時間をモード別標準時間で計算
  *                         実際のduration値ではなく、セッション数×13秒で計算
@@ -1084,23 +1087,29 @@ function createLessonCard(lesson) {
     };
     const gradeColor = gradeColors[grade] || 'text-white';
 
+    // 【改善v2.0.1】モバイル最適化: 縦積みレイアウトに変更
     card.innerHTML = `
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <i data-lucide="music" class="text-blue-300" style="width: 20px; height: 20px;"></i>
-                <div>
-                    <div class="text-white font-medium">${fullModeName}</div>
-                    <div class="text-white-60 text-sm">${dateStr} · ${lesson.sessions.length}セッション</div>
+        <div class="flex flex-col gap-2">
+            <!-- 上段: モード名 + 日時 -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="music" class="text-blue-300" style="width: 18px; height: 18px;"></i>
+                    <div class="text-white font-medium text-sm">${fullModeName}</div>
                 </div>
+                <div class="text-white-60 text-xs">${dateStr}</div>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="text-center">
-                    <div class="${gradeColor} text-xl font-bold">${grade}</div>
-                    <div class="text-white-60 text-sm">グレード</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-white text-lg">±${Math.abs(averageError).toFixed(1)}¢</div>
-                    <div class="text-white-60 text-sm">平均誤差</div>
+            <!-- 下段: セッション数 + グレード + 誤差 -->
+            <div class="flex items-center justify-between">
+                <div class="text-white-60 text-xs">${lesson.sessions.length}セッション</div>
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1">
+                        <span class="text-white-60 text-xs">グレード</span>
+                        <span class="${gradeColor} text-lg font-bold">${grade}</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-white-60 text-xs">誤差</span>
+                        <span class="text-white text-sm">±${Math.abs(averageError).toFixed(1)}¢</span>
+                    </div>
                 </div>
             </div>
         </div>

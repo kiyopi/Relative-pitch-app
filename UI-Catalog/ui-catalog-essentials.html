@@ -1359,6 +1359,220 @@ color: 'purple' // 履歴・一覧系</div>
     </div>
 </section>
 
+<!-- トレーニング記録カード（モバイル最適化） -->
+<section id="training-record-cards" class="catalog-section">
+    <h2 class="text-2xl font-bold text-white mb-4">📊 トレーニング記録カード（モバイル最適化）</h2>
+    <p class="text-white-70 mb-6">モバイル表示を改善したレッスンカードのデザイン案</p>
+
+    <!-- 現在のデザイン（比較用） -->
+    <h3 class="text-xl font-bold text-white mb-3">❌ 現在のデザイン（モバイルで窮屈）</h3>
+    <div class="flex flex-col gap-3 mb-8" style="max-width: 420px;">
+        <div class="glass-card" style="cursor: pointer;">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="music" class="text-blue-300" style="width: 20px; height: 20px;"></i>
+                    <div>
+                        <div class="text-white font-medium">ランダム基音（上行）</div>
+                        <div class="text-white-60 text-sm">11/20 14:30 · 8セッション</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-center">
+                        <div class="text-yellow-300 text-xl font-bold">S</div>
+                        <div class="text-white-60 text-sm">グレード</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-white text-lg">±12.3¢</div>
+                        <div class="text-white-60 text-sm">平均誤差</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="glass-card" style="cursor: pointer;">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="music" class="text-blue-300" style="width: 20px; height: 20px;"></i>
+                    <div>
+                        <div class="text-white font-medium">連続チャレンジ（上行）</div>
+                        <div class="text-white-60 text-sm">11/19 18:45 · 12セッション</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-center">
+                        <div class="text-green-300 text-xl font-bold">A</div>
+                        <div class="text-white-60 text-sm">グレード</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-white text-lg">±18.7¢</div>
+                        <div class="text-white-60 text-sm">平均誤差</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 改善案1: 縦積みレイアウト -->
+    <h3 class="text-xl font-bold text-white mb-3">✅ 改善案1: 縦積みレイアウト（gap-2）</h3>
+    <p class="text-white-60 text-sm mb-4">モバイルで読みやすい縦積みデザイン。カード間マージンを狭く（gap-2 = 8px）。</p>
+    <div class="flex flex-col gap-2 mb-8" style="max-width: 420px;">
+        <div class="glass-card" style="cursor: pointer;">
+            <div class="flex flex-col gap-2">
+                <!-- 上段: モード名 + 日時 -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="music" class="text-blue-300" style="width: 18px; height: 18px;"></i>
+                        <div class="text-white font-medium text-sm">ランダム基音（上行）</div>
+                    </div>
+                    <div class="text-white-60 text-xs">11/20 14:30</div>
+                </div>
+                <!-- 下段: セッション数 + グレード + 誤差 -->
+                <div class="flex items-center justify-between">
+                    <div class="text-white-60 text-xs">8セッション</div>
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-1">
+                            <span class="text-white-60 text-xs">グレード</span>
+                            <span class="text-yellow-300 text-lg font-bold">S</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="text-white-60 text-xs">誤差</span>
+                            <span class="text-white text-sm">±12.3¢</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="glass-card" style="cursor: pointer;">
+            <div class="flex flex-col gap-2">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="music" class="text-blue-300" style="width: 18px; height: 18px;"></i>
+                        <div class="text-white font-medium text-sm">連続チャレンジ（上行）</div>
+                    </div>
+                    <div class="text-white-60 text-xs">11/19 18:45</div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="text-white-60 text-xs">12セッション</div>
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-1">
+                            <span class="text-white-60 text-xs">グレード</span>
+                            <span class="text-green-300 text-lg font-bold">A</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="text-white-60 text-xs">誤差</span>
+                            <span class="text-white text-sm">±18.7¢</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="glass-card" style="cursor: pointer;">
+            <div class="flex flex-col gap-2">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="music" class="text-blue-300" style="width: 18px; height: 18px;"></i>
+                        <div class="text-white font-medium text-sm">12音階（両方向・上行）</div>
+                    </div>
+                    <div class="text-white-60 text-xs">11/18 16:20</div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="text-white-60 text-xs">24セッション</div>
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-1">
+                            <span class="text-white-60 text-xs">グレード</span>
+                            <span class="text-blue-300 text-lg font-bold">B</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="text-white-60 text-xs">誤差</span>
+                            <span class="text-white text-sm">±24.1¢</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 改善案2: コンパクトな横並び（gap-2） -->
+    <h3 class="text-xl font-bold text-white mb-3">✅ 改善案2: コンパクトな横並び（gap-2）</h3>
+    <p class="text-white-60 text-sm mb-4">現在のレイアウトを保ちつつ、テキストサイズとマージンを最適化。</p>
+    <div class="flex flex-col gap-2 mb-8" style="max-width: 420px;">
+        <div class="glass-card" style="cursor: pointer; padding: 0.875rem;">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="music" class="text-blue-300" style="width: 18px; height: 18px;"></i>
+                    <div>
+                        <div class="text-white font-medium text-sm">ランダム基音（上行）</div>
+                        <div class="text-white-60 text-xs">11/20 14:30 · 8セッション</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="text-center">
+                        <div class="text-yellow-300 text-lg font-bold">S</div>
+                        <div class="text-white-60 text-xs">グレード</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-white text-sm">±12.3¢</div>
+                        <div class="text-white-60 text-xs">誤差</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="glass-card" style="cursor: pointer; padding: 0.875rem;">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="music" class="text-blue-300" style="width: 18px; height: 18px;"></i>
+                    <div>
+                        <div class="text-white font-medium text-sm">連続チャレンジ（上行）</div>
+                        <div class="text-white-60 text-xs">11/19 18:45 · 12セッション</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="text-center">
+                        <div class="text-green-300 text-lg font-bold">A</div>
+                        <div class="text-white-60 text-xs">グレード</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-white text-sm">±18.7¢</div>
+                        <div class="text-white-60 text-xs">誤差</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="glass-card" style="cursor: pointer; padding: 0.875rem;">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="music" class="text-blue-300" style="width: 18px; height: 18px;"></i>
+                    <div>
+                        <div class="text-white font-medium text-sm">12音階（両方向・上行）</div>
+                        <div class="text-white-60 text-xs">11/18 16:20 · 24セッション</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="text-center">
+                        <div class="text-blue-300 text-lg font-bold">B</div>
+                        <div class="text-white-60 text-xs">グレード</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-white text-sm">±24.1¢</div>
+                        <div class="text-white-60 text-xs">誤差</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 比較サマリー -->
+    <div class="glass-card" style="background: rgba(59, 130, 246, 0.1);">
+        <h4 class="text-white font-semibold mb-3">💡 改善ポイント</h4>
+        <ul class="text-white-60 text-sm space-y-2">
+            <li>✅ <strong>カード間マージン削減</strong>: gap-3（12px）→ gap-2（8px）で縦スクロール削減</li>
+            <li>✅ <strong>テキストサイズ最適化</strong>: text-xl/text-lg → text-lg/text-sm でモバイル表示改善</li>
+            <li>✅ <strong>アイコンサイズ削減</strong>: 20px → 18px でスペース確保</li>
+            <li>✅ <strong>改善案1（縦積み）</strong>: モバイルで最も読みやすい、情報が明確</li>
+            <li>✅ <strong>改善案2（コンパクト横並び）</strong>: 既存レイアウトを保持しつつ最適化</li>
+        </ul>
+    </div>
+</section>
+
             </main>
 
             <!-- フッター -->

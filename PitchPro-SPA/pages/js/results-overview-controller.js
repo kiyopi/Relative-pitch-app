@@ -1,11 +1,12 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.6.0 (2025-11-19)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.7.0 (2025-11-20)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.6.0
- * Date: 2025-11-19
+ * Version: 4.7.0
+ * Date: 2025-11-20
  * Changelog:
+ *   v4.7.0 - 【重要修正】削除ボタンセクションを常に表示（コア機能のため、トレーニング記録からの遷移時のみではなく常時表示）
  *   v4.6.0 - 【コード一貫性改善】下行モードボタン3箇所をNavigationManager.navigate()に統一
  *   v4.5.0 - 【コード一貫性改善】全recordsボタンをNavigationManager.navigate()に統一（7箇所修正）
  *            sessionStorage.clear()の不適切な使用を削除、AudioDetector破棄を適切に管理
@@ -388,6 +389,13 @@ function updateOverviewUI(evaluation, sessionData, fromRecords = false, scaleDir
     if (!fromRecords) {
         // 【修正v4.0.7】chromaticDirectionとscaleDirectionの両方を渡す
         displayNextSteps(currentMode, evaluation, chromaticDirection, scaleDirection);
+    }
+
+    // 【修正v4.7.0】削除ボタンセクションを常に表示（コア機能のため）
+    const dangerZoneSection = document.getElementById('danger-zone-section');
+    if (dangerZoneSection) {
+        dangerZoneSection.style.display = 'block';
+        console.log('✅ [updateOverviewUI] 削除ボタンセクションを表示');
     }
 }
 
@@ -1808,11 +1816,12 @@ function handleRecordsViewMode() {
         console.log('✅ 実行日時を表示');
     }
 
-    // Danger Zoneセクションを表示
+    // 【注意v4.7.0】削除ボタンセクションの表示はupdateOverviewUI()で統一管理
+    // このコードは後方互換性のため残していますが、実際の表示制御はupdateOverviewUI()で実行されます
     const dangerZoneSection = document.getElementById('danger-zone-section');
     if (dangerZoneSection) {
         dangerZoneSection.style.display = 'block';
-        console.log('✅ Danger Zoneセクションを表示');
+        console.log('✅ 削除ボタンセクションを表示（fromRecords時の冗長処理）');
     }
 
     // トレーニング記録へ戻るボタンを追加（Danger Zoneの後に配置）
