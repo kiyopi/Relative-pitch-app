@@ -1,11 +1,13 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.8.0 (2025-11-21)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.9.0 (2025-11-21)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.8.0
+ * Version: 4.9.0
  * Date: 2025-11-21
  * Changelog:
+ *   v4.9.0 - 【高速化】Chart初期化をrequestAnimationFrameから即座実行に変更（遅延表示問題解決）
+ *            - canvas存在時は即座に初期化、未準備時は16ms後に再試行（最大3回）
  *   v4.8.0 - 【エラーハンドリング】誤差推移グラフのエラーハンドリング追加（try-catch、UIエラーメッセージ表示）
  *   v4.7.0 - 【重要修正】削除ボタンセクションを常に表示（コア機能のため、トレーニング記録からの遷移時のみではなく常時表示）
  *   v4.6.0 - 【コード一貫性改善】下行モードボタン3箇所をNavigationManager.navigate()に統一
@@ -200,43 +202,60 @@ window.initResultsOverview = async function initResultsOverview() {
     // UI更新（トレーニング記録からの遷移フラグとscaleDirectionを渡す）
     updateOverviewUI(overallEvaluation, sessionData, fromRecords, scaleDirection);
 
-    // 【修正v4.0.2】DOM更新完了を待ってからChart.js・Lucide初期化を実行
-    // requestAnimationFrameでブラウザのレンダリングサイクル後に実行
-    requestAnimationFrame(() => {
-        // Chart.js初期化
-        console.log('🔍 [DEBUG] Chart型チェック:', typeof Chart);
-        if (typeof Chart !== 'undefined') {
-            console.log('📊 [initializeCharts] Chart.js初期化開始');
+    // 【修正v4.9.0】Chart初期化の高速化
+    // canvas要素が存在すれば即座に初期化、なければ短いタイムアウトで再試行
+    const initChartImmediate = () => {
+        const canvas = document.getElementById('error-trend-chart');
+        if (canvas && typeof Chart !== 'undefined') {
+            console.log('📊 [initializeCharts] Chart.js初期化開始（即座実行）');
             initializeCharts(sessionData);
             console.log('✅ [initializeCharts] Chart.js初期化完了');
-        } else {
-            console.error('❌ Chart.jsが読み込まれていません');
+            return true;
         }
+        return false;
+    };
 
-        // トレーニング記録からの遷移の場合、UI要素を調整
-        if (fromRecords) {
-            setTimeout(() => {
-                handleRecordsViewMode();
-            }, 100);
-        }
+    // 即座に試行
+    if (!initChartImmediate()) {
+        // canvas未準備の場合、短いタイムアウト後に再試行（最大3回）
+        let retryCount = 0;
+        const maxRetries = 3;
+        const retryChart = () => {
+            retryCount++;
+            console.log(`⏳ [initializeCharts] 再試行 ${retryCount}/${maxRetries}`);
+            if (!initChartImmediate() && retryCount < maxRetries) {
+                setTimeout(retryChart, 50);
+            } else if (retryCount >= maxRetries) {
+                console.error('❌ Chart初期化失敗: canvas要素またはChart.jsが見つかりません');
+                showChartError('グラフの初期化に失敗しました');
+            }
+        };
+        setTimeout(retryChart, 16); // 1フレーム相当
+    }
 
-        // ローディング状態を非表示
-        LoadingComponent.toggle('stats', false);
+    // トレーニング記録からの遷移の場合、UI要素を調整
+    if (fromRecords) {
+        setTimeout(() => {
+            handleRecordsViewMode();
+        }, 100);
+    }
 
-        // 🎨 Lucideアイコン一括初期化（DOM完全更新後に実行）
-        if (typeof window.initializeLucideIcons === 'function') {
-            console.log('🎨 [results-overview] Lucideアイコン一括初期化');
-            window.initializeLucideIcons({ immediate: true });
-        }
+    // ローディング状態を非表示（即座に実行）
+    LoadingComponent.toggle('stats', false);
 
-        // 【修正v4.0.6】ポップオーバーイベントリスナーを初期化
-        setupPopoverListeners();
+    // 🎨 Lucideアイコン一括初期化（即座に実行）
+    if (typeof window.initializeLucideIcons === 'function') {
+        console.log('🎨 [results-overview] Lucideアイコン一括初期化');
+        window.initializeLucideIcons({ immediate: true });
+    }
 
-        // 【修正v4.0.7】ナビゲーションボタンイベントリスナーを初期化
-        setupNavigationListeners();
+    // 【修正v4.0.6】ポップオーバーイベントリスナーを初期化
+    setupPopoverListeners();
 
-        console.log('=== 総合評価ページ初期化完了 ===');
-    });
+    // 【修正v4.0.7】ナビゲーションボタンイベントリスナーを初期化
+    setupNavigationListeners();
+
+    console.log('=== 総合評価ページ初期化完了 ===');
 }
 
 /**

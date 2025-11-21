@@ -12756,3 +12756,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 13:28:08] コミット: fix(chart): 誤差推移グラフのエラーハンドリング追加
+
+- Chart作成をtry-catchで囲み、エラー時にUIエラーメッセージを表示
+- canvas要素・2Dコンテキスト取得失敗時のエラーハンドリング追加
+- showChartError()関数追加（エラーメッセージのUI表示）
+- 既存チャート破棄時のエラーハンドリング追加
+- results-overview-controller.js v4.8.0
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
