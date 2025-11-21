@@ -1929,6 +1929,11 @@ function handleRecordsViewMode() {
         // containerの一番下に追加
         container.appendChild(backButtonWrapper);
         console.log('✅ トレーニング記録へ戻るボタンを追加');
+
+        // Lucideアイコン初期化（動的追加されたアイコン用）
+        if (typeof window.initializeLucideIcons === 'function') {
+            window.initializeLucideIcons({ immediate: true });
+        }
     }
 }
 
