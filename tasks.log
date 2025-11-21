@@ -12923,3 +12923,34 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 15:28:01] コミット: fix(chart): モバイル時のチャート幅を拡張
+
+- canvasからインラインスタイルを削除（Chart.js自身がサイズ管理）
+- chart-containerのフォールバック高さは維持
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 15:34:23] コミット: chore: キャッシュバスター更新 v20251121004
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 15:46:28] コミット: fix(chart): クラス名衝突を修正 .chart-wrapper → .error-trend-wrapper
+
+- premium-analysis.cssの.chart-wrapper（200x200px円グラフ用）と衝突
+- 総合評価ページ用に.error-trend-wrapperに変更
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 15:46:28] コミット: chore: キャッシュバスター更新 v20251121005
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 15:57:48] コミット: chore: キャッシュバスター更新 router.js v20251121006
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
