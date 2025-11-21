@@ -18,7 +18,8 @@ class SimpleRouter {
             'records': 'pages/records.html',
             'results-overview': 'pages/results-overview.html',
             'premium-analysis': 'pages/premium-analysis.html',
-            'settings': 'pages/settings.html'
+            'settings': 'pages/settings.html',
+            'help': 'pages/help.html'
         };
 
         /**
@@ -172,6 +173,23 @@ class SimpleRouter {
             'settings': {
                 init: 'initSettings',
                 dependencies: []
+            },
+            'help': {
+                init: 'initHelpPage',
+                dependencies: [],
+                preventDoubleInit: false,  // ステートレスなため不要
+                cleanup: async () => {
+                    console.log('🧹 [Router] Cleaning up help page...');
+                    // AudioDetectorが残っていれば破棄（helpページはマイク不要）
+                    if (window.NavigationManager?.currentAudioDetector) {
+                        console.log('🧹 [Router] Destroying AudioDetector from help');
+                        window.NavigationManager._destroyAudioDetector(
+                            window.NavigationManager.currentAudioDetector
+                        );
+                        window.NavigationManager.currentAudioDetector = null;
+                    }
+                    console.log('✅ [Router] Help page cleanup complete');
+                }
             }
         };
 
