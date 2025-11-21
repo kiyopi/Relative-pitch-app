@@ -139,14 +139,16 @@
                     </h2>
 
                     <!-- チャートエリア（ローディングをcanvas上に重ねて表示） -->
-                    <div class="chart-wrapper">
+                    <!-- 注: position:relativeはCSSが読み込まれない場合のフォールバック -->
+                    <div class="chart-wrapper" style="position: relative; min-height: 200px;">
                         <!-- ローディング（canvasの上に重ねて表示） -->
                         <div class="chart-loading-overlay" id="chart-loading">
                             <i data-lucide="loader-2" class="text-blue-300 animate-spin icon-2xl"></i>
                             <p class="text-white-60">グラフを読み込み中...</p>
                         </div>
                         <!-- canvasは常に表示状態（サイズ計算のため） -->
-                        <div class="chart-container">
+                        <!-- 注: min-heightはCSSが読み込まれない場合のフォールバック -->
+                        <div class="chart-container" style="min-height: 200px;">
                             <canvas id="error-trend-chart"></canvas>
                         </div>
                     </div>
