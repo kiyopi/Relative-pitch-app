@@ -1355,8 +1355,9 @@
    誤差推移チャート（総合評価ページ）
    ================================================== */
 
-/* チャートラッパー（ローディングオーバーレイ用） */
-.chart-wrapper {
+/* 誤差推移チャートラッパー（ローディングオーバーレイ用） */
+/* 注: premium-analysis.cssの.chart-wrapperと衝突を避けるため別名 */
+.error-trend-wrapper {
     position: relative;
     min-height: 200px;
 }
