@@ -1948,7 +1948,7 @@ function confirmDeleteLesson() {
     }
 
     // 確認ダイアログ
-    const message = `このレッスンのすべてのデータを削除してもよろしいですか？\n\nレッスンID: ${lessonId}\n\nこの操作は元に戻せません。`;
+    const message = `このレッスンを削除してもよろしいですか？\n\n削除後の復元はできません。`;
 
     if (confirm(message)) {
         deleteLesson(lessonId);
@@ -1963,31 +1963,29 @@ function deleteLesson(lessonId) {
     try {
         console.log(`🗑️ レッスン削除開始: ${lessonId}`);
 
+        // 削除前に現在のモード・方向を保存（再開用）
+        const params = new URLSearchParams(window.location.hash.split('?')[1] || '');
+        const currentMode = params.get('mode') || 'random';
+        const currentDirection = params.get('direction') || 'ascending';
+        const isFromRecords = params.get('fromRecords') === 'true';
+
         // DataManagerで削除実行
         const result = window.DataManager.deleteLesson(lessonId);
 
         if (result.success) {
-            alert(result.message);
             console.log(`✅ レッスン削除成功: ${result.deletedCount}件`);
 
             // レコードページからの表示の場合はレコードページに戻る
-            const params = new URLSearchParams(window.location.hash.split('?')[1] || '');
-            const isFromRecords = params.get('fromRecords') === 'true';
-
             if (isFromRecords) {
-                // レコードページに戻る
+                alert(result.message);
                 if (window.NavigationManager) {
                     window.NavigationManager.navigate('records');
                 } else {
                     window.location.hash = 'records';
                 }
             } else {
-                // ホームページに戻る
-                if (window.NavigationManager) {
-                    window.NavigationManager.navigate('home');
-                } else {
-                    window.location.hash = 'home';
-                }
+                // トレーニング完了後の削除：削除完了セクションを表示
+                showDeleteCompleteSection(currentMode, currentDirection, result.deletedCount);
             }
         } else {
             alert(`削除に失敗しました\n\n${result.message}`);
@@ -1997,6 +1995,83 @@ function deleteLesson(lessonId) {
     } catch (error) {
         alert(`削除中にエラーが発生しました\n\n${error.message}`);
         console.error('❌ レッスン削除エラー:', error);
+    }
+}
+
+/**
+ * 削除完了セクションを表示
+ * メインコンテンツを非表示にし、削除完了メッセージと遷移ボタンを表示
+ */
+function showDeleteCompleteSection(mode, direction, deletedCount) {
+    console.log(`📝 削除完了セクション表示: mode=${mode}, direction=${direction}`);
+
+    // メインコンテンツを非表示
+    const mainSections = document.querySelectorAll('.wide-main > section:not(#delete-complete-section)');
+    mainSections.forEach(section => {
+        section.style.display = 'none';
+    });
+
+    // 外れ値アラートも非表示
+    const outlierAlert = document.getElementById('outlier-explanation-overview-container');
+    if (outlierAlert) {
+        outlierAlert.style.display = 'none';
+    }
+
+    // 削除完了セクションを表示
+    const deleteCompleteSection = document.getElementById('delete-complete-section');
+    if (deleteCompleteSection) {
+        deleteCompleteSection.style.display = 'block';
+
+        // メッセージを設定（モード名のみ取得、方向は含めない）
+        const modeDisplayName = window.ModeController
+            ? window.ModeController.getMode(mode)?.shortName || mode
+            : mode;
+        const directionDisplayName = direction === 'ascending' ? '上行' : '下行';
+
+        const messageEl = document.getElementById('delete-complete-message');
+        if (messageEl) {
+            messageEl.textContent = `${deletedCount}件のセッションデータを削除しました。`;
+        }
+
+        // 再開ボタンのイベント設定
+        const restartBtn = document.getElementById('restart-training-btn');
+        if (restartBtn) {
+            // ボタンテキストを動的に更新
+            const btnText = restartBtn.querySelector('span');
+            if (btnText) {
+                btnText.textContent = `${modeDisplayName}・${directionDisplayName}で再開`;
+            }
+
+            restartBtn.onclick = () => {
+                console.log(`🔄 トレーニング再開: mode=${mode}, direction=${direction}`);
+                // マイク許可が保持されているため、trainingページに直接遷移
+                if (window.NavigationManager) {
+                    window.NavigationManager.navigate('training', {
+                        mode: mode,
+                        direction: direction
+                    });
+                } else {
+                    window.location.hash = `training?mode=${mode}&direction=${direction}`;
+                }
+            };
+        }
+
+        // ホームボタンのイベント設定
+        const homeBtn = document.getElementById('go-home-btn');
+        if (homeBtn) {
+            homeBtn.onclick = () => {
+                if (window.NavigationManager) {
+                    window.NavigationManager.navigate('home');
+                } else {
+                    window.location.hash = 'home';
+                }
+            };
+        }
+
+        // Lucideアイコン初期化
+        if (typeof window.initializeLucideIcons === 'function') {
+            window.initializeLucideIcons({ immediate: true });
+        }
     }
 }
 
