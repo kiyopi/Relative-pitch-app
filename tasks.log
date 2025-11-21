@@ -12807,3 +12807,16 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 13:58:39] コミット: fix(results-overview): Chart初期化の根本修正 v4.11.0
+
+問題: chart-contentがdisplay:noneの状態ではcanvasサイズが
+      0x0になりChart.js初期化が失敗する
+
+解決:
+- Chart初期化前にchart-contentをdisplay:blockに変更
+- requestAnimationFrameでDOM更新を待機してから初期化
+- canvasサイズを確認してから初期化を実行
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

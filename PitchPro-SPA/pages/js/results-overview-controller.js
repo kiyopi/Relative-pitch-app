@@ -1,11 +1,15 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.11.0 (2025-11-21)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.12.0 (2025-11-21)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.11.0
+ * Version: 4.12.0
  * Date: 2025-11-21
  * Changelog:
+ *   v4.12.0 - 【HTML構造改善】チャートローディングをオーバーレイ方式に変更
+ *            - canvasは常に表示状態（サイズ計算可能）
+ *            - ローディングはcanvas上にposition:absoluteで重ねて表示
+ *            - Chart初期化完了後にローディングオーバーレイを非表示
  *   v4.11.0 - 【根本修正】Chart初期化前にchart-contentを表示
  *            - 問題: display:noneの状態ではcanvasサイズが0x0になりChart初期化不可
  *            - 解決: 先にchart-contentをdisplay:blockにしてからChart初期化
@@ -215,12 +219,10 @@ window.initResultsOverview = async function initResultsOverview() {
     // UI更新（トレーニング記録からの遷移フラグとscaleDirectionを渡す）
     updateOverviewUI(overallEvaluation, sessionData, fromRecords, scaleDirection);
 
-    // 【修正v4.11.0】Chart初期化の根本修正
-    // 問題: chart-contentがdisplay:noneの状態ではcanvasサイズが0x0になる
-    // 解決: 先にchart-contentを表示してからChart初期化を実行
-    const initChartWithVisibility = () => {
-        const chartLoading = document.getElementById('chart-loading');
-        const chartContent = document.getElementById('chart-content');
+    // 【修正v4.12.0】Chart初期化のシンプル化
+    // HTML構造変更: canvasは常に表示状態、ローディングを上に重ねて表示
+    // → display:noneの問題が解消され、即座にChart初期化可能
+    const initChart = () => {
         const canvas = document.getElementById('error-trend-chart');
 
         if (!canvas) {
@@ -235,39 +237,33 @@ window.initResultsOverview = async function initResultsOverview() {
             return;
         }
 
-        // 先にコンテンツを表示（canvasにサイズを与えるため）
-        if (chartLoading) chartLoading.style.display = 'none';
-        if (chartContent) chartContent.style.display = 'block';
+        const rect = canvas.getBoundingClientRect();
+        console.log(`📐 [Chart] canvas描画サイズ: ${rect.width}x${rect.height}`);
 
-        // DOMの更新を待ってからChart初期化
-        requestAnimationFrame(() => {
-            const rect = canvas.getBoundingClientRect();
-            console.log(`📐 [Chart] canvas描画サイズ: ${rect.width}x${rect.height}`);
-
-            if (rect.width === 0 || rect.height === 0) {
-                // まだサイズがない場合は少し待って再試行
-                setTimeout(() => {
-                    const retryRect = canvas.getBoundingClientRect();
-                    console.log(`📐 [Chart] 再確認サイズ: ${retryRect.width}x${retryRect.height}`);
-                    if (retryRect.width > 0 && retryRect.height > 0) {
-                        console.log('📊 [initializeCharts] Chart.js初期化開始');
-                        initializeCharts(sessionData);
-                        console.log('✅ [initializeCharts] Chart.js初期化完了');
-                    } else {
-                        console.error('❌ [Chart] canvasサイズが確定しません');
-                        showChartError('グラフの初期化に失敗しました');
-                    }
-                }, 100);
-            } else {
-                console.log('📊 [initializeCharts] Chart.js初期化開始');
-                initializeCharts(sessionData);
-                console.log('✅ [initializeCharts] Chart.js初期化完了');
-            }
-        });
+        if (rect.width > 0 && rect.height > 0) {
+            console.log('📊 [initializeCharts] Chart.js初期化開始');
+            initializeCharts(sessionData);
+            console.log('✅ [initializeCharts] Chart.js初期化完了');
+        } else {
+            // canvasサイズがまだない場合は少し待って再試行
+            console.log('⏳ [Chart] canvasサイズ待機中...');
+            setTimeout(() => {
+                const retryRect = canvas.getBoundingClientRect();
+                console.log(`📐 [Chart] 再確認サイズ: ${retryRect.width}x${retryRect.height}`);
+                if (retryRect.width > 0 && retryRect.height > 0) {
+                    console.log('📊 [initializeCharts] Chart.js初期化開始');
+                    initializeCharts(sessionData);
+                    console.log('✅ [initializeCharts] Chart.js初期化完了');
+                } else {
+                    console.error('❌ [Chart] canvasサイズが確定しません');
+                    showChartError('グラフの初期化に失敗しました');
+                }
+            }, 100);
+        }
     };
 
     // Chart初期化を実行
-    initChartWithVisibility();
+    initChart();
 
     // トレーニング記録からの遷移の場合、UI要素を調整
     if (fromRecords) {
@@ -1085,14 +1081,11 @@ function initializeCharts(sessionData) {
         return;
     }
 
-    // ローディング非表示・コンテンツ表示
-    console.log('🔍 [initializeCharts] LoadingComponent:', typeof window.LoadingComponent);
-    if (window.LoadingComponent) {
-        console.log('📊 [initializeCharts] LoadingComponent.toggle("chart", false) 実行中...');
-        window.LoadingComponent.toggle('chart', false);
-        console.log('✅ [initializeCharts] ローディング非表示完了');
-    } else {
-        console.error('❌ [initializeCharts] LoadingComponentが見つかりません');
+    // ローディング非表示（オーバーレイを非表示にする）
+    const chartLoading = document.getElementById('chart-loading');
+    if (chartLoading) {
+        chartLoading.style.display = 'none';
+        console.log('✅ [initializeCharts] ローディングオーバーレイ非表示完了');
     }
 }
 
@@ -1103,15 +1096,16 @@ function initializeCharts(sessionData) {
 function showChartError(message) {
     console.error('📊 [showChartError]', message);
 
-    // ローディングを非表示
-    if (window.LoadingComponent) {
-        window.LoadingComponent.toggle('chart', false);
+    // ローディングオーバーレイを非表示
+    const chartLoading = document.getElementById('chart-loading');
+    if (chartLoading) {
+        chartLoading.style.display = 'none';
     }
 
     // エラーメッセージをチャートコンテナに表示
-    const chartContent = document.getElementById('chart-content');
-    if (chartContent) {
-        chartContent.innerHTML = `
+    const chartContainer = document.querySelector('.chart-container');
+    if (chartContainer) {
+        chartContainer.innerHTML = `
             <div class="chart-error-message" style="text-align: center; padding: 2rem; color: rgba(255, 255, 255, 0.7);">
                 <i data-lucide="alert-triangle" style="width: 48px; height: 48px; margin-bottom: 1rem; color: #fbbf24;"></i>
                 <p style="margin: 0; font-size: 0.9rem;">${message}</p>
