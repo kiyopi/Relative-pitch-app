@@ -12846,3 +12846,80 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 14:21:36] コミット: refactor(results-overview): 評価分布セクションのローディング削除
+
+- DistributionChartは即座にレンダリングするためローディング不要
+- distribution-loading/distribution-content構造を削除
+- コンテンツを直接表示する形式に変更
+- LoadingComponent.toggle('distribution', false)呼び出しを削除
+
+Note: recordsページは他セクションと統一したフローのためローディング維持
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 14:28:07] コミット: refactor(results-overview): 不要なローディング処理を削除
+
+- stats セクション: HTML要素が存在しないLoadingComponent呼び出しを削除
+- sessions セクション: localStorageからの同期読み込みのため
+  ローディングHTML構造とJS呼び出しを削除
+
+全てのデータはlocalStorageから同期的に読み込まれるため
+ローディング表示は不要と判断
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 14:31:07] コミット: chore: キャッシュバスター更新 (results-overview-controller, results.css)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 14:36:54] コミット: fix(chart): CSSが読み込まれない場合のフォールバックスタイル追加
+
+- chart-wrapper: position:relative, min-height:200pxをインラインで追加
+- chart-container: min-height:200pxをインラインで追加
+- CSSが404エラーでも最低限のレイアウトが維持される
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 14:38:46] コミット: chore: キャッシュバスター更新 (base.css, results.css v20251121002)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 14:51:29] コミット: fix(chart): canvasに直接サイズ指定でフォールバック強化
+
+- chart-container: min-height→heightに変更（確実なサイズ指定）
+- canvas: width:100%, height:100%を追加（親サイズを継承）
+- min-heightだけではcanvasに高さが伝わらない問題を修正
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 14:52:25] コミット: chore: キャッシュバスター更新 v20251121003
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 15:11:20] コミット: feat(help): ヘルプページコンテンツ拡充 - 音域・用語説明追加
+
+- 音域についてセクション追加（2オクターブ推奨、自動補完機能説明）
+- 用語の違いセクション追加（上行・下行 vs 上昇・下降の区別）
+- トレーニングモード説明を正確化（上行5+下行5=10トレーニング）
+- 弱点練習モード（次期バージョン予定）を追加
+- 基音の説明を修正（ランダム基音→音程合わせて「ド」発声）
+- router.jsにhelpページのcleanup関数を追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 15:22:30] コミット: fix(chart): モバイル時のチャート幅を拡張
+
+- ネガティブマージンで左右余白を削減
+- 480px以下でさらに拡張
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
