@@ -95,9 +95,6 @@ window.initResultsOverview = async function initResultsOverview() {
     console.log('=== 総合評価ページ初期化開始 ===');
     isResultsOverviewInitialized = true;
 
-    // ローディング状態を表示
-    LoadingComponent.toggle('stats', true);
-
     // 全セッションデータを取得
     const hash = window.location.hash;
     const allSessionData = window.SessionDataManager 
@@ -108,7 +105,6 @@ window.initResultsOverview = async function initResultsOverview() {
 
     if (allSessionData.length === 0) {
         console.warn('⚠️ セッションデータが見つかりません');
-        LoadingComponent.toggle('stats', false);
         return;
     }
 
@@ -271,9 +267,6 @@ window.initResultsOverview = async function initResultsOverview() {
             handleRecordsViewMode();
         }, 100);
     }
-
-    // ローディング状態を非表示（即座に実行）
-    LoadingComponent.toggle('stats', false);
 
     // 🎨 Lucideアイコン一括初期化（即座に実行）
     if (typeof window.initializeLucideIcons === 'function') {
@@ -655,11 +648,6 @@ function displaySessionGrid(sessionData) {
     container.innerHTML = finalHTML;
     console.log('📊 [displaySessionGrid] container.innerHTML設定完了');
     console.log('📊 [displaySessionGrid] 関数終了');
-
-    // ローディング非表示・コンテンツ表示
-    if (window.LoadingComponent) {
-        window.LoadingComponent.toggle('sessions', false);
-    }
 }
 
 /**
