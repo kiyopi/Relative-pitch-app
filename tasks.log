@@ -12786,3 +12786,24 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 13:49:54] コミット: fix(results-overview): グラフ初期化の安定性向上 v4.10.0
+
+- canvasの実描画サイズ（getBoundingClientRect）をチェックして
+  描画可能な状態になるまで待機
+- リトライ回数を3→10回、間隔を50→100msに延長（最大1秒待機）
+- 各リトライで詳細なステータスログを出力
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 13:55:57] コミット: docs(help): ヘルプページ仕様書作成
+
+- コンテンツ構成（7セクション）定義
+- 技術仕様（router.js/index.html追加方法）
+- UIデザイン仕様（HTML構造）
+- スタイル定義（help.css新規作成方針）
+- 実装チェックリスト
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -1,11 +1,15 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.10.0 (2025-11-21)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.11.0 (2025-11-21)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.10.0
+ * Version: 4.11.0
  * Date: 2025-11-21
  * Changelog:
+ *   v4.11.0 - 【根本修正】Chart初期化前にchart-contentを表示
+ *            - 問題: display:noneの状態ではcanvasサイズが0x0になりChart初期化不可
+ *            - 解決: 先にchart-contentをdisplay:blockにしてからChart初期化
+ *            - requestAnimationFrameでDOM更新を待機してから初期化実行
  *   v4.10.0 - 【安定性向上】Chart初期化の信頼性大幅改善
  *            - canvasの実描画サイズ（getBoundingClientRect）をチェック
  *            - リトライ回数を3→10回、間隔を50→100msに延長（最大1秒待機）
@@ -211,57 +215,59 @@ window.initResultsOverview = async function initResultsOverview() {
     // UI更新（トレーニング記録からの遷移フラグとscaleDirectionを渡す）
     updateOverviewUI(overallEvaluation, sessionData, fromRecords, scaleDirection);
 
-    // 【修正v4.10.0】Chart初期化の安定性向上
-    // canvas要素が描画可能な状態になるまで待機してから初期化
-    const isCanvasReady = () => {
+    // 【修正v4.11.0】Chart初期化の根本修正
+    // 問題: chart-contentがdisplay:noneの状態ではcanvasサイズが0x0になる
+    // 解決: 先にchart-contentを表示してからChart初期化を実行
+    const initChartWithVisibility = () => {
+        const chartLoading = document.getElementById('chart-loading');
+        const chartContent = document.getElementById('chart-content');
         const canvas = document.getElementById('error-trend-chart');
+
         if (!canvas) {
-            console.log('⏳ [Chart] canvas要素なし');
-            return false;
+            console.error('❌ [Chart] canvas要素が見つかりません');
+            showChartError('グラフの表示エリアが見つかりません');
+            return;
         }
+
         if (typeof Chart === 'undefined') {
-            console.log('⏳ [Chart] Chart.js未ロード');
-            return false;
+            console.error('❌ [Chart] Chart.jsが読み込まれていません');
+            showChartError('グラフライブラリの読み込みに失敗しました');
+            return;
         }
-        // canvasが実際に描画可能なサイズを持っているか確認
-        const rect = canvas.getBoundingClientRect();
-        if (rect.width === 0 || rect.height === 0) {
-            console.log(`⏳ [Chart] canvas描画サイズなし: ${rect.width}x${rect.height}`);
-            return false;
-        }
-        return true;
-    };
 
-    const tryInitChart = () => {
-        if (isCanvasReady()) {
-            console.log('📊 [initializeCharts] Chart.js初期化開始');
-            initializeCharts(sessionData);
-            console.log('✅ [initializeCharts] Chart.js初期化完了');
-            return true;
-        }
-        return false;
-    };
+        // 先にコンテンツを表示（canvasにサイズを与えるため）
+        if (chartLoading) chartLoading.style.display = 'none';
+        if (chartContent) chartContent.style.display = 'block';
 
-    // 即座に試行
-    if (!tryInitChart()) {
-        // canvas未準備の場合、段階的リトライ（最大10回、100ms間隔）
-        let retryCount = 0;
-        const maxRetries = 10;
-        const retryInterval = 100;
-        const retryChart = () => {
-            retryCount++;
-            console.log(`⏳ [Chart] 再試行 ${retryCount}/${maxRetries}`);
-            if (tryInitChart()) {
-                console.log(`✅ [Chart] ${retryCount}回目で初期化成功`);
-            } else if (retryCount < maxRetries) {
-                setTimeout(retryChart, retryInterval);
+        // DOMの更新を待ってからChart初期化
+        requestAnimationFrame(() => {
+            const rect = canvas.getBoundingClientRect();
+            console.log(`📐 [Chart] canvas描画サイズ: ${rect.width}x${rect.height}`);
+
+            if (rect.width === 0 || rect.height === 0) {
+                // まだサイズがない場合は少し待って再試行
+                setTimeout(() => {
+                    const retryRect = canvas.getBoundingClientRect();
+                    console.log(`📐 [Chart] 再確認サイズ: ${retryRect.width}x${retryRect.height}`);
+                    if (retryRect.width > 0 && retryRect.height > 0) {
+                        console.log('📊 [initializeCharts] Chart.js初期化開始');
+                        initializeCharts(sessionData);
+                        console.log('✅ [initializeCharts] Chart.js初期化完了');
+                    } else {
+                        console.error('❌ [Chart] canvasサイズが確定しません');
+                        showChartError('グラフの初期化に失敗しました');
+                    }
+                }, 100);
             } else {
-                console.error('❌ Chart初期化失敗: 最大リトライ回数到達');
-                showChartError('グラフの初期化に失敗しました');
+                console.log('📊 [initializeCharts] Chart.js初期化開始');
+                initializeCharts(sessionData);
+                console.log('✅ [initializeCharts] Chart.js初期化完了');
             }
-        };
-        setTimeout(retryChart, 50); // 最初のリトライは早めに
-    }
+        });
+    };
+
+    // Chart初期化を実行
+    initChartWithVisibility();
 
     // トレーニング記録からの遷移の場合、UI要素を調整
     if (fromRecords) {
