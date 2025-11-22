@@ -2087,6 +2087,7 @@ function setupVolumeAdjustmentControls() {
 
 /**
  * ステップインジケーター更新
+ * 【v4.6.0】Step状態をsessionStorageに保存（リロード時のStep別判定用）
  */
 function updateStepStatus(stepNumber, status) {
     const step = document.getElementById(`step-${stepNumber}`);
@@ -2095,6 +2096,9 @@ function updateStepStatus(stepNumber, status) {
     step.classList.remove('active', 'completed');
     if (status === 'active') {
         step.classList.add('active');
+        // 【v4.6.0】アクティブになったStepをsessionStorageに保存
+        sessionStorage.setItem('preparationCurrentStep', stepNumber.toString());
+        console.log(`📍 [v4.6.0] preparationCurrentStep = ${stepNumber} (active)`);
     } else if (status === 'completed') {
         step.classList.add('completed');
     }

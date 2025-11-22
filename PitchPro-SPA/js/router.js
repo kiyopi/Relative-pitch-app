@@ -924,9 +924,11 @@ class SimpleRouter {
             }
 
             // 【v4.3.1】preparationPageActiveフラグのクリーンアップ
+            // 【v4.6.0】preparationCurrentStepもクリア
             if (this.currentPage === 'preparation') {
                 sessionStorage.removeItem('preparationPageActive');
-                console.log('🔄 [Router] preparationPageActiveフラグを削除（ページ離脱）');
+                sessionStorage.removeItem('preparationCurrentStep');
+                console.log('🔄 [Router] preparationフラグを削除（ページ離脱）');
             }
 
         } catch (error) {
