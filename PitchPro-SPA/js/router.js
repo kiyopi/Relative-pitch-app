@@ -3,6 +3,8 @@
  * Based on vanilla JS + 自作SPA development roadmap
  *
  * Changelog:
+ *   v2.12.0 (2025-11-22) - 外部スクリプト二重読み込み防止のバグ修正（executedScripts Set使用）
+ *   v2.11.0 (2025-11-22) - [REVERTED] 外部スクリプトの二重読み込み防止（document.scriptsチェックにバグあり）
  *   v2.3.0 (2025-11-20) - training page cleanup改善（NavigationManager統合徹底化の完成）
  *   v2.2.0 (2025-11-19) - preparation page cleanup改善（NavigationManager管理時はスキップ、二重破棄防止）
  *   v2.1.0 (2025-11-19) - records page cleanup追加（AudioDetector適切な破棄、メモリリーク防止）
@@ -196,6 +198,10 @@ class SimpleRouter {
         // 初期化済みフラグ管理（二重初期化防止用）
         this.initializedPages = new Set();
 
+        // 【v2.12.0追加】実行済みスクリプト追跡（二重実行防止用）
+        // document.scriptsではなく明示的なSetで管理することで、innerHTML直後の自己参照バグを回避
+        this.executedScripts = new Set();
+
         // 【Phase 1追加】遷移制御フラグ（競合状態防止）
         this.isNavigating = false;
         this.currentNavigationId = 0;
@@ -327,29 +333,35 @@ class SimpleRouter {
             this.appRoot.innerHTML = html;
 
             // 2.5. HTMLに含まれるスクリプトを手動で実行（SPAでinnerHTMLはスクリプトを実行しないため）
-            // 【v2.11.0修正】外部スクリプトの二重読み込み防止
+            // 【v2.12.0修正】外部スクリプトの二重実行防止（executedScripts Setで追跡）
+            //
+            // 【重要】v2.11.0のdocument.scriptsチェックはバグがあった:
+            // - innerHTML直後、テンプレートのスクリプトはdocument.scriptsに含まれる（未実行でも）
+            // - そのため自分自身を検出して初回でもスキップしてしまう
+            //
+            // 【v2.12.0の修正】:
+            // - executedScripts Setで「実際に実行した」スクリプトのみを追跡
+            // - innerHTML直後の未実行スクリプトはSetに含まれない
+            // - ページリロード時はRouterインスタンスが再作成されSetもリセット
             const scriptTags = this.appRoot.querySelectorAll('script');
             scriptTags.forEach(oldScript => {
                 const scriptSrc = oldScript.getAttribute('src');
 
-                // 外部スクリプト（src属性あり）の場合、既に読み込まれているかチェック
+                // 外部スクリプト（src属性あり）の場合、実行済みかチェック
                 if (scriptSrc) {
                     // URLからクエリパラメータを除去してベースURLを取得
                     const baseSrc = scriptSrc.split('?')[0];
 
-                    // document.scripts内に同じスクリプトが既に存在するかチェック
-                    const alreadyLoaded = Array.from(document.scripts).some(existingScript => {
-                        const existingSrc = existingScript.getAttribute('src');
-                        if (!existingSrc) return false;
-                        const existingBaseSrc = existingSrc.split('?')[0];
-                        return existingBaseSrc === baseSrc || existingBaseSrc.endsWith(baseSrc);
-                    });
-
-                    if (alreadyLoaded) {
-                        console.log(`⏭️ [Router] スクリプト既読み込み済み、スキップ: ${baseSrc}`);
+                    // 【v2.12.0修正】executedScripts Setで実行済みかチェック
+                    if (this.executedScripts.has(baseSrc)) {
+                        console.log(`⏭️ [Router] スクリプト既実行済み、スキップ: ${baseSrc}`);
                         oldScript.remove(); // テンプレート内のスクリプトタグを削除
                         return; // このスクリプトをスキップ
                     }
+
+                    // これから実行するのでSetに追加
+                    this.executedScripts.add(baseSrc);
+                    console.log(`📜 [Router] スクリプト実行: ${baseSrc}`);
                 }
 
                 const newScript = document.createElement('script');
