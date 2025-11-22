@@ -327,8 +327,31 @@ class SimpleRouter {
             this.appRoot.innerHTML = html;
 
             // 2.5. HTMLに含まれるスクリプトを手動で実行（SPAでinnerHTMLはスクリプトを実行しないため）
+            // 【v2.11.0修正】外部スクリプトの二重読み込み防止
             const scriptTags = this.appRoot.querySelectorAll('script');
             scriptTags.forEach(oldScript => {
+                const scriptSrc = oldScript.getAttribute('src');
+
+                // 外部スクリプト（src属性あり）の場合、既に読み込まれているかチェック
+                if (scriptSrc) {
+                    // URLからクエリパラメータを除去してベースURLを取得
+                    const baseSrc = scriptSrc.split('?')[0];
+
+                    // document.scripts内に同じスクリプトが既に存在するかチェック
+                    const alreadyLoaded = Array.from(document.scripts).some(existingScript => {
+                        const existingSrc = existingScript.getAttribute('src');
+                        if (!existingSrc) return false;
+                        const existingBaseSrc = existingSrc.split('?')[0];
+                        return existingBaseSrc === baseSrc || existingBaseSrc.endsWith(baseSrc);
+                    });
+
+                    if (alreadyLoaded) {
+                        console.log(`⏭️ [Router] スクリプト既読み込み済み、スキップ: ${baseSrc}`);
+                        oldScript.remove(); // テンプレート内のスクリプトタグを削除
+                        return; // このスクリプトをスキップ
+                    }
+                }
+
                 const newScript = document.createElement('script');
 
                 // 属性をコピー
