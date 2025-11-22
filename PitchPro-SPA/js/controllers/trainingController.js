@@ -1424,13 +1424,14 @@ function loadVoiceRangeData() {
 function checkVoiceRangeData() {
     // 音域データが存在しない
     if (!voiceRangeData || !voiceRangeData.results) {
+        console.log('🔍 音域データチェック: データなしまたはresultsなし');
         return false;
     }
 
-    // 全音域データを使用（comfortableRangeは廃止）
-    // 理由: comfortableRangeの計算ロジックが存在せず、全音域で十分
+    // 新形式のみサポート: results.lowFreq, results.highFreq
     const rangeData = voiceRangeData.results;
     if (!rangeData.lowFreq || !rangeData.highFreq) {
+        console.log('🔍 音域データチェック: lowFreq/highFreqなし');
         return false;
     }
 

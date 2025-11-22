@@ -606,8 +606,10 @@ class NavigationManager {
 
         // 2. trainingページのダイレクトアクセス検出
         // 【v4.6.1】新規ナビゲーション（ブックマーク等）の場合、URLパラメータで判定
-        if (page === 'training' && this.isNewNavigation()) {
-            console.log('🔍 [v4.6.1] trainingページへの新規ナビゲーション検出');
+        // 【v4.6.2修正】NORMAL_TRANSITIONフラグがある場合は正常なSPA遷移として判定
+        const hasNormalTransitionFlag = sessionStorage.getItem(this.KEYS.NORMAL_TRANSITION) === 'true';
+        if (page === 'training' && this.isNewNavigation() && !hasNormalTransitionFlag) {
+            console.log('🔍 [v4.6.2] trainingページへの新規ナビゲーション検出（フラグなし）');
 
             // sessionStorageフラグをクリア（古い状態を引き継がない）
             sessionStorage.removeItem('trainingPageActive');
@@ -632,6 +634,9 @@ class NavigationManager {
                 await this.redirectToPreparation('ダイレクトアクセス検出（パラメータ有効）');
                 return { shouldContinue: false, reason: 'direct-access-training-to-preparation' };
             }
+        } else if (page === 'training' && hasNormalTransitionFlag) {
+            // 【v4.6.2】正常なSPA遷移 - ダイレクトアクセス検出をスキップ
+            console.log('✅ [v4.6.2] 正常なSPA遷移検出（NORMAL_TRANSITIONフラグあり）- ダイレクトアクセス検出スキップ');
         }
 
         // 従来のダイレクトアクセス検出（SPA内遷移でフラグがない場合）
