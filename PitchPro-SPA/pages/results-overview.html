@@ -236,6 +236,22 @@
                     </div>
                 </section>
 
+                <!-- レッスンデータ削除 -->
+                <section class="glass-card" id="danger-zone-section" style="display: none;">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-white font-semibold text-sm mb-1">このレッスンを削除</h3>
+                            <p class="text-white-60 text-xs mb-0">
+                                削除後の復元はできません。
+                            </p>
+                        </div>
+                        <button class="btn btn-danger btn-w-auto" onclick="confirmDeleteLesson()">
+                            <i data-lucide="trash-2"></i>
+                            <span>削除</span>
+                        </button>
+                    </div>
+                </section>
+
                 <!-- 無料版 vs プレミアム版比較 -->
                 <section class="glass-card mb-8">
                     <h2 class="heading-md">
@@ -356,19 +372,28 @@
                     </div>
                 </section>
 
-                <!-- レッスンデータ削除 -->
-                <section class="glass-card" id="danger-zone-section" style="display: none;">
-                    <div class="flex flex-col gap-3">
-                        <div>
-                            <h3 class="text-white font-semibold mb-1">このレッスンを削除</h3>
-                            <p class="text-white-60 text-sm mb-0">
-                                このレッスンのすべてのデータを削除します。この操作は元に戻せません。
+                <!-- 削除完了セクション（削除後に表示） -->
+                <section class="glass-card" id="delete-complete-section" style="display: none;">
+                    <div class="flex flex-col items-center gap-4 py-4">
+                        <div class="delete-complete-icon">
+                            <i data-lucide="check-circle" class="text-green-400" style="width: 48px; height: 48px;"></i>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="text-white font-semibold mb-2">レッスンデータを削除しました</h3>
+                            <p class="text-white-60 text-sm mb-0" id="delete-complete-message">
+                                <!-- JavaScriptで動的生成 -->
                             </p>
                         </div>
-                        <button class="btn btn-danger" onclick="confirmDeleteLesson()">
-                            <i data-lucide="trash-2"></i>
-                            <span>削除</span>
-                        </button>
+                        <div class="flex flex-col md:flex-row gap-3 mt-2 w-full md:justify-center">
+                            <button class="btn btn-primary md:btn-w-1/4" id="restart-training-btn">
+                                <i data-lucide="repeat"></i>
+                                <span>同じモードで再開</span>
+                            </button>
+                            <button class="btn btn-outline md:btn-w-1/4" id="go-home-btn">
+                                <i data-lucide="home"></i>
+                                <span>ホームに戻る</span>
+                            </button>
+                        </div>
                     </div>
                 </section>
         </main>

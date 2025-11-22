@@ -94,8 +94,18 @@
  * - リロードメッセージの明確化（ユーザー混乱の解消）
  * - Hybridアプローチの明確化（preparation=Preventive, training/result-session=Reactive）
  *
- * @version 4.4.2
- * @date 2025-11-20
+ * 【v4.6.1更新】
+ * - trainingダイレクトアクセス時のリダイレクト先を改善
+ * - Navigation Timing API v2で新規ナビゲーション（ブックマーク等）を検出
+ * - isNewNavigation()メソッド追加: navigate/reload/back_forwardを区別
+ * - validateTrainingParams()メソッド追加: mode/direction/startNoteを検証
+ * - モード情報なし → ホームへリダイレクト（モード選択画面）
+ * - chromaticモードで基音なし → ホームへリダイレクト
+ * - モード情報あり → preparationへリダイレクト（マイク準備）
+ * - sessionStorageフラグ残存による誤検出を防止（新規ナビゲーション時にクリア）
+ *
+ * @version 4.6.1
+ * @date 2025-11-22
  */
 
 class NavigationManager {
@@ -297,6 +307,77 @@ class NavigationManager {
 
         console.log('❌ [NavigationManager] リロード未検出 - 通常のSPA遷移として扱う');
         return false;
+    }
+
+    /**
+     * 【v4.6.1】新規ナビゲーション検出（ブックマーク・URL直接入力等）
+     *
+     * Navigation Timing API v2を使用して、SPA内遷移と新規ナビゲーションを区別
+     * - 'navigate': 新規ナビゲーション（ブックマーク、URL入力、外部リンク）
+     * - 'reload': リロード
+     * - 'back_forward': 戻る/進む
+     *
+     * @returns {boolean} true: 新規ナビゲーション, false: SPA内遷移またはリロード
+     */
+    static isNewNavigation() {
+        const navEntries = performance.getEntriesByType('navigation');
+        if (navEntries.length > 0) {
+            const navType = navEntries[0].type;
+            console.log(`🔍 [NavigationManager] Navigation type: ${navType}`);
+            return navType === 'navigate';
+        }
+        // フォールバック: 古いAPI
+        if (performance.navigation) {
+            const isNavigate = performance.navigation.type === 0; // TYPE_NAVIGATE
+            console.log(`🔍 [NavigationManager] Navigation type (legacy): ${performance.navigation.type} (navigate: ${isNavigate})`);
+            return isNavigate;
+        }
+        return false;
+    }
+
+    /**
+     * 【v4.6.1】trainingページアクセス時のパラメータ検証
+     *
+     * URLパラメータからモード・方向・基音を取得し、ModeControllerに委譲して検証
+     * 新規モード追加時はModeController.modesのみ更新すればOK
+     *
+     * @returns {Object} { isValid: boolean, reason: string, message: string, params: object }
+     */
+    static validateTrainingParams() {
+        const hash = window.location.hash.substring(1);
+        const urlParams = new URLSearchParams(hash.split('?')[1] || '');
+
+        const params = {
+            mode: urlParams.get('mode'),
+            direction: urlParams.get('direction'),  // デフォルト値は設定しない（必須パラメータ）
+            startNote: urlParams.get('startNote'),
+            chromaticDirection: urlParams.get('chromaticDirection')
+        };
+
+        console.log(`🔍 [NavigationManager] Training params from URL:`, params);
+
+        // ModeControllerが利用可能か確認
+        if (typeof window.ModeController === 'undefined' || !window.ModeController.validateTrainingParams) {
+            console.warn('⚠️ [NavigationManager] ModeController.validateTrainingParams not available, using fallback');
+            // フォールバック: 基本的なチェックのみ
+            if (!params.mode) {
+                return { isValid: false, reason: 'no-mode', message: 'モードが指定されていません。', params };
+            }
+            if (!params.direction) {
+                return { isValid: false, reason: 'no-direction', message: '方向が指定されていません。', params };
+            }
+            return { isValid: true, reason: 'valid', message: 'パラメータは有効です（フォールバック）。', params };
+        }
+
+        // ModeControllerに検証を委譲
+        const result = window.ModeController.validateTrainingParams(params);
+
+        return {
+            isValid: result.isValid,
+            reason: result.reason,
+            message: result.message,
+            params
+        };
     }
 
     /**
@@ -524,6 +605,41 @@ class NavigationManager {
         }
 
         // 2. trainingページのダイレクトアクセス検出
+        // 【v4.6.1】新規ナビゲーション（ブックマーク等）の場合、URLパラメータで判定
+        // 【v4.6.2修正】NORMAL_TRANSITIONフラグがある場合は正常なSPA遷移として判定
+        const hasNormalTransitionFlag = sessionStorage.getItem(this.KEYS.NORMAL_TRANSITION) === 'true';
+        if (page === 'training' && this.isNewNavigation() && !hasNormalTransitionFlag) {
+            console.log('🔍 [v4.6.2] trainingページへの新規ナビゲーション検出（フラグなし）');
+
+            // sessionStorageフラグをクリア（古い状態を引き継がない）
+            sessionStorage.removeItem('trainingPageActive');
+            sessionStorage.removeItem(this.KEYS.NORMAL_TRANSITION);
+
+            const validation = this.validateTrainingParams();
+
+            if (!validation.isValid) {
+                // パラメータ不足 → ホームへリダイレクト（モード選択から）
+                console.log(`⚠️ [v4.6.1] パラメータ不足: ${validation.reason}`);
+
+                // ModeControllerから返されたメッセージを使用（ホームへの案内を追加）
+                const alertMessage = `${validation.message}\nホーム画面からやり直してください。`;
+                alert(alertMessage);
+                window.location.hash = 'home';
+                return { shouldContinue: false, reason: `direct-access-training-${validation.reason}` };
+            } else {
+                // パラメータ有効 → preparationへリダイレクト（マイク準備が必要）
+                const mode = validation.params?.mode;
+                console.log(`✅ [v4.6.1] パラメータ有効 - preparationへリダイレクト (mode: ${mode})`);
+                alert('トレーニングページは準備ページから開始してください。\nマイク設定のため準備ページに移動します。');
+                await this.redirectToPreparation('ダイレクトアクセス検出（パラメータ有効）');
+                return { shouldContinue: false, reason: 'direct-access-training-to-preparation' };
+            }
+        } else if (page === 'training' && hasNormalTransitionFlag) {
+            // 【v4.6.2】正常なSPA遷移 - ダイレクトアクセス検出をスキップ
+            console.log('✅ [v4.6.2] 正常なSPA遷移検出（NORMAL_TRANSITIONフラグあり）- ダイレクトアクセス検出スキップ');
+        }
+
+        // 従来のダイレクトアクセス検出（SPA内遷移でフラグがない場合）
         if (this.requiresPreparation(page)) {
             alert('トレーニングページは準備ページから開始してください。\nマイク設定のため準備ページに移動します。');
             await this.redirectToPreparation('ダイレクトアクセス検出');
@@ -541,7 +657,16 @@ class NavigationManager {
                 return { shouldContinue: true, reason: 'reload-handled-by-pitchpro' };
             }
 
-            // preparationページ: Preventiveアプローチ（マイクテスト・音域テストリセット）
+            // 【v4.6.0】preparationページ: 常にページ継続（Step 1から再開）
+            // 理由: セクション表示/非表示の複雑さを考慮し、統一動作でバグ防止
+            if (page === 'preparation') {
+                console.log('✅ [v4.6.0] preparationリロード検出 - ページ継続（Step 1から再開）');
+                sessionStorage.removeItem('preparationPageActive');
+                sessionStorage.removeItem('preparationCurrentStep');
+                return { shouldContinue: true, reason: 'preparation-reload-continue' };
+            }
+
+            // その他のページ: 従来通りのPreventiveアプローチ
             if (config.reloadMessage) {
                 alert(config.reloadMessage);
             }
@@ -550,7 +675,8 @@ class NavigationManager {
             // （detectReload内で削除されているはずだが、念のため再確認）
             if (page === 'preparation') {
                 sessionStorage.removeItem('preparationPageActive');
-                console.log('✅ [NavigationManager] preparationPageActiveフラグをクリア（リロード検出後）');
+                sessionStorage.removeItem('preparationCurrentStep');
+                console.log('✅ [NavigationManager] preparationフラグをクリア（リロード検出後）');
             }
 
             // 【v4.4.2】リダイレクト完了フラグを設定（2回目の検出を防止）

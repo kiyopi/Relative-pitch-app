@@ -1,12 +1,113 @@
 # 音量バー統合仕様書 (VOLUME_BAR_INTEGRATION_SPECIFICATION)
 
-**バージョン**: 1.0.0  
-**最終更新**: 2025年1月7日  
-**作成者**: Claude Code  
+**バージョン**: 1.1.0
+**最終更新**: 2025-11-22
+**作成者**: Claude Code
+
+## 変更履歴
+- **v1.1.0 (2025-11-22)**: 基音再生音量の永続化機能追加（Issue #2対応）
+- **v1.0.0 (2025-01-07)**: 初版作成  
 
 ## 🎯 概要
 
 PitchProライブラリと音量バー表示システムの統合仕様書。VolumeBarControllerコンポーネントを使用した統一音量制御システムの実装方法を定義。
+
+---
+
+## 🔊 基音再生音量の永続化 (v1.1.0追加)
+
+### 概要
+
+準備ページで設定した基音再生音量をlocalStorageに保存し、トレーニング開始時に復元する機能。
+
+### 問題の背景（Issue #2）
+
+- 準備画面で調整した音量がトレーニング開始毎にリセットされていた
+- PitchShifter再初期化時にDeviceDetectorのデフォルト音量を使用していた
+- ユーザーの音量設定が保持されない問題
+
+### 解決策
+
+#### 1. 保存形式
+
+```javascript
+// localStorageキー
+const VOLUME_STORAGE_KEY = 'pitchpro_volume_percent';
+
+// 保存値: 0〜100のパーセント値
+// 50% = デバイスデフォルト音量
+// 0% = baseVolume - 30dB
+// 100% = baseVolume + 30dB
+```
+
+#### 2. dB計算式
+
+```javascript
+function getSavedVolumeDb() {
+    const volumePercent = getSavedVolumePercent(); // 0-100
+    const baseVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
+    const volumeOffset = (volumePercent - 50) * 0.6; // 50%差で±30dB
+    return baseVolume + volumeOffset;
+}
+```
+
+#### 3. 実装箇所
+
+| ファイル | 役割 |
+|---------|------|
+| `preparation-pitchpro-cycle.js` | 音量保存・スライダー初期値復元・PitchShifter初期化時に保存音量使用 |
+| `router.js` | PitchShifterバックグラウンド初期化時に保存音量使用 |
+| `trainingController.js` | フォールバック初期化時に保存音量使用 |
+
+#### 4. ヘルパー関数
+
+```javascript
+// 音量パーセント値を保存
+function saveVolumePercent(volumePercent) {
+    localStorage.setItem('pitchpro_volume_percent', volumePercent.toString());
+}
+
+// 保存済み音量パーセント値を取得
+function getSavedVolumePercent() {
+    const saved = localStorage.getItem('pitchpro_volume_percent');
+    if (saved !== null) {
+        const parsed = parseInt(saved, 10);
+        if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
+            return parsed;
+        }
+    }
+    return 50; // デフォルト50%
+}
+
+// 保存済み音量からdB値を計算
+function getSavedVolumeDb() {
+    const volumePercent = getSavedVolumePercent();
+    const baseVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
+    const volumeOffset = (volumePercent - 50) * 0.6;
+    return baseVolume + volumeOffset;
+}
+```
+
+#### 5. 音量スライダー初期化
+
+```javascript
+// 準備ページ読み込み時
+const volumeSlider = document.getElementById('app-volume-slider');
+if (volumeSlider) {
+    // 保存済み音量でスライダー初期値を復元
+    const savedVolumePercent = getSavedVolumePercent();
+    volumeSlider.value = savedVolumePercent;
+
+    // 変更時に保存
+    volumeSlider.addEventListener('input', (e) => {
+        const volumePercent = parseInt(e.target.value);
+        saveVolumePercent(volumePercent);
+        // PitchShifterに音量を適用...
+    });
+}
+```
+
+---
 
 ## ⚠️ 重要な注意事項
 

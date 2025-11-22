@@ -11,7 +11,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>8va相対音感トレーニング - ホーム</title>
-    <link rel="stylesheet" href="styles/base.css?v=20251121003">
+    <link rel="stylesheet" href="styles/base.css?v=20251121005">
     <link rel="stylesheet" href="styles/results.css?v=20251121005">
     <link rel="stylesheet" href="styles/training.css?v=20251119001">
     <link rel="stylesheet" href="styles/voice-range.css?v=20251119001">
@@ -37,7 +37,7 @@
     <script src="js/data-manager.js?v=1763569803"></script>
     <!-- 【v1.0.0追加】フラグ管理ヘルパー（NavigationManager依存前提） -->
     <script src="js/flag-manager.js?v=20251120001"></script>
-    <script src="js/navigation-manager.js?v=1763636512"></script>
+    <script src="js/navigation-manager.js?v=1763791772"></script>
     <script src="js/evaluation-calculator.js?v=20251029012"></script>
     <!-- DistributionChart コンポーネント（評価分布グラフ統一表示） -->
     <script src="js/components/DistributionChart.js?v=20251118002"></script>
@@ -51,14 +51,14 @@
     <script src="pages/js/result-session-controller.js?v=1763697925"></script>
     <!-- 【v2.0.0追加】Router統一初期化システム用コントローラー -->
     <script src="pages/js/records-controller.js?v=1763697523"></script>
-    <script src="pages/js/results-overview-controller.js?v=20251121003"></script>
+    <script src="pages/js/results-overview-controller.js?v=20251121008"></script>
     <script src="pages/js/settings-controller.js?v=20251109002"></script>
     <script src="pages/js/premium-analysis-calculator.js?v=20251110001"></script>
     <script src="pages/js/premium-analysis-controller.js?v=20251110001"></script>
     <script src="pages/js/help-controller.js?v=20251121001"></script>
     <script src="js/core/pitchpro-v1.3.5.umd.js?v=20251118001"></script>
     <script src="js/core/pitchpro-config.js?v=20251110006"></script>
-    <script src="js/core/device-detector.js?v=20251117001"></script>
+    <script src="js/core/device-detector.js?v=1763793821"></script>
 
     <!-- 音域テスト正規版（SPA対応・条件付き初期化） -->
     <script src="pages/js/voice-range-test.js?v=1762761450"></script>
@@ -74,14 +74,14 @@
 
     <!-- PitchShifter Library -->
     <script type="module">
-        import { PitchShifter } from './js/core/reference-tones.js?v=2.9.0&t=1761735209&nocache=1';
+        import { PitchShifter } from './js/core/reference-tones.js?v=2.9.2&t=1763798493&nocache=1';
         import * as Tone from 'tone';
 
         window.PitchShifter = PitchShifter;
         window.Tone = Tone;
 
-        console.log('✅ PitchShifter loaded globally (v2.9.0 - Optimized Envelope)');
-        console.log('📦 [CACHE BUSTER] Timestamp: 1761735209');
+        console.log('✅ PitchShifter loaded globally (v2.9.2 - AudioContext Debug)');
+        console.log('📦 [CACHE BUSTER] Timestamp: 1763798493');
         console.log('⚙️ [ENVELOPE] attack: 0.02s, sustain: 1.0s, release: 1.5s (2.52s total), curve: linear');
         console.log('✅ Tone.js v15.1.22 (stable latest) loaded globally');
     </script>

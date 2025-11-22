@@ -1,10 +1,17 @@
 # ModeController仕様書
 
-**バージョン**: 2.0.1
+**バージョン**: 2.4.0
 **作成日**: 2025-11-11
-**最終更新**: 2025-11-16
+**最終更新**: 2025-11-22
 
 **変更履歴**:
+- v2.4.0 (2025-11-22): trainingController.jsのmodeConfig完全統合
+  - **trainingController.jsの重複modeConfig定義を削除**
+  - 各モードに`requiredBaseNotes`プロパティ追加（音域内必要最小基音数）
+  - `getRequiredBaseNotes(modeId)`メソッド追加
+  - `validateTrainingParams(params)`メソッド追加（v2.3.0）
+  - `getValidModeIds()`メソッド追加（v2.3.0）
+  - NavigationManager v4.6.1でパラメータ検証にModeController活用
 - v2.0.1 (2025-11-16): UI一貫性向上のための統合使用拡大
   - **preparationController.js**: リダイレクトメッセージとサブタイトルで`generatePageTitle()`使用
   - **results-overview-controller.js**: 次のステップボタンのdescriptionで`generatePageTitle()`使用
@@ -100,6 +107,7 @@ const ModeController = {
     shortName: string,             // 短縮名（'ランダム基音'）
     description: string,           // 説明文
     sessionsPerLesson: number | function,  // セッション数（固定値 or 動的計算関数）
+    requiredBaseNotes: number,     // 音域内に必要な最小基音数（v2.4.0追加）
     baseNoteSelection: string,     // 基音選択方式
     hasIndividualResults: boolean, // セッション個別結果表示の有無
     hasRangeAdjustment: boolean,   // 音域調整機能の有無
@@ -326,7 +334,40 @@ getSessionsPerLesson(modeId, options = {}) {
 
 ---
 
-### 3. getModeName(modeId, useShortName)
+### 3. getRequiredBaseNotes(modeId) 【v2.4.0追加】
+
+モードに必要な最小基音数を取得（音域内に最低限必要な基音の数）
+
+**使用例**:
+```javascript
+// ランダム基音モード
+const requiredNotes1 = ModeController.getRequiredBaseNotes('random');
+// → 8
+
+// 連続チャレンジモード
+const requiredNotes2 = ModeController.getRequiredBaseNotes('continuous');
+// → 12
+
+// 12音階モード
+const requiredNotes3 = ModeController.getRequiredBaseNotes('12tone');
+// → 12
+```
+
+**実装詳細**:
+```javascript
+getRequiredBaseNotes(modeId) {
+    const mode = this.getMode(modeId);
+    return mode?.requiredBaseNotes || 8; // デフォルト8音
+}
+```
+
+**用途**:
+- 音域不足時の自動拡張処理（trainingController.js）
+- 音域テスト結果の妥当性判定
+
+---
+
+### 4. getModeName(modeId, useShortName)
 
 モード名を取得
 
@@ -422,6 +463,72 @@ const beginnerModes = ModeController.getAllModes({ difficulty: 'beginner' });
 
 ---
 
+### 8. getValidModeIds(excludeDeprecated) 【v2.3.0追加】
+
+有効なモードIDのリストを取得
+
+**使用例**:
+```javascript
+// 有効なモードIDを取得
+const validModes = ModeController.getValidModeIds();
+// → ['random', 'continuous', '12tone']
+
+// 非推奨モードを含める
+const allModes = ModeController.getValidModeIds(false);
+```
+
+**実装詳細**:
+```javascript
+getValidModeIds(excludeDeprecated = true) {
+    return Object.keys(this.modes).filter(id =>
+        !excludeDeprecated || !this.modes[id].deprecated
+    );
+}
+```
+
+**用途**:
+- パラメータ検証時のモード有効性チェック
+- NavigationManager.validateTrainingParams()で使用
+
+---
+
+### 9. validateTrainingParams(params) 【v2.3.0追加】
+
+トレーニングパラメータの一括検証（パラメータ検証の一元管理）
+
+**使用例**:
+```javascript
+const result = ModeController.validateTrainingParams({
+    mode: 'random',
+    direction: 'ascending',
+    startNote: null,
+    chromaticDirection: null
+});
+
+// 成功時
+// → { isValid: true, reason: 'valid', message: 'パラメータは有効です。', details: {...} }
+
+// 失敗時（モードなし）
+// → { isValid: false, reason: 'no-mode', message: 'トレーニングモードが指定されていません。', details: {...} }
+
+// 失敗時（方向なし）
+// → { isValid: false, reason: 'no-direction', message: '音階方向（上行/下行）が指定されていません。', details: {...} }
+
+// 失敗時（12音階で基音なし）
+// → { isValid: false, reason: 'chromatic-no-startnote', message: '12音階モードには基音の指定が必要です。', details: {...} }
+```
+
+**検証項目**:
+1. **mode**: 必須、有効なモードIDか
+2. **direction**: 必須（全モード共通）、'ascending' or 'descending'
+3. **startNote**: 12音階モードのみ必須
+
+**用途**:
+- NavigationManager v4.6.1でのダイレクトアクセス検出時のパラメータ検証
+- 新モード追加時もModeController.modesの更新のみで対応可能
+
+---
+
 ## 📊 統合戦略
 
 ### Phase 1: ModeController導入（完了）
@@ -434,9 +541,9 @@ const beginnerModes = ModeController.getAllModes({ difficulty: 'beginner' });
 
 ---
 
-### Phase 2: 段階的統合（次回作業）
+### Phase 2: 段階的統合（完了 v2.4.0）
 
-#### Step 1: records-controller.js統合
+#### Step 1: records-controller.js統合（完了 v2.0.1）
 
 **変更前**:
 ```javascript
@@ -472,7 +579,7 @@ const getSessionsPerLesson = (mode, sessions) => {
 
 ---
 
-#### Step 2: trainingController.js統合
+#### Step 2: trainingController.js統合（完了 v2.4.0）
 
 **変更前**:
 ```javascript
@@ -501,12 +608,37 @@ const modeConfig = {
 };
 ```
 
-**変更後**:
+**変更後（v2.4.0完了）**:
 ```javascript
-// ModeController活用
-const modeConfig = ModeController.toTrainingConfig();
+// 【v2.4.0】ModeController統合 - modeConfig定義を完全削除
+// trainingController.jsでは直接ModeControllerメソッドを使用
 
-// 12音階モード両方向の動的調整
+// モード有効性チェック
+if (modeParam && window.ModeController?.getMode(modeParam)) {
+    currentMode = modeParam;
+}
+
+// モード名取得
+const modeName = window.ModeController?.getModeName(currentMode);
+
+// セッション数取得
+const maxSessions = sessionManager.getMaxSessions(); // 内部でModeController使用
+
+// hasIndividualResults取得
+const modeConfig = window.ModeController?.getMode(currentMode);
+if (modeConfig?.hasIndividualResults) { ... }
+
+// 必要基音数取得
+const requiredNotes = window.ModeController?.getRequiredBaseNotes(currentMode);
+```
+
+**削除されたコード**:
+- `const modeConfig = { ... }` 定義（約20行）
+- `modeConfig['12tone'].maxSessions = 24;` 動的変更（不要に）
+
+**旧実装（削除済み）**:
+```javascript
+// 12音階モード両方向の動的調整（削除済み - ModeController.getSessionsPerLesson()で対応）
 if (currentMode === '12tone' && directionParam === 'both') {
     modeConfig['12tone'].maxSessions = ModeController.getSessionsPerLesson('12tone', { direction: 'both' });
 }
@@ -514,16 +646,17 @@ if (currentMode === '12tone' && directionParam === 'both') {
 
 ---
 
-#### Step 3: 名称統一の完全実施
+#### Step 3: 名称統一の完全実施（完了 v2.0.1）
 
-**対象箇所**:
-- `results-overview-controller.js`: モード名表示
-- `records-controller.js`: 統計表示のモード名
-- `session-data-recorder.js`: モード名ロギング
+**対象箇所（すべて完了）**:
+- ✅ `results-overview-controller.js`: モード名表示
+- ✅ `records-controller.js`: 統計表示のモード名
+- ✅ `preparationController.js`: リダイレクトメッセージ、サブタイトル
+- ✅ `trainingController.js`: ページタイトル、ログ出力
 
 **統一方法**:
 ```javascript
-// 従来（分散定義）
+// 従来（分散定義）- 削除済み
 const modeNames = { 'random': 'ランダム基音モード', ... };
 const modeName = modeNames[mode];
 
@@ -869,6 +1002,35 @@ uniqueLessonIds.size = 6 (8個ではない) ❌
 ---
 
 ## 📝 変更履歴
+
+### v2.4.0 (2025-11-22)
+
+**🔗 trainingController.js完全統合**:
+- `modeConfig`定義（約20行）を完全削除
+- 11箇所のmodeConfig参照をModeControllerメソッドに置換
+- maxSessionsの動的変更コードを削除（ModeController.getSessionsPerLesson()で対応）
+
+**🆕 新プロパティ追加**:
+- 各モードに`requiredBaseNotes`追加（音域内必要最小基音数）
+  - random: 8
+  - continuous: 12
+  - 12tone: 12
+
+**🆕 新メソッド追加**:
+- `getRequiredBaseNotes(modeId)`: 音域内に必要な最小基音数を取得
+- `validateTrainingParams(params)`: トレーニングパラメータの一括検証（v2.3.0）
+- `getValidModeIds()`: 有効なモードIDリスト取得（v2.3.0）
+
+**🔗 NavigationManager連携（v4.6.1）**:
+- ダイレクトアクセス時のパラメータ検証にModeController.validateTrainingParams()使用
+- 新モード追加時もModeController.modesの更新のみで対応可能
+
+**📈 保守性向上**:
+- モード情報の単一情報源（Single Source of Truth）を完全実現
+- 新モード追加時の修正箇所を1箇所に集約
+- ハードコードされた分散定義を完全排除
+
+---
 
 ### v2.0.0 (2025-11-12)
 

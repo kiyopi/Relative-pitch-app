@@ -3,6 +3,8 @@
  * Based on vanilla JS + 自作SPA development roadmap
  *
  * Changelog:
+ *   v2.12.0 (2025-11-22) - 外部スクリプト二重読み込み防止のバグ修正（executedScripts Set使用）
+ *   v2.11.0 (2025-11-22) - [REVERTED] 外部スクリプトの二重読み込み防止（document.scriptsチェックにバグあり）
  *   v2.3.0 (2025-11-20) - training page cleanup改善（NavigationManager統合徹底化の完成）
  *   v2.2.0 (2025-11-19) - preparation page cleanup改善（NavigationManager管理時はスキップ、二重破棄防止）
  *   v2.1.0 (2025-11-19) - records page cleanup追加（AudioDetector適切な破棄、メモリリーク防止）
@@ -196,6 +198,10 @@ class SimpleRouter {
         // 初期化済みフラグ管理（二重初期化防止用）
         this.initializedPages = new Set();
 
+        // 【v2.12.0追加】実行済みスクリプト追跡（二重実行防止用）
+        // document.scriptsではなく明示的なSetで管理することで、innerHTML直後の自己参照バグを回避
+        this.executedScripts = new Set();
+
         // 【Phase 1追加】遷移制御フラグ（競合状態防止）
         this.isNavigating = false;
         this.currentNavigationId = 0;
@@ -327,8 +333,37 @@ class SimpleRouter {
             this.appRoot.innerHTML = html;
 
             // 2.5. HTMLに含まれるスクリプトを手動で実行（SPAでinnerHTMLはスクリプトを実行しないため）
+            // 【v2.12.0修正】外部スクリプトの二重実行防止（executedScripts Setで追跡）
+            //
+            // 【重要】v2.11.0のdocument.scriptsチェックはバグがあった:
+            // - innerHTML直後、テンプレートのスクリプトはdocument.scriptsに含まれる（未実行でも）
+            // - そのため自分自身を検出して初回でもスキップしてしまう
+            //
+            // 【v2.12.0の修正】:
+            // - executedScripts Setで「実際に実行した」スクリプトのみを追跡
+            // - innerHTML直後の未実行スクリプトはSetに含まれない
+            // - ページリロード時はRouterインスタンスが再作成されSetもリセット
             const scriptTags = this.appRoot.querySelectorAll('script');
             scriptTags.forEach(oldScript => {
+                const scriptSrc = oldScript.getAttribute('src');
+
+                // 外部スクリプト（src属性あり）の場合、実行済みかチェック
+                if (scriptSrc) {
+                    // URLからクエリパラメータを除去してベースURLを取得
+                    const baseSrc = scriptSrc.split('?')[0];
+
+                    // 【v2.12.0修正】executedScripts Setで実行済みかチェック
+                    if (this.executedScripts.has(baseSrc)) {
+                        console.log(`⏭️ [Router] スクリプト既実行済み、スキップ: ${baseSrc}`);
+                        oldScript.remove(); // テンプレート内のスクリプトタグを削除
+                        return; // このスクリプトをスキップ
+                    }
+
+                    // これから実行するのでSetに追加
+                    this.executedScripts.add(baseSrc);
+                    console.log(`📜 [Router] スクリプト実行: ${baseSrc}`);
+                }
+
                 const newScript = document.createElement('script');
 
                 // 属性をコピー
@@ -828,7 +863,10 @@ class SimpleRouter {
             // DeviceDetectorから音量設定を取得（統一設定）
             const deviceVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
             const deviceType = window.DeviceDetector?.getDeviceType() ?? 'pc';
-            console.log(`🔊 PitchShifter音量: ${deviceVolume}dB (デバイス: ${deviceType}, DeviceDetector統一設定)`);
+
+            // 【Issue #2修正】保存済み音量を優先、なければDeviceDetectorデフォルト
+            const savedVolumeDb = this.getSavedVolumeDb();
+            console.log(`🔊 PitchShifter音量: ${savedVolumeDb.toFixed(1)}dB (デバイス: ${deviceType}, 保存済み設定復元)`);
 
             // 新規作成
             // ⚠️ IMPORTANT: attack/release値を変更する場合は、以下の2箇所も同時に変更すること
@@ -838,7 +876,7 @@ class SimpleRouter {
                 baseUrl: 'audio/piano/',
                 attack: 0.02,
                 release: 1.5,
-                volume: deviceVolume
+                volume: savedVolumeDb
             });
 
             // バックグラウンドで初期化（完了を待たない）
@@ -853,6 +891,29 @@ class SimpleRouter {
         } catch (error) {
             console.warn('⚠️ PitchShifter初期化エラー（バックグラウンド）:', error);
         }
+    }
+
+    // 【Issue #2修正】音量永続化ヘルパーメソッド
+    getSavedVolumeDb() {
+        const VOLUME_STORAGE_KEY = 'pitchpro_volume_percent';
+        const DEFAULT_VOLUME_PERCENT = 50;
+
+        let volumePercent = DEFAULT_VOLUME_PERCENT;
+        try {
+            const saved = localStorage.getItem(VOLUME_STORAGE_KEY);
+            if (saved !== null) {
+                const parsed = parseInt(saved, 10);
+                if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
+                    volumePercent = parsed;
+                }
+            }
+        } catch (e) {
+            console.warn('⚠️ 音量設定の読み込みに失敗:', e);
+        }
+
+        const baseVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
+        const volumeOffset = (volumePercent - 50) * 0.6; // 50%差で±30dB
+        return baseVolume + volumeOffset;
     }
 
     async setupResultSessionEvents(fullHash = '') {
@@ -924,9 +985,11 @@ class SimpleRouter {
             }
 
             // 【v4.3.1】preparationPageActiveフラグのクリーンアップ
+            // 【v4.6.0】preparationCurrentStepもクリア
             if (this.currentPage === 'preparation') {
                 sessionStorage.removeItem('preparationPageActive');
-                console.log('🔄 [Router] preparationPageActiveフラグを削除（ページ離脱）');
+                sessionStorage.removeItem('preparationCurrentStep');
+                console.log('🔄 [Router] preparationフラグを削除（ページ離脱）');
             }
 
         } catch (error) {

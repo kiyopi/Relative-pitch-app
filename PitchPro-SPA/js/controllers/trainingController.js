@@ -2,7 +2,13 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: v4.0.22 (2025-11-18) - 音域自動拡張の条件緩和
+ * 🔥 VERSION: v4.5.0 (2025-11-21) - マイク事前チェック追加
+ *
+ * 【v4.5.0修正内容】
+ * - マイク事前チェック追加: initializeTrainingPage()でgetUserMedia()を実行
+ * - ドレミガイド中のダイアログ防止: 基音再生前にマイク許可を確認
+ * - SPA化の恩恵活用: ここで取得した許可はドレミガイドでそのまま使用可能
+ * - エラーハンドリング: 許可拒否・デバイスエラー時は準備ページへリダイレクト
  *
  * 【v4.0.22修正内容】
  * - 下行モード拡張条件緩和: 10%余裕を追加（基音-1オクターブが音域下限の90%以上）
@@ -186,28 +192,9 @@ function updateDirectionBadges(scaleDirection, chromaticDirection = null) {
 let currentMode = 'random'; // 'random' | 'continuous' | '12tone'
 let voiceRangeData = null; // 音域データ
 
-// モード設定
-const modeConfig = {
-    random: {
-        maxSessions: 8,
-        title: 'ランダム基音モード',
-        hasIndividualResults: true,
-        baseNoteSelection: 'random_c3_octave'
-    },
-    continuous: {
-        maxSessions: 12,
-        title: '連続チャレンジモード',
-        hasIndividualResults: false,
-        baseNoteSelection: 'random_chromatic'
-    },
-    '12tone': {
-        maxSessions: 12,
-        title: '12音階モード',
-        hasIndividualResults: false,
-        baseNoteSelection: 'sequential_chromatic',
-        hasRangeAdjustment: true
-    }
-};
+// 【v2.4.0】モード設定はModeControllerに一元化
+// 旧modeConfig定義は削除 - window.ModeController.getMode(modeId)を使用すること
+// 参照: /js/mode-controller.js
 
 export async function initializeTrainingPage() {
     console.log('TrainingController initializing...');
@@ -226,12 +213,13 @@ export async function initializeTrainingPage() {
     console.log('🔍 [DEBUG] directionパラメータ:', directionParam);
     console.log('🔍 [DEBUG] scaleDirectionパラメータ:', scaleDirectionParam);
 
-    if (modeParam && modeConfig[modeParam]) {
+    // 【v2.4.0】ModeControllerでモード有効性チェック
+    if (modeParam && window.ModeController && window.ModeController.getMode(modeParam)) {
         currentMode = modeParam;
-        console.log(`✅ モード設定: ${currentMode} (${modeConfig[currentMode].title})`);
+        console.log(`✅ モード設定: ${currentMode} (${window.ModeController.getModeName(currentMode)})`);
     } else {
         console.warn(`⚠️ モードパラメータ不正: ${modeParam} - デフォルト(random)を使用`);
-        console.warn(`🔍 [DEBUG] 利用可能なモード:`, Object.keys(modeConfig));
+        console.warn(`🔍 [DEBUG] 利用可能なモード:`, window.ModeController?.getValidModeIds() || ['random', 'continuous', '12tone']);
         currentMode = 'random';
     }
 
@@ -264,15 +252,9 @@ export async function initializeTrainingPage() {
         window.currentTrainingDirection = directionParam;
         chromaticDirectionForBadge = directionParam;
         console.log(`✅ 12音階モード方向: ${directionParam}`);
-
-        // 両方向の場合はmaxSessionsを24に変更
-        if (directionParam === 'both') {
-            modeConfig['12tone'].maxSessions = 24;
-            console.log(`✅ 12音階モード両方向: maxSessions=24に設定`);
-        } else {
-            modeConfig['12tone'].maxSessions = 12;
-            console.log(`✅ 12音階モード片方向: maxSessions=12に設定`);
-        }
+        // 【v2.4.0】maxSessionsの動的変更は不要 - ModeController.getSessionsPerLesson()で対応
+        const expectedSessions = window.ModeController.getSessionsPerLesson('12tone', { direction: directionParam });
+        console.log(`✅ 12音階モード: maxSessions=${expectedSessions}（ModeController管理）`);
     }
 
     // 音階方向・基音方向バッジを更新（DOM読み込み後に実行）
@@ -397,6 +379,34 @@ export async function initializeTrainingPage() {
     // ダイレクトアクセス検出により、マイク許可問題は根本解決済み
     // リロード時はアプリのアラートのみ表示（ダイアログ1つでスムーズ）
 
+    // 【v4.5.0追加】マイク事前チェック - ドレミガイド中のダイアログ出現を防止
+    // SPA化により、ここで取得したマイク許可はドレミガイドでそのまま使用可能
+    // 基音再生（PitchShifter）はマイク不要なので、ダイアログ表示中も問題なし
+    try {
+        console.log('🎤 [v4.5.0] マイク事前チェック開始...');
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        console.log('✅ [v4.5.0] マイク許可確認完了 - MediaStream取得成功');
+
+        // MediaStreamは保持せず、許可状態の確認のみ
+        // AudioDetectorが後で独自にMediaStreamを取得する
+        stream.getTracks().forEach(track => track.stop());
+        console.log('🔄 [v4.5.0] 確認用MediaStreamを解放（AudioDetectorが再取得）');
+    } catch (error) {
+        console.error('❌ [v4.5.0] マイク許可取得失敗:', error);
+
+        // マイク許可が拒否された場合は準備ページへリダイレクト
+        if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+            alert('マイクの使用が許可されていません。\nトレーニングにはマイクが必要です。');
+            await NavigationManager.redirectToPreparation('マイク許可拒否');
+            return;
+        }
+
+        // その他のエラー（デバイスなし等）
+        alert(`マイクエラー: ${error.message}\nマイクが正しく接続されているか確認してください。`);
+        await NavigationManager.redirectToPreparation('マイクエラー');
+        return;
+    }
+
     // Setup button (常に再登録)
     const playButton = document.getElementById('play-base-note');
     if (playButton) {
@@ -445,8 +455,9 @@ function initializeModeUI() {
     console.log('Initializing mode UI...');
 
     // モード設定を取得
-    const config = modeConfig[currentMode];
-    console.log(`📋 現在のモード: ${config.title}`);
+    // 【v2.4.0】ModeController統合
+    const modeName = window.ModeController?.getModeName(currentMode) || currentMode;
+    console.log(`📋 現在のモード: ${modeName}`);
 
     // 音階方向を取得
     const scaleDirection = sessionStorage.getItem('trainingDirection') || 'ascending';
@@ -469,8 +480,10 @@ function initializeModeUI() {
  * - 連続モード・12音階モード：既存セッションデータを保持して継続
  */
 function initializeModeTraining() {
-    const config = modeConfig[currentMode];
-    console.log(`🆕 ${config.title}の初期化処理を実行`);
+    // 【v2.4.0】ModeController統合
+    const modeConfig = window.ModeController?.getMode(currentMode);
+    const modeName = window.ModeController?.getModeName(currentMode) || currentMode;
+    console.log(`🆕 ${modeName}の初期化処理を実行`);
 
     // localStorageクリア処理は preparation-pitchpro-cycle.js が実行済み
     // ここではモード別の基音選定のみ実行
@@ -478,7 +491,7 @@ function initializeModeTraining() {
 
     // 【新規】全セッション分の基音を事前に一括選定
     usedBaseNotes = []; // 使用済み基音リストをリセット（トレーニング開始時）
-    selectedBaseNotes = selectAllBaseNotesForMode(config);
+    selectedBaseNotes = selectAllBaseNotesForMode(modeConfig);
 
     // 最初のセッションの基音を事前に選択（ボタンクリック時の遅延を回避）
     preselectBaseNote();
@@ -501,7 +514,7 @@ function preselectBaseNote() {
         console.log('═══════════════════════════════════════════════════');
         console.log(`🎼 [セッション ${sessionIndex + 1}/${selectedBaseNotes.length}] 基音セット完了`);
         console.log(`   現在の基音: ${baseNoteInfo.note} (${baseNoteInfo.frequency.toFixed(1)}Hz)`);
-        console.log(`   選定モード: ${currentMode} (${modeConfig[currentMode]?.title || '不明'})`);
+        console.log(`   選定モード: ${currentMode} (${window.ModeController?.getModeName(currentMode) || '不明'})`);
         console.log(`   全基音リスト: ${selectedBaseNotes.map(n => n.note).join(' → ')}`);
         console.log('═══════════════════════════════════════════════════');
         console.log('');
@@ -536,6 +549,32 @@ function getDeviceVolume() {
     return window.DeviceDetector.getDeviceVolume();
 }
 
+/**
+ * 【Issue #2修正】保存済み音量パーセントからdB値を計算
+ * @returns {number} dB値（DeviceDetector基準音量 + オフセット）
+ */
+function getSavedVolumeDb() {
+    const VOLUME_STORAGE_KEY = 'pitchpro_volume_percent';
+    const DEFAULT_VOLUME_PERCENT = 50;
+
+    let volumePercent = DEFAULT_VOLUME_PERCENT;
+    try {
+        const saved = localStorage.getItem(VOLUME_STORAGE_KEY);
+        if (saved !== null) {
+            const parsed = parseInt(saved, 10);
+            if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
+                volumePercent = parsed;
+            }
+        }
+    } catch (e) {
+        console.warn('⚠️ 音量設定の読み込みに失敗:', e);
+    }
+
+    const baseVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
+    const volumeOffset = (volumePercent - 50) * 0.6; // 50%差で±30dB
+    return baseVolume + volumeOffset;
+}
+
 // PitchShifter初期化（シングルトンパターン + グローバルインスタンス活用）
 async function initializePitchShifter() {
     // 1. グローバルインスタンスが既に初期化済みなら使用
@@ -546,6 +585,11 @@ async function initializePitchShifter() {
         // 【v4.0.8修正】グローバルインスタンスは準備フェーズで音量調整済み
         // ユーザーの音量スライダー設定を尊重するため、setVolume()を呼ばない
         console.log('🔊 準備フェーズの音量設定を維持（ユーザー調整を尊重）');
+
+        // 【DEBUG】現在のPitchShifter音量を確認
+        if (pitchShifter.sampler && pitchShifter.sampler.volume) {
+            console.log(`🔊 [DEBUG] PitchShifter現在の音量: ${pitchShifter.sampler.volume.value}dB`);
+        }
 
         return pitchShifter;
     }
@@ -586,15 +630,16 @@ async function initializePitchShifter() {
 
         console.log('✅ PitchShifter利用可能:', typeof window.PitchShifter);
 
-        const deviceVolume = getDeviceVolume();
+        // 【Issue #2修正】保存済み音量を優先、なければDeviceDetectorデフォルト
+        const savedVolumeDb = getSavedVolumeDb();
         const deviceType = getDeviceType();
-        console.log(`📱 デバイス: ${deviceType}, 音量: ${deviceVolume}dB`);
+        console.log(`📱 デバイス: ${deviceType}, 音量: ${savedVolumeDb.toFixed(1)}dB (保存済み設定復元)`);
 
-        // デバイス別最適化音量を設定
+        // 保存済み音量を設定
         pitchShifter = new window.PitchShifter({
             baseUrl: 'audio/piano/',
             release: 2.5,
-            volume: deviceVolume
+            volume: savedVolumeDb
         });
 
         await pitchShifter.initialize();
@@ -1167,10 +1212,11 @@ function handleSessionComplete() {
             : 0;
         console.log(`🔍 [DEBUG] レッスン別セッション数: lessonId=${currentLessonId}, ${sessionNumber}セッション (全体=${totalSessions}セッション)`);
 
-        const config = modeConfig[currentMode];
+        // 【v2.4.0】ModeController統合
+        const modeConfig = window.ModeController?.getMode(currentMode);
 
         // モード別の処理分岐
-        if (config.hasIndividualResults) {
+        if (modeConfig?.hasIndividualResults) {
             // ランダムモード：個別セッション結果ページへ遷移
             console.log(`📊 ランダムモード：セッション${sessionNumber}の結果ページへ遷移`);
 
@@ -1324,9 +1370,10 @@ window.resetTrainingPageFlag = resetTrainingPageFlag;
  */
 function updateSessionProgressUI() {
     // 【修正v4.0.0】SessionManager統合: 重複コード削減
-    const config = modeConfig[currentMode];
+    // 【v2.4.0】ModeController統合
+    const modeName = window.ModeController?.getModeName(currentMode) || currentMode;
 
-    console.log(`📊 セッション進行状況: ${sessionManager.getProgressText()} (${config.title})`);
+    console.log(`📊 セッション進行状況: ${sessionManager.getProgressText()} (${modeName})`);
 
     // 進行バーを更新
     const progressFill = document.querySelector('.progress-section .progress-fill');
@@ -1377,13 +1424,14 @@ function loadVoiceRangeData() {
 function checkVoiceRangeData() {
     // 音域データが存在しない
     if (!voiceRangeData || !voiceRangeData.results) {
+        console.log('🔍 音域データチェック: データなしまたはresultsなし');
         return false;
     }
 
-    // 全音域データを使用（comfortableRangeは廃止）
-    // 理由: comfortableRangeの計算ロジックが存在せず、全音域で十分
+    // 新形式のみサポート: results.lowFreq, results.highFreq
     const rangeData = voiceRangeData.results;
     if (!rangeData.lowFreq || !rangeData.highFreq) {
+        console.log('🔍 音域データチェック: lowFreq/highFreqなし');
         return false;
     }
 
@@ -1448,17 +1496,9 @@ function getAvailableNotes() {
         console.log(`   範囲: ${availableNotes[0].note} (${availableNotes[0].frequency.toFixed(1)}Hz) - ${availableNotes[availableNotes.length - 1].note} (${availableNotes[availableNotes.length - 1].frequency.toFixed(1)}Hz)`);
     }
 
-    // 【モード別最小音数チェック】音域不足の場合は自動拡張
-    let requiredNotes = 0;
-    let modeName = '';
-
-    if (currentMode === 'random') {
-        requiredNotes = 8; // ランダム基音モードは8音必須
-        modeName = 'ランダム基音モード';
-    } else if (currentMode === 'continuous' || currentMode === '12tone') {
-        requiredNotes = 12; // 連続チャレンジ・12音階モードは12音必須
-        modeName = currentMode === 'continuous' ? '連続チャレンジモード' : '12音階モード';
-    }
+    // 【v2.4.0】ModeController統合 - モード別最小音数チェック
+    const requiredNotes = window.ModeController?.getRequiredBaseNotes(currentMode) || 8;
+    const modeName = window.ModeController?.getModeName(currentMode) || currentMode;
 
     if (requiredNotes > 0 && availableNotes.length < requiredNotes) {
         const neededNotes = requiredNotes - availableNotes.length;
@@ -1510,10 +1550,38 @@ function getAvailableNotes() {
             availableNotes = [...availableNotes, ...notesToAdd];
 
             if (notesToAdd.length > 0) {
-                console.log(`✅ ${requiredNotes}音確保完了: ${availableNotes.map(n => n.note).join(', ')}`);
+                console.log(`✅ 高音側から${notesToAdd.length}音追加: ${notesToAdd.map(n => n.note).join(', ')}`);
                 console.log(`   ※ 追加された${notesToAdd.length}音は基音+1オクターブが音域上限を若干超えますが、`);
                 console.log(`     オクターブ相対音感トレーニングとして${requiredNotes}音使用を優先します`);
             }
+
+            // 【v2.10.0追加】高音側で不足した場合、低音側にも拡張
+            const stillNeeded = requiredNotes - availableNotes.length;
+            if (stillNeeded > 0) {
+                console.log(`   ⚠️ 高音側拡張後も${stillNeeded}音不足 → 低音側にも拡張を試行`);
+                const lowestAvailableNote = availableNotes[0];
+
+                // 基音-1オクターブが音域下限の90%以上（10%余裕）
+                const lowerNotes = allNotes.filter(note =>
+                    note.frequency < lowestAvailableNote.frequency &&
+                    note.frequency / 2 >= lowFreq * 0.9
+                );
+
+                console.log(`   候補（低音側拡張）: ${lowerNotes.length}音 (${lowerNotes.map(n => n.note).join(', ')})`);
+
+                // 必要な分だけ追加（高い音から順に）
+                const lowerNotesToAdd = lowerNotes.slice(-stillNeeded);
+                if (lowerNotesToAdd.length > 0) {
+                    availableNotes = [...lowerNotesToAdd, ...availableNotes];
+                    notesToAdd = [...notesToAdd, ...lowerNotesToAdd];
+                    console.log(`✅ 低音側から${lowerNotesToAdd.length}音追加: ${lowerNotesToAdd.map(n => n.note).join(', ')}`);
+                }
+            }
+        }
+
+        // 最終確認ログ
+        if (availableNotes.length >= requiredNotes) {
+            console.log(`✅ ${requiredNotes}音確保完了: ${availableNotes.map(n => n.note).join(', ')}`);
         }
 
         // 拡張失敗時の警告
@@ -1562,7 +1630,7 @@ function getVoiceRangeOctaves() {
  * 【統合】全セッション分の基音を一括選定
  * トレーニング開始時に呼び出し、全セッションの基音を事前に確定
  *
- * @param {Object} config - モード設定 (modeConfig[mode])
+ * @param {Object} config - モード設定 (ModeController.getMode(modeId))
  * @returns {Array} 選定された基音の配列
  */
 function selectAllBaseNotesForMode(config) {
@@ -1875,6 +1943,16 @@ function selectSequentialMode(availableNotes, maxSessions) {
     if (actualCount < 12) {
         console.error(`❌ [12音階モード] 致命的エラー: 12音確保に失敗（実際: ${actualCount}音）`);
         console.error(`   → getAvailableNotes()の自動拡張ロジックを確認してください`);
+        // 【v2.10.0追加】フォールバック: 利用可能な音を繰り返し使用してセッション数を確保
+        console.warn(`⚠️ フォールバック: ${actualCount}音を繰り返し使用して${maxSessions}セッションを実行`);
+        for (let session = 0; session < maxSessions; session++) {
+            const note = chromaticNotes[session % actualCount];
+            if (note) {
+                selectedNotes.push(note);
+            }
+        }
+        console.log(`⚠️ フォールバック選択: ${selectedNotes.map(n => n.note).join(' → ')}`);
+        return selectedNotes;
     } else {
         console.log(`✅ [12音階モード] クロマチック12音確保完了: ${chromaticNotes.map(n => n.note).join(' → ')}`);
     }

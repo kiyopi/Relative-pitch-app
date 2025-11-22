@@ -12923,3 +12923,151 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 15:28:01] コミット: fix(chart): モバイル時のチャート幅を拡張
+
+- canvasからインラインスタイルを削除（Chart.js自身がサイズ管理）
+- chart-containerのフォールバック高さは維持
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 15:34:23] コミット: chore: キャッシュバスター更新 v20251121004
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 15:46:28] コミット: fix(chart): クラス名衝突を修正 .chart-wrapper → .error-trend-wrapper
+
+- premium-analysis.cssの.chart-wrapper（200x200px円グラフ用）と衝突
+- 総合評価ページ用に.error-trend-wrapperに変更
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 15:46:28] コミット: chore: キャッシュバスター更新 v20251121005
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 15:57:48] コミット: chore: キャッシュバスター更新 router.js v20251121006
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 16:27:11] コミット: chore: tasks.log更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 18:29:42] コミット: fix(icon): トレーニング記録に戻るボタンのLucideアイコン初期化追加
+[2025-11-21 20:50:46] コミット: feat(delete): レッスン削除後の再開/ホーム選択UI実装
+
+- 削除完了セクション追加（再開ボタン・ホームボタン）
+- 削除後は直接trainingページへ遷移（マイク保持）
+- 削除確認メッセージ改善（lessonId削除、文言シンプル化）
+- 削除ボタンを「次のステップ」後に移動、サイズ調整
+- 外れ値アラートも削除完了時に非表示
+- base.css重複クラス整理（.flex, .gap-3等）
+- md:flex-row, md:justify-centerレスポンシブクラス追加
+- 古いメモリ削除・新しい実装状況メモリ追加
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 12:18:38] コミット: refactor(mode): ModeController統合完了・trainingController重複排除 (v2.4.0)
+
+- trainingController.jsの重複modeConfig定義を完全削除（約20行）
+- 11箇所のmodeConfig参照をModeControllerメソッドに置換
+- 各モードにrequiredBaseNotesプロパティ追加（音域内必要最小基音数）
+- getRequiredBaseNotes()メソッド追加
+- validateTrainingParams()メソッド追加（パラメータ一括検証）
+- getValidModeIds()メソッド追加
+- MODE_CONTROLLER_SPECIFICATION.md v2.4.0に更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 12:18:47] コミット: feat(navigation): リロード検出仕様v4.6.1・ModeControllerパラメータ検証連携
+
+- NavigationManager v4.6.1: ModeController.validateTrainingParams()活用
+- preparation-pitchpro-cycle.js: 最適化ログ追加
+- router.js: 微調整
+- NAVIGATION_RELOAD_DETECTION_SPECIFICATION.md v4.6.1に更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 12:18:56] コミット: docs(specs): 仕様書更新 - マイクバックグラウンド復帰・トレーニング仕様
+
+- MICROPHONE_BACKGROUND_RESILIENCE.md: マイク復帰処理仕様追加
+- TRAINING_SPECIFICATION.md: マイク事前チェック（v4.5.0）記載追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 13:59:24] コミット: fix(volume): 基音再生音量の永続化機能追加 (Issue #2)
+
+## 問題
+準備画面で設定した音量がトレーニング開始毎にリセットされる
+
+## 原因
+1. 音量スライダー変更時にlocalStorageへ保存していなかった
+2. PitchShifter再初期化時にDeviceDetectorデフォルト音量を使用していた
+
+## 解決策
+- preparation-pitchpro-cycle.js: 音量永続化ヘルパー関数追加・スライダー変更時に保存
+- router.js: getSavedVolumeDb()メソッド追加・保存済み音量で初期化
+- trainingController.js: getSavedVolumeDb()関数追加・フォールバック時も保存済み音量使用
+
+## 保存形式
+- キー: pitchpro_volume_percent
+- 値: 0〜100のパーセント値（50%=デバイスデフォルト）
+- 計算: baseVolume + (percent - 50) * 0.6 dB
+
+Closes #2
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 14:12:55] コミット: chore: キャッシュバスター更新 (Issue #2修正反映用)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 14:22:51] コミット: debug(volume): 準備ページ・トレーニングページの音量デバッグログ追加
+
+- preparation-pitchpro-cycle.js: 再生前の音量をログ出力
+- trainingController.js: グローバルインスタンス使用時の音量をログ出力
+- index.html: キャッシュバスター更新
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 14:28:30] コミット: fix(volume): 低音域の音量調整を強化（v2.9.1）
+
+- 低音域(C2-B2): 0.5x → 0.35x に調整
+- 中低音域(C3-B3): 0.7x → 0.5x に調整
+- トレーニング時の低音が準備ページより大きく聞こえる問題に対処
+- キャッシュバスター更新
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 14:56:01] コミット: debug(volume): playNote実行直前のsampler.volume.value確認ログ追加
+
+- reference-tones.js: triggerAttack直前にsampler.volume.valueをログ出力
+- 準備ページとトレーニングページで音量が異なる問題の原因調査用
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 16:23:05] コミット: fix(navigation): SPA遷移誤検出修正 + iPhone音量調整（v4.6.2, Issue #2）
+
+- NavigationManager v4.6.2: NORMAL_TRANSITIONフラグで正常なSPA遷移を判定
+- device-detector.js: iPhone/iPad/Android音量を-12dBに統一（Issue #2修正）
+- trainingController: 新形式音域データのみサポート
+- キャッシュバスター更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
