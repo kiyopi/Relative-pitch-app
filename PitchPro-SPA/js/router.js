@@ -828,7 +828,10 @@ class SimpleRouter {
             // DeviceDetectorから音量設定を取得（統一設定）
             const deviceVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
             const deviceType = window.DeviceDetector?.getDeviceType() ?? 'pc';
-            console.log(`🔊 PitchShifter音量: ${deviceVolume}dB (デバイス: ${deviceType}, DeviceDetector統一設定)`);
+
+            // 【Issue #2修正】保存済み音量を優先、なければDeviceDetectorデフォルト
+            const savedVolumeDb = this.getSavedVolumeDb();
+            console.log(`🔊 PitchShifter音量: ${savedVolumeDb.toFixed(1)}dB (デバイス: ${deviceType}, 保存済み設定復元)`);
 
             // 新規作成
             // ⚠️ IMPORTANT: attack/release値を変更する場合は、以下の2箇所も同時に変更すること
@@ -838,7 +841,7 @@ class SimpleRouter {
                 baseUrl: 'audio/piano/',
                 attack: 0.02,
                 release: 1.5,
-                volume: deviceVolume
+                volume: savedVolumeDb
             });
 
             // バックグラウンドで初期化（完了を待たない）
@@ -853,6 +856,29 @@ class SimpleRouter {
         } catch (error) {
             console.warn('⚠️ PitchShifter初期化エラー（バックグラウンド）:', error);
         }
+    }
+
+    // 【Issue #2修正】音量永続化ヘルパーメソッド
+    getSavedVolumeDb() {
+        const VOLUME_STORAGE_KEY = 'pitchpro_volume_percent';
+        const DEFAULT_VOLUME_PERCENT = 50;
+
+        let volumePercent = DEFAULT_VOLUME_PERCENT;
+        try {
+            const saved = localStorage.getItem(VOLUME_STORAGE_KEY);
+            if (saved !== null) {
+                const parsed = parseInt(saved, 10);
+                if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
+                    volumePercent = parsed;
+                }
+            }
+        } catch (e) {
+            console.warn('⚠️ 音量設定の読み込みに失敗:', e);
+        }
+
+        const baseVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
+        const volumeOffset = (volumePercent - 50) * 0.6; // 50%差で±30dB
+        return baseVolume + volumeOffset;
     }
 
     async setupResultSessionEvents(fullHash = '') {

@@ -13,6 +13,52 @@
 let micPermissionListenerAdded = false; // マイク許可ボタンのイベントリスナー重複防止フラグ
 let isPlayingBaseNote = false; // 基音再生中フラグ（連続クリック防止）
 
+// ===== 【Issue #2修正】音量永続化ヘルパー関数 =====
+const VOLUME_STORAGE_KEY = 'pitchpro_volume_percent';
+const DEFAULT_VOLUME_PERCENT = 50; // 50% = デバイスデフォルト音量
+
+/**
+ * 音量パーセント値をlocalStorageに保存
+ * @param {number} volumePercent - 0〜100のパーセント値
+ */
+function saveVolumePercent(volumePercent) {
+    try {
+        localStorage.setItem(VOLUME_STORAGE_KEY, volumePercent.toString());
+    } catch (e) {
+        console.warn('⚠️ 音量設定の保存に失敗:', e);
+    }
+}
+
+/**
+ * localStorageから音量パーセント値を取得
+ * @returns {number} 0〜100のパーセント値（未保存の場合はデフォルト50%）
+ */
+function getSavedVolumePercent() {
+    try {
+        const saved = localStorage.getItem(VOLUME_STORAGE_KEY);
+        if (saved !== null) {
+            const parsed = parseInt(saved, 10);
+            if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
+                return parsed;
+            }
+        }
+    } catch (e) {
+        console.warn('⚠️ 音量設定の読み込みに失敗:', e);
+    }
+    return DEFAULT_VOLUME_PERCENT;
+}
+
+/**
+ * 保存済み音量パーセントからdB値を計算
+ * @returns {number} dB値（DeviceDetector基準音量 + オフセット）
+ */
+function getSavedVolumeDb() {
+    const volumePercent = getSavedVolumePercent();
+    const baseVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
+    const volumeOffset = (volumePercent - 50) * 0.6; // 50%差で±30dB
+    return baseVolume + volumeOffset;
+}
+
 // ===== PitchProサイクル管理システム =====
 
 /**
@@ -782,10 +828,10 @@ class PitchProCycleManager {
                 return;
             }
 
-            // DeviceDetectorから音量設定を取得（統一設定）
-            const deviceVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
+            // 【Issue #2修正】保存済み音量を優先、なければDeviceDetectorデフォルト
+            const savedVolumeDb = getSavedVolumeDb();
             const deviceType = window.DeviceDetector?.getDeviceType() ?? 'pc';
-            console.log(`🔊 PitchShifter音量: ${deviceVolume}dB (デバイス: ${deviceType}, DeviceDetector統一設定)`);
+            console.log(`🔊 PitchShifter音量: ${savedVolumeDb.toFixed(1)}dB (デバイス: ${deviceType}, 保存済み設定復元)`);
 
             // 新規作成または再作成
             // ⚠️ IMPORTANT: attack/release値を変更する場合は、以下の2箇所も同時に変更すること
@@ -795,7 +841,7 @@ class PitchProCycleManager {
                 baseUrl: 'audio/piano/',
                 attack: 0.02,
                 release: 1.5,
-                volume: deviceVolume
+                volume: savedVolumeDb
             });
 
             // 初期化
@@ -2056,8 +2102,16 @@ function setupVolumeAdjustmentControls() {
     const volumeSlider = document.getElementById('app-volume-slider');
 
     if (volumeSlider) {
+        // 【Issue #2修正】保存済み音量でスライダー初期値を復元
+        const savedVolumePercent = getSavedVolumePercent();
+        volumeSlider.value = savedVolumePercent;
+        console.log(`🔊 音量スライダー初期値を復元: ${savedVolumePercent}%`);
+
         volumeSlider.addEventListener('input', (e) => {
             const volumePercent = parseInt(e.target.value);
+
+            // 【Issue #2修正】localStorageに音量を保存
+            saveVolumePercent(volumePercent);
 
             // PitchShifterの音量を調整
             if (window.pitchShifterInstance && window.pitchShifterInstance.isInitialized) {
@@ -2074,7 +2128,7 @@ function setupVolumeAdjustmentControls() {
                 const targetVolume = baseVolume + volumeOffset;
 
                 window.pitchShifterInstance.setVolume(targetVolume);
-                console.log(`🔊 音量調整: ${volumePercent}% (${targetVolume.toFixed(1)}dB, 基準${baseVolume}dB, DeviceDetector統一設定)`);
+                console.log(`🔊 音量調整: ${volumePercent}% (${targetVolume.toFixed(1)}dB, 基準${baseVolume}dB, DeviceDetector統一設定) [保存済み]`);
             }
         });
         console.log('✅ 音量スライダーのイベントリスナー設定完了');

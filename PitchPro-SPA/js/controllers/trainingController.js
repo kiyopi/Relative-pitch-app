@@ -549,6 +549,32 @@ function getDeviceVolume() {
     return window.DeviceDetector.getDeviceVolume();
 }
 
+/**
+ * 【Issue #2修正】保存済み音量パーセントからdB値を計算
+ * @returns {number} dB値（DeviceDetector基準音量 + オフセット）
+ */
+function getSavedVolumeDb() {
+    const VOLUME_STORAGE_KEY = 'pitchpro_volume_percent';
+    const DEFAULT_VOLUME_PERCENT = 50;
+
+    let volumePercent = DEFAULT_VOLUME_PERCENT;
+    try {
+        const saved = localStorage.getItem(VOLUME_STORAGE_KEY);
+        if (saved !== null) {
+            const parsed = parseInt(saved, 10);
+            if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
+                volumePercent = parsed;
+            }
+        }
+    } catch (e) {
+        console.warn('⚠️ 音量設定の読み込みに失敗:', e);
+    }
+
+    const baseVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
+    const volumeOffset = (volumePercent - 50) * 0.6; // 50%差で±30dB
+    return baseVolume + volumeOffset;
+}
+
 // PitchShifter初期化（シングルトンパターン + グローバルインスタンス活用）
 async function initializePitchShifter() {
     // 1. グローバルインスタンスが既に初期化済みなら使用
@@ -599,15 +625,16 @@ async function initializePitchShifter() {
 
         console.log('✅ PitchShifter利用可能:', typeof window.PitchShifter);
 
-        const deviceVolume = getDeviceVolume();
+        // 【Issue #2修正】保存済み音量を優先、なければDeviceDetectorデフォルト
+        const savedVolumeDb = getSavedVolumeDb();
         const deviceType = getDeviceType();
-        console.log(`📱 デバイス: ${deviceType}, 音量: ${deviceVolume}dB`);
+        console.log(`📱 デバイス: ${deviceType}, 音量: ${savedVolumeDb.toFixed(1)}dB (保存済み設定復元)`);
 
-        // デバイス別最適化音量を設定
+        // 保存済み音量を設定
         pitchShifter = new window.PitchShifter({
             baseUrl: 'audio/piano/',
             release: 2.5,
-            volume: deviceVolume
+            volume: savedVolumeDb
         });
 
         await pitchShifter.initialize();
