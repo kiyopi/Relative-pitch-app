@@ -13043,3 +13043,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 14:28:30] コミット: fix(volume): 低音域の音量調整を強化（v2.9.1）
+
+- 低音域(C2-B2): 0.5x → 0.35x に調整
+- 中低音域(C3-B3): 0.7x → 0.5x に調整
+- トレーニング時の低音が準備ページより大きく聞こえる問題に対処
+- キャッシュバスター更新
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

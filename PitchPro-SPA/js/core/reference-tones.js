@@ -166,6 +166,8 @@ const t = class t {
         console.log(`🔉 [PitchShifter] Mid-low adjustment: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
       }
 
+      // 【DEBUG】再生直前のsampler音量を確認
+      console.log(`🔊 [DEBUG] sampler.volume.value: ${this.sampler.volume.value}dB`);
       console.log(`🎵 [PitchShifter] Playing ${e} (${a.frequency.toFixed(2)}Hz) for ${i}s at velocity ${adjustedVelocity.toFixed(2)}`);
 
       // 【修正】即座に再生開始（オフセットなし）
