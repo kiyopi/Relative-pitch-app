@@ -12959,3 +12959,78 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-21 18:29:42] コミット: fix(icon): トレーニング記録に戻るボタンのLucideアイコン初期化追加
+[2025-11-21 20:50:46] コミット: feat(delete): レッスン削除後の再開/ホーム選択UI実装
+
+- 削除完了セクション追加（再開ボタン・ホームボタン）
+- 削除後は直接trainingページへ遷移（マイク保持）
+- 削除確認メッセージ改善（lessonId削除、文言シンプル化）
+- 削除ボタンを「次のステップ」後に移動、サイズ調整
+- 外れ値アラートも削除完了時に非表示
+- base.css重複クラス整理（.flex, .gap-3等）
+- md:flex-row, md:justify-centerレスポンシブクラス追加
+- 古いメモリ削除・新しい実装状況メモリ追加
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 12:18:38] コミット: refactor(mode): ModeController統合完了・trainingController重複排除 (v2.4.0)
+
+- trainingController.jsの重複modeConfig定義を完全削除（約20行）
+- 11箇所のmodeConfig参照をModeControllerメソッドに置換
+- 各モードにrequiredBaseNotesプロパティ追加（音域内必要最小基音数）
+- getRequiredBaseNotes()メソッド追加
+- validateTrainingParams()メソッド追加（パラメータ一括検証）
+- getValidModeIds()メソッド追加
+- MODE_CONTROLLER_SPECIFICATION.md v2.4.0に更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 12:18:47] コミット: feat(navigation): リロード検出仕様v4.6.1・ModeControllerパラメータ検証連携
+
+- NavigationManager v4.6.1: ModeController.validateTrainingParams()活用
+- preparation-pitchpro-cycle.js: 最適化ログ追加
+- router.js: 微調整
+- NAVIGATION_RELOAD_DETECTION_SPECIFICATION.md v4.6.1に更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 12:18:56] コミット: docs(specs): 仕様書更新 - マイクバックグラウンド復帰・トレーニング仕様
+
+- MICROPHONE_BACKGROUND_RESILIENCE.md: マイク復帰処理仕様追加
+- TRAINING_SPECIFICATION.md: マイク事前チェック（v4.5.0）記載追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 13:59:24] コミット: fix(volume): 基音再生音量の永続化機能追加 (Issue #2)
+
+## 問題
+準備画面で設定した音量がトレーニング開始毎にリセットされる
+
+## 原因
+1. 音量スライダー変更時にlocalStorageへ保存していなかった
+2. PitchShifter再初期化時にDeviceDetectorデフォルト音量を使用していた
+
+## 解決策
+- preparation-pitchpro-cycle.js: 音量永続化ヘルパー関数追加・スライダー変更時に保存
+- router.js: getSavedVolumeDb()メソッド追加・保存済み音量で初期化
+- trainingController.js: getSavedVolumeDb()関数追加・フォールバック時も保存済み音量使用
+
+## 保存形式
+- キー: pitchpro_volume_percent
+- 値: 0〜100のパーセント値（50%=デバイスデフォルト）
+- 計算: baseVolume + (percent - 50) * 0.6 dB
+
+Closes #2
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 14:12:55] コミット: chore: キャッシュバスター更新 (Issue #2修正反映用)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

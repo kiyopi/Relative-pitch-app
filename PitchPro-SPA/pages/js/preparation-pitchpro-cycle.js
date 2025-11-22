@@ -2043,6 +2043,10 @@ function setupVolumeAdjustmentControls() {
 
                 // C4 (261.6Hz) を再生
                 console.log('▶️ C4音を再生開始...');
+                // 【DEBUG】再生前にPitchShifter音量を確認
+                if (window.pitchShifterInstance.sampler && window.pitchShifterInstance.sampler.volume) {
+                    console.log(`🔊 [DEBUG] 準備ページ再生時の音量: ${window.pitchShifterInstance.sampler.volume.value}dB`);
+                }
                 await window.pitchShifterInstance.playNote("C4", 1.0);
                 console.log('✅ 基音C4を再生しました');
 

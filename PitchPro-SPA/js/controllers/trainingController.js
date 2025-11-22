@@ -586,6 +586,11 @@ async function initializePitchShifter() {
         // ユーザーの音量スライダー設定を尊重するため、setVolume()を呼ばない
         console.log('🔊 準備フェーズの音量設定を維持（ユーザー調整を尊重）');
 
+        // 【DEBUG】現在のPitchShifter音量を確認
+        if (pitchShifter.sampler && pitchShifter.sampler.volume) {
+            console.log(`🔊 [DEBUG] PitchShifter現在の音量: ${pitchShifter.sampler.volume.value}dB`);
+        }
+
         return pitchShifter;
     }
 

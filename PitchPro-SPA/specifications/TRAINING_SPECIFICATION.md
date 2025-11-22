@@ -1,10 +1,28 @@
 # トレーニング機能仕様書（SPA版）
 
-**バージョン**: 4.5.0
+**バージョン**: 4.6.0
 **作成日**: 2025-10-23
-**最終更新**: 2025-11-21
+**最終更新**: 2025-11-22
 
 **変更履歴**:
+- v4.6.0 (2025-11-22): 基音再生音量の永続化機能追加（GitHub Issue #2対応）
+  - **Feature**: 準備ページで設定した基音再生音量をlocalStorageに保存し、トレーニング開始時に復元
+    - **問題背景**: 準備画面で調整した音量がトレーニング開始毎にリセットされていた
+    - **根本原因**:
+      - 音量スライダーの変更がメモリ上のインスタンスにのみ反映
+      - ページ遷移時にPitchShifterインスタンスが破棄され設定が消失
+      - PitchShifter再初期化時にDeviceDetectorのデフォルト音量を使用
+    - **解決策**: localStorageに音量パーセント値（0-100）を保存、PitchShifter初期化時に復元
+    - **保存キー**: `pitchpro_volume_percent`
+    - **dB計算式**: `baseVolume + (percent - 50) * 0.6`（50%差で±30dB）
+    - **修正ファイル1**: `/PitchPro-SPA/pages/js/preparation-pitchpro-cycle.js`
+      - ヘルパー関数追加: `saveVolumePercent()`, `getSavedVolumePercent()`, `getSavedVolumeDb()`
+      - 音量スライダー初期値復元、変更時保存、PitchShifter初期化時に保存音量使用
+    - **修正ファイル2**: `/PitchPro-SPA/js/router.js`
+      - `getSavedVolumeDb()`メソッド追加、バックグラウンドPitchShifter初期化時に保存音量使用
+    - **修正ファイル3**: `/PitchPro-SPA/js/controllers/trainingController.js`
+      - `getSavedVolumeDb()`関数追加、フォールバック初期化時に保存音量使用
+    - **関連仕様書**: `VOLUME_BAR_INTEGRATION_SPECIFICATION.md` v1.1.0
 - v4.5.0 (2025-11-21): マイク事前チェック追加 - ドレミガイド中のダイアログ出現防止
   - **Feature**: トレーニングページ初期化時マイク事前チェック
     - **目的**: ブラウザDiscard後のドレミガイド中マイク許可ダイアログ出現を完全回避
