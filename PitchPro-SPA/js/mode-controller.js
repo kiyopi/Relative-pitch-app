@@ -1,6 +1,6 @@
 /**
  * モード管理統合コントローラー
- * @version 2.2.0
+ * @version 2.3.0
  * @description 全トレーニングモードの定義と設定を一元管理
  *
  * 【責任範囲】
@@ -12,6 +12,7 @@
  * - 基音選択方式の定義
  * - UI表示（アイコン・色・タイトル）の統一管理 ★v2.0.0追加
  * - 1セッション標準時間の定義 ★v2.0.1追加
+ * - トレーニングパラメータ検証 ★v2.3.0追加
  *
  * 【使用箇所】
  * - trainingController.js: トレーニング実行
@@ -19,8 +20,15 @@
  * - session-data-recorder.js: セッションデータ保存
  * - results-overview-controller.js: 総合評価ページ ★v2.0.0追加
  * - preparation-pitchpro-cycle.js: 準備ページサブタイトル表示 ★v2.1.0追加
+ * - navigation-manager.js: ダイレクトアクセス時のパラメータ検証 ★v2.3.0追加
  *
  * 【変更履歴】
+ * v2.3.0 (2025-11-22): validateTrainingParams()メソッド追加
+ *                      - モード・方向・基音の一元検証
+ *                      - NavigationManagerから委譲呼び出し
+ *                      - 新規モード追加時のメンテナンス性向上
+ *                      getValidModeIds()メソッド追加
+ *                      - 有効なモードIDリストを取得
  * v2.2.0 (2025-11-19): getDisplayName()にuseShortNameパラメータ追加
  *                      デフォルトをtrue（短縮形）に設定
  *                      - useShortName: true  → "ランダム基音 上行" (デフォルト)
@@ -46,6 +54,7 @@ const ModeController = {
             shortName: 'ランダム基音',
             description: '音域内ランダム基音、連続重複なし',
             sessionsPerLesson: 8,
+            requiredBaseNotes: 8, // 【v2.4.0】音域内に必要な最小基音数
             baseNoteSelection: 'random_c3_octave',
             hasIndividualResults: true,
             hasRangeAdjustment: false,
@@ -70,6 +79,7 @@ const ModeController = {
             shortName: '連続チャレンジ',
             description: 'クロマチック12音、連続重複防止',
             sessionsPerLesson: 12,
+            requiredBaseNotes: 12, // 【v2.4.0】音域内に必要な最小基音数
             baseNoteSelection: 'random_chromatic',
             hasIndividualResults: false,
             hasRangeAdjustment: false,
@@ -97,6 +107,7 @@ const ModeController = {
                 if (options.direction === 'both') return 24;
                 return 12; // ascending or descending
             },
+            requiredBaseNotes: 12, // 【v2.4.0】音域内に必要な最小基音数
             baseNoteSelection: 'sequential_chromatic',
             hasIndividualResults: false,
             hasRangeAdjustment: true,
@@ -160,6 +171,18 @@ const ModeController = {
         }
 
         return mode.sessionsPerLesson;
+    },
+
+    /**
+     * 【v2.4.0】モードに必要な最小基音数を取得
+     * 音域内に最低限必要な基音の数を返す
+     *
+     * @param {string} modeId - モードID
+     * @returns {number} 必要な最小基音数
+     */
+    getRequiredBaseNotes(modeId) {
+        const mode = this.getMode(modeId);
+        return mode?.requiredBaseNotes || 8; // デフォルト8音
     },
 
     /**
@@ -352,6 +375,110 @@ const ModeController = {
 
         // Lucideアイコンは updateLucideIcon() 内で自動的に再初期化される
         return true;
+    },
+
+    /**
+     * 【v2.3.0】トレーニングパラメータの検証
+     *
+     * URLパラメータやリクエストからモード・方向・基音を検証
+     * NavigationManagerなど外部から一元的に呼び出し可能
+     *
+     * @param {object} params - 検証対象パラメータ
+     * @param {string} params.mode - モードID（必須）
+     * @param {string} params.direction - 音階方向（ascending/descending）（必須）
+     * @param {string} params.startNote - 基音（12音階モードのみ必須）
+     * @param {string} params.chromaticDirection - 12音階基音方向（12音階モードのみ）
+     * @returns {object} { isValid: boolean, reason: string, details: object }
+     */
+    validateTrainingParams(params = {}) {
+        const { mode, direction, startNote, chromaticDirection } = params;
+        const validModeIds = Object.keys(this.modes).filter(id => !this.modes[id].deprecated);
+
+        console.log(`🔍 [ModeController] パラメータ検証:`, params);
+        console.log(`📋 [ModeController] 有効なモード: ${validModeIds.join(', ')}`);
+
+        // 1. モード必須チェック
+        if (!mode) {
+            return {
+                isValid: false,
+                reason: 'no-mode',
+                message: 'トレーニングモードが指定されていません。',
+                details: { validModes: validModeIds }
+            };
+        }
+
+        // 2. モード有効性チェック
+        if (!validModeIds.includes(mode)) {
+            return {
+                isValid: false,
+                reason: 'invalid-mode',
+                message: `無効なトレーニングモードです: ${mode}`,
+                details: { validModes: validModeIds, providedMode: mode }
+            };
+        }
+
+        // 3. 方向必須チェック（全モード共通）
+        const validDirections = ['ascending', 'descending'];
+        if (!direction) {
+            return {
+                isValid: false,
+                reason: 'no-direction',
+                message: '音階方向（上行/下行）が指定されていません。',
+                details: { validDirections }
+            };
+        }
+
+        if (!validDirections.includes(direction)) {
+            return {
+                isValid: false,
+                reason: 'invalid-direction',
+                message: `無効な音階方向です: ${direction}`,
+                details: { validDirections, providedDirection: direction }
+            };
+        }
+
+        // 4. 12音階モード固有チェック
+        if (mode === '12tone') {
+            // 基音（startNote）必須
+            if (!startNote) {
+                return {
+                    isValid: false,
+                    reason: 'chromatic-no-startnote',
+                    message: '12音階モードには基音の指定が必要です。',
+                    details: { mode }
+                };
+            }
+
+            // chromaticDirection（基音進行方向）チェック
+            const validChromaticDirections = ['ascending', 'descending', 'both'];
+            if (chromaticDirection && !validChromaticDirections.includes(chromaticDirection)) {
+                return {
+                    isValid: false,
+                    reason: 'invalid-chromatic-direction',
+                    message: `無効な基音進行方向です: ${chromaticDirection}`,
+                    details: { validChromaticDirections, providedChromaticDirection: chromaticDirection }
+                };
+            }
+        }
+
+        // 5. すべてのチェックをパス
+        return {
+            isValid: true,
+            reason: 'valid',
+            message: 'パラメータは有効です。',
+            details: { mode, direction, startNote, chromaticDirection }
+        };
+    },
+
+    /**
+     * 【v2.3.0】有効なモードIDリストを取得
+     * @param {boolean} excludeDeprecated - 非推奨モードを除外するか（デフォルト: true）
+     * @returns {string[]} 有効なモードIDの配列
+     */
+    getValidModeIds(excludeDeprecated = true) {
+        return Object.keys(this.modes).filter(id =>
+            !excludeDeprecated || !this.modes[id].deprecated
+        );
     }
 };
 
