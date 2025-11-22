@@ -1550,10 +1550,38 @@ function getAvailableNotes() {
             availableNotes = [...availableNotes, ...notesToAdd];
 
             if (notesToAdd.length > 0) {
-                console.log(`✅ ${requiredNotes}音確保完了: ${availableNotes.map(n => n.note).join(', ')}`);
+                console.log(`✅ 高音側から${notesToAdd.length}音追加: ${notesToAdd.map(n => n.note).join(', ')}`);
                 console.log(`   ※ 追加された${notesToAdd.length}音は基音+1オクターブが音域上限を若干超えますが、`);
                 console.log(`     オクターブ相対音感トレーニングとして${requiredNotes}音使用を優先します`);
             }
+
+            // 【v2.10.0追加】高音側で不足した場合、低音側にも拡張
+            const stillNeeded = requiredNotes - availableNotes.length;
+            if (stillNeeded > 0) {
+                console.log(`   ⚠️ 高音側拡張後も${stillNeeded}音不足 → 低音側にも拡張を試行`);
+                const lowestAvailableNote = availableNotes[0];
+
+                // 基音-1オクターブが音域下限の90%以上（10%余裕）
+                const lowerNotes = allNotes.filter(note =>
+                    note.frequency < lowestAvailableNote.frequency &&
+                    note.frequency / 2 >= lowFreq * 0.9
+                );
+
+                console.log(`   候補（低音側拡張）: ${lowerNotes.length}音 (${lowerNotes.map(n => n.note).join(', ')})`);
+
+                // 必要な分だけ追加（高い音から順に）
+                const lowerNotesToAdd = lowerNotes.slice(-stillNeeded);
+                if (lowerNotesToAdd.length > 0) {
+                    availableNotes = [...lowerNotesToAdd, ...availableNotes];
+                    notesToAdd = [...notesToAdd, ...lowerNotesToAdd];
+                    console.log(`✅ 低音側から${lowerNotesToAdd.length}音追加: ${lowerNotesToAdd.map(n => n.note).join(', ')}`);
+                }
+            }
+        }
+
+        // 最終確認ログ
+        if (availableNotes.length >= requiredNotes) {
+            console.log(`✅ ${requiredNotes}音確保完了: ${availableNotes.map(n => n.note).join(', ')}`);
         }
 
         // 拡張失敗時の警告
@@ -1915,6 +1943,16 @@ function selectSequentialMode(availableNotes, maxSessions) {
     if (actualCount < 12) {
         console.error(`❌ [12音階モード] 致命的エラー: 12音確保に失敗（実際: ${actualCount}音）`);
         console.error(`   → getAvailableNotes()の自動拡張ロジックを確認してください`);
+        // 【v2.10.0追加】フォールバック: 利用可能な音を繰り返し使用してセッション数を確保
+        console.warn(`⚠️ フォールバック: ${actualCount}音を繰り返し使用して${maxSessions}セッションを実行`);
+        for (let session = 0; session < maxSessions; session++) {
+            const note = chromaticNotes[session % actualCount];
+            if (note) {
+                selectedNotes.push(note);
+            }
+        }
+        console.log(`⚠️ フォールバック選択: ${selectedNotes.map(n => n.note).join(' → ')}`);
+        return selectedNotes;
     } else {
         console.log(`✅ [12音階モード] クロマチック12音確保完了: ${chromaticNotes.map(n => n.note).join(' → ')}`);
     }
