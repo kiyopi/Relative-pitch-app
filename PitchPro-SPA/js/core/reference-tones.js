@@ -153,16 +153,16 @@ const t = class t {
       // 【追加】Tone.js内部準備のための短時間待機（クリッキングノイズ対策）
       await new Promise(resolve => setTimeout(resolve, 10));
 
-      // 【追加】低音域の音量バランス調整
-      // C2-B2 (65-123Hz): 0.5x velocity (低音の響きを抑制)
-      // C3-B3 (130-246Hz): 0.7x velocity (中低音を控えめに)
+      // 【追加】低音域の音量バランス調整（v2.9.1: 調整強化）
+      // C2-B2 (65-123Hz): 0.35x velocity (低音の響きを強く抑制)
+      // C3-B3 (130-246Hz): 0.5x velocity (中低音を控えめに - 0.7→0.5に強化)
       // C4以上: 1.0x velocity (通常音量)
       let adjustedVelocity = o;
       if (a.frequency < 130) {
-        adjustedVelocity = o * 0.5;  // 低音域は半分
+        adjustedVelocity = o * 0.35;  // 低音域は35%（0.5→0.35に強化）
         console.log(`🔉 [PitchShifter] Low bass adjustment: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
       } else if (a.frequency < 260) {
-        adjustedVelocity = o * 0.7;  // 中低音域は70%
+        adjustedVelocity = o * 0.5;  // 中低音域は50%（0.7→0.5に強化）
         console.log(`🔉 [PitchShifter] Mid-low adjustment: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
       }
 

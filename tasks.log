@@ -13034,3 +13034,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 14:22:51] コミット: debug(volume): 準備ページ・トレーニングページの音量デバッグログ追加
+
+- preparation-pitchpro-cycle.js: 再生前の音量をログ出力
+- trainingController.js: グローバルインスタンス使用時の音量をログ出力
+- index.html: キャッシュバスター更新
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
