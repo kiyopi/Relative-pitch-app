@@ -1,10 +1,20 @@
 # トレーニング機能仕様書（SPA版）
 
-**バージョン**: 4.0.9
+**バージョン**: 4.5.0
 **作成日**: 2025-10-23
-**最終更新**: 2025-11-16
+**最終更新**: 2025-11-21
 
 **変更履歴**:
+- v4.5.0 (2025-11-21): マイク事前チェック追加 - ドレミガイド中のダイアログ出現防止
+  - **Feature**: トレーニングページ初期化時マイク事前チェック
+    - **目的**: ブラウザDiscard後のドレミガイド中マイク許可ダイアログ出現を完全回避
+    - **背景**: 長時間デスクトップ切替後、ブラウザがタブをdiscardするとMediaStreamが消滅
+    - **問題**: 従来の3重防御（visibilitychange等）では対処不可能なケース
+    - **解決**: `initializeTrainingPage()`内で`getUserMedia()`による事前チェックを実行
+    - **SPA化の恩恵**: ページ遷移なしでコンテキスト維持、事前取得した許可がドレミガイドで使用可能
+    - **修正ファイル**: `/PitchPro-SPA/js/controllers/trainingController.js` (v4.5.0)
+    - **エラーハンドリング**: 許可拒否・デバイスエラー時は準備ページへリダイレクト
+    - **関連仕様書**: `MICROPHONE_BACKGROUND_RESILIENCE.md` v3.0.0
 - v4.0.9 (2025-11-16): GitHub Issue #1関連修正 - 未定義関数エラー修正とコードクリーンアップ
   - **Bug #11-10**: 総合評価ページ未定義関数エラー（v4.0.9）
     - **問題**: `results-overview-controller.js`で`renderStatsSection()`等の未定義関数エラー、総合評価ページ表示不可
@@ -1335,6 +1345,48 @@ training ページ = トレーニング実行中
   → リロードでマイク許可ダイアログが出るのは望ましくない
   → preparation へリダイレクトして確実に準備を完了
 ```
+
+#### 6.3.3 マイク事前チェック（v4.5.0追加）
+
+**背景**: v4.4.0でtrainingページのリロード対応を「Reactiveアプローチ」（PitchProに委譲）に変更したが、ブラウザDiscardの場合は対処不可能
+
+**問題**: ブラウザがタブをdiscard（完全破棄）した場合：
+- MediaStreamが消滅（復帰ではなく再取得が必要）
+- 最悪のシナリオ: ドレミガイド中にマイク許可ダイアログが出現 → レッスン破綻
+
+**解決策**: `initializeTrainingPage()`でマイク事前チェックを実行
+
+```javascript
+// 【v4.5.0追加】マイク事前チェック - ドレミガイド中のダイアログ出現を防止
+try {
+    console.log('🎤 [v4.5.0] マイク事前チェック開始...');
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    console.log('✅ [v4.5.0] マイク許可確認完了');
+    stream.getTracks().forEach(track => track.stop());
+} catch (error) {
+    // 許可拒否/デバイスエラー → 準備ページへリダイレクト
+    await NavigationManager.redirectToPreparation('マイク許可エラー');
+    return;
+}
+```
+
+**新しい処理フロー**:
+```
+trainingページ表示
+        ↓
+initializeTrainingPage() 開始
+        ↓
+【v4.5.0追加】マイク事前チェック ← ダイアログはここで出る（必要時のみ）
+        ↓
+  許可OK → ボタン有効化 → 基音再生 → ドレミガイド（ダイアログなし✅）
+  許可NG → 準備ページへリダイレクト
+```
+
+**SPA化との関係**:
+- MPA時代: ページ遷移でコンテキスト破棄 → 事前チェックの意味なし
+- SPA化後: ハッシュ変更のみでコンテキスト維持 → 事前チェックの許可がそのまま使える
+
+**詳細**: `MICROPHONE_BACKGROUND_RESILIENCE.md` v3.0.0「ブラウザDiscard時の最終防御策」参照
 
 ### 6.4 ダイレクトアクセス対応（モード維持）
 
