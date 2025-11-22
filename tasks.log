@@ -13053,3 +13053,21 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 14:56:01] コミット: debug(volume): playNote実行直前のsampler.volume.value確認ログ追加
+
+- reference-tones.js: triggerAttack直前にsampler.volume.valueをログ出力
+- 準備ページとトレーニングページで音量が異なる問題の原因調査用
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 16:23:05] コミット: fix(navigation): SPA遷移誤検出修正 + iPhone音量調整（v4.6.2, Issue #2）
+
+- NavigationManager v4.6.2: NORMAL_TRANSITIONフラグで正常なSPA遷移を判定
+- device-detector.js: iPhone/iPad/Android音量を-12dBに統一（Issue #2修正）
+- trainingController: 新形式音域データのみサポート
+- キャッシュバスター更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

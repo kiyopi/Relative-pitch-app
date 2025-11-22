@@ -168,6 +168,10 @@ const t = class t {
 
       // 【DEBUG】再生直前のsampler音量を確認
       console.log(`🔊 [DEBUG] sampler.volume.value: ${this.sampler.volume.value}dB`);
+      // 【DEBUG v2.9.2】AudioContext状態とTone.js Destination確認
+      const ctx = l.getContext();
+      console.log(`🔊 [DEBUG] AudioContext state: ${ctx.state}`);
+      console.log(`🔊 [DEBUG] Tone.Destination volume: ${l.getDestination().volume.value}dB`);
       console.log(`🎵 [PitchShifter] Playing ${e} (${a.frequency.toFixed(2)}Hz) for ${i}s at velocity ${adjustedVelocity.toFixed(2)}`);
 
       // 【修正】即座に再生開始（オフセットなし）

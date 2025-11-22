@@ -18,5 +18,5 @@
   
   // カスタムタスク設定
   "tasks.version": "2.0.0",
-  "liveServer.settings.port": 5501
+  "liveServer.settings.port": 5502
 }
