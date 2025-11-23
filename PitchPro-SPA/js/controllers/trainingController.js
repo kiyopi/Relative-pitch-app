@@ -787,15 +787,46 @@ async function startTraining() {
             console.log(`🔊 [iOS v4] Tone.context.state: ${Tone.context?.state}`);
         }
 
-        // 【iOS Safari対応 v3】audioSession切り替えは行わない
-        // 理由: playbackモードに切り替えると2回目以降の基音再生で音が出なくなる問題が発生
-        // マイク停止（stopDetection）のみで対応し、audioSessionは変更しない
-        // WebKit Bug #218012 の回避策としては不完全だが、音が出ないよりは音量が小さい方がマシ
+        // 【iOS Safari対応 v12】ユーザー操作コールスタック内でサイレントオーディオを再生
+        // Web Audio APIをアンロックするため、HTMLの<audio>要素で微小音量の音を再生
+        // 重要: awaitせずにplay()を呼び出す（ユーザージェスチャーコールスタック内で同期的に実行）
+        try {
+            const silentMp3 = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRwmHAAAAAAD/+9DEAAAIAANIAAAAgAADSAAAAATEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tQxBcAAADSAAAAAAAAANIAAAAATEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=';
+            const silentAudio = new Audio(silentMp3);
+            silentAudio.volume = 0.01;
+            // awaitせずにplay()を呼び出し（ユーザージェスチャーコールスタック内で同期的に実行）
+            silentAudio.play().then(() => {
+                console.log('🔊 [iOS v12] サイレントオーディオ再生完了（Web Audio APIキック）');
+            }).catch(e => {
+                console.log('ℹ️ [iOS v12] サイレントオーディオ再生スキップ:', e.message);
+            });
+        } catch (silentError) {
+            console.log('ℹ️ [iOS v12] サイレントオーディオ例外:', silentError.message);
+        }
+
+        // 【iOS Safari対応 v12】audioSession を playback に切り替え
+        // WebKit Bug #218012: マイクがアクティブだと音量が自動的に下がる問題の回避
+        // サイレントオーディオでWeb Audio APIをアンロックしたので、切り替えても音が出るようになった
         if (navigator.audioSession) {
-            console.log(`🔊 [iOS] audioSession.type (現在): ${navigator.audioSession.type}（変更なし）`);
+            try {
+                navigator.audioSession.type = 'playback';
+                console.log('🔊 [iOS v12] audioSession.type → playback（音量改善のため）');
+            } catch (e) {
+                console.log('⚠️ audioSession切り替え失敗:', e.message);
+            }
         }
 
         await pitchShifter.playNote(baseNoteInfo.note, 1.0);
+
+        // 【iOS Safari対応 v12】基音再生後にaudioSessionを戻す
+        if (navigator.audioSession) {
+            try {
+                navigator.audioSession.type = 'play-and-record';
+                console.log('🔊 [iOS v12] audioSession.type → play-and-record（復元）');
+            } catch (e) {
+                console.log('⚠️ audioSession復元失敗:', e.message);
+            }
+        }
 
         // 【v4.2.2改善】基音再生後はマイクオフのまま（ドレミガイド開始時にオン）
         // 基音の音を拾わないようにするため

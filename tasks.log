@@ -13444,3 +13444,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 00:14:55] コミット: fix(iOS): v12 サイレントオーディオをユーザークリック時に移動
+
+- preparation-pitchpro-cycle.js: v11のサイレントオーディオ（PitchShifter初期化時）を削除
+- preparation-pitchpro-cycle.js: v12でサイレントオーディオを基音試聴ボタンクリック時に追加
+- 根本原因: 2周目以降のページ読み込みでは自動初期化がユーザージェスチャーコールスタック外
+- 解決策: ユーザーがボタンをクリックした瞬間（同期的コールスタック内）でサイレントMP3再生
+- awaitせずにplay()を呼び出し、.then()で後続処理をチェーン
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
