@@ -13295,3 +13295,20 @@ WebKit Bug #218012 対応: マイクアクティブ時の音量低下問題を�
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 17:35:10] コミット: fix(iOS): トレーニングページのaudioSession切り替えを削除 + 音域テストログ抑制
+
+問題: audioSession.type='playback'に切り替えると2回目以降の基音再生で音が出なくなる
+
+trainingController.js:
+- audioSession切り替えを削除（マイク停止のみで対応）
+- 音が出なくなる問題を回避（音量が小さい方がマシ）
+
+voice-range-test.js:
+- 🚫 人間の声の範囲外 ログを抑制
+- 🎤 音声継続検出開始 ログを抑制
+- 🟡 音声継続検出中 ログを抑制
+- ⚠️ 音声継続検出リセット ログを抑制
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

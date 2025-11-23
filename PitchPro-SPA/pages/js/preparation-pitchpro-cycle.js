@@ -2037,7 +2037,7 @@ function setupVolumeAdjustmentControls() {
                 if (!icon || !text) {
                     console.warn('⚠️ ボタン内の要素が見つかりません');
                     // 要素が見つからない場合は音声だけ再生
-                    await window.pitchShifterInstance.playNote("C4", 1.0);
+                    await window.pitchShifterInstance.playNote("C3", 1.0); // テスト用: C4→C3
                     return;
                 }
 
@@ -2048,8 +2048,10 @@ function setupVolumeAdjustmentControls() {
                 window.updateLucideIcon && window.updateLucideIcon(icon, 'loader-2');
                 text.textContent = '再生中...';
 
-                // C4 (261.6Hz) を再生
-                console.log('▶️ C4音を再生開始...');
+                // C3 (130.8Hz) を再生（テスト用）
+                // 【DEBUG】再生回数をカウントして1回目と2回目の違いを調査
+                window._baseNotePlayCount = (window._baseNotePlayCount || 0) + 1;
+                console.log(`▶️ 基音再生開始... (${window._baseNotePlayCount}回目)`);
 
                 // 【iOS Safari対応 v2】マイクを一時停止してから音声再生
                 // WebKit Bug #218012: マイクがアクティブだと音量が自動的に下がる
@@ -2089,8 +2091,13 @@ function setupVolumeAdjustmentControls() {
                 if (window.pitchShifterInstance.sampler && window.pitchShifterInstance.sampler.volume) {
                     console.log(`🔊 [DEBUG] 準備ページ再生時の音量: ${window.pitchShifterInstance.sampler.volume.value}dB`);
                 }
-                await window.pitchShifterInstance.playNote("C4", 1.0);
-                console.log('✅ 基音C4を再生しました');
+                // 【DEBUG】AudioContext状態を確認
+                if (window.Tone && window.Tone.context) {
+                    console.log(`🔊 [DEBUG] Tone.context.state: ${window.Tone.context.state}`);
+                    console.log(`🔊 [DEBUG] Tone.Destination.volume: ${window.Tone.Destination.volume.value}dB`);
+                }
+                await window.pitchShifterInstance.playNote("C3", 1.0); // テスト用: C4→C3
+                console.log(`✅ 基音C3を再生しました (${window._baseNotePlayCount}回目)`);
 
                 // 【iOS Safari対応 v2】再生完了後にマイクを再開
                 if (micWasActive && audioDetector) {
