@@ -13416,3 +13416,15 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 23:47:17] コミット: fix(audio): iOS 17+対策をトレーニングページにも適用
+
+- trainingController.jsにv4修正を追加
+  - playNote()前にTone.start()を同期的に呼び出し
+  - iOS 17+ではawait後はユーザー操作コールスタック外と判断される
+- キャッシュバスターを更新（v10コードが確実に適用されるように）
+  - preparation-pitchpro-cycle.js: 1763904733
+  - trainingController.js: 1763904733
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

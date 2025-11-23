@@ -682,6 +682,18 @@ async function initializePitchShifter() {
             }
         }
 
+        // 【iOS Safari対応 v11】サイレントオーディオ再生でWeb Audio APIをキック
+        // HTMLの<audio>要素での再生がWeb Audio APIを「アンロック」する
+        try {
+            const silentMp3 = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRwmHAAAAAAD/+9DEAAAIAANIAAAAgAADSAAAAATEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tQxBcAAADSAAAAAAAAANIAAAAATEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=';
+            const silentAudio = new Audio(silentMp3);
+            silentAudio.volume = 0.01;
+            await silentAudio.play();
+            console.log('🔊 [iOS v11] サイレントオーディオ再生完了（Web Audio APIキック）');
+        } catch (silentError) {
+            console.log('ℹ️ [iOS v11] サイレントオーディオ再生スキップ:', silentError.message);
+        }
+
         // グローバルインスタンスとして登録
         window.pitchShifterInstance = pitchShifter;
 
