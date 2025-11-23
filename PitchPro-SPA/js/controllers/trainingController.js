@@ -2,7 +2,14 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: v4.5.0 (2025-11-21) - マイク事前チェック追加
+ * 🔥 VERSION: v4.5.1 (2025-11-23) - タイマークリーンアップ強化
+ *
+ * 【v4.5.1修正内容】
+ * - ページ離脱時のタイマークリーンアップ強化
+ * - doremiGuideTimeoutId: ドレミガイド開始タイマー（2.5秒）
+ * - nextSessionTimeoutId: 次セッション開始タイマー（1秒）
+ * - resetTrainingPageFlag()で両タイマーをクリア
+ * - 中断されたトレーニングのタイマーが新しいトレーニングに影響する問題を修正
  *
  * 【v4.5.0修正内容】
  * - マイク事前チェック追加: initializeTrainingPage()でgetUserMedia()を実行
@@ -99,6 +106,10 @@ let currentScaleDirection = 'ascending';  // 現在の音階方向（'ascending'
 
 // 【v4.0.0追加】SessionManager統合
 let sessionManager = null;       // セッション管理専門クラス
+
+// 【v4.0.21追加】タイマーID保持（ページ離脱時のクリーンアップ用）
+let doremiGuideTimeoutId = null;   // ドレミガイド開始用タイマー（2.5秒）
+let nextSessionTimeoutId = null;   // 次セッション開始用タイマー（1秒）
 
 // 相対音程（ドレミ...）と半音ステップの対応
 // 【下行モード対応】音階方向に応じて動的に変更されるため let に変更
@@ -796,7 +807,8 @@ async function startTraining() {
         // 【v4.0.8】2.5秒後にドレミガイド開始
         // 基音総再生時間: attack(0.02s) + sustain(1.0s) + release(2.5s) = 3.52s
         // ドレミガイド開始時は基音のreleaseフェーズ中（自然な音の重なり）
-        setTimeout(async () => {
+        // 【v4.0.21】タイマーIDを保存（ページ離脱時のクリーンアップ用）
+        doremiGuideTimeoutId = setTimeout(async () => {
             // 【v4.2.2追加】ドレミガイド開始時にマイクオン（基音の音を拾わないため）
             if (audioDetector) {
                 console.log('🔊 ドレミガイド開始 - マイクオン');
@@ -1270,7 +1282,9 @@ function handleSessionComplete() {
                 updateSessionProgressUI();
 
                 // 1秒後に次のセッションを自動開始
-                setTimeout(() => {
+                // 【v4.0.21】タイマーIDを保存（ページ離脱時のクリーンアップ用）
+                nextSessionTimeoutId = setTimeout(() => {
+                    nextSessionTimeoutId = null; // 実行後はクリア
                     console.log(`🎵 セッション${sessionNumber + 1}開始`);
 
                     // 次のセッションのために基音を事前選択
@@ -1352,6 +1366,18 @@ function handleSessionComplete() {
 export function resetTrainingPageFlag() {
     isInitialized = false;
     usedBaseNotes = []; // 使用済み基音リストをリセット
+
+    // 【v4.0.21追加】タイマーをクリア（ページ離脱時の中断対応）
+    if (doremiGuideTimeoutId) {
+        clearTimeout(doremiGuideTimeoutId);
+        doremiGuideTimeoutId = null;
+        console.log('⏱️ ドレミガイドタイマーをクリア');
+    }
+    if (nextSessionTimeoutId) {
+        clearTimeout(nextSessionTimeoutId);
+        nextSessionTimeoutId = null;
+        console.log('⏱️ 次セッション開始タイマーをクリア');
+    }
 
     // ブラウザバック防止はrouter.jsで自動解除されます
 
