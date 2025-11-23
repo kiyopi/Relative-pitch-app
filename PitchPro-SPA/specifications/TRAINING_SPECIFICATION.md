@@ -1,10 +1,21 @@
 # トレーニング機能仕様書（SPA版）
 
-**バージョン**: 4.7.0
+**バージョン**: 4.8.0
 **作成日**: 2025-10-23
-**最終更新**: 2025-11-22
+**最終更新**: 2025-11-23
 
 **変更履歴**:
+- v4.8.0 (2025-11-23): iOS Safari AudioSession対策の文書化
+  - **Documentation**: 準備ページv9実装（audioSession切替 + Tone.start()強制実行）
+    - **問題**: iOS Safariでマイクアクティブ時に基音再生の音量が極端に小さくなる（WebKit Bug #218012）
+    - **原因**: audioSessionが`play-and-record`の時、音声出力が受話口にルーティングされる
+    - **解決**: audioSessionを`playback`に切替後、`Tone.start()`を強制実行してルーティングを更新
+    - **ブチ音対策**: audioSession復元タイミングを3000msに設定（音の完全終了後）
+    - **修正ファイル**: `/PitchPro-SPA/pages/js/preparation-pitchpro-cycle.js` (v9)
+  - **Documentation**: トレーニングページでの意図的な無効化理由を文書化
+    - **理由**: audioSession切替を行うと2回目以降の基音再生で音が出なくなる問題が発生
+    - **現状**: マイク停止（stopDetection）のみで対応、audioSessionは変更しない
+    - **関連仕様書**: `IOS_SAFARI_AUDIO_SESSION_SPECIFICATION.md` v1.0.0（新規作成）
 - v4.7.0 (2025-11-22): 音域不足時の拡張ロジック改善（v2.10.0）
   - **Bug Fix**: 12音階モードで音域が狭い場合（1.77オクターブ等）にトレーニングページが読み込めないバグを修正
     - **問題**: 高音側拡張のみで12音確保に失敗（11音）→ `selectSequentialMode()`でundefinedアクセス → クラッシュ

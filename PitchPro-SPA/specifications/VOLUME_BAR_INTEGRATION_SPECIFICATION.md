@@ -1,10 +1,14 @@
 # 音量バー統合仕様書 (VOLUME_BAR_INTEGRATION_SPECIFICATION)
 
-**バージョン**: 1.1.0
-**最終更新**: 2025-11-22
+**バージョン**: 1.2.0
+**最終更新**: 2025-11-23
 **作成者**: Claude Code
 
 ## 変更履歴
+
+- **v1.2.0 (2025-11-23)**: iOS Safari AudioSession関連情報追加
+  - 関連仕様書への参照追加: `IOS_SAFARI_AUDIO_SESSION_SPECIFICATION.md`
+  - iOS Safariでマイクアクティブ時に音量が小さくなる問題（WebKit Bug #218012）の対策情報
 - **v1.1.0 (2025-11-22)**: 基音再生音量の永続化機能追加（Issue #2対応）
 - **v1.0.0 (2025-01-07)**: 初版作成  
 
@@ -372,6 +376,20 @@ const controller = new VolumeBarController({
 - **シンプル実装例**: `/test-volume-controller.html`
 - **統合テスト例**: `/test-ui-integration.html`
 - **コンポーネントテスト例**: `/Bolt/v2/pages/volume-bar-test.html`
+
+---
+
+## 🔗 関連仕様書
+
+| 仕様書 | 関連内容 |
+|--------|----------|
+| `IOS_SAFARI_AUDIO_SESSION_SPECIFICATION.md` | iOS Safari特有の音量問題（WebKit Bug #218012）対策 |
+| `TRAINING_SPECIFICATION.md` | 基音再生音量の永続化機能、トレーニングフロー |
+| `MICROPHONE_BACKGROUND_RESILIENCE.md` | マイクバックグラウンド復帰仕様 |
+
+### iOS Safari音量問題について
+
+iOS Safariでは、マイクがアクティブな状態で音声を再生すると音量が極端に小さくなる問題があります（WebKit Bug #218012）。詳細は`IOS_SAFARI_AUDIO_SESSION_SPECIFICATION.md`を参照してください。
 
 ---
 
