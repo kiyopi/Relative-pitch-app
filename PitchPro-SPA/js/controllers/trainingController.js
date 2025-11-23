@@ -767,6 +767,14 @@ async function startTraining() {
             }
         }
 
+        // 【iOS Safari対応 v4】iOS 17+対策: Tone.start()を同期的に呼ぶ
+        // await前にTone.start()を呼ばないと、ユーザー操作コールスタック外と判断される
+        if (typeof Tone !== 'undefined') {
+            console.log('🔊 [iOS v4] Tone.start()を同期的に呼び出し...');
+            Tone.start();  // awaitしない！同期的に呼ぶことが重要
+            console.log(`🔊 [iOS v4] Tone.context.state: ${Tone.context?.state}`);
+        }
+
         // 【iOS Safari対応 v3】audioSession切り替えは行わない
         // 理由: playbackモードに切り替えると2回目以降の基音再生で音が出なくなる問題が発生
         // マイク停止（stopDetection）のみで対応し、audioSessionは変更しない

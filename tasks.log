@@ -13403,3 +13403,16 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 22:24:59] コミット: fix(audio): iOS 17+初回音声再生問題・無音時異常誤差・iPad音量強化
+
+- iOS Safari v10対応: await前にTone.start()を同期呼び出し
+  - iOS 17+ではawait後はユーザー操作コールスタック外と判断される問題を修正
+- ドレミガイド無音時の異常誤差修正 (v4.1.0)
+  - 音量5%以上を必須条件に追加（環境ノイズ除外）
+- iPad基音音量強化 (v2.9.3)
+  - 低音域: 0.35x → 0.6x、中低音域: 0.5x → 0.75x
+- ホームボタンデバッグログ追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
