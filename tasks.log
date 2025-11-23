@@ -13241,3 +13241,16 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 16:25:11] コミット: fix: 基音試聴ボタンのe.currentTarget null問題を修正
+
+【問題】
+- awaitの後にe.currentTargetを参照するとnullになる
+- TypeError: null is not an object (evaluating 'btn.querySelector')
+
+【修正】
+- ボタン参照をawaitの前に取得するように変更
+- catch文でも同様に修正
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -394,6 +394,21 @@ export async function initializeTrainingPage() {
     // SPA化により、ここで取得したマイク許可はドレミガイドでそのまま使用可能
     // 基音再生（PitchShifter）はマイク不要なので、ダイアログ表示中も問題なし
     try {
+        // 【iOS Safari対応】audioSession を 'play-and-record' に設定
+        // 準備ページで 'playback' に設定されている場合があるため、マイクアクセス前にリセット
+        if (navigator.audioSession) {
+            try {
+                const currentType = navigator.audioSession.type;
+                console.log(`🎤 [iOS] audioSession.type (現在): ${currentType}`);
+                if (currentType !== 'play-and-record') {
+                    navigator.audioSession.type = 'play-and-record';
+                    console.log('🎤 [iOS] audioSession.type を "play-and-record" に設定');
+                }
+            } catch (sessionError) {
+                console.warn('⚠️ audioSession設定失敗（続行）:', sessionError);
+            }
+        }
+
         console.log('🎤 [v4.5.0] マイク事前チェック開始...');
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         console.log('✅ [v4.5.0] マイク許可確認完了 - MediaStream取得成功');
