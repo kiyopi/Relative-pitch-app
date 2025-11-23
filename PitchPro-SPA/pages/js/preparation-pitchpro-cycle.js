@@ -2087,27 +2087,20 @@ function setupVolumeAdjustmentControls() {
                     }
                 }
 
-                // 【iOS Safari対応 v6】Tone.start()を明示的に呼び出し（トレーニングページと統一）
-                // iOS/iPadOSではユーザーインタラクション時にAudioContextを明示的にresumeする必要がある
-                if (typeof Tone !== 'undefined' && Tone.context) {
-                    console.log(`🔊 AudioContext状態確認... (state: ${Tone.context.state})`);
+                // 【iOS Safari対応 v8】audioSession切り替え後にTone.start()を強制実行
+                // iOS Safariでは、audioSessionをplaybackに切り替えた後でないと
+                // スピーカールーティングが正しく設定されない
+                if (typeof Tone !== 'undefined') {
+                    console.log(`🔊 AudioContext状態確認... (state: ${Tone.context?.state})`);
 
-                    // Tone.start()を明示的に呼び出し（iOS/iPadOS対応）
-                    if (Tone.context.state === 'suspended') {
-                        console.log('🔊 Tone.start()実行中...');
-                        await Tone.start();
-                        console.log(`✅ Tone.start()完了 (state: ${Tone.context.state})`);
-                    }
+                    // audioSession切り替え後に強制的にTone.start()を実行
+                    // これによりAudioContextのルーティングが再設定される
+                    console.log('🔊 Tone.start()を強制実行（audioSession切り替え後）...');
+                    await Tone.start();
+                    console.log(`✅ Tone.start()完了 (state: ${Tone.context?.state})`);
 
-                    // resume()で確実に起動
-                    if (Tone.context.state !== 'running') {
-                        console.log(`🔊 AudioContext再開中... (state: ${Tone.context.state})`);
-                        await Tone.context.resume();
-                        console.log(`✅ AudioContext再開完了 (state: ${Tone.context.state})`);
-
-                        // 安定化のため少し待機（iOS/iPadOS対策）
-                        await new Promise(resolve => setTimeout(resolve, 100));
-                    }
+                    // 安定化のため少し待機
+                    await new Promise(resolve => setTimeout(resolve, 50));
                 }
 
                 // C3を再生（Tone.js Sampler経由）

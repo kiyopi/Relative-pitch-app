@@ -13360,3 +13360,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 19:36:32] コミット: fix(volume): audioSession切り替えを復活（v7方式）
+
+- playbackモードに切り替えて音量改善
+- 再生完了後（2.6秒後）に確実にplay-and-recordに復元
+- audioSession復元後にマイク再開（順序を明確化）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
