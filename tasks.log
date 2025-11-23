@@ -13214,3 +13214,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 Co-Authored-By: Claude <noreply@anthropic.com>
 [2025-11-23 15:12:38] コミット: chore: キャッシュバスター更新（テスト用C3変更反映）
+[2025-11-23 15:27:15] コミット: debug(volume): AudioDetector状態とMediaStream確認ログ追加
+
+- 準備ページの基音試聴でAudioDetector/MediaStream状態をログ出力
+- 実験: 再生前にAudioDetector一時起動→停止（iOSルーティング検証）
+- テスト用C3をC4に戻す
+- キャッシュバスター更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

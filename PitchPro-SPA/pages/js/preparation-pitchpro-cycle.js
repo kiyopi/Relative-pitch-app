@@ -2046,39 +2046,25 @@ function setupVolumeAdjustmentControls() {
                 window.updateLucideIcon && window.updateLucideIcon(icon, 'loader-2');
                 text.textContent = '再生中...';
 
-                // 【テスト用】C4 (261.6Hz) を再生
+                // C4 (261.6Hz) を再生
                 console.log('▶️ C4音を再生開始...');
 
-                // 【DEBUG v2.9.3】AudioDetector状態とMediaStream状態を確認
-                const audioDetector = window.globalAudioDetector || (typeof pitchProCycleManager !== 'undefined' ? pitchProCycleManager.audioDetector : null);
-                console.log(`🎤 [DEBUG] AudioDetector存在: ${!!audioDetector}`);
-                if (audioDetector) {
-                    console.log(`🎤 [DEBUG] AudioDetector.microphoneController: ${!!audioDetector.microphoneController}`);
-                    if (audioDetector.microphoneController) {
-                        const mc = audioDetector.microphoneController;
-                        console.log(`🎤 [DEBUG] MicrophoneController.stream: ${!!mc.stream}`);
-                        console.log(`🎤 [DEBUG] MicrophoneController.stream.active: ${mc.stream ? mc.stream.active : 'N/A'}`);
-                    }
-                }
-
-                // 【実験】トレーニングページと同様にAudioDetectorを一時起動してから再生
-                // iOSでMediaStreamアクティブ時の音声出力ルーティングを確認
-                let wasStarted = false;
-                if (audioDetector && audioDetector.startDetection) {
-                    console.log('🎤 [実験] AudioDetector一時起動...');
+                // 【iOS Safari対応】navigator.audioSession APIで音声出力ルーティングを制御
+                // マイク停止後の音量低下問題を解決
+                // https://stackoverflow.com/questions/76083738/ios-safari-lowers-audio-playback-volume-when-mic-is-in-use
+                if (navigator.audioSession) {
                     try {
-                        await audioDetector.startDetection();
-                        wasStarted = true;
-                        console.log('🎤 [実験] AudioDetector起動完了');
+                        const currentType = navigator.audioSession.type;
+                        console.log(`🔊 [iOS] audioSession.type (現在): ${currentType}`);
 
-                        // 少し待機してから停止→再生（トレーニングページのフローを模倣）
-                        await new Promise(resolve => setTimeout(resolve, 100));
-
-                        audioDetector.stopDetection();
-                        console.log('🎤 [実験] AudioDetector停止完了');
-                    } catch (adError) {
-                        console.warn('⚠️ AudioDetector起動失敗（続行）:', adError);
+                        // 再生モードに切り替え（マイク使用後の音量低下を回避）
+                        navigator.audioSession.type = 'playback';
+                        console.log('🔊 [iOS] audioSession.type を "playback" に設定');
+                    } catch (sessionError) {
+                        console.warn('⚠️ audioSession設定失敗（続行）:', sessionError);
                     }
+                } else {
+                    console.log('ℹ️ navigator.audioSession APIは利用不可（非iOS環境）');
                 }
 
                 // 【DEBUG】再生前にPitchShifter音量を確認
