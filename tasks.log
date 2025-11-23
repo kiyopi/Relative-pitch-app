@@ -13254,3 +13254,15 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 17:02:37] コミット: fix(iOS): audioSession.typeをマイクアクセス前にplay-and-recordに設定
+
+準備ページでplaybackに設定されたaudioSessionがトレーニングページの
+マイクアクセスと競合していた問題を修正
+
+- trainingController.js: getUserMedia前にaudioSession.typeをチェック
+- play-and-record以外の場合は切り替えを実行
+- InvalidStateError: AudioSession category is not compatible with audio capture を解消
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

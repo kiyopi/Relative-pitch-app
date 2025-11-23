@@ -243,10 +243,8 @@ function isStableVoiceDetection(result) {
 
     // 音程チェック：周波数と音程名の両方が必要（最優先）
     if (!result.frequency || !result.note) {
-        console.log('🔇 音程が検出されていません:', {
-            frequency: result.frequency,
-            note: result.note
-        });
+        // 【デバッグログ抑制】大量出力を防止
+        // console.log('🔇 音程が検出されていません:', { frequency: result.frequency, note: result.note });
         // 継続検出もリセット
         stability.lowFreqContinuousStart = null;
         return false;
@@ -775,12 +773,8 @@ function recordMeasurementData(result) {
 
     // 無効なデータをフィルタリング
     if (!result.frequency || !result.volume) {
-        console.log('🔇 データ記録スキップ:', {
-            phase: currentPhase,
-            frequency: result.frequency || 'なし',
-            volume: result.volume || 'なし',
-            reason: !result.frequency ? '周波数なし' : '音量なし'
-        });
+        // 【デバッグログ抑制】大量出力を防止
+        // console.log('🔇 データ記録スキップ:', { phase: currentPhase, frequency: result.frequency || 'なし', volume: result.volume || 'なし', reason: !result.frequency ? '周波数なし' : '音量なし' });
         return;
     }
 
@@ -788,12 +782,8 @@ function recordMeasurementData(result) {
     const stability = globalState.voiceStability;
     if (result.frequency < stability.minFrequencyForVoice ||
         result.frequency > stability.maxFrequencyForVoice) {
-        console.log('🔇 データ記録スキップ（周波数範囲外）:', {
-            phase: currentPhase,
-            frequency: `${result.frequency.toFixed(1)} Hz`,
-            validRange: `${stability.minFrequencyForVoice}-${stability.maxFrequencyForVoice} Hz`,
-            reason: '人間の声の範囲外'
-        });
+        // 【デバッグログ抑制】大量出力を防止
+        // console.log('🔇 データ記録スキップ（周波数範囲外）:', { phase: currentPhase, frequency: `${result.frequency.toFixed(1)} Hz`, validRange: `${stability.minFrequencyForVoice}-${stability.maxFrequencyForVoice} Hz`, reason: '人間の声の範囲外' });
         return;
     }
 
