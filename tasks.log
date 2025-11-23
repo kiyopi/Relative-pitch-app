@@ -13369,3 +13369,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 19:51:31] コミット: fix(volume): audioSession切り替え後にTone.start()を強制実行（v8）
+
+- audioSessionをplaybackに切り替えた後にTone.start()を強制実行
+- これによりAudioContextのルーティングが再設定される可能性
+- 条件判定を削除し、常にTone.start()を実行
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -2107,8 +2107,9 @@ function setupVolumeAdjustmentControls() {
                 await window.pitchShifterInstance.playNote("C3", 1.0);
                 console.log('✅ 基音C3を再生しました');
 
-                // 【iOS Safari対応 v7】再生完了後にaudioSessionを復元してマイクを再開
-                // 音の残響（リリース）が終わるまで待ってから、確実にplay-and-recordに戻す
+                // 【iOS Safari対応 v9】再生完了後にaudioSessionを復元してマイクを再開
+                // 音の残響（リリース）が完全に終わるまで待ってから、確実にplay-and-recordに戻す
+                // ブチ音防止のため、2.52秒 + 余裕（500ms）= 3000msに設定
                 setTimeout(async () => {
                     try {
                         // audioSessionを先に復元（マイク再開前に）
@@ -2125,7 +2126,7 @@ function setupVolumeAdjustmentControls() {
                     } catch (restoreError) {
                         console.warn('⚠️ 復元処理失敗:', restoreError);
                     }
-                }, 2600); // リリース完了後（2.52s + バッファ）
+                }, 3000); // リリース完全終了後（2.52s + 余裕500ms = 3s）
 
                 // 2.52秒後にボタンを元に戻す（attack:0.02s + sustain:1.0s + release:1.5s = 2.52s）
                 // 【iOS Safari対応 v4】CSSクラス制御のみ（DOM操作排除）
