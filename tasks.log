@@ -13351,3 +13351,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 19:25:58] コミット: fix(volume): Tone.start()を明示的に呼び出し（トレーニングページと統一）
+
+- iOS/iPadOSではユーザーインタラクション時にAudioContextを明示的にresumeする必要がある
+- Tone.context.state === 'suspended' の場合にTone.start()を呼び出し
+- トレーニングページと同じ処理パターンを準備ページにも適用
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

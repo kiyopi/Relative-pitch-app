@@ -2075,12 +2075,16 @@ function setupVolumeAdjustmentControls() {
                     }
                 }
 
-                // 【iOS Safari対応 v5】audioSession切り替えは行わない（トレーニングページと統一）
-                // 理由: playbackモードに切り替えると2回目以降の基音再生で音が出なくなる問題が発生
-                // マイク停止（stopDetection）のみで対応し、audioSessionは変更しない
-                // WebKit Bug #218012 の回避策としては不完全だが、音が出ないよりは音量が小さい方がマシ
+                // 【iOS Safari対応 v7】audioSessionをplaybackに切り替え（音量改善のため）
+                // WebKit Bug #218012: マイクがアクティブだと音量が自動的に下がる
+                // 再生完了後に確実にplay-and-recordに戻すことで、2回目以降の問題を回避
                 if (navigator.audioSession) {
-                    console.log(`🔊 [iOS] audioSession.type (現在): ${navigator.audioSession.type}（変更なし）`);
+                    try {
+                        navigator.audioSession.type = 'playback';
+                        console.log('🔊 [iOS] audioSession.type → playback（音量改善のため）');
+                    } catch (sessionError) {
+                        console.warn('⚠️ audioSession設定失敗（続行）:', sessionError);
+                    }
                 }
 
                 // 【iOS Safari対応 v6】Tone.start()を明示的に呼び出し（トレーニングページと統一）
@@ -2110,19 +2114,25 @@ function setupVolumeAdjustmentControls() {
                 await window.pitchShifterInstance.playNote("C3", 1.0);
                 console.log('✅ 基音C3を再生しました');
 
-                // 【iOS Safari対応 v5】再生完了後にマイクを再開
-                // audioSession切り替えは行わない（トレーニングページと統一）
-                if (micWasActive && audioDetector) {
-                    // 音の残響（リリース）が終わるまで少し待つ
-                    setTimeout(async () => {
-                        try {
+                // 【iOS Safari対応 v7】再生完了後にaudioSessionを復元してマイクを再開
+                // 音の残響（リリース）が終わるまで待ってから、確実にplay-and-recordに戻す
+                setTimeout(async () => {
+                    try {
+                        // audioSessionを先に復元（マイク再開前に）
+                        if (navigator.audioSession) {
+                            navigator.audioSession.type = 'play-and-record';
+                            console.log('🔊 [iOS] audioSession.type → play-and-record（復元）');
+                        }
+
+                        // マイクを再開
+                        if (micWasActive && audioDetector) {
                             audioDetector.startDetection();
                             console.log('✅ [iOS] マイク再開完了');
-                        } catch (micError) {
-                            console.warn('⚠️ マイク再開失敗:', micError);
                         }
-                    }, 2600); // リリース完了後（2.52s + バッファ）
-                }
+                    } catch (restoreError) {
+                        console.warn('⚠️ 復元処理失敗:', restoreError);
+                    }
+                }, 2600); // リリース完了後（2.52s + バッファ）
 
                 // 2.52秒後にボタンを元に戻す（attack:0.02s + sustain:1.0s + release:1.5s = 2.52s）
                 // 【iOS Safari対応 v4】CSSクラス制御のみ（DOM操作排除）
