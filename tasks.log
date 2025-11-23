@@ -13224,3 +13224,20 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 15:44:47] コミット: fix(iOS): navigator.audioSession APIで音量低下問題を解決
+
+【原因特定】
+- iOS Safariでマイク使用後、音声再生の音量が大幅に低下する既知の問題
+- エコーキャンセレーションによる音声出力ルーティングの変更が原因
+- 準備ページのみで発生（マイク停止後の再生）
+
+【解決策】
+- navigator.audioSession.type = 'playback' を設定
+- マイク使用後でも正常な音量で再生可能に
+
+【参照】
+- https://stackoverflow.com/questions/76083738/ios-safari-lowers-audio-playback-volume-when-mic-is-in-use
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

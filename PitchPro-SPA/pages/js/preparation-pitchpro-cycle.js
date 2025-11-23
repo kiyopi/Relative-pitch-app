@@ -2007,7 +2007,9 @@ function setupVolumeAdjustmentControls() {
             });
 
             // フォーカスを外す（押下状態を解除）
-            e.currentTarget.blur();
+            // 【重要】awaitの前にボタン参照を取得（awaitの後はe.currentTargetがnullになる）
+            const btn = e.currentTarget;
+            btn.blur();
 
             // 再生中フラグを立てる
             isPlayingBaseNote = true;
@@ -2017,6 +2019,7 @@ function setupVolumeAdjustmentControls() {
                 if (!window.pitchShifterInstance) {
                     console.warn('⚠️ PitchShifterインスタンスが存在しません - 再生をスキップ');
                     alert('音声システムの初期化中です。もう一度お試しください。');
+                    isPlayingBaseNote = false;
                     return;
                 }
 
@@ -2028,7 +2031,6 @@ function setupVolumeAdjustmentControls() {
                 }
 
                 // ボタンを無効化して「再生中」状態に変更
-                const btn = e.currentTarget;
                 const icon = btn.querySelector('[data-lucide]') || btn.querySelector('svg') || btn.querySelector('i');
                 const text = btn.querySelector('span');
 
@@ -2101,8 +2103,7 @@ function setupVolumeAdjustmentControls() {
                 console.error('❌ 基音再生エラー:', error);
                 alert('音声再生に失敗しました: ' + error.message);
 
-                // エラー時もボタンを元に戻す
-                const btn = e.currentTarget;
+                // エラー時もボタンを元に戻す（btnは既に関数スコープで取得済み）
                 const icon = btn.querySelector('[data-lucide]') || btn.querySelector('svg') || btn.querySelector('i');
                 const text = btn.querySelector('span');
 
