@@ -2051,9 +2051,25 @@ function setupVolumeAdjustmentControls() {
                 // C4 (261.6Hz) を再生
                 console.log('▶️ C4音を再生開始...');
 
+                // 【iOS Safari対応 v2】マイクを一時停止してから音声再生
+                // WebKit Bug #218012: マイクがアクティブだと音量が自動的に下がる
+                // 解決策: マイク停止 → audioSession変更 → 再生 → マイク再開
+                const audioDetector = window.globalAudioDetector || pitchProCycleManager?.audioDetector;
+                let micWasActive = false;
+
+                if (audioDetector) {
+                    try {
+                        console.log('🎤 [iOS] マイクを一時停止...');
+                        audioDetector.stopDetection();
+                        micWasActive = true;
+                        console.log('✅ [iOS] マイク停止完了');
+                    } catch (micError) {
+                        console.warn('⚠️ マイク停止失敗（続行）:', micError);
+                    }
+                }
+
                 // 【iOS Safari対応】navigator.audioSession APIで音声出力ルーティングを制御
-                // マイク停止後の音量低下問題を解決
-                // https://stackoverflow.com/questions/76083738/ios-safari-lowers-audio-playback-volume-when-mic-is-in-use
+                // マイク停止後に設定することで効果を最大化
                 if (navigator.audioSession) {
                     try {
                         const currentType = navigator.audioSession.type;
@@ -2075,6 +2091,25 @@ function setupVolumeAdjustmentControls() {
                 }
                 await window.pitchShifterInstance.playNote("C4", 1.0);
                 console.log('✅ 基音C4を再生しました');
+
+                // 【iOS Safari対応 v2】再生完了後にマイクを再開
+                if (micWasActive && audioDetector) {
+                    // 音の残響（リリース）が終わるまで少し待つ
+                    setTimeout(async () => {
+                        try {
+                            // audioSession を play-and-record に戻す
+                            if (navigator.audioSession) {
+                                navigator.audioSession.type = 'play-and-record';
+                                console.log('🔊 [iOS] audioSession.type を "play-and-record" に復元');
+                            }
+
+                            audioDetector.startDetection();
+                            console.log('✅ [iOS] マイク再開完了');
+                        } catch (micError) {
+                            console.warn('⚠️ マイク再開失敗:', micError);
+                        }
+                    }, 2600); // リリース完了後（2.52s + バッファ）
+                }
 
                 // 2.52秒後にボタンを元に戻す（attack:0.02s + sustain:1.0s + release:1.5s = 2.52s）
                 setTimeout(() => {

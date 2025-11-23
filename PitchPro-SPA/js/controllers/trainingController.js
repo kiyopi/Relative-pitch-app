@@ -767,6 +767,17 @@ async function startTraining() {
             }
         }
 
+        // 【iOS Safari対応 v2】audioSession を playback に設定
+        // WebKit Bug #218012: マイク停止後に設定することで音量低下を回避
+        if (navigator.audioSession) {
+            try {
+                navigator.audioSession.type = 'playback';
+                console.log('🔊 [iOS] audioSession.type を "playback" に設定（基音再生用）');
+            } catch (sessionError) {
+                console.warn('⚠️ audioSession設定失敗（続行）:', sessionError);
+            }
+        }
+
         await pitchShifter.playNote(baseNoteInfo.note, 1.0);
 
         // 【v4.2.2改善】基音再生後はマイクオフのまま（ドレミガイド開始時にオン）
@@ -805,6 +816,17 @@ async function startTraining() {
         // ドレミガイド開始時は基音のreleaseフェーズ中（自然な音の重なり）
         // 【v4.0.21】タイマーIDを保存（ページ離脱時のクリーンアップ用）
         doremiGuideTimeoutId = setTimeout(async () => {
+            // 【iOS Safari対応 v2】audioSession を play-and-record に戻す
+            // マイク再開前に設定することで正常なオーディオルーティングを確保
+            if (navigator.audioSession) {
+                try {
+                    navigator.audioSession.type = 'play-and-record';
+                    console.log('🔊 [iOS] audioSession.type を "play-and-record" に復元（マイク再開用）');
+                } catch (sessionError) {
+                    console.warn('⚠️ audioSession設定失敗（続行）:', sessionError);
+                }
+            }
+
             // 【v4.2.2追加】ドレミガイド開始時にマイクオン（基音の音を拾わないため）
             if (audioDetector) {
                 console.log('🔊 ドレミガイド開始 - マイクオン');

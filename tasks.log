@@ -13266,3 +13266,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 17:10:17] コミット: chore(logs): 音域テストの大量デバッグログを抑制
+
+- voice-range-test.js: 以下のログをコメントアウト
+  - 🔇 音程が検出されていません
+  - 🔇 データ記録スキップ
+  - 🔇 データ記録スキップ（周波数範囲外）
+- コンソールの可読性向上
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
