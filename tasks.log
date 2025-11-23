@@ -13277,3 +13277,21 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 17:20:46] コミット: fix(iOS): 基音再生時にマイクを一時停止してaudioSessionを切り替え
+
+WebKit Bug #218012 対応: マイクアクティブ時の音量低下問題を解決
+
+準備ページ（preparation-pitchpro-cycle.js）:
+- 基音再生前にaudioDetector.stopDetection()でマイク停止
+- audioSession.type を 'playback' に設定
+- 再生完了後(2.6秒)にマイク再開と'play-and-record'復元
+
+トレーニングページ（trainingController.js）:
+- 基音再生前にaudioSession.type を 'playback' に設定
+- ドレミガイド開始時に'play-and-record'に復元してからマイク再開
+
+参考: https://bugs.webkit.org/show_bug.cgi?id=218012
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

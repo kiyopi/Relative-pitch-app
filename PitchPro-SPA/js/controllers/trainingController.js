@@ -767,15 +767,12 @@ async function startTraining() {
             }
         }
 
-        // 【iOS Safari対応 v2】audioSession を playback に設定
-        // WebKit Bug #218012: マイク停止後に設定することで音量低下を回避
+        // 【iOS Safari対応 v3】audioSession切り替えは行わない
+        // 理由: playbackモードに切り替えると2回目以降の基音再生で音が出なくなる問題が発生
+        // マイク停止（stopDetection）のみで対応し、audioSessionは変更しない
+        // WebKit Bug #218012 の回避策としては不完全だが、音が出ないよりは音量が小さい方がマシ
         if (navigator.audioSession) {
-            try {
-                navigator.audioSession.type = 'playback';
-                console.log('🔊 [iOS] audioSession.type を "playback" に設定（基音再生用）');
-            } catch (sessionError) {
-                console.warn('⚠️ audioSession設定失敗（続行）:', sessionError);
-            }
+            console.log(`🔊 [iOS] audioSession.type (現在): ${navigator.audioSession.type}（変更なし）`);
         }
 
         await pitchShifter.playNote(baseNoteInfo.note, 1.0);
@@ -816,16 +813,8 @@ async function startTraining() {
         // ドレミガイド開始時は基音のreleaseフェーズ中（自然な音の重なり）
         // 【v4.0.21】タイマーIDを保存（ページ離脱時のクリーンアップ用）
         doremiGuideTimeoutId = setTimeout(async () => {
-            // 【iOS Safari対応 v2】audioSession を play-and-record に戻す
-            // マイク再開前に設定することで正常なオーディオルーティングを確保
-            if (navigator.audioSession) {
-                try {
-                    navigator.audioSession.type = 'play-and-record';
-                    console.log('🔊 [iOS] audioSession.type を "play-and-record" に復元（マイク再開用）');
-                } catch (sessionError) {
-                    console.warn('⚠️ audioSession設定失敗（続行）:', sessionError);
-                }
-            }
+            // 【iOS Safari対応 v3】audioSession切り替えを行わないため、復元も不要
+            // audioSessionは変更していないので、そのままマイクを再開
 
             // 【v4.2.2追加】ドレミガイド開始時にマイクオン（基音の音を拾わないため）
             if (audioDetector) {

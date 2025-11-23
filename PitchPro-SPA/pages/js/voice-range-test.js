@@ -253,10 +253,8 @@ function isStableVoiceDetection(result) {
     // 人間の声の周波数範囲チェック
     if (result.frequency < stability.minFrequencyForVoice ||
         result.frequency > stability.maxFrequencyForVoice) {
-        console.log('🚫 人間の声の範囲外:', {
-            frequency: result.frequency,
-            range: `${stability.minFrequencyForVoice}-${stability.maxFrequencyForVoice}Hz`
-        });
+        // 【デバッグログ抑制】大量出力を防止
+        // console.log('🚫 人間の声の範囲外:', { frequency: result.frequency, range: `${stability.minFrequencyForVoice}-${stability.maxFrequencyForVoice}Hz` });
         // 範囲外なので継続検出もリセット
         stability.lowFreqContinuousStart = null;
         return false;
@@ -274,12 +272,8 @@ function isStableVoiceDetection(result) {
         // 初回検出時にタイムスタンプを記録
         if (stability.lowFreqContinuousStart === null) {
             stability.lowFreqContinuousStart = now;
-            console.log('🎤 音声継続検出開始:', {
-                frequency: result.frequency.toFixed(1) + 'Hz',
-                note: result.note,
-                volume: (result.volume * 100).toFixed(1) + '%',
-                threshold: (lowFreqVolumeThreshold * 100).toFixed(1) + '%'
-            });
+            // 【デバッグログ抑制】大量出力を防止
+            // console.log('🎤 音声継続検出開始:', { frequency: result.frequency.toFixed(1) + 'Hz', note: result.note, volume: (result.volume * 100).toFixed(1) + '%', threshold: (lowFreqVolumeThreshold * 100).toFixed(1) + '%' });
         }
 
         // 継続時間をチェック
@@ -293,30 +287,17 @@ function isStableVoiceDetection(result) {
             });
             return true; // 安定性チェックをバイパス
         } else {
-            console.log('🟡 音声継続検出中:', {
-                frequency: result.frequency.toFixed(1) + 'Hz',
-                duration: (continuousDuration / 1000).toFixed(1) + '秒',
-                required: (stability.lowFreqContinuousDuration / 1000) + '秒',
-                volume: (result.volume * 100).toFixed(1) + '%'
-            });
+            // 【デバッグログ抑制】大量出力を防止
+            // console.log('🟡 音声継続検出中:', { frequency: result.frequency.toFixed(1) + 'Hz', duration: (continuousDuration / 1000).toFixed(1) + '秒', required: (stability.lowFreqContinuousDuration / 1000) + '秒', volume: (result.volume * 100).toFixed(1) + '%' });
         }
     } else {
         // 🎵 v3.1.19修正: リセット条件を音量のみに簡素化
         // 条件を満たさない場合は継続検出をリセット
         if (stability.lowFreqContinuousStart !== null) {
-            let reason = '不明';
-            if (!hasValidFrequency) {
-                reason = `人間の声の範囲外（${result.frequency ? result.frequency.toFixed(1) : 'なし'}Hz、有効範囲: ${stability.minFrequencyForVoice}-${stability.maxFrequencyForVoice}Hz）`;
-            } else if (!hasMinVolume) {
-                reason = `音量不足（${result.volume ? (result.volume * 100).toFixed(1) : '0'}% < ${(lowFreqVolumeThreshold * 100).toFixed(1)}%）`;
-            }
-
-            console.log('⚠️ 音声継続検出リセット:', {
-                reason: reason,
-                frequency: result.frequency ? result.frequency.toFixed(1) + 'Hz' : 'なし',
-                volume: result.volume ? (result.volume * 100).toFixed(1) + '%' : 'なし',
-                threshold: (lowFreqVolumeThreshold * 100).toFixed(1) + '%'
-            });
+            // 【デバッグログ抑制】大量出力を防止
+            // let reason = '不明';
+            // if (!hasValidFrequency) { reason = `人間の声の範囲外...`; } else if (!hasMinVolume) { reason = `音量不足...`; }
+            // console.log('⚠️ 音声継続検出リセット:', { reason, frequency, volume, threshold });
             stability.lowFreqContinuousStart = null;
         }
     }
