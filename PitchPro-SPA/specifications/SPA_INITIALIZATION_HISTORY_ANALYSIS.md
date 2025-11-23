@@ -639,4 +639,106 @@ async waitForDependencies(deps) {
 
 ## 更新履歴
 
+- 2025-11-23: v2.12.0修正内容を追記（スクリプト二重実行防止機能のバグ修正）
 - 2025-11-17: 初版作成（歴史的背景調査完了）
+
+---
+
+## 📝 追記: router.js v2.11.0 → v2.12.0 修正履歴（2025-11-23）
+
+### 背景
+
+2025-11-22に発見された「preparation-pitchpro-cycle.jsの二重読み込み問題」を解決するため、v2.11.0で外部スクリプトの二重読み込み防止機能を追加したが、重大なバグが発見された。
+
+### v2.11.0のバグ（コミット: 44b927a）
+
+**症状**:
+- ホームページからpreparationページに遷移しても、スクリプトが実行されない
+- ページ機能が停止し、トップページ以外に遷移できない
+
+**根本原因**:
+```javascript
+// v2.11.0の問題コード
+const alreadyLoaded = Array.from(document.scripts).some(existingScript => {
+    // ... 自分自身も含めて検索してしまう
+});
+```
+
+**問題の詳細**:
+```
+1. innerHTML = html でテンプレートのスクリプトがDOMに追加
+   → document.scripts にも即座に含まれる（未実行でも！）
+
+2. querySelectorAll('script') でスクリプトを取得
+
+3. 「このスクリプトはdocument.scriptsにある?」チェック
+   → YES（自分自身を検出してしまう）
+
+4. alreadyLoaded = true → 初回なのにスキップ！
+```
+
+### v2.12.0の修正（コミット: e7cef2f）
+
+**解決策**: `document.scripts`チェックをやめ、`executedScripts` Setで明示的に追跡
+
+```javascript
+class SimpleRouter {
+    constructor() {
+        // 【v2.12.0追加】実行済みスクリプト追跡（二重実行防止用）
+        this.executedScripts = new Set();
+    }
+
+    async loadPage(page, fullHash = '', signal = null) {
+        // ... innerHTML挿入後 ...
+
+        scriptTags.forEach(oldScript => {
+            const scriptSrc = oldScript.getAttribute('src');
+
+            if (scriptSrc) {
+                const baseSrc = scriptSrc.split('?')[0];
+
+                // 【v2.12.0修正】executedScripts Setで実行済みかチェック
+                if (this.executedScripts.has(baseSrc)) {
+                    console.log(`⏭️ [Router] スクリプト既実行済み、スキップ: ${baseSrc}`);
+                    oldScript.remove();
+                    return;
+                }
+
+                // これから実行するのでSetに追加
+                this.executedScripts.add(baseSrc);
+                console.log(`📜 [Router] スクリプト実行: ${baseSrc}`);
+            }
+
+            // replaceChild処理...
+        });
+    }
+}
+```
+
+### 修正の利点
+
+| 項目 | 説明 |
+|------|------|
+| **正確性** | 「実行した」という事実を追跡するので誤判定なし |
+| **シンプル** | クラス内プロパティで完結 |
+| **自然なリセット** | ページリロード → インスタンス再作成 → Set リセット |
+| **NavigationManager互換** | 独立した仕組みで競合しない |
+
+### シナリオ別検証（修正後）
+
+| シナリオ | executedScripts | 動作 |
+|----------|-----------------|------|
+| home → preparation（初回）| 空 | ✅ 実行、Setに追加 |
+| preparation → training | preparation.js | ✅ training.js実行 |
+| training → preparation（再訪問）| 両方含む | ✅ スキップ |
+| ページリロード | リセット（新インスタンス）| ✅ 再実行 |
+
+### 関連ドキュメント
+
+- `SCRIPT_DUPLICATE_LOADING_BUG_REPORT.md` - v2.11.0バグの詳細レポート
+
+### 教訓
+
+1. **document.scriptsはリアルタイムでDOMを反映** - innerHTML直後のチェックには不適
+2. **スクリプト実行状態の追跡は明示的なデータ構造で行うべき**
+3. **SPAでのスクリプト管理は複雑** - 十分なテストが必要
