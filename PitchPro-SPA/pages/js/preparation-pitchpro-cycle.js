@@ -2035,8 +2035,7 @@ function setupVolumeAdjustmentControls() {
                 if (!icon || !text) {
                     console.warn('⚠️ ボタン内の要素が見つかりません');
                     // 要素が見つからない場合は音声だけ再生
-                    // 【テスト用】C4→C3に変更（トレーニングと同じ音程で比較）
-                    await window.pitchShifterInstance.playNote("C3", 1.0);
+                    await window.pitchShifterInstance.playNote("C4", 1.0);
                     return;
                 }
 
@@ -2047,14 +2046,47 @@ function setupVolumeAdjustmentControls() {
                 window.updateLucideIcon && window.updateLucideIcon(icon, 'loader-2');
                 text.textContent = '再生中...';
 
-                // 【テスト用】C3 (130.8Hz) を再生（トレーニングと同じ音程で比較）
-                console.log('▶️ C3音を再生開始...（テスト用）');
+                // 【テスト用】C4 (261.6Hz) を再生
+                console.log('▶️ C4音を再生開始...');
+
+                // 【DEBUG v2.9.3】AudioDetector状態とMediaStream状態を確認
+                const audioDetector = window.globalAudioDetector || (typeof pitchProCycleManager !== 'undefined' ? pitchProCycleManager.audioDetector : null);
+                console.log(`🎤 [DEBUG] AudioDetector存在: ${!!audioDetector}`);
+                if (audioDetector) {
+                    console.log(`🎤 [DEBUG] AudioDetector.microphoneController: ${!!audioDetector.microphoneController}`);
+                    if (audioDetector.microphoneController) {
+                        const mc = audioDetector.microphoneController;
+                        console.log(`🎤 [DEBUG] MicrophoneController.stream: ${!!mc.stream}`);
+                        console.log(`🎤 [DEBUG] MicrophoneController.stream.active: ${mc.stream ? mc.stream.active : 'N/A'}`);
+                    }
+                }
+
+                // 【実験】トレーニングページと同様にAudioDetectorを一時起動してから再生
+                // iOSでMediaStreamアクティブ時の音声出力ルーティングを確認
+                let wasStarted = false;
+                if (audioDetector && audioDetector.startDetection) {
+                    console.log('🎤 [実験] AudioDetector一時起動...');
+                    try {
+                        await audioDetector.startDetection();
+                        wasStarted = true;
+                        console.log('🎤 [実験] AudioDetector起動完了');
+
+                        // 少し待機してから停止→再生（トレーニングページのフローを模倣）
+                        await new Promise(resolve => setTimeout(resolve, 100));
+
+                        audioDetector.stopDetection();
+                        console.log('🎤 [実験] AudioDetector停止完了');
+                    } catch (adError) {
+                        console.warn('⚠️ AudioDetector起動失敗（続行）:', adError);
+                    }
+                }
+
                 // 【DEBUG】再生前にPitchShifter音量を確認
                 if (window.pitchShifterInstance.sampler && window.pitchShifterInstance.sampler.volume) {
                     console.log(`🔊 [DEBUG] 準備ページ再生時の音量: ${window.pitchShifterInstance.sampler.volume.value}dB`);
                 }
-                await window.pitchShifterInstance.playNote("C3", 1.0);
-                console.log('✅ 基音C3を再生しました（テスト用）');
+                await window.pitchShifterInstance.playNote("C4", 1.0);
+                console.log('✅ 基音C4を再生しました');
 
                 // 2.52秒後にボタンを元に戻す（attack:0.02s + sustain:1.0s + release:1.5s = 2.52s）
                 setTimeout(() => {

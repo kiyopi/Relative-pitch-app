@@ -13071,3 +13071,146 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 17:04:07] コミット: debug(volume): AudioContext/Destination状態デバッグログ追加 (Issue #2調査)
+
+- reference-tones.js: 再生時にAudioContext.stateとTone.Destination volumeをログ出力
+- 連続再生時の音量変化問題の原因特定用
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 17:51:42] コミット: fix(training): 12音階モードで音域不足時の拡張ロジック改善
+
+- 高音側拡張後に不足がある場合、低音側にも拡張を試行するよう修正
+- selectSequentialMode()にフォールバック処理を追加（12音未満でもクラッシュしない）
+- log7.txtの「12音確保に失敗（実際: 11音）」エラーを解決
+
+Issue: 12音階モードで音域が狭い場合にトレーニングページが読み込めないバグ
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 17:54:34] コミット: docs(training): 音域不足時の拡張ロジック仕様を追加（v4.7.0）
+
+- 3.6節「音域不足時の拡張ロジック」を新規追加
+  - モード別必要基音数（初級8音、中級12音、上級12音）
+  - 拡張処理フロー（上行: 高音側→低音側、下行: 低音側）
+  - 各モード別フォールバック処理の詳細
+  - 実例とログ出力例を記載
+- バージョンを4.7.0に更新、変更履歴にv2.10.0バグ修正を記録
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-22 17:57:48] コミット: fix(router): 外部スクリプトの二重読み込み防止（v2.11.0）
+
+- ページ遷移時にテンプレート内の<script src>タグが複数回実行される問題を修正
+- 既に読み込まれたスクリプトはスキップする処理を追加
+- preparation-pitchpro-cycle.jsの「duplicate variable」エラーを解決
+
+Issue: 準備ページへの再遷移時に「SyntaxError: Can't create duplicate variable: 'pitchProCycleManager'」エラー発生
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 13:06:57] コミット: docs: SPA関連ドキュメントを更新
+
+- SPA_INITIALIZATION_HISTORY_ANALYSIS.md: v2.12.0修正内容を追記
+  - v2.11.0のバグ（document.scriptsチェック問題）
+  - v2.12.0の修正（executedScripts Set追跡）
+  - 教訓と関連ドキュメントへの参照
+
+- SPA_PAGE_TITLE_MANAGEMENT_PROPOSAL.md: 新規作成
+  - ブラウザ履歴タイトル問題の分析
+  - 修正案の提案と影響範囲分析
+  - History APIとの関係整理
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 13:14:12] コミット: docs(specs): ページタイトル管理提案書にナビゲーション安定化分析を追加
+
+- セクション8「ナビゲーション安定化への貢献」を追加
+- NavigationManagerの現在の課題を分析
+- ページタイトルによる状態追跡の可能性を検討
+- 安定化への貢献ポイントを表形式で整理
+- 統合実装案（v2.13.0）を追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 13:21:22] コミット: feat(router): ページタイトル管理機能を実装 (v2.13.0)
+
+- pageConfigsに全9ページのtitleプロパティを追加
+  - home: ホーム
+  - preparation: 準備
+  - training: トレーニング
+  - result-session: セッション結果
+  - results-overview: 総合評価
+  - records: トレーニング記録
+  - premium-analysis: 詳細分析
+  - settings: 設定
+  - help: ヘルプ
+- updatePageTitle()メソッドを追加
+- loadPage()完了時にタイトルを更新
+
+効果:
+- ブラウザの履歴でページを識別可能
+- 複数タブを開いた際にページの区別が可能
+- デバッグ時にタイトルでページ状態を確認可能
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 13:22:50] コミット: chore: キャッシュバスター更新 (router.js v2.13.0)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 13:38:12] コミット: fix(training): ページ離脱時のタイマークリーンアップ強化 (v4.5.1)
+
+- 問題: トレーニング中断後、新しいトレーニングで古いタイマーが発火
+- 原因: setTimeout が clearTimeout されずにページ離脱
+- 修正:
+  - doremiGuideTimeoutId (2.5秒): ドレミガイド開始タイマーを追跡
+  - nextSessionTimeoutId (1秒): 次セッション開始タイマーを追跡
+  - resetTrainingPageFlag() で両タイマーをクリア
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 13:42:10] コミット: chore: キャッシュバスター更新 (trainingController.js v4.5.1)
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 13:54:29] コミット: chore: マイクテスト詳細ログをデバッグフラグで制御
+
+- DEBUG_MIC_TEST フラグを追加（デフォルト: false）
+- 🎤 PitchPro検出ログを条件付きに変更
+- 🎬 音声検出タイマー開始ログを条件付きに変更
+- ⏰ 経過時間ログを条件付きに変更
+- ログが長くなる問題を解決
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 14:53:00] コミット: fix(audio): 基音再生AudioContext初期化をreference-tones.jsに統合 (v2.9.2)
+
+- playNote()内でTone.start()とAudioContext.resume()を統一実行
+- 準備ページ・トレーニングページで同一のAudioContext初期化処理
+- trainingController.jsから重複コードを削除
+- iPhoneでの準備ページ音量問題の修正を目的とした変更
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 15:09:34] コミット: test(volume): 準備ページの基音をC3に変更（音量比較テスト用）
+
+- C4→C3に変更してトレーニングページと同じ音程で比較可能に
+- iPhoneでの音量差の原因特定のための一時的な変更
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 15:12:38] コミット: chore: キャッシュバスター更新（テスト用C3変更反映）
