@@ -2035,7 +2035,8 @@ function setupVolumeAdjustmentControls() {
                 if (!icon || !text) {
                     console.warn('⚠️ ボタン内の要素が見つかりません');
                     // 要素が見つからない場合は音声だけ再生
-                    await window.pitchShifterInstance.playNote("C4", 1.0);
+                    // 【テスト用】C4→C3に変更（トレーニングと同じ音程で比較）
+                    await window.pitchShifterInstance.playNote("C3", 1.0);
                     return;
                 }
 
@@ -2046,14 +2047,14 @@ function setupVolumeAdjustmentControls() {
                 window.updateLucideIcon && window.updateLucideIcon(icon, 'loader-2');
                 text.textContent = '再生中...';
 
-                // C4 (261.6Hz) を再生
-                console.log('▶️ C4音を再生開始...');
+                // 【テスト用】C3 (130.8Hz) を再生（トレーニングと同じ音程で比較）
+                console.log('▶️ C3音を再生開始...（テスト用）');
                 // 【DEBUG】再生前にPitchShifter音量を確認
                 if (window.pitchShifterInstance.sampler && window.pitchShifterInstance.sampler.volume) {
                     console.log(`🔊 [DEBUG] 準備ページ再生時の音量: ${window.pitchShifterInstance.sampler.volume.value}dB`);
                 }
-                await window.pitchShifterInstance.playNote("C4", 1.0);
-                console.log('✅ 基音C4を再生しました');
+                await window.pitchShifterInstance.playNote("C3", 1.0);
+                console.log('✅ 基音C3を再生しました（テスト用）');
 
                 // 2.52秒後にボタンを元に戻す（attack:0.02s + sustain:1.0s + release:1.5s = 2.52s）
                 setTimeout(() => {
