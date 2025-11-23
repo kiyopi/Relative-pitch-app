@@ -123,9 +123,13 @@
                 </div>
 
                 <!-- 基音試聴ボタン -->
-                <button class="base-note-button" id="test-base-note-btn">
+                <!-- 【iOS Safari対応 v4】CSS制御でテキスト切り替え（JS DOM操作排除でブチ音防止） -->
+                <!-- 状態: btn-disabled=初期化中, btn-playing=再生中, 通常=基音を試聴 -->
+                <button class="base-note-button btn-disabled" id="test-base-note-btn" disabled>
                     <i data-lucide="volume-2" style="width: 24px; height: 24px;"></i>
-                    <span>基音を試聴</span>
+                    <span class="btn-text-ready">基音を試聴</span>
+                    <span class="btn-text-loading">初期化中...</span>
+                    <span class="btn-text-playing">再生中...</span>
                 </button>
 
                 <!-- ボリュームコントローラー -->
@@ -311,4 +315,4 @@
 </main>
 
 <!-- preparation-pitchpro-cycle.js -->
-<script src="pages/js/preparation-pitchpro-cycle.js?v=1763887817"></script>
+<script src="pages/js/preparation-pitchpro-cycle.js?v=1763890575"></script>

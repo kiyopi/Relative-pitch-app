@@ -691,8 +691,21 @@ class PitchProCycleManager {
                     console.log('🔊 音量調整セクションを表示');
                 }
 
+                // 【iOS Safari対応 v4】基音試聴ボタンはHTMLで初期状態disabled
+                // CSSで「初期化中...」「基音を試聴」の表示を制御（JS DOM操作排除）
+                const testBaseNoteBtn = document.getElementById('test-base-note-btn');
+                console.log('🔄 基音試聴ボタン: 初期化待ち（HTML初期状態: disabled + btn-disabled）');
+
                 // PitchShifter初期化（音量調整で使用）
                 await this.ensurePitchShifterInitialized();
+
+                // 【iOS Safari対応 v4】PitchShifter初期化完了後にボタンを有効化
+                // CSSクラスの削除のみで表示を切り替え（テキスト変更なし）
+                if (testBaseNoteBtn && window.pitchShifterInstance?.isInitialized) {
+                    testBaseNoteBtn.disabled = false;
+                    testBaseNoteBtn.classList.remove('btn-disabled');
+                    console.log('✅ 基音試聴ボタンを有効化（PitchShifter初期化完了）');
+                }
 
                 // Lucideアイコン初期化（音量調整セクションのアイコン用）
                 if (typeof lucide !== 'undefined') {
@@ -1141,6 +1154,17 @@ function setupMicPermissionFlow() {
                     await new Promise(resolve => setTimeout(resolve, 500));
                     console.log('✅ マイクストリーム安定化完了');
                     console.log('✅ マイク許可成功！');
+
+                    // 【iOS Safari対応 v3】マイク初期化直後にaudioSessionを明示的に設定
+                    // これにより、基音を試聴ボタン押下時にautoではなくplay-and-recordから開始される
+                    if (navigator.audioSession) {
+                        try {
+                            navigator.audioSession.type = 'play-and-record';
+                            console.log('🔊 [iOS] audioSession.type を "play-and-record" に初期設定');
+                        } catch (sessionError) {
+                            console.warn('⚠️ audioSession初期設定失敗（続行）:', sessionError);
+                        }
+                    }
 
                     // localStorage保存（新規追加）
                     localStorage.setItem('micPermissionGranted', 'true');
@@ -1976,21 +2000,18 @@ function updateMicButtonState(state) {
 function setupVolumeAdjustmentControls() {
     console.log('🔊 音量調整コントロール設定開始');
 
-    // 基音試聴ボタンの状態をリセット（リロード時の「再生中...」状態を解除）
+    // 【iOS Safari対応 v4】基音試聴ボタンの状態をリセット
+    // CSSクラス制御のみ（JS DOM操作排除でブチ音防止）
     const testBaseNoteBtn = document.getElementById('test-base-note-btn');
     if (testBaseNoteBtn) {
-        const icon = testBaseNoteBtn.querySelector('[data-lucide]') || testBaseNoteBtn.querySelector('svg') || testBaseNoteBtn.querySelector('i');
-        const text = testBaseNoteBtn.querySelector('span');
-
-        testBaseNoteBtn.disabled = false;
-        if (icon) {
-            window.updateLucideIcon && window.updateLucideIcon(icon, 'volume-2');
+        // リロード時: PitchShifter初期化済みなら有効化、未初期化なら無効のまま
+        if (window.pitchShifterInstance?.isInitialized) {
+            testBaseNoteBtn.disabled = false;
+            testBaseNoteBtn.classList.remove('btn-disabled');
+            console.log('🔄 基音試聴ボタン: 有効化（PitchShifter初期化済み）');
+        } else {
+            console.log('🔄 基音試聴ボタン: 無効のまま（PitchShifter未初期化）');
         }
-        if (text) {
-            text.textContent = '基音を試聴';
-        }
-
-        console.log('🔄 基音試聴ボタンの状態をリセット');
 
         // イベントリスナー設定
         testBaseNoteBtn.addEventListener('click', async (e) => {
@@ -2030,74 +2051,43 @@ function setupVolumeAdjustmentControls() {
                     console.log('✅ PitchShifter初期化完了');
                 }
 
-                // ボタンを無効化して「再生中」状態に変更
-                const icon = btn.querySelector('[data-lucide]') || btn.querySelector('svg') || btn.querySelector('i');
-                const text = btn.querySelector('span');
-
-                if (!icon || !text) {
-                    console.warn('⚠️ ボタン内の要素が見つかりません');
-                    // 要素が見つからない場合は音声だけ再生
-                    await window.pitchShifterInstance.playNote("C3", 1.0); // テスト用: C4→C3
-                    return;
-                }
-
-                const originalIconName = icon.getAttribute('data-lucide');
-                const originalText = text.textContent;
-
+                // 【iOS Safari対応 v4】ボタンを「再生中」状態に変更
+                // CSSクラス制御のみ（textContent変更なし・Lucideアイコン更新なしでブチ音防止）
                 btn.disabled = true;
-                window.updateLucideIcon && window.updateLucideIcon(icon, 'loader-2');
-                text.textContent = '再生中...';
+                btn.classList.add('btn-playing');
 
-                // C3 (130.8Hz) を再生（テスト用）
-                // 【DEBUG】再生回数をカウントして1回目と2回目の違いを調査
-                window._baseNotePlayCount = (window._baseNotePlayCount || 0) + 1;
-                console.log(`▶️ 基音再生開始... (${window._baseNotePlayCount}回目)`);
+                // 【iOS Safari対応 v4】C3 (130.8Hz) を再生
+                // PitchShifter初期化完了後に呼び出されることを前提
+                console.log('▶️ 基音再生開始...');
 
-                // 【iOS Safari対応 v2】マイクを一時停止してから音声再生
+                // 【iOS Safari対応】マイクを一時停止してから音声再生
                 // WebKit Bug #218012: マイクがアクティブだと音量が自動的に下がる
-                // 解決策: マイク停止 → audioSession変更 → 再生 → マイク再開
                 const audioDetector = window.globalAudioDetector || pitchProCycleManager?.audioDetector;
                 let micWasActive = false;
 
                 if (audioDetector) {
                     try {
-                        console.log('🎤 [iOS] マイクを一時停止...');
                         audioDetector.stopDetection();
                         micWasActive = true;
-                        console.log('✅ [iOS] マイク停止完了');
+                        console.log('🎤 [iOS] マイク一時停止');
                     } catch (micError) {
                         console.warn('⚠️ マイク停止失敗（続行）:', micError);
                     }
                 }
 
-                // 【iOS Safari対応】navigator.audioSession APIで音声出力ルーティングを制御
-                // マイク停止後に設定することで効果を最大化
+                // 【iOS Safari対応】navigator.audioSession APIで再生モードに切り替え
                 if (navigator.audioSession) {
                     try {
-                        const currentType = navigator.audioSession.type;
-                        console.log(`🔊 [iOS] audioSession.type (現在): ${currentType}`);
-
-                        // 再生モードに切り替え（マイク使用後の音量低下を回避）
                         navigator.audioSession.type = 'playback';
-                        console.log('🔊 [iOS] audioSession.type を "playback" に設定');
+                        console.log('🔊 [iOS] audioSession → playback');
                     } catch (sessionError) {
                         console.warn('⚠️ audioSession設定失敗（続行）:', sessionError);
                     }
-                } else {
-                    console.log('ℹ️ navigator.audioSession APIは利用不可（非iOS環境）');
                 }
 
-                // 【DEBUG】再生前にPitchShifter音量を確認
-                if (window.pitchShifterInstance.sampler && window.pitchShifterInstance.sampler.volume) {
-                    console.log(`🔊 [DEBUG] 準備ページ再生時の音量: ${window.pitchShifterInstance.sampler.volume.value}dB`);
-                }
-                // 【DEBUG】AudioContext状態を確認
-                if (window.Tone && window.Tone.context) {
-                    console.log(`🔊 [DEBUG] Tone.context.state: ${window.Tone.context.state}`);
-                    console.log(`🔊 [DEBUG] Tone.Destination.volume: ${window.Tone.Destination.volume.value}dB`);
-                }
-                await window.pitchShifterInstance.playNote("C3", 1.0); // テスト用: C4→C3
-                console.log(`✅ 基音C3を再生しました (${window._baseNotePlayCount}回目)`);
+                // C3を再生（Tone.js Sampler経由）
+                await window.pitchShifterInstance.playNote("C3", 1.0);
+                console.log('✅ 基音C3を再生しました');
 
                 // 【iOS Safari対応 v2】再生完了後にマイクを再開
                 if (micWasActive && audioDetector) {
@@ -2119,25 +2109,12 @@ function setupVolumeAdjustmentControls() {
                 }
 
                 // 2.52秒後にボタンを元に戻す（attack:0.02s + sustain:1.0s + release:1.5s = 2.52s）
+                // 【iOS Safari対応 v4】CSSクラス制御のみ（DOM操作排除）
                 setTimeout(() => {
-                    // アイコン要素を再取得（Lucideで置き換わっている可能性があるため）
-                    const currentIcon = btn.querySelector('[data-lucide]') || btn.querySelector('svg');
-                    const currentText = btn.querySelector('span');
-
                     btn.disabled = false;
-                    if (currentIcon) {
-                        window.updateLucideIcon && window.updateLucideIcon(currentIcon, originalIconName);
-                    }
-                    if (currentText) {
-                        currentText.textContent = originalText;
-                    }
-
-                    // フォーカスを外す
+                    btn.classList.remove('btn-playing');
                     btn.blur();
-
-                    // 再生中フラグを下ろす
                     isPlayingBaseNote = false;
-
                     console.log('✅ ボタン状態を復元しました');
                 }, 2520); // 2.52秒 = 2520ms
 
@@ -2145,22 +2122,11 @@ function setupVolumeAdjustmentControls() {
                 console.error('❌ 基音再生エラー:', error);
                 alert('音声再生に失敗しました: ' + error.message);
 
-                // エラー時もボタンを元に戻す（btnは既に関数スコープで取得済み）
-                const icon = btn.querySelector('[data-lucide]') || btn.querySelector('svg') || btn.querySelector('i');
-                const text = btn.querySelector('span');
-
+                // エラー時もボタンを元に戻す
+                // 【iOS Safari対応 v4】CSSクラス制御のみ
                 btn.disabled = false;
-                if (icon) {
-                    window.updateLucideIcon && window.updateLucideIcon(icon, 'volume-2');
-                }
-                if (text) {
-                    text.textContent = '基音を試聴';
-                }
-
-                // フォーカスを外す
+                btn.classList.remove('btn-playing');
                 btn.blur();
-
-                // 再生中フラグを下ろす
                 isPlayingBaseNote = false;
             }
         });

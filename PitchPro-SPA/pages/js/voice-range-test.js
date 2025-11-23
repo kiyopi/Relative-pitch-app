@@ -710,14 +710,10 @@ function handleVoiceDetection(result, audioDetector) {
         }
     } else {
         // 測定中は基本的な音量チェックのみ（緩い判定）
-        if (result.volume && result.volume >= globalState.voiceDetectionThreshold * 0.5) {
-            console.log('🔊 測定中音声データ記録:', {
-                currentPhase: globalState.currentPhase,
-                volume: result.volume,
-                frequency: result.frequency,
-                note: result.note
-            });
-        }
+        // 【ログ抑制】測定中音声データ記録は大量に出るため抑制
+        // if (result.volume && result.volume >= globalState.voiceDetectionThreshold * 0.5) {
+        //     console.log('🔊 測定中音声データ記録:', { ... });
+        // }
     }
 }
 
@@ -2519,7 +2515,8 @@ function updateCircularProgress(progress) {
         const circumference = 2 * Math.PI * 72; // r=72の円周
         const offset = circumference - (progress / 100) * circumference;
         progressCircle.style.strokeDashoffset = offset;
-        console.log(`🔄 円形プログレス更新: ${progress}% (offset: ${offset})`);
+        // 【ログ抑制】頻繁に呼ばれるため抑制
+        // console.log(`🔄 円形プログレス更新: ${progress}% (offset: ${offset})`);
     }
 }
 

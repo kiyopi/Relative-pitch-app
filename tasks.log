@@ -13312,3 +13312,15 @@ voice-range-test.js:
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 17:50:44] コミット: debug(iOS): 基音再生をC3に変更 + 1回目/2回目の違い調査ログ追加
+
+準備ページの基音試聴で1回目が小さく2回目が大きい問題を調査
+
+- 基音をC4→C3に変更（テスト用）
+- 再生回数カウンター追加
+- Tone.context.state ログ追加
+- Tone.Destination.volume ログ追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

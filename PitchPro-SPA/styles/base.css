@@ -806,6 +806,36 @@ body::before {
   cursor: not-allowed;
 }
 
+/* 【iOS Safari対応 v4】基音試聴ボタンの状態表示（CSS制御） */
+/* JS DOM操作を排除してブチ音を防止 */
+
+/* 通常状態: 「基音を試聴」のみ表示 */
+.base-note-button .btn-text-ready {
+  display: inline;
+}
+.base-note-button .btn-text-loading,
+.base-note-button .btn-text-playing {
+  display: none;
+}
+
+/* 無効化状態（btn-disabled）: 「初期化中...」のみ表示 */
+.base-note-button.btn-disabled .btn-text-ready,
+.base-note-button.btn-disabled .btn-text-playing {
+  display: none;
+}
+.base-note-button.btn-disabled .btn-text-loading {
+  display: inline;
+}
+
+/* 再生中状態（btn-playing）: 「再生中...」のみ表示 */
+.base-note-button.btn-playing .btn-text-ready,
+.base-note-button.btn-playing .btn-text-loading {
+  display: none;
+}
+.base-note-button.btn-playing .btn-text-playing {
+  display: inline;
+}
+
 .base-note-button svg,
 .base-note-button i {
   width: 24px;
