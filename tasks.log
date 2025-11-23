@@ -13455,3 +13455,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 00:31:44] コミット: fix(iOS): trainingControllerにv12 audioSession切り替え追加
+
+- trainingController.js: サイレントオーディオ再生を追加（v12）
+- trainingController.js: audioSession.type を playback に切り替え（基音再生時）
+- trainingController.js: 基音再生後に play-and-record に復元
+- 根本原因: WebKit Bug #218012 で play-and-record モードだと音量が極端に小さい
+- 準備ページと同じアプローチをトレーニングページにも適用
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
