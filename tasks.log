@@ -13428,3 +13428,19 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 00:08:11] コミット: fix(audio): iOS Safari初期化問題対策 - サイレントオーディオ再生追加
+
+【iOS Safari対応 v11】
+- PitchShifter初期化後にサイレントMP3を再生
+- HTMLの<audio>要素での再生がWeb Audio APIを「アンロック」する
+- Tone.js GitHub Issue #164の推奨パターンを適用
+
+修正ファイル:
+- preparation-pitchpro-cycle.js: initializePitchShifter後にサイレント再生
+- trainingController.js: initializePitchShifter後にサイレント再生
+
+参考: https://github.com/Tonejs/Tone.js/issues/164
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
