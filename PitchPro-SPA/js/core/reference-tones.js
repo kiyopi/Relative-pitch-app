@@ -1,8 +1,12 @@
 /**
  * PitchShifter - Tone.js Sampler Wrapper
- * @version 2.9.2
+ * @version 2.9.3
  * @date 2025-11-23
  * @changelog
+ *   - 2025-11-23 v2.9.3: iPad低音域音量強化
+ *     - iPad検出（iPadOS 13+のMacintosh偽装対応）
+ *     - 低音域: iPad 0.6x, その他 0.35x
+ *     - 中低音域: iPad 0.75x, その他 0.5x
  *   - 2025-11-23 v2.9.2: AudioContext初期化ロジックの統一
  *     - 準備ページ・トレーニングページで同一の基音再生処理を実行
  *     - iOS/iPadOS対応: Tone.start() + resume()の統一呼び出し
@@ -52,7 +56,7 @@
  *   - 2025-10-28: 低音域の音量バランス調整・音割れ対策強化
  *   - 2025-10-28: キャッシュバスター実装（クエリパラメータでバージョン管理）
  */
-const SAMPLE_VERSION = "2.9.2";
+const SAMPLE_VERSION = "2.9.3";
 var c = Object.defineProperty;
 var f = (s, e, i) => e in s ? c(s, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : s[e] = i;
 var n = (s, e, i) => f(s, typeof e != "symbol" ? e + "" : e, i);
@@ -168,17 +172,24 @@ const t = class t {
       // 【追加】Tone.js内部準備のための短時間待機（クリッキングノイズ対策）
       await new Promise(resolve => setTimeout(resolve, 10));
 
-      // 【追加】低音域の音量バランス調整（v2.9.1: 調整強化）
-      // C2-B2 (65-123Hz): 0.35x velocity (低音の響きを強く抑制)
-      // C3-B3 (130-246Hz): 0.5x velocity (中低音を控えめに - 0.7→0.5に強化)
+      // 【追加】低音域の音量バランス調整（v2.9.3: iPad対応強化）
+      // iPad検出: iPadOS 13+はMacintoshを偽装するため、タッチ判定も使用
+      const userAgent = navigator.userAgent;
+      const isIPad = /iPad/.test(userAgent) || (/Macintosh/.test(userAgent) && 'ontouchend' in document);
+
+      // C2-B2 (65-123Hz): 低音域の音量調整
+      // C3-B3 (130-246Hz): 中低音域の音量調整
       // C4以上: 1.0x velocity (通常音量)
+      // iPad: スピーカー特性を考慮して音量を上げる
       let adjustedVelocity = o;
       if (a.frequency < 130) {
-        adjustedVelocity = o * 0.35;  // 低音域は35%（0.5→0.35に強化）
-        console.log(`🔉 [PitchShifter] Low bass adjustment: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
+        // 低音域: iPad 0.6x, その他 0.35x
+        adjustedVelocity = isIPad ? o * 0.6 : o * 0.35;
+        console.log(`🔉 [PitchShifter] Low bass adjustment${isIPad ? ' (iPad)' : ''}: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
       } else if (a.frequency < 260) {
-        adjustedVelocity = o * 0.5;  // 中低音域は50%（0.7→0.5に強化）
-        console.log(`🔉 [PitchShifter] Mid-low adjustment: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
+        // 中低音域: iPad 0.75x, その他 0.5x
+        adjustedVelocity = isIPad ? o * 0.75 : o * 0.5;
+        console.log(`🔉 [PitchShifter] Mid-low adjustment${isIPad ? ' (iPad)' : ''}: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
       }
 
       // 【DEBUG】再生直前のsampler音量を確認

@@ -204,32 +204,45 @@
          * 準備・トレーニングページでは確認ダイアログを表示
          */
         function handleFooterHomeButtonClick() {
+            // 【デバッグログ v1】ホームボタン押下検出
+            console.log('🏠 [FooterHome] ボタンクリック検出');
+
             const currentPage = window.router ? window.router.currentPage : '';
+            console.log(`🏠 [FooterHome] 現在のページ: ${currentPage}`);
 
             // 準備フェーズ・トレーニングページでは確認ダイアログ
             if (currentPage === 'preparation' || currentPage === 'training') {
+                console.log('🏠 [FooterHome] 確認ダイアログを表示します');
                 const message = currentPage === 'preparation'
                     ? '音域テストを中断してホームに戻りますか？'
                     : 'トレーニング中です。\nホームに戻ると進行中のデータが失われます。\n本当にホームに戻りますか？';
 
-                if (confirm(message)) {
+                const confirmed = confirm(message);
+                console.log(`🏠 [FooterHome] 確認結果: ${confirmed ? 'OK' : 'キャンセル'}`);
+
+                if (confirmed) {
                     // 【修正v4.0.4】トレーニング中断時は未完了レッスンデータを削除
                     if (currentPage === 'training') {
+                        console.log('🏠 [FooterHome] cleanupIncompleteLesson()を呼び出し');
                         cleanupIncompleteLesson();
                     }
 
                     // NavigationManagerを使用して安全に遷移
+                    console.log('🏠 [FooterHome] ホームへ遷移開始');
                     if (window.NavigationManager) {
                         NavigationManager.navigate('home');
                     } else {
+                        console.log('🏠 [FooterHome] NavigationManager未検出、hash変更で遷移');
                         window.location.hash = 'home';
                     }
                 }
             } else {
                 // その他のページは確認なしで遷移
+                console.log('🏠 [FooterHome] 確認なしでホームへ遷移');
                 if (window.NavigationManager) {
                     NavigationManager.navigate('home');
                 } else {
+                    console.log('🏠 [FooterHome] NavigationManager未検出、hash変更で遷移');
                     window.location.hash = 'home';
                 }
             }

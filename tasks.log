@@ -13378,3 +13378,28 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 20:13:35] コミット: fix(volume): audioSession復元タイミングを3秒に延長（ブチ音防止）
+
+- 2600ms → 3000ms に変更
+- 音の残響（release 1.5s）が完全に終わってからaudioSessionを復元
+- これによりルーティング変更時のブチ音を防止
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 20:49:13] コミット: docs: iOS Safari AudioSession仕様書を新規作成、関連仕様書更新
+
+- 新規作成: IOS_SAFARI_AUDIO_SESSION_SPECIFICATION.md v1.0.0
+  - WebKit Bug #218012（マイクアクティブ時の音量低下）対策を文書化
+  - 準備ページv9実装（audioSession切替 + Tone.start()強制実行）
+  - トレーニングページでの意図的な無効化理由を記録
+  - ブチ音対策（3秒待機）の技術的背景を説明
+- 更新: TRAINING_SPECIFICATION.md v4.8.0
+  - iOS Safari AudioSession対策の変更履歴追加
+- 更新: VOLUME_BAR_INTEGRATION_SPECIFICATION.md v1.2.0
+  - 関連仕様書セクション追加
+  - iOS Safari音量問題への参照追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

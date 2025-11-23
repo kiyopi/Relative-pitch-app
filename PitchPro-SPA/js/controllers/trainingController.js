@@ -1104,15 +1104,21 @@ function handlePitchUpdate(result) {
 
     // 音量バーは autoUpdateUI: true により自動更新される
 
+    // 【v4.1.0修正】音程検出条件を強化
+    // 問題: 無音時（音量2-3%）でも環境ノイズが「明瞭な音」として誤検出される
+    // 対策: 明瞭度0.25以上 AND 音量5%以上を必須条件とする
+    const MIN_CLARITY = 0.25;
+    const MIN_VOLUME = 0.05;  // 5% - 環境ノイズを除外する閾値
+
     // 音程検出のログ（デバッグ用）
-    if (result.frequency && result.clarity > 0.25) {
+    if (result.frequency && result.clarity > MIN_CLARITY && result.volume > MIN_VOLUME) {
         // 1秒に1回だけログ出力
         if (!lastPitchLog || Date.now() - lastPitchLog > 1000) {
             console.log(`🎵 音程検出: ${result.frequency.toFixed(1)}Hz (${result.note || ''}), 明瞭度: ${result.clarity.toFixed(2)}, 音量: ${(result.volume * 100).toFixed(1)}%`);
             lastPitchLog = Date.now();
         }
 
-        // 音程データをバッファに追加（明瞭度0.25以上で収集 - 精度とデータ量のバランス最適化）
+        // 音程データをバッファに追加（明瞭度・音量条件を満たすデータのみ収集）
         if (currentIntervalIndex < intervals.length) {
             pitchDataBuffer.push({
                 step: currentIntervalIndex,

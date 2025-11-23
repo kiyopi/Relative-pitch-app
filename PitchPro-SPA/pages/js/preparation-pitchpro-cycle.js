@@ -2032,6 +2032,17 @@ function setupVolumeAdjustmentControls() {
             const btn = e.currentTarget;
             btn.blur();
 
+            // 【iOS Safari対応 v10】ユーザー操作コールスタック内でTone.start()を呼ぶ
+            // iOS 17+では、awaitの後はユーザー操作と見なされないため、
+            // 最初のawaitより前に同期的にTone.start()を呼ぶ必要がある
+            // 重要: Tone.start()をawaitせずに呼び出す（同期的コールスタック内で実行）
+            if (typeof Tone !== 'undefined') {
+                console.log('🔊 [iOS v10] Tone.start()を同期的に呼び出し（await前）...');
+                // .then()で後続処理をチェーン（awaitを使わない）
+                Tone.start();
+                console.log(`🔊 [iOS v10] Tone.context.state: ${Tone.context?.state}`);
+            }
+
             // 再生中フラグを立てる
             isPlayingBaseNote = true;
 
@@ -2087,17 +2098,14 @@ function setupVolumeAdjustmentControls() {
                     }
                 }
 
-                // 【iOS Safari対応 v8】audioSession切り替え後にTone.start()を強制実行
-                // iOS Safariでは、audioSessionをplaybackに切り替えた後でないと
-                // スピーカールーティングが正しく設定されない
+                // 【iOS Safari対応 v8】audioSession切り替え後にTone.start()を実行
+                // 注意: v10で最初のユーザー操作時にTone.start()を呼んでいるが、
+                //       audioSession.type変更後にも再度呼ぶ必要がある（ルーティング更新のため）
                 if (typeof Tone !== 'undefined') {
-                    console.log(`🔊 AudioContext状態確認... (state: ${Tone.context?.state})`);
-
-                    // audioSession切り替え後に強制的にTone.start()を実行
-                    // これによりAudioContextのルーティングが再設定される
-                    console.log('🔊 Tone.start()を強制実行（audioSession切り替え後）...');
+                    console.log(`🔊 [iOS v8] AudioContext状態確認... (state: ${Tone.context?.state})`);
+                    console.log('🔊 [iOS v8] Tone.start()を実行（audioSession切り替え後）...');
                     await Tone.start();
-                    console.log(`✅ Tone.start()完了 (state: ${Tone.context?.state})`);
+                    console.log(`✅ [iOS v8] Tone.start()完了 (state: ${Tone.context?.state})`);
 
                     // 安定化のため少し待機
                     await new Promise(resolve => setTimeout(resolve, 50));
