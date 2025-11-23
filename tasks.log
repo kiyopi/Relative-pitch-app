@@ -13324,3 +13324,21 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 18:44:25] コミット: fix(iOS): 基音試聴ボタンのCSS制御方式統一・ログ抑制
+
+## 基音試聴ボタン改善（iOS Safari対応 v4）
+- HTML: 3状態テキスト（btn-text-ready/loading/playing）をCSS制御
+- JS: textContent変更を排除、CSSクラス追加/削除のみ（ブチ音防止）
+- PitchShifter初期化完了後にボタンを有効化
+- マイク初期化直後にaudioSession.type='play-and-record'を設定
+
+## 音域テストログ抑制
+- 「測定中音声データ記録」ログを抑制
+- 「円形プログレス更新」ログを抑制
+
+## キャッシュバスター更新
+- preparation-pitchpro-cycle.js, voice-range-test.js, base.css
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

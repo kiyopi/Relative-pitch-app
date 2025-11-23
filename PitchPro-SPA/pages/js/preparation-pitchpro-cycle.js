@@ -2075,31 +2075,24 @@ function setupVolumeAdjustmentControls() {
                     }
                 }
 
-                // 【iOS Safari対応】navigator.audioSession APIで再生モードに切り替え
+                // 【iOS Safari対応 v5】audioSession切り替えは行わない（トレーニングページと統一）
+                // 理由: playbackモードに切り替えると2回目以降の基音再生で音が出なくなる問題が発生
+                // マイク停止（stopDetection）のみで対応し、audioSessionは変更しない
+                // WebKit Bug #218012 の回避策としては不完全だが、音が出ないよりは音量が小さい方がマシ
                 if (navigator.audioSession) {
-                    try {
-                        navigator.audioSession.type = 'playback';
-                        console.log('🔊 [iOS] audioSession → playback');
-                    } catch (sessionError) {
-                        console.warn('⚠️ audioSession設定失敗（続行）:', sessionError);
-                    }
+                    console.log(`🔊 [iOS] audioSession.type (現在): ${navigator.audioSession.type}（変更なし）`);
                 }
 
                 // C3を再生（Tone.js Sampler経由）
                 await window.pitchShifterInstance.playNote("C3", 1.0);
                 console.log('✅ 基音C3を再生しました');
 
-                // 【iOS Safari対応 v2】再生完了後にマイクを再開
+                // 【iOS Safari対応 v5】再生完了後にマイクを再開
+                // audioSession切り替えは行わない（トレーニングページと統一）
                 if (micWasActive && audioDetector) {
                     // 音の残響（リリース）が終わるまで少し待つ
                     setTimeout(async () => {
                         try {
-                            // audioSession を play-and-record に戻す
-                            if (navigator.audioSession) {
-                                navigator.audioSession.type = 'play-and-record';
-                                console.log('🔊 [iOS] audioSession.type を "play-and-record" に復元');
-                            }
-
                             audioDetector.startDetection();
                             console.log('✅ [iOS] マイク再開完了');
                         } catch (micError) {
