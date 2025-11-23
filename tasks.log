@@ -13342,3 +13342,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-23 19:06:42] コミット: fix(volume): audioSession切り替えを削除（トレーニングページと統一）
+
+- playbackモードへの切り替えを削除（2回目以降の再生で音が出なくなる問題対策）
+- マイク停止のみで対応する方式に統一
+- WebKit Bug #218012の回避策として不完全だが、音が出ないよりは音量が小さい方がマシ
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

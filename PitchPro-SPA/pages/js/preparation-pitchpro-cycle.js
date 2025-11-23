@@ -2083,6 +2083,29 @@ function setupVolumeAdjustmentControls() {
                     console.log(`🔊 [iOS] audioSession.type (現在): ${navigator.audioSession.type}（変更なし）`);
                 }
 
+                // 【iOS Safari対応 v6】Tone.start()を明示的に呼び出し（トレーニングページと統一）
+                // iOS/iPadOSではユーザーインタラクション時にAudioContextを明示的にresumeする必要がある
+                if (typeof Tone !== 'undefined' && Tone.context) {
+                    console.log(`🔊 AudioContext状態確認... (state: ${Tone.context.state})`);
+
+                    // Tone.start()を明示的に呼び出し（iOS/iPadOS対応）
+                    if (Tone.context.state === 'suspended') {
+                        console.log('🔊 Tone.start()実行中...');
+                        await Tone.start();
+                        console.log(`✅ Tone.start()完了 (state: ${Tone.context.state})`);
+                    }
+
+                    // resume()で確実に起動
+                    if (Tone.context.state !== 'running') {
+                        console.log(`🔊 AudioContext再開中... (state: ${Tone.context.state})`);
+                        await Tone.context.resume();
+                        console.log(`✅ AudioContext再開完了 (state: ${Tone.context.state})`);
+
+                        // 安定化のため少し待機（iOS/iPadOS対策）
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                }
+
                 // C3を再生（Tone.js Sampler経由）
                 await window.pitchShifterInstance.playNote("C3", 1.0);
                 console.log('✅ 基音C3を再生しました');
