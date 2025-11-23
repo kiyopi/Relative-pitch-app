@@ -3,6 +3,7 @@
  * Based on vanilla JS + 自作SPA development roadmap
  *
  * Changelog:
+ *   v2.13.0 (2025-11-23) - ページタイトル管理機能追加（履歴・タブでページ識別可能に）
  *   v2.12.0 (2025-11-22) - 外部スクリプト二重読み込み防止のバグ修正（executedScripts Set使用）
  *   v2.11.0 (2025-11-22) - [REVERTED] 外部スクリプトの二重読み込み防止（document.scriptsチェックにバグあり）
  *   v2.3.0 (2025-11-20) - training page cleanup改善（NavigationManager統合徹底化の完成）
@@ -40,11 +41,13 @@ class SimpleRouter {
         this.pageConfigs = {
             'home': {
                 init: null,  // setupHomeEvents()で特別処理（setupPageEvents内で直接呼び出し）
-                dependencies: []
+                dependencies: [],
+                title: 'ホーム'  // 【v2.13.0追加】
             },
             'preparation': {
                 init: 'initializePreparationPitchProCycle',
                 dependencies: ['PitchPro'],
+                title: '準備',  // 【v2.13.0追加】
                 cleanup: async () => {
                     console.log('🧹 [Router] Cleaning up preparation page...');
 
@@ -74,6 +77,7 @@ class SimpleRouter {
             'training': {
                 init: 'initializeTrainingPage',
                 dependencies: ['PitchPro'],
+                title: 'トレーニング',  // 【v2.13.0追加】
                 cleanup: async () => {
                     console.log('🧹 [Router] Cleaning up training page...');
 
@@ -137,12 +141,14 @@ class SimpleRouter {
             },
             'result-session': {
                 init: 'initializeResultSessionPage',
-                dependencies: []
+                dependencies: [],
+                title: 'セッション結果'  // 【v2.13.0追加】
             },
             'results-overview': {
                 init: 'initResultsOverview',
                 dependencies: ['Chart', 'DistributionChart'],
                 preventDoubleInit: true,
+                title: '総合評価',  // 【v2.13.0追加】
                 cleanup: async () => {
                     console.log('🧹 [Router] Cleaning up results-overview page...');
                     // Reset controller's initialization flag
@@ -155,6 +161,7 @@ class SimpleRouter {
             'records': {
                 init: 'initRecords',
                 dependencies: ['Chart', 'DistributionChart'],
+                title: 'トレーニング記録',  // 【v2.13.0追加】
                 cleanup: async () => {
                     console.log('🧹 [Router] Cleaning up records page...');
                     // AudioDetectorが残っていれば破棄（recordsページはマイク不要）
@@ -170,16 +177,19 @@ class SimpleRouter {
             },
             'premium-analysis': {
                 init: 'initPremiumAnalysis',
-                dependencies: ['Chart']
+                dependencies: ['Chart'],
+                title: '詳細分析'  // 【v2.13.0追加】
             },
             'settings': {
                 init: 'initSettings',
-                dependencies: []
+                dependencies: [],
+                title: '設定'  // 【v2.13.0追加】
             },
             'help': {
                 init: 'initHelpPage',
                 dependencies: [],
                 preventDoubleInit: false,  // ステートレスなため不要
+                title: 'ヘルプ',  // 【v2.13.0追加】
                 cleanup: async () => {
                     console.log('🧹 [Router] Cleaning up help page...');
                     // AudioDetectorが残っていれば破棄（helpページはマイク不要）
@@ -414,6 +424,9 @@ class SimpleRouter {
             // 7. 現在のページを更新
             this.currentPage = page;
 
+            // 【v2.13.0追加】8. ページタイトルを更新
+            this.updatePageTitle(page);
+
             console.log(`✅ [Router] Page loaded: ${page}`);
 
         } catch (error) {
@@ -426,6 +439,23 @@ class SimpleRouter {
             console.error(`Error loading page ${page}:`, error);
             throw error;
         }
+    }
+
+    /**
+     * 【v2.13.0追加】ページタイトルを更新
+     *
+     * ブラウザの履歴・タブでページを識別可能にするため、
+     * ページ遷移完了時にdocument.titleを更新します。
+     *
+     * @param {string} page - ページ識別子
+     */
+    updatePageTitle(page) {
+        const config = this.pageConfigs[page];
+        const pageTitle = config?.title || page;
+        const fullTitle = `8va相対音感トレーニング - ${pageTitle}`;
+
+        document.title = fullTitle;
+        console.log(`📝 [Router] Page title updated: ${fullTitle}`);
     }
 
     /**
