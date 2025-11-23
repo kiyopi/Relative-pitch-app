@@ -13,6 +13,9 @@
 let micPermissionListenerAdded = false; // マイク許可ボタンのイベントリスナー重複防止フラグ
 let isPlayingBaseNote = false; // 基音再生中フラグ（連続クリック防止）
 
+// ===== デバッグ設定 =====
+const DEBUG_MIC_TEST = false; // マイクテスト詳細ログ（🎤 PitchPro検出、⏰ 経過時間）
+
 // ===== 【Issue #2修正】音量永続化ヘルパー関数 =====
 const VOLUME_STORAGE_KEY = 'pitchpro_volume_percent';
 const DEFAULT_VOLUME_PERCENT = 50; // 50% = デバイスデフォルト音量
@@ -453,7 +456,9 @@ class PitchProCycleManager {
         // PitchProの内部最適化を完全に信頼
         // PitchProが値を返している = 有効な音声として認識済み
 
-        console.log(`🎤 PitchPro検出: freq:${result.frequency?.toFixed(1)}Hz vol:${(result.volume * 100)?.toFixed(1)}% clarity:${result.clarity?.toFixed(2)}`);
+        if (DEBUG_MIC_TEST) {
+            console.log(`🎤 PitchPro検出: freq:${result.frequency?.toFixed(1)}Hz vol:${(result.volume * 100)?.toFixed(1)}% clarity:${result.clarity?.toFixed(2)}`);
+        }
 
         // PitchProが有効な音声データを返している場合のみタイマー進行
         const isValidVoice = result.volume > 0 && result.frequency > 0;
@@ -462,11 +467,11 @@ class PitchProCycleManager {
             // 初回の有効音声検出時にタイマーを開始
             if (!this.state.detectionStartTime) {
                 this.state.detectionStartTime = Date.now();
-                console.log('🎬 音声検出タイマー開始');
+                if (DEBUG_MIC_TEST) console.log('🎬 音声検出タイマー開始');
             }
 
             const elapsedTime = Date.now() - this.state.detectionStartTime;
-            console.log(`⏰ 経過時間: ${(elapsedTime/1000).toFixed(1)}秒 / 1.0秒`);
+            if (DEBUG_MIC_TEST) console.log(`⏰ 経過時間: ${(elapsedTime/1000).toFixed(1)}秒 / 1.0秒`);
 
             // 1秒間の音声検出で成功
             if (elapsedTime >= this.config.MIN_DETECTION_TIME) {
