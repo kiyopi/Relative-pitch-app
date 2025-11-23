@@ -724,27 +724,8 @@ async function startTraining() {
         // DOM操作（setAttribute, innerHTML, textContent等）は
         // Tone.jsのオーディオレンダリングと競合してブチ音の原因になる
 
-        // iOS/iPadOS対応: AudioContextを明示的にresume（ユーザーインタラクション時に必須）
-        if (typeof Tone !== 'undefined' && Tone.context) {
-            console.log('🔊 AudioContext状態確認... (state:', Tone.context.state + ')');
-
-            // Tone.start()を明示的に呼び出し（iOS/iPadOS対応）
-            if (Tone.context.state === 'suspended') {
-                console.log('🔊 Tone.start()実行中...');
-                await Tone.start();
-                console.log('✅ Tone.start()完了 (state:', Tone.context.state + ')');
-            }
-
-            // resume()で確実に起動
-            if (Tone.context.state !== 'running') {
-                console.log('🔊 AudioContext再開中... (state:', Tone.context.state + ')');
-                await Tone.context.resume();
-                console.log('✅ AudioContext再開完了 (state:', Tone.context.state + ')');
-
-                // 安定化のため少し待機（iOS/iPadOS対策）
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
-        }
+        // 【v4.0.21】iOS/iPadOS対応のAudioContext初期化は
+        // reference-tones.js playNote()内に統合（v2.9.2）
 
         // 事前選択済みの基音を使用して再生（2秒）
         if (!baseNoteInfo) {

@@ -1,8 +1,12 @@
 /**
  * PitchShifter - Tone.js Sampler Wrapper
- * @version 2.9.0
- * @date 2025-10-29
+ * @version 2.9.2
+ * @date 2025-11-23
  * @changelog
+ *   - 2025-11-23 v2.9.2: AudioContext初期化ロジックの統一
+ *     - 準備ページ・トレーニングページで同一の基音再生処理を実行
+ *     - iOS/iPadOS対応: Tone.start() + resume()の統一呼び出し
+ *     - trainingController.jsの重複コードを削除
  *   - 2025-10-29 v2.9.0: エンベロープ調整（attack:0.02s + release:1.5s）
  *     - アタック時間0.02s（高速応答）
  *     - サステイン1.0s（適度な長さ）
@@ -48,7 +52,7 @@
  *   - 2025-10-28: 低音域の音量バランス調整・音割れ対策強化
  *   - 2025-10-28: キャッシュバスター実装（クエリパラメータでバージョン管理）
  */
-const SAMPLE_VERSION = "2.9.0";
+const SAMPLE_VERSION = "2.9.2";
 var c = Object.defineProperty;
 var f = (s, e, i) => e in s ? c(s, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : s[e] = i;
 var n = (s, e, i) => f(s, typeof e != "symbol" ? e + "" : e, i);
@@ -140,13 +144,24 @@ const t = class t {
       if (!a)
         throw new Error(`Invalid note: ${e}`);
 
-      // 【追加】AudioContext状態を再確認（稀な音切れ対策）
+      // 【v2.9.2統合】iOS/iPadOS対応: AudioContext初期化の統一ロジック
+      // 準備ページ・トレーニングページで同一の処理を実行
       const audioContext = l.getContext();
-      if (audioContext.state !== "running") {
-        console.warn("⚠️ [PitchShifter] AudioContext suspended, resuming...");
+      console.log(`🔊 [PitchShifter] AudioContext状態確認 (state: ${audioContext.state})`);
+
+      // Tone.start()を明示的に呼び出し（iOS/iPadOS対応）
+      if (audioContext.state === "suspended") {
+        console.log("🔊 [PitchShifter] Tone.start()実行中...");
         await l.start();
+        console.log(`✅ [PitchShifter] Tone.start()完了 (state: ${audioContext.state})`);
+      }
+
+      // resume()で確実に起動
+      if (audioContext.state !== "running") {
+        console.log(`🔊 [PitchShifter] AudioContext再開中... (state: ${audioContext.state})`);
         await audioContext.resume();
-        // 安定化のため待機時間延長（50ms → 100ms）
+        console.log(`✅ [PitchShifter] AudioContext再開完了 (state: ${audioContext.state})`);
+        // 安定化のため待機（iOS/iPadOS対策）
         await new Promise(resolve => setTimeout(resolve, 100));
       }
 
