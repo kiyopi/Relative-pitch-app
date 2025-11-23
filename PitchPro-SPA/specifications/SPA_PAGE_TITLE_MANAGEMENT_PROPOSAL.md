@@ -293,9 +293,100 @@ updatePageTitle(page) {
 
 ---
 
-## 8. 結論
+## 8. ナビゲーション安定化への貢献
 
-### 8.1 推奨アクション
+### 8.1 現在のNavigationManagerの課題
+
+NavigationManagerは以下の方法でリロード/ダイレクトアクセスを検出している:
+
+```javascript
+// sessionStorageフラグによる遷移証明
+static KEYS = {
+    NORMAL_TRANSITION: 'normalTransitionToTraining',
+    NORMAL_TRANSITION_PREPARATION: 'normalTransitionToPreparation',
+    NORMAL_TRANSITION_RESULT_SESSION: 'normalTransitionToResultSession',
+    REDIRECT_COMPLETED: 'reloadRedirected'
+};
+
+// visibilitychange + タイムスタンプによるデスクトップ切り替え検出
+static lastVisibilityChange = 0;
+```
+
+**課題**:
+- フラグ管理が複雑（4種類のフラグ）
+- ページごとに個別のフラグが必要
+- フラグのクリアタイミングが重要
+
+### 8.2 ページタイトルによる状態追跡の可能性
+
+ページタイトルを活用することで、**補助的な状態追跡**が可能:
+
+```javascript
+// 現在のページを特定
+function getCurrentPageFromTitle() {
+    const title = document.title;
+    const match = title.match(/8va相対音感トレーニング - (.+)/);
+    return match ? match[1] : 'unknown';
+}
+
+// ナビゲーション検証
+function validateNavigation(expectedPage) {
+    const currentPage = getCurrentPageFromTitle();
+    if (currentPage !== expectedPage) {
+        console.warn(`⚠️ ページ不整合: 期待=${expectedPage}, 実際=${currentPage}`);
+        return false;
+    }
+    return true;
+}
+```
+
+### 8.3 安定化への貢献ポイント
+
+| 項目 | 現状 | タイトル管理後 |
+|------|------|---------------|
+| **デバッグ容易性** | ハッシュのみで判断 | タイトル+ハッシュで確認可能 |
+| **履歴追跡** | 全て同じタイトル | ページごとに識別可能 |
+| **状態整合性チェック** | フラグのみ | タイトルも併用可能 |
+| **ユーザー体験** | 履歴が区別できない | 履歴でページを識別可能 |
+
+### 8.4 統合実装案
+
+```javascript
+// router.js - loadPage完了時
+async loadPage(page, fullHash = '', signal = null) {
+    // ... 既存処理 ...
+
+    // 7. 現在のページを更新
+    this.currentPage = page;
+
+    // 【v2.13.0追加】ページタイトルを更新
+    this.updatePageTitle(page);
+
+    // 【v2.13.0追加】状態整合性ログ
+    console.log(`📝 [Router] Page state: hash=${page}, title=${document.title}`);
+
+    console.log(`✅ [Router] Page loaded: ${page}`);
+}
+
+updatePageTitle(page) {
+    const config = this.pageConfigs[page];
+    const pageTitle = config?.title || page;
+    const fullTitle = `8va相対音感トレーニング - ${pageTitle}`;
+
+    document.title = fullTitle;
+
+    // 状態整合性チェック（デバッグ用）
+    if (this.currentPage !== page) {
+        console.warn(`⚠️ [Router] Page state mismatch: currentPage=${this.currentPage}, loadedPage=${page}`);
+    }
+}
+```
+
+---
+
+## 9. 結論
+
+### 9.1 推奨アクション
 
 1. **案A（document.titleのみ更新）**を実装
 2. `pageConfigs`に`title`プロパティを追加
@@ -303,7 +394,7 @@ updatePageTitle(page) {
 4. 基本テストと履歴テストを実行
 5. 問題があれば案Bに拡張を検討
 
-### 8.2 リスク評価
+### 9.2 リスク評価
 
 | リスク | レベル | 理由 |
 |--------|--------|------|
@@ -311,7 +402,7 @@ updatePageTitle(page) {
 | NavigationManagerとの競合 | 🟢 低 | 案Aでは独立した処理 |
 | テスト工数 | 🟢 低 | 基本的なナビゲーションテストで確認可能 |
 
-### 8.3 工数見積もり
+### 9.3 工数見積もり
 
 | 作業 | 時間 |
 |------|------|
@@ -319,6 +410,15 @@ updatePageTitle(page) {
 | テスト | 30分 |
 | ドキュメント更新 | 15分 |
 | **合計** | **1時間** |
+
+### 9.4 期待される効果
+
+| 効果 | 説明 |
+|------|------|
+| **UX向上** | ブラウザ履歴・タブでページを識別可能 |
+| **デバッグ向上** | タイトルでページ状態を即座に確認 |
+| **安定性向上** | 状態整合性チェックの補助手段として活用可能 |
+| **将来の拡張性** | history.replaceState()統合への基盤 |
 
 ---
 
