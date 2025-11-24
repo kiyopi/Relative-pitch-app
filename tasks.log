@@ -13672,3 +13672,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 14:36:10] コミット: chore: キャッシュバスター更新 (1763962490)
+
+- index.html: reference-tones.js, device-detector.js, CACHE BUSTER timestamp更新
+- router.js: preparation.html パス更新
+- preparation.html: preparation-pitchpro-cycle.js パス更新
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
