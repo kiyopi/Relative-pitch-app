@@ -13551,3 +13551,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 11:08:07] コミット: fix(volume): iPhone/Android音量を-12dBに戻し、iPadのみ+20dB維持
+
+- iPhone: +18dB → -12dB（Issue #2で確定した正しい値）
+- Android: +18dB → -12dB（PCと同等）
+- iPad: +20dB維持（iPad専用の音量調整）
+- キャッシュバスター更新 (1763950073)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

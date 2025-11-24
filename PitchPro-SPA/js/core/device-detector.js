@@ -117,9 +117,9 @@
             const device = this.getDeviceType();
             const sensitivitySettings = {
                 pc: 4.0,       // 4.0x: PC内蔵マイク
-                iphone: 4.5,   // 4.5x: iPhone最適化
+                iphone: 3.5,   // 3.5x: ノイズ軽減のため感度を下げる
                 ipad: 7.0,     // 7.0x: iPad最適化
-                android: 4.5   // 4.5x: iPhoneと同等の設定（実機テスト後に調整推奨）
+                android: 4.0   // 4.0x: PCと同等
             };
             return sensitivitySettings[device] || 4.0;
         },
