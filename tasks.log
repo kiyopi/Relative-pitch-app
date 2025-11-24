@@ -13505,3 +13505,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 09:48:46] コミット: Merge branch 'claude/add-answer-feedback' - Issue #5 iPad音量修正
+
+fix: iPad準備ページの基音視聴音量を改善
+- iPad: velocity 1.0（フル振幅）
+- 他デバイス: velocity 0.9
+- 既存のAudioContext resume、マイク制御、audioSession切り替えを維持
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

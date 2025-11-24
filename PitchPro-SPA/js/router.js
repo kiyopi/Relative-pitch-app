@@ -62,6 +62,17 @@ class SimpleRouter {
                         return;
                     }
 
+                    // 【iPad対応】PitchShifter停止（trainingと同様のクリーンアップ）
+                    // 準備ページ → ホーム → 準備ページ再遷移時に、古いTone.js接続が壊れた状態で残る問題を修正
+                    if (window.pitchShifterInstance) {
+                        console.log('🧹 [Router] PitchShifterをクリーンアップ...');
+                        if (typeof window.pitchShifterInstance.dispose === 'function') {
+                            window.pitchShifterInstance.dispose();
+                        }
+                        window.pitchShifterInstance = null;
+                        console.log('✅ [Router] PitchShifterクリーンアップ完了');
+                    }
+
                     // NavigationManagerが管理していない場合のみクリーンアップ
                     if (typeof window.preparationManager !== 'undefined' && window.preparationManager) {
                         await window.preparationManager.cleanupPitchPro();
