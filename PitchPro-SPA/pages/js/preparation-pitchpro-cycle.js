@@ -2111,46 +2111,32 @@ function setupVolumeAdjustmentControls() {
                     }
                 }
 
-                // 【iOS Safari対応 v7】audioSessionをplaybackに切り替え（音量改善のため）
-                // WebKit Bug #218012: マイクがアクティブだと音量が自動的に下がる
-                // 再生完了後に確実にplay-and-recordに戻すことで、2回目以降の問題を回避
+                // 【iOS Safari対応 v11】audioSession切り替えを行わない（トレーニングと統一）
+                // 理由: playbackモードに切り替えると準備ページとトレーニングページで音量差が生じる
+                // trainingController.jsと同様、マイク停止（stopDetection）のみで対応
                 if (navigator.audioSession) {
-                    try {
-                        navigator.audioSession.type = 'playback';
-                        console.log('🔊 [iOS] audioSession.type → playback（音量改善のため）');
-                    } catch (sessionError) {
-                        console.warn('⚠️ audioSession設定失敗（続行）:', sessionError);
-                    }
+                    console.log(`🔊 [iOS] audioSession.type (現在): ${navigator.audioSession.type}（変更なし）`);
                 }
 
-                // 【iOS Safari対応 v8】audioSession切り替え後にTone.start()を実行
-                // 注意: v10で最初のユーザー操作時にTone.start()を呼んでいるが、
-                //       audioSession.type変更後にも再度呼ぶ必要がある（ルーティング更新のため）
+                // 【iOS Safari対応 v8】Tone.start()を実行（AudioContext状態確認）
                 if (typeof Tone !== 'undefined') {
                     console.log(`🔊 [iOS v8] AudioContext状態確認... (state: ${Tone.context?.state})`);
-                    console.log('🔊 [iOS v8] Tone.start()を実行（audioSession切り替え後）...');
-                    await Tone.start();
-                    console.log(`✅ [iOS v8] Tone.start()完了 (state: ${Tone.context?.state})`);
-
-                    // 安定化のため少し待機
-                    await new Promise(resolve => setTimeout(resolve, 50));
+                    if (Tone.context?.state === 'suspended') {
+                        console.log('🔊 [iOS v8] Tone.start()を実行...');
+                        await Tone.start();
+                        console.log(`✅ [iOS v8] Tone.start()完了 (state: ${Tone.context?.state})`);
+                    }
                 }
 
                 // C3を再生（Tone.js Sampler経由）- velocity適用
                 await window.pitchShifterInstance.playNote("C3", 1.0, velocity);
                 console.log('✅ 基音C3を再生しました');
 
-                // 【iOS Safari対応 v9】再生完了後にaudioSessionを復元してマイクを再開
-                // 音の残響（リリース）が完全に終わるまで待ってから、確実にplay-and-recordに戻す
+                // 【iOS Safari対応 v11】再生完了後にマイクを再開
+                // audioSession切り替えは行わないため、マイク再開のみ
                 // ブチ音防止のため、2.52秒 + 余裕（500ms）= 3000msに設定
                 setTimeout(async () => {
                     try {
-                        // audioSessionを先に復元（マイク再開前に）
-                        if (navigator.audioSession) {
-                            navigator.audioSession.type = 'play-and-record';
-                            console.log('🔊 [iOS] audioSession.type → play-and-record（復元）');
-                        }
-
                         // マイクを再開
                         if (micWasActive && audioDetector) {
                             audioDetector.startDetection();

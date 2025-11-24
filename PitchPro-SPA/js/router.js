@@ -15,7 +15,7 @@ class SimpleRouter {
     constructor() {
         this.routes = {
             'home': 'templates/home.html',
-            'preparation': 'templates/preparation.html?v=1763958589',
+            'preparation': 'templates/preparation.html?v=1763960384',
             'training': 'pages/training.html?v=1763958589',
             'result-session': 'pages/result-session.html',
             'records': 'pages/records.html',
