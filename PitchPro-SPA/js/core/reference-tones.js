@@ -1,8 +1,9 @@
 /**
  * PitchShifter - Tone.js Sampler Wrapper
- * @version 2.9.3
- * @date 2025-11-23
+ * @version 2.9.6
+ * @date 2025-11-24
  * @changelog
+ *   - 2025-11-24 v2.9.6: iPad専用velocity減衰なし（iPhoneは通常減衰）
  *   - 2025-11-23 v2.9.3: iPad低音域音量強化
  *     - iPad検出（iPadOS 13+のMacintosh偽装対応）
  *     - 低音域: iPad 0.6x, その他 0.35x
@@ -56,7 +57,7 @@
  *   - 2025-10-28: 低音域の音量バランス調整・音割れ対策強化
  *   - 2025-10-28: キャッシュバスター実装（クエリパラメータでバージョン管理）
  */
-const SAMPLE_VERSION = "2.9.3";
+const SAMPLE_VERSION = "2.9.6";
 var c = Object.defineProperty;
 var f = (s, e, i) => e in s ? c(s, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : s[e] = i;
 var n = (s, e, i) => f(s, typeof e != "symbol" ? e + "" : e, i);
