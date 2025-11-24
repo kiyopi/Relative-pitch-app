@@ -1354,6 +1354,23 @@ function setupMicPermissionFlow() {
         skipRangeTestBtn.addEventListener('click', async () => {
             console.log('🚀 トレーニング開始ボタン（音域設定済み表示）がクリックされました');
 
+            // 【v4.2.0】基音再生中は遷移をブロック
+            if (isPlayingBaseNote) {
+                console.log('⚠️ 基音再生中のため、トレーニング開始をブロック');
+                alert('基音の再生が完了するまでお待ちください');
+                return;
+            }
+
+            // 【v4.2.0】ページ遷移前にPitchShifterを停止
+            if (window.pitchShifterInstance) {
+                try {
+                    await window.pitchShifterInstance.stop();
+                    console.log('✅ PitchShifter停止完了（トレーニング遷移前）');
+                } catch (e) {
+                    console.warn('⚠️ PitchShifter停止エラー（無視）:', e);
+                }
+            }
+
             try {
                 // 【新規追加】モード情報を先に取得
                 const redirectInfo = window.preparationRedirectInfo;
@@ -1592,6 +1609,23 @@ function setupMicPermissionFlow() {
     if (completeRangeTestBtn) {
         completeRangeTestBtn.addEventListener('click', async () => {
             console.log('🚀 トレーニング開始ボタン（音域テスト完了後）がクリックされました');
+
+            // 【v4.2.0】基音再生中は遷移をブロック
+            if (isPlayingBaseNote) {
+                console.log('⚠️ 基音再生中のため、トレーニング開始をブロック');
+                alert('基音の再生が完了するまでお待ちください');
+                return;
+            }
+
+            // 【v4.2.0】ページ遷移前にPitchShifterを停止
+            if (window.pitchShifterInstance) {
+                try {
+                    await window.pitchShifterInstance.stop();
+                    console.log('✅ PitchShifter停止完了（トレーニング遷移前）');
+                } catch (e) {
+                    console.warn('⚠️ PitchShifter停止エラー（無視）:', e);
+                }
+            }
 
             // 【新規追加】モード情報を先に取得
             const redirectInfo = window.preparationRedirectInfo;

@@ -13698,3 +13698,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 15:08:46] コミット: fix(audio): トレーニング基音再生前にマイク停止を確実に実行
+
+- audioDetectorが未初期化の場合はNavigationManagerから取得
+- WebKit Bug #218012回避のためマイク停止を確実に実行
+- 準備ページとトレーニングページの音量差を解消
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
