@@ -865,7 +865,6 @@ class PitchProCycleManager {
             // 初期化
             await window.pitchShifterInstance.initialize();
             console.log('✅ PitchShifter初期化完了');
-            // 注: サイレントオーディオ再生はv12でユーザークリック時に移動済み（ユーザージェスチャーコールスタック内で実行するため）
 
         } catch (error) {
             console.warn('⚠️ PitchShifter初期化エラー:', error);
@@ -2042,23 +2041,6 @@ function setupVolumeAdjustmentControls() {
                 // .then()で後続処理をチェーン（awaitを使わない）
                 Tone.start();
                 console.log(`🔊 [iOS v10] Tone.context.state: ${Tone.context?.state}`);
-            }
-
-            // 【iOS Safari対応 v12】ユーザー操作コールスタック内でサイレントオーディオを再生
-            // Web Audio APIをアンロックするため、HTMLの<audio>要素で微小音量の音を再生
-            // 重要: awaitせずに.play()を呼び出す（ユーザージェスチャーコールスタック内で同期的に実行）
-            try {
-                const silentMp3 = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRwmHAAAAAAD/+9DEAAAIAANIAAAAgAADSAAAAATEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tQxBcAAADSAAAAAAAAANIAAAAATEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=';
-                const silentAudio = new Audio(silentMp3);
-                silentAudio.volume = 0.01;
-                // awaitせずにplay()を呼び出し（ユーザージェスチャーコールスタック内で同期的に実行）
-                silentAudio.play().then(() => {
-                    console.log('🔊 [iOS v12] サイレントオーディオ再生完了（Web Audio APIキック）');
-                }).catch(e => {
-                    console.log('ℹ️ [iOS v12] サイレントオーディオ再生スキップ:', e.message);
-                });
-            } catch (silentError) {
-                console.log('ℹ️ [iOS v12] サイレントオーディオ例外:', silentError.message);
             }
 
             // 再生中フラグを立てる

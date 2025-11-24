@@ -13480,3 +13480,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 09:13:05] コミット: Merge branch 'claude/fix-ipad-audio-playback' into feature/modular-spa-architecture
+
+fix(audio): add AudioContext resume for iPad preparation page
+
+- iPad対応: AudioContextのsuspended状態をチェックしてresumeを実行
+- ホームボタンでバックグラウンド移行後の音声再生問題を修正
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
