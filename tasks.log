@@ -13561,3 +13561,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 11:17:28] コミット: fix(sensitivity): iPhoneの感度を下げてノイズ軽減
+
+- iPhone: 4.5x → 3.5x（ノイズを拾いにくくする）
+- Android: 4.5x → 4.0x（PCと同等に調整）
+- キャッシュバスター更新 (1763950648)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
