@@ -13471,3 +13471,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 00:43:24] コミット: fix: router.jsのテンプレートキャッシュバスター更新
+
+- router.js: preparation.html, training.htmlのキャッシュバスター更新
+- index.html: router.jsのキャッシュバスター更新
+- 古いテンプレートがキャッシュされてv12コードが読み込まれない問題を修正
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
