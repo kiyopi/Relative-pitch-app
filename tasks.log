@@ -13593,3 +13593,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 11:43:52] コミット: fix(volume): iPhoneの低音域減衰を復元（v2.9.6）
+
+- v2.9.5でiPadとiPhoneを同じ分岐に入れてしまったミスを修正
+- iPad: 1.0x（減衰なし）← 維持
+- iPhone: 0.5x（減衰あり）← edf9fc0の安定状態に戻す
+- キャッシュバスター更新 (1763952220)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

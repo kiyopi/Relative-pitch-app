@@ -101,7 +101,7 @@
             const device = this.getDeviceType();
             const volumeSettings = {
                 pc: -12,       // -12dB: Mac音量50%環境での適切な音量
-                iphone: -12,   // -12dB: PCと同等（v2.9.2 Issue #2修正）
+                iphone: 0,     // 0dB: -12dBでは小さすぎるため調整
                 ipad: +20,     // +20dB: デバイス音量50%時に最適化（Tone.js推奨上限）
                 android: -12   // -12dB: PCと同等（実機テスト後に調整推奨）
             };
