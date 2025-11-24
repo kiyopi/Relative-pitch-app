@@ -13575,3 +13575,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 11:29:06] コミット: fix(volume): iPhone低音域の減衰も撤廃（v2.9.5）
+
+- iPhoneも低音域/中低音域のvelocity減衰を撤廃
+- iOS（iPad/iPhone）共通で1.0x（減衰なし）に統一
+- これにより準備ページの基音がiPhoneでも聞こえやすくなる
+- キャッシュバスター更新 (1763951336)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
