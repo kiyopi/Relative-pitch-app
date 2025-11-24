@@ -99,11 +99,13 @@
          */
         getDeviceVolume() {
             const device = this.getDeviceType();
+            // 【重要】全デバイス-12dB統一（edf9fc0で正常動作確認済み）
+            // +20dBなどの高音量設定はTone.jsでクリッピングを起こし音が出なくなる
             const volumeSettings = {
                 pc: -12,       // -12dB: Mac音量50%環境での適切な音量
-                iphone: 0,     // 0dB: -12dBでは小さすぎるため調整
-                ipad: +20,     // +20dB: デバイス音量50%時に最適化（Tone.js推奨上限）
-                android: -12   // -12dB: PCと同等（実機テスト後に調整推奨）
+                iphone: -12,   // -12dB: PCと同等（edf9fc0で正常動作確認）
+                ipad: -12,     // -12dB: PCと同等（+20dBはクリッピングの原因）
+                android: -12   // -12dB: PCと同等
             };
             return volumeSettings[device] || -12;
         },
@@ -117,9 +119,9 @@
             const device = this.getDeviceType();
             const sensitivitySettings = {
                 pc: 4.0,       // 4.0x: PC内蔵マイク
-                iphone: 3.5,   // 3.5x: ノイズ軽減のため感度を下げる
+                iphone: 4.5,   // 4.5x: iPhone最適化（edf9fc0で正常動作確認）
                 ipad: 7.0,     // 7.0x: iPad最適化
-                android: 4.0   // 4.0x: PCと同等
+                android: 4.5   // 4.5x: iPhoneと同等
             };
             return sensitivitySettings[device] || 4.0;
         },

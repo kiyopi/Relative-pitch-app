@@ -1,9 +1,13 @@
 /**
  * PitchShifter - Tone.js Sampler Wrapper
- * @version 2.9.6
+ * @version 2.9.7
  * @date 2025-11-24
  * @changelog
- *   - 2025-11-24 v2.9.6: iPad専用velocity減衰なし（iPhoneは通常減衰）
+ *   - 2025-11-24 v2.9.7: edf9fc0の正常設定に復元（理論的検証済み）
+ *     - iPad: 0.6x/0.75x（軽減衰でクリッピング防止）
+ *     - iPhone/PC/Android: 0.35x/0.5x（強減衰で歪み防止）
+ *     - velocity 1.0x（減衰なし）は+20dBと組み合わせてクリッピングの原因だった
+ *   - 2025-11-24 v2.9.6: iPad専用velocity減衰なし（問題あり - 撤回）
  *   - 2025-11-23 v2.9.3: iPad低音域音量強化
  *     - iPad検出（iPadOS 13+のMacintosh偽装対応）
  *     - 低音域: iPad 0.6x, その他 0.35x
@@ -57,7 +61,7 @@
  *   - 2025-10-28: 低音域の音量バランス調整・音割れ対策強化
  *   - 2025-10-28: キャッシュバスター実装（クエリパラメータでバージョン管理）
  */
-const SAMPLE_VERSION = "2.9.6";
+const SAMPLE_VERSION = "2.9.7";
 var c = Object.defineProperty;
 var f = (s, e, i) => e in s ? c(s, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : s[e] = i;
 var n = (s, e, i) => f(s, typeof e != "symbol" ? e + "" : e, i);
@@ -181,17 +185,18 @@ const t = class t {
       // C2-B2 (65-123Hz): 低音域の音量調整
       // C3-B3 (130-246Hz): 中低音域の音量調整
       // C4以上: 1.0x velocity (通常音量)
-      // iPad: スピーカー特性を考慮して音量を維持（減衰なし）
-      // iPhone/PC/Android: 減衰あり（edf9fc0の安定版）
+      // 【重要】適度な減衰でクリッピング防止（edf9fc0で正常動作確認）
+      // iPad: スピーカー特性を考慮して軽めの減衰
+      // iPhone/PC/Android: 低音再生困難なため強めの減衰
       let adjustedVelocity = o;
       if (a.frequency < 130) {
-        // 低音域: iPad 1.0x（減衰なし）, その他 0.35x
-        adjustedVelocity = isIPad ? o : o * 0.35;
-        console.log(`🔉 [PitchShifter] Low bass adjustment${isIPad ? ' (iPad, no reduction)' : ''}: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
+        // 低音域: iPad 0.6x, その他 0.35x
+        adjustedVelocity = isIPad ? o * 0.6 : o * 0.35;
+        console.log(`🔉 [PitchShifter] Low bass adjustment${isIPad ? ' (iPad)' : ''}: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
       } else if (a.frequency < 260) {
-        // 中低音域: iPad 1.0x（減衰なし）, その他 0.5x
-        adjustedVelocity = isIPad ? o : o * 0.5;
-        console.log(`🔉 [PitchShifter] Mid-low adjustment${isIPad ? ' (iPad, no reduction)' : ''}: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
+        // 中低音域: iPad 0.75x, その他 0.5x
+        adjustedVelocity = isIPad ? o * 0.75 : o * 0.5;
+        console.log(`🔉 [PitchShifter] Mid-low adjustment${isIPad ? ' (iPad)' : ''}: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
       }
 
       // 【DEBUG】再生直前のsampler音量を確認
