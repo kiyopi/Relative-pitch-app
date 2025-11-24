@@ -1984,7 +1984,9 @@ function setupVolumeAdjustmentControls() {
                 if (!icon || !text) {
                     console.warn('⚠️ ボタン内の要素が見つかりません');
                     // 要素が見つからない場合は音声だけ再生
-                    await window.pitchShifterInstance.playNote("C4", 1.0);
+                    // iPad対応: velocity を 1.0 に設定（デフォルト0.8では音量不足）
+                    const velocity = window.DeviceDetector?.getDeviceType() === 'ipad' ? 1.0 : 0.9;
+                    await window.pitchShifterInstance.playNote("C4", 1.0, velocity);
                     return;
                 }
 
@@ -1996,8 +1998,11 @@ function setupVolumeAdjustmentControls() {
                 text.textContent = '再生中...';
 
                 // C4 (261.6Hz) を再生
-                console.log('▶️ C4音を再生開始...');
-                await window.pitchShifterInstance.playNote("C4", 1.0);
+                // iPad対応: velocity を 1.0 に設定（デフォルト0.8では音量不足）
+                // 他デバイスも 0.9 に引き上げて明瞭な基音を提供
+                const velocity = window.DeviceDetector?.getDeviceType() === 'ipad' ? 1.0 : 0.9;
+                console.log(`▶️ C4音を再生開始... (velocity: ${velocity}, device: ${window.DeviceDetector?.getDeviceType() || 'unknown'})`);
+                await window.pitchShifterInstance.playNote("C4", 1.0, velocity);
                 console.log('✅ 基音C4を再生しました');
 
                 // 2.52秒後にボタンを元に戻す（attack:0.02s + sustain:1.0s + release:1.5s = 2.52s）
