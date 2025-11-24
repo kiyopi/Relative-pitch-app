@@ -13603,3 +13603,10 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 12:19:04] コミット: fix(volume): iPhone音量を0dBに調整（-12dBでは小さすぎる）
+
+キャッシュバスター更新 (1763954344)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
