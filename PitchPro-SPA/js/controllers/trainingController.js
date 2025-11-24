@@ -755,16 +755,20 @@ async function startTraining() {
         console.log(`   基音: ${baseNoteInfo.note} (${baseNoteInfo.frequency.toFixed(1)}Hz)`);
         console.log('');
 
-        // 【v4.1.2改善】基音再生中は検出を停止（MediaStream保持）
+        // 【v4.1.3改善】基音再生中は検出を停止（MediaStream保持）
         // mute()だけでは検出ループが継続し、BLOCKEDログが大量出力される問題に対応
-        if (audioDetector) {
+        // 【v4.1.4修正】audioDetectorが未初期化の場合はNavigationManagerから取得
+        const detectorToStop = audioDetector || window.NavigationManager?.currentAudioDetector || window.globalAudioDetector;
+        if (detectorToStop) {
             console.log('🎤 基音再生前に検出を停止（MediaStream保持）');
             try {
-                audioDetector.stopDetection();
+                detectorToStop.stopDetection();
                 console.log('⏹️ 検出停止完了 - MediaStreamは健全');
             } catch (error) {
                 console.warn('⚠️ stopDetection()エラー（無視して続行）:', error);
             }
+        } else {
+            console.log('⚠️ AudioDetectorが未初期化のため停止スキップ');
         }
 
         // 【iOS Safari対応 v3】audioSession切り替えは行わない

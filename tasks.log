@@ -13690,3 +13690,11 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 15:02:04] コミット: fix(volume): iPad音量を+12dBに調整（play-and-record統一後）
+
+- +20dBから+12dBに変更
+- play-and-recordモード統一後の適切な音量
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
