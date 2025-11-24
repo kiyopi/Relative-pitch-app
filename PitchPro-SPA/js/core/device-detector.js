@@ -104,7 +104,7 @@
             const volumeSettings = {
                 pc: -12,       // -12dB: Mac音量50%環境での適切な音量
                 iphone: +18,   // +18dB: デバイス音量50%時に最適化
-                ipad: +20,     // +20dB: デバイス音量50%時に最適化（Tone.js推奨上限）
+                ipad: +12,     // +12dB: play-and-record統一後の適切な音量
                 android: +18   // +18dB: iPhoneと同等の設定
             };
             return volumeSettings[device] || -12;

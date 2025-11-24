@@ -13681,3 +13681,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 14:55:54] コミット: chore: 強制キャッシュバスター更新 (1763963701)
+
+- ルートindex.html: リダイレクトURLにキャッシュバスター追加
+- PitchPro-SPA/index.html: lucide-init, router, home-direction-tabs更新
+- iPadキャッシュ問題対策
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
