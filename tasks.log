@@ -13490,3 +13490,13 @@ fix(audio): add AudioContext resume for iPad preparation page
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 09:26:15] コミット: fix(audio): edf9fc0に戻してiPad AudioContext resume修正のみ適用
+
+- trainingController.js, preparation-pitchpro-cycle.js をedf9fc0（iPhoneの問題解決時点）に戻す
+- iPad対応のAudioContext resume修正のみを再適用
+- v12のサイレントオーディオ/audioSession切り替え等の不要な修正を削除
+- iPhoneの連続チャレンジの基音再生タイミング問題を解消
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
