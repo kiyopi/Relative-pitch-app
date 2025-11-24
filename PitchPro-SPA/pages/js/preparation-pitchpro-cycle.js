@@ -2092,7 +2092,9 @@ function setupVolumeAdjustmentControls() {
 
                 // 【iOS Safari対応 v4】C3 (130.8Hz) を再生
                 // PitchShifter初期化完了後に呼び出されることを前提
-                console.log('▶️ 基音再生開始...');
+                // iPad対応: velocity を 1.0 に設定（デフォルト0.8では音量不足）
+                const velocity = window.DeviceDetector?.getDeviceType() === 'ipad' ? 1.0 : 0.9;
+                console.log(`▶️ 基音再生開始... (velocity: ${velocity}, device: ${window.DeviceDetector?.getDeviceType() || 'unknown'})`);
 
                 // 【iOS Safari対応】マイクを一時停止してから音声再生
                 // WebKit Bug #218012: マイクがアクティブだと音量が自動的に下がる
@@ -2134,8 +2136,8 @@ function setupVolumeAdjustmentControls() {
                     await new Promise(resolve => setTimeout(resolve, 50));
                 }
 
-                // C3を再生（Tone.js Sampler経由）
-                await window.pitchShifterInstance.playNote("C3", 1.0);
+                // C3を再生（Tone.js Sampler経由）- velocity適用
+                await window.pitchShifterInstance.playNote("C3", 1.0, velocity);
                 console.log('✅ 基音C3を再生しました');
 
                 // 【iOS Safari対応 v9】再生完了後にaudioSessionを復元してマイクを再開
