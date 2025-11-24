@@ -180,19 +180,17 @@ const t = class t {
       // C2-B2 (65-123Hz): 低音域の音量調整
       // C3-B3 (130-246Hz): 中低音域の音量調整
       // C4以上: 1.0x velocity (通常音量)
-      // iOS（iPad/iPhone）: スピーカー特性を考慮して音量を維持（減衰なし）
-      // v2.9.5: iPhone低音域の減衰も撤廃（iPad同様）
-      const isIPhone = /iPhone/.test(userAgent);
-      const isIOS = isIPad || isIPhone;
+      // iPad: スピーカー特性を考慮して音量を維持（減衰なし）
+      // iPhone/PC/Android: 減衰あり（edf9fc0の安定版）
       let adjustedVelocity = o;
       if (a.frequency < 130) {
-        // 低音域: iOS 1.0x（減衰なし）, その他 0.35x
-        adjustedVelocity = isIOS ? o : o * 0.35;
-        console.log(`🔉 [PitchShifter] Low bass adjustment${isIOS ? ' (iOS, no reduction)' : ''}: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
+        // 低音域: iPad 1.0x（減衰なし）, その他 0.35x
+        adjustedVelocity = isIPad ? o : o * 0.35;
+        console.log(`🔉 [PitchShifter] Low bass adjustment${isIPad ? ' (iPad, no reduction)' : ''}: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
       } else if (a.frequency < 260) {
-        // 中低音域: iOS 1.0x（減衰なし）, その他 0.5x
-        adjustedVelocity = isIOS ? o : o * 0.5;
-        console.log(`🔉 [PitchShifter] Mid-low adjustment${isIOS ? ' (iOS, no reduction)' : ''}: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
+        // 中低音域: iPad 1.0x（減衰なし）, その他 0.5x
+        adjustedVelocity = isIPad ? o : o * 0.5;
+        console.log(`🔉 [PitchShifter] Mid-low adjustment${isIPad ? ' (iPad, no reduction)' : ''}: velocity ${o.toFixed(2)} → ${adjustedVelocity.toFixed(2)}`);
       }
 
       // 【DEBUG】再生直前のsampler音量を確認
