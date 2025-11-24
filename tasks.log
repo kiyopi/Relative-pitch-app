@@ -13524,3 +13524,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 10:43:53] コミット: fix(volume): 低音域の音量調整を強化（v2.9.4）
+
+- iPad低音域のvelocity減衰を撤廃（0.6x/0.75x → 1.0x）
+- 中低音域（130-260Hz）: iPad 1.0x（減衰なし）
+- 低音域（<130Hz）: iPad 1.0x（減衰なし）
+- これにより準備ページのC3基音がiPadで聞こえやすくなる
+- キャッシュバスター更新 (1763948592)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
