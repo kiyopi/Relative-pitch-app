@@ -13626,3 +13626,49 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 13:03:10] コミット: fix(version): SAMPLE_VERSION を 2.9.6 に修正 + キャッシュバスター更新
+
+- reference-tones.js: SAMPLE_VERSION が 2.9.3 のままだった問題を修正
+- ヘッダーコメントを v2.9.6 に更新
+- キャッシュバスター: 1763956938 に更新
+  - index.html (device-detector, router, reference-tones)
+  - router.js (preparation, training templates)
+  - preparation.html (preparation-pitchpro-cycle.js)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 13:32:03] コミット: fix(volume): 低音域の音量調整を強化（v2.9.1）
+
+- edf9fc0の正常動作設定に復元
+- 全デバイス -12dB統一（+20dBはクリッピングの原因）
+- iPad velocity: 0.6x/0.75x（低音/中低音）
+- iPhone/PC velocity: 0.35x/0.5x（低音/中低音）
+- SAMPLE_VERSION: 2.9.7
+- キャッシュバスター更新: 1763958589
+- Serenaメモリに調査結果・最適設定を記録
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 14:00:34] コミット: fix(volume): iPad/iPhone音量設定を実機テスト済み値に修正
+
+- iPad: +20dB（実機テスト確認済み）
+- iPhone: +18dB（実機テスト確認済み）
+- Android: +18dB
+- PC: -12dB（変更なし）
+- reference-tones.jsのiPad分岐は維持（将来の微調整用）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 14:27:16] コミット: fix(audio): 準備ページのaudioSession切り替えを削除（トレーニングと統一）
+
+- audioSession.type = 'playback' への切り替えを削除
+- trainingController.jsと同様、マイク停止のみで対応
+- 準備ページとトレーニングページで音量を統一
+- iPad/iPhoneで音量差が生じる問題を解決
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
