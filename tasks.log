@@ -13515,3 +13515,12 @@ fix: iPad準備ページの基音視聴音量を改善
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 10:34:46] コミット: fix(iPad): 準備ページ再遷移時のPitchShifterクリーンアップ追加
+
+- router.js: preparation cleanup時にPitchShifter.dispose()を実行
+- 準備ページ → ホーム → 準備ページ再遷移時に古いTone.js接続が壊れる問題を修正
+- trainingと同様のクリーンアップパターンを適用
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
