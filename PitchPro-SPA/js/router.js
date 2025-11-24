@@ -62,6 +62,17 @@ class SimpleRouter {
                         await window.preparationManager.cleanupPitchPro();
                     }
 
+                    // 【iPad対応】PitchShifter停止（trainingと同様のクリーンアップ）
+                    // ホームに戻った後、再度準備ページに来た時に古いインスタンスが
+                    // 残っていると音がほぼ無音になる問題を修正
+                    if (window.pitchShifterInstance) {
+                        console.log('🎹 [Router] Stopping PitchShifter (preparation cleanup)...');
+                        if (typeof window.pitchShifterInstance.dispose === 'function') {
+                            window.pitchShifterInstance.dispose();
+                        }
+                        window.pitchShifterInstance = null;
+                    }
+
                     // 初期化フラグをリセット
                     if (typeof window.resetPreparationPageFlag === 'function') {
                         window.resetPreparationPageFlag();
