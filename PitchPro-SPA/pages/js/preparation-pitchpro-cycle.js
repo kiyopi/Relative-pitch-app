@@ -250,7 +250,7 @@ class PitchProCycleManager {
 
                     // preparation固有設定
                     deviceOptimization: true,
-                    debug: true  // 【デバッグ有効化】ノイズ値確認のため
+                    debug: false  // 【ログ削減】iPadコンソール安定化のためfalse
                 })
             );
 
@@ -1055,10 +1055,12 @@ function waitForLibraries() {
  */
 window.initializePreparationPitchProCycle = async function() {
     console.log('🚀 initializePreparationPitchProCycle - 初期化開始（SPA対応）');
+    console.log('📍 [DEBUG] micPermissionListenerAdded現在値:', micPermissionListenerAdded);
 
     // SPA環境でのリロード対策: グローバルフラグをリセット
     micPermissionListenerAdded = false;
-    console.log('🔄 イベントリスナーフラグをリセット');
+    console.log('🔄 イベントリスナーフラグをリセット: false');
+    console.log('📍 [DEBUG] リセット後のmicPermissionListenerAdded:', micPermissionListenerAdded);
 
     // 【v4.1.0追加】URLパラメータからモード情報を取得してUI更新
     const hash = window.location.hash.substring(1);
@@ -1206,8 +1208,11 @@ if (typeof document !== 'undefined') {
  */
 function setupMicPermissionFlow() {
     console.log('🔧 setupMicPermissionFlow開始');
+    console.log('📍 [DEBUG] setupMicPermissionFlow開始時のmicPermissionListenerAdded:', micPermissionListenerAdded);
+
     const requestMicBtn = document.getElementById('request-mic-btn');
     console.log('🔍 マイクボタン要素:', requestMicBtn);
+    console.log('📍 [DEBUG] ボタンの状態 - disabled:', requestMicBtn?.disabled, ', innerHTML:', requestMicBtn?.innerHTML?.substring(0, 50));
 
     if (!requestMicBtn) {
         console.error('❌ マイク許可ボタンが見つかりません');
@@ -1222,10 +1227,12 @@ function setupMicPermissionFlow() {
     // 既にイベントリスナーが追加されている場合はスキップ
     if (micPermissionListenerAdded) {
         console.log('✅ イベントリスナーは既に設定済み（スキップ）');
+        console.log('📍 [DEBUG] スキップ理由: micPermissionListenerAdded = true');
         return;
     }
 
     console.log('✅ イベントリスナーを設定します');
+    console.log('📍 [DEBUG] イベントリスナー設定直前のmicPermissionListenerAdded:', micPermissionListenerAdded);
 
     // シンプルで確実なイベント設定（preparation-simple-test.htmlの成功パターン）
     requestMicBtn.addEventListener('click', async () => {
