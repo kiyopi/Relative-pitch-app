@@ -1073,9 +1073,10 @@ class NavigationManager {
         // 現在のページを取得
         const currentPage = window.location.hash.split('?')[0].substring(1);
 
-        // 1. 【改善v4.0.1】AudioDetector管理 - トレーニングフロー内では完全保持
-        //    → トレーニングフロー内: 何もしない（各ページControllerが管理）
-        //    → トレーニングフロー外: destroy()を実行してMediaStream完全解放
+        // 1. 【改善v4.6.0】AudioDetector管理 - PitchPro MicrophoneLifecycleManagerに委譲
+        //    → 全ての遷移: AudioDetectorを保持（PitchProのアイドル監視が自動管理）
+        //    → iOS Safari MediaStream再取得問題の回避
+        //    → 準備ページに戻った時、既存のAudioDetectorを再利用可能
         if (this.currentAudioDetector) {
             const isTraining = this.isTrainingFlow(currentPage, page);
 
@@ -1086,16 +1087,14 @@ class NavigationManager {
                 console.log('📝 [NavigationManager] 音声検出管理は各ページControllerに委譲');
 
             } else {
-                // トレーニングフロー外の遷移: MediaStream完全解放
-                console.log('🧹 [NavigationManager] トレーニングフロー外遷移: MediaStream破棄');
-                this._destroyAudioDetector(this.currentAudioDetector);
-                this.currentAudioDetector = null;
+                // 【v4.6.0変更】トレーニングフロー外の遷移でも即座に破棄しない
+                // PitchPro MicrophoneLifecycleManagerのアイドル監視に任せる
+                // これによりiOS SafariのMediaStream再取得問題を回避
+                console.log('🔄 [NavigationManager] トレーニングフロー外遷移: AudioDetector保持（PitchPro管理に委譲）');
+                console.log('📝 [NavigationManager] MicrophoneLifecycleManagerのアイドル監視が自動でリソース管理');
 
-                // globalAudioDetectorもクリア
-                if (window.globalAudioDetector) {
-                    window.globalAudioDetector = null;
-                    console.log('🗑️ [NavigationManager] globalAudioDetectorクリア');
-                }
+                // 注: globalAudioDetectorは保持したまま
+                // 準備ページに戻った時に再利用可能
             }
         }
 

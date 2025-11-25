@@ -1226,90 +1226,124 @@ function setupMicPermissionFlow() {
             requestMicBtn.innerHTML = '<i data-lucide="loader" style="width: 24px; height: 24px;"></i><span>許可を待っています...</span>';
             if (typeof lucide !== 'undefined') window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
 
+            // 【v4.6.0】既存のglobalAudioDetectorを再利用できるかチェック
+            const existingDetector = window.globalAudioDetector;
+            let canReuseExisting = false;
+
+            if (existingDetector) {
+                console.log('🔍 [v4.6.0] 既存のglobalAudioDetector発見 - 再利用可能性をチェック...');
+                const healthCheck = await verifyMediaStreamHealth(existingDetector);
+                if (healthCheck.healthy) {
+                    console.log('✅ [v4.6.0] 既存のAudioDetector再利用可能:', healthCheck.details);
+                    canReuseExisting = true;
+
+                    // pitchProCycleManagerに既存のAudioDetectorを設定
+                    pitchProCycleManager.audioDetector = existingDetector;
+                } else {
+                    console.log('⚠️ [v4.6.0] 既存のAudioDetector再利用不可:', healthCheck.reason);
+                    // 既存のAudioDetectorを破棄して新規作成
+                    try {
+                        existingDetector.destroy && await existingDetector.destroy();
+                    } catch (e) {
+                        console.warn('⚠️ 既存AudioDetector破棄エラー（続行）:', e);
+                    }
+                    window.globalAudioDetector = null;
+                }
+            }
+
             // PitchProサイクル管理を使う場合
             if (typeof pitchProCycleManager !== 'undefined' && pitchProCycleManager && pitchProCycleManager.audioDetector) {
-                // リロード後の古いリソースを完全にクリーンアップ
-                console.log('🧹 リロード後クリーンアップ開始...');
-                try {
-                    if (pitchProCycleManager.audioDetector.microphoneController) {
-                        await pitchProCycleManager.audioDetector.stopDetection();
-                        console.log('✅ 既存の検出を停止');
+                // 【v4.6.0】既存を再利用する場合はクリーンアップをスキップ
+                if (!canReuseExisting) {
+                    // リロード後の古いリソースを完全にクリーンアップ
+                    console.log('🧹 リロード後クリーンアップ開始...');
+                    try {
+                        if (pitchProCycleManager.audioDetector.microphoneController) {
+                            await pitchProCycleManager.audioDetector.stopDetection();
+                            console.log('✅ 既存の検出を停止');
+                        }
+                    } catch (cleanupError) {
+                        console.warn('⚠️ クリーンアップエラー（続行）:', cleanupError);
                     }
-                } catch (cleanupError) {
-                    console.warn('⚠️ クリーンアップエラー（続行）:', cleanupError);
                 }
 
-                // AudioDetectionComponentの初期化（v1.3.1では内部でマイク許可も処理）
-                console.log('🎤 AudioDetectionComponent.initialize() 開始（マイク許可含む）');
-                try {
-                    await pitchProCycleManager.audioDetector.initialize();
-                    console.log('✅ AudioDetectionComponent.initialize() 完了');
+                // 【v4.6.0】既存を再利用する場合は初期化をスキップ
+                if (canReuseExisting) {
+                    console.log('✅ [v4.6.0] 既存のAudioDetectorを再利用 - 初期化スキップ');
+                    console.log('✅ マイク許可成功！（既存ストリーム再利用）');
+                } else {
+                    // AudioDetectionComponentの初期化（v1.3.1では内部でマイク許可も処理）
+                    console.log('🎤 AudioDetectionComponent.initialize() 開始（マイク許可含む）');
+                    try {
+                        await pitchProCycleManager.audioDetector.initialize();
+                        console.log('✅ AudioDetectionComponent.initialize() 完了');
 
-                    // 初期化後、少し待ってからマイクストリームが安定するのを待つ
-                    console.log('⏳ マイクストリーム安定化待機中...');
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    console.log('✅ マイクストリーム安定化完了');
+                        // 初期化後、少し待ってからマイクストリームが安定するのを待つ
+                        console.log('⏳ マイクストリーム安定化待機中...');
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        console.log('✅ マイクストリーム安定化完了');
 
-                    // 【v4.1.0】MediaStream健全性検証（iOS Safari再取得問題対策）
-                    const streamHealthCheck = await verifyMediaStreamHealth(pitchProCycleManager.audioDetector);
-                    if (!streamHealthCheck.healthy) {
-                        console.error('❌ MediaStream健全性検証失敗:', streamHealthCheck.reason);
-                        throw new Error(`MediaStream検証失敗: ${streamHealthCheck.reason}`);
-                    }
-                    console.log('✅ MediaStream健全性検証完了:', streamHealthCheck);
-
-                    console.log('✅ マイク許可成功！');
-
-                    // 【iOS Safari対応 v3】マイク初期化直後にaudioSessionを明示的に設定
-                    // これにより、基音を試聴ボタン押下時にautoではなくplay-and-recordから開始される
-                    if (navigator.audioSession) {
-                        try {
-                            navigator.audioSession.type = 'play-and-record';
-                            console.log('🔊 [iOS] audioSession.type を "play-and-record" に初期設定');
-                        } catch (sessionError) {
-                            console.warn('⚠️ audioSession初期設定失敗（続行）:', sessionError);
+                        // 【v4.1.0】MediaStream健全性検証（iOS Safari再取得問題対策）
+                        const streamHealthCheck = await verifyMediaStreamHealth(pitchProCycleManager.audioDetector);
+                        if (!streamHealthCheck.healthy) {
+                            console.error('❌ MediaStream健全性検証失敗:', streamHealthCheck.reason);
+                            throw new Error(`MediaStream検証失敗: ${streamHealthCheck.reason}`);
                         }
+                        console.log('✅ MediaStream健全性検証完了:', streamHealthCheck);
+
+                        console.log('✅ マイク許可成功！');
+
+                        // 【iOS Safari対応 v3】マイク初期化直後にaudioSessionを明示的に設定
+                        // これにより、基音を試聴ボタン押下時にautoではなくplay-and-recordから開始される
+                        if (navigator.audioSession) {
+                            try {
+                                navigator.audioSession.type = 'play-and-record';
+                                console.log('🔊 [iOS] audioSession.type を "play-and-record" に初期設定');
+                            } catch (sessionError) {
+                                console.warn('⚠️ audioSession初期設定失敗（続行）:', sessionError);
+                            }
+                        }
+
+                    } catch (initError) {
+                        console.error('❌ AudioDetectionComponent初期化エラー:', initError);
+                        // 【v4.1.0】初期化エラー時は上位にスローして適切に処理
+                        throw initError;
                     }
+                }
 
-                    // localStorage保存（新規追加）
-                    localStorage.setItem('micPermissionGranted', 'true');
-                    localStorage.setItem('micPermissionTimestamp', new Date().toISOString());
-                    console.log('💾 micPermissionGranted localStorage保存完了');
+                // 【共通処理】localStorage保存（新規・再利用両方で実行）
+                localStorage.setItem('micPermissionGranted', 'true');
+                localStorage.setItem('micPermissionTimestamp', new Date().toISOString());
+                console.log('💾 micPermissionGranted localStorage保存完了');
 
-                    // Phase 2: 音声テスト開始（状態管理を含む）
-                    // 注: 音声テストは常に実施（マイク動作確認のため必須）
-                    // 音域データの分岐は音声テスト完了後に実施
-                    console.log('🎤 音声テスト開始');
-                    const startResult = await pitchProCycleManager.startAudioDetection('audiotest');
-                    if (!startResult.success) {
-                        throw new Error(`音声テスト開始失敗: ${startResult.error}`);
-                    }
-                    console.log('✅ 音声テスト開始成功（PitchProサイクル管理）');
+                // Phase 2: 音声テスト開始（状態管理を含む）
+                // 注: 音声テストは常に実施（マイク動作確認のため必須）
+                // 音域データの分岐は音声テスト完了後に実施
+                console.log('🎤 音声テスト開始');
+                const startResult = await pitchProCycleManager.startAudioDetection('audiotest');
+                if (!startResult.success) {
+                    throw new Error(`音声テスト開始失敗: ${startResult.error}`);
+                }
+                console.log('✅ 音声テスト開始成功（PitchProサイクル管理）');
 
-                    // 音声テストセクションを表示
-                    const audioTestSection = document.getElementById('audio-test-section');
-                    if (audioTestSection) {
-                        audioTestSection.classList.remove('hidden');
-                        console.log('✅ 音声テストセクションを表示');
-                    }
+                // 音声テストセクションを表示
+                const audioTestSection = document.getElementById('audio-test-section');
+                if (audioTestSection) {
+                    audioTestSection.classList.remove('hidden');
+                    console.log('✅ 音声テストセクションを表示');
+                }
 
-                    // 【Phase3改善】AudioDetectionComponentインスタンスをグローバルに共有（将来のStep2連携用）
-                    window.globalAudioDetector = pitchProCycleManager.audioDetector;
-                    window.audioDetector = pitchProCycleManager.audioDetector;
-                    console.log('✅ globalAudioDetectorをStep2連携用に設定');
+                // 【Phase3改善】AudioDetectionComponentインスタンスをグローバルに共有（将来のStep2連携用）
+                window.globalAudioDetector = pitchProCycleManager.audioDetector;
+                window.audioDetector = pitchProCycleManager.audioDetector;
+                console.log('✅ globalAudioDetectorをStep2連携用に設定');
 
-                    // 【Phase3追加】NavigationManagerに登録（MediaStream保持のため）
-                    if (window.NavigationManager) {
-                        window.NavigationManager.registerAudioDetector(pitchProCycleManager.audioDetector);
-                        console.log('✅ NavigationManagerにAudioDetectorを登録');
-                    } else {
-                        console.warn('⚠️ NavigationManagerが見つかりません');
-                    }
-
-                } catch (initError) {
-                    console.error('❌ AudioDetectionComponent初期化エラー:', initError);
-                    // 【v4.1.0】初期化エラー時は上位にスローして適切に処理
-                    throw initError;
+                // 【Phase3追加】NavigationManagerに登録（MediaStream保持のため）
+                if (window.NavigationManager) {
+                    window.NavigationManager.registerAudioDetector(pitchProCycleManager.audioDetector);
+                    console.log('✅ NavigationManagerにAudioDetectorを登録');
+                } else {
+                    console.warn('⚠️ NavigationManagerが見つかりません');
                 }
             }
 
