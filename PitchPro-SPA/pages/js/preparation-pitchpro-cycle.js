@@ -424,24 +424,28 @@ class PitchProCycleManager {
     handlePitchUpdate(result) {
         if (!this.state.detectionActive) return;
 
-        // 【v1.3.2修正】clarityThreshold未満の場合は音量バーを強制的に0%にリセット
-        // 環境ノイズ（clarity: 0.00-0.90）が音量バーに表示される問題を解決
+        // 【v1.3.3修正】autoUpdateUI: false のため、手動でUI更新
         const clarityThreshold = 0.85; // pitchpro-config.jsと同じ閾値
+
+        // UI要素取得
+        const volumeBar = document.getElementById('volume-progress');
+        const volumeText = document.getElementById('volume-value');
+        const frequencyValue = document.getElementById('frequency-value');
+
         if (result.clarity < clarityThreshold) {
-            // 音量バーを0%に強制リセット
-            const volumeBar = document.getElementById('volume-progress');
-            if (volumeBar) {
-                volumeBar.style.width = '0%';
-            }
-            // 周波数・音量テキストもクリア
-            const volumeText = document.getElementById('volume-value');
-            const frequencyValue = document.getElementById('frequency-value');
+            // 環境ノイズ（clarity < 0.85）: 音量バーを0%表示
+            if (volumeBar) volumeBar.style.width = '0%';
             if (volumeText) volumeText.textContent = '0%';
             if (frequencyValue) frequencyValue.textContent = '0.0';
-        }
+        } else {
+            // 有効な音声（clarity >= 0.85）: 通常通り表示
+            const volumePercent = (result.volume * 100).toFixed(1);
+            const frequency = result.frequency.toFixed(1);
 
-        // autoUpdateUI: true のため、PitchProが自動でUI更新
-        // ここではモード別のロジック処理のみ実行
+            if (volumeBar) volumeBar.style.width = `${volumePercent}%`;
+            if (volumeText) volumeText.textContent = `${volumePercent}%`;
+            if (frequencyValue) frequencyValue.textContent = frequency;
+        }
 
         // モード別処理
         switch (this.state.currentMode) {

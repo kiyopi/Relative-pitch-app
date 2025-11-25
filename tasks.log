@@ -13963,3 +13963,17 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-25 15:15:09] コミット: fix(volume-bar): 音量バー表示・リセット問題の修正 (v4.0.23)
+
+- 【問題1修正】clarityThreshold未満で音量バー強制0%表示
+  - 環境ノイズ(clarity: 0.00-0.90, 音量1.7-5.9%)の音量バー表示を排除
+  - preparation-pitchpro-cycle.js handlePitchUpdate()にフィルタリング追加
+
+- 【問題2修正】PitchProのresetDisplayElements()使用で確実なリセット
+  - NavigationManager._destroyAudioDetector()をPitchPro標準メソッドに変更
+  - preparationページ (#volume-progress) のリセット対応
+  - フォールバック機能で全ページの音量バー対応
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
