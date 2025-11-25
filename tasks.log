@@ -13707,3 +13707,139 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-24 15:20:34] コミット: fix(audio): 基音再生中のトレーニング遷移をブロック
+
+- isPlayingBaseNoteフラグをチェックして遷移をブロック
+- ページ遷移前にPitchShifterを確実に停止
+- 音が鳴り続けたままトレーニングに遷移する問題を修正
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-25 12:30:25] コミット: refactor(volume): 音量システム統一とUI修正（v4.4.0）
+
+## 音量システム統一
+- 旧システム（pitchpro_volume_percent）を完全削除
+- 新システム（pitchpro_base_note_volume_offset）に統一
+- 設定ページのティックスライダー（-20, -10, 0, +10, +20dB）で管理
+
+## 修正ファイル
+### 実装
+- trainingController.js: getSavedVolumeDb()を新システムに変更
+- preparation-pitchpro-cycle.js: 旧ヘルパー関数削除、新システム実装
+- router.js: getBaseNoteVolumeOffset()追加、音量取得統一
+- settings-controller.js: 音量設定中央寄せ修正
+- settings.html: デバイス情報セクション移動（アプリ情報の上）
+
+### 仕様書
+- BASE_NOTE_PLAYBACK_SPECIFICATION.md: v1.1.0（音量システム統一記録）
+- VOLUME_TEST_REMOVAL_HISTORY.md: 新規作成（音量テスト廃止の経緯）
+- VOLUME_BAR_INTEGRATION_SPECIFICATION.md: v1.3.0（旧システム廃止記録）
+- TRAINING_SPECIFICATION.md: v4.9.0（v4.6.0廃止記録）
+
+### UI修正
+- preparation.html: ステップラベルに「音域テスト」表示機能追加
+- base.css: 音量スライダー中央寄せ（margin: 0 auto）
+
+## キャッシュバスター更新
+- index.html: router.js v=1764039998
+- training.html: trainingController.js v=1764039998
+- preparation.html: preparation-pitchpro-cycle.js v=1764041241
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-25 12:46:13] コミット: fix(preparation): 音域データ存在時の音声テスト完了メッセージ表示制御
+
+- 音域データなし: 「音声検出が正常に完了しました」メッセージ表示
+- 音域データあり: メッセージ非表示（準備完了状態のため不要）
+- UI矛盾解消: 「準備完了」表示時の不要メッセージ削除
+
+Modified:
+- preparation-pitchpro-cycle.js: 条件分岐で表示制御 (Line 673-684)
+- preparation.html: キャッシュバスター更新 (v=1764042012)
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-25 12:57:05] コミット: fix(preparation): 音域データ保存済み時のセクション表示を改善
+
+音域データが存在する場合のセクションタイトル・説明文を最適化:
+
+【修正前】
+- タイトル: 「音声テスト」
+- 説明: 「音量と周波数検出を確認します」
+- 問題: 次のアクションが不明確
+
+【修正後】
+- タイトル: 「準備完了」
+- 説明: 「トレーニング開始ボタンでトレーニングを始めましょう　音域テストの再測定も可能です」
+- 改善: 次のアクション（トレーニング開始）とオプション（再測定）を明示
+
+Modified:
+- preparation-pitchpro-cycle.js: セクションタイトル・説明文の動的変更 (Line 677-687)
+- preparation.html: キャッシュバスター更新 (v=1764042965)
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-25 13:08:32] コミット: fix(pitchpro-config): 仕様書準拠の設定値に修正（v1.2.0）
+
+【問題】
+iPhoneで音域テスト時にノイズを拾い、低音域の成功率が低下
+
+【原因】
+設定値が仕様書と不一致:
+- 仕様書: clarityThreshold: 0.6, minVolumeAbsolute: 0.01 ✅
+- 実装: clarityThreshold: 0.4, minVolumeAbsolute: 0.003 ❌
+
+【修正内容】
+pitchpro-config.js (v1.2.0):
+- clarityThreshold: 0.4 → 0.6 (明瞭度閾値1.5倍厳格化)
+- minVolumeAbsolute: 0.003 → 0.01 (最小音量3倍厳格化)
+
+【効果】
+- ✅ 環境ノイズ（エアコン、換気扇等）を排除
+- ✅ iPhone低音域での成功率向上
+- ✅ 明確な発声のみを検出
+- ✅ 誤検出率の大幅低減
+
+【経緯】
+PitchProConfig統一時に誤って緩い値で初期化され、
+統一後は全ページがその設定を参照していた
+
+Modified:
+- js/core/pitchpro-config.js: 仕様書VOLUME_BAR_INTEGRATION_SPECIFICATION.md準拠の設定値に修正
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-25 13:11:58] コミット: chore: pitchpro-config.jsのキャッシュバスター更新
+
+v1.2.0設定値修正を反映するためキャッシュバスター更新:
+- pitchpro-config.js: v=20251110006 → v=1764043880
+
+GitHub Pages用の強制更新を保証
+
+Modified:
+- index.html: pitchpro-config.jsキャッシュバスター更新
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-25 13:17:31] コミット: chore: PitchProConfig依存ファイルのキャッシュバスター更新
+
+pitchpro-config.js v1.2.0設定変更を確実に反映するため、
+PitchProConfigを使用する全ファイルのキャッシュバスター更新:
+
+Modified:
+- templates/preparation.html: preparation-pitchpro-cycle.js v=1764044222
+- pages/training.html: trainingController.js v=1764044222
+
+これで準備ページ・トレーニングページでも新設定が適用される:
+- clarityThreshold: 0.6 (ノイズ排除強化)
+- minVolumeAbsolute: 0.01 (環境ノイズ排除)
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

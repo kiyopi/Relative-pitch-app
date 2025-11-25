@@ -467,6 +467,15 @@ export async function initializeTrainingPage() {
             startTraining();
         });
         console.log('✅ イベントリスナー登録完了（再登録）');
+
+        // 【v4.0.21】初期化完了後にボタンを有効化
+        newButton.disabled = false;
+        newButton.classList.remove('btn-disabled');
+        const buttonText = newButton.querySelector('span');
+        if (buttonText) {
+            buttonText.textContent = '基音を再生';
+        }
+        console.log('✅ 基音ボタンを有効化（初期化完了）');
     } else {
         console.error('❌ play-base-noteボタンが見つかりません');
     }

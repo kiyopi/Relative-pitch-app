@@ -13,7 +13,7 @@
 let micPermissionListenerAdded = false; // マイク許可ボタンのイベントリスナー重複防止フラグ
 
 // ===== デバッグ設定 =====
-const DEBUG_MIC_TEST = false; // マイクテスト詳細ログ（🎤 PitchPro検出、⏰ 経過時間）
+const DEBUG_MIC_TEST = true; // マイクテスト詳細ログ（🎤 PitchPro検出、⏰ 経過時間）
 
 // ===== 【v4.4.0統一】音量永続化ヘルパー関数 =====
 // 設定ページのティックスライダーと同じキーを使用
@@ -117,7 +117,7 @@ class PitchProCycleManager {
 
                     // preparation固有設定
                     deviceOptimization: true,
-                    debug: false  // 【v4.1.3】本番環境ではデバッグログを無効化
+                    debug: true  // 【デバッグ有効化】ノイズ値確認のため
                 })
             );
 
