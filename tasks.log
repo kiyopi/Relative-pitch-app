@@ -13843,3 +13843,41 @@ Modified:
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-25 13:38:47] コミット: fix(audio): iPhone低音域ノイズ対策・音量調整・基音ボタン初期化修正（v1.2.1）
+
+主要修正:
+- PitchProConfig v1.2.1: ノイズ排除設定強化（clarity 0.65, volume 0.012）
+- DeviceDetector v1.0.2: iPhone音量 18dB→10dB（大音量問題解決）
+- trainingController: 基音ボタン初期化・活性化ロジック修正
+- preparation: デバッグログ有効化（ノイズ値確認用）
+
+詳細:
+1. PitchProConfig設定値微調整
+   - clarityThreshold: 0.60 → 0.65（ノイズ排除さらに強化）
+   - minVolumeAbsolute: 0.010 → 0.012（環境ノイズ排除強化）
+   - iPhone低音域ノイズ検出問題の完全解決を目指す
+
+2. iPhone音量調整
+   - getDeviceVolume(): 18dB → 10dB
+   - デバイス音量50%での大音量問題を解決
+   - iPad(12dB)に近い適切な音量に調整
+
+3. トレーニングページ基音ボタン修正
+   - 問題: PitchShifter未初期化でもボタンが押せた
+   - 修正: HTMLで初期状態disabled、初期化完了時に活性化
+   - 効果: 初回タップ時の無音問題を解決
+
+4. デバッグログ有効化
+   - DEBUG_MIC_TEST: true
+   - AudioDetectionComponent debug: true
+   - マイクテスト・音域テストの詳細ログ出力
+
+キャッシュバスター更新:
+- pitchpro-config.js: v=1764045480
+- device-detector.js: v=1764045480
+- preparation-pitchpro-cycle.js: v=1764045480
+- trainingController.js: v=1764045480
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
