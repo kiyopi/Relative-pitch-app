@@ -88,7 +88,7 @@
  * - タイミング最適化: ドレミガイド開始タイミングのコメントを正確に修正
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.20 (2025-11-17) LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.25 (2025-11-25) LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
@@ -1025,6 +1025,15 @@ async function startDoremiGuide() {
             });
             console.log('✅ UIセレクター更新完了');
 
+            // 【DEBUG v4.0.24】UIキャッシュ状態を確認
+            const status = audioDetector.getStatus();
+            console.log('🔍 [DEBUG] AudioDetector状態:', {
+                state: status.state,
+                autoUpdateUI: status.config?.autoUpdateUI,
+                volumeBarSelector: status.config?.volumeBarSelector,
+                uiElements: Object.keys(status.config || {}).filter(k => k.includes('Selector'))
+            });
+
             // コールバック設定（再利用でも必要）
             audioDetector.setCallbacks({
                 onPitchUpdate: (result) => {
@@ -1047,10 +1056,35 @@ async function startDoremiGuide() {
             }
         }
 
+        // 【v4.0.25】AudioContextがsuspendedの場合は再開
+        // iPad/iPhoneで基音再生後にAudioContextがsuspendedに戻る問題への対処
+        const audioManager = audioDetector?.pitchDetector?.audioManager;
+        if (audioManager?.audioContext) {
+            const ctxState = audioManager.audioContext.state;
+            console.log(`🔍 [v4.0.25] AudioContext状態確認: ${ctxState}`);
+            if (ctxState === 'suspended' || ctxState === 'interrupted') {
+                console.log('🔄 [v4.0.25] AudioContext再開中...');
+                await audioManager.audioContext.resume();
+                console.log(`✅ [v4.0.25] AudioContext再開完了: ${audioManager.audioContext.state}`);
+            }
+        }
+
         // 音声検出開始（初回も2回目以降も実行）
         // 【v4.2.0改善】PitchPro v1.3.5で冪等性対応済み - 状態チェック不要
         await audioDetector.startDetection();
         console.log('✅ マイクオン完了 - 音声検出開始');
+
+        // 【DEBUG v4.0.24】startDetection後の状態を確認
+        const statusAfter = audioDetector.getStatus();
+        console.log('🔍 [DEBUG] startDetection後:', {
+            state: statusAfter.state,
+            pitchDetectorState: statusAfter.pitchDetectorStatus?.componentState,
+            uiUpdateTimer: audioDetector.uiUpdateTimer ? 'active' : 'null'
+        });
+
+        // 【DEBUG v4.0.24】DOM要素の存在確認
+        const volumeBarElement = document.querySelector('.mic-recognition-section .progress-fill');
+        console.log('🔍 [DEBUG] 音量バーDOM要素:', volumeBarElement ? '存在' : '見つからない');
 
     } catch (error) {
         console.error('❌ AudioDetectionComponent初期化失敗:', error);

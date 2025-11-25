@@ -14064,3 +14064,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-25 17:41:51] コミット: debug: マイク許可ボタン2回目訪問時の問題調査用ログ追加
+
+- initializePreparationPitchProCycle()とsetupMicPermissionFlow()に
+  詳細デバッグログを追加
+- debug: true → false に変更（PitchPro内部ログ削減）
+- cache buster: 1764060064
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
