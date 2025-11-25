@@ -243,6 +243,9 @@ class PitchProCycleManager {
 
 
             // PitchPro AudioDetectionComponent作成（統一設定モジュール使用）
+            // 【v4.8.0修正】onPitchUpdateをコンストラクタで設定（ノイズゲート適用のため）
+            // setCallbacks()でonPitchUpdateを設定するとPitchDetectorに直接伝播し、
+            // _getProcessedResult()（ノイズゲート処理）がバイパスされる問題を回避
             this.audioDetector = new window.PitchPro.AudioDetectionComponent(
                 window.PitchProConfig.getDefaultConfig({
                     // UI要素セレクター（preparation固有）
@@ -253,7 +256,11 @@ class PitchProCycleManager {
 
                     // preparation固有設定
                     deviceOptimization: true,
-                    debug: false  // 【ログ削減】iPadコンソール安定化のためfalse
+                    debug: false,  // 【ログ削減】iPadコンソール安定化のためfalse
+
+                    // 【重要】onPitchUpdateはコンストラクタで設定
+                    // これによりノイズゲートが正しく適用される
+                    onPitchUpdate: (result) => this.handlePitchUpdate(result)
                 })
             );
 
@@ -334,26 +341,27 @@ class PitchProCycleManager {
             this.state.detectionStartTime = null; // 初回音声検出時に設定
             this.state.currentMode = mode;
 
-            // 【重要】コールバック設定を最初に行う
+            // 【v4.8.0修正】onPitchUpdateはコンストラクタで設定済み
+            // setCallbacks()でonPitchUpdateを設定するとPitchDetectorに直接伝播し、
+            // ノイズゲート処理がバイパスされるため、ここでは設定しない
             this.audioDetector.setCallbacks({
-                onPitchUpdate: (result) => this.handlePitchUpdate(result),
+                // onPitchUpdate: コンストラクタで設定済み（ノイズゲート適用のため）
                 onVolumeUpdate: (volume) => this.handleVolumeUpdate(volume),
-                onError: (context, error) => this.handleAudioError(context, error),
-                onStateChange: (state) => {}
+                onError: (context, error) => this.handleAudioError(context, error)
             });
-            console.log('✅ コールバック設定完了（最初）');
+            console.log('✅ コールバック設定完了（onPitchUpdate除外）');
 
             // モード別UI設定（コールバック設定の後）
             this.updateUISelectorsForMode(mode);
 
-            // updateSelectors()でコールバックがクリアされるため、再度設定
+            // 【v4.8.0修正】updateSelectors()後もonPitchUpdateはコンストラクタ設定が維持される
+            // onVolumeUpdate, onErrorのみ再設定
             this.audioDetector.setCallbacks({
-                onPitchUpdate: (result) => this.handlePitchUpdate(result),
+                // onPitchUpdate: コンストラクタで設定済み（ノイズゲート適用のため）
                 onVolumeUpdate: (volume) => this.handleVolumeUpdate(volume),
-                onError: (context, error) => this.handleAudioError(context, error),
-                onStateChange: (state) => {}
+                onError: (context, error) => this.handleAudioError(context, error)
             });
-            console.log('✅ コールバック再設定完了（updateSelectors後）');
+            console.log('✅ コールバック再設定完了（onPitchUpdate除外）');
 
             // 検出開始
             // 【v4.2.0改善】PitchPro v1.3.5で冪等性対応済み - 状態チェック不要
