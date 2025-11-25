@@ -13904,3 +13904,23 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-25 14:12:35] コミット: fix(audio): 音量バー不一致問題の修正（v1.2.3）
+
+【問題1】0.0Hz表示なのに音量バー20%表示
+- minVolumeAbsolute: 0.012 → 0.020 (2.0%)
+- 環境ノイズ1.7%の音量バー表示を排除
+- 音量バーとHz表示の一致を実現
+
+【問題2】ホームボタン押下で音量バーが復帰しない
+- NavigationManager._destroyAudioDetectorに音量バーリセット処理追加
+- 新規メソッド: _resetVolumeBar()
+- すべての.progress-fill要素を0%にリセット
+
+更新ファイル:
+- pitchpro-config.js v1.2.3
+- navigation-manager.js v4.0.22
+- キャッシュバスター更新（1764047529）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
