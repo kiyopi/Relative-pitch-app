@@ -76,7 +76,8 @@ window.initializeLucideIcons = function(options = {}) {
                     console.warn('⚠️ [LUCIDE-DEBUG] No SVG elements found - icons may not have been created');
                 }
             } else {
-                console.log('✅ [LUCIDE] Icons initialized');
+                // 【ログ削減】iPadコンソール安定化のためコメントアウト
+                // console.log('✅ [LUCIDE] Icons initialized');
             }
 
             return true;
@@ -163,13 +164,13 @@ window.updateLucideIcon = function(target, iconName, attributes = {}) {
         if (iconElement) {
             // i要素が存在する場合は属性を更新
             iconElement.setAttribute('data-lucide', iconName);
-            console.log(`✅ [LUCIDE-UPDATE] Updated i element: ${iconName}`);
+            // 【ログ削減】console.log(`✅ [LUCIDE-UPDATE] Updated i element: ${iconName}`);
         } else {
             // i要素が存在しない（svgに置き換わっている）場合
             const existingSvg = container.querySelector('svg');
             if (existingSvg) {
                 existingSvg.remove();
-                console.log(`🗑️ [LUCIDE-UPDATE] Removed existing svg element`);
+                // 【ログ削減】console.log(`🗑️ [LUCIDE-UPDATE] Removed existing svg element`);
             }
 
             // 新しいi要素を作成
@@ -180,7 +181,7 @@ window.updateLucideIcon = function(target, iconName, attributes = {}) {
             iconElement.style.width = attrs.width;
             iconElement.style.height = attrs.height;
             container.appendChild(iconElement);
-            console.log(`✅ [LUCIDE-UPDATE] Created new i element: ${iconName}`);
+            // 【ログ削減】console.log(`✅ [LUCIDE-UPDATE] Created new i element: ${iconName}`);
         }
 
         // Lucideアイコンを再初期化
@@ -198,8 +199,9 @@ window.updateLucideIcon = function(target, iconName, attributes = {}) {
     }
 };
 
-// 初回ロード時のみ自動実行（デバッグモード有効）
+// 初回ロード時のみ自動実行（デバッグモードオフ）
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔍 [LUCIDE] DOMContentLoaded fired - initializing icons...');
-    window.initializeLucideIcons({ debug: true });
+    // 【ログ削減】iPadコンソール安定化のためコメントアウト
+    // console.log('🔍 [LUCIDE] DOMContentLoaded fired - initializing icons...');
+    window.initializeLucideIcons({ debug: false });
 });

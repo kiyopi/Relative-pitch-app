@@ -13,7 +13,7 @@
 let micPermissionListenerAdded = false; // マイク許可ボタンのイベントリスナー重複防止フラグ
 
 // ===== デバッグ設定 =====
-const DEBUG_MIC_TEST = true; // マイクテスト詳細ログ（🎤 PitchPro検出、⏰ 経過時間）
+const DEBUG_MIC_TEST = false; // マイクテスト詳細ログ（🎤 PitchPro検出、⏰ 経過時間）- iPadコンソール安定化のためfalse
 
 // ===== 【v4.4.0統一】音量永続化ヘルパー関数 =====
 // 設定ページのティックスライダーと同じキーを使用
@@ -57,7 +57,8 @@ function getSavedVolumeDb() {
  * @returns {Promise<{healthy: boolean, reason?: string, details?: Object}>}
  */
 async function verifyMediaStreamHealth(audioDetector) {
-    console.log('🔍 [v4.1.0] MediaStream健全性検証開始...');
+    // 【ログ削減】冗長なログを削除
+    // console.log('🔍 [v4.1.0] MediaStream健全性検証開始...');
 
     try {
         // 1. AudioDetectorの基本状態確認
@@ -96,7 +97,7 @@ async function verifyMediaStreamHealth(audioDetector) {
             readyState: track.readyState
         };
 
-        console.log('🔍 [v4.1.0] トラック状態:', trackState);
+        // 【ログ削減】console.log('🔍 [v4.1.0] トラック状態:', trackState);
 
         // 6. トラックがliveでない場合は失敗
         if (track.readyState !== 'live') {
@@ -127,10 +128,11 @@ async function verifyMediaStreamHealth(audioDetector) {
 
             // 少なくとも一部のデータが非ゼロであることを確認
             const hasNonZeroData = dataArray.some(v => v !== 0);
-            console.log('🔍 [v4.1.0] AnalyserNode データ検証:', {
-                hasNonZeroData,
-                sampleValues: Array.from(dataArray.slice(0, 10))
-            });
+            // 【ログ削減】
+            // console.log('🔍 [v4.1.0] AnalyserNode データ検証:', {
+            //     hasNonZeroData,
+            //     sampleValues: Array.from(dataArray.slice(0, 10))
+            // });
 
             // 注: 静かな環境では全てゼロになる可能性があるため、
             // ここでは警告のみとし、失敗とはしない
@@ -139,15 +141,23 @@ async function verifyMediaStreamHealth(audioDetector) {
             }
         }
 
-        // 9. AudioContext状態確認
+        // 9. AudioContext状態確認（suspended/interrupted両方を処理）
         const audioContext = audioManager.audioContext;
-        if (audioContext && audioContext.state === 'suspended') {
-            console.log('🔄 [v4.1.0] AudioContext suspended検出 - resume実行');
+        if (audioContext && (audioContext.state === 'suspended' || audioContext.state === 'interrupted')) {
+            console.log(`🔄 [v4.1.1] AudioContext ${audioContext.state}検出 - resume実行`);
             try {
                 await audioContext.resume();
-                console.log('✅ [v4.1.0] AudioContext resume完了');
+                console.log('✅ [v4.1.1] AudioContext resume完了, 新状態:', audioContext.state);
             } catch (resumeError) {
-                console.warn('⚠️ [v4.1.0] AudioContext resume失敗:', resumeError);
+                console.warn('⚠️ [v4.1.1] AudioContext resume失敗:', resumeError);
+                // interrupted状態でresume失敗の場合、再初期化が必要
+                if (audioContext.state === 'interrupted') {
+                    return {
+                        healthy: false,
+                        reason: `AudioContext ${audioContext.state}からの復帰失敗`,
+                        details: { audioContextState: audioContext.state }
+                    };
+                }
             }
         }
 
@@ -603,7 +613,8 @@ class PitchProCycleManager {
     handleVolumeUpdate(volume) {
         // PitchProのキャッシュベース管理により自動更新されるため、
         // 追加処理のみここで実装
-        console.log('🔊 音量更新:', volume);
+        // 【ログ削減】高頻度のため無効化
+        // if (DEBUG_MIC_TEST) console.log('🔊 音量更新:', volume);
     }
 
     /**

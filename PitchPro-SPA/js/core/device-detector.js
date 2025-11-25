@@ -172,6 +172,6 @@
         }
     };
 
-    console.log('✅ DeviceDetector loaded (v1.0.3 - iOS/Android/PC support)');
+    console.log('✅ DeviceDetector loaded (v1.0.4 - iPad 6dB, Android 0dB)');
 
 })();

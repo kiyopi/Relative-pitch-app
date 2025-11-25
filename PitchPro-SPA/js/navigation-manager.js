@@ -849,6 +849,12 @@ class NavigationManager {
      * @param {Object} audioDetector - AudioDetectionComponentインスタンス
      */
     static registerAudioDetector(audioDetector) {
+        // 【v4.6.1】同じインスタンスの場合は破棄しない
+        if (this.currentAudioDetector === audioDetector) {
+            console.log('ℹ️ [NavigationManager] 同一AudioDetector再登録 - スキップ');
+            return;
+        }
+
         // 既存インスタンスがある場合は先に破棄
         if (this.currentAudioDetector) {
             console.warn('⚠️ [NavigationManager] 既存AudioDetectorを破棄');
