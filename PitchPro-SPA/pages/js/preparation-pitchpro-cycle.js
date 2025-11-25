@@ -673,6 +673,19 @@ class PitchProCycleManager {
                 if (voiceRangeData && rangeSavedDisplay) {
                     // 音域データあり - 音域設定済み表示
                     // 音声テスト完了メッセージは不要（全て完了済みのため）
+
+                    // セクションタイトルと説明を「準備完了」に変更
+                    const audioTestTitle = document.getElementById('audio-test-title');
+                    const sectionDescription = document.getElementById('audio-test-description');
+                    if (audioTestTitle) {
+                        audioTestTitle.textContent = '準備完了';
+                        console.log('✅ セクションタイトルを「準備完了」に変更');
+                    }
+                    if (sectionDescription) {
+                        sectionDescription.textContent = 'トレーニング開始ボタンでトレーニングを始めましょう　音域テストの再測定も可能です';
+                        console.log('✅ セクション説明を更新');
+                    }
+
                     this.displaySavedRangeData(voiceRangeData, rangeSavedDisplay);
                     console.log('✅ 音域データ表示完了（音声テスト完了メッセージは非表示）');
                 } else {
