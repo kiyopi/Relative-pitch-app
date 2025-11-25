@@ -48,6 +48,129 @@ function getSavedVolumeDb() {
     return baseVolume + volumeOffset;
 }
 
+/**
+ * 【v4.1.0】MediaStream健全性検証関数
+ * iOS Safariで一度破棄したMediaStreamを再取得した際に、
+ * 実際に音声データが流れているかを検証する
+ *
+ * @param {Object} audioDetector - AudioDetectionComponentインスタンス
+ * @returns {Promise<{healthy: boolean, reason?: string, details?: Object}>}
+ */
+async function verifyMediaStreamHealth(audioDetector) {
+    console.log('🔍 [v4.1.0] MediaStream健全性検証開始...');
+
+    try {
+        // 1. AudioDetectorの基本状態確認
+        if (!audioDetector) {
+            return { healthy: false, reason: 'AudioDetector未定義' };
+        }
+
+        // 2. MicrophoneControllerへのアクセス
+        const micController = audioDetector.microphoneController;
+        if (!micController) {
+            return { healthy: false, reason: 'MicrophoneController未取得' };
+        }
+
+        // 3. AudioManagerへのアクセス
+        const audioManager = micController.audioManager;
+        if (!audioManager) {
+            return { healthy: false, reason: 'AudioManager未取得' };
+        }
+
+        // 4. MediaStream存在確認
+        const mediaStream = audioManager.mediaStream || audioManager._mediaStream;
+        if (!mediaStream) {
+            return { healthy: false, reason: 'MediaStream未取得' };
+        }
+
+        // 5. トラック状態確認
+        const audioTracks = mediaStream.getAudioTracks();
+        if (audioTracks.length === 0) {
+            return { healthy: false, reason: 'オーディオトラックなし' };
+        }
+
+        const track = audioTracks[0];
+        const trackState = {
+            enabled: track.enabled,
+            muted: track.muted,
+            readyState: track.readyState
+        };
+
+        console.log('🔍 [v4.1.0] トラック状態:', trackState);
+
+        // 6. トラックがliveでない場合は失敗
+        if (track.readyState !== 'live') {
+            return {
+                healthy: false,
+                reason: `トラック状態が異常: ${track.readyState}`,
+                details: trackState
+            };
+        }
+
+        // 7. トラックがmutedの場合は失敗
+        if (track.muted) {
+            return {
+                healthy: false,
+                reason: 'トラックがミュート状態',
+                details: trackState
+            };
+        }
+
+        // 8. 実際の音声データ検証（AnalyserNodeを使用）
+        const analyser = audioManager.analyserNode ||
+                        audioManager.filteredAnalyser ||
+                        audioManager.rawAnalyser;
+
+        if (analyser) {
+            const dataArray = new Float32Array(analyser.fftSize);
+            analyser.getFloatTimeDomainData(dataArray);
+
+            // 少なくとも一部のデータが非ゼロであることを確認
+            const hasNonZeroData = dataArray.some(v => v !== 0);
+            console.log('🔍 [v4.1.0] AnalyserNode データ検証:', {
+                hasNonZeroData,
+                sampleValues: Array.from(dataArray.slice(0, 10))
+            });
+
+            // 注: 静かな環境では全てゼロになる可能性があるため、
+            // ここでは警告のみとし、失敗とはしない
+            if (!hasNonZeroData) {
+                console.warn('⚠️ [v4.1.0] AnalyserNodeデータが全てゼロ（静かな環境の可能性）');
+            }
+        }
+
+        // 9. AudioContext状態確認
+        const audioContext = audioManager.audioContext;
+        if (audioContext && audioContext.state === 'suspended') {
+            console.log('🔄 [v4.1.0] AudioContext suspended検出 - resume実行');
+            try {
+                await audioContext.resume();
+                console.log('✅ [v4.1.0] AudioContext resume完了');
+            } catch (resumeError) {
+                console.warn('⚠️ [v4.1.0] AudioContext resume失敗:', resumeError);
+            }
+        }
+
+        // 10. 健全性確認完了
+        return {
+            healthy: true,
+            details: {
+                trackState,
+                audioContextState: audioContext?.state,
+                mediaStreamActive: mediaStream.active
+            }
+        };
+
+    } catch (error) {
+        console.error('❌ [v4.1.0] MediaStream健全性検証エラー:', error);
+        return {
+            healthy: false,
+            reason: `検証エラー: ${error.message}`,
+            error
+        };
+    }
+}
+
 // ===== PitchProサイクル管理システム =====
 
 /**
@@ -1126,6 +1249,15 @@ function setupMicPermissionFlow() {
                     console.log('⏳ マイクストリーム安定化待機中...');
                     await new Promise(resolve => setTimeout(resolve, 500));
                     console.log('✅ マイクストリーム安定化完了');
+
+                    // 【v4.1.0】MediaStream健全性検証（iOS Safari再取得問題対策）
+                    const streamHealthCheck = await verifyMediaStreamHealth(pitchProCycleManager.audioDetector);
+                    if (!streamHealthCheck.healthy) {
+                        console.error('❌ MediaStream健全性検証失敗:', streamHealthCheck.reason);
+                        throw new Error(`MediaStream検証失敗: ${streamHealthCheck.reason}`);
+                    }
+                    console.log('✅ MediaStream健全性検証完了:', streamHealthCheck);
+
                     console.log('✅ マイク許可成功！');
 
                     // 【iOS Safari対応 v3】マイク初期化直後にaudioSessionを明示的に設定
@@ -1175,7 +1307,9 @@ function setupMicPermissionFlow() {
                     }
 
                 } catch (initError) {
-                    console.warn('⚠️ AudioDetectionComponent初期化エラー:', initError);
+                    console.error('❌ AudioDetectionComponent初期化エラー:', initError);
+                    // 【v4.1.0】初期化エラー時は上位にスローして適切に処理
+                    throw initError;
                 }
             }
 
