@@ -13881,3 +13881,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-25 13:51:11] コミット: fix(volume): iPhone音量を0dBに調整（v1.0.3）
+
+- iPhone音量: 10dB → 0dB（デバイス音量50%時の大音量問題完全解決）
+- device-detector.js v1.0.3に更新
+- キャッシュバスター更新（1764046153）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
