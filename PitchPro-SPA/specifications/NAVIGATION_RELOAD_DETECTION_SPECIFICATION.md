@@ -1,9 +1,9 @@
 # Navigation & Reload Detection Specification
 # ナビゲーション・リロード検出システム仕様書
 
-**バージョン**: 2.4.0
+**バージョン**: 2.5.0
 **作成日**: 2025-11-18
-**最終更新**: 2025-11-22
+**最終更新**: 2025-11-25
 **プロジェクト**: 8va相対音感トレーニングアプリ
 
 ---
@@ -1137,6 +1137,31 @@ sessionStorage.removeItem(page + 'PageActive');
 ---
 
 ## 更新履歴
+
+### v2.5.0 (2025-11-25)
+- **追加**: visibilitychange時のAudioContext自動resume機能（v4.5.0）
+  - iOS Safariでconfirmダイアログ表示→キャンセル後に音量バーが動かなくなる問題を解決
+  - PitchProのMicrophoneLifecycleManagerはモニタリング再開のみでAudioContext.resume()を呼ばない
+  - NavigationManagerのvisibilitychangeハンドラーでAudioContext.resume()を自動実行
+- **問題の原因分析**:
+  1. ホームボタン押下時にconfirmダイアログが表示される
+  2. `Page became hidden`が発生し、iOSがAudioContextをsuspend状態にする
+  3. キャンセル後`Page became visible`で復帰するが、MicrophoneLifecycleManagerは「monitoring」再開のみ
+  4. AudioContextがsuspendedのままのため、音量値が低く（1.9%〜4%程度）ノイズゲート閾値（5.60%）以下に
+  5. BLOCKEDとなり音量バーが更新されない
+- **解決策**: `initVisibilityTracking()`のvisibilitychangeハンドラーに以下を追加
+  ```javascript
+  if (!document.hidden && window.globalAudioDetector) {
+      const audioManager = window.globalAudioDetector.audioManager || ...;
+      if (audioManager?.audioContext?.state === 'suspended') {
+          await audioManager.audioContext.resume();
+      }
+  }
+  ```
+- **影響範囲**: 準備ページ・トレーニングページ・音域テストすべてで有効
+  - NavigationManagerのvisibilitychangeハンドラーはグローバルに1回だけ登録
+  - `window.globalAudioDetector`は準備ページで設定され、全ページで参照可能
+- **変更ファイル**: `/PitchPro-SPA/js/navigation-manager.js`
 
 ### v2.4.0 (2025-11-22)
 - **追加**: trainingダイレクトアクセス時のパラメータ検証強化（v4.6.1）

@@ -129,12 +129,30 @@ class NavigationManager {
      */
     static initVisibilityTracking() {
         if (!this.visibilityTrackingInitialized) {
-            document.addEventListener('visibilitychange', () => {
+            document.addEventListener('visibilitychange', async () => {
                 this.lastVisibilityChange = Date.now();
                 console.log('🔍 [NavigationManager] visibilitychange検出:', document.hidden ? 'hidden' : 'visible');
                 console.log('🔍 [NavigationManager] lastVisibilityChange更新:', this.lastVisibilityChange);
                 console.log('🔍 [NavigationManager] 現在のURL:', window.location.href);
                 console.log('🔍 [NavigationManager] performance.navigation.type:', performance.navigation?.type);
+
+                // 【v4.5.0】ページ可視状態復帰時にAudioContextをresumeする（iOS Safari対応）
+                // MicrophoneLifecycleManagerはモニタリング再開のみでAudioContext.resume()を呼ばないため
+                if (!document.hidden && window.globalAudioDetector) {
+                    try {
+                        const audioManager = window.globalAudioDetector.audioManager ||
+                                            window.globalAudioDetector._audioManager ||
+                                            window.globalAudioDetector.microphoneController?.audioManager;
+
+                        if (audioManager?.audioContext && audioManager.audioContext.state === 'suspended') {
+                            console.log('🔄 [NavigationManager] AudioContext suspended検出 - resume実行');
+                            await audioManager.audioContext.resume();
+                            console.log('✅ [NavigationManager] AudioContext resume完了');
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ [NavigationManager] AudioContext resume失敗:', e);
+                    }
+                }
 
                 // グラフ状態のデバッグログ
                 const chartLoading = document.getElementById('chart-loading');
