@@ -15,7 +15,8 @@
 // 詳細: SPA_DEVELOPMENT_JOURNEY_AND_ARCHITECTURE.md 参照
 
 // ===== デバッグ設定 =====
-const DEBUG_MIC_TEST = false; // マイクテスト詳細ログ（🎤 PitchPro検出、⏰ 経過時間）- iPadコンソール安定化のためfalse
+const DEBUG_MIC_TEST = true; // マイクテスト詳細ログ（🎤 PitchPro検出、⏰ 経過時間）- ノイズレベル確認のため一時的にtrue
+const DEBUG_NOISE_LEVEL = true; // 【デバッグ用】ノイズレベル確認用ログ（rawVolume含む）
 
 // ===== 【v4.4.0統一】音量永続化ヘルパー関数 =====
 // 設定ページのティックスライダーと同じキーを使用
@@ -579,6 +580,14 @@ class PitchProCycleManager {
 
         if (DEBUG_MIC_TEST) {
             console.log(`🎤 PitchPro検出: freq:${result.frequency?.toFixed(1)}Hz vol:${(result.volume * 100)?.toFixed(1)}% clarity:${result.clarity?.toFixed(2)}`);
+        }
+
+        // 【デバッグ用】ノイズレベル確認 - rawVolumeとvolumeの差分を確認
+        if (DEBUG_NOISE_LEVEL) {
+            const rawVol = result.rawVolume !== undefined ? (result.rawVolume * 100).toFixed(2) : 'N/A';
+            const processedVol = (result.volume * 100).toFixed(2);
+            const noiseGateApplied = result.volume === 0 && result.rawVolume > 0;
+            console.log(`🔊 ノイズ確認: rawVolume:${rawVol}% → volume:${processedVol}% ${noiseGateApplied ? '【ノイズゲート適用】' : ''}`);
         }
 
         // PitchProが有効な音声データを返している場合のみタイマー進行
