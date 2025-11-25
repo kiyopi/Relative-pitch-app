@@ -1,15 +1,19 @@
 # 音量バー統合仕様書 (VOLUME_BAR_INTEGRATION_SPECIFICATION)
 
-**バージョン**: 1.2.0
-**最終更新**: 2025-11-23
+**バージョン**: 1.3.0
+**最終更新**: 2025-01-25
 **作成者**: Claude Code
 
 ## 変更履歴
 
+- **v1.3.0 (2025-01-25)**: 音量テスト廃止に伴う仕様更新
+  - 準備ページの音量スライダー削除に伴い、v1.1.0の永続化機能は廃止
+  - 設定ページのティックスライダー（`pitchpro_base_note_volume_offset`）に統合
+  - 詳細: `/specifications/VOLUME_TEST_REMOVAL_HISTORY.md`
 - **v1.2.0 (2025-11-23)**: iOS Safari AudioSession関連情報追加
   - 関連仕様書への参照追加: `IOS_SAFARI_AUDIO_SESSION_SPECIFICATION.md`
   - iOS Safariでマイクアクティブ時に音量が小さくなる問題（WebKit Bug #218012）の対策情報
-- **v1.1.0 (2025-11-22)**: 基音再生音量の永続化機能追加（Issue #2対応）
+- **v1.1.0 (2025-11-22)**: 基音再生音量の永続化機能追加（Issue #2対応）- **廃止**
 - **v1.0.0 (2025-01-07)**: 初版作成  
 
 ## 🎯 概要
@@ -18,96 +22,66 @@ PitchProライブラリと音量バー表示システムの統合仕様書。Vol
 
 ---
 
-## 🔊 基音再生音量の永続化 (v1.1.0追加)
+## 🔊 基音再生音量の永続化 (v1.3.0更新)
 
 ### 概要
 
-準備ページで設定した基音再生音量をlocalStorageに保存し、トレーニング開始時に復元する機能。
+**v1.3.0（2025-01-25）で大幅変更**: 準備ページの音量スライダーは削除され、設定ページのティックスライダーに統合されました。
 
-### 問題の背景（Issue #2）
+### 変更の経緯
 
-- 準備画面で調整した音量がトレーニング開始毎にリセットされていた
-- PitchShifter再初期化時にDeviceDetectorのデフォルト音量を使用していた
-- ユーザーの音量設定が保持されない問題
+**v1.1.0（廃止）**: 準備ページに音量スライダーがあり、`pitchpro_volume_percent`（0-100%）で保存
+**v1.3.0（現行）**: 設定ページのティックスライダー（-20, -10, 0, +10, +20）で`pitchpro_base_note_volume_offset`に保存
 
-### 解決策
+**削除理由**: 準備ページとトレーニングページで環境差があり、音量が異なる問題が発生したため。
+**詳細**: `/specifications/VOLUME_TEST_REMOVAL_HISTORY.md`、`/specifications/BASE_NOTE_PLAYBACK_SPECIFICATION.md`を参照。
+
+### 現在の実装（v1.3.0）
 
 #### 1. 保存形式
 
 ```javascript
 // localStorageキー
-const VOLUME_STORAGE_KEY = 'pitchpro_volume_percent';
+const BASE_NOTE_VOLUME_KEY = 'pitchpro_base_note_volume_offset';
 
-// 保存値: 0〜100のパーセント値
-// 50% = デバイスデフォルト音量
-// 0% = baseVolume - 30dB
-// 100% = baseVolume + 30dB
+// 保存値: -20, -10, 0, +10, +20 のdB値
+// 0 = デバイスデフォルト音量（オフセットなし）
 ```
 
-#### 2. dB計算式
-
-```javascript
-function getSavedVolumeDb() {
-    const volumePercent = getSavedVolumePercent(); // 0-100
-    const baseVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
-    const volumeOffset = (volumePercent - 50) * 0.6; // 50%差で±30dB
-    return baseVolume + volumeOffset;
-}
-```
-
-#### 3. 実装箇所
+#### 2. 実装箇所
 
 | ファイル | 役割 |
 |---------|------|
-| `preparation-pitchpro-cycle.js` | 音量保存・スライダー初期値復元・PitchShifter初期化時に保存音量使用 |
-| `router.js` | PitchShifterバックグラウンド初期化時に保存音量使用 |
-| `trainingController.js` | フォールバック初期化時に保存音量使用 |
+| `pages/js/settings-controller.js` | 音量オフセット保存・ティックスライダー制御 |
+| `js/controllers/trainingController.js` | オフセット取得・音量適用 |
+| `pages/js/preparation-pitchpro-cycle.js` | PitchShifter初期化時にオフセット適用 |
+| `js/router.js` | バックグラウンド初期化時にオフセット適用 |
 
-#### 4. ヘルパー関数
+#### 3. ヘルパー関数
 
 ```javascript
-// 音量パーセント値を保存
-function saveVolumePercent(volumePercent) {
-    localStorage.setItem('pitchpro_volume_percent', volumePercent.toString());
-}
-
-// 保存済み音量パーセント値を取得
-function getSavedVolumePercent() {
-    const saved = localStorage.getItem('pitchpro_volume_percent');
-    if (saved !== null) {
-        const parsed = parseInt(saved, 10);
-        if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
-            return parsed;
+// 音量オフセットを取得
+function getBaseNoteVolumeOffset() {
+    const KEY = 'pitchpro_base_note_volume_offset';
+    try {
+        const saved = localStorage.getItem(KEY);
+        if (saved !== null) {
+            const parsed = parseInt(saved, 10);
+            if (!isNaN(parsed) && parsed >= -20 && parsed <= 20) {
+                return parsed;
+            }
         }
+    } catch (e) {
+        console.warn('⚠️ 音量オフセット読み込み失敗:', e);
     }
-    return 50; // デフォルト50%
+    return 0; // デフォルト値（オフセットなし）
 }
 
-// 保存済み音量からdB値を計算
+// 保存済み音量設定を取得（dB値）
 function getSavedVolumeDb() {
-    const volumePercent = getSavedVolumePercent();
     const baseVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
-    const volumeOffset = (volumePercent - 50) * 0.6;
+    const volumeOffset = getBaseNoteVolumeOffset();
     return baseVolume + volumeOffset;
-}
-```
-
-#### 5. 音量スライダー初期化
-
-```javascript
-// 準備ページ読み込み時
-const volumeSlider = document.getElementById('app-volume-slider');
-if (volumeSlider) {
-    // 保存済み音量でスライダー初期値を復元
-    const savedVolumePercent = getSavedVolumePercent();
-    volumeSlider.value = savedVolumePercent;
-
-    // 変更時に保存
-    volumeSlider.addEventListener('input', (e) => {
-        const volumePercent = parseInt(e.target.value);
-        saveVolumePercent(volumePercent);
-        // PitchShifterに音量を適用...
-    });
 }
 ```
 

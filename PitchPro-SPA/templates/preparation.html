@@ -32,12 +32,12 @@
             <!-- 接続線 -->
             <div class="step-connector" id="connector-1"></div>
 
-            <!-- Step 2: 音声・音量確認 -->
+            <!-- Step 2: 音声テスト -->
             <div class="flex-1 text-center">
                 <div class="step-indicator" id="step-2">
-                    <i data-lucide="volume-2" style="width: 24px; height: 24px;"></i>
+                    <i data-lucide="mic" style="width: 24px; height: 24px;"></i>
                 </div>
-                <p class="text-xs text-white-60">音声・音量</p>
+                <p class="text-xs text-white-60" id="step-2-label">音声テスト</p>
             </div>
 
             <!-- 接続線 -->
@@ -114,42 +114,7 @@
                 <p id="detection-success-message">音声検出が完了しました！</p>
             </div>
 
-            <!-- 音量調整セクション（初期状態: 非表示） -->
-            <div class="hidden" id="volume-adjustment-section">
-                <!-- デバイス音量推奨 -->
-                <div class="info-alert">
-                    <i data-lucide="ear" style="color: #60a5fa; width: 32px; height: 32px; display: block; min-width: 32px; min-height: 32px;"></i>
-                    <p>「基音を試聴」ボタンを押して音を聞き、適切な音量になるようボリュームコントローラーで調整しましょう。</p>
-                </div>
-
-                <!-- 基音試聴ボタン -->
-                <!-- 【iOS Safari対応 v4】CSS制御でテキスト切り替え（JS DOM操作排除でブチ音防止） -->
-                <!-- 状態: btn-disabled=初期化中, btn-playing=再生中, 通常=基音を試聴 -->
-                <button class="base-note-button btn-disabled" id="test-base-note-btn" disabled>
-                    <i data-lucide="volume-2" style="width: 24px; height: 24px;"></i>
-                    <span class="btn-text-ready">基音を試聴</span>
-                    <span class="btn-text-loading">初期化中...</span>
-                    <span class="btn-text-playing">再生中...</span>
-                </button>
-
-                <!-- ボリュームコントローラー -->
-                <div class="volume-control-container">
-                    <div class="volume-control-header">
-                        <span class="volume-control-label">ボリュームコントローラー</span>
-                    </div>
-                    <div class="volume-slider-wrapper">
-                        <span class="volume-indicator">-</span>
-                        <input type="range"
-                               id="app-volume-slider"
-                               class="volume-slider"
-                               min="0"
-                               max="100"
-                               value="50"
-                               step="1">
-                        <span class="volume-indicator">+</span>
-                    </div>
-                </div>
-            </div>
+            <!-- 音量調整セクション: 削除済み（backup/volume-test-featureブランチに保存） -->
 
             <!-- 音域テストを開始ボタン（正規版互換） -->
             <button class="btn btn-primary hidden" id="start-range-test-btn">
@@ -315,4 +280,4 @@
 </main>
 
 <!-- preparation-pitchpro-cycle.js -->
-<script src="pages/js/preparation-pitchpro-cycle.js?v=1763965234"></script>
+<script src="pages/js/preparation-pitchpro-cycle.js?v=1764041241"></script>

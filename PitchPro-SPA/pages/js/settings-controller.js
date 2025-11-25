@@ -9,6 +9,9 @@
 (function() {
     'use strict';
 
+    // 基音再生音量の永続化キー
+    const BASE_NOTE_VOLUME_KEY = 'pitchpro_base_note_volume_offset';
+
     /**
      * 設定ページ初期化
      */
@@ -17,6 +20,9 @@
 
         // デバイス情報表示
         displayDeviceInfo();
+
+        // 音量スライダー初期化
+        initializeVolumeSlider();
 
         // イベントリスナー登録
         registerEventListeners();
@@ -63,6 +69,86 @@
             `${deviceInfo.screen.width} × ${deviceInfo.screen.height}`;
 
         console.log('✅ デバイス情報表示完了:', deviceInfo);
+    }
+
+    /**
+     * 音量スライダー初期化
+     */
+    function initializeVolumeSlider() {
+        const slider = document.getElementById('base-note-volume-slider');
+        const tickLabels = document.querySelectorAll('.tick-label');
+
+        if (!slider) {
+            console.warn('⚠️ 音量スライダーが見つかりません');
+            return;
+        }
+
+        // 保存済みの値を復元
+        const savedValue = getSavedVolumeOffset();
+        slider.value = savedValue;
+        updateTickLabels(tickLabels, savedValue);
+
+        console.log(`🔊 音量スライダー初期値を復元: ${savedValue > 0 ? '+' : ''}${savedValue}dB`);
+
+        // スライダー操作イベント
+        slider.addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+
+            // アクティブな目盛りラベルを更新
+            updateTickLabels(tickLabels, value);
+        });
+
+        // スライダー変更確定時に保存
+        slider.addEventListener('change', (e) => {
+            const value = parseInt(e.target.value);
+            saveVolumeOffset(value);
+            console.log(`🔊 音量オフセットを保存: ${value > 0 ? '+' : ''}${value}dB`);
+        });
+    }
+
+    /**
+     * 目盛りラベルの更新
+     */
+    function updateTickLabels(tickLabels, value) {
+        tickLabels.forEach(label => {
+            const labelValue = parseInt(label.dataset.value);
+            if (labelValue === value) {
+                label.classList.add('active');
+            } else {
+                label.classList.remove('active');
+            }
+        });
+    }
+
+    /**
+     * 保存済み音量オフセットを取得
+     * @returns {number} -20〜+20のオフセット値（デフォルト0）
+     */
+    function getSavedVolumeOffset() {
+        try {
+            const saved = localStorage.getItem(BASE_NOTE_VOLUME_KEY);
+            if (saved !== null) {
+                const parsed = parseInt(saved, 10);
+                if (!isNaN(parsed) && parsed >= -20 && parsed <= 20) {
+                    return parsed;
+                }
+            }
+        } catch (e) {
+            console.warn('⚠️ 音量設定の読み込みに失敗:', e);
+        }
+        return 0; // デフォルト値
+    }
+
+    /**
+     * 音量オフセットを保存
+     * @param {number} offset - -20〜+20のオフセット値
+     */
+    function saveVolumeOffset(offset) {
+        try {
+            localStorage.setItem(BASE_NOTE_VOLUME_KEY, offset.toString());
+        } catch (e) {
+            console.warn('⚠️ 音量設定の保存に失敗:', e);
+        }
     }
 
     /**

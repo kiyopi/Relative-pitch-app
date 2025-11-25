@@ -1,10 +1,16 @@
 # トレーニング機能仕様書（SPA版）
 
-**バージョン**: 4.8.0
+**バージョン**: 4.9.0
 **作成日**: 2025-10-23
-**最終更新**: 2025-11-23
+**最終更新**: 2025-01-25
 
 **変更履歴**:
+- v4.9.0 (2025-01-25): 音量テスト廃止に伴う音量システム統一（v4.4.0）
+  - **Breaking Change**: v4.6.0で実装した`pitchpro_volume_percent`システムを完全削除
+  - **理由**: 準備ページの音量テスト廃止、環境差による音量問題の解決
+  - **新システム**: 設定ページのティックスライダー（`pitchpro_base_note_volume_offset`, -20～+20dB）
+  - **修正ファイル**: trainingController.js, preparation-pitchpro-cycle.js, router.js
+  - **関連仕様書**: `BASE_NOTE_PLAYBACK_SPECIFICATION.md` v1.1.0, `VOLUME_TEST_REMOVAL_HISTORY.md`
 - v4.8.0 (2025-11-23): iOS Safari AudioSession対策の文書化
   - **Documentation**: 準備ページv9実装（audioSession切替 + Tone.start()強制実行）
     - **問題**: iOS Safariでマイクアクティブ時に基音再生の音量が極端に小さくなる（WebKit Bug #218012）
@@ -25,24 +31,13 @@
     - **修正ファイル**: `/PitchPro-SPA/js/controllers/trainingController.js` (v2.10.0)
   - **Documentation**: 3.6節「音域不足時の拡張ロジック」を追加
     - モード別必要基音数、拡張処理フロー、フォールバック処理を包括的に文書化
-- v4.6.0 (2025-11-22): 基音再生音量の永続化機能追加（GitHub Issue #2対応）
+- v4.6.0 (2025-11-22): 基音再生音量の永続化機能追加（GitHub Issue #2対応）- **v4.9.0で廃止**
   - **Feature**: 準備ページで設定した基音再生音量をlocalStorageに保存し、トレーニング開始時に復元
     - **問題背景**: 準備画面で調整した音量がトレーニング開始毎にリセットされていた
-    - **根本原因**:
-      - 音量スライダーの変更がメモリ上のインスタンスにのみ反映
-      - ページ遷移時にPitchShifterインスタンスが破棄され設定が消失
-      - PitchShifter再初期化時にDeviceDetectorのデフォルト音量を使用
-    - **解決策**: localStorageに音量パーセント値（0-100）を保存、PitchShifter初期化時に復元
-    - **保存キー**: `pitchpro_volume_percent`
-    - **dB計算式**: `baseVolume + (percent - 50) * 0.6`（50%差で±30dB）
-    - **修正ファイル1**: `/PitchPro-SPA/pages/js/preparation-pitchpro-cycle.js`
-      - ヘルパー関数追加: `saveVolumePercent()`, `getSavedVolumePercent()`, `getSavedVolumeDb()`
-      - 音量スライダー初期値復元、変更時保存、PitchShifter初期化時に保存音量使用
-    - **修正ファイル2**: `/PitchPro-SPA/js/router.js`
-      - `getSavedVolumeDb()`メソッド追加、バックグラウンドPitchShifter初期化時に保存音量使用
-    - **修正ファイル3**: `/PitchPro-SPA/js/controllers/trainingController.js`
-      - `getSavedVolumeDb()`関数追加、フォールバック初期化時に保存音量使用
-    - **関連仕様書**: `VOLUME_BAR_INTEGRATION_SPECIFICATION.md` v1.1.0
+    - **旧システム（廃止）**: `pitchpro_volume_percent`（0-100%）、dB計算式: `baseVolume + (percent - 50) * 0.6`
+    - **廃止理由**: 準備ページの音量テスト機能削除（2025-01-25）、環境差による音量問題
+    - **新システム**: 設定ページのティックスライダー（`pitchpro_base_note_volume_offset`, -20～+20dB）
+    - **関連仕様書**: `VOLUME_BAR_INTEGRATION_SPECIFICATION.md` v1.3.0, `BASE_NOTE_PLAYBACK_SPECIFICATION.md` v1.1.0
 - v4.5.0 (2025-11-21): マイク事前チェック追加 - ドレミガイド中のダイアログ出現防止
   - **Feature**: トレーニングページ初期化時マイク事前チェック
     - **目的**: ブラウザDiscard後のドレミガイド中マイク許可ダイアログ出現を完全回避

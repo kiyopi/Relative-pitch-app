@@ -11,54 +11,40 @@
 
 // ===== グローバル変数 =====
 let micPermissionListenerAdded = false; // マイク許可ボタンのイベントリスナー重複防止フラグ
-let isPlayingBaseNote = false; // 基音再生中フラグ（連続クリック防止）
 
 // ===== デバッグ設定 =====
 const DEBUG_MIC_TEST = false; // マイクテスト詳細ログ（🎤 PitchPro検出、⏰ 経過時間）
 
-// ===== 【Issue #2修正】音量永続化ヘルパー関数 =====
-const VOLUME_STORAGE_KEY = 'pitchpro_volume_percent';
-const DEFAULT_VOLUME_PERCENT = 50; // 50% = デバイスデフォルト音量
+// ===== 【v4.4.0統一】音量永続化ヘルパー関数 =====
+// 設定ページのティックスライダーと同じキーを使用
 
 /**
- * 音量パーセント値をlocalStorageに保存
- * @param {number} volumePercent - 0〜100のパーセント値
+ * 設定ページの音量オフセット（dB）を取得
+ * @returns {number} -20〜+20のdB値（未保存の場合は0）
  */
-function saveVolumePercent(volumePercent) {
+function getBaseNoteVolumeOffset() {
+    const KEY = 'pitchpro_base_note_volume_offset';
     try {
-        localStorage.setItem(VOLUME_STORAGE_KEY, volumePercent.toString());
-    } catch (e) {
-        console.warn('⚠️ 音量設定の保存に失敗:', e);
-    }
-}
-
-/**
- * localStorageから音量パーセント値を取得
- * @returns {number} 0〜100のパーセント値（未保存の場合はデフォルト50%）
- */
-function getSavedVolumePercent() {
-    try {
-        const saved = localStorage.getItem(VOLUME_STORAGE_KEY);
+        const saved = localStorage.getItem(KEY);
         if (saved !== null) {
             const parsed = parseInt(saved, 10);
-            if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
+            if (!isNaN(parsed) && parsed >= -20 && parsed <= 20) {
                 return parsed;
             }
         }
     } catch (e) {
-        console.warn('⚠️ 音量設定の読み込みに失敗:', e);
+        console.warn('⚠️ 音量オフセット読み込み失敗:', e);
     }
-    return DEFAULT_VOLUME_PERCENT;
+    return 0; // デフォルト値（オフセットなし）
 }
 
 /**
- * 保存済み音量パーセントからdB値を計算
- * @returns {number} dB値（DeviceDetector基準音量 + オフセット）
+ * 保存済み音量設定を取得（dB値）
+ * @returns {number} dB値（DeviceDetector基準音量 + ユーザー調整オフセット）
  */
 function getSavedVolumeDb() {
-    const volumePercent = getSavedVolumePercent();
     const baseVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
-    const volumeOffset = (volumePercent - 50) * 0.6; // 50%差で±30dB
+    const volumeOffset = getBaseNoteVolumeOffset();
     return baseVolume + volumeOffset;
 }
 
@@ -658,11 +644,12 @@ class PitchProCycleManager {
 
             // 音声テスト完了メッセージを表示
             if (successMessage) {
-                successMessage.textContent = '「ド」の音程を検出できました！音量を調整してから音域テストに進みましょう。';
+                successMessage.textContent = '「ド」の音程を検出できました！';
             }
 
-            // 1.5秒後に音量調整セクションを表示
-            console.log('⏳ 1.5秒後に音量調整セクションを表示します...');
+            // 1.5秒後に次のステップへ進む
+            // 音量調整機能は削除済み（backup/volume-test-featureブランチに保存）
+            console.log('⏳ 1.5秒後に次のステップを表示します...');
             setTimeout(async () => {
                 // audio-test-contentを非表示
                 const audioTestContent = document.getElementById('audio-test-content');
@@ -677,40 +664,10 @@ class PitchProCycleManager {
                     console.log('✅ detection-success を非表示にしました');
                 }
 
-                // セクションタイトルを「音量テスト」に変更
-                const audioTestTitle = document.getElementById('audio-test-title');
-                if (audioTestTitle) {
-                    audioTestTitle.textContent = '音量テスト';
-                    console.log('✅ セクションタイトルを「音量テスト」に変更しました');
-                }
-
-                // 音量調整セクションを表示
-                const volumeAdjustmentSection = document.getElementById('volume-adjustment-section');
-                if (volumeAdjustmentSection) {
-                    volumeAdjustmentSection.classList.remove('hidden');
-                    console.log('🔊 音量調整セクションを表示');
-                }
-
-                // 【iOS Safari対応 v4】基音試聴ボタンはHTMLで初期状態disabled
-                // CSSで「初期化中...」「基音を試聴」の表示を制御（JS DOM操作排除）
-                const testBaseNoteBtn = document.getElementById('test-base-note-btn');
-                console.log('🔄 基音試聴ボタン: 初期化待ち（HTML初期状態: disabled + btn-disabled）');
-
-                // PitchShifter初期化（音量調整で使用）
-                await this.ensurePitchShifterInitialized();
-
-                // 【iOS Safari対応 v4】PitchShifter初期化完了後にボタンを有効化
-                // CSSクラスの削除のみで表示を切り替え（テキスト変更なし）
-                if (testBaseNoteBtn && window.pitchShifterInstance?.isInitialized) {
-                    testBaseNoteBtn.disabled = false;
-                    testBaseNoteBtn.classList.remove('btn-disabled');
-                    console.log('✅ 基音試聴ボタンを有効化（PitchShifter初期化完了）');
-                }
-
-                // Lucideアイコン初期化（音量調整セクションのアイコン用）
+                // Lucideアイコン初期化
                 if (typeof lucide !== 'undefined') {
                     window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
-                    console.log('✅ Lucideアイコン初期化完了（音量調整セクション）');
+                    console.log('✅ Lucideアイコン初期化完了');
                 }
 
                 if (voiceRangeData && rangeSavedDisplay) {
@@ -948,7 +905,6 @@ window.initializePreparationPitchProCycle = async function() {
 
     // SPA環境でのリロード対策: グローバルフラグをリセット
     micPermissionListenerAdded = false;
-    isPlayingBaseNote = false;
     console.log('🔄 イベントリスナーフラグをリセット');
 
     // 【v4.1.0追加】URLパラメータからモード情報を取得してUI更新
@@ -1064,9 +1020,7 @@ window.initializePreparationPitchProCycle = async function() {
     console.log('🎤 マイク許可ボタンイベント設定開始');
     setupMicPermissionFlow();
 
-    // 音量調整コントロール設定
-    console.log('🔊 音量調整コントロール設定開始');
-    setupVolumeAdjustmentControls();
+    // 音量調整機能は削除済み（backup/volume-test-featureブランチに保存）
 
     // ステップインジケーター初期化
     console.log('📊 ステップインジケーター初期化');
@@ -1354,14 +1308,7 @@ function setupMicPermissionFlow() {
         skipRangeTestBtn.addEventListener('click', async () => {
             console.log('🚀 トレーニング開始ボタン（音域設定済み表示）がクリックされました');
 
-            // 【v4.2.0】基音再生中は遷移をブロック
-            if (isPlayingBaseNote) {
-                console.log('⚠️ 基音再生中のため、トレーニング開始をブロック');
-                alert('基音の再生が完了するまでお待ちください');
-                return;
-            }
-
-            // 【v4.2.0】ページ遷移前にPitchShifterを停止
+            // ページ遷移前にPitchShifterを停止（音量テスト機能削除後も安全のため残す）
             if (window.pitchShifterInstance) {
                 try {
                     await window.pitchShifterInstance.stop();
@@ -1610,14 +1557,7 @@ function setupMicPermissionFlow() {
         completeRangeTestBtn.addEventListener('click', async () => {
             console.log('🚀 トレーニング開始ボタン（音域テスト完了後）がクリックされました');
 
-            // 【v4.2.0】基音再生中は遷移をブロック
-            if (isPlayingBaseNote) {
-                console.log('⚠️ 基音再生中のため、トレーニング開始をブロック');
-                alert('基音の再生が完了するまでお待ちください');
-                return;
-            }
-
-            // 【v4.2.0】ページ遷移前にPitchShifterを停止
+            // ページ遷移前にPitchShifterを停止（音量テスト機能削除後も安全のため残す）
             if (window.pitchShifterInstance) {
                 try {
                     await window.pitchShifterInstance.stop();
@@ -1769,6 +1709,25 @@ async function checkAndDisplayExistingRangeData() {
     // Step 2: 音声テストセクションを表示状態にして、コンテンツを切り替え
     if (audioTestSection) {
         audioTestSection.classList.remove('hidden');
+
+        // セクションタイトルを「準備完了」に変更
+        const audioTestTitle = document.getElementById('audio-test-title');
+        const sectionDescription = audioTestSection.querySelector('.section-description');
+        if (audioTestTitle) {
+            audioTestTitle.textContent = '準備完了';
+            console.log('✅ セクションタイトルを「準備完了」に変更');
+        }
+        if (sectionDescription) {
+            sectionDescription.textContent = '音域設定が完了しています';
+            console.log('✅ セクション説明を更新');
+        }
+
+        // ステップインジケーターのラベルも「音域テスト」に変更
+        const step2Label = document.getElementById('step-2-label');
+        if (step2Label) {
+            step2Label.textContent = '音域テスト';
+            console.log('✅ ステップ2ラベルを「音域テスト」に変更');
+        }
 
         // 音声テストコンテンツを非表示
         if (audioTestContent) {
@@ -2028,224 +1987,8 @@ function updateMicButtonState(state) {
     window.initializeLucideIcons && window.initializeLucideIcons({ immediate: true });
 }
 
-/**
- * 音量調整コントロール設定
- */
-function setupVolumeAdjustmentControls() {
-    console.log('🔊 音量調整コントロール設定開始');
-
-    // 【iOS Safari対応 v4】基音試聴ボタンの状態をリセット
-    // CSSクラス制御のみ（JS DOM操作排除でブチ音防止）
-    const testBaseNoteBtn = document.getElementById('test-base-note-btn');
-    if (testBaseNoteBtn) {
-        // リロード時: PitchShifter初期化済みなら有効化、未初期化なら無効のまま
-        if (window.pitchShifterInstance?.isInitialized) {
-            testBaseNoteBtn.disabled = false;
-            testBaseNoteBtn.classList.remove('btn-disabled');
-            console.log('🔄 基音試聴ボタン: 有効化（PitchShifter初期化済み）');
-        } else {
-            console.log('🔄 基音試聴ボタン: 無効のまま（PitchShifter未初期化）');
-        }
-
-        // イベントリスナー設定
-        testBaseNoteBtn.addEventListener('click', async (e) => {
-            // 再生中は早期リターン（連続クリック防止）
-            if (isPlayingBaseNote) {
-                console.log('⚠️ 既に再生中のため、クリックを無視します');
-                return;
-            }
-
-            console.log('🎵 基音試聴ボタンがクリックされました');
-            console.log('🔍 PitchShifter状態:', {
-                exists: !!window.pitchShifterInstance,
-                isInitialized: window.pitchShifterInstance?.isInitialized
-            });
-
-            // フォーカスを外す（押下状態を解除）
-            // 【重要】awaitの前にボタン参照を取得（awaitの後はe.currentTargetがnullになる）
-            const btn = e.currentTarget;
-            btn.blur();
-
-            // 【iOS Safari対応 v10】ユーザー操作コールスタック内でTone.start()を呼ぶ
-            // iOS 17+では、awaitの後はユーザー操作と見なされないため、
-            // 最初のawaitより前に同期的にTone.start()を呼ぶ必要がある
-            // 重要: Tone.start()をawaitせずに呼び出す（同期的コールスタック内で実行）
-            if (typeof Tone !== 'undefined') {
-                console.log('🔊 [iOS v10] Tone.start()を同期的に呼び出し（await前）...');
-                // .then()で後続処理をチェーン（awaitを使わない）
-                Tone.start();
-                console.log(`🔊 [iOS v10] Tone.context.state: ${Tone.context?.state}`);
-            }
-
-            // 再生中フラグを立てる
-            isPlayingBaseNote = true;
-
-            try {
-                // PitchShifterインスタンスを確認
-                if (!window.pitchShifterInstance) {
-                    console.warn('⚠️ PitchShifterインスタンスが存在しません - 再生をスキップ');
-                    alert('音声システムの初期化中です。もう一度お試しください。');
-                    isPlayingBaseNote = false;
-                    return;
-                }
-
-                // 初期化されていない場合は初期化を試みる
-                if (!window.pitchShifterInstance.isInitialized) {
-                    console.log('🔄 PitchShifterを初期化中...');
-                    await window.pitchShifterInstance.initialize();
-                    console.log('✅ PitchShifter初期化完了');
-                }
-
-                // 【iPad対応】iOS/iPadOS対応: AudioContextを明示的にresume
-                // ホームボタンでバックグラウンドに移行後、AudioContextがsuspendedになるため
-                if (typeof Tone !== 'undefined' && Tone.context) {
-                    console.log('🔊 AudioContext状態確認... (state:', Tone.context.state + ')');
-
-                    // Tone.start()を明示的に呼び出し（iOS/iPadOS対応）
-                    if (Tone.context.state === 'suspended') {
-                        console.log('🔊 Tone.start()実行中...');
-                        await Tone.start();
-                        console.log('✅ Tone.start()完了 (state:', Tone.context.state + ')');
-                    }
-
-                    // resume()で確実に起動
-                    if (Tone.context.state !== 'running') {
-                        console.log('🔊 AudioContext再開中... (state:', Tone.context.state + ')');
-                        await Tone.context.resume();
-                        console.log('✅ AudioContext再開完了 (state:', Tone.context.state + ')');
-
-                        // 安定化のため少し待機（iOS/iPadOS対策）
-                        await new Promise(resolve => setTimeout(resolve, 100));
-                    }
-                }
-
-                // 【iOS Safari対応 v4】ボタンを「再生中」状態に変更
-                // CSSクラス制御のみ（textContent変更なし・Lucideアイコン更新なしでブチ音防止）
-                btn.disabled = true;
-                btn.classList.add('btn-playing');
-
-                // 【iOS Safari対応 v4】C3 (130.8Hz) を再生
-                // PitchShifter初期化完了後に呼び出されることを前提
-                // iPad対応: velocity を 1.0 に設定（デフォルト0.8では音量不足）
-                const velocity = window.DeviceDetector?.getDeviceType() === 'ipad' ? 1.0 : 0.9;
-                console.log(`▶️ 基音再生開始... (velocity: ${velocity}, device: ${window.DeviceDetector?.getDeviceType() || 'unknown'})`);
-
-                // 【iOS Safari対応】マイクを一時停止してから音声再生
-                // WebKit Bug #218012: マイクがアクティブだと音量が自動的に下がる
-                const audioDetector = window.globalAudioDetector || pitchProCycleManager?.audioDetector;
-                let micWasActive = false;
-
-                if (audioDetector) {
-                    try {
-                        audioDetector.stopDetection();
-                        micWasActive = true;
-                        console.log('🎤 [iOS] マイク一時停止');
-                    } catch (micError) {
-                        console.warn('⚠️ マイク停止失敗（続行）:', micError);
-                    }
-                }
-
-                // 【iOS Safari対応 v11】audioSession切り替えを行わない（トレーニングと統一）
-                // 理由: playbackモードに切り替えると準備ページとトレーニングページで音量差が生じる
-                // trainingController.jsと同様、マイク停止（stopDetection）のみで対応
-                if (navigator.audioSession) {
-                    console.log(`🔊 [iOS] audioSession.type (現在): ${navigator.audioSession.type}（変更なし）`);
-                }
-
-                // 【iOS Safari対応 v8】Tone.start()を実行（AudioContext状態確認）
-                if (typeof Tone !== 'undefined') {
-                    console.log(`🔊 [iOS v8] AudioContext状態確認... (state: ${Tone.context?.state})`);
-                    if (Tone.context?.state === 'suspended') {
-                        console.log('🔊 [iOS v8] Tone.start()を実行...');
-                        await Tone.start();
-                        console.log(`✅ [iOS v8] Tone.start()完了 (state: ${Tone.context?.state})`);
-                    }
-                }
-
-                // C3を再生（Tone.js Sampler経由）- velocity適用
-                await window.pitchShifterInstance.playNote("C3", 1.0, velocity);
-                console.log('✅ 基音C3を再生しました');
-
-                // 【iOS Safari対応 v11】再生完了後にマイクを再開
-                // audioSession切り替えは行わないため、マイク再開のみ
-                // ブチ音防止のため、2.52秒 + 余裕（500ms）= 3000msに設定
-                setTimeout(async () => {
-                    try {
-                        // マイクを再開
-                        if (micWasActive && audioDetector) {
-                            audioDetector.startDetection();
-                            console.log('✅ [iOS] マイク再開完了');
-                        }
-                    } catch (restoreError) {
-                        console.warn('⚠️ 復元処理失敗:', restoreError);
-                    }
-                }, 3000); // リリース完全終了後（2.52s + 余裕500ms = 3s）
-
-                // 2.52秒後にボタンを元に戻す（attack:0.02s + sustain:1.0s + release:1.5s = 2.52s）
-                // 【iOS Safari対応 v4】CSSクラス制御のみ（DOM操作排除）
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.classList.remove('btn-playing');
-                    btn.blur();
-                    isPlayingBaseNote = false;
-                    console.log('✅ ボタン状態を復元しました');
-                }, 2520); // 2.52秒 = 2520ms
-
-            } catch (error) {
-                console.error('❌ 基音再生エラー:', error);
-                alert('音声再生に失敗しました: ' + error.message);
-
-                // エラー時もボタンを元に戻す
-                // 【iOS Safari対応 v4】CSSクラス制御のみ
-                btn.disabled = false;
-                btn.classList.remove('btn-playing');
-                btn.blur();
-                isPlayingBaseNote = false;
-            }
-        });
-        console.log('✅ 基音試聴ボタンのイベントリスナー設定完了');
-    } else {
-        console.warn('⚠️ test-base-note-btn要素が見つかりません');
-    }
-
-    // 音量スライダー
-    const volumeSlider = document.getElementById('app-volume-slider');
-
-    if (volumeSlider) {
-        // 【Issue #2修正】保存済み音量でスライダー初期値を復元
-        const savedVolumePercent = getSavedVolumePercent();
-        volumeSlider.value = savedVolumePercent;
-        console.log(`🔊 音量スライダー初期値を復元: ${savedVolumePercent}%`);
-
-        volumeSlider.addEventListener('input', (e) => {
-            const volumePercent = parseInt(e.target.value);
-
-            // 【Issue #2修正】localStorageに音量を保存
-            saveVolumePercent(volumePercent);
-
-            // PitchShifterの音量を調整
-            if (window.pitchShifterInstance && window.pitchShifterInstance.isInitialized) {
-                // 音量調整範囲: 50%（中央）= 基準音量、0%（左端）= -30dB、100%（右端）= +30dB
-                // 50% = baseVolume（DeviceDetector統一設定）
-                // 100% = baseVolume + 30dB
-                // 0% = baseVolume - 30dB
-
-                // DeviceDetectorから基準音量を取得（統一設定）
-                const baseVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
-
-                // パーセンテージに応じて音量を調整（50%が基準）
-                const volumeOffset = (volumePercent - 50) * 0.6; // 50%差で±30dB
-                const targetVolume = baseVolume + volumeOffset;
-
-                window.pitchShifterInstance.setVolume(targetVolume);
-                console.log(`🔊 音量調整: ${volumePercent}% (${targetVolume.toFixed(1)}dB, 基準${baseVolume}dB, DeviceDetector統一設定) [保存済み]`);
-            }
-        });
-        console.log('✅ 音量スライダーのイベントリスナー設定完了');
-    }
-
-    console.log('🎉 音量調整コントロール設定完了');
-}
+// setupVolumeAdjustmentControls()は削除済み（backup/volume-test-featureブランチに保存）
+// 音量調整機能（基音試聴ボタン、音量スライダー）はトレーニングページとの音量差問題により廃止
 
 // ===== UI制御ユーティリティ =====
 

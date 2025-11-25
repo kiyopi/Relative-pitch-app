@@ -20,36 +20,39 @@
     <!-- メインコンテンツエリア -->
     <main class="wide-main">
 
-        <!-- デバイス情報セクション -->
+        <!-- 音量設定セクション -->
         <section class="glass-card">
             <h4 class="heading-md">
-                <i data-lucide="smartphone" class="text-blue-300"></i>
-                <span>デバイス情報</span>
+                <i data-lucide="volume-2" class="text-yellow-300"></i>
+                <span>音量設定</span>
             </h4>
 
-            <div class="flex flex-col gap-3">
-                <!-- デバイスタイプ -->
-                <div class="flex items-center justify-between">
-                    <span class="text-sm text-white-80">デバイスタイプ</span>
-                    <span class="text-sm text-white" id="device-type">-</span>
-                </div>
+            <div class="flex flex-col gap-2">
+                <h5 class="text-body font-semibold">基音の再生音量</h5>
+                <p class="text-sm text-white-60 mb-2">トレーニング時の基音再生音量を調整します</p>
 
-                <!-- 音量設定 -->
-                <div class="flex items-center justify-between">
-                    <span class="text-sm text-white-80">基準音音量</span>
-                    <span class="text-sm text-white" id="device-volume">-</span>
-                </div>
+                <div class="tick-slider-container">
+                    <div class="tick-slider-wrapper">
+                        <input type="range"
+                               class="tick-slider"
+                               id="base-note-volume-slider"
+                               min="-20"
+                               max="20"
+                               step="10"
+                               value="0">
 
-                <!-- 感度設定 -->
-                <div class="flex items-center justify-between">
-                    <span class="text-sm text-white-80">マイク感度</span>
-                    <span class="text-sm text-white" id="device-sensitivity">-</span>
-                </div>
+                        <div class="tick-labels">
+                            <span class="tick-label" data-value="-20">-20</span>
+                            <span class="tick-label" data-value="-10">-10</span>
+                            <span class="tick-label active" data-value="0">0</span>
+                            <span class="tick-label" data-value="10">+10</span>
+                            <span class="tick-label" data-value="20">+20</span>
+                        </div>
+                    </div>
 
-                <!-- 画面サイズ -->
-                <div class="flex items-center justify-between">
-                    <span class="text-sm text-white-80">画面サイズ</span>
-                    <span class="text-sm text-white" id="screen-size">-</span>
+                    <div class="tick-slider-hint">
+                        音割れする場合は下げる / 聞こえにくい場合は上げる
+                    </div>
                 </div>
             </div>
         </section>
@@ -147,6 +150,40 @@
                         <i data-lucide="alert-triangle" style="width: 20px; height: 20px;"></i>
                         <span>リセット実行</span>
                     </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- デバイス情報セクション -->
+        <section class="glass-card">
+            <h4 class="heading-md">
+                <i data-lucide="smartphone" class="text-blue-300"></i>
+                <span>デバイス情報</span>
+            </h4>
+
+            <div class="flex flex-col gap-3">
+                <!-- デバイスタイプ -->
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-white-80">デバイスタイプ</span>
+                    <span class="text-sm text-white" id="device-type">-</span>
+                </div>
+
+                <!-- 音量設定 -->
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-white-80">基準音音量</span>
+                    <span class="text-sm text-white" id="device-volume">-</span>
+                </div>
+
+                <!-- 感度設定 -->
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-white-80">マイク感度</span>
+                    <span class="text-sm text-white" id="device-sensitivity">-</span>
+                </div>
+
+                <!-- 画面サイズ -->
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-white-80">画面サイズ</span>
+                    <span class="text-sm text-white" id="screen-size">-</span>
                 </div>
             </div>
         </section>

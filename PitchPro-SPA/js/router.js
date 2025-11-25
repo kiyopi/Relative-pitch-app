@@ -934,26 +934,27 @@ class SimpleRouter {
         }
     }
 
-    // 【Issue #2修正】音量永続化ヘルパーメソッド
-    getSavedVolumeDb() {
-        const VOLUME_STORAGE_KEY = 'pitchpro_volume_percent';
-        const DEFAULT_VOLUME_PERCENT = 50;
-
-        let volumePercent = DEFAULT_VOLUME_PERCENT;
+    // 【v4.4.0統一】音量永続化ヘルパーメソッド
+    // 設定ページのティックスライダーと同じキーを使用
+    getBaseNoteVolumeOffset() {
+        const KEY = 'pitchpro_base_note_volume_offset';
         try {
-            const saved = localStorage.getItem(VOLUME_STORAGE_KEY);
+            const saved = localStorage.getItem(KEY);
             if (saved !== null) {
                 const parsed = parseInt(saved, 10);
-                if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
-                    volumePercent = parsed;
+                if (!isNaN(parsed) && parsed >= -20 && parsed <= 20) {
+                    return parsed;
                 }
             }
         } catch (e) {
-            console.warn('⚠️ 音量設定の読み込みに失敗:', e);
+            console.warn('⚠️ 音量オフセット読み込み失敗:', e);
         }
+        return 0; // デフォルト値（オフセットなし）
+    }
 
+    getSavedVolumeDb() {
         const baseVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
-        const volumeOffset = (volumePercent - 50) * 0.6; // 50%差で±30dB
+        const volumeOffset = this.getBaseNoteVolumeOffset();
         return baseVolume + volumeOffset;
     }
 

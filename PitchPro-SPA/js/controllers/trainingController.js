@@ -136,6 +136,26 @@ function getScaleSteps(direction) {
 }
 
 /**
+ * 【v4.3.0】設定ページで保存された基音再生音量オフセットを取得
+ * @returns {number} -20〜+20のオフセット値（デフォルト0）
+ */
+function getBaseNoteVolumeOffset() {
+    const KEY = 'pitchpro_base_note_volume_offset';
+    try {
+        const saved = localStorage.getItem(KEY);
+        if (saved !== null) {
+            const parsed = parseInt(saved, 10);
+            if (!isNaN(parsed) && parsed >= -20 && parsed <= 20) {
+                return parsed;
+            }
+        }
+    } catch (e) {
+        console.warn('⚠️ 音量オフセット読み込み失敗:', e);
+    }
+    return 0;
+}
+
+/**
  * ドレミガイドのHTMLを動的に生成
  * @param {string[]} intervals - 音程名の配列 ['ド', 'レ', 'ミ', ...] または ['ド', 'シ', 'ラ', ...]
  */
@@ -576,28 +596,13 @@ function getDeviceVolume() {
 }
 
 /**
- * 【Issue #2修正】保存済み音量パーセントからdB値を計算
- * @returns {number} dB値（DeviceDetector基準音量 + オフセット）
+ * 【v4.4.0統一】保存済み音量設定を取得（dB値）
+ * 設定ページのティックスライダーと同じキーを使用
+ * @returns {number} dB値（DeviceDetector基準音量 + ユーザー調整オフセット）
  */
 function getSavedVolumeDb() {
-    const VOLUME_STORAGE_KEY = 'pitchpro_volume_percent';
-    const DEFAULT_VOLUME_PERCENT = 50;
-
-    let volumePercent = DEFAULT_VOLUME_PERCENT;
-    try {
-        const saved = localStorage.getItem(VOLUME_STORAGE_KEY);
-        if (saved !== null) {
-            const parsed = parseInt(saved, 10);
-            if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
-                volumePercent = parsed;
-            }
-        }
-    } catch (e) {
-        console.warn('⚠️ 音量設定の読み込みに失敗:', e);
-    }
-
     const baseVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
-    const volumeOffset = (volumePercent - 50) * 0.6; // 50%差で±30dB
+    const volumeOffset = getBaseNoteVolumeOffset(); // 新システム使用
     return baseVolume + volumeOffset;
 }
 
@@ -777,6 +782,15 @@ async function startTraining() {
         // WebKit Bug #218012 の回避策としては不完全だが、音が出ないよりは音量が小さい方がマシ
         if (navigator.audioSession) {
             console.log(`🔊 [iOS] audioSession.type (現在): ${navigator.audioSession.type}（変更なし）`);
+        }
+
+        // 【v4.3.0】設定ページの音量オフセットを適用
+        const volumeOffset = getBaseNoteVolumeOffset();
+        if (volumeOffset !== 0 && pitchShifter.setVolume) {
+            const baseVolume = window.DeviceDetector?.getDeviceVolume() ?? -6;
+            const adjustedVolume = baseVolume + volumeOffset;
+            pitchShifter.setVolume(adjustedVolume);
+            console.log(`🔊 音量オフセット適用: ${baseVolume}dB + ${volumeOffset > 0 ? '+' : ''}${volumeOffset}dB = ${adjustedVolume}dB`);
         }
 
         await pitchShifter.playNote(baseNoteInfo.note, 1.0);

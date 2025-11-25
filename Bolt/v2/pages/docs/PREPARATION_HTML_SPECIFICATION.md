@@ -5,15 +5,20 @@
 **ファイル**: `/Bolt/v2/pages/preparation.html`
 **目的**: 8va相対音感トレーニングアプリのトレーニング前準備ページ
 **機能**: マイク許可 → 音声テスト → 音域テスト → 結果表示の完全フロー
-**最終更新**: 2025年1月（globalAudioDetectorスコープ問題解決済み）
+**最終更新**: 2025-01-25（音声テスト機能削除、音量調整機能を設定ページへ移行）
 
 ## 🎯 主要機能
 
-### 1. 4段階の準備フロー
+### 1. 3段階の準備フロー
 1. **マイク許可**: ユーザーの音声入力許可取得
-2. **音声テスト**: 基本的な音声検出機能確認
+2. **音声テスト**: 基本的な音声検出機能確認（**音量調整機能は削除済み**）
 3. **音域テスト**: ユーザーの音域測定（低音・高音）
-4. **結果表示**: 測定結果とトレーニング開始準備
+
+**重要な変更（v2.9.1）**:
+- **音量テスト機能削除**: 基音プレビュー再生・音量スライダーを削除
+- **理由**: 準備ページとトレーニングページで環境が異なり、音量差が発生する問題を根本解決
+- **代替実装**: 設定ページにシンプルな5段階ティックスライダーを実装
+- **詳細**: `/specifications/VOLUME_TEST_REMOVAL_HISTORY.md` 参照
 
 ### 2. リアルタイム音声処理
 - **PitchPro v1.3.1**: 最新音声処理ライブラリ統合
@@ -60,6 +65,12 @@ preparation.html
 **アイコン**: Lucide `mic` アイコン
 
 #### 2. 進捗ステップ表示 (lines 34-66)
+
+**重要な変更（v2.9.1）**:
+- **Step 2**: 「音声・音量」→「音声テスト」に変更
+- **アイコン**: `volume-2` → `mic` に変更
+- **理由**: 音量調整機能削除に伴う表示整合性の確保
+
 ```html
 <div class="flex items-center justify-between gap-4">
     <!-- Step 1: マイク許可 -->
@@ -71,7 +82,15 @@ preparation.html
     </div>
     <!-- 接続線 -->
     <div class="step-connector" id="connector-1"></div>
-    <!-- Step 2: 音声テスト -->
+    <!-- Step 2: 音声テスト ← 変更済み -->
+    <div class="flex-1 text-center">
+        <div class="step-indicator" id="step-2">
+            <i data-lucide="mic"></i> <!-- volume-2 から mic に変更 -->
+        </div>
+        <p class="text-xs text-white-60 mt-2">音声テスト</p> <!-- 変更済み -->
+    </div>
+    <!-- 接続線 -->
+    <div class="step-connector" id="connector-2"></div>
     <!-- Step 3: 音域テスト -->
 </div>
 ```
@@ -107,8 +126,22 @@ preparation.html
 - **セキュリティ**: プライバシー保護メッセージ
 
 #### 4. 音声テストセクション (lines 91-168)
+
+**重要な変更（v2.9.1）**:
+- **削除機能**: 基音プレビュー再生ボタン・音量スライダーを削除
+- **残存機能**: 音量検出・周波数検出表示のみ
+- **動的タイトル変更**: 音域データ保存済みの場合、タイトルを「準備完了」に変更
+
 ```html
 <section class="test-section hidden" id="audio-test-section">
+    <!-- セクションヘッダー（動的変更対応） -->
+    <div class="section-header">
+        <!-- 通常時: "音声テスト" / 音域保存済み時: "準備完了" -->
+        <h3 class="text-section-title" id="audio-test-title">音声テスト</h3>
+        <!-- 通常時: "音量と周波数検出を確認します" / 音域保存済み時: "音域設定が完了しています" -->
+        <p class="section-description">音量と周波数検出を確認します</p>
+    </div>
+
     <!-- 音声テスト中表示エリア -->
     <div class="audio-test-content" id="audio-test-content">
         <div class="voice-instruction">
@@ -139,6 +172,9 @@ preparation.html
         </div>
     </div>
 
+    <!-- ❌ 削除済み: 音量調整セクション（基音プレビュー・音量スライダー） -->
+    <!-- 代替実装: settings.htmlに5段階ティックスライダーを配置 -->
+
     <!-- 成功表示 -->
     <div class="success-alert hidden" id="detection-success">
         <i data-lucide="check-circle"></i>
@@ -159,11 +195,29 @@ preparation.html
 ```
 
 **重要な要素**:
+- `#audio-test-title`: セクションタイトル（動的変更対象）
+- `.section-description`: セクション説明（動的変更対象）
 - `#volume-value`: 音量パーセント表示
 - `#volume-progress`: 音量バー（width動的変更）
 - `#frequency-value`: 検出周波数・音程名表示
 - `#detection-success`: 音声検出成功時表示
 - `#start-range-test-btn`: 次ステップへの進行ボタン
+
+**動的タイトル変更ロジック（preparation-pitchpro-cycle.js）**:
+```javascript
+// 音域データ保存済みの場合、セクションタイトルを「準備完了」に変更
+const audioTestTitle = document.getElementById('audio-test-title');
+const sectionDescription = audioTestSection.querySelector('.section-description');
+
+if (audioTestTitle) {
+    audioTestTitle.textContent = '準備完了';
+    console.log('✅ セクションタイトルを「準備完了」に変更');
+}
+if (sectionDescription) {
+    sectionDescription.textContent = '音域設定が完了しています';
+    console.log('✅ セクション説明を更新');
+}
+```
 
 #### 5. 音域テストセクション (lines 171-249)
 ```html
