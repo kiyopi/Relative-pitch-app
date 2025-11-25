@@ -983,8 +983,14 @@ class NavigationManager {
             audioDetector.stopDetection();
             console.log('🛑 [NavigationManager] 音声検出停止');
 
-            // 【追加v4.0.22】音量バーを確実にリセット
-            this._resetVolumeBar();
+            // 【修正v4.0.23】PitchProのresetDisplayElements()を使用してUI要素をリセット
+            if (typeof audioDetector.resetDisplayElements === 'function') {
+                audioDetector.resetDisplayElements();
+                console.log('🔄 [NavigationManager] PitchPro UI要素リセット完了');
+            } else {
+                // フォールバック: 手動でリセット
+                this._resetVolumeBar();
+            }
 
             // 【重要】MediaStream完全解放
             // destroy()を呼ばないと、バックグラウンドでマイクが開いたままになり、
@@ -998,20 +1004,24 @@ class NavigationManager {
     }
 
     /**
-     * 音量バーをリセット（すべてのページの音量バーを0%に戻す）
+     * 音量バーを手動リセット（フォールバック用）
      * @private
      */
     static _resetVolumeBar() {
         try {
-            // 準備ページ・トレーニングページ・音域テストページの音量バー
+            // preparationページ
+            const volumeProgress = document.getElementById('volume-progress');
+            if (volumeProgress) {
+                volumeProgress.style.width = '0%';
+            }
+
+            // trainingページ・音域テストページ
             const volumeBars = document.querySelectorAll('.progress-fill');
             volumeBars.forEach(bar => {
                 bar.style.width = '0%';
             });
 
-            if (volumeBars.length > 0) {
-                console.log(`🔄 [NavigationManager] 音量バーリセット完了（${volumeBars.length}個）`);
-            }
+            console.log(`🔄 [NavigationManager] 手動音量バーリセット完了`);
         } catch (error) {
             console.error('❌ [NavigationManager] 音量バーリセットエラー:', error);
         }

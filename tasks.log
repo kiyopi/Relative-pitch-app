@@ -13944,3 +13944,22 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-25 14:24:18] コミット: fix(html): scriptタグ閉じタグ漏れを修正（重大なバグ）
+
+【重大なバグ修正】
+- pitchpro-config.js のscriptタグ閉じタグ漏れ
+- navigation-manager.js のscriptタグ閉じタグ漏れ
+
+この問題により、以下のJavaScriptが正しく読み込まれず、
+すべての設定変更が反映されていませんでした：
+- PitchProConfig (clarityThreshold, minVolumeAbsolute)
+- NavigationManager (_resetVolumeBar)
+
+影響:
+- v1.2.3の設定値が反映されない
+- 音量バーリセット処理が動作しない
+- プライベートブラウズでも変化なし
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

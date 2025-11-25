@@ -424,6 +424,22 @@ class PitchProCycleManager {
     handlePitchUpdate(result) {
         if (!this.state.detectionActive) return;
 
+        // 【v1.3.2修正】clarityThreshold未満の場合は音量バーを強制的に0%にリセット
+        // 環境ノイズ（clarity: 0.00-0.90）が音量バーに表示される問題を解決
+        const clarityThreshold = 0.85; // pitchpro-config.jsと同じ閾値
+        if (result.clarity < clarityThreshold) {
+            // 音量バーを0%に強制リセット
+            const volumeBar = document.getElementById('volume-progress');
+            if (volumeBar) {
+                volumeBar.style.width = '0%';
+            }
+            // 周波数・音量テキストもクリア
+            const volumeText = document.getElementById('volume-value');
+            const frequencyValue = document.getElementById('frequency-value');
+            if (volumeText) volumeText.textContent = '0%';
+            if (frequencyValue) frequencyValue.textContent = '0.0';
+        }
+
         // autoUpdateUI: true のため、PitchProが自動でUI更新
         // ここではモード別のロジック処理のみ実行
 
