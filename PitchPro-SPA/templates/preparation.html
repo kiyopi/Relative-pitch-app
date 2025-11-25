@@ -76,7 +76,13 @@
         <section class="test-section hidden" id="audio-test-section">
             <div class="section-header">
                 <h3 class="text-section-title" id="audio-test-title">音声テスト</h3>
-                <p class="section-description">音量と周波数検出を確認します</p>
+                <p class="section-description" id="audio-test-description">音量と周波数検出を確認します</p>
+            </div>
+
+            <!-- 音声テスト完了表示（音域テスト開始前に表示） -->
+            <div class="success-alert hidden" id="audio-test-completed">
+                <i data-lucide="check-circle" style="color: #22c55e; width: 24px; height: 24px; display: block; min-width: 24px; min-height: 24px;"></i>
+                <p>音声検出が正常に完了しました</p>
             </div>
 
             <!-- 音声テスト中表示エリア -->
@@ -280,4 +286,4 @@
 </main>
 
 <!-- preparation-pitchpro-cycle.js -->
-<script src="pages/js/preparation-pitchpro-cycle.js?v=1764041241"></script>
+<script src="pages/js/preparation-pitchpro-cycle.js?v=1764042012"></script>

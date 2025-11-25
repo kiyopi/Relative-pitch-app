@@ -658,7 +658,7 @@ class PitchProCycleManager {
                     console.log('✅ audio-test-content を非表示にしました');
                 }
 
-                // 成功メッセージを非表示
+                // 検出中の成功メッセージを非表示
                 if (detectionSuccess) {
                     detectionSuccess.classList.add('hidden');
                     console.log('✅ detection-success を非表示にしました');
@@ -672,10 +672,16 @@ class PitchProCycleManager {
 
                 if (voiceRangeData && rangeSavedDisplay) {
                     // 音域データあり - 音域設定済み表示
+                    // 音声テスト完了メッセージは不要（全て完了済みのため）
                     this.displaySavedRangeData(voiceRangeData, rangeSavedDisplay);
-                    console.log('✅ 音域データ表示完了');
+                    console.log('✅ 音域データ表示完了（音声テスト完了メッセージは非表示）');
                 } else {
-                    // 音域データなし - 音域テストボタン表示
+                    // 音域データなし - 音声テスト完了メッセージ＋音域テストボタン表示
+                    const audioTestCompleted = document.getElementById('audio-test-completed');
+                    if (audioTestCompleted) {
+                        audioTestCompleted.classList.remove('hidden');
+                        console.log('✅ audio-test-completed を表示しました');
+                    }
                     // localStorage保存（Step1完了データ）
                     localStorage.setItem('audioTestCompleted', 'true');
                     localStorage.setItem('audioTestTimestamp', new Date().toISOString());
