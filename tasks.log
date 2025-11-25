@@ -13890,3 +13890,17 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-25 13:59:53] コミット: fix(noise): clarityThresholdを0.75に強化（v1.2.2）
+
+- clarityThreshold: 0.65 → 0.75（環境ノイズの高明瞭度検出に対応）
+- iPhone低音域ノイズ（31-97Hz、clarity 0.67-0.90）の排除を強化
+- pitchpro-config.js v1.2.2に更新
+- キャッシュバスター更新（1764046763）
+
+理由:
+- 環境ノイズが0.67-0.90の高い明瞭度を持つことが判明
+- 正常な発声は0.97-0.99の明瞭度を持つため、0.75で区別可能
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

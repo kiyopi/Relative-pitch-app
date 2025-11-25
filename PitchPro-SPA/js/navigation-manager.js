@@ -983,6 +983,9 @@ class NavigationManager {
             audioDetector.stopDetection();
             console.log('🛑 [NavigationManager] 音声検出停止');
 
+            // 【追加v4.0.22】音量バーを確実にリセット
+            this._resetVolumeBar();
+
             // 【重要】MediaStream完全解放
             // destroy()を呼ばないと、バックグラウンドでマイクが開いたままになり、
             // 長時間経過後にPitchProが警告アラートを表示してpopstateイベントが発火する問題が発生
@@ -991,6 +994,26 @@ class NavigationManager {
 
         } catch (error) {
             console.error('❌ [NavigationManager] AudioDetector破棄エラー:', error);
+        }
+    }
+
+    /**
+     * 音量バーをリセット（すべてのページの音量バーを0%に戻す）
+     * @private
+     */
+    static _resetVolumeBar() {
+        try {
+            // 準備ページ・トレーニングページ・音域テストページの音量バー
+            const volumeBars = document.querySelectorAll('.progress-fill');
+            volumeBars.forEach(bar => {
+                bar.style.width = '0%';
+            });
+
+            if (volumeBars.length > 0) {
+                console.log(`🔄 [NavigationManager] 音量バーリセット完了（${volumeBars.length}個）`);
+            }
+        } catch (error) {
+            console.error('❌ [NavigationManager] 音量バーリセットエラー:', error);
         }
     }
 
