@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Callback Volume Fix Test</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 15px;
+            margin: 0;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #00d4ff;
+        }
+        .section {
+            background: #2d2d44;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffd700;
+            font-size: 13px;
+        }
+        .volume-bar-container {
+            background: #1a1a2e;
+            border-radius: 8px;
+            height: 30px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .volume-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00d4ff);
+            width: 0%;
+            transition: width 0.1s ease-out;
+            border-radius: 8px;
+        }
+        .volume-text {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 12px;
+        }
+        .data-item {
+            background: #1a1a2e;
+            padding: 8px;
+            border-radius: 5px;
+        }
+        .data-label {
+            color: #888;
+            font-size: 10px;
+        }
+        .data-value {
+            font-weight: bold;
+            font-size: 14px;
+            color: #00ff88;
+        }
+        .data-value.match { color: #00ff88; }
+        .data-value.mismatch { color: #ff6b6b; }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px 0;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            color: #000;
+        }
+        .btn-secondary {
+            background: #444;
+            color: #fff;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+        }
+        .log-container {
+            background: #0d0d1a;
+            border-radius: 8px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 11px;
+        }
+        .log-entry {
+            margin: 3px 0;
+            padding: 3px 5px;
+            border-radius: 3px;
+        }
+        .log-info { background: #1a3a4a; }
+        .log-warn { background: #4a3a1a; color: #ffd700; }
+        .log-error { background: #4a1a1a; color: #ff6b6b; }
+        .log-success { background: #1a4a2a; color: #00ff88; }
+        .status-box {
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .status-pass { background: #1a4a2a; color: #00ff88; }
+        .status-fail { background: #4a1a1a; color: #ff6b6b; }
+        .status-pending { background: #4a3a1a; color: #ffd700; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Callback Volume Fix Test</h1>
+
+        <!-- Test Status -->
+        <div class="section">
+            <div class="section-title">Test Status</div>
+            <div class="status-box status-pending" id="testStatus">Waiting to start...</div>
+        </div>
+
+        <!-- Device Info -->
+        <div class="section">
+            <div class="section-title">Device Info</div>
+            <div class="data-grid">
+                <div class="data-item">
+                    <div class="data-label">Device Type</div>
+                    <div class="data-value" id="deviceType">-</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Volume Multiplier</div>
+                    <div class="data-value" id="volumeMultiplier">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Volume Display -->
+        <div class="section">
+            <div class="section-title">Volume (autoUpdateUI)</div>
+            <div class="volume-bar-container">
+                <div class="volume-bar" id="volumeBar"></div>
+            </div>
+            <div class="volume-text" id="volumeText">0.0%</div>
+        </div>
+
+        <!-- Comparison -->
+        <div class="section">
+            <div class="section-title">Callback vs Bar Comparison</div>
+            <div class="data-grid">
+                <div class="data-item">
+                    <div class="data-label">Callback result.volume</div>
+                    <div class="data-value" id="callbackVolume">-</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Bar Width</div>
+                    <div class="data-value" id="barWidth">-</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Difference</div>
+                    <div class="data-value" id="difference">-</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Match Status</div>
+                    <div class="data-value" id="matchStatus">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="section">
+            <button class="btn btn-primary" id="startBtn" onclick="startDetection()">Start Detection</button>
+            <button class="btn btn-secondary" id="stopBtn" onclick="stopDetection()" disabled>Stop Detection</button>
+        </div>
+
+        <!-- Log -->
+        <div class="section">
+            <div class="section-title">Log</div>
+            <div class="log-container" id="logContainer"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        const timestamp = Date.now();
+        const script = document.createElement('script');
+        script.src = `./js/core/pitchpro-v1.3.6.umd.js?t=${timestamp}`;
+        script.onload = () => {
+            log('success', `PitchPro ${window.PitchPro?.VERSION || 'unknown'} loaded`);
+            initializeApp();
+        };
+        script.onerror = () => {
+            log('error', 'Failed to load PitchPro');
+        };
+        document.head.appendChild(script);
+
+        let audioDetector = null;
+        let matchCount = 0;
+        let mismatchCount = 0;
+
+        function log(type, message) {
+            // コンソールにも出力
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warn' ? '⚠️' : 'ℹ️';
+            console.log(`${prefix} [${timestamp}] ${message}`);
+
+            const container = document.getElementById('logContainer');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${timestamp}] ${message}`;
+            container.insertBefore(entry, container.firstChild);
+            while (container.children.length > 50) {
+                container.removeChild(container.lastChild);
+            }
+        }
+
+        function initializeApp() {
+            const PitchPro = window.PitchPro;
+            if (!PitchPro || !PitchPro.DeviceDetection) {
+                log('error', 'DeviceDetection not available');
+                return;
+            }
+
+            const specs = PitchPro.DeviceDetection.getDeviceSpecs();
+            document.getElementById('deviceType').textContent = specs.deviceType;
+            document.getElementById('volumeMultiplier').textContent = `${specs.volumeMultiplier}x`;
+
+            log('info', `Device: ${specs.deviceType}, volumeMultiplier: ${specs.volumeMultiplier}`);
+        }
+
+        window.startDetection = async function() {
+            const PitchPro = window.PitchPro;
+            if (!PitchPro) {
+                log('error', 'PitchPro not loaded');
+                return;
+            }
+
+            try {
+                log('info', 'Initializing...');
+                matchCount = 0;
+                mismatchCount = 0;
+
+                audioDetector = new PitchPro.AudioDetectionComponent({
+                    volumeBarSelector: '#volumeBar',
+                    volumeTextSelector: '#volumeText',
+                    autoUpdateUI: true,
+                    deviceOptimization: true,
+                    debug: false
+                });
+
+                await audioDetector.initialize();
+                log('success', 'Initialized');
+
+                // Set callback AFTER initialize
+                audioDetector.setCallbacks({
+                    onPitchUpdate: (result) => {
+                        checkVolumeMatch(result);
+                    },
+                    onError: (error) => {
+                        log('error', `Error: ${error.message}`);
+                    }
+                });
+
+                const started = await audioDetector.startDetection();
+                if (started) {
+                    document.getElementById('startBtn').disabled = true;
+                    document.getElementById('stopBtn').disabled = false;
+                    document.getElementById('testStatus').textContent = 'Testing...';
+                    document.getElementById('testStatus').className = 'status-box status-pending';
+                    log('success', 'Detection started');
+                } else {
+                    log('error', 'Failed to start detection');
+                }
+
+            } catch (error) {
+                log('error', `Init error: ${error.message}`);
+            }
+        };
+
+        window.stopDetection = function() {
+            if (audioDetector) {
+                audioDetector.stopDetection();
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+
+                // Final result
+                const total = matchCount + mismatchCount;
+                const passRate = total > 0 ? (matchCount / total * 100).toFixed(1) : 0;
+
+                if (mismatchCount === 0 && matchCount > 0) {
+                    document.getElementById('testStatus').textContent = `PASS - ${matchCount} matches`;
+                    document.getElementById('testStatus').className = 'status-box status-pass';
+                    log('success', `Test PASSED: ${matchCount}/${total} matches (100%)`);
+                } else {
+                    document.getElementById('testStatus').textContent = `FAIL - ${mismatchCount} mismatches`;
+                    document.getElementById('testStatus').className = 'status-box status-fail';
+                    log('error', `Test FAILED: ${mismatchCount}/${total} mismatches`);
+                }
+
+                log('info', 'Detection stopped');
+            }
+        };
+
+        let lastLogTime = 0;
+
+        let callCount = 0;
+
+        function checkVolumeMatch(result) {
+            callCount++;
+            const callbackVolume = result.volume;
+            const volumeBar = document.getElementById('volumeBar');
+            const barWidthStr = volumeBar ? volumeBar.style.width : '0%';
+            const barWidth = parseFloat(barWidthStr) || 0;
+
+            // 最初の5回は詳細ログ出力
+            if (callCount <= 5) {
+                console.log('📦 [callback] result:', result);
+                console.log(`📊 [callback] volume=${callbackVolume.toFixed(4)}, barWidth=${barWidthStr}`);
+            }
+
+            // Update display
+            document.getElementById('callbackVolume').textContent = `${callbackVolume.toFixed(2)}%`;
+            document.getElementById('barWidth').textContent = barWidthStr;
+
+            // Check if values match (within 1% tolerance)
+            const diff = Math.abs(callbackVolume - barWidth);
+            document.getElementById('difference').textContent = `${diff.toFixed(2)}%`;
+
+            const isMatch = diff < 1.0; // 1% tolerance
+
+            if (isMatch) {
+                matchCount++;
+                document.getElementById('matchStatus').textContent = 'MATCH';
+                document.getElementById('matchStatus').className = 'data-value match';
+            } else {
+                mismatchCount++;
+                document.getElementById('matchStatus').textContent = 'MISMATCH';
+                document.getElementById('matchStatus').className = 'data-value mismatch';
+            }
+
+            // Log periodically
+            const now = Date.now();
+            if (now - lastLogTime > 500) {
+                lastLogTime = now;
+                if (callbackVolume > 0) {
+                    const status = isMatch ? 'MATCH' : 'MISMATCH';
+                    log(isMatch ? 'success' : 'warn',
+                        `${status}: callback=${callbackVolume.toFixed(1)}% bar=${barWidth.toFixed(1)}% diff=${diff.toFixed(2)}%`);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
