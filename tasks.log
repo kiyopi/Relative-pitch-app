@@ -14284,3 +14284,11 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 15:11:29] コミット: fix(preparation): autoUpdateUI: trueに修正（v4.0.34）
+
+- preparation-pitchpro-cycle.jsのautoUpdateUI: false → true
+- AudioDetector再利用時も音量バーが正しく更新されるように
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -1038,6 +1038,7 @@ body::before {
 .progress-fill {
   height: 100%;
   border-radius: 4px;
+  max-width: 100%;  /* 音量値が100%を超える場合のクランプ */
 }
 
 .progress-fill-custom {
