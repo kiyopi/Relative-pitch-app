@@ -1,9 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <!-- キャッシュ無効化 -->
@@ -27,7 +28,8 @@
 
     <!-- Chart.js（総合評価ページで使用） -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 
     <!-- JavaScript モジュール -->
     <script src="js/utils/music-theory.js?v=20251110001"></script>
@@ -56,7 +58,7 @@
     <script src="pages/js/premium-analysis-calculator.js?v=20251110001"></script>
     <script src="pages/js/premium-analysis-controller.js?v=20251110001"></script>
     <script src="pages/js/help-controller.js?v=20251121001"></script>
-    <script src="js/core/pitchpro-v1.3.6.umd.js?v=1764160000"></script>
+    <script src="js/core/pitchpro-v1.3.6.umd.js?v=1764161501"></script>
     <script src="js/core/pitchpro-config.js?v=1764160000"></script>
     <script src="js/core/device-detector.js?v=1764058979"></script>
     <!-- 音域テスト正規版（SPA対応・条件付き初期化） -->
@@ -85,56 +87,57 @@
         console.log('✅ Tone.js v15.1.22 (stable latest) loaded globally');
     </script>
 </head>
+
 <body>
     <div class="container">
         <!-- Header -->
         <header class="app-header">
-                <div class="header-brand">
-                    <div class="header-icon-wrapper">
-                        <div class="header-icon">
-                            <i data-lucide="music" class="icon-lg text-white"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <h1 class="text-3xl font-bold text-white">8va相対音感トレーニング</h1>
-                        <p class="text-purple-200">あなたの音感を科学的に向上させましょう</p>
+            <div class="header-brand">
+                <div class="header-icon-wrapper">
+                    <div class="header-icon">
+                        <i data-lucide="music" class="icon-lg text-white"></i>
                     </div>
                 </div>
-                <!-- モバイル用ハンバーガーメニュー -->
-                <button class="menu-toggle" id="menu-toggle">
-                    <i data-lucide="menu" class="icon-md"></i>
+                <div>
+                    <h1 class="text-3xl font-bold text-white">8va相対音感トレーニング</h1>
+                    <p class="text-purple-200">あなたの音感を科学的に向上させましょう</p>
+                </div>
+            </div>
+            <!-- モバイル用ハンバーガーメニュー -->
+            <button class="menu-toggle" id="menu-toggle">
+                <i data-lucide="menu" class="icon-md"></i>
+            </button>
+
+            <!-- PC用ナビゲーション -->
+            <nav class="header-nav" id="header-nav">
+                <button class="nav-button" onclick="location.hash='records'" title="トレーニング記録を見る">
+                    <i data-lucide="history" class="icon-md"></i>
+                    <span class="nav-text">記録</span>
                 </button>
-                
-                <!-- PC用ナビゲーション -->
-                <nav class="header-nav" id="header-nav">
-                    <button class="nav-button" onclick="location.hash='records'" title="トレーニング記録を見る">
-                        <i data-lucide="history" class="icon-md"></i>
-                        <span class="nav-text">記録</span>
-                    </button>
-                    <button class="nav-button" onclick="location.hash='premium-analysis'" title="詳細分析">
-                        <i data-lucide="bar-chart-3" class="icon-md"></i>
-                        <span class="nav-text">詳細分析</span>
-                    </button>
-                    <button class="nav-button" onclick="location.hash='settings'" title="設定・データ管理">
-                        <i data-lucide="settings" class="icon-md"></i>
-                        <span class="nav-text">設定</span>
-                    </button>
-                    <button class="nav-button" onclick="location.hash='help'" title="ヘルプ">
-                        <i data-lucide="help-circle" class="icon-md"></i>
-                        <span class="nav-text">ヘルプ</span>
-                    </button>
-                    <button class="nav-button">
-                        <i data-lucide="share" class="icon-md"></i>
-                        <span class="nav-text">共有</span>
-                    </button>
-                </nav>
+                <button class="nav-button" onclick="location.hash='premium-analysis'" title="詳細分析">
+                    <i data-lucide="bar-chart-3" class="icon-md"></i>
+                    <span class="nav-text">詳細分析</span>
+                </button>
+                <button class="nav-button" onclick="location.hash='settings'" title="設定・データ管理">
+                    <i data-lucide="settings" class="icon-md"></i>
+                    <span class="nav-text">設定</span>
+                </button>
+                <button class="nav-button" onclick="location.hash='help'" title="ヘルプ">
+                    <i data-lucide="help-circle" class="icon-md"></i>
+                    <span class="nav-text">ヘルプ</span>
+                </button>
+                <button class="nav-button">
+                    <i data-lucide="share" class="icon-md"></i>
+                    <span class="nav-text">共有</span>
+                </button>
+            </nav>
         </header>
 
         <!-- Main Content Container for SPA -->
         <main id="app-root" class="wide-main">
             <!-- 動的にコンテンツがここに読み込まれます -->
         </main>
-        
+
         <!-- Footer -->
         <footer class="footer-base">
             <!-- ナビゲーションボタン（トップページ以外で表示） -->
@@ -161,11 +164,11 @@
 
     <!-- メニュー開閉スクリプト -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const menuToggle = document.getElementById('menu-toggle');
             const headerNav = document.getElementById('header-nav');
-            
-            menuToggle.addEventListener('click', function() {
+
+            menuToggle.addEventListener('click', function () {
                 headerNav.classList.toggle('active');
                 // アイコン切り替え
                 const icon = menuToggle.querySelector('i');
@@ -181,9 +184,9 @@
                     }
                 }
             });
-            
+
             // 外側クリックで閉じる
-            document.addEventListener('click', function(event) {
+            document.addEventListener('click', function (event) {
                 if (!menuToggle.contains(event.target) && !headerNav.contains(event.target)) {
                     headerNav.classList.remove('active');
                     const icon = menuToggle.querySelector('i');
@@ -313,4 +316,5 @@
         }
     </script>
 </body>
+
 </html>

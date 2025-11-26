@@ -14363,3 +14363,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 22:01:58] コミット: fix: PitchPro v1.3.7 二重増幅問題修正
+
+- GainNode(sensitivity)とvolumeMultiplierの二重増幅を修正
+- iPhone: 3.5倍×200倍×3倍=2100倍 → 正常な範囲に修正
+- 音量バー100%問題の根本原因を解決
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
