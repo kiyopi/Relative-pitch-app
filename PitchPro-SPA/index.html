@@ -156,7 +156,7 @@
     <script src="js/lucide-init.js?v=1764058979"></script>
 
     <!-- SPA Router -->
-    <script src="js/router.js?v=1764039998"></script>
+    <script src="js/router.js?v=1764133328"></script>
 
     <!-- Home Page Direction Tabs -->
     <script src="js/home-direction-tabs.js?v=1763963701"></script>
@@ -269,6 +269,11 @@
             } else {
                 // その他のページは確認なしで遷移
                 console.log('🏠 [FooterHome] 確認なしでホームへ遷移');
+
+                // 【v4.0.31追加】ホーム遷移時はAudioDetectorをクリーンアップ
+                // トレーニングフロー外への遷移なので、古いAudioDetectorを破棄
+                cleanupAudioDetectorForHome();
+
                 if (window.NavigationManager) {
                     NavigationManager.navigate('home');
                 } else {
@@ -276,6 +281,50 @@
                     window.location.hash = 'home';
                 }
             }
+        }
+
+        /**
+         * ホーム遷移時のAudioDetectorクリーンアップ
+         * トレーニングフロー外への遷移時に呼び出される
+         */
+        function cleanupAudioDetectorForHome() {
+            console.log('🧹 [FooterHome] ホーム遷移時AudioDetectorクリーンアップ開始');
+
+            // AudioDetector停止・破棄
+            if (window.audioDetector) {
+                try {
+                    window.audioDetector.stopDetection();
+                    if (typeof window.audioDetector.destroy === 'function') {
+                        window.audioDetector.destroy();
+                    }
+                    console.log('✅ [FooterHome] AudioDetector停止・破棄完了');
+                } catch (error) {
+                    console.warn('⚠️ [FooterHome] AudioDetector停止エラー:', error);
+                }
+                window.audioDetector = null;
+            }
+
+            // globalAudioDetectorクリア
+            if (window.globalAudioDetector) {
+                try {
+                    window.globalAudioDetector.stopDetection();
+                    if (typeof window.globalAudioDetector.destroy === 'function') {
+                        window.globalAudioDetector.destroy();
+                    }
+                } catch (error) {
+                    console.warn('⚠️ [FooterHome] globalAudioDetector停止エラー:', error);
+                }
+                window.globalAudioDetector = null;
+                console.log('✅ [FooterHome] globalAudioDetectorクリア完了');
+            }
+
+            // NavigationManager.currentAudioDetectorクリア
+            if (window.NavigationManager?.currentAudioDetector) {
+                window.NavigationManager.currentAudioDetector = null;
+                console.log('✅ [FooterHome] NavigationManager.currentAudioDetectorクリア完了');
+            }
+
+            console.log('🧹 [FooterHome] AudioDetectorクリーンアップ完了');
         }
 
         /**

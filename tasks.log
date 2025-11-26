@@ -14227,3 +14227,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 Co-Authored-By: Claude <noreply@anthropic.com>
 [2025-11-26 13:39:06] コミット: debug: VolumeUIHelper計算式をデバッグログ追加で確認
 [2025-11-26 13:43:03] コミット: fix: VolumeUIHelper計算式をrawVolume*100に修正（multiplier不使用）
+[2025-11-26 13:55:23] コミット: fix(pitchpro-config): autoUpdateUIデフォルト値をfalseに修正
+
+- pitchpro-config.jsのautoUpdateUIデフォルト値: true → false
+- VolumeUIHelper統一管理のための修正漏れを解消
+- trainingController.jsでautoUpdateUI:trueが適用されていた問題を修正
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
