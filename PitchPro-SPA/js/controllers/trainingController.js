@@ -1616,7 +1616,27 @@ function getAvailableNotes() {
 
         let notesToAdd = [];
 
-        if (currentScaleDirection === 'descending') {
+        // 【v4.0.33】availableNotesが空の場合の対応
+        if (availableNotes.length === 0) {
+            console.warn(`   ⚠️ 理想的な基音が0音 → 音域中心付近から${requiredNotes}音を直接選択`);
+
+            // 音域の中心周波数を計算
+            const centerFreq = Math.sqrt(lowFreq * highFreq);
+
+            // 中心に最も近い音を基準に、周囲の音を選択
+            const sortedByCenter = [...allNotes].sort((a, b) =>
+                Math.abs(a.frequency - centerFreq) - Math.abs(b.frequency - centerFreq)
+            );
+
+            // 必要な分だけ選択（最大でrequiredNotes）
+            availableNotes = sortedByCenter.slice(0, requiredNotes);
+
+            // 周波数順にソート
+            availableNotes.sort((a, b) => a.frequency - b.frequency);
+
+            console.log(`   ✅ 音域中心付近から${availableNotes.length}音選択: ${availableNotes.map(n => n.note).join(', ')}`);
+            console.log(`   ※ 音域が狭いため、一部の音は基音±1オクターブが音域外になる可能性があります`);
+        } else if (currentScaleDirection === 'descending') {
             // 【下行モード】低音側に拡張
             const lowestAvailableNote = availableNotes[0];
 
