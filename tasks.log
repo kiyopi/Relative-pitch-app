@@ -14159,3 +14159,47 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 12:02:38] コミット: chore: キャッシュバスター更新 (pitchpro-v1.3.5.umd.js)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 12:18:33] コミット: debug(volume): deviceSpecs確認ログ追加（準備/トレーニングページ比較用）
+
+- 準備ページとトレーニングページでdeviceSpecsのvolumeMultiplier値を
+  ログ出力して比較できるようにした
+- result.volumeが準備ページ10%、トレーニングページ43%と4倍の差がある問題調査用
+- getStatus().deviceSpecsで正確な設定値を取得
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 12:24:22] コミット: chore: キャッシュバスター更新 (v1764127357)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 12:36:33] コミット: fix(preparation): 音量バー更新を一元管理 (v4.0.27)
+
+- autoUpdateUI: false に変更し、コールバック内で明示的にUI更新
+- 問題: autoUpdateUI:true と コールバック両方で更新すると初回/2回目訪問で挙動が異なる
+- 解決: updateUIFromResult() で音量バー・周波数表示を一元管理
+- デバッグログ追加: result.volume の値範囲を確認するため
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 12:38:05] コミット: chore: キャッシュバスター更新 (v=1764128271)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 12:42:02] コミット: fix(preparation): result.volumeを100倍して0-100%に変換 (v4.0.28)
+
+- 問題: result.volumeは0-1の範囲で返されるため音量バーがほぼ動かなかった
+- 修正: result.volume * 100 で0-100%に変換
+- デバッグログ削除
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
