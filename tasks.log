@@ -14236,3 +14236,51 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 14:06:31] コミット: fix(footer-home): ホーム遷移時にAudioDetectorをクリーンアップ
+
+【問題】
+- result-session等からフッターホームボタンでホームに戻る時、AudioDetectorがクリーンアップされなかった
+- 再度トレーニング開始時に古いAudioDetectorが再利用され、rawVolumeが半分以下に低下
+
+【修正】
+- cleanupAudioDetectorForHome()関数を追加
+- 準備/トレーニング以外のページからホーム遷移時にAudioDetectorを停止・破棄
+- window.audioDetector、globalAudioDetector、NavigationManager.currentAudioDetectorをすべてクリア
+
+【影響】
+- 初回: rawVolume 0.30〜0.35 (30〜35%)
+- 修正前再開: rawVolume 0.11〜0.14 (11〜14%) ← 問題
+- 修正後再開: 新規AudioDetector作成で正常値に
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 14:50:12] コミット: fix(audio): VolumeUIHelper廃止・iOS Safari既知バグ対策 (v4.0.32)
+
+- VolumeUIHelperを削除、autoUpdateUI: trueに復元
+- cleanupAudioDetectorForHome()を削除（WebKit Bug 230902対策）
+- 各ページからVolumeUIHelper呼び出しを削除
+- PitchPro音量処理仕様書をSerenaメモに追加
+
+iOS Safari既知バグ:
+- getUserMedia()を複数回呼び出すと音量が半減
+- AudioDetector破棄→再作成でトリガーされる
+- 対策: MediaStreamを保持、破棄処理を削除
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 14:56:02] コミット: fix(training): 音域0音時のTypeError修正 (v4.0.33)
+
+- availableNotesが空の場合のガード処理を追加
+- 音域が狭く理想的な基音が0音の場合、音域中心から直接8音選択
+- TypeError: undefined is not an object を修正
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 15:03:39] コミット: fix: キャッシュバスター更新 pitchpro-config.js
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

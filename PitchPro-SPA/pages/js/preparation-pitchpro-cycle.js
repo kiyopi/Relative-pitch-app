@@ -256,7 +256,7 @@ class PitchProCycleManager {
 
                     // preparation固有設定
                     deviceOptimization: true,
-                    autoUpdateUI: false,  // 【v4.0.27】コールバック内で一元管理するためfalse
+                    autoUpdateUI: true,  // 【v4.0.34】PitchPro標準のUI自動更新を使用
                     debug: false  // 【ログ削減】iPadコンソール安定化のためfalse
                 })
             );
