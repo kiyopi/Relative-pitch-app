@@ -14300,3 +14300,35 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 15:27:47] コミット: debug: 音量バーDOM監視ログ追加（v4.0.35）
+
+- preparation-pitchpro-cycle.js: #volume-progressのstyle.width監視
+- trainingController.js: トレーニング用音量バーのstyle.width監視
+- MutationObserverで実際にDOMに設定される値を確認
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 18:33:30] コミット: fix(audio): PitchPro v1.3.6統合 - 音量バー100%問題修正
+
+- PitchPro v1.3.6を追加（setCallbacks()音量値修正版）
+- index.html: v1.3.5 → v1.3.6に更新
+- trainingController.js: autoUpdateUI: true、手動補正コード削除
+- training.html: キャッシュバスター更新
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 19:08:26] コミット: fix(audio): PitchPro v1.3.6対応 - result.volume二重乗算問題修正
+
+v1.3.6でresult.volumeが0-100%の処理済み値を返すように変更されたため、
+アプリ側の * 100 処理を削除
+
+- preparation-pitchpro-cycle.js: ログ出力の * 100 削除
+- voice-range-test.js: 4箇所の * 100 削除
+- trainingController.js: ログ出力の * 100 削除、MIN_VOLUME を 0.05 → 5 に変更
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 19:09:58] コミット: chore: update cache busters

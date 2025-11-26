@@ -1039,11 +1039,17 @@ class NavigationManager {
                 volumeProgress.style.width = '0%';
             }
 
-            // trainingページ・音域テストページ
-            const volumeBars = document.querySelectorAll('.progress-fill');
-            volumeBars.forEach(bar => {
-                bar.style.width = '0%';
-            });
+            // trainingページ（ID指定に統一）
+            const trainingVolumeProgress = document.getElementById('training-volume-progress');
+            if (trainingVolumeProgress) {
+                trainingVolumeProgress.style.width = '0%';
+            }
+
+            // 音域テストページ
+            const rangeTestVolumeBar = document.getElementById('range-test-volume-bar');
+            if (rangeTestVolumeBar) {
+                rangeTestVolumeBar.style.width = '0%';
+            }
 
             console.log(`🔄 [NavigationManager] 手動音量バーリセット完了`);
         } catch (error) {

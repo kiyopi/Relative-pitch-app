@@ -1058,11 +1058,14 @@ async function startDoremiGuide() {
             // 再利用の場合: UIセレクターを更新
             console.log(`🔄 [Phase2] AudioDetectorを再利用（ソース: ${reusedSource}）`);
             console.log('🔄 UIセレクターを更新中...');
+            // 【v4.0.38】autoUpdateUI: falseで手動更新に切り替え
+            // 再利用時、preparationのautoUpdateUI:trueが引き継がれて100%問題が発生
             await audioDetector.updateSelectors({
                 volumeBarSelector: '#training-volume-progress',  // 🔥 ID指定に統一
                 volumeTextSelector: null,
                 frequencySelector: null,
-                noteSelector: null
+                noteSelector: null,
+                autoUpdateUI: false  // 🔥 v1.3.6: 手動更新で100%問題回避
             });
             console.log('✅ UIセレクター更新完了');
 
@@ -1208,7 +1211,14 @@ function handlePitchUpdate(result) {
 
     // 【デバッグ】コールバックが呼ばれていることを確認（3秒に1回）
     if (!lastCallbackLog || Date.now() - lastCallbackLog > 3000) {
-        console.log(`🔔 [DEBUG] handlePitchUpdate called - frequency: ${result.frequency?.toFixed(1) || 'null'}, clarity: ${result.clarity?.toFixed(2) || 'null'}, volume: ${result.volume?.toFixed(1)}%`);
+        console.log(`🔔 [DEBUG] handlePitchUpdate:`, {
+            frequency: result.frequency?.toFixed(1),
+            clarity: result.clarity?.toFixed(2),
+            volume: result.volume?.toFixed(1),
+            rawVolume: result.rawVolume?.toFixed(4),
+            volumeCalculation: result.rawVolume ?
+                `${result.rawVolume.toFixed(4)} × 200 × 3 = ${(result.rawVolume * 200 * 3).toFixed(1)}` : 'N/A'
+        });
         lastCallbackLog = Date.now();
     }
 
