@@ -1170,10 +1170,8 @@ function handlePitchUpdate(result) {
         lastCallbackLog = Date.now();
     }
 
-    // 【v4.0.30改善】VolumeUIHelperを使用して音量バーを統一更新
-    if (window.VolumeUIHelper) {
-        window.VolumeUIHelper.updateVolumeBar('.mic-recognition-section .progress-fill', result.volume);
-    }
+    // 【v4.0.32】autoUpdateUI: trueのため、音量バー更新はPitchProに任せる
+    // iOS Safari既知バグ（WebKit Bug 230902）対策のためVolumeUIHelper方式を廃止
 
     // 【v4.1.0修正】音程検出条件を強化
     // 問題: 無音時（音量2-3%）でも環境ノイズが「明瞭な音」として誤検出される

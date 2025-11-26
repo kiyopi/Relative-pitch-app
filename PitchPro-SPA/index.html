@@ -57,12 +57,10 @@
     <script src="pages/js/premium-analysis-controller.js?v=20251110001"></script>
     <script src="pages/js/help-controller.js?v=20251121001"></script>
     <script src="js/core/pitchpro-v1.3.5.umd.js?v=1764126136"></script>
-    <script src="js/core/pitchpro-config.js?v=1764132529"></script>
+    <script src="js/core/pitchpro-config.js?v=1764135937"></script>
     <script src="js/core/device-detector.js?v=1764058979"></script>
-    <script src="js/core/volume-ui-helper.js?v=1764132000"></script>
-
     <!-- 音域テスト正規版（SPA対応・条件付き初期化） -->
-    <script src="pages/js/voice-range-test.js?v=1764130641"></script>
+    <script src="pages/js/voice-range-test.js?v=1764135937"></script>
 
     <!-- Tone.js Library (Required for PitchShifter) -->
     <script type="importmap">
@@ -270,9 +268,9 @@
                 // その他のページは確認なしで遷移
                 console.log('🏠 [FooterHome] 確認なしでホームへ遷移');
 
-                // 【v4.0.31追加】ホーム遷移時はAudioDetectorをクリーンアップ
-                // トレーニングフロー外への遷移なので、古いAudioDetectorを破棄
-                cleanupAudioDetectorForHome();
+                // 【v4.0.32】iOS Safari既知バグ対策のためAudioDetector破棄を削除
+                // WebKit Bug 230902: getUserMedia()再呼び出しで音量が半減する
+                // AudioDetectorはstopDetection()のみで停止、MediaStreamは保持
 
                 if (window.NavigationManager) {
                     NavigationManager.navigate('home');
@@ -281,50 +279,6 @@
                     window.location.hash = 'home';
                 }
             }
-        }
-
-        /**
-         * ホーム遷移時のAudioDetectorクリーンアップ
-         * トレーニングフロー外への遷移時に呼び出される
-         */
-        function cleanupAudioDetectorForHome() {
-            console.log('🧹 [FooterHome] ホーム遷移時AudioDetectorクリーンアップ開始');
-
-            // AudioDetector停止・破棄
-            if (window.audioDetector) {
-                try {
-                    window.audioDetector.stopDetection();
-                    if (typeof window.audioDetector.destroy === 'function') {
-                        window.audioDetector.destroy();
-                    }
-                    console.log('✅ [FooterHome] AudioDetector停止・破棄完了');
-                } catch (error) {
-                    console.warn('⚠️ [FooterHome] AudioDetector停止エラー:', error);
-                }
-                window.audioDetector = null;
-            }
-
-            // globalAudioDetectorクリア
-            if (window.globalAudioDetector) {
-                try {
-                    window.globalAudioDetector.stopDetection();
-                    if (typeof window.globalAudioDetector.destroy === 'function') {
-                        window.globalAudioDetector.destroy();
-                    }
-                } catch (error) {
-                    console.warn('⚠️ [FooterHome] globalAudioDetector停止エラー:', error);
-                }
-                window.globalAudioDetector = null;
-                console.log('✅ [FooterHome] globalAudioDetectorクリア完了');
-            }
-
-            // NavigationManager.currentAudioDetectorクリア
-            if (window.NavigationManager?.currentAudioDetector) {
-                window.NavigationManager.currentAudioDetector = null;
-                console.log('✅ [FooterHome] NavigationManager.currentAudioDetectorクリア完了');
-            }
-
-            console.log('🧹 [FooterHome] AudioDetectorクリーンアップ完了');
         }
 
         /**

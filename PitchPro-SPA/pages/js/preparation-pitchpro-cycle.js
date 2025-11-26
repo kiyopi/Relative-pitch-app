@@ -569,14 +569,13 @@ class PitchProCycleManager {
 
     /**
      * 音程更新ハンドラー（PitchProコールバック）
-     * 【v4.0.27改善】autoUpdateUI: false により、ここで音量バー・周波数表示を一元管理
+     * 【v4.0.32改善】autoUpdateUI: true でPitchProがUI更新を担当
      */
     handlePitchUpdate(result) {
         if (!this.state.detectionActive) return;
 
-        // 【v4.0.27】UI更新を一元管理（autoUpdateUI: falseのため手動更新）
-        // PitchProコールバックのresult.volumeは0-100の範囲で返される
-        this.updateUIFromResult(result);
+        // 【v4.0.32】autoUpdateUI: trueのため、UI更新はPitchProに任せる
+        // iOS Safari既知バグ（WebKit Bug 230902）対策のためVolumeUIHelper方式を廃止
 
         // モード別処理
         switch (this.state.currentMode) {
@@ -587,34 +586,7 @@ class PitchProCycleManager {
     }
 
     /**
-     * 【v4.0.30改善】音量バー・周波数表示の一元更新
-     * VolumeUIHelperを使用して統一的にUI更新
-     * autoUpdateUI: falseのため、コールバック内で明示的にUI更新
-     */
-    updateUIFromResult(result) {
-        // VolumeUIHelperを使用して統一更新
-        if (window.VolumeUIHelper) {
-            window.VolumeUIHelper.updateFromResult(result, {
-                volumeBar: this.uiElements.volumeBar,
-                volumeText: this.uiElements.volumeText,
-                frequency: this.uiElements.frequencyDisplay
-            });
-        } else {
-            // フォールバック（VolumeUIHelper未ロード時）
-            console.warn('⚠️ VolumeUIHelper not loaded, using fallback');
-            const volumePercent = Math.min(100, Math.max(0, result.volume * 100));
-            if (this.uiElements.volumeBar) {
-                this.uiElements.volumeBar.style.width = `${volumePercent}%`;
-            }
-            if (this.uiElements.volumeText) {
-                this.uiElements.volumeText.textContent = `${volumePercent.toFixed(1)}%`;
-            }
-        }
-    }
-
-    /**
      * 周波数から音名を取得
-     * @deprecated VolumeUIHelper.frequencyToNoteName()を使用
      */
     getNoteName(frequency) {
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];

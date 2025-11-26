@@ -678,14 +678,8 @@ async function startVoiceRangeTest(audioDetectorInstance) { // 引数を追加
 function handleVoiceDetection(result, audioDetector) {
     // 音声検出処理（本番用 - デバッグカウンター削除済み）
 
-    // 【v4.0.30改善】VolumeUIHelperを使用して音量バー・周波数表示を統一更新
-    if (window.VolumeUIHelper) {
-        window.VolumeUIHelper.updateFromResult(result, {
-            volumeBar: '#range-test-volume-bar',
-            volumeText: '#range-test-volume-text',
-            frequency: '#range-test-frequency-value'
-        });
-    }
+    // 【v4.0.32】autoUpdateUI: trueのため、UI更新はPitchProに任せる
+    // iOS Safari既知バグ（WebKit Bug 230902）対策のためVolumeUIHelper方式を廃止
 
     // 測定データを常に記録（音量が閾値以下でも）
     recordMeasurementData(result);

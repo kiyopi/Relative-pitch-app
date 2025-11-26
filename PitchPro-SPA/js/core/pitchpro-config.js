@@ -122,11 +122,11 @@
 
                 /**
                  * UI自動更新
-                 * - デフォルトfalse
-                 * - VolumeUIHelperで統一管理するため無効化
-                 * - 【v1.2.4】autoUpdateUI:trueで音量2倍バグ発生のため
+                 * - デフォルトtrue（PitchProに任せる）
+                 * - VolumeUIHelperアプローチはiOS Safari既知バグにより廃止
+                 * - 【v1.2.5】autoUpdateUI:trueに復元
                  */
-                autoUpdateUI: options.autoUpdateUI !== undefined ? options.autoUpdateUI : false,
+                autoUpdateUI: options.autoUpdateUI !== undefined ? options.autoUpdateUI : true,
 
                 /**
                  * デバッグモード
