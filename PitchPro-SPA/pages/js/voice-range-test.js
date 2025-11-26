@@ -270,10 +270,11 @@ function isStableVoiceDetection(result) {
 
     if (hasValidFrequency && hasMinVolume) {
         // 初回検出時にタイムスタンプを記録
+        // 【v4.0.38】PitchPro v1.3.6対応: result.volumeは既に0-100%の処理済み値
         if (stability.lowFreqContinuousStart === null) {
             stability.lowFreqContinuousStart = now;
             // 【デバッグログ抑制】大量出力を防止
-            // console.log('🎤 音声継続検出開始:', { frequency: result.frequency.toFixed(1) + 'Hz', note: result.note, volume: (result.volume * 100).toFixed(1) + '%', threshold: (lowFreqVolumeThreshold * 100).toFixed(1) + '%' });
+            // console.log('🎤 音声継続検出開始:', { frequency: result.frequency.toFixed(1) + 'Hz', note: result.note, volume: result.volume.toFixed(1) + '%', threshold: (lowFreqVolumeThreshold * 100).toFixed(1) + '%' });
         }
 
         // 継続時間をチェック
@@ -283,7 +284,7 @@ function isStableVoiceDetection(result) {
                 frequency: result.frequency.toFixed(1) + 'Hz',
                 note: result.note,
                 duration: (continuousDuration / 1000).toFixed(1) + '秒',
-                volume: (result.volume * 100).toFixed(1) + '%'
+                volume: result.volume.toFixed(1) + '%'  // v1.3.6: 既に0-100%
             });
             return true; // 安定性チェックをバイパス
         } else {
@@ -368,14 +369,16 @@ function isStableVoiceDetection(result) {
         return false;
     }
     
+    // 【v4.0.38】PitchPro v1.3.6対応: result.volumeは既に0-100%の処理済み値
+    // avgVolumeはrecentDetectionsから計算されるため、格納時点の値に依存
     console.log('✅ 安定した音声を検出（緩和版）:', {
         note: result.note,
         frequency: result.frequency.toFixed(1) + 'Hz',
-        volume: (result.volume * 100).toFixed(1) + '%',
+        volume: result.volume.toFixed(1) + '%',  // v1.3.6: 既に0-100%
         detectionCount: stability.recentDetections.length,
         avgFreq: avgFreq.toFixed(1) + 'Hz',
         freqStability: maxDeviation.toFixed(1) + 'Hz',
-        volumeStability: (avgVolume * 100).toFixed(1) + '%'
+        volumeStability: avgVolume.toFixed(1) + '%'  // recentDetectionsもv1.3.6対応済み
     });
     
     return true;
@@ -740,7 +743,8 @@ function recordMeasurementData(result) {
                 if (!globalState.hasContinuityFailure) {
                     console.warn('⚠️ 音声途切れ検出: 連続性失敗フラグを設定');
                     console.warn(`📊 無音フレーム数: ${globalState.silentFrameCount}フレーム（約${Math.round(globalState.silentFrameCount * 33)}ms相当）`);
-                    console.warn(`📊 最終チェック値: 周波数=${result.frequency ? result.frequency.toFixed(1) : 'なし'}Hz, 音量=${result.volume ? (result.volume * 100).toFixed(1) : '0'}%`);
+                    // 【v4.0.38】PitchPro v1.3.6対応: result.volumeは既に0-100%
+                    console.warn(`📊 最終チェック値: 周波数=${result.frequency ? result.frequency.toFixed(1) : 'なし'}Hz, 音量=${result.volume ? result.volume.toFixed(1) : '0'}%`);
                     globalState.hasContinuityFailure = true;
                 }
                 // 測定は継続（3秒後に判定）

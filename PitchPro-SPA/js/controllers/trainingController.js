@@ -1204,10 +1204,11 @@ let pitchDataBuffer = []; // 各ステップの音程データを一時保存
 function handlePitchUpdate(result) {
     // AudioDetectionComponentからのresultは直接PitchProの形式
     // result: { frequency, clarity, volume, note }
+    // 【v4.0.38】PitchPro v1.3.6対応: result.volumeは既に0-100%の処理済み値
 
     // 【デバッグ】コールバックが呼ばれていることを確認（3秒に1回）
     if (!lastCallbackLog || Date.now() - lastCallbackLog > 3000) {
-        console.log(`🔔 [DEBUG] handlePitchUpdate called - frequency: ${result.frequency?.toFixed(1) || 'null'}, clarity: ${result.clarity?.toFixed(2) || 'null'}, volume: ${(result.volume * 100).toFixed(1)}%`);
+        console.log(`🔔 [DEBUG] handlePitchUpdate called - frequency: ${result.frequency?.toFixed(1) || 'null'}, clarity: ${result.clarity?.toFixed(2) || 'null'}, volume: ${result.volume?.toFixed(1)}%`);
         lastCallbackLog = Date.now();
     }
 
@@ -1218,14 +1219,15 @@ function handlePitchUpdate(result) {
     // 【v4.1.0修正】音程検出条件を強化
     // 問題: 無音時（音量2-3%）でも環境ノイズが「明瞭な音」として誤検出される
     // 対策: 明瞭度0.25以上 AND 音量5%以上を必須条件とする
+    // 【v4.0.38】v1.3.6対応: volumeは0-100%なのでMIN_VOLUMEも5（5%）に変更
     const MIN_CLARITY = 0.25;
-    const MIN_VOLUME = 0.05;  // 5% - 環境ノイズを除外する閾値
+    const MIN_VOLUME = 5;  // 5% - 環境ノイズを除外する閾値（v1.3.6: 0-100%）
 
     // 音程検出のログ（デバッグ用）
     if (result.frequency && result.clarity > MIN_CLARITY && result.volume > MIN_VOLUME) {
         // 1秒に1回だけログ出力
         if (!lastPitchLog || Date.now() - lastPitchLog > 1000) {
-            console.log(`🎵 音程検出: ${result.frequency.toFixed(1)}Hz (${result.note || ''}), 明瞭度: ${result.clarity.toFixed(2)}, 音量: ${(result.volume * 100).toFixed(1)}%`);
+            console.log(`🎵 音程検出: ${result.frequency.toFixed(1)}Hz (${result.note || ''}), 明瞭度: ${result.clarity.toFixed(2)}, 音量: ${result.volume.toFixed(1)}%`);
             lastPitchLog = Date.now();
         }
 

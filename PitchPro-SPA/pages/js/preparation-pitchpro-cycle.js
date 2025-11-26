@@ -645,14 +645,15 @@ class PitchProCycleManager {
         // PitchProの内部最適化を完全に信頼
         // PitchProが値を返している = 有効な音声として認識済み
 
+        // 【v4.0.38】PitchPro v1.3.6対応: result.volumeは既に0-100%の処理済み値
         if (DEBUG_MIC_TEST) {
-            console.log(`🎤 PitchPro検出: freq:${result.frequency?.toFixed(1)}Hz vol:${(result.volume * 100)?.toFixed(1)}% clarity:${result.clarity?.toFixed(2)}`);
+            console.log(`🎤 PitchPro検出: freq:${result.frequency?.toFixed(1)}Hz vol:${result.volume?.toFixed(1)}% clarity:${result.clarity?.toFixed(2)}`);
         }
 
         // 【デバッグ用】ノイズレベル確認 - rawVolumeとvolumeの差分を確認
         if (DEBUG_NOISE_LEVEL) {
             const rawVol = result.rawVolume !== undefined ? (result.rawVolume * 100).toFixed(2) : 'N/A';
-            const processedVol = (result.volume * 100).toFixed(2);
+            const processedVol = result.volume.toFixed(2);  // v1.3.6: 既に0-100%
             const noiseGateApplied = result.volume === 0 && result.rawVolume > 0;
             console.log(`🔊 ノイズ確認: rawVolume:${rawVol}% → volume:${processedVol}% ${noiseGateApplied ? '【ノイズゲート適用】' : ''}`);
         }
