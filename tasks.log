@@ -14074,3 +14074,40 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-25 20:22:11] コミット: fix(noise-gate): onPitchUpdateをコンストラクタで設定してノイズゲート適用を修正 (v4.8.0)
+
+- setCallbacks()でonPitchUpdateを設定するとPitchDetectorに直接伝播し、
+  _getProcessedResult()（ノイズゲート処理）がバイパスされる問題を修正
+- onPitchUpdateをコンストラクタで設定することで、正しくノイズゲートが適用される
+- setCallbacks()からはonPitchUpdateを除外し、onVolumeUpdateとonErrorのみ設定
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 09:37:04] コミット: revert: onPitchUpdateコンストラクタ設定を元に戻す
+
+- d96fda4の変更を取り消し
+- ノイズゲートは正しく動作していた
+- 問題はnoiseGate閾値が低すぎることだった
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 09:52:16] コミット: test: iPhone/iPad noiseGate値を0.06に調整してテスト
+
+- iPad: 0.023 → 0.06 (閾値12%)
+- iPhone: 0.028 → 0.06 (閾値12%)
+- 環境ノイズ(約10.86%)をブロックするため
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 09:53:14] コミット: test: iPhone/iPad noiseGate値を0.06に調整してテスト
+
+- iPad: 0.023 → 0.06 (閾値12%)
+- iPhone: 0.028 → 0.06 (閾値12%)
+- 環境ノイズ(約10.86%)をブロックするため
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -3,6 +3,7 @@
  * Based on vanilla JS + 自作SPA development roadmap
  *
  * Changelog:
+ *   v2.14.0 (2025-11-26) - preparation page cleanup改善（AudioDetector停止・参照クリアをtrainingと統一）
  *   v2.13.0 (2025-11-23) - ページタイトル管理機能追加（履歴・タブでページ識別可能に）
  *   v2.12.0 (2025-11-22) - 外部スクリプト二重読み込み防止のバグ修正（executedScripts Set使用）
  *   v2.11.0 (2025-11-22) - [REVERTED] 外部スクリプトの二重読み込み防止（document.scriptsチェックにバグあり）
@@ -74,8 +75,21 @@ class SimpleRouter {
                     }
 
                     // NavigationManagerが管理していない場合のみクリーンアップ
-                    if (typeof window.preparationManager !== 'undefined' && window.preparationManager) {
-                        await window.preparationManager.cleanupPitchPro();
+                    // 【v2.14.0】window.audioDetectorを使用（trainingと同じパターン）
+                    if (window.audioDetector) {
+                        console.log('🛑 [Router] Stopping AudioDetector...');
+                        try {
+                            window.audioDetector.stopDetection();
+                        } catch (error) {
+                            console.warn('⚠️ [Router] AudioDetector already stopped:', error);
+                        }
+                        window.audioDetector = null;
+                    }
+
+                    // globalAudioDetectorもクリア（フロー外遷移のため）
+                    if (window.globalAudioDetector) {
+                        console.log('🧹 [Router] globalAudioDetectorをクリア');
+                        window.globalAudioDetector = null;
                     }
 
                     // 初期化フラグをリセット
