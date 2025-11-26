@@ -122,10 +122,11 @@
 
                 /**
                  * UI自動更新
-                 * - デフォルトtrue
-                 * - 音量バー・周波数表示の自動更新
+                 * - デフォルトfalse
+                 * - VolumeUIHelperで統一管理するため無効化
+                 * - 【v1.2.4】autoUpdateUI:trueで音量2倍バグ発生のため
                  */
-                autoUpdateUI: options.autoUpdateUI !== undefined ? options.autoUpdateUI : true,
+                autoUpdateUI: options.autoUpdateUI !== undefined ? options.autoUpdateUI : false,
 
                 /**
                  * デバッグモード

@@ -14203,3 +14203,27 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 12:50:31] コミット: fix(all): 音量バー手動更新を全ページに追加 (v4.0.29)
+
+- trainingController.js: handlePitchUpdate内で音量バー手動更新
+- voice-range-test.js: handleVoiceDetection内で音量バー手動更新
+- 原因: autoUpdateUI: falseのため、コールバック内で明示的にUI更新が必要
+- result.volumeは0-1範囲なので100倍して0-100%に変換
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 13:23:53] コミット: feat(volume-ui): VolumeUIHelper統一音量バー更新システム実装
+
+- VolumeUIHelper新規作成: 音量バー・周波数表示の統一更新ヘルパー
+- DeviceDetector.getDeviceSensitivity()でvolumeMultiplier自動適用
+- preparation-pitchpro-cycle.js: VolumeUIHelper使用に変更
+- trainingController.js: VolumeUIHelper使用に変更
+- voice-range-test.js: VolumeUIHelper使用に変更（周波数表示も対応）
+- autoUpdateUI:falseでの手動UI更新を一元管理
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 13:39:06] コミット: debug: VolumeUIHelper計算式をデバッグログ追加で確認
+[2025-11-26 13:43:03] コミット: fix: VolumeUIHelper計算式をrawVolume*100に修正（multiplier不使用）
