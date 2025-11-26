@@ -14332,3 +14332,12 @@ v1.3.6でresult.volumeが0-100%の処理済み値を返すように変更され�
 
 Co-Authored-By: Claude <noreply@anthropic.com>
 [2025-11-26 19:09:58] コミット: chore: update cache busters
+[2025-11-26 20:06:09] コミット: debug: rawVolumeデバッグログ追加（トレーニング画面100%問題調査）
+
+- handlePitchUpdate()にrawVolume値と計算過程をログ出力
+- result.rawVolume × 200 × 3 の計算式を表示
+- キャッシュバスター更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
