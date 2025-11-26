@@ -36,13 +36,22 @@
 
         /**
          * 生の音量値を表示用パーセントに変換
-         * @param {number} rawVolume - result.volume (0-1の範囲)
+         * @param {number} rawVolume - result.volume (0-1の範囲、実際は0-0.3程度)
          * @returns {number} 表示用パーセント (0-100)
+         *
+         * 【計算式】PitchProの自動UI更新と同じ:
+         *   displayPercent = rawVolume * volumeMultiplier
+         *   (volumeMultiplierはデバイス別: PC=4.0, iPhone=4.5, iPad=7.0)
          */
         calculateVolumePercent(rawVolume) {
             const multiplier = this.getVolumeMultiplier();
-            // PitchProと同じ計算式: volume * multiplier、最大100でクランプ
-            return Math.min(100, Math.max(0, rawVolume * multiplier * 100));
+            // 【デバッグ】実際の値を確認
+            const result = Math.min(100, Math.max(0, rawVolume * multiplier));
+            // 10回に1回だけログ出力（大量ログ防止）
+            if (Math.random() < 0.1) {
+                console.log(`🔊 [VolumeUIHelper] rawVolume=${rawVolume.toFixed(4)}, multiplier=${multiplier}, result=${result.toFixed(1)}%`);
+            }
+            return result;
         },
 
         /**
