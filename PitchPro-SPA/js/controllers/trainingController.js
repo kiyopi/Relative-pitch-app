@@ -1170,12 +1170,9 @@ function handlePitchUpdate(result) {
         lastCallbackLog = Date.now();
     }
 
-    // 【v4.0.29】音量バーを手動更新（autoUpdateUI: falseのため）
-    // result.volumeは0-1の範囲 → 100倍して0-100%に変換
-    const volumeBar = document.querySelector('.mic-recognition-section .progress-fill');
-    if (volumeBar) {
-        const volumePercent = Math.min(100, Math.max(0, result.volume * 100));
-        volumeBar.style.width = `${volumePercent}%`;
+    // 【v4.0.30改善】VolumeUIHelperを使用して音量バーを統一更新
+    if (window.VolumeUIHelper) {
+        window.VolumeUIHelper.updateVolumeBar('.mic-recognition-section .progress-fill', result.volume);
     }
 
     // 【v4.1.0修正】音程検出条件を強化

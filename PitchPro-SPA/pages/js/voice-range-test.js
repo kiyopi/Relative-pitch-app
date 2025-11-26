@@ -678,17 +678,13 @@ async function startVoiceRangeTest(audioDetectorInstance) { // 引数を追加
 function handleVoiceDetection(result, audioDetector) {
     // 音声検出処理（本番用 - デバッグカウンター削除済み）
 
-    // 【v4.0.29】音量バーを手動更新（autoUpdateUI: falseのため）
-    // result.volumeは0-1の範囲 → 100倍して0-100%に変換
-    const volumeBar = document.getElementById('range-test-volume-bar');
-    if (volumeBar) {
-        const volumePercent = Math.min(100, Math.max(0, result.volume * 100));
-        volumeBar.style.width = `${volumePercent}%`;
-    }
-    const volumeText = document.getElementById('range-test-volume-text');
-    if (volumeText) {
-        const volumePercent = Math.min(100, Math.max(0, result.volume * 100));
-        volumeText.textContent = `${volumePercent.toFixed(1)}%`;
+    // 【v4.0.30改善】VolumeUIHelperを使用して音量バー・周波数表示を統一更新
+    if (window.VolumeUIHelper) {
+        window.VolumeUIHelper.updateFromResult(result, {
+            volumeBar: '#range-test-volume-bar',
+            volumeText: '#range-test-volume-text',
+            frequency: '#range-test-frequency-value'
+        });
     }
 
     // 測定データを常に記録（音量が閾値以下でも）

@@ -587,37 +587,34 @@ class PitchProCycleManager {
     }
 
     /**
-     * 【v4.0.28修正】音量バー・周波数表示の一元更新
+     * 【v4.0.30改善】音量バー・周波数表示の一元更新
+     * VolumeUIHelperを使用して統一的にUI更新
      * autoUpdateUI: falseのため、コールバック内で明示的にUI更新
-     *
-     * 【重要】result.volumeは0-1の範囲で返される（PitchProコールバック経由）
-     * UIに表示する際は100倍して0-100%に変換する必要がある
      */
     updateUIFromResult(result) {
-        // result.volumeは0-1の範囲 → 100倍して0-100%に変換
-        const volumePercent = Math.min(100, Math.max(0, result.volume * 100));
-
-        // 音量バー更新
-        if (this.uiElements.volumeBar) {
-            this.uiElements.volumeBar.style.width = `${volumePercent}%`;
-        }
-
-        // 音量テキスト更新
-        if (this.uiElements.volumeText) {
-            this.uiElements.volumeText.textContent = `${volumePercent.toFixed(1)}%`;
-        }
-
-        // 周波数表示更新
-        if (this.uiElements.frequencyDisplay && result.frequency > 0) {
-            const noteName = this.getNoteName(result.frequency);
-            this.uiElements.frequencyDisplay.textContent = `${result.frequency.toFixed(1)} Hz (${noteName})`;
-        } else if (this.uiElements.frequencyDisplay) {
-            this.uiElements.frequencyDisplay.textContent = '0.0 Hz';
+        // VolumeUIHelperを使用して統一更新
+        if (window.VolumeUIHelper) {
+            window.VolumeUIHelper.updateFromResult(result, {
+                volumeBar: this.uiElements.volumeBar,
+                volumeText: this.uiElements.volumeText,
+                frequency: this.uiElements.frequencyDisplay
+            });
+        } else {
+            // フォールバック（VolumeUIHelper未ロード時）
+            console.warn('⚠️ VolumeUIHelper not loaded, using fallback');
+            const volumePercent = Math.min(100, Math.max(0, result.volume * 100));
+            if (this.uiElements.volumeBar) {
+                this.uiElements.volumeBar.style.width = `${volumePercent}%`;
+            }
+            if (this.uiElements.volumeText) {
+                this.uiElements.volumeText.textContent = `${volumePercent.toFixed(1)}%`;
+            }
         }
     }
 
     /**
      * 周波数から音名を取得
+     * @deprecated VolumeUIHelper.frequencyToNoteName()を使用
      */
     getNoteName(frequency) {
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
