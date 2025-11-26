@@ -14292,3 +14292,11 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 15:17:10] コミット: fix(css): 音量バー100%超え問題の修正（max-width追加）
+
+- .progress-fillにmax-width: 100%を追加
+- volumeMultiplier適用後の値が100%を超える場合のクランプ
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

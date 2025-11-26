@@ -17,6 +17,47 @@
 // ===== デバッグ設定 =====
 const DEBUG_MIC_TEST = true; // マイクテスト詳細ログ（🎤 PitchPro検出、⏰ 経過時間）- ノイズレベル確認のため一時的にtrue
 const DEBUG_NOISE_LEVEL = true; // 【デバッグ用】ノイズレベル確認用ログ（rawVolume含む）
+const DEBUG_VOLUME_BAR = true; // 【v4.0.35】音量バーDOM監視ログ
+
+// 【v4.0.35】音量バーDOM監視（MutationObserver）
+if (DEBUG_VOLUME_BAR) {
+    let lastVolumeBarLog = 0;
+    const observeVolumeBar = () => {
+        const volumeBar = document.getElementById('volume-progress');
+        if (!volumeBar) {
+            console.log('📊 [VolumeBarDebug] #volume-progress not found yet, retry in 500ms');
+            setTimeout(observeVolumeBar, 500);
+            return;
+        }
+
+        console.log('📊 [VolumeBarDebug] Starting MutationObserver on #volume-progress');
+
+        const observer = new MutationObserver((mutations) => {
+            const now = Date.now();
+            // 500msに1回だけログ出力
+            if (now - lastVolumeBarLog < 500) return;
+            lastVolumeBarLog = now;
+
+            const currentWidth = volumeBar.style.width;
+            const computedWidth = window.getComputedStyle(volumeBar).width;
+            const parentWidth = volumeBar.parentElement?.offsetWidth || 'N/A';
+
+            console.log(`📊 [VolumeBarDebug] style.width: "${currentWidth}", computed: ${computedWidth}, parent: ${parentWidth}px`);
+        });
+
+        observer.observe(volumeBar, {
+            attributes: true,
+            attributeFilter: ['style']
+        });
+    };
+
+    // DOMContentLoadedまたは即座に実行
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', observeVolumeBar);
+    } else {
+        setTimeout(observeVolumeBar, 100);
+    }
+}
 
 // ===== 【v4.4.0統一】音量永続化ヘルパー関数 =====
 // 設定ページのティックスライダーと同じキーを使用

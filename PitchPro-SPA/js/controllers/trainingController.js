@@ -88,7 +88,45 @@
  * - タイミング最適化: ドレミガイド開始タイミングのコメントを正確に修正
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.26 (2025-11-26) LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.35 (2025-11-26) LOADED 🔥🔥🔥');
+
+// 【v4.0.35】音量バーDOM監視デバッグ
+const DEBUG_TRAINING_VOLUME_BAR = true;
+if (DEBUG_TRAINING_VOLUME_BAR) {
+    let lastTrainingVolumeBarLog = 0;
+    const observeTrainingVolumeBar = () => {
+        // トレーニングページの音量バーセレクター
+        const volumeBar = document.querySelector('.mic-recognition-section .progress-fill');
+        if (!volumeBar) {
+            console.log('📊 [TrainingVolumeBarDebug] .mic-recognition-section .progress-fill not found yet, retry in 500ms');
+            setTimeout(observeTrainingVolumeBar, 500);
+            return;
+        }
+
+        console.log('📊 [TrainingVolumeBarDebug] Starting MutationObserver on training volume bar');
+
+        const observer = new MutationObserver((mutations) => {
+            const now = Date.now();
+            // 500msに1回だけログ出力
+            if (now - lastTrainingVolumeBarLog < 500) return;
+            lastTrainingVolumeBarLog = now;
+
+            const currentWidth = volumeBar.style.width;
+            const computedWidth = window.getComputedStyle(volumeBar).width;
+            const parentWidth = volumeBar.parentElement?.offsetWidth || 'N/A';
+
+            console.log(`📊 [TrainingVolumeBarDebug] style.width: "${currentWidth}", computed: ${computedWidth}, parent: ${parentWidth}px`);
+        });
+
+        observer.observe(volumeBar, {
+            attributes: true,
+            attributeFilter: ['style']
+        });
+    };
+
+    // 少し遅延してから開始（ページ遷移後のDOM生成を待つ）
+    setTimeout(observeTrainingVolumeBar, 1000);
+}
 
 let isInitialized = false;
 let pitchShifter = null;
