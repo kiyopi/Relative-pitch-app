@@ -95,10 +95,10 @@ const DEBUG_TRAINING_VOLUME_BAR = true;
 if (DEBUG_TRAINING_VOLUME_BAR) {
     let lastTrainingVolumeBarLog = 0;
     const observeTrainingVolumeBar = () => {
-        // トレーニングページの音量バーセレクター
-        const volumeBar = document.querySelector('.mic-recognition-section .progress-fill');
+        // トレーニングページの音量バーセレクター（ID指定に統一）
+        const volumeBar = document.getElementById('training-volume-progress');
         if (!volumeBar) {
-            console.log('📊 [TrainingVolumeBarDebug] .mic-recognition-section .progress-fill not found yet, retry in 500ms');
+            console.log('📊 [TrainingVolumeBarDebug] #training-volume-progress not found yet, retry in 500ms');
             setTimeout(observeTrainingVolumeBar, 500);
             return;
         }
@@ -1012,13 +1012,16 @@ async function startDoremiGuide() {
             console.log('🎤 [Phase2] AudioDetectionComponent新規作成');
 
             // 統一設定モジュールを使用（倍音補正・周波数範囲を統一管理）
+            // 【v4.0.37】PitchPro v1.3.6でsetCallbacks()の音量値修正完了
+            // autoUpdateUI: trueでPitchProの自動UI更新を使用
             audioDetector = new window.PitchPro.AudioDetectionComponent(
                 window.PitchProConfig.getDefaultConfig({
-                    volumeBarSelector: '.mic-recognition-section .progress-fill',
+                    volumeBarSelector: '#training-volume-progress',  // 🔥 ID指定に統一
                     volumeTextSelector: null,
                     frequencySelector: null,
                     noteSelector: null,
-                    smoothing: 0.1  // 🔥 DeviceDetectionの0.25を上書き（CPU負荷軽減）
+                    smoothing: 0.1,  // 🔥 DeviceDetectionの0.25を上書き（CPU負荷軽減）
+                    autoUpdateUI: true  // 🔥 PitchPro v1.3.6で音量値修正完了
                 })
             );
 
@@ -1048,7 +1051,7 @@ async function startDoremiGuide() {
             // 🔥 v1.3.2対応: UIキャッシュを明示的に再構築
             console.log('🔄 UIキャッシュを再構築中...');
             await audioDetector.updateSelectors({
-                volumeBarSelector: '.mic-recognition-section .progress-fill'
+                volumeBarSelector: '#training-volume-progress'  // 🔥 ID指定に統一
             });
             console.log('✅ UIキャッシュ再構築完了');
         } else {
@@ -1056,7 +1059,7 @@ async function startDoremiGuide() {
             console.log(`🔄 [Phase2] AudioDetectorを再利用（ソース: ${reusedSource}）`);
             console.log('🔄 UIセレクターを更新中...');
             await audioDetector.updateSelectors({
-                volumeBarSelector: '.mic-recognition-section .progress-fill',
+                volumeBarSelector: '#training-volume-progress',  // 🔥 ID指定に統一
                 volumeTextSelector: null,
                 frequencySelector: null,
                 noteSelector: null
@@ -1127,8 +1130,8 @@ async function startDoremiGuide() {
             uiUpdateTimer: audioDetector.uiUpdateTimer ? 'active' : 'null'
         });
 
-        // 【DEBUG v4.0.24】DOM要素の存在確認
-        const volumeBarElement = document.querySelector('.mic-recognition-section .progress-fill');
+        // 【DEBUG v4.0.24】DOM要素の存在確認（ID指定に統一）
+        const volumeBarElement = document.getElementById('training-volume-progress');
         console.log('🔍 [DEBUG] 音量バーDOM要素:', volumeBarElement ? '存在' : '見つからない');
 
     } catch (error) {
@@ -1208,8 +1211,9 @@ function handlePitchUpdate(result) {
         lastCallbackLog = Date.now();
     }
 
-    // 【v4.0.32】autoUpdateUI: trueのため、音量バー更新はPitchProに任せる
-    // iOS Safari既知バグ（WebKit Bug 230902）対策のためVolumeUIHelper方式を廃止
+    // 【v4.0.37】手動音量バー更新削除
+    // PitchPro v1.3.6でsetCallbacks()がgetProcessedResult()経由になり、
+    // autoUpdateUI: trueで音量バーが正しく更新されるようになった
 
     // 【v4.1.0修正】音程検出条件を強化
     // 問題: 無音時（音量2-3%）でも環境ノイズが「明瞭な音」として誤検出される
@@ -1322,8 +1326,8 @@ function handleSessionComplete() {
         micBadge.classList.remove('measuring');
     }
 
-    // 音量バーをリセット
-    const volumeBar = document.querySelector('.mic-recognition-section .progress-fill');
+    // 音量バーをリセット（ID指定に統一）
+    const volumeBar = document.getElementById('training-volume-progress');
     if (volumeBar) {
         volumeBar.style.width = '0%';
         console.log('🔄 音量バーリセット');
