@@ -1065,7 +1065,7 @@ async function startDoremiGuide() {
                 volumeTextSelector: null,
                 frequencySelector: null,
                 noteSelector: null,
-                autoUpdateUI: false  // 🔥 v1.3.6: 手動更新で100%問題回避
+                autoUpdateUI: true  // 🔥 v1.3.6: 手動更新で100%問題回避
             });
             console.log('✅ UIセレクター更新完了');
 
@@ -1216,8 +1216,7 @@ function handlePitchUpdate(result) {
             clarity: result.clarity?.toFixed(2),
             volume: result.volume?.toFixed(1),
             rawVolume: result.rawVolume?.toFixed(4),
-            volumeCalculation: result.rawVolume ?
-                `${result.rawVolume.toFixed(4)} × 200 × 3 = ${(result.rawVolume * 200 * 3).toFixed(1)}` : 'N/A'
+            volumeCalculation: 'Handled by PitchPro v1.3.9'
         });
         lastCallbackLog = Date.now();
     }
