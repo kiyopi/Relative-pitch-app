@@ -14111,3 +14111,32 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 10:43:13] コミット: test: noiseGate 0.06 + volumeMultiplier調整（iPad:2.0, iPhone:1.5）
+
+- iPad: volumeMultiplier 4.0→2.0
+- iPhone: volumeMultiplier 3.0→1.5
+- noiseGate 0.06（閾値12%）と組み合わせて適切な音量表示範囲を実現
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 11:17:55] コミット: fix(audio): volumeMultiplier調整とAudioDetectorクリーンアップ修正 (v4.0.23)
+
+- iPad volumeMultiplier: 2.0 → 3.0（音量バー表示範囲拡大）
+- iPhone volumeMultiplier: 1.5 → 2.5（音量バー表示範囲拡大）
+- 準備ページ→ホーム遷移時のAudioDetector明示的停止を追加（v4.0.5）
+- NAVIGATION_HANDLING_SPECIFICATION.md v5.2.0更新
+  - 非トレーニングフロー（準備→ホーム）のクリーンアップ仕様修正
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 11:36:16] コミット: fix(audio): volumeMultiplier 5.0に統一 (iPhone/iPad)
+
+- iPhone: 2.5 → 5.0
+- iPad: 3.0 → 5.0
+- 声を出した時に50-60%程度表示されるよう調整
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
