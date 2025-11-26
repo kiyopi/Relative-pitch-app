@@ -243,6 +243,9 @@ class PitchProCycleManager {
 
 
             // PitchPro AudioDetectionComponent作成（統一設定モジュール使用）
+            // 【v4.0.27改善】autoUpdateUI: false で音量バー更新を一元管理
+            // 問題: autoUpdateUI:trueとコールバック両方で更新すると初回/2回目訪問で挙動が異なる
+            // 解決: コールバック内で明示的にUI更新することで処理を1箇所に集約
             this.audioDetector = new window.PitchPro.AudioDetectionComponent(
                 window.PitchProConfig.getDefaultConfig({
                     // UI要素セレクター（preparation固有）
@@ -253,6 +256,7 @@ class PitchProCycleManager {
 
                     // preparation固有設定
                     deviceOptimization: true,
+                    autoUpdateUI: false,  // 【v4.0.27】コールバック内で一元管理するためfalse
                     debug: false  // 【ログ削減】iPadコンソール安定化のためfalse
                 })
             );
@@ -565,12 +569,14 @@ class PitchProCycleManager {
 
     /**
      * 音程更新ハンドラー（PitchProコールバック）
+     * 【v4.0.27改善】autoUpdateUI: false により、ここで音量バー・周波数表示を一元管理
      */
     handlePitchUpdate(result) {
         if (!this.state.detectionActive) return;
 
-        // 音量バー・周波数表示は autoUpdateUI: true により自動更新される
-        // trainingController.js・voice-range-test.jsと統一
+        // 【v4.0.27】UI更新を一元管理（autoUpdateUI: falseのため手動更新）
+        // PitchProコールバックのresult.volumeは0-100の範囲で返される
+        this.updateUIFromResult(result);
 
         // モード別処理
         switch (this.state.currentMode) {
@@ -578,6 +584,48 @@ class PitchProCycleManager {
                 this.handleAudioTestPitchUpdate(result);
                 break;
         }
+    }
+
+    /**
+     * 【v4.0.27追加】音量バー・周波数表示の一元更新
+     * autoUpdateUI: falseのため、コールバック内で明示的にUI更新
+     */
+    updateUIFromResult(result) {
+        // 【DEBUG v4.0.27】result.volumeの値範囲を確認
+        // PitchPro _getProcessedResult()は0-100を返すはずだが、ログでは0-1に見える
+        console.log(`🔊 [v4.0.27] result.volume=${result.volume?.toFixed(3)}, rawVolume=${result.rawVolume?.toFixed(3)}`);
+
+        // 音量バー更新（result.volumeが0-100であることを想定）
+        if (this.uiElements.volumeBar) {
+            const volumePercent = Math.min(100, Math.max(0, result.volume));
+            this.uiElements.volumeBar.style.width = `${volumePercent}%`;
+        }
+
+        // 音量テキスト更新
+        if (this.uiElements.volumeText) {
+            const volumePercent = Math.min(100, Math.max(0, result.volume));
+            this.uiElements.volumeText.textContent = `${volumePercent.toFixed(1)}%`;
+        }
+
+        // 周波数表示更新
+        if (this.uiElements.frequencyDisplay && result.frequency > 0) {
+            const noteName = this.getNoteName(result.frequency);
+            this.uiElements.frequencyDisplay.textContent = `${result.frequency.toFixed(1)} Hz (${noteName})`;
+        } else if (this.uiElements.frequencyDisplay) {
+            this.uiElements.frequencyDisplay.textContent = '0.0 Hz';
+        }
+    }
+
+    /**
+     * 周波数から音名を取得
+     */
+    getNoteName(frequency) {
+        const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        const A4 = 440;
+        const semitones = Math.round(12 * Math.log2(frequency / A4));
+        const noteIndex = ((semitones % 12) + 12 + 9) % 12; // A=0から始まるのでC=0に変換
+        const octave = Math.floor((semitones + 9) / 12) + 4;
+        return `${noteNames[noteIndex]}${octave}`;
     }
 
     /**
