@@ -44,12 +44,13 @@
          *   (volumeMultiplierはデバイス別: PC=4.0, iPhone=4.5, iPad=7.0)
          */
         calculateVolumePercent(rawVolume) {
-            const multiplier = this.getVolumeMultiplier();
-            // 【デバッグ】実際の値を確認
-            const result = Math.min(100, Math.max(0, rawVolume * multiplier));
-            // 10回に1回だけログ出力（大量ログ防止）
+            // result.volumeは0-1の範囲（実際は0〜0.5程度）
+            // 単純に100倍して0-100%に変換
+            // 注: multiplierは使用しない（PitchPro内部で既に正規化されているため）
+            const result = Math.min(100, Math.max(0, rawVolume * 100));
+            // 【デバッグ】10回に1回だけログ出力
             if (Math.random() < 0.1) {
-                console.log(`🔊 [VolumeUIHelper] rawVolume=${rawVolume.toFixed(4)}, multiplier=${multiplier}, result=${result.toFixed(1)}%`);
+                console.log(`🔊 [VolumeUIHelper] rawVolume=${rawVolume.toFixed(4)} → ${result.toFixed(1)}%`);
             }
             return result;
         },
