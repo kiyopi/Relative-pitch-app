@@ -14355,3 +14355,11 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 20:38:02] コミット: debug: テストページをアプリ側にコピー（同一環境比較用）
+
+- test-callback-volume-fix.html をPitchPro-SPAにコピー
+- PitchProのパスをアプリ側のv1.3.6に変更
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
