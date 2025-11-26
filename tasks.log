@@ -14140,3 +14140,22 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 12:00:41] コミット: fix(audio): volumeMultiplier 5.0→2.0で100%張り付き問題修正
+
+問題:
+- iPhone/iPadでvolumeMultiplier=5.0が高すぎて
+  通常の声(volumeAsPercent 20-40%)でも即座に100%にクランプ
+- 例: 44% × 5.0 = 220% → 100%にクランプ
+
+修正:
+- iPhone: volumeMultiplier 5.0 → 2.0
+- iPad: volumeMultiplier 5.0 → 2.0
+
+期待される動作:
+- 通常の声(25%)で50%程度の表示
+- 大きな声(50%)で100%に到達
+- noiseGate 0.06(12%閾値)は維持
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
