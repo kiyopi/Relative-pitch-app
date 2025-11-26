@@ -1,9 +1,14 @@
 # ナビゲーション・リソース管理仕様書
 
-**バージョン**: 5.1.0
+**バージョン**: 5.2.0
 **作成日**: 2025-10-22
-**最終更新**: 2025-11-20
+**最終更新**: 2025-11-26
 **対象**: PitchPro-SPA（8va相対音感トレーニングアプリ）
+
+**v5.2.0更新内容**:
+- 準備ページ→ホーム遷移時のAudioDetectorクリーンアップ問題を修正（index.html v4.0.5）
+- フッターホームボタンで準備ページ専用クリーンアップ処理を追加
+- NavigationManager.currentAudioDetectorクリア処理を明示化
 
 **v5.1.0更新内容**:
 - デスクトップ切り替え時のリロード誤検出問題を解決（NavigationManager v4.4.1）
@@ -2226,18 +2231,24 @@ static isTrainingFlow(from, to) {
 5. trainingページでAudioDetector使用可能 ✅
 
 非トレーニングフロー（preparation → home等）:
-1. 通常のページ遷移
-2. NavigationManagerはAudioDetectorを管理していない
-3. router.js preparation cleanup 実行
-4. currentAudioDetector不在確認 → cleanup 実行 ✅
-5. AudioDetector適切破棄 ✅
+⚠️ 重要: マイク許可後はNavigationManager.registerAudioDetector()が呼ばれるため、
+currentAudioDetectorが設定されている。そのままではrouter.jsのcleanupがスキップされる。
+
+【v5.2.0修正】フッターホームボタン（index.html v4.0.5）で明示的クリーンアップ:
+1. フッター「ホームに戻る」ボタンクリック（currentPage === 'preparation'）
+2. AudioDetector停止: window.audioDetector.stopDetection()
+3. 参照クリア: window.audioDetector = null, window.globalAudioDetector = null
+4. NavigationManager.currentAudioDetector = null でクリア
+5. NavigationManager.navigate('home') 実行
+6. router.js cleanup実行時: currentAudioDetector不在 → 正常終了
 ```
 
 **効果**:
 - ✅ トレーニングフローでAudioDetector保持を保証
-- ✅ 非トレーニングフローで適切にクリーンアップ
+- ✅ 非トレーニングフローで適切にクリーンアップ（v5.2.0修正）
 - ✅ 二重破棄の完全防止
 - ✅ NavigationManagerとRouterの責任範囲明確化
+- ✅ フッターホームボタンによるクリーンアップ責任の明確化（v5.2.0追加）
 
 #### 問題1: preparation-pitchpro-cycle.js v1.1.0 - training遷移の統一化
 
@@ -2589,6 +2600,12 @@ preparation → training 遷移時:
 |  |  | - ✅ NavigationManagerのダイレクトアクセス誤検出を防止（正規遷移として認識） |  |
 |  |  | - ✅ 問題: 「preparation?mode=continuous」のような不完全URLでブロック → ホーム強制リダイレクト |  |
 |  |  | - ✅ 解決: 現在のscaleDirection（ascending/descending）を全ての遷移URLに含める |  |
+| 5.2.0 | 2025-11-26 | 準備ページ→ホーム遷移時のAudioDetectorクリーンアップ問題を修正 | Claude |
+|  |  | - ✅ index.html v4.0.5: フッターホームボタンに準備ページ専用クリーンアップ処理追加 |  |
+|  |  | - ✅ AudioDetector.stopDetection()で検出を明示的に停止 |  |
+|  |  | - ✅ window.audioDetector, window.globalAudioDetector, NavigationManager.currentAudioDetectorをクリア |  |
+|  |  | - ✅ 問題: マイク許可後にregisterAudioDetector()でcurrentAudioDetectorが設定され、router.jsのcleanupがスキップされていた |  |
+|  |  | - ✅ 解決: フッターホームボタンで遷移前に明示的にクリーンアップを実行 |  |
 | 3.3.0 | 2025-11-13 | ブラウザバック防止システムの最適化と設計思想明確化 | Claude |
 |  |  | - ✅ preparation ページをPAGE_CONFIGに追加（マイク管理中のブラウザバック防止） |  |
 |  |  | - ✅ allowedTransitions から records エントリを削除（非防止対象ページの除外） |  |
