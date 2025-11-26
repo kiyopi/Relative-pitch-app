@@ -587,23 +587,23 @@ class PitchProCycleManager {
     }
 
     /**
-     * 【v4.0.27追加】音量バー・周波数表示の一元更新
+     * 【v4.0.28修正】音量バー・周波数表示の一元更新
      * autoUpdateUI: falseのため、コールバック内で明示的にUI更新
+     *
+     * 【重要】result.volumeは0-1の範囲で返される（PitchProコールバック経由）
+     * UIに表示する際は100倍して0-100%に変換する必要がある
      */
     updateUIFromResult(result) {
-        // 【DEBUG v4.0.27】result.volumeの値範囲を確認
-        // PitchPro _getProcessedResult()は0-100を返すはずだが、ログでは0-1に見える
-        console.log(`🔊 [v4.0.27] result.volume=${result.volume?.toFixed(3)}, rawVolume=${result.rawVolume?.toFixed(3)}`);
+        // result.volumeは0-1の範囲 → 100倍して0-100%に変換
+        const volumePercent = Math.min(100, Math.max(0, result.volume * 100));
 
-        // 音量バー更新（result.volumeが0-100であることを想定）
+        // 音量バー更新
         if (this.uiElements.volumeBar) {
-            const volumePercent = Math.min(100, Math.max(0, result.volume));
             this.uiElements.volumeBar.style.width = `${volumePercent}%`;
         }
 
         // 音量テキスト更新
         if (this.uiElements.volumeText) {
-            const volumePercent = Math.min(100, Math.max(0, result.volume));
             this.uiElements.volumeText.textContent = `${volumePercent.toFixed(1)}%`;
         }
 
