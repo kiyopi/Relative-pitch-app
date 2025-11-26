@@ -263,6 +263,15 @@ class PitchProCycleManager {
                 console.log('✅ デバイス自動最適化完了（統合管理）');
             }
 
+            // 【DEBUG v4.0.26】準備ページでのdeviceSpecs確認（トレーニングページとの比較用）
+            const prepStatus = this.audioDetector.getStatus();
+            console.log('🔊 [DEBUG v4.0.26 PREP] deviceSpecs:', {
+                volumeMultiplier: prepStatus.deviceSpecs?.volumeMultiplier,
+                noiseGate: prepStatus.deviceSpecs?.noiseGate,
+                sensitivity: prepStatus.deviceSpecs?.sensitivity,
+                deviceType: prepStatus.deviceSpecs?.deviceType
+            });
+
             // 初期化はボタンクリック時に行うため、ここではスキップ
 
             this.currentPhase = 'initialized';

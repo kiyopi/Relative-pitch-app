@@ -88,7 +88,7 @@
  * - タイミング最適化: ドレミガイド開始タイミングのコメントを正確に修正
  */
 
-console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.25 (2025-11-25) LOADED 🔥🔥🔥');
+console.log('🔥🔥🔥 TrainingController.js VERSION: v4.0.26 (2025-11-26) LOADED 🔥🔥🔥');
 
 let isInitialized = false;
 let pitchShifter = null;
@@ -1025,13 +1025,20 @@ async function startDoremiGuide() {
             });
             console.log('✅ UIセレクター更新完了');
 
-            // 【DEBUG v4.0.24】UIキャッシュ状態を確認
+            // 【DEBUG v4.0.26】UIキャッシュ状態とdeviceSpecsを確認
             const status = audioDetector.getStatus();
             console.log('🔍 [DEBUG] AudioDetector状態:', {
                 state: status.state,
                 autoUpdateUI: status.config?.autoUpdateUI,
                 volumeBarSelector: status.config?.volumeBarSelector,
                 uiElements: Object.keys(status.config || {}).filter(k => k.includes('Selector'))
+            });
+            // 【DEBUG v4.0.26】deviceSpecs確認（問題調査用）- getStatus()はdeviceSpecsを直接返す
+            console.log('🔊 [DEBUG v4.0.26 TRAINING] deviceSpecs:', {
+                volumeMultiplier: status.deviceSpecs?.volumeMultiplier,
+                noiseGate: status.deviceSpecs?.noiseGate,
+                sensitivity: status.deviceSpecs?.sensitivity,
+                deviceType: status.deviceSpecs?.deviceType
             });
 
             // コールバック設定（再利用でも必要）
