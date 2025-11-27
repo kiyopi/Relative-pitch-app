@@ -14471,3 +14471,42 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 18:28:42] コミット: fix(training): ホームボタン押下時にAudioDetectorを停止 (v4.5.2追加修正)
+
+- トレーニングページからホーム遷移時にaudioDetector.stopDetection()を呼び出し
+- ホームに戻った後も音程検出が動き続ける問題を修正
+- ドレミガイド中断と音声検出停止の両方を確実に実行
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 18:54:21] コミット: fix(navigation): training→home遷移時にAudioDetector.stopDetection()を追加 (v4.6.3)
+
+- NavigationManager.navigate()でtraining→home遷移時に音声検出を停止
+- destroy()ではなくstopDetection()を使用しMediaStreamを保持
+- iOS Safari MediaStreamバグ（WebKit Bug 230902）を回避
+- canSkipPreparation()機能との互換性を維持
+- 準備ページスキップ時の再利用を可能に
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 19:07:29] コミット: refactor(index): training時のstopDetection()をNavigationManagerに一元化 (v4.6.3)
+
+- index.htmlからtraining→home時のstopDetection()を削除
+- NavigationManager.navigate()で統一管理
+- 重複処理を排除し保守性を向上
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 19:12:50] コミット: docs(training): v4.10.0 ドレミガイド中断処理の一元化を文書化
+
+- v4.6.3の変更内容を仕様書に追記
+- AudioDetector停止処理のNavigationManager一元化を記録
+- iOS Safari MediaStreamバグ対応の設計思想を明記
+- 修正ファイル・関連仕様書へのリファレンスを追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
