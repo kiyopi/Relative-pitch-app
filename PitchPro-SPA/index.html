@@ -164,10 +164,12 @@
 
     <!-- メニュー開閉スクリプト -->
     <script>
-        document.addEventListener('DOMContentLoaded', function  () {
+        document.addEventListener('DOMContentLoaded', function() {
             const menuToggle = document.getElementById('menu-toggle');
-            const headerNav = document.getElementById('header-nav');  menuToggle.addEventListener('click', function () {
-                 headerNav.classList.toggle('active');
+            const headerNav = document.getElementById('header-nav');
+
+            menuToggle.addEventListener('click', function() {
+                headerNav.classList.toggle('active');
                 // アイコン切り替え
                 const icon = menuToggle.querySelector('i');
                 if (icon) {
@@ -183,9 +185,9 @@
                 }
             });
 
-         で閉じる
-            document.addEventListener('click', function (event) {
-                 if (!menuToggle.contains(event.target) && !headerNav.contains(event.target)) {
+            // 外側クリックで閉じる
+            document.addEventListener('click', function(event) {
+                if (!menuToggle.contains(event.target) && !headerNav.contains(event.target)) {
                     headerNav.classList.remove('active');
                     const icon = menuToggle.querySelector('i');
                     if (icon) {
@@ -200,10 +202,10 @@
         });
 
         /**
-                 ームに戻         クハンドラー
-         * 準備・トレーニングペ         ログを表示
+         * ホームに戻るボタンクリックハンドラー
+         * 準備・トレーニングページでは確認ダイアログを表示
          */
-        f         andleFooterHomeButtonClick() {
+        function handleFooterHomeButtonClick() {
             // 【デバッグログ v1】ホームボタン押下検出
             console.log('🏠 [FooterHome] ボタンクリック検出');
 
@@ -283,9 +285,10 @@
         }
 
         /**
-                 ンのデー         
-         * トレーニング中断時に                */
-        f         leanupIncompleteLesson() {
+         * 未完了レッスンのデータクリーンアップ
+         * トレーニング中断時に呼び出される
+         */
+        function cleanupIncompleteLesson() {
             try {
                 const currentLessonId = sessionStorage.getItem('currentLessonId');
                 if (!currentLessonId) {
