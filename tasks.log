@@ -14448,3 +14448,16 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 13:47:04] コミット: fix(pitchpro): v1.3.12 二重増幅バグ修正
+
+- 音量スケーリング修正: e.volume * 200 → e.volume * 100
+- v1.3.11では実効ゲインが2倍過大だった問題を修正
+- index.html破損を再修復（handleFooterHomeButtonClick, cleanupIncompleteLesson）
+
+修正効果:
+- iPad: 1500倍 → 750倍 (感度2.5 × 100 × volumeMultiplier3)
+- iPhone: 400倍 → 200倍 (感度2 × 100 × volumeMultiplier2)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

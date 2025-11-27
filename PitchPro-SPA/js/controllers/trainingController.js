@@ -2,7 +2,13 @@
  * Training Controller - Integrated Implementation
  * PitchPro AudioDetectionComponent + PitchShifter統合版
  *
- * 🔥 VERSION: v4.5.1 (2025-11-23) - タイマークリーンアップ強化
+ * 🔥 VERSION: v4.5.2 (2025-11-27) - ホームボタンからの自動遷移防止
+ *
+ * 【v4.5.2修正内容】
+ * - ドレミガイドループ中のページ離脱チェック追加（isInitializedフラグ確認）
+ * - handleSessionComplete()冒頭でページ離脱チェック追加
+ * - フッターホームボタンでホームに戻った後、自動でセッション評価に遷移する問題を修正
+ * - 700ms×8のループが完了してもisInitialized=falseなら遷移しない
  *
  * 【v4.5.1修正内容】
  * - ページ離脱時のタイマークリーンアップ強化
@@ -1165,6 +1171,12 @@ async function startDoremiGuide() {
     pitchDataBuffer = [];
 
     for (let i = 0; i < guideCount; i++) {
+        // 【v4.0.40追加】ページ離脱チェック（ホームボタン押下時のセッション完了防止）
+        if (!isInitialized) {
+            console.log('🛑 [DoremiGuide] ページ離脱検出 - ドレミガイドを中断');
+            return; // ループを中断、handleSessionComplete()を呼ばない
+        }
+
         currentIntervalIndex = i;
 
         // 前の音符を完了状態に & データ記録
@@ -1187,6 +1199,12 @@ async function startDoremiGuide() {
 
         // ユーザーの発声時間を確保（700ms間隔）
         await new Promise(resolve => setTimeout(resolve, 700));
+    }
+
+    // 【v4.0.40追加】ループ後のページ離脱チェック
+    if (!isInitialized) {
+        console.log('🛑 [DoremiGuide] ページ離脱検出（ループ後） - セッション完了処理をスキップ');
+        return;
     }
 
     // 最後の音符を完了状態に & データ記録
@@ -1319,6 +1337,12 @@ function recordStepPitchData(step) {
 
 // セッション完了ハンドラ
 function handleSessionComplete() {
+    // 【v4.0.40追加】ページ離脱チェック（ホームボタン押下後の遷移防止）
+    if (!isInitialized) {
+        console.log('🛑 [handleSessionComplete] ページ離脱検出 - 処理をスキップ');
+        return;
+    }
+
     console.log('✅ トレーニング完了');
 
     // 【変更】audioDetectorのクリーンアップはNavigationManagerが自動実行
