@@ -14461,3 +14461,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 18:17:42] コミット: fix(training): ホームボタン押下後の自動セッション評価遷移を防止 (v4.5.2)
+
+- ドレミガイドループ内にisInitializedチェック追加
+- handleSessionComplete()冒頭にページ離脱チェック追加
+- フッターホームボタンでホームに戻った後、自動遷移する問題を修正
+- 700ms×8のループ完了後もisInitialized=falseなら遷移しない
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

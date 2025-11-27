@@ -226,6 +226,17 @@
                     if (currentPage === 'training') {
                         console.log('🏠 [FooterHome] cleanupIncompleteLesson()を呼び出し');
                         cleanupIncompleteLesson();
+
+                        // 【修正v4.5.2】トレーニングページからホーム遷移時もAudioDetectorを停止
+                        console.log('🏠 [FooterHome] トレーニングページからのホーム遷移 - AudioDetectorを停止');
+                        if (window.audioDetector) {
+                            try {
+                                window.audioDetector.stopDetection();
+                                console.log('✅ [FooterHome] AudioDetector停止完了');
+                            } catch (error) {
+                                console.warn('⚠️ [FooterHome] AudioDetector停止エラー:', error);
+                            }
+                        }
                     }
 
                     // 【修正v4.0.5】準備ページからホーム遷移時はAudioDetectorを明示的に停止
