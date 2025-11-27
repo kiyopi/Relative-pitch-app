@@ -1,9 +1,14 @@
 /**
  * セッション結果ページコントローラー
- * @version 2.5.3
- * @lastUpdate 2025-11-21
+ * @version 3.3.0
+ * @lastUpdate 2025-11-27
  *
  * 変更履歴:
+ * - 3.3.0: 外れ値除外ポリシーの変更（evaluation-calculator.jsと統一）
+ *   - 外れ値閾値を180¢→800¢に変更（警告用フラグのみ、除外なし）
+ *   - 平均誤差計算: すべてのデータを使用、除外廃止
+ *   - 評価分布計算: すべてのデータを使用、除外廃止
+ *   - アラートメッセージ: 「除外しています」→「警告のみ」に修正
  * - 2.5.3: 外れ値レイアウトを総合評価と統一
  *   - error-outlierクラスを追加（amber背景）
  *   - errorInCents表示形式をtoFixed(1)に統一
@@ -198,23 +203,17 @@ function updateSessionUI(sessionData, sessionNumber) {
         console.log('✅ ダミーデータを生成:', sessionData.pitchErrors);
     }
 
-    // 【追加】外れ値情報を計算（固定閾値180¢）
+    // 【v3.3.0】外れ値情報を計算（800¢閾値は警告用フラグのみ、除外なし）
     const errors = sessionData.pitchErrors.map(e => Math.abs(e.errorInCents));
-    const outlierThreshold = 180; // 全デバイス共通の固定閾値
+    const outlierThreshold = 800; // 警告用閾値（evaluation-calculator.jsと統一）
 
-    const validErrors = errors.filter(e => e <= outlierThreshold);
-    const outlierCount = errors.length - validErrors.length;
+    // 800¢超の警告用フラグ（評価計算には影響しない）
+    const outlierCount = errors.filter(e => e > outlierThreshold).length;
     const outlierFiltered = outlierCount > 0;
 
-    // 平均誤差計算（外れ値除外後）
-    let avgError;
-    if (validErrors.length > 0) {
-        avgError = validErrors.reduce((sum, e) => sum + e, 0) / validErrors.length;
-        console.log(`📊 外れ値除外: ${outlierCount}音除外（${outlierThreshold}¢超）、有効音: ${validErrors.length}/${errors.length}`);
-    } else {
-        avgError = errors.reduce((sum, e) => sum + e, 0) / errors.length;
-        console.warn('⚠️ すべての音が外れ値と判定されました。元の値を使用します。');
-    }
+    // 平均誤差計算（すべてのデータを使用、除外なし）
+    const avgError = errors.reduce((sum, e) => sum + e, 0) / errors.length;
+    console.log(`📊 平均誤差計算: 全${errors.length}音使用、警告対象: ${outlierCount}音（${outlierThreshold}¢超）`);
 
     const avgErrorEl = document.getElementById('average-error');
     if (avgErrorEl) {
@@ -224,9 +223,8 @@ function updateSessionUI(sessionData, sessionNumber) {
     // 【追加】外れ値情報を表示（平均誤差の下）
     displayOutlierNotice(outlierFiltered, outlierCount);
 
-    // 評価分布計算・表示（外れ値除外）
-    const validPitchErrors = sessionData.pitchErrors.filter(e => Math.abs(e.errorInCents) <= outlierThreshold);
-    displaySessionEvaluationDistribution(validPitchErrors, outlierCount);
+    // 【v3.3.0】評価分布計算・表示（すべてのデータを使用、除外なし）
+    displaySessionEvaluationDistribution(sessionData.pitchErrors, outlierCount);
 
     // 精度ランク表示
     displayAccuracyBadge(Math.abs(avgError));
@@ -568,10 +566,10 @@ function displayOutlierNotice(outlierFiltered, outlierCount) {
         }
     }
 
-    // 内容を更新
+    // 【v3.3.0】内容を更新（除外廃止、警告のみ）
     existingNotice.innerHTML = `
         <i data-lucide="alert-circle" class="text-amber-400"></i>
-        <p>${outlierCount}音が目標の音程よりも大幅にずれています。外れ値として評価から除外しています。</p>
+        <p>${outlierCount}音に大きな誤差（800¢超）が検出されました。測定環境や発声を確認してください。</p>
     `;
 
     // Lucideアイコン再初期化
@@ -602,14 +600,14 @@ function displayOutlierExplanation(outlierFiltered, outlierCount) {
         }
     }
 
-    // 外れ値がある場合のみ表示（総合評価と統一されたスタイル）
+    // 【v3.3.0】外れ値がある場合のみ表示（除外廃止、警告のみに修正）
     if (outlierFiltered) {
         explanationContainer.innerHTML = `
             <div class="warning-alert">
                 <i data-lucide="alert-circle" class="text-amber-500"></i>
                 <div>
                     <p><strong>大きな誤差について</strong></p>
-                    <p>このセッションで<strong>${outlierCount}音</strong>に大きな誤差が検出されました。正常に測定できなかった可能性があります。詳細分析で確認することをおすすめします。</p>
+                    <p>このセッションで<strong>${outlierCount}音</strong>に大きな誤差（800¢超）が検出されました。結果に問題がある場合は、総合評価から該当セッションを削除できます。</p>
                 </div>
             </div>
         `;

@@ -1,11 +1,16 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.12.0 (2025-11-21)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.13.0 (2025-11-27)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.12.0
- * Date: 2025-11-21
+ * Version: 4.13.0
+ * Date: 2025-11-27
  * Changelog:
+ *   v4.13.0 - 【外れ値除外ポリシー変更】evaluation-calculator.jsと統一
+ *            - セッショングリッド: 外れ値除外廃止、すべてのデータで平均誤差計算
+ *            - 誤差推移グラフ: 外れ値除外廃止、すべてのデータで平均誤差計算
+ *            - 外れ値閾値を180¢→800¢に変更（警告用フラグのみ、除外なし）
+ *            - アラートメッセージ: 削除案内を明確化
  *   v4.12.0 - 【HTML構造改善】チャートローディングをオーバーレイ方式に変更
  *            - canvasは常に表示状態（サイズ計算可能）
  *            - ローディングはcanvas上にposition:absoluteで重ねて表示
@@ -595,21 +600,22 @@ function displaySessionGrid(sessionData) {
     const sessionBoxes = sessionData.map((session, index) => {
         console.log(`📊 [displaySessionGrid] セッション ${index + 1} 処理開始`);
         
-        // 【追加】外れ値を除外した平均誤差を計算（固定閾値180¢）
+        // 【v3.3.0】平均誤差計算（すべてのデータを使用、除外なし）
         const errors = session.pitchErrors
             ? session.pitchErrors.map(e => Math.abs(e.errorInCents))
             : [];
         console.log(`📊 [displaySessionGrid] セッション ${index + 1} errors:`, errors);
 
-        const outlierThreshold = 180; // 全デバイス共通の固定閾値
+        const outlierThreshold = 800; // 警告用閾値（evaluation-calculator.jsと統一）
 
-        const validErrors = errors.filter(e => e <= outlierThreshold);
-        const outlierCount = errors.length - validErrors.length;
-        console.log(`📊 [displaySessionGrid] セッション ${index + 1} validErrors:`, validErrors.length, 'outliers:', outlierCount);
+        // 800¢超の警告用フラグ（評価計算には影響しない）
+        const outlierCount = errors.filter(e => e > outlierThreshold).length;
+        console.log(`📊 [displaySessionGrid] セッション ${index + 1} 警告対象: ${outlierCount}音（${outlierThreshold}¢超）`);
 
-        const avgError = validErrors.length > 0
-            ? validErrors.reduce((sum, e) => sum + e, 0) / validErrors.length
-            : errors.reduce((sum, e) => sum + e, 0) / errors.length;
+        // すべてのデータで平均誤差を計算（除外なし）
+        const avgError = errors.length > 0
+            ? errors.reduce((sum, e) => sum + e, 0) / errors.length
+            : 0;
         console.log(`📊 [displaySessionGrid] セッション ${index + 1} avgError:`, avgError);
 
         // 統合評価関数を使用（v2.1.0: EvaluationCalculator統合）
@@ -895,16 +901,14 @@ function initializeCharts(sessionData) {
         return;
     }
 
-    // セッション別平均誤差データ（符号付き: + = シャープ, - = フラット）
+    // 【v3.3.0】セッション別平均誤差データ（符号付き: + = シャープ, - = フラット）
+    // すべてのデータを使用（除外なし）
     const labels = sessionData.map((_, i) => `S${i + 1}`);
     const data = sessionData.map(session => {
         if (!session.pitchErrors || session.pitchErrors.length === 0) return 0;
-        // 外れ値除外（180¢超）
-        const validErrors = session.pitchErrors.filter(e => Math.abs(e.errorInCents) <= 180);
-        if (validErrors.length === 0) return 0;
-        // 符号付き平均（Math.abs()を使わない）
-        const sum = validErrors.reduce((s, e) => s + e.errorInCents, 0);
-        return parseFloat((sum / validErrors.length).toFixed(1));
+        // 符号付き平均（Math.abs()を使わない、除外なし）
+        const sum = session.pitchErrors.reduce((s, e) => s + e.errorInCents, 0);
+        return parseFloat((sum / session.pitchErrors.length).toFixed(1));
     });
 
     // Chart作成をtry-catchで囲む
@@ -1734,14 +1738,14 @@ function displayOutlierExplanationOverview(outlierFiltered, outlierCount, outlie
         }
     }
 
-    // 外れ値がある場合のみ表示
+    // 【v3.3.0】外れ値がある場合のみ表示（除外廃止、警告のみに修正）
     if (outlierFiltered) {
         explanationContainer.innerHTML = `
             <div class="warning-alert">
                 <i data-lucide="alert-circle" class="text-amber-500"></i>
                 <div>
                     <p><strong>大きな誤差について</strong></p>
-                    <p>大きな誤差が検出されました。正常に測定できなかった可能性があります。詳細分析で確認し、必要に応じてレッスン削除機能をご利用ください。削除はトレーニング記録ページのトレーニング履歴からでも行えます。</p>
+                    <p>大きな誤差（800¢超）が検出されました。結果に問題がある場合は、下の「レッスン削除」ボタンまたはトレーニング記録ページの履歴から削除できます。</p>
                 </div>
             </div>
         `;
