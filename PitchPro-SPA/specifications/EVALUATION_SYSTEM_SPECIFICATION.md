@@ -1,9 +1,16 @@
 # 相対音感トレーニングアプリ - 評価システム仕様書
 
-**バージョン**: 2.4.0
+**バージョン**: 2.5.0
 **作成日**: 2025-08-07
-**更新日**: 2025-11-20
+**更新日**: 2025-11-27
 **用途**: セッション単位（8音）の音程精度評価・採点システムの詳細仕様
+
+**v2.5.0 重要更新内容** (2025-11-27):
+- **評価計算ロジックの一元管理**: `EvaluationCalculator`クラスに統合
+- **OUTLIER_THRESHOLD定数化**: 800¢閾値を定数として一元管理
+- **extractSessionMetrics()追加**: 単一セッション用のメトリクス抽出メソッド
+- **保守性向上**: 閾値変更時は`evaluation-calculator.js`の1箇所修正で全体反映
+- **コード重複削除**: result-session-controller, results-overview-controllerの重複ロジック統合
 
 **v2.4.0 重要更新内容** (2025-11-20):
 - **外れ値戦略の根本的再設計**: 自動除外廃止 → 警告表示 + ユーザー判断へ移行
@@ -787,11 +794,35 @@ distribution[evaluation.level]++;  // 800¢超もPracticeとしてカウント
 
 | ファイル | 変更内容 |
 |---------|---------|
-| `evaluation-calculator.js` | 自動除外ロジック削除、800¢警告フラグ追加 |
+| `evaluation-calculator.js` | v2.0.0: OUTLIER_THRESHOLD定数追加、extractSessionMetrics()追加 |
+| `result-session-controller.js` | v3.4.0: extractSessionMetrics()で一元管理、ハードコード廃止 |
+| `results-overview-controller.js` | v4.14.0: extractSessionMetrics()で一元管理、ハードコード廃止 |
 | `DistributionChart.js` | 800¢超除外ロジック削除、全データをPracticeとしてカウント |
-| `results-overview-controller.js` | 800¢超をamber表示、警告メッセージ更新 |
 | `base.css` | `.text-amber-500`クラス追加 |
 | `results.css` | `.note-result-item.error-outlier`スタイル追加 |
+
+#### 一元管理アーキテクチャ (v2.5.0)
+
+```
+EvaluationCalculator（中央管理クラス）
+├── OUTLIER_THRESHOLD = 800        # 外れ値警告閾値（定数）
+├── extractSessionMetrics()        # 単一セッション用メトリクス抽出
+│   └── 戻り値: { avgError, outlierCount, outlierFiltered, errors, totalNotes }
+├── calculateBasicMetrics()        # 複数セッション用（総合評価）
+├── evaluateAverageError()         # 平均誤差→評価レベル判定
+└── evaluatePitchError()           # 個別誤差→評価レベル判定
+
+使用箇所:
+├── result-session-controller.js   # セッション結果ページ（ランダム基音モード）
+├── results-overview-controller.js # 総合評価ページ（全モード共通）
+└── records-controller.js          # トレーニング記録ページ
+```
+
+**閾値変更時の修正箇所**:
+```javascript
+// evaluation-calculator.js の1箇所のみ変更すれば全体に反映
+static OUTLIER_THRESHOLD = 800;  // ← ここを変更するだけ
+```
 
 #### UI表示ルール
 

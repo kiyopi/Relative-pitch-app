@@ -1,9 +1,16 @@
 # 動的グレード計算ロジック仕様書
 
-**バージョン**: 1.0.0  
-**作成日**: 2025-08-14  
-**目的**: 動的グレード計算の完全なロジック定義と実装仕様  
+**バージョン**: 1.1.0
+**作成日**: 2025-08-14
+**更新日**: 2025-11-27
+**目的**: 動的グレード計算の完全なロジック定義と実装仕様
 **重要性**: 12音律理論と4つの核心洞察に基づく評価システムの中核
+
+**v1.1.0 更新内容** (2025-11-27):
+- **一元管理アーキテクチャ追加**: `EvaluationCalculator`クラスによる評価計算の統合
+- **OUTLIER_THRESHOLD定数化**: 800¢閾値を定数として一元管理
+- **extractSessionMetrics()追加**: 単一セッション用のメトリクス抽出メソッド
+- **実装ファイルとの対応明確化**: 仕様と実装の一致を保証
 
 ---
 
@@ -367,6 +374,58 @@ function generateAchievementMessage(gradeResult, modeInfo) {
 
 ---
 
+## 🏗️ 一元管理アーキテクチャ (v1.1.0)
+
+### **EvaluationCalculatorクラス構成**
+
+```
+evaluation-calculator.js
+├── 定数
+│   └── OUTLIER_THRESHOLD = 800    # 外れ値警告閾値（¢）
+│
+├── 単一セッション用
+│   └── extractSessionMetrics(pitchErrors)
+│       → { avgError, outlierCount, outlierFiltered, errors, totalNotes }
+│
+├── 複数セッション用（総合評価）
+│   ├── calculateDynamicGrade(sessionData)  # メインエントリーポイント
+│   ├── calculateBasicMetrics(sessionData)  # 基本メトリクス計算
+│   └── applyTechnicalAdjustment()          # デバイス品質補正
+│
+└── 評価判定
+    ├── evaluateAverageError(avgError)      # 平均誤差→評価レベル
+    ├── evaluatePitchError(cents)           # 個別誤差→評価レベル
+    └── determineGrade()                    # S〜E級判定
+```
+
+### **使用ファイル一覧**
+
+| ファイル | 使用メソッド | 用途 |
+|---------|------------|------|
+| `result-session-controller.js` | `extractSessionMetrics()` | セッション結果（ランダム基音） |
+| `results-overview-controller.js` | `extractSessionMetrics()`, `calculateDynamicGrade()` | 総合評価（全モード） |
+| `records-controller.js` | `calculateDynamicGrade()` | トレーニング記録 |
+| `DistributionChart.js` | `evaluatePitchError()` | 評価分布グラフ |
+
+### **閾値変更時の対応**
+
+```javascript
+// evaluation-calculator.js のこの1箇所を変更するだけで全体に反映
+class EvaluationCalculator {
+  static OUTLIER_THRESHOLD = 800;  // ← ここを変更
+  // ...
+}
+```
+
+### **設計原則**
+
+1. **Single Source of Truth**: 評価ロジックは`EvaluationCalculator`に集約
+2. **定数の一元管理**: 閾値・評価基準はクラス定数として定義
+3. **コントローラーの責務**: UIロジックのみ、計算ロジックは委譲
+4. **テスト容易性**: 評価計算を独立してテスト可能
+
+---
+
 ## 🔬 音程精度評価の学術的根拠（2025年調査）
 
 ### **背景: 評価基準の妥当性検証**
@@ -439,23 +498,25 @@ function generateAchievementMessage(gradeResult, modeInfo) {
 
 #### **外れ値の定義**
 
-**測定エラー vs 技能の問題**（2025年実データ分析により更新）:
+**測定エラー vs 技能の問題**（2025-11-27 v2.5.0更新）:
 
-- **±150¢超（半音1.5個分以上）**:
-  - **実データで10.4%発生** - 明らかな測定エラー
-  - PitchProのオクターブ誤認識（倍音検出エラー）
-  - step 1（レ）で41.7%の確率で発生するパターン
-  - 明瞭度・音量は正常 → アルゴリズムの問題
-  - **評価から除外**
+**現行ポリシー**: 外れ値は**警告表示のみ、自動除外なし**（ユーザーがレッスン削除で対応）
 
-- **±50¢～150¢**:
-  - 重大な誤差だが測定可能範囲
-  - 苦手音程の可能性
-  - 評価に含めるが注意喚起
+- **±800¢超（約1オクターブ）**:
+  - 明らかな測定エラー
+  - PitchProのオクターブ誤認識（倍音検出エラー）の可能性
+  - **警告表示のみ**、評価計算には含める
+  - ユーザーにレッスン削除を推奨
+  - `EvaluationCalculator.OUTLIER_THRESHOLD = 800` で定義
+
+- **±50¢～800¢**:
+  - 重大な誤差だが技能の問題の可能性
+  - Practice評価としてカウント
+  - 評価に含める
 
 - **±50¢以内**:
   - 通常の評価範囲
-  - 一般リスナーの知覚閾値内
+  - Excellent/Good/Pass判定対象
 
 #### **統計的処理手法**
 
@@ -569,5 +630,6 @@ if (outlierCount > 0) {
 
 ## 📝 更新履歴
 
-- **2025-08-14**: 初版作成
+- **2025-08-14**: 初版作成 (v1.0.0)
 - **2025-11-06**: S級crownアイコンのカスタムSVG仕様を追記（`customSvg: true`フラグ追加）
+- **2025-11-27**: v1.1.0 一元管理アーキテクチャ追加、OUTLIER_THRESHOLD定数化、外れ値定義を800¢に更新
