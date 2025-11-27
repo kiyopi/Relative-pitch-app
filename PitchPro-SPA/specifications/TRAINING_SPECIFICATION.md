@@ -1,10 +1,26 @@
 # トレーニング機能仕様書（SPA版）
 
-**バージョン**: 4.9.0
+**バージョン**: 4.10.0
 **作成日**: 2025-10-23
-**最終更新**: 2025-01-25
+**最終更新**: 2025-11-27
 
 **変更履歴**:
+- v4.10.0 (2025-11-27): ドレミガイド中のホームボタン押下時処理の一元化（v4.6.3）
+  - **Bug Fix**: ドレミガイド進行中にホームボタンを押した際、音声検出が停止しない問題を修正
+    - **問題**: training→home遷移時にAudioDetector.stopDetection()が呼ばれず、ホーム画面でも音程検出が継続
+    - **根本原因**: NavigationManager.navigate()のトレーニングフロー外遷移処理でstopDetection()が実行されていなかった
+    - **解決**: NavigationManager.navigate()にtraining→home遷移専用のstopDetection()処理を追加
+  - **Refactoring**: AudioDetector停止処理のNavigationManager一元化
+    - **変更前**: index.html（フッターホームボタン）とNavigationManagerの両方でstopDetection()を実行（重複）
+    - **変更後**: NavigationManager.navigate()のみでstopDetection()を実行（一元化）
+    - **index.html変更**: training時のstopDetection()を削除、コメントで委譲先を明記
+  - **設計思想**: iOS Safari MediaStreamバグ（WebKit Bug 230902）への対応
+    - **destroy()ではなくstopDetection()を使用**: MediaStreamを保持し、getUserMedia()再呼び出しによる音量半減を回避
+    - **canSkipPreparation()との互換性維持**: AudioDetectorインスタンスを保持することで準備ページスキップ機能が動作
+  - **修正ファイル**:
+    - `/PitchPro-SPA/js/navigation-manager.js` (v4.6.3) - training→home遷移時のstopDetection()追加
+    - `/PitchPro-SPA/index.html` - training時のstopDetection()削除（NavigationManagerに委譲）
+  - **関連仕様書**: `NAVIGATION_RELOAD_DETECTION_SPECIFICATION.md`、Serenaメモリ `PERM-volume-bar-ios-safari-bug-analysis-20251126`
 - v4.9.0 (2025-01-25): 音量テスト廃止に伴う音量システム統一（v4.4.0）
   - **Breaking Change**: v4.6.0で実装した`pitchpro_volume_percent`システムを完全削除
   - **理由**: 準備ページの音量テスト廃止、環境差による音量問題の解決
