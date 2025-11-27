@@ -1,7 +1,12 @@
 /**
  * セッションデータ記録モジュール
- * @version 3.0.0 - lessonID方式＋完全なモード管理統合
+ * @version 3.1.0 - 無音検出時のnull誤差記録対応
  * @description トレーニングセッションの音程誤差データを記録
+ *
+ * v3.1.0変更点（2025-11-27）:
+ * - 無音（detectedFrequency=0）時はerrorInCents=nullで記録
+ * - nullは「無効な測定」を示し、評価計算から除外される
+ * - 従来の誤差0（完璧）と明確に区別
  *
  * v3.0.0変更点（2025-11-11）:
  * - lessonId方式実装（セッションをレッスン単位で正確に管理）
@@ -95,6 +100,7 @@ class SessionDataRecorder {
         }
 
         // セント単位の誤差計算（1オクターブ = 1200セント）
+        // v3.1.0: 無音時はnullが返される
         const errorInCents = this.calculateCentError(detectedFrequency, expectedFrequency);
 
         const pitchData = {
@@ -102,15 +108,23 @@ class SessionDataRecorder {
             expectedNote,
             expectedFrequency,
             detectedFrequency,
-            errorInCents: parseFloat(errorInCents.toFixed(1)), // 小数点1位
-            clarity: parseFloat(clarity.toFixed(3)),
-            volume: parseFloat(volume.toFixed(3)),
-            timestamp: Date.now()
+            // v3.1.0: nullは無効な測定、数値は有効な測定
+            errorInCents: errorInCents === null ? null : parseFloat(errorInCents.toFixed(1)),
+            clarity: parseFloat((clarity || 0).toFixed(3)),
+            volume: parseFloat((volume || 0).toFixed(3)),
+            timestamp: Date.now(),
+            // v3.1.0: 無効フラグを明示的に記録
+            isValid: errorInCents !== null
         };
 
         this.currentSession.pitchErrors.push(pitchData);
 
-        console.log(`📊 音程誤差記録 [Step ${step}]:`, pitchData);
+        // ログ出力を分岐
+        if (pitchData.isValid) {
+            console.log(`📊 音程誤差記録 [Step ${step}]:`, pitchData);
+        } else {
+            console.warn(`⚠️ 無効な測定記録 [Step ${step}]: 無音または検出不可`, pitchData);
+        }
 
         return pitchData;
     }
@@ -119,11 +133,16 @@ class SessionDataRecorder {
      * セント単位の誤差計算
      * @param {number} detected - 検出周波数
      * @param {number} expected - 期待周波数
-     * @returns {number} セント単位の誤差
+     * @returns {number|null} セント単位の誤差（無効な入力時はnull）
+     *
+     * v3.1.0: 無効な入力（無音等）時はnullを返す
+     * - null = 測定無効（評価から除外）
+     * - 0 = 完璧な音程（Excellent評価）
      */
     calculateCentError(detected, expected) {
+        // 無効な入力はnullを返す（誤差0とは明確に区別）
         if (!detected || !expected || detected <= 0 || expected <= 0) {
-            return 0;
+            return null;
         }
         return 1200 * Math.log2(detected / expected);
     }

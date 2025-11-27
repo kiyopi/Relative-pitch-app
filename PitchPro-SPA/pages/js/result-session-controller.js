@@ -1,9 +1,13 @@
 /**
  * セッション結果ページコントローラー
- * @version 3.4.0
+ * @version 3.5.0
  * @lastUpdate 2025-11-27
  *
  * 変更履歴:
+ * - 3.5.0: 無音検出（null誤差）データの表示対応
+ *   - errorInCents === null のデータを「無効」として表示
+ *   - 無音時にExcellent評価になるバグを修正
+ *   - 無効データは「---」表示、専用アイコン（mic-off）で表示
  * - 3.4.0: EvaluationCalculator.extractSessionMetrics()による一元管理
  *   - 重複していた外れ値計算・平均誤差計算をEvaluationCalculatorに統合
  *   - OUTLIER_THRESHOLD定数を参照（ハードコード廃止）
@@ -359,14 +363,23 @@ function displayDetailedAnalysis(pitchErrors, outlierThreshold) {
     container.innerHTML = '';
 
     pitchErrors.forEach((error, index) => {
-        const absError = Math.abs(error.errorInCents);
+        // 【v3.5.0】無効なデータ（無音等）の判定
+        const isInvalid = error.errorInCents === null;
+        const absError = isInvalid ? 0 : Math.abs(error.errorInCents);
 
-        // 【追加】外れ値判定
-        const isOutlier = absError > outlierThreshold;
+        // 【追加】外れ値判定（無効データは外れ値判定しない）
+        const isOutlier = !isInvalid && absError > outlierThreshold;
 
-        // 統合評価関数を使用（外れ値でない場合）
+        // 統合評価関数を使用
         let evaluation;
-        if (isOutlier) {
+        if (isInvalid) {
+            // 無効データ（無音等）
+            evaluation = {
+                icon: 'mic-off',
+                color: 'text-gray-400',
+                label: '無効'
+            };
+        } else if (isOutlier) {
             evaluation = {
                 icon: 'alert-circle',
                 color: 'text-amber-400',
@@ -377,15 +390,30 @@ function displayDetailedAnalysis(pitchErrors, outlierThreshold) {
         }
 
         const iconTransform = evaluation.icon === 'thumbs-up' ? 'transform: translateY(-2px) translateX(2px);' : '';
-        const deviationClass = error.errorInCents >= 0 ? 'text-pitch-deviation-plus' : 'text-pitch-deviation-minus';
+
+        // 無効データの場合は特別なクラスを使用
+        let deviationClass;
+        let deviationText;
+        if (isInvalid) {
+            deviationClass = 'text-gray-400';
+            deviationText = '---';
+        } else {
+            deviationClass = error.errorInCents >= 0 ? 'text-pitch-deviation-plus' : 'text-pitch-deviation-minus';
+            deviationText = `${error.errorInCents >= 0 ? '+' : ''}${error.errorInCents.toFixed(1)}¢`;
+        }
 
         const noteElement = document.createElement('div');
         noteElement.className = 'note-result-item';
 
-        // 外れ値の場合はamber背景を追加（総合評価と統一）
+        // 外れ値の場合はamber背景、無効データの場合はgray背景
         if (isOutlier) {
             noteElement.classList.add('error-outlier');
+        } else if (isInvalid) {
+            noteElement.classList.add('error-invalid');
         }
+
+        // 周波数表示（無効データの場合は「---」）
+        const detectedFreqText = isInvalid ? '---' : `${error.detectedFrequency.toFixed(0)}Hz`;
 
         noteElement.innerHTML = `
             <div class="flex items-center justify-between">
@@ -395,11 +423,11 @@ function displayDetailedAnalysis(pitchErrors, outlierThreshold) {
                     </div>
                     <div>
                         <div class="text-body">目標 ${error.expectedFrequency.toFixed(0)}Hz</div>
-                        <div class="text-body">実音 ${error.detectedFrequency.toFixed(0)}Hz</div>
+                        <div class="text-body">実音 ${detectedFreqText}</div>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <div class="${deviationClass}">${error.errorInCents >= 0 ? '+' : ''}${error.errorInCents.toFixed(1)}¢</div>
+                    <div class="${deviationClass}">${deviationText}</div>
                     <div class="flex items-center justify-center">
                         <i data-lucide="${evaluation.icon}" class="${evaluation.color}" style="width: 28px; height: 28px; ${iconTransform}"></i>
                     </div>

@@ -253,6 +253,18 @@
     border-color: rgba(245, 158, 11, 0.3);
 }
 
+/* 無効データ（無音等）用スタイル */
+.note-result-item.error-invalid {
+    background: rgba(156, 163, 175, 0.1);  /* gray背景 */
+    border: 1px solid rgba(156, 163, 175, 0.2);
+    opacity: 0.7;
+}
+
+.note-result-item.error-invalid:hover {
+    background: rgba(156, 163, 175, 0.15);
+    border-color: rgba(156, 163, 175, 0.3);
+}
+
 /* note-result-item内のテキストスタイル - margin-bottomを0に */
 .note-result-item .text-body,
 .note-result-item .text-pitch-deviation-plus,

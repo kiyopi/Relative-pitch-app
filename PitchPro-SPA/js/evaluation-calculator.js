@@ -1,11 +1,16 @@
 /**
  * セッション評価計算モジュール
  *
- * @version 2.0.0
+ * @version 2.1.0
  * @description DYNAMIC_GRADE_LOGIC_SPECIFICATION.md準拠の動的グレード計算システム
  * @features モード別評価・デバイス品質補正・12音律理論対応
  *
  * Changelog:
+ *   v2.1.0 (2025-11-27) - 無音検出（null誤差）対応
+ *     - errorInCents === null のデータを無効な測定として除外
+ *     - invalidCount（無効測定数）をメトリクスに追加
+ *     - 無音時にExcellent評価になるバグを修正
+ *
  *   v2.0.0 (2025-11-27) - 評価計算の一元管理
  *     - OUTLIER_THRESHOLD定数を追加（800¢）
  *     - extractSessionMetrics()を追加（単一セッション用）
@@ -13,7 +18,7 @@
  */
 
 class EvaluationCalculator {
-  static VERSION = '2.0.0';
+  static VERSION = '2.1.0';
 
   /**
    * 外れ値閾値（警告用、除外なし）
@@ -25,8 +30,10 @@ class EvaluationCalculator {
    * 単一セッションのメトリクスを抽出
    * result-session-controller, results-overview-controller等で使用
    *
-   * @param {Array} pitchErrors - 音程誤差配列 [{errorInCents: number}, ...]
-   * @returns {Object} { avgError, outlierCount, outlierFiltered, errors }
+   * @param {Array} pitchErrors - 音程誤差配列 [{errorInCents: number|null}, ...]
+   * @returns {Object} { avgError, outlierCount, outlierFiltered, errors, totalNotes, invalidCount }
+   *
+   * v2.1.0: errorInCents === null（無音等）のデータを除外して計算
    */
   static extractSessionMetrics(pitchErrors) {
     if (!pitchErrors || pitchErrors.length === 0) {
@@ -35,11 +42,33 @@ class EvaluationCalculator {
         outlierCount: 0,
         outlierFiltered: false,
         errors: [],
-        totalNotes: 0
+        totalNotes: 0,
+        invalidCount: 0
       };
     }
 
-    const errors = pitchErrors.map(e => Math.abs(e.errorInCents));
+    // v2.1.0: 有効なデータ（errorInCents !== null）のみ抽出
+    const validErrors = pitchErrors.filter(e => e.errorInCents !== null);
+    const invalidCount = pitchErrors.length - validErrors.length;
+
+    if (invalidCount > 0) {
+      console.warn(`⚠️ 無効な測定データ: ${invalidCount}件を評価から除外`);
+    }
+
+    // 有効なデータがない場合
+    if (validErrors.length === 0) {
+      return {
+        avgError: 0,
+        outlierCount: 0,
+        outlierFiltered: false,
+        errors: [],
+        totalNotes: 0,
+        invalidCount,
+        allInvalid: true
+      };
+    }
+
+    const errors = validErrors.map(e => Math.abs(e.errorInCents));
     const outlierCount = errors.filter(e => e > this.OUTLIER_THRESHOLD).length;
     const avgError = errors.reduce((sum, e) => sum + e, 0) / errors.length;
 
@@ -48,7 +77,8 @@ class EvaluationCalculator {
       outlierCount,
       outlierFiltered: outlierCount > 0,
       errors,
-      totalNotes: errors.length
+      totalNotes: validErrors.length,
+      invalidCount
     };
   }
 
@@ -192,12 +222,15 @@ class EvaluationCalculator {
    * 3. 基本メトリクス計算ロジック
    * @param {Array} sessionData - セッションデータ配列
    * @param {Object} deviceInfo - デバイス品質情報
+   *
+   * v2.1.0: errorInCents === null（無音等）のデータを除外して計算
    */
   static calculateBasicMetrics(sessionData, deviceInfo = null) {
     let totalError = 0;
     let totalNotes = 0;
     let excellentNotes = 0;
     let errors = [];
+    let invalidCount = 0;
 
     // 各セッションから音程データを分析
     sessionData.forEach(session => {
@@ -207,6 +240,12 @@ class EvaluationCalculator {
       }
 
       session.pitchErrors.forEach(note => {
+        // v2.1.0: 無効なデータ（null）をスキップ
+        if (note.errorInCents === null) {
+          invalidCount++;
+          return;
+        }
+
         const absError = Math.abs(note.errorInCents);
 
         totalError += absError;
@@ -220,16 +259,22 @@ class EvaluationCalculator {
       });
     });
 
+    // 無効データがある場合は警告
+    if (invalidCount > 0) {
+      console.warn(`⚠️ 無効な測定データ: ${invalidCount}件を評価から除外（無音等）`);
+    }
+
     // データがない場合のフォールバック
     if (totalNotes === 0) {
-      console.warn('⚠️ 音程データが存在しません。ダミーデータを使用します。');
+      console.warn('⚠️ 有効な音程データが存在しません。ダミーデータを使用します。');
       return {
         avgError: 50.0,
         excellenceRate: 0.5,
         stability: 15.0,
         totalNotes: 0,
         excellentNotes: 0,
-        outlierFiltered: false
+        outlierFiltered: false,
+        invalidCount
       };
     }
 
@@ -260,7 +305,8 @@ class EvaluationCalculator {
       excellentNotes,
       outlierFiltered,
       outlierCount,
-      outlierThreshold: this.OUTLIER_THRESHOLD // 定数を参照
+      outlierThreshold: this.OUTLIER_THRESHOLD, // 定数を参照
+      invalidCount
     };
   }
 
@@ -461,17 +507,25 @@ class EvaluationCalculator {
   /**
    * 評価分布の計算
    * @param {Array} pitchErrors - 音程誤差配列
-   * @returns {Object} { excellent, good, pass, practice }
+   * @returns {Object} { excellent, good, pass, practice, invalid }
+   *
+   * v2.1.0: errorInCents === null のデータは invalid としてカウント
    */
   static calculateDistribution(pitchErrors) {
     const distribution = {
       excellent: 0,
       good: 0,
       pass: 0,
-      practice: 0
+      practice: 0,
+      invalid: 0
     };
 
     pitchErrors.forEach(error => {
+      // v2.1.0: 無効なデータは invalid としてカウント
+      if (error.errorInCents === null) {
+        distribution.invalid++;
+        return;
+      }
       const absError = Math.abs(error.errorInCents);
       const evaluation = this.evaluatePitchError(absError);
       distribution[evaluation.level]++;
