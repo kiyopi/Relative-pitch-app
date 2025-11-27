@@ -1,11 +1,19 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.15.0 (2025-11-27)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.17.0 (2025-11-28)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.15.0
- * Date: 2025-11-27
+ * Version: 4.17.0
+ * Date: 2025-11-28
  * Changelog:
+ *   v4.17.0 - 【詳細分析の無音対応】showSessionDetailでEvaluationCalculator統合
+ *            - extractSessionMetrics()で一元管理（avgError, invalidCount, allInvalid取得）
+ *            - 全無音セッション: Practiceバッジ + mic-offアイコン + 専用メッセージ
+ *            - 平均誤差: 全無音時は「---」表示
+ *            - アラート表示は保留（将来的にコンポーネント化予定）
+ *   v4.16.0 - 【無音データ対応強化】誤差推移グラフの無音データ除外（暫定措置）
+ *            - 無音セッション（全データnull）はグラフでnull（線が途切れる）
+ *            - 有効データのみで平均誤差を計算
  *   v4.15.0 - 【無音データ対応】errorInCents === null の表示対応
  *            - 無効データは「---」表示、mic-offアイコン、グレー背景
  *            - 無音時にエラーが発生する問題を修正
@@ -696,22 +704,17 @@ window.showSessionDetail = function(sessionIndex) {
         }
     });
 
-    // 2. すべてのデータで平均誤差を計算（除外なし）
-    const errors = session.pitchErrors
-        ? session.pitchErrors.map(e => Math.abs(e.errorInCents))
-        : [];
-
-    const avgError = errors.length > 0
-        ? errors.reduce((sum, e) => sum + e, 0) / errors.length
-        : 0;
-
-    // 800¢超の警告用フラグ（評価計算には影響しない）
-    const outlierThreshold = 800;
-    const outlierCount = errors.filter(e => e > outlierThreshold).length;
-    const outlierFiltered = outlierCount > 0;
+    // 2. 【v4.17.0】EvaluationCalculator.extractSessionMetrics()で一元管理
+    // result-session-controller.jsと統一
+    const metrics = window.EvaluationCalculator.extractSessionMetrics(session.pitchErrors);
+    const { avgError, outlierCount, outlierFiltered, invalidCount, allInvalid } = metrics;
+    const outlierThreshold = window.EvaluationCalculator.OUTLIER_THRESHOLD || 800;
 
     if (outlierFiltered) {
-        console.log(`⚠️ 警告: ${outlierCount}音が${outlierThreshold}¢を超えています（全${errors.length}音）`);
+        console.log(`⚠️ 警告: ${outlierCount}音が${outlierThreshold}¢を超えています（全${metrics.totalNotes}音）`);
+    }
+    if (invalidCount > 0) {
+        console.log(`⚠️ 無効データ: ${invalidCount}音が無音でした`);
     }
 
     // 3. タイトルを更新
@@ -722,14 +725,24 @@ window.showSessionDetail = function(sessionIndex) {
     const baseNoteEl = document.querySelector('.score-base-note');
     if (baseNoteEl) baseNoteEl.textContent = session.baseNote || 'C4';
 
-    // 5. 精度バッジを更新（v2.0.0: EvaluationCalculator統合）
+    // 5. 精度バッジを更新（v4.17.0: 全無音対応追加）
     const badge = document.querySelector('.accuracy-badge');
     const message = document.querySelector('.rank-grid-center p');
     if (badge && message) {
         badge.className = 'accuracy-badge accuracy-badge-container';
 
-        // 統合評価関数を使用
-        const evaluation = window.EvaluationCalculator.evaluateAverageError(avgError);
+        // 【v4.17.0】全無音の場合はPractice + mic-off + 専用メッセージ
+        let evaluation;
+        if (allInvalid) {
+            evaluation = {
+                level: 'practice',
+                icon: 'mic-off',
+                color: 'text-gray-400',
+                message: '音声が検出されませんでした'
+            };
+        } else {
+            evaluation = window.EvaluationCalculator.evaluateAverageError(avgError);
+        }
 
         badge.classList.add(`accuracy-badge-${evaluation.level}`);
         badge.innerHTML = `
@@ -741,9 +754,11 @@ window.showSessionDetail = function(sessionIndex) {
         message.textContent = evaluation.message;
     }
 
-    // 6. 平均誤差を更新
+    // 6. 平均誤差を更新（全無音の場合は「---」）
     const avgErrorEl = document.querySelector('.score-average');
-    if (avgErrorEl) avgErrorEl.textContent = `±${avgError.toFixed(1)}¢`;
+    if (avgErrorEl) {
+        avgErrorEl.textContent = allInvalid ? '---' : `±${avgError.toFixed(1)}¢`;
+    }
 
     // 7. 音別詳細結果を表示（v2.0.0: EvaluationCalculator統合 + 外れ値アイコン）
     const container = document.getElementById('detail-note-results');
@@ -919,13 +934,16 @@ function initializeCharts(sessionData) {
     }
 
     // 【v3.3.0】セッション別平均誤差データ（符号付き: + = シャープ, - = フラット）
-    // すべてのデータを使用（除外なし）
+    // 【v4.16.0】無音データ（errorInCents === null）を除外して計算
     const labels = sessionData.map((_, i) => `S${i + 1}`);
     const data = sessionData.map(session => {
-        if (!session.pitchErrors || session.pitchErrors.length === 0) return 0;
-        // 符号付き平均（Math.abs()を使わない、除外なし）
-        const sum = session.pitchErrors.reduce((s, e) => s + e.errorInCents, 0);
-        return parseFloat((sum / session.pitchErrors.length).toFixed(1));
+        if (!session.pitchErrors || session.pitchErrors.length === 0) return null;
+        // 有効なデータ（null以外）のみ抽出
+        const validErrors = session.pitchErrors.filter(e => e.errorInCents !== null);
+        if (validErrors.length === 0) return null;  // 全て無音の場合はnull
+        // 符号付き平均（Math.abs()を使わない）
+        const sum = validErrors.reduce((s, e) => s + e.errorInCents, 0);
+        return parseFloat((sum / validErrors.length).toFixed(1));
     });
 
     // Chart作成をtry-catchで囲む

@@ -1,9 +1,14 @@
 /**
  * セッション結果ページコントローラー
- * @version 3.5.0
+ * @version 3.5.1
  * @lastUpdate 2025-11-27
  *
  * 変更履歴:
+ * - 3.5.1: 全無音セッション時の表示改善（暫定措置）
+ *   - 全無音の場合はPracticeバッジ + mic-offアイコン + 専用メッセージ
+ *   - 平均誤差は「---」表示
+ *   - 無音アラートを外れ値アラートと同様に表示（displaySilentNotice追加）
+ *   - 一部無音の場合は「X音中Y音で音声が検出されませんでした」と表示
  * - 3.5.0: 無音検出（null誤差）データの表示対応
  *   - errorInCents === null のデータを「無効」として表示
  *   - 無音時にExcellent評価になるバグを修正
@@ -212,29 +217,43 @@ function updateSessionUI(sessionData, sessionNumber) {
     }
 
     // 【v3.4.0】EvaluationCalculator.extractSessionMetrics()で一元管理
+    // 【v3.5.1】invalidCount, allInvalidを追加取得
     const metrics = window.EvaluationCalculator.extractSessionMetrics(sessionData.pitchErrors);
-    const { avgError, outlierCount, outlierFiltered } = metrics;
-    console.log(`📊 平均誤差計算: 全${metrics.totalNotes}音使用、警告対象: ${outlierCount}音（${EvaluationCalculator.OUTLIER_THRESHOLD}¢超）`);
+    const { avgError, outlierCount, outlierFiltered, invalidCount, allInvalid } = metrics;
+    console.log(`📊 平均誤差計算: 全${metrics.totalNotes}音使用、警告対象: ${outlierCount}音（${EvaluationCalculator.OUTLIER_THRESHOLD}¢超）、無効: ${invalidCount}音`);
 
     const avgErrorEl = document.getElementById('average-error');
     if (avgErrorEl) {
-        avgErrorEl.textContent = `±${avgError.toFixed(1)}¢`;
+        // 【v3.5.1】全無音の場合は「---」表示
+        if (allInvalid) {
+            avgErrorEl.textContent = '---';
+        } else {
+            avgErrorEl.textContent = `±${avgError.toFixed(1)}¢`;
+        }
     }
 
-    // 外れ値情報を表示（平均誤差の下）
-    displayOutlierNotice(outlierFiltered, outlierCount);
+    // 【v3.5.1】無音データがある場合はアラート表示（外れ値より優先）
+    displaySilentNotice(invalidCount, sessionData.pitchErrors.length);
+
+    // 外れ値情報を表示（平均誤差の下）- 無音でない場合のみ
+    if (!allInvalid) {
+        displayOutlierNotice(outlierFiltered, outlierCount);
+    }
 
     // 評価分布計算・表示（すべてのデータを使用）
     displaySessionEvaluationDistribution(sessionData.pitchErrors, outlierCount);
 
     // 精度ランク表示
-    displayAccuracyBadge(Math.abs(avgError));
+    // 【v3.5.1】全無音の場合はPractice + 専用メッセージ
+    displayAccuracyBadge(allInvalid ? null : Math.abs(avgError), allInvalid);
 
     // 詳細分析表示（外れ値アイコン表示）
     displayDetailedAnalysis(sessionData.pitchErrors, EvaluationCalculator.OUTLIER_THRESHOLD);
 
-    // 【追加】外れ値説明セクション表示（詳細分析の下）
-    displayOutlierExplanation(outlierFiltered, outlierCount);
+    // 【追加】外れ値説明セクション表示（詳細分析の下）- 無音でない場合のみ
+    if (!allInvalid) {
+        displayOutlierExplanation(outlierFiltered, outlierCount);
+    }
 
     // 次のセッションボタン更新
     updateNextSessionButton(sessionNumber);
@@ -286,14 +305,25 @@ function displaySessionEvaluationDistribution(pitchErrors, outlierCount = 0) {
 /**
  * 精度バッジを表示（v2.0.0: EvaluationCalculator統合）
  */
-function displayAccuracyBadge(avgError) {
+function displayAccuracyBadge(avgError, allInvalid = false) {
     const badge = document.querySelector('.accuracy-badge');
     const message = document.querySelector('.trophy-section p');
 
     if (!badge || !message) return;
 
-    // 統合評価関数を使用
-    const evaluation = EvaluationCalculator.evaluateAverageError(avgError);
+    // 【v3.5.1】全無音の場合はPractice評価 + 専用メッセージ
+    let evaluation;
+    if (allInvalid) {
+        evaluation = {
+            level: 'practice',
+            icon: 'mic-off',
+            color: 'text-gray-400',
+            message: '音声が検出されませんでした'
+        };
+    } else {
+        // 統合評価関数を使用
+        evaluation = EvaluationCalculator.evaluateAverageError(avgError);
+    }
 
     // 既存のクラスを削除
     badge.className = 'accuracy-badge relative';
@@ -561,6 +591,52 @@ document.addEventListener('click', function(event) {
         popover.classList.remove('show');
     }
 });
+
+/**
+ * 【v3.5.1】無音データ情報を表示（外れ値より優先して表示）
+ */
+function displaySilentNotice(invalidCount, totalNotes) {
+    // 既存の無音通知を探す
+    let existingNotice = document.getElementById('silent-notice');
+
+    // 無音データがない場合は削除
+    if (invalidCount === 0) {
+        if (existingNotice) {
+            existingNotice.remove();
+        }
+        return;
+    }
+
+    // 無音データがある場合は表示
+    if (!existingNotice) {
+        // 新規作成
+        existingNotice = document.createElement('div');
+        existingNotice.id = 'silent-notice';
+        existingNotice.className = 'warning-alert';
+
+        // score-gridの後に挿入（外れ値通知より先に表示）
+        const scoreGrid = document.querySelector('.score-grid');
+        if (scoreGrid && scoreGrid.parentNode) {
+            scoreGrid.parentNode.insertBefore(existingNotice, scoreGrid.nextSibling);
+        }
+    }
+
+    // 全無音か一部無音かでメッセージを変える
+    const isAllInvalid = invalidCount === totalNotes;
+    const messageText = isAllInvalid
+        ? '音声が検出されませんでした。マイクの設定や周囲の環境をご確認ください。'
+        : `${totalNotes}音中${invalidCount}音で音声が検出されませんでした。`;
+
+    existingNotice.innerHTML = `
+        <i data-lucide="mic-off" class="text-gray-400"></i>
+        <p>${messageText}</p>
+    `;
+
+    // Lucideアイコン再初期化
+    if (typeof window.initializeLucideIcons === 'function') {
+        window.initializeLucideIcons({ immediate: true });
+    }
+}
 
 /**
  * 外れ値情報を表示（平均誤差の下に簡潔な通知）

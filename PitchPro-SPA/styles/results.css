@@ -1345,6 +1345,12 @@
     margin-bottom: 0;
 }
 
+/* 無音通知 - セッション評価ページ用 */
+#silent-notice {
+    margin-top: 20px;
+    margin-bottom: 0;
+}
+
 /* 外れ値説明セクション - warning-alertスタイル使用 */
 #outlier-explanation-container .warning-alert,
 #outlier-explanation-overview-container .warning-alert {

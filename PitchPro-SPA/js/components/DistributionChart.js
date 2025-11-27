@@ -5,8 +5,11 @@
  * 評価分布を統一的に表示するコンポーネント。
  * セッション評価・総合評価・トレーニング記録の3ページで共通使用。
  *
- * @version 1.0.0
- * @date 2025-11-15
+ * @version 1.1.0
+ * @date 2025-11-27
+ *
+ * @changelog
+ *   v1.1.0 - 無音データ（errorInCents === null）を評価から除外（暫定措置）
  *
  * @features
  * - 評価分布計算（Excellent/Good/Pass/Practice）
@@ -26,6 +29,9 @@ class DistributionChart {
      *
      * @param {Array} sessionData - セッションデータ配列
      * @returns {Object} 評価分布オブジェクト
+     *
+     * v1.1.0: 無音データ（errorInCents === null）は評価不能のため除外
+     *         （暫定措置：将来的に無音セッション検出機能で保存自体を防ぐ予定）
      */
     static calculateDistribution(sessionData) {
         const distribution = {
@@ -46,10 +52,14 @@ class DistributionChart {
             }
 
             session.pitchErrors.forEach(error => {
-                const absError = Math.abs(error.errorInCents);
+                // v1.1.0: 無音データ（null）は評価不能のため除外
+                if (error.errorInCents === null) {
+                    return;
+                }
 
                 distribution.total++;
 
+                const absError = Math.abs(error.errorInCents);
                 const evaluation = window.EvaluationCalculator.evaluatePitchError(absError);
                 distribution[evaluation.level]++;
             });
