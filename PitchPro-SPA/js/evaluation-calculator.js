@@ -38,12 +38,13 @@ class EvaluationCalculator {
   static extractSessionMetrics(pitchErrors) {
     if (!pitchErrors || pitchErrors.length === 0) {
       return {
-        avgError: 0,
+        avgError: null,
         outlierCount: 0,
         outlierFiltered: false,
         errors: [],
         totalNotes: 0,
-        invalidCount: 0
+        invalidCount: 0,
+        allInvalid: true
       };
     }
 
@@ -55,10 +56,11 @@ class EvaluationCalculator {
       console.warn(`⚠️ 無効な測定データ: ${invalidCount}件を評価から除外`);
     }
 
-    // 有効なデータがない場合
+    // v2.2.0: 有効なデータがない場合はavgError: nullを返す
+    // avgError: 0だと完璧な音程と判定されてしまうため
     if (validErrors.length === 0) {
       return {
-        avgError: 0,
+        avgError: null,
         outlierCount: 0,
         outlierFiltered: false,
         errors: [],
@@ -78,7 +80,8 @@ class EvaluationCalculator {
       outlierFiltered: outlierCount > 0,
       errors,
       totalNotes: validErrors.length,
-      invalidCount
+      invalidCount,
+      allInvalid: false
     };
   }
 
@@ -460,6 +463,17 @@ class EvaluationCalculator {
    * @returns {Object} { level: 'excellent'|'good'|'pass'|'practice', icon, color, cssClass }
    */
   static evaluatePitchError(absError) {
+    // v2.2.0: 無効な入力（null, undefined, NaN）は「無効」評価を返す
+    if (absError === null || absError === undefined || isNaN(absError)) {
+      return {
+        level: 'invalid',
+        icon: 'mic-off',
+        color: 'text-gray-400',
+        cssClass: 'color-eval-invalid',
+        message: '音声が検出されませんでした'
+      };
+    }
+
     if (absError <= 20) {
       return {
         level: 'excellent',
