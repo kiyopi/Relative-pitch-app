@@ -14420,3 +14420,22 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 12:27:18] コミット: fix(pitchpro): iPad最適化 v1.3.11 + index.html破損修復
+
+- iPad設定最適化: sensitivity 4.0→2.5, volumeMultiplier 4→3, noiseGate 0.023→0.05
+- index.html破損修復: handleFooterHomeButtonClick関数定義の修正
+- 仕様書更新: PITCHPRO_VOLUME_FIX_v1.3.9.mdにv1.3.11変更を追記
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 12:38:50] コミット: fix(index): フッターホームボタン破損を完全修復
+
+- handleFooterHomeButtonClick関数定義の修復
+- cleanupIncompleteLesson関数定義の修復
+- DOMContentLoadedイベントリスナーの改行修復
+- コメント破損の修復
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
