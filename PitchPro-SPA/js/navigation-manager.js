@@ -104,8 +104,14 @@
  * - モード情報あり → preparationへリダイレクト（マイク準備）
  * - sessionStorageフラグ残存による誤検出を防止（新規ナビゲーション時にクリア）
  *
- * @version 4.6.1
- * @date 2025-11-22
+ * 【v4.6.3更新】
+ * - training→home遷移時に音声検出を停止するロジック追加
+ * - destroy()ではなくstopDetection()を使用（MediaStream保持）
+ * - iOS Safari MediaStreamバグ（WebKit Bug 230902）を回避
+ * - canSkipPreparation()機能との互換性を維持
+ *
+ * @version 4.6.3
+ * @date 2025-11-27
  */
 
 class NavigationManager {
@@ -1104,6 +1110,20 @@ class NavigationManager {
                 // これによりiOS SafariのMediaStream再取得問題を回避
                 console.log('🔄 [NavigationManager] トレーニングフロー外遷移: AudioDetector保持（PitchPro管理に委譲）');
                 console.log('📝 [NavigationManager] MicrophoneLifecycleManagerのアイドル監視が自動でリソース管理');
+
+                // 【v4.6.3追加】training→home遷移時は音声検出を停止
+                // iOS Safari MediaStreamバグ（WebKit Bug 230902）を回避するため、
+                // destroy()ではなくstopDetection()を使用（MediaStreamは保持）
+                // これにより準備ページスキップ機能（canSkipPreparation）も維持される
+                if (currentPage === 'training' && page === 'home') {
+                    console.log('🛑 [v4.6.3] training→home遷移: 音声検出を停止（MediaStream保持）');
+                    try {
+                        this.currentAudioDetector.stopDetection();
+                        console.log('✅ [v4.6.3] AudioDetector.stopDetection()完了');
+                    } catch (error) {
+                        console.warn('⚠️ [v4.6.3] stopDetection()エラー:', error);
+                    }
+                }
 
                 // 注: globalAudioDetectorは保持したまま
                 // 準備ページに戻った時に再利用可能
