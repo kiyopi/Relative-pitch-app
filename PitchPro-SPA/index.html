@@ -58,7 +58,7 @@
     <script src="pages/js/premium-analysis-calculator.js?v=20251110001"></script>
     <script src="pages/js/premium-analysis-controller.js?v=20251110001"></script>
     <script src="pages/js/help-controller.js?v=20251121001"></script>
-    <script src="js/core/pitchpro-v1.3.6.umd.js?v=1.3.10"></script>
+    <script src="js/core/pitchpro-v1.3.6.umd.js?v=1.3.11"></script>
     <script src="js/core/pitchpro-config.js?v=1764160000"></script>
     <script src="js/core/device-detector.js?v=1764058979"></script>
     <!-- 音域テスト正規版（SPA対応・条件付き初期化） -->
@@ -164,12 +164,10 @@
 
     <!-- メニュー開閉スクリプト -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function  () {
             const menuToggle = document.getElementById('menu-toggle');
-            const headerNav = document.getElementById('header-nav');
-
-            menuToggle.addEventListener('click', function () {
-                headerNav.classList.toggle('active');
+            const headerNav = document.getElementById('header-nav');  menuToggle.addEventListener('click', function () {
+                 headerNav.classList.toggle('active');
                 // アイコン切り替え
                 const icon = menuToggle.querySelector('i');
                 if (icon) {
@@ -185,9 +183,9 @@
                 }
             });
 
-            // 外側クリックで閉じる
+         で閉じる
             document.addEventListener('click', function (event) {
-                if (!menuToggle.contains(event.target) && !headerNav.contains(event.target)) {
+                 if (!menuToggle.contains(event.target) && !headerNav.contains(event.target)) {
                     headerNav.classList.remove('active');
                     const icon = menuToggle.querySelector('i');
                     if (icon) {
@@ -202,10 +200,10 @@
         });
 
         /**
-         * フッター「ホームに戻る」ボタンのクリックハンドラー
-         * 準備・トレーニングページでは確認ダイアログを表示
+                 ームに戻         クハンドラー
+         * 準備・トレーニングペ         ログを表示
          */
-        function handleFooterHomeButtonClick() {
+        f         andleFooterHomeButtonClick() {
             // 【デバッグログ v1】ホームボタン押下検出
             console.log('🏠 [FooterHome] ボタンクリック検出');
 

@@ -14372,3 +14372,51 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 22:24:38] コミット: fix: 音量計算の単位をパーセント基準に統一
+
+- .volume * 2 → .volume * 100 (パーセント変換)
+- noiseGate * 100 * 2 → noiseGate * 100 (単位統一)
+- iPhone 3倍補正で入力33%→表示100%の適切なバランス
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-26 23:19:33] コミット: fix(volume): PitchPro v1.3.9統合 - iPhone感度調整
+
+- volumeMultiplier: 3→2 (iPhone) - 50%で100%到達に調整
+- noiseGate: 0.028→0.04 (iPhone) - 環境ノイズ誤検知を低減
+- updateSelectorsバグ修正 - autoUpdateUI設定が正しく反映
+- trainingController: autoUpdateUI: trueでPitchPro標準UI更新を使用
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 11:57:30] コミット: fix(volume): PitchPro v1.3.10 - 音域テストノイズ対策
+
+## 変更内容
+- iPhone sensitivity: 3.5 → 2.0（環境ノイズの絶対量を削減）
+- iPhone noiseGate: 0.04 → 0.08（残存ノイズを確実にカット）
+
+## 背景
+音域テスト開始直後にノイズを拾い「Low range measurement failed」が
+頻発していた問題を解決
+
+## 仕様書追加
+- PITCHPRO_VOLUME_FIX_v1.3.9.md: 二重増幅問題とv1.3.9/v1.3.10修正を記録
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 12:07:32] コミット: fix: index.htmlの破損を修復 - handleFooterHomeButtonClick関数
+
+## 修正内容
+- 関数定義の破損を修復（`f andleFooterHomeButtonClick` → `function handleFooterHomeButtonClick`）
+- コメント破損を修復（`で閉じる` → `// 外側クリックで閉じる`）
+- 行結合問題を修復（DOMContentLoadedイベントリスナー）
+
+## 原因
+セッション評価ページでホームボタンが機能しない問題の根本原因
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
