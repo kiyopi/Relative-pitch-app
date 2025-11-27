@@ -1,11 +1,14 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.14.0 (2025-11-27)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.15.0 (2025-11-27)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.14.0
+ * Version: 4.15.0
  * Date: 2025-11-27
  * Changelog:
+ *   v4.15.0 - 【無音データ対応】errorInCents === null の表示対応
+ *            - 無効データは「---」表示、mic-offアイコン、グレー背景
+ *            - 無音時にエラーが発生する問題を修正
  *   v4.14.0 - 【一元管理】EvaluationCalculator.extractSessionMetrics()統合
  *            - セッショングリッド: 重複ロジックを統一メソッド呼び出しに置換
  *            - OUTLIER_THRESHOLD定数を参照（ハードコード廃止）
@@ -749,14 +752,23 @@ window.showSessionDetail = function(sessionIndex) {
         container.innerHTML = '';
 
         session.pitchErrors.forEach((error, index) => {
-            const absError = Math.abs(error.errorInCents);
+            // 【v4.15.0】無効なデータ（無音等）の判定
+            const isInvalid = error.errorInCents === null;
+            const absError = isInvalid ? 0 : Math.abs(error.errorInCents);
 
-            // 【追加】外れ値判定
-            const isOutlier = absError > outlierThreshold;
+            // 【追加】外れ値判定（無効データは外れ値判定しない）
+            const isOutlier = !isInvalid && absError > outlierThreshold;
 
-            // 統合評価関数を使用（外れ値でない場合）
+            // 統合評価関数を使用
             let evaluation;
-            if (isOutlier) {
+            if (isInvalid) {
+                // 無効データ（無音等）
+                evaluation = {
+                    icon: 'mic-off',
+                    color: 'text-gray-400',
+                    label: '無効'
+                };
+            } else if (isOutlier) {
                 evaluation = {
                     icon: 'alert-circle',
                     color: 'text-amber-500',
@@ -766,15 +778,29 @@ window.showSessionDetail = function(sessionIndex) {
                 evaluation = window.EvaluationCalculator.evaluatePitchError(absError);
             }
 
-            const deviationClass = error.errorInCents >= 0 ? 'text-pitch-deviation-plus' : 'text-pitch-deviation-minus';
+            // 無効データの場合は特別なクラスを使用
+            let deviationClass;
+            let deviationText;
+            if (isInvalid) {
+                deviationClass = 'text-gray-400';
+                deviationText = '---';
+            } else {
+                deviationClass = error.errorInCents >= 0 ? 'text-pitch-deviation-plus' : 'text-pitch-deviation-minus';
+                deviationText = `${error.errorInCents >= 0 ? '+' : ''}${error.errorInCents.toFixed(1)}¢`;
+            }
 
             const noteElement = document.createElement('div');
             noteElement.className = 'note-result-item';
 
-            // 800¢超の場合はamber背景を追加
+            // 外れ値の場合はamber背景、無効データの場合はgray背景
             if (isOutlier) {
                 noteElement.classList.add('error-outlier');
+            } else if (isInvalid) {
+                noteElement.classList.add('error-invalid');
             }
+
+            // 周波数表示（無効データの場合は「---」）
+            const detectedFreqText = isInvalid ? '---' : `${error.detectedFrequency.toFixed(0)}Hz`;
 
             noteElement.innerHTML = `
                 <div class="flex items-center justify-between">
@@ -784,11 +810,11 @@ window.showSessionDetail = function(sessionIndex) {
                         </div>
                         <div>
                             <div class="text-body">目標 ${error.expectedFrequency.toFixed(0)}Hz</div>
-                            <div class="text-body">実音 ${error.detectedFrequency.toFixed(0)}Hz</div>
+                            <div class="text-body">実音 ${detectedFreqText}</div>
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <div class="${deviationClass}">${error.errorInCents >= 0 ? '+' : ''}${error.errorInCents.toFixed(1)}¢</div>
+                        <div class="${deviationClass}">${deviationText}</div>
                         <div class="flex items-center justify-center">
                             <i data-lucide="${evaluation.icon}" class="${evaluation.color}" style="width: 28px; height: 28px;"></i>
                         </div>
