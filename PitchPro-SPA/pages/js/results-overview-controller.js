@@ -1,11 +1,15 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.13.0 (2025-11-27)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.14.0 (2025-11-27)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.13.0
+ * Version: 4.14.0
  * Date: 2025-11-27
  * Changelog:
+ *   v4.14.0 - 【一元管理】EvaluationCalculator.extractSessionMetrics()統合
+ *            - セッショングリッド: 重複ロジックを統一メソッド呼び出しに置換
+ *            - OUTLIER_THRESHOLD定数を参照（ハードコード廃止）
+ *            - 保守性向上: 閾値変更時は1箇所の修正で完結
  *   v4.13.0 - 【外れ値除外ポリシー変更】evaluation-calculator.jsと統一
  *            - セッショングリッド: 外れ値除外廃止、すべてのデータで平均誤差計算
  *            - 誤差推移グラフ: 外れ値除外廃止、すべてのデータで平均誤差計算
@@ -599,26 +603,13 @@ function displaySessionGrid(sessionData) {
     console.log('📊 [displaySessionGrid] map処理開始...');
     const sessionBoxes = sessionData.map((session, index) => {
         console.log(`📊 [displaySessionGrid] セッション ${index + 1} 処理開始`);
-        
-        // 【v3.3.0】平均誤差計算（すべてのデータを使用、除外なし）
-        const errors = session.pitchErrors
-            ? session.pitchErrors.map(e => Math.abs(e.errorInCents))
-            : [];
-        console.log(`📊 [displaySessionGrid] セッション ${index + 1} errors:`, errors);
 
-        const outlierThreshold = 800; // 警告用閾値（evaluation-calculator.jsと統一）
+        // 【v4.14.0】EvaluationCalculator.extractSessionMetrics()で一元管理
+        const metrics = window.EvaluationCalculator.extractSessionMetrics(session.pitchErrors);
+        const { avgError, outlierCount } = metrics;
+        console.log(`📊 [displaySessionGrid] セッション ${index + 1} avgError: ${avgError}, 警告対象: ${outlierCount}音`);
 
-        // 800¢超の警告用フラグ（評価計算には影響しない）
-        const outlierCount = errors.filter(e => e > outlierThreshold).length;
-        console.log(`📊 [displaySessionGrid] セッション ${index + 1} 警告対象: ${outlierCount}音（${outlierThreshold}¢超）`);
-
-        // すべてのデータで平均誤差を計算（除外なし）
-        const avgError = errors.length > 0
-            ? errors.reduce((sum, e) => sum + e, 0) / errors.length
-            : 0;
-        console.log(`📊 [displaySessionGrid] セッション ${index + 1} avgError:`, avgError);
-
-        // 統合評価関数を使用（v2.1.0: EvaluationCalculator統合）
+        // 統合評価関数を使用
         const evaluation = window.EvaluationCalculator.evaluateAverageError(avgError);
         console.log(`📊 [displaySessionGrid] セッション ${index + 1} evaluation:`, evaluation);
         
@@ -1738,14 +1729,15 @@ function displayOutlierExplanationOverview(outlierFiltered, outlierCount, outlie
         }
     }
 
-    // 【v3.3.0】外れ値がある場合のみ表示（除外廃止、警告のみに修正）
+    // 【v4.14.0】外れ値がある場合のみ表示（定数参照）
     if (outlierFiltered) {
+        const threshold = window.EvaluationCalculator?.OUTLIER_THRESHOLD || 800;
         explanationContainer.innerHTML = `
             <div class="warning-alert">
                 <i data-lucide="alert-circle" class="text-amber-500"></i>
                 <div>
                     <p><strong>大きな誤差について</strong></p>
-                    <p>大きな誤差（800¢超）が検出されました。結果に問題がある場合は、下の「レッスン削除」ボタンまたはトレーニング記録ページの履歴から削除できます。</p>
+                    <p>大きな誤差（${threshold}¢超）が検出されました。結果に問題がある場合は、下の「レッスン削除」ボタンまたはトレーニング記録ページの履歴から削除できます。</p>
                 </div>
             </div>
         `;

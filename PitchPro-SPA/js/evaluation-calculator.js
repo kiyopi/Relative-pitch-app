@@ -1,13 +1,56 @@
 /**
  * セッション評価計算モジュール
  *
- * @version 1.0.0
+ * @version 2.0.0
  * @description DYNAMIC_GRADE_LOGIC_SPECIFICATION.md準拠の動的グレード計算システム
  * @features モード別評価・デバイス品質補正・12音律理論対応
+ *
+ * Changelog:
+ *   v2.0.0 (2025-11-27) - 評価計算の一元管理
+ *     - OUTLIER_THRESHOLD定数を追加（800¢）
+ *     - extractSessionMetrics()を追加（単一セッション用）
+ *     - 各コントローラーの重複ロジックを統一
  */
 
 class EvaluationCalculator {
-  static VERSION = '1.0.0';
+  static VERSION = '2.0.0';
+
+  /**
+   * 外れ値閾値（警告用、除外なし）
+   * 全コントローラーでこの定数を参照すること
+   */
+  static OUTLIER_THRESHOLD = 800;
+
+  /**
+   * 単一セッションのメトリクスを抽出
+   * result-session-controller, results-overview-controller等で使用
+   *
+   * @param {Array} pitchErrors - 音程誤差配列 [{errorInCents: number}, ...]
+   * @returns {Object} { avgError, outlierCount, outlierFiltered, errors }
+   */
+  static extractSessionMetrics(pitchErrors) {
+    if (!pitchErrors || pitchErrors.length === 0) {
+      return {
+        avgError: 0,
+        outlierCount: 0,
+        outlierFiltered: false,
+        errors: [],
+        totalNotes: 0
+      };
+    }
+
+    const errors = pitchErrors.map(e => Math.abs(e.errorInCents));
+    const outlierCount = errors.filter(e => e > this.OUTLIER_THRESHOLD).length;
+    const avgError = errors.reduce((sum, e) => sum + e, 0) / errors.length;
+
+    return {
+      avgError: Math.round(avgError * 10) / 10,
+      outlierCount,
+      outlierFiltered: outlierCount > 0,
+      errors,
+      totalNotes: errors.length
+    };
+  }
 
   /**
    * メイン関数: 動的グレード計算
@@ -193,13 +236,12 @@ class EvaluationCalculator {
     // すべてのデータで平均誤差を計算（除外なし）
     const avgError = totalError / totalNotes;
 
-    // 800¢超の警告用フラグ（評価計算には影響しない）
-    const outlierThreshold = 800;
-    const outlierCount = errors.filter(e => e > outlierThreshold).length;
+    // 警告用フラグ（評価計算には影響しない）- 定数を使用
+    const outlierCount = errors.filter(e => e > this.OUTLIER_THRESHOLD).length;
     const outlierFiltered = outlierCount > 0;
 
     if (outlierFiltered) {
-      console.log(`⚠️ 警告: ${outlierCount}音が${outlierThreshold}¢を超えています（全${errors.length}音）`);
+      console.log(`⚠️ 警告: ${outlierCount}音が${this.OUTLIER_THRESHOLD}¢を超えています（全${errors.length}音）`);
     }
 
     // 優秀音割合計算
@@ -218,7 +260,7 @@ class EvaluationCalculator {
       excellentNotes,
       outlierFiltered,
       outlierCount,
-      outlierThreshold // 外れ値閾値を返す
+      outlierThreshold: this.OUTLIER_THRESHOLD // 定数を参照
     };
   }
 

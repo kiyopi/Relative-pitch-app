@@ -1,9 +1,13 @@
 /**
  * セッション結果ページコントローラー
- * @version 3.3.0
+ * @version 3.4.0
  * @lastUpdate 2025-11-27
  *
  * 変更履歴:
+ * - 3.4.0: EvaluationCalculator.extractSessionMetrics()による一元管理
+ *   - 重複していた外れ値計算・平均誤差計算をEvaluationCalculatorに統合
+ *   - OUTLIER_THRESHOLD定数を参照（ハードコード廃止）
+ *   - 保守性向上: 閾値変更時は1箇所の修正で完結
  * - 3.3.0: 外れ値除外ポリシーの変更（evaluation-calculator.jsと統一）
  *   - 外れ値閾値を180¢→800¢に変更（警告用フラグのみ、除外なし）
  *   - 平均誤差計算: すべてのデータを使用、除外廃止
@@ -203,34 +207,27 @@ function updateSessionUI(sessionData, sessionNumber) {
         console.log('✅ ダミーデータを生成:', sessionData.pitchErrors);
     }
 
-    // 【v3.3.0】外れ値情報を計算（800¢閾値は警告用フラグのみ、除外なし）
-    const errors = sessionData.pitchErrors.map(e => Math.abs(e.errorInCents));
-    const outlierThreshold = 800; // 警告用閾値（evaluation-calculator.jsと統一）
-
-    // 800¢超の警告用フラグ（評価計算には影響しない）
-    const outlierCount = errors.filter(e => e > outlierThreshold).length;
-    const outlierFiltered = outlierCount > 0;
-
-    // 平均誤差計算（すべてのデータを使用、除外なし）
-    const avgError = errors.reduce((sum, e) => sum + e, 0) / errors.length;
-    console.log(`📊 平均誤差計算: 全${errors.length}音使用、警告対象: ${outlierCount}音（${outlierThreshold}¢超）`);
+    // 【v3.4.0】EvaluationCalculator.extractSessionMetrics()で一元管理
+    const metrics = window.EvaluationCalculator.extractSessionMetrics(sessionData.pitchErrors);
+    const { avgError, outlierCount, outlierFiltered } = metrics;
+    console.log(`📊 平均誤差計算: 全${metrics.totalNotes}音使用、警告対象: ${outlierCount}音（${EvaluationCalculator.OUTLIER_THRESHOLD}¢超）`);
 
     const avgErrorEl = document.getElementById('average-error');
     if (avgErrorEl) {
         avgErrorEl.textContent = `±${avgError.toFixed(1)}¢`;
     }
 
-    // 【追加】外れ値情報を表示（平均誤差の下）
+    // 外れ値情報を表示（平均誤差の下）
     displayOutlierNotice(outlierFiltered, outlierCount);
 
-    // 【v3.3.0】評価分布計算・表示（すべてのデータを使用、除外なし）
+    // 評価分布計算・表示（すべてのデータを使用）
     displaySessionEvaluationDistribution(sessionData.pitchErrors, outlierCount);
 
     // 精度ランク表示
     displayAccuracyBadge(Math.abs(avgError));
 
     // 詳細分析表示（外れ値アイコン表示）
-    displayDetailedAnalysis(sessionData.pitchErrors, outlierThreshold);
+    displayDetailedAnalysis(sessionData.pitchErrors, EvaluationCalculator.OUTLIER_THRESHOLD);
 
     // 【追加】外れ値説明セクション表示（詳細分析の下）
     displayOutlierExplanation(outlierFiltered, outlierCount);
@@ -566,10 +563,11 @@ function displayOutlierNotice(outlierFiltered, outlierCount) {
         }
     }
 
-    // 【v3.3.0】内容を更新（除外廃止、警告のみ）
+    // 【v3.4.0】内容を更新（定数参照）
+    const threshold = window.EvaluationCalculator?.OUTLIER_THRESHOLD || 800;
     existingNotice.innerHTML = `
         <i data-lucide="alert-circle" class="text-amber-400"></i>
-        <p>${outlierCount}音に大きな誤差（800¢超）が検出されました。測定環境や発声を確認してください。</p>
+        <p>${outlierCount}音に大きな誤差（${threshold}¢超）が検出されました。測定環境や発声を確認してください。</p>
     `;
 
     // Lucideアイコン再初期化
@@ -600,14 +598,15 @@ function displayOutlierExplanation(outlierFiltered, outlierCount) {
         }
     }
 
-    // 【v3.3.0】外れ値がある場合のみ表示（除外廃止、警告のみに修正）
+    // 【v3.4.0】外れ値がある場合のみ表示（定数参照）
     if (outlierFiltered) {
+        const threshold = window.EvaluationCalculator?.OUTLIER_THRESHOLD || 800;
         explanationContainer.innerHTML = `
             <div class="warning-alert">
                 <i data-lucide="alert-circle" class="text-amber-500"></i>
                 <div>
                     <p><strong>大きな誤差について</strong></p>
-                    <p>このセッションで<strong>${outlierCount}音</strong>に大きな誤差（800¢超）が検出されました。結果に問題がある場合は、総合評価から該当セッションを削除できます。</p>
+                    <p>このセッションで<strong>${outlierCount}音</strong>に大きな誤差（${threshold}¢超）が検出されました。結果に問題がある場合は、総合評価から該当セッションを削除できます。</p>
                 </div>
             </div>
         `;
