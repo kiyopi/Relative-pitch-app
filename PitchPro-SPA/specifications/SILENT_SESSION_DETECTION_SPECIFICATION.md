@@ -1,9 +1,9 @@
 # 無音セッション検出機能 仕様書
 
-**バージョン**: 0.2.0
+**バージョン**: 0.3.0
 **作成日**: 2025-11-27
 **最終更新**: 2025-11-28
-**ステータス**: 一部実装済み（暫定措置）
+**ステータス**: 設計確定・実装待ち
 
 ---
 
@@ -114,171 +114,199 @@
 
 ---
 
-## 2. 機能要件
+## 2. 機能要件（v0.3.0 確定版）
 
 ### 2.1 検出タイミング
 
 | 項目 | 仕様 |
 |-----|------|
 | 検出タイミング | **1セッション（8音）終了後** |
-| 検出条件 | 1音以上が無効（`errorInCents === null`） |
+| 検出条件 | **4音以上が無効**（`errorInCents === null`） |
 | 検出対象 | 全トレーニングモード（ランダム/連続/12音階） |
 
-**理由**:
-- リアルタイム検出（例: 連続3音無音で停止）は、ノイズを拾って連続判定が不安定になる
-- セッション終了後なら、確実に無効音数をカウント可能
+**閾値の理由（v0.3.0で確定）**:
+- **1-3音無音**: タイミングミス・緊張など「実力」として記録する価値がある
+- **4音以上無音**: 半分以上欠損 = トレーニングとして成立しない → 中断
+- **全8音無音**: 放置・マイク故障・環境問題 → 完全に無効
 
-### 2.2 ダイアログ表示
+### 2.2 動作仕様（シンプル版）
 
-無効データが検出された場合、以下のダイアログを表示：
+**4音以上無音検出時の動作:**
 
 ```
-┌─────────────────────────────────────────────┐
-│  ⚠️ 音声が検出されませんでした              │
-│                                             │
-│  8音中 3音で音声が検出されませんでした。     │
-│  マイクの設定や周囲の環境をご確認ください。   │
-│                                             │
-│  このセッションのデータは保存されません。     │
-│                                             │
-│  ┌─────────────┐    ┌─────────────┐        │
-│  │   続ける    │    │   やめる    │        │
-│  └─────────────┘    └─────────────┘        │
-└─────────────────────────────────────────────┘
+セッション完了
+  → handleSessionComplete()
+  → 無音チェック（4音以上?）
+    → Yes: タイマーキャンセル
+           → cleanupIncompleteLesson()（データ削除）
+           → sessionStorageにフラグ設定
+           → NavigationManager.navigate('home')
+           → ホームでアラート表示
+    → No: 通常処理（保存・遷移）
 ```
 
-### 2.3 ユーザー選択肢
+**選択肢は不要**:
+- 「続ける」「やめる」のダイアログは実装しない
+- 4音以上無音 = トレーニング不成立なので、自動でホームへ戻す
+- やめたい場合は既存のフッターホームボタンで対応可能
 
-| 選択 | 動作 |
-|-----|------|
-| **続ける** | セッションデータを**保存せず**、次のセッションへ進む（または結果ページへ） |
-| **やめる** | レッスン全体を中断し、ホームへ戻る（該当レッスンのデータは保存しない） |
+### 2.3 ホーム遷移後のアラート表示
 
-### 2.4 モード別動作
+```javascript
+// ホーム初期化時
+const silentData = sessionStorage.getItem('silentSessionDetected');
+if (silentData) {
+    sessionStorage.removeItem('silentSessionDetected');
+    const { invalidCount, totalNotes } = JSON.parse(silentData);
+    alert(`音声が検出されなかったため、トレーニングを中断しました。\n\n${totalNotes}音中${invalidCount}音で音声が検出されませんでした。\nマイクの設定や周囲の環境をご確認ください。`);
+}
+```
 
-| モード | 「続ける」時の動作 | 「やめる」時の動作 |
-|-------|------------------|------------------|
-| **ランダム基音** | 次セッションへ（結果ページスキップ） | ホームへ戻る |
-| **連続チャレンジ** | 次セッションへ自動継続 | ホームへ戻る |
-| **12音階** | 次セッションへ自動継続 | ホームへ戻る |
+### 2.4 モード別動作（統一）
 
-**重要**: 「続ける」を選んでも、**無効なセッションは保存されない**。
+| モード | 4音以上無音時の動作 |
+|-------|------------------|
+| **ランダム基音** | ホームへ戻る + アラート表示 |
+| **連続チャレンジ** | ホームへ戻る + アラート表示 |
+| **12音階** | ホームへ戻る + アラート表示 |
+
+**全モード共通**: 選択肢なし、自動でホームへ戻る
+
+### 2.5 1-3音無音の場合
+
+- **保存する**（現状の暫定措置で対応済み）
+- 無音の音は `errorInCents = null` として記録
+- 評価は有効データのみで計算
+- セッション評価・総合評価ページで適切に表示（セクション0参照）
 
 ---
 
-## 3. 技術仕様
+## 3. 技術仕様（v0.3.0 確定版）
 
 ### 3.1 無効データの判定
 
 ```javascript
-// SessionDataRecorder.completeSession() または handleSessionComplete() 内で判定
-function hasInvalidData(session) {
-    if (!session.pitchErrors || session.pitchErrors.length === 0) {
-        return true; // データなし = 無効
+// handleSessionComplete() 内で判定
+const currentSession = sessionRecorder?.getCurrentSession();
+if (currentSession?.pitchErrors) {
+    const invalidCount = currentSession.pitchErrors.filter(e => e.errorInCents === null).length;
+    if (invalidCount >= 4) {
+        // 4音以上無音 → 中断処理
     }
-
-    // 1音でも null があれば無効
-    const invalidCount = session.pitchErrors.filter(e => e.errorInCents === null).length;
-    return invalidCount > 0;
-}
-
-function getInvalidCount(session) {
-    if (!session.pitchErrors) return 0;
-    return session.pitchErrors.filter(e => e.errorInCents === null).length;
 }
 ```
 
 ### 3.2 処理フロー
 
 ```
-現在のフロー:
-ドレミガイド完了
-  → handleSessionComplete()
-  → sessionRecorder.completeSession() [保存]
-  → 遷移（結果ページ or 次セッション or 総合評価）
-
 変更後のフロー:
 ドレミガイド完了
   → handleSessionComplete()
-  → 無効データチェック
-    → 無効あり:
-        → ダイアログ表示（非同期待機）
-        → 「続ける」: 保存スキップ → 遷移
-        → 「やめる」: レッスン中断 → ホームへ
-    → 無効なし:
-        → sessionRecorder.completeSession() [保存]
-        → 遷移
+  → ページ離脱チェック（既存）
+  → 無音チェック（4音以上?）
+    → 4音以上無音:
+        → nextSessionTimeoutId をキャンセル
+        → sessionStorage にフラグ設定
+        → cleanupIncompleteLesson()
+        → NavigationManager.navigate('home')
+        → return（以降の処理スキップ）
+    → 3音以下:
+        → 通常処理（保存・遷移）
 ```
 
 ### 3.3 変更対象ファイル
 
-| ファイル | 変更内容 | 難易度 |
-|---------|---------|-------|
-| `trainingController.js` | `handleSessionComplete()`に無効判定・ダイアログ追加 | 中 |
-| `session-data-recorder.js` | `hasInvalidData()`メソッド追加（オプション） | 低 |
-| `training.html` | ダイアログHTML追加 | 低 |
-| `training.css` | ダイアログスタイル追加 | 低 |
+| ファイル | 変更内容 | 難易度 | 工数 |
+|---------|---------|-------|------|
+| `trainingController.js` | `handleSessionComplete()`に無音判定追加 | 低 | 15分 |
+| `router.js` または `index.html` | ホーム初期化時にアラート表示 | 低 | 15分 |
+| **合計** | | | **30分** |
 
-### 3.4 ダイアログ実装案
+**不要になった変更:**
+- ~~`training.html` ダイアログHTML~~ → 不要
+- ~~`training.css` ダイアログスタイル~~ → 不要
+- ~~`session-data-recorder.js` メソッド追加~~ → 不要
 
-```html
-<!-- training.html に追加 -->
-<div id="silent-session-dialog" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
-        <div class="modal-icon">
-            <i data-lucide="mic-off" class="text-amber-400"></i>
-        </div>
-        <h3 class="modal-title">音声が検出されませんでした</h3>
-        <p class="modal-message">
-            8音中 <span id="invalid-count">0</span>音で音声が検出されませんでした。<br>
-            マイクの設定や周囲の環境をご確認ください。
-        </p>
-        <p class="modal-note">このセッションのデータは保存されません。</p>
-        <div class="modal-buttons">
-            <button id="silent-dialog-continue" class="btn btn-primary">続ける</button>
-            <button id="silent-dialog-quit" class="btn btn-outline">やめる</button>
-        </div>
-    </div>
-</div>
+### 3.4 実装コード（確定版）
+
+```javascript
+// trainingController.js - handleSessionComplete() 冒頭に追加
+function handleSessionComplete() {
+    // 【v4.0.40追加】ページ離脱チェック
+    if (!isInitialized) {
+        console.log('🛑 [handleSessionComplete] ページ離脱検出 - 処理をスキップ');
+        return;
+    }
+
+    // 【v4.6.0追加】無音セッション検出（4音以上無音で中断）
+    const currentSession = sessionRecorder?.getCurrentSession();
+    if (currentSession?.pitchErrors) {
+        const invalidCount = currentSession.pitchErrors.filter(e => e.errorInCents === null).length;
+        if (invalidCount >= 4) {
+            console.log(`🔇 無音検出: ${invalidCount}/8音 - トレーニング中断`);
+
+            // タイマーキャンセル（連続モード用）
+            if (nextSessionTimeoutId) {
+                clearTimeout(nextSessionTimeoutId);
+                nextSessionTimeoutId = null;
+            }
+
+            // フラグ設定（ホームでアラート表示用）
+            sessionStorage.setItem('silentSessionDetected', JSON.stringify({
+                invalidCount: invalidCount,
+                totalNotes: 8
+            }));
+
+            // クリーンアップ + ホーム遷移
+            cleanupIncompleteLesson();
+            if (window.NavigationManager) {
+                window.NavigationManager.navigate('home');
+            } else {
+                window.location.hash = 'home';
+            }
+            return;
+        }
+    }
+
+    console.log('✅ トレーニング完了');
+    // 以降は通常処理...
+}
 ```
 
 ```javascript
-// trainingController.js に追加
-function showSilentSessionDialog(invalidCount, totalNotes) {
-    return new Promise((resolve) => {
-        const dialog = document.getElementById('silent-session-dialog');
-        const countSpan = document.getElementById('invalid-count');
-        const continueBtn = document.getElementById('silent-dialog-continue');
-        const quitBtn = document.getElementById('silent-dialog-quit');
+// router.js または index.html - ホーム初期化時に追加
+function checkSilentSessionAlert() {
+    const silentData = sessionStorage.getItem('silentSessionDetected');
+    if (silentData) {
+        sessionStorage.removeItem('silentSessionDetected');
+        const { invalidCount, totalNotes } = JSON.parse(silentData);
 
-        countSpan.textContent = invalidCount;
-        dialog.style.display = 'flex';
-
-        // Lucideアイコン初期化
-        if (typeof window.initializeLucideIcons === 'function') {
-            window.initializeLucideIcons({ immediate: true });
-        }
-
-        const cleanup = () => {
-            dialog.style.display = 'none';
-            continueBtn.removeEventListener('click', onContinue);
-            quitBtn.removeEventListener('click', onQuit);
-        };
-
-        const onContinue = () => {
-            cleanup();
-            resolve('continue');
-        };
-
-        const onQuit = () => {
-            cleanup();
-            resolve('quit');
-        };
-
-        continueBtn.addEventListener('click', onContinue);
-        quitBtn.addEventListener('click', onQuit);
-    });
+        // 少し遅延してから表示（ページ遷移完了後）
+        setTimeout(() => {
+            alert(`音声が検出されなかったため、トレーニングを中断しました。\n\n${totalNotes}音中${invalidCount}音で音声が検出されませんでした。\nマイクの設定や周囲の環境をご確認ください。`);
+        }, 100);
+    }
 }
+```
+
+### 3.5 デバッグ用スキップフラグ
+
+開発時に無音検出を無効化するためのフラグ:
+
+```javascript
+// trainingController.js
+const DEBUG_SKIP_SILENT_CHECK = localStorage.getItem('debug_skipSilentCheck') === 'true';
+
+// 無音チェック部分
+if (!DEBUG_SKIP_SILENT_CHECK && invalidCount >= 4) {
+    // 中断処理
+}
+```
+
+**開発者コンソールで設定:**
+```javascript
+localStorage.setItem('debug_skipSilentCheck', 'true');  // 無効化
+localStorage.setItem('debug_skipSilentCheck', 'false'); // 有効化（デフォルト）
 ```
 
 ---
@@ -318,32 +346,36 @@ if (nextSessionTimeoutId) {
 
 ---
 
-## 5. 実装計画
+## 5. 実装計画（v0.3.0 確定版）
 
-### 5.1 段階的実装（推奨）
+### 5.1 シンプル実装（全モード共通）
 
-| フェーズ | 内容 | 工数 |
-|---------|-----|------|
-| **Phase 1** | ランダムモードのみ対応 | 2時間 |
-| **Phase 2** | 連続/12音階モード対応 | 2時間 |
-| **Phase 3** | テスト・調整 | 1-2時間 |
-| **合計** | | **5-6時間** |
+| 項目 | 内容 | 工数 |
+|------|-----|------|
+| **実装** | `handleSessionComplete()`に無音判定追加 | 15分 |
+| **実装** | ホーム初期化時にアラート表示追加 | 15分 |
+| **テスト** | 各モードで動作確認 | 15分 |
+| **合計** | | **45分** |
 
-### 5.2 Phase 1 詳細（ランダムモードのみ）
+### 5.2 実装手順
 
-1. `training.html` にダイアログHTML追加
-2. `training.css` にダイアログスタイル追加
-3. `trainingController.js`:
-   - `showSilentSessionDialog()` 関数追加
-   - `handleSessionComplete()` に無効判定追加（ランダムモードのみ）
-4. テスト: 無音でトレーニング → ダイアログ表示確認
+1. `trainingController.js`:
+   - `handleSessionComplete()` 冒頭に無音判定追加
+   - デバッグ用スキップフラグ追加
+2. `router.js` または `index.html`:
+   - ホーム初期化時に `checkSilentSessionAlert()` 呼び出し
+3. テスト:
+   - 4音以上無音 → ホーム遷移 + アラート表示確認
+   - 3音以下無音 → 通常処理確認
 
-### 5.3 Phase 2 詳細（連続/12音階対応）
+### 5.3 実装時期
 
-1. `handleSessionComplete()` のモード分岐を調整
-2. 自動継続タイマーのキャンセル処理追加
-3. 「続ける」時の次セッション開始ロジック調整
-4. テスト: 各モードで無音トレーニング → 正常動作確認
+**後回し**: デバッグ効率の観点から、リリース直前に実装予定
+
+理由:
+- 実装中は常に声を出す必要があり、開発効率が低下
+- デバッグ用スキップフラグで対応可能だが、煩雑
+- 実装自体は30分程度で完了するため、後回しでもリスクなし
 
 ---
 
@@ -379,15 +411,16 @@ if (nextSessionTimeoutId) {
 
 ---
 
-## 7. 決定事項（要確認）
+## 7. 決定事項（v0.3.0 確定）
 
-| 項目 | 現在の想定 | 確認必要 |
-|-----|----------|---------|
-| 検出タイミング | セッション終了後 | ✓ |
-| 検出条件 | 1音以上無効 | ✓ |
-| 「続ける」時の動作 | 保存せず次へ | ✓ |
-| 「やめる」時の動作 | レッスン中断、ホームへ | ✓ |
-| 実装アプローチ | 段階的（Phase 1-3） | 要確認 |
+| 項目 | 決定内容 | 理由 |
+|-----|----------|------|
+| 検出タイミング | セッション終了後 | リアルタイムは不安定 |
+| 検出条件 | **4音以上無効** | 1-3音は実力として記録、4音以上は不成立 |
+| 選択肢 | **なし（自動ホーム遷移）** | 4音以上 = 不成立、続ける意味なし |
+| アラート表示 | ホーム遷移後にalert() | トレーニング中断理由を説明 |
+| 既存機能流用 | `cleanupIncompleteLesson()` | フッターホームボタンと同じ処理 |
+| 実装時期 | **リリース直前** | デバッグ効率の観点 |
 
 ---
 
@@ -395,5 +428,6 @@ if (nextSessionTimeoutId) {
 
 | 日付 | バージョン | 内容 |
 |-----|----------|------|
+| 2025-11-28 | 0.3.0 | 設計確定版。閾値を4音以上に変更、選択肢を廃止、シンプル実装に変更 |
 | 2025-11-28 | 0.2.0 | 暫定措置（セクション0）を追加。表示問題の対応を実装・文書化 |
 | 2025-11-27 | 0.1.0 | 初版作成（ドラフト） |
