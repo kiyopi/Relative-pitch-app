@@ -63,7 +63,7 @@ window.initPremiumAnalysis = async function() {
     });
 
     // UI更新
-    updateTab1UI(intervalAccuracy, brainProcessing);
+    updateTab1UI(intervalAccuracy, brainProcessing, allSessionData);
     updateTab2UI(errorPatterns);
     updateTab3UI(practicePlan);
     updateTab4UI(growthRecords);
@@ -83,7 +83,7 @@ window.initPremiumAnalysis = async function() {
 /**
  * Tab 1: 音程精度分析のUI更新
  */
-function updateTab1UI(data, brainProcessing) {
+function updateTab1UI(data, brainProcessing, allSessionData) {
     if (!data) return;
 
     // 平均音程精度
@@ -125,6 +125,106 @@ function updateTab1UI(data, brainProcessing) {
 
     // 音域ブロック分析
     updateBrainProcessingUI(brainProcessing);
+
+    // モード別平均精度
+    updateModeAccuracySummary(allSessionData);
+}
+
+/**
+ * モード別平均精度のUI更新
+ */
+function updateModeAccuracySummary(allSessionData) {
+    if (!allSessionData || allSessionData.length === 0) return;
+
+    // モード別にセッションデータを分類
+    const modeData = {
+        random: { all: [], ascending: [], descending: [] },
+        continuous: { all: [], ascending: [], descending: [] },
+        '12tone': {
+            all: [],
+            ascending: [],      // scaleDirection: ascending
+            descending: [],     // scaleDirection: descending
+            chromaticAsc: [],   // chromaticDirection: ascending
+            chromaticDesc: []   // chromaticDirection: descending
+        }
+    };
+
+    // セッションデータを分類
+    allSessionData.forEach(session => {
+        const mode = session.mode;
+        const scaleDir = session.scaleDirection;
+        const chromDir = session.chromaticDirection;
+
+        if (mode === 'random') {
+            modeData.random.all.push(session);
+            if (scaleDir === 'ascending') modeData.random.ascending.push(session);
+            if (scaleDir === 'descending') modeData.random.descending.push(session);
+        } else if (mode === 'continuous') {
+            modeData.continuous.all.push(session);
+            if (scaleDir === 'ascending') modeData.continuous.ascending.push(session);
+            if (scaleDir === 'descending') modeData.continuous.descending.push(session);
+        } else if (mode === '12tone') {
+            modeData['12tone'].all.push(session);
+            if (scaleDir === 'ascending') modeData['12tone'].ascending.push(session);
+            if (scaleDir === 'descending') modeData['12tone'].descending.push(session);
+            if (chromDir === 'ascending') modeData['12tone'].chromaticAsc.push(session);
+            if (chromDir === 'descending') modeData['12tone'].chromaticDesc.push(session);
+        }
+    });
+
+    // 平均誤差を計算するヘルパー関数
+    const calcAvgError = (sessions) => {
+        if (sessions.length === 0) return null;
+        let totalError = 0;
+        let count = 0;
+        sessions.forEach(session => {
+            if (session.pitchErrors && Array.isArray(session.pitchErrors)) {
+                session.pitchErrors.forEach(pe => {
+                    if (pe && typeof pe.errorInCents === 'number' && !isNaN(pe.errorInCents)) {
+                        totalError += Math.abs(pe.errorInCents);
+                        count++;
+                    }
+                });
+            }
+        });
+        return count > 0 ? (totalError / count).toFixed(1) : null;
+    };
+
+    // 値を表示するヘルパー関数
+    const displayValue = (elementId, avgError) => {
+        const el = document.getElementById(elementId);
+        if (el) {
+            if (avgError !== null) {
+                el.textContent = `±${avgError}¢`;
+            } else {
+                el.textContent = '--';
+                el.classList.add('mode-accuracy-no-data');
+            }
+        }
+    };
+
+    // ランダム基音
+    displayValue('random-accuracy-value', calcAvgError(modeData.random.all));
+    displayValue('random-asc-value', calcAvgError(modeData.random.ascending));
+    displayValue('random-desc-value', calcAvgError(modeData.random.descending));
+
+    // 連続チャレンジ
+    displayValue('continuous-accuracy-value', calcAvgError(modeData.continuous.all));
+    displayValue('continuous-asc-value', calcAvgError(modeData.continuous.ascending));
+    displayValue('continuous-desc-value', calcAvgError(modeData.continuous.descending));
+
+    // 12音階
+    displayValue('12tone-accuracy-value', calcAvgError(modeData['12tone'].all));
+    displayValue('12tone-asc-value', calcAvgError(modeData['12tone'].ascending));
+    displayValue('12tone-desc-value', calcAvgError(modeData['12tone'].descending));
+    displayValue('12tone-chromatic-asc-value', calcAvgError(modeData['12tone'].chromaticAsc));
+    displayValue('12tone-chromatic-desc-value', calcAvgError(modeData['12tone'].chromaticDesc));
+
+    console.log('✅ モード別平均精度を更新しました', {
+        random: modeData.random.all.length,
+        continuous: modeData.continuous.all.length,
+        '12tone': modeData['12tone'].all.length
+    });
 }
 
 /**

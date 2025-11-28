@@ -57,6 +57,76 @@
                     全<span id="total-data-points">--</span>音のデータから算出
                 </p>
             </div>
+
+            <!-- モード別平均精度 -->
+            <div id="mode-accuracy-summary" class="mode-accuracy-summary">
+                <!-- ランダム基音 -->
+                <div class="mode-accuracy-card">
+                    <div class="mode-accuracy-card-title">
+                        <i data-lucide="shuffle" style="width: 16px; height: 16px;"></i>
+                        <span>ランダム基音</span>
+                    </div>
+                    <div id="random-accuracy-value" class="mode-accuracy-card-value text-purple-300">--</div>
+                    <div class="mode-accuracy-details">
+                        <div class="mode-accuracy-detail-row">
+                            <span class="mode-accuracy-detail-label">上行</span>
+                            <span id="random-asc-value" class="mode-accuracy-detail-value">--</span>
+                        </div>
+                        <div class="mode-accuracy-detail-row">
+                            <span class="mode-accuracy-detail-label">下行</span>
+                            <span id="random-desc-value" class="mode-accuracy-detail-value">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 連続チャレンジ -->
+                <div class="mode-accuracy-card">
+                    <div class="mode-accuracy-card-title">
+                        <i data-lucide="repeat" style="width: 16px; height: 16px;"></i>
+                        <span>連続チャレンジ</span>
+                    </div>
+                    <div id="continuous-accuracy-value" class="mode-accuracy-card-value text-blue-300">--</div>
+                    <div class="mode-accuracy-details">
+                        <div class="mode-accuracy-detail-row">
+                            <span class="mode-accuracy-detail-label">上行</span>
+                            <span id="continuous-asc-value" class="mode-accuracy-detail-value">--</span>
+                        </div>
+                        <div class="mode-accuracy-detail-row">
+                            <span class="mode-accuracy-detail-label">下行</span>
+                            <span id="continuous-desc-value" class="mode-accuracy-detail-value">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 12音階 -->
+                <div class="mode-accuracy-card">
+                    <div class="mode-accuracy-card-title">
+                        <i data-lucide="music-2" style="width: 16px; height: 16px;"></i>
+                        <span>12音階</span>
+                    </div>
+                    <div id="12tone-accuracy-value" class="mode-accuracy-card-value text-green-300">--</div>
+                    <div class="mode-accuracy-details">
+                        <div class="mode-accuracy-detail-row">
+                            <span class="mode-accuracy-detail-label">上行</span>
+                            <span id="12tone-asc-value" class="mode-accuracy-detail-value">--</span>
+                        </div>
+                        <div class="mode-accuracy-detail-row">
+                            <span class="mode-accuracy-detail-label">下行</span>
+                            <span id="12tone-desc-value" class="mode-accuracy-detail-value">--</span>
+                        </div>
+                        <div class="mode-accuracy-12tone-extra">
+                            <div class="mode-accuracy-detail-row">
+                                <span class="mode-accuracy-detail-label">上昇</span>
+                                <span id="12tone-chromatic-asc-value" class="mode-accuracy-detail-value">--</span>
+                            </div>
+                            <div class="mode-accuracy-detail-row">
+                                <span class="mode-accuracy-detail-label">下降</span>
+                                <span id="12tone-chromatic-desc-value" class="mode-accuracy-detail-value">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- 音程間隔別精度 -->
