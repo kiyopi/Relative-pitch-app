@@ -3,6 +3,13 @@
  * @version 2.9.7
  * @date 2025-11-24
  * @changelog
+ *   - 2025-11-28 v2.9.9: ブチ音対策修正（スケジュール廃止 + Attack延長）
+ *     - 音の揺れ（ジッター）を防ぐためスケジュール再生を廃止し即時再生へ戻す
+ *     - ブチ音対策としてAttack（立ち上がり）を0.02s→0.1sに延長し、物理的にノイズを防ぐ
+ *   - 2025-11-27 v2.9.8: ブチ音対策強化（50ms遅延 + スケジュール再生）
+ *     - PC環境でのブチ音（ポップノイズ）を防止
+ *     - 再生開始前に50msのバッファ時間を確保
+ *     - Tone.now() + 0.05s で正確にスケジュール再生
  *   - 2025-11-24 v2.9.7: edf9fc0の正常設定に復元（理論的検証済み）
  *     - iPad: 0.6x/0.75x（軽減衰でクリッピング防止）
  *     - iPhone/PC/Android: 0.35x/0.5x（強減衰で歪み防止）
@@ -61,7 +68,7 @@
  *   - 2025-10-28: 低音域の音量バランス調整・音割れ対策強化
  *   - 2025-10-28: キャッシュバスター実装（クエリパラメータでバージョン管理）
  */
-const SAMPLE_VERSION = "2.9.7";
+const SAMPLE_VERSION = "2.9.9";
 var c = Object.defineProperty;
 var f = (s, e, i) => e in s ? c(s, e, { enumerable: !0, configurable: !0, writable: !0, value: i }) : s[e] = i;
 var n = (s, e, i) => f(s, typeof e != "symbol" ? e + "" : e, i);
@@ -79,8 +86,8 @@ const t = class t {
       // 2. /pages/js/preparation-pitchpro-cycle.js (line 839-840)
       release: e.release ?? 1.5,
       // Natural release (1.5s) for smooth decay
-      attack: e.attack ?? 0.02,
-      // Fast attack (0.02s) for immediate response
+      attack: e.attack ?? 0.1,
+      // Slow attack (0.1s) to prevent popping noise naturally
       volume: e.volume ?? -6,
       noteRange: e.noteRange || t.AVAILABLE_NOTES.map((i) => i.note)
     };
@@ -128,7 +135,7 @@ const t = class t {
       console.log("📥 [PitchShifter] Loading audio samples...");
       await l.loaded();
 
-      this.isInitialized = !0, console.log("✅ [PitchShifter] Initialization complete - attack:0.02s + sustain:1.0s + release:1.5s (2.52s total)");
+      this.isInitialized = !0, console.log("✅ [PitchShifter] Initialization complete - attack:0.1s + sustain:1.0s + release:1.5s (2.6s total)");
     } catch (e) {
       throw console.error("❌ [PitchShifter] Initialization failed:", e), new Error(`PitchShifter initialization failed: ${e}`);
     }
@@ -207,8 +214,8 @@ const t = class t {
       console.log(`🔊 [DEBUG] Tone.Destination volume: ${l.getDestination().volume.value}dB`);
       console.log(`🎵 [PitchShifter] Playing ${e} (${a.frequency.toFixed(2)}Hz) for ${i}s at velocity ${adjustedVelocity.toFixed(2)}`);
 
-      // 【修正】即座に再生開始（オフセットなし）
-      // triggerAttack/triggerReleaseの分離により低音域でのノイズを防止
+      // 【修正 v2.9.9】スケジュール再生を廃止し、即時再生に戻す（音の揺れ対策）
+      // ブチ音対策はAttackタイムの延長（0.1s）で行う
       this.sampler.triggerAttack(e, void 0, adjustedVelocity);
 
       // 指定時間後にリリース
@@ -216,7 +223,7 @@ const t = class t {
         this.sampler && (this.sampler.triggerRelease(e), console.log(`🔇 [PitchShifter] Released ${e}`));
         this.isPlaying = !1;
         console.log(`✅ [PitchShifter] Playback completed ${e}`);
-      }, i * 1e3);
+      }, i * 1000);
     } catch (a) {
       throw this.isPlaying = !1, console.error("❌ [PitchShifter] Play note failed:", a), a;
     }

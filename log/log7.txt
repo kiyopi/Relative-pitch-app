@@ -1,75 +1,23 @@
-⏺ v1.3.6 音量100%問題 - 調査レポート
+[Error] ❌ [Router] Error initializing page "results-overview": – TypeError: null is not an object (evaluating 'error.errorInCents.toFixed') — results-overview-controller.js:791:114
+TypeError: null is not an object (evaluating 'error.errorInCents.toFixed') — results-overview-controller.js:791:114（anonymous関数） — results-overview-controller.js:791:114forEach（anonymous関数） — results-overview-controller.js:751updateOverviewUI — results-overview-controller.js:436（anonymous関数） — results-overview-controller.js:225initResultsOverview — results-overview-controller.js:97（anonymous関数） — router.js:550
+	（anonymous関数） (router.js:569)
+[Error] ❌ [Router] Failed to initialize page: results-overview
+	showInitializationError (router.js:754)
+	（anonymous関数） (router.js:570)
+[Error] ❌ [Router] Error details: – TypeError: null is not an object (evaluating 'error.errorInCents.toFixed') — results-overview-controller.js:791:114
+TypeError: null is not an object (evaluating 'error.errorInCents.toFixed') — results-overview-controller.js:791:114
+	showInitializationError (router.js:755)
+	（anonymous関数） (router.js:570)
+[Log] 📍 [NavigationManager] ブラウザバック防止: ダミーエントリー追加×2 (results-overview) (navigation-manager.js, line 1311)
+[Log] 📝 [NavigationManager] 通知メッセージ: 総合評価画面です。 (navigation-manager.js, line 1312)
 
-  調査結果サマリー
-
-  | 環境           | PitchProバージョン | 大きな声での音量値 | 100%到達   |
-  |--------------|---------------|-----------|----------|
-  | テストページ (旧)   | v1.3.5        | 84-92%    | ❌        |
-  | テストページ (新)   | v1.3.6        | 91-97%    | ❌        |
-  | アプリ 準備画面     | v1.3.6        | 26-74%    | ❌        |
-  | アプリ トレーニング画面 | v1.3.6        | 100%      | ✅ 常に100% |
-
-  重要な発見
-
-  1. PitchProファイルは同一
-    - アプリとテストページで使用しているファイルのMD5ハッシュが完全一致
-    - e2169bb0d0951bab8e357881a653f1c3
-  2. deviceSpecs設定も同一
-  volumeMultiplier: 3
-  noiseGate: 0.028
-  sensitivity: 3.5
-  deviceType: "iPhone"
-  3. テストページv1.3.6では100%にならない
-    - 最大値: 97.5%
-    - 通常値: 91-93%
-    - PitchProライブラリ自体は正常に動作
-
-  問題の所在
-
-  トレーニング画面固有の問題である可能性が高い。
-
-  同じPitchProライブラリ、同じdeviceSpecs設定でも：
-  - 準備画面: 正常（26-74%）
-  - トレーニング画面: 異常（常に100%）
-
-  調査すべき箇所
-
-  1. trainingController.js の handlePitchUpdate()
-    - /Users/isao/Documents/Relative-pitch-app/PitchPro-SPA/js/controllers/trainingController.js
-    - 1207-1248行目
-    - result.rawVolume のデバッグログを追加して実際の値を確認
-  2. AudioDetectorの再利用
-    - トレーニング画面では準備画面から引き継いだAudioDetectorを再利用
-    - 引き継ぎ時に何か状態が変わっている可能性
-  3. updateSelectors() の影響
-    - トレーニング画面でセレクターを更新する際の処理
-
-  確認用デバッグコード（提案）
-
-  trainingController.js の handlePitchUpdate() に以下を追加：
-
-  // 1214行目の既存ログを拡張
-  if (!lastCallbackLog || Date.now() - lastCallbackLog > 3000) {
-      console.log(`🔔 [DEBUG] handlePitchUpdate:`, {
-          frequency: result.frequency?.toFixed(1),
-          clarity: result.clarity?.toFixed(2),
-          volume: result.volume?.toFixed(1),
-          rawVolume: result.rawVolume?.toFixed(4),  // ← 追加
-          volumeCalculation: result.rawVolume ?
-              `${result.rawVolume.toFixed(4)} × 200 × 3 = ${(result.rawVolume * 200 * 
-  3).toFixed(1)}` : 'N/A'  // ← 追加
-      });
-      lastCallbackLog = Date.now();
-  }
-
-  結論
-
-  PitchProライブラリ（v1.3.6）は正常に動作している。
-
-  問題は：
-  - アプリのトレーニング画面固有の問題
-  - または、トレーニング時の声の大きさがテストページより大きい
-
-  次のステップ：
-  1. rawVolume のデバッグログを追加してアプリ側で再テスト
-  2. 実際の計算値を確認して原因を特定
+ブラウザバックは無効になっています。
+ホームボタンまたは「新しいトレーニングを始める」ボタンをご利用ください。
+[Log] ✅ [NavigationManager] ブラウザバック防止イベントリスナー登録完了 (results-overview) (navigation-manager.js, line 1371)
+[Log] 📝 [Router] Page title updated: 8va相対音感トレーニング - 総合評価 (router.js, line 483)
+[Log] ✅ [Router] Page loaded: results-overview (router.js, line 455)
+[Log] ✅ [Router] Navigation 4 completed successfully (router.js, line 309)
+[Info] Successfully preconnected to https://fonts.googleapis.com/
+[Info] Successfully preconnected to https://fonts.gstatic.com/
+[Error] Failed to load resource: the server responded with a status of 404 (Not Found) (base.css, line 0)
+[Error] Failed to load resource: the server responded with a status of 404 (Not Found) (results.css, line 0)

@@ -14510,3 +14510,204 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 19:21:42] コミット: docs(microphone): idleTimeout 10分→3分短縮を仕様書に記録 (v3.1.0)
+
+- MICROPHONE_BACKGROUND_RESILIENCE.md v3.1.0に更新
+- PitchPro idleTimeout短縮（600000ms→180000ms）の影響分析を追加
+- 各トレーニングシナリオの所要時間と3分超過リスクを表形式で文書化
+- 結論: 通常使用では影響なし、放置時はgetUserMedia()再呼び出しで正常動作
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 19:43:18] コミット: fix(outlier): 外れ値除外ポリシーをevaluation-calculator.jsと統一
+
+- 外れ値閾値を180¢→800¢に変更（警告用フラグのみ、除外なし）
+- result-session-controller.js (v3.3.0):
+  - 平均誤差計算: すべてのデータを使用、除外廃止
+  - 評価分布計算: すべてのデータを使用、除外廃止
+  - アラートメッセージ: 「除外しています」→警告のみに修正
+- results-overview-controller.js (v4.13.0):
+  - セッショングリッド: 外れ値除外廃止
+  - 誤差推移グラフ: 外れ値除外廃止
+  - アラートメッセージ: 削除案内を明確化
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 20:16:35] コミット: refactor(evaluation): 評価計算ロジックをEvaluationCalculatorに一元管理
+
+- EvaluationCalculator (v2.0.0):
+  - OUTLIER_THRESHOLD定数を追加（800¢）
+  - extractSessionMetrics()を追加（単一セッション用）
+  - calculateBasicMetrics()内の閾値を定数参照に変更
+
+- result-session-controller.js (v3.4.0):
+  - 重複していた外れ値計算をEvaluationCalculator.extractSessionMetrics()に統合
+  - アラートメッセージのハードコード閾値を定数参照に変更
+
+- results-overview-controller.js (v4.14.0):
+  - セッショングリッドの重複ロジックをextractSessionMetrics()に統合
+  - アラートメッセージのハードコード閾値を定数参照に変更
+
+保守性向上: 閾値変更時は1箇所(OUTLIER_THRESHOLD)の修正で完結
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 20:36:26] コミット: docs: 評価計算の一元管理アーキテクチャを仕様書に明記
+
+- EVALUATION_SYSTEM_SPECIFICATION.md (v2.5.0):
+  - 一元管理アーキテクチャセクション追加
+  - EvaluationCalculator中央管理クラスの構成図
+  - 使用ファイル一覧と参照関係を明記
+  - 閾値変更時の対応方法を記載
+
+- DYNAMIC_GRADE_LOGIC_SPECIFICATION.md (v1.1.0):
+  - 一元管理アーキテクチャセクション追加
+  - 外れ値定義を800¢に更新（OUTLIER_THRESHOLD定数）
+  - 設計原則（Single Source of Truth等）を明記
+  - 更新履歴にv1.1.0追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 21:55:38] コミット: fix(evaluation): 無音時にExcellent評価になるバグを修正
+
+ドレミガイド中に無音だった場合、誤差0（完璧）として記録され
+全てExcellent評価になる問題を修正
+
+修正内容:
+- session-data-recorder.js (v3.1.0):
+  - 無音時はerrorInCents=nullで記録（誤差0と明確に区別）
+  - isValidフラグを追加して無効測定を明示
+
+- evaluation-calculator.js (v2.1.0):
+  - errorInCents===nullのデータを評価から除外
+  - invalidCountをメトリクスに追加
+  - calculateDistributionにinvalidカテゴリ追加
+
+- result-session-controller.js (v3.5.0):
+  - 無効データは「---」表示、mic-offアイコン
+  - .error-invalidクラスでグレー背景表示
+
+- results.css:
+  - .error-invalidスタイル追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 22:23:50] コミット: chore: キャッシュバスター更新
+
+- evaluation-calculator.js (v2.1.0)
+- session-data-recorder.js (v3.1.0)
+- result-session-controller.js (v3.5.0)
+- results.css
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 22:30:59] コミット: fix(results-overview): 無音データ(null)表示時のエラーを修正
+
+results-overview-controller.js (v4.15.0):
+- errorInCents === null 時に toFixed() でエラーになる問題を修正
+- 無効データは「---」表示、mic-offアイコン、グレー背景
+- result-session-controller.js と同じ対応を適用
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 23:07:13] コミット: fix(evaluation): avgError=nullの評価がExcellentになるバグを修正
+
+v2.2.0:
+- extractSessionMetrics(): 空/全無効データ時にavgError: nullを返す
+  （avgError: 0だと完璧な音程と誤判定されるため）
+- evaluatePitchError(): null/undefined/NaN入力時にlevel: 'invalid'を返す
+  （JavaScriptでnull <= 20がtrueになる問題を回避）
+- allInvalidフラグを追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-27 23:31:23] コミット: chore(pitchpro): v1.3.13に更新（PCノイズ問題対応）
+
+- pitchpro-v1.3.13.umd.js を追加
+- index.html の参照を v1.3.12 → v1.3.13 に変更
+- PC環境での無音時ノイズ検出問題を調整
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-28 08:58:21] コミット: fix(silent-session): 無音セッション表示の暫定対応完了
+
+- DistributionChart v1.1.0: 無音データ（null）を評価分布から除外
+- result-session-controller v3.5.1: 全無音時Practice+mic-off+アラート表示
+- results-overview-controller v4.17.0: 詳細分析の無音対応（ランクバッジのみ、アラート保留）
+- results.css: silent-noticeのマージン調整
+
+暫定措置: 将来的に無音セッション検出機能で保存自体を防ぐ予定
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-28 09:38:51] コミット: docs(requirements): Bluetoothオーディオ非推奨を技術的制約に追加
+
+- 6.1項にBluetoothオーディオの制約を追記
+- 理由: A2DP/HFPプロファイル切り替え、150-200ms遅延、ピッチ変動
+- 症状: マイク集音低下（2秒で無音化）、基音再生の不自然な収束
+- 推奨環境: 有線イヤホン、内蔵スピーカー＋内蔵マイク
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-28 10:43:05] コミット: docs(spec): 無音セッション検出仕様書 v0.3.0 - 設計確定版
+
+- 検出閾値を1音→4音以上に変更（半分以上欠損で中断）
+- 「続ける/やめる」ダイアログを廃止、自動ホーム遷移に簡素化
+- sessionStorageによるアラート表示方式を採用
+- 全モード統一動作（ランダム/連続/12音階）
+- 実装時間: 30-45分（実装は後回し）
+- デバッグ効率のため実装延期を明記
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-28 11:37:10] コミット: refactor(records): レッスン履歴をテーブル形式にリファクタリング
+
+- glass-cardからテーブル形式に変更（縦スペース約45%削減）
+- PC用テーブル + モバイル用コンパクトカードのレスポンシブ対応
+- モード別アイコン適用（random=shuffle, continuous=zap, 12tone=music）
+- グレード色をUIカタログ総合評価に準拠（S=yellow, A=gray等）
+- 旧createLessonCard関数を削除、createLessonTableRowに統一
+- もっと見る表示件数を10件に変更
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-28 13:38:22] コミット: fix(mobile): モバイルでヘッダー・削除セクションを上下配置
+
+- トレーニング履歴: 見出しとソートプルダウンを縦並びに（480px以下）
+- 総合評価: 削除セクションを縦並び、ボタン全幅に（480px以下）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-28 13:52:27] コミット: fix(mobile): 削除ボタンのwidth:100%を削除
+
+- モバイルでの削除ボタンが全幅になる問題を修正
+- base.cssの.btn-dangerからwidth:100%を削除
+- results.cssの不要な追加スタイルを削除
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-28 13:53:01] コミット: chore: キャッシュバスター更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-28 13:54:53] コミット: revert(mobile): 削除ボタンのwidth:100%を復元
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
