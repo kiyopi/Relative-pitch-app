@@ -14719,3 +14719,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-28 14:10:16] コミット: fix: ホームリロード時のresult-session誤初期化を修正
+
+- GitHub Pagesではpathname が index.html を含まないためSPA判定が失敗
+- 'PitchPro-SPA' を含む場合もSPAとして扱うよう条件を修正
+- result-session-controller.js v3.5.2
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

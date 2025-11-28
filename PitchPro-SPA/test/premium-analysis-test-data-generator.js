@@ -91,38 +91,38 @@
             scaleDirection: 'descending',
             sessionsPerLesson: 12
         },
-        'twelve-asc-ascending': {
-            mode: 'twelve',
+        '12tone-asc-ascending': {
+            mode: '12tone',
             chromaticDirection: 'ascending',
             scaleDirection: 'ascending',
             sessionsPerLesson: 12
         },
-        'twelve-asc-descending': {
-            mode: 'twelve',
+        '12tone-asc-descending': {
+            mode: '12tone',
             chromaticDirection: 'ascending',
             scaleDirection: 'descending',
             sessionsPerLesson: 12
         },
-        'twelve-desc-ascending': {
-            mode: 'twelve',
+        '12tone-desc-ascending': {
+            mode: '12tone',
             chromaticDirection: 'descending',
             scaleDirection: 'ascending',
             sessionsPerLesson: 12
         },
-        'twelve-desc-descending': {
-            mode: 'twelve',
+        '12tone-desc-descending': {
+            mode: '12tone',
             chromaticDirection: 'descending',
             scaleDirection: 'descending',
             sessionsPerLesson: 12
         },
-        'twelve-both-ascending': {
-            mode: 'twelve',
+        '12tone-both-ascending': {
+            mode: '12tone',
             chromaticDirection: 'both',
             scaleDirection: 'ascending',
             sessionsPerLesson: 24
         },
-        'twelve-both-descending': {
-            mode: 'twelve',
+        '12tone-both-descending': {
+            mode: '12tone',
             chromaticDirection: 'both',
             scaleDirection: 'descending',
             sessionsPerLesson: 24
@@ -475,20 +475,46 @@
             }));
         }
 
-        // 12音階モードに挑戦（直近）
+        // 12音階モードに挑戦（直近）- 6種類すべて
         const advancedConfig = {
             stepErrors: [10, 32, 22, 20, 18, 26, 38, 16],
             bias: 2,
             variance: 10
         };
 
+        // 上昇（基音進行）・上行（音階方向）
         sessions.push(...generateLesson({
-            modeKey: 'twelve-asc-ascending',
-            baseTimestamp: getTimestampDaysAgo(5),
+            modeKey: '12tone-asc-ascending',
+            baseTimestamp: getTimestampDaysAgo(12),
             errorConfig: advancedConfig
         }));
+        // 上昇・下行
         sessions.push(...generateLesson({
-            modeKey: 'twelve-desc-ascending',
+            modeKey: '12tone-asc-descending',
+            baseTimestamp: getTimestampDaysAgo(10),
+            errorConfig: advancedConfig
+        }));
+        // 下降・上行
+        sessions.push(...generateLesson({
+            modeKey: '12tone-desc-ascending',
+            baseTimestamp: getTimestampDaysAgo(8),
+            errorConfig: advancedConfig
+        }));
+        // 下降・下行
+        sessions.push(...generateLesson({
+            modeKey: '12tone-desc-descending',
+            baseTimestamp: getTimestampDaysAgo(6),
+            errorConfig: advancedConfig
+        }));
+        // 両方向・上行
+        sessions.push(...generateLesson({
+            modeKey: '12tone-both-ascending',
+            baseTimestamp: getTimestampDaysAgo(4),
+            errorConfig: advancedConfig
+        }));
+        // 両方向・下行
+        sessions.push(...generateLesson({
+            modeKey: '12tone-both-descending',
             baseTimestamp: getTimestampDaysAgo(2),
             errorConfig: advancedConfig
         }));
@@ -601,42 +627,42 @@
         // 12音階（各種）
         for (let i = 0; i < 5; i++) {
             sessions.push(...generateLesson({
-                modeKey: 'twelve-asc-ascending',
+                modeKey: '12tone-asc-ascending',
                 baseTimestamp: getTimestampDaysAgo(25 - i * 4),
                 errorConfig: advancedConfig
             }));
         }
         for (let i = 0; i < 4; i++) {
             sessions.push(...generateLesson({
-                modeKey: 'twelve-asc-descending',
+                modeKey: '12tone-asc-descending',
                 baseTimestamp: getTimestampDaysAgo(23 - i * 4),
                 errorConfig: advancedConfig
             }));
         }
         for (let i = 0; i < 3; i++) {
             sessions.push(...generateLesson({
-                modeKey: 'twelve-desc-ascending',
+                modeKey: '12tone-desc-ascending',
                 baseTimestamp: getTimestampDaysAgo(15 - i * 4),
                 errorConfig: advancedConfig
             }));
         }
         for (let i = 0; i < 3; i++) {
             sessions.push(...generateLesson({
-                modeKey: 'twelve-desc-descending',
+                modeKey: '12tone-desc-descending',
                 baseTimestamp: getTimestampDaysAgo(13 - i * 4),
                 errorConfig: advancedConfig
             }));
         }
         for (let i = 0; i < 2; i++) {
             sessions.push(...generateLesson({
-                modeKey: 'twelve-both-ascending',
+                modeKey: '12tone-both-ascending',
                 baseTimestamp: getTimestampDaysAgo(6 - i * 3),
                 errorConfig: advancedConfig
             }));
         }
         for (let i = 0; i < 2; i++) {
             sessions.push(...generateLesson({
-                modeKey: 'twelve-both-descending',
+                modeKey: '12tone-both-descending',
                 baseTimestamp: getTimestampDaysAgo(5 - i * 3),
                 errorConfig: advancedConfig
             }));
