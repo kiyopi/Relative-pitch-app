@@ -166,7 +166,7 @@ class SimpleRouter {
             },
             'result-session': {
                 init: 'initializeResultSessionPage',
-                dependencies: [],
+                dependencies: ['DistributionChart'],
                 title: 'セッション結果'  // 【v2.13.0追加】
             },
             'results-overview': {

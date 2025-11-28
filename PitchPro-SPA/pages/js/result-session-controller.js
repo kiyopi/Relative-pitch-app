@@ -1,9 +1,12 @@
 /**
  * セッション結果ページコントローラー
- * @version 3.5.1
- * @lastUpdate 2025-11-27
+ * @version 3.5.2
+ * @lastUpdate 2025-11-28
  *
  * 変更履歴:
+ * - 3.5.2: GitHub Pages SPA対応のDOMContentLoaded条件修正
+ *   - pathname に 'PitchPro-SPA' が含まれる場合もSPAとして扱う
+ *   - ホームページリロード時の誤初期化を防止
  * - 3.5.1: 全無音セッション時の表示改善（暫定措置）
  *   - 全無音の場合はPracticeバッジ + mic-offアイコン + 専用メッセージ
  *   - 平均誤差は「---」表示
@@ -96,7 +99,12 @@ async function initializeResultSessionPage() {
 }
 
 // SPAでない場合の従来のDOMContentLoaded初期化も残す
-if (!window.location.pathname.includes('index.html')) {
+// 【v3.5.2修正】SPAのindex.htmlで誤って初期化されないよう条件を修正
+// GitHub Pagesでは pathname が /Relative-pitch-app/PitchPro-SPA/ となり index.html を含まないため
+// パスに 'PitchPro-SPA' が含まれる場合もSPAとして扱う
+const isSPA = window.location.pathname.includes('index.html') ||
+              window.location.pathname.includes('PitchPro-SPA');
+if (!isSPA) {
     document.addEventListener('DOMContentLoaded', initializeResultSessionPage);
 }
 

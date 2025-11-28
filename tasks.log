@@ -14711,3 +14711,11 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-28 14:04:44] コミット: feat: テストデータジェネレーターをindex.htmlに追加
+
+- 詳細分析ページのテスト用ダミーデータ生成スクリプト
+- コンソールからTestDataGenerator.generateScenarioA()等で使用可能
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
