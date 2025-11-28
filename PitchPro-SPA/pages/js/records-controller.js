@@ -284,7 +284,7 @@ function calculateStatistics(sessions) {
         const scaleDirectionName = scaleDirectionNames[data.scaleDirection] || data.scaleDirection;
         const chromaticDirectionName = chromaticDirectionNames[data.chromaticDirection] || data.chromaticDirection;
 
-        // 完全なモード名の生成（createLessonCardと同じロジック）
+        // 完全なモード名の生成（createLessonTableRowと同じロジック）
         let fullName;
         if (data.mode === '12tone' || data.mode === 'chromatic') {
             // 12音階モード: 「12音階（両方向・上行）」のように基音進行方向も表示
@@ -688,9 +688,9 @@ async function displaySessionList(sessions) {
     const sortType = sortSelect ? sortSelect.value : 'newest';
     const sortedLessons = sortLessons(lessons, sortType);
 
-    // 初期表示件数（テスト用に一時的に削減）
-    const INITIAL_DISPLAY = 3;  // TODO: テスト後に20に戻す
-    const LOAD_MORE_COUNT = 3;  // TODO: テスト後に20に戻す
+    // 初期表示件数
+    const INITIAL_DISPLAY = 10;
+    const LOAD_MORE_COUNT = 10;
 
     // 表示件数の管理
     let currentDisplay = INITIAL_DISPLAY;
@@ -717,16 +717,46 @@ async function displaySessionList(sessions) {
 
     console.log(`[Records] 総レッスン数: ${sortedLessons.length}, 表示件数: ${currentDisplay}, 表示: ${displayLessons.length}件, 残り: ${remaining}件`);
 
-    // コンテナをクリア
+    // コンテナをクリアしてテーブル構造を生成
     container.innerHTML = '';
+
+    // PC用テーブル + モバイル用リストを生成
+    const tableContainer = document.createElement('div');
+    tableContainer.className = 'lesson-history-table-container';
+
+    // PC用テーブル
+    const table = document.createElement('table');
+    table.className = 'lesson-history-table';
+    table.innerHTML = `
+        <thead>
+            <tr>
+                <th>日時</th>
+                <th>モード</th>
+                <th>評価</th>
+                <th>誤差</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    `;
+    const tbody = table.querySelector('tbody');
+
+    // モバイル用リスト
+    const mobileList = document.createElement('div');
+    mobileList.className = 'lesson-history-mobile';
 
     // 非同期で段階的に表示（UX向上）
     for (const lesson of displayLessons) {
-        const lessonCard = createLessonCard(lesson);
-        container.appendChild(lessonCard);
+        const { tableRow, mobileItem } = createLessonTableRow(lesson);
+        tbody.appendChild(tableRow);
+        mobileList.appendChild(mobileItem);
         // 次のフレームまで待機（レンダリングを段階的に実行）
         await new Promise(resolve => setTimeout(resolve, 0));
     }
+
+    tableContainer.appendChild(table);
+    tableContainer.appendChild(mobileList);
+    container.appendChild(tableContainer);
 
     // もっと見るボタンの表示制御
     if (loadMoreContainer && remainingCountEl) {
@@ -1015,16 +1045,11 @@ function groupSessionsIntoLessons(sessions) {
 }
 
 /**
- * レッスンカードを作成（レッスン = 複数セッションのグループ）
+ * レッスンのテーブル行とモバイルアイテムを生成
  * @param {Object} lesson - レッスンデータ
- * @returns {HTMLElement} カード要素
+ * @returns {Object} { tableRow: HTMLTableRowElement, mobileItem: HTMLDivElement }
  */
-function createLessonCard(lesson) {
-    const card = document.createElement('div');
-    card.className = 'glass-card';
-    card.style.cursor = 'pointer';
-    card.onclick = () => viewLessonDetail(lesson);
-
+function createLessonTableRow(lesson) {
     const date = new Date(lesson.startTime);
     const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
 
@@ -1033,7 +1058,6 @@ function createLessonCard(lesson) {
     let averageError = 0;
 
     try {
-        // 全セッションで評価計算
         const evaluation = window.EvaluationCalculator.calculateDynamicGrade(lesson.sessions);
         grade = evaluation.grade;
         averageError = evaluation.metrics.adjusted.avgError;
@@ -1069,53 +1093,59 @@ function createLessonCard(lesson) {
     // 完全なモード名の生成
     let fullModeName;
     if (lesson.mode === '12tone' || lesson.mode === 'chromatic') {
-        // 12音階モード: 「12音階（両方向・上行）」のように基音進行方向も表示
         fullModeName = `${modeName}（${chromaticDirectionName}・${scaleDirectionName}）`;
     } else {
-        // ランダム基音・連続チャレンジ: 「ランダム基音（上行）」のように音階方向のみ
         fullModeName = `${modeName}（${scaleDirectionName}）`;
     }
 
-    // グレードに応じた色
-    const gradeColors = {
-        'S': 'text-yellow-300',
-        'A': 'text-green-300',
-        'B': 'text-blue-300',
-        'C': 'text-orange-300',
-        'D': 'text-red-300',
-        'E': 'text-gray-300'
+    // モード別アイコン設定（ModeController準拠）
+    const modeIcons = {
+        'random': { icon: 'shuffle', color: 'text-green-300' },
+        'continuous': { icon: 'zap', color: 'text-orange-300' },
+        'chromatic': { icon: 'music', color: 'text-purple-300' },
+        '12tone': { icon: 'music', color: 'text-purple-300' }
     };
-    const gradeColor = gradeColors[grade] || 'text-white';
+    const modeIcon = modeIcons[lesson.mode] || { icon: 'music', color: 'text-blue-300' };
 
-    // 【改善v2.0.1】モバイル最適化: 縦積みレイアウトに変更
-    card.innerHTML = `
-        <div class="flex flex-col gap-2">
-            <!-- 上段: モード名 + 日時 -->
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="music" class="text-blue-300" style="width: 18px; height: 18px;"></i>
-                    <div class="text-white font-medium text-sm">${fullModeName}</div>
-                </div>
-                <div class="text-white-60 text-xs">${dateStr}</div>
+    // グレード用CSSクラス（小文字）
+    const gradeClass = grade !== '-' ? `grade-${grade.toLowerCase()}` : '';
+
+    // === PC用テーブル行 ===
+    const tableRow = document.createElement('tr');
+    tableRow.onclick = () => viewLessonDetail(lesson);
+    tableRow.innerHTML = `
+        <td class="col-date">${dateStr}</td>
+        <td>
+            <div class="col-mode">
+                <i data-lucide="${modeIcon.icon}" class="${modeIcon.color}"></i>
+                <span>${fullModeName}</span>
             </div>
-            <!-- 下段: セッション数 + グレード + 誤差 -->
-            <div class="flex items-center justify-between">
-                <div class="text-white-60 text-xs">${lesson.sessions.length}セッション</div>
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center gap-1">
-                        <span class="text-white-60 text-xs">グレード</span>
-                        <span class="${gradeColor} text-lg font-bold">${grade}</span>
-                    </div>
-                    <div class="flex items-center gap-1">
-                        <span class="text-white-60 text-xs">誤差</span>
-                        <span class="text-white text-sm">±${Math.abs(averageError).toFixed(1)}¢</span>
-                    </div>
-                </div>
+        </td>
+        <td class="col-grade ${gradeClass}">${grade}</td>
+        <td class="col-error">±${Math.abs(averageError).toFixed(1)}¢</td>
+        <td class="col-arrow"><i data-lucide="chevron-right"></i></td>
+    `;
+
+    // === モバイル用アイテム ===
+    const mobileItem = document.createElement('div');
+    mobileItem.className = 'lesson-history-mobile-item';
+    mobileItem.onclick = () => viewLessonDetail(lesson);
+    mobileItem.innerHTML = `
+        <div class="lesson-history-mobile-left">
+            <div class="lesson-history-mobile-mode">
+                <i data-lucide="${modeIcon.icon}" class="${modeIcon.color}"></i>
+                <span>${fullModeName}</span>
             </div>
+            <div class="lesson-history-mobile-meta">${dateStr}</div>
+        </div>
+        <div class="lesson-history-mobile-right">
+            <div class="lesson-history-mobile-error">±${Math.abs(averageError).toFixed(1)}¢</div>
+            <div class="lesson-history-mobile-grade ${gradeClass}">${grade}</div>
+            <i data-lucide="chevron-right" class="col-arrow"></i>
         </div>
     `;
 
-    return card;
+    return { tableRow, mobileItem };
 }
 
 /**

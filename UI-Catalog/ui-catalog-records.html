@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UIカタログ - トレーニング記録</title>
+
+    <!-- favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📋</text></svg>">
+
+    <!-- スタイルシート -->
+    <link rel="stylesheet" href="../PitchPro-SPA/styles/base.css">
+    <link rel="stylesheet" href="../PitchPro-SPA/styles/records.css">
+    <link rel="stylesheet" href="ui-catalog.css">
+
+    <!-- フォント -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- アイコンライブラリ -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <style>
+        /* === UIカタログ固有スタイル（records.cssの参照用デモ） === */
+        /* 本番用スタイルはrecords.cssに定義済み */
+
+        /* 比較用: 現行glass-cardレイアウト */
+        .current-layout-demo .glass-card {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="ui-catalog min-h-screen p-6">
+        <div class="container max-w-7xl mx-auto">
+            <!-- ヘッダー -->
+            <header class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-white mb-4">トレーニング記録 UIカタログ</h1>
+                <p class="text-blue-200 text-xl">トレーニング記録ページ専用コンポーネント</p>
+                <p class="text-white-70 mt-2">
+                    <a href="ui-catalog-index.html" class="text-blue-300 hover:text-blue-200">← カタログトップに戻る</a>
+                </p>
+            </header>
+
+            <!-- メインコンテンツエリア -->
+            <main id="catalog-content">
+
+                <!-- セクション1: 新レイアウト（テーブル形式） -->
+                <section id="new-table-layout" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">新デザイン: テーブル形式</h2>
+                    <p class="text-white-70 mb-6">一覧性を重視したコンパクトなテーブルレイアウト（PC向け）</p>
+
+                    <div class="component-showcase">
+                        <div class="lesson-history-table-container">
+                            <table class="lesson-history-table">
+                                <thead>
+                                    <tr>
+                                        <th>日時</th>
+                                        <th>モード</th>
+                                        <th>評価</th>
+                                        <th>誤差</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- ランダム基音: shuffle + green -->
+                                    <tr>
+                                        <td class="col-date">11/28 15:30</td>
+                                        <td>
+                                            <div class="col-mode">
+                                                <i data-lucide="shuffle" class="text-green-300"></i>
+                                                <span>ランダム基音（上行）</span>
+                                            </div>
+                                        </td>
+                                        <td class="col-grade grade-a">A</td>
+                                        <td class="col-error">±25.3¢</td>
+                                        <td class="col-arrow"><i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i></td>
+                                    </tr>
+                                    <!-- 連続チャレンジ: zap + orange -->
+                                    <tr>
+                                        <td class="col-date">11/28 14:00</td>
+                                        <td>
+                                            <div class="col-mode">
+                                                <i data-lucide="zap" class="text-orange-300"></i>
+                                                <span>連続チャレンジ（上行）</span>
+                                            </div>
+                                        </td>
+                                        <td class="col-grade grade-b">B</td>
+                                        <td class="col-error">±32.1¢</td>
+                                        <td class="col-arrow"><i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i></td>
+                                    </tr>
+                                    <!-- 12音階: music + purple -->
+                                    <tr>
+                                        <td class="col-date">11/27 20:15</td>
+                                        <td>
+                                            <div class="col-mode">
+                                                <i data-lucide="music" class="text-purple-300"></i>
+                                                <span>12音階（両方向・上行）</span>
+                                            </div>
+                                        </td>
+                                        <td class="col-grade grade-s">S</td>
+                                        <td class="col-error">±12.5¢</td>
+                                        <td class="col-arrow"><i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i></td>
+                                    </tr>
+                                    <!-- ランダム基音: shuffle + green -->
+                                    <tr>
+                                        <td class="col-date">11/27 18:45</td>
+                                        <td>
+                                            <div class="col-mode">
+                                                <i data-lucide="shuffle" class="text-green-300"></i>
+                                                <span>ランダム基音（下行）</span>
+                                            </div>
+                                        </td>
+                                        <td class="col-grade grade-c">C</td>
+                                        <td class="col-error">±45.8¢</td>
+                                        <td class="col-arrow"><i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i></td>
+                                    </tr>
+                                    <!-- 連続チャレンジ: zap + orange -->
+                                    <tr>
+                                        <td class="col-date">11/26 21:00</td>
+                                        <td>
+                                            <div class="col-mode">
+                                                <i data-lucide="zap" class="text-orange-300"></i>
+                                                <span>連続チャレンジ（上行）</span>
+                                            </div>
+                                        </td>
+                                        <td class="col-grade grade-d">D</td>
+                                        <td class="col-error">±68.2¢</td>
+                                        <td class="col-arrow"><i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <!-- モバイル用 -->
+                            <div class="lesson-history-mobile">
+                                <!-- ランダム基音: shuffle + green -->
+                                <div class="lesson-history-mobile-item">
+                                    <div class="lesson-history-mobile-left">
+                                        <div class="lesson-history-mobile-mode">
+                                            <i data-lucide="shuffle" class="text-green-300" style="width: 14px; height: 14px;"></i>
+                                            <span>ランダム基音（上行）</span>
+                                        </div>
+                                        <div class="lesson-history-mobile-meta">11/28 15:30</div>
+                                    </div>
+                                    <div class="lesson-history-mobile-right">
+                                        <div class="lesson-history-mobile-grade grade-a">A</div>
+                                        <div class="lesson-history-mobile-error">±25.3¢</div>
+                                        <i data-lucide="chevron-right" class="text-white-40" style="width: 16px; height: 16px;"></i>
+                                    </div>
+                                </div>
+                                <!-- 連続チャレンジ: zap + orange -->
+                                <div class="lesson-history-mobile-item">
+                                    <div class="lesson-history-mobile-left">
+                                        <div class="lesson-history-mobile-mode">
+                                            <i data-lucide="zap" class="text-orange-300" style="width: 14px; height: 14px;"></i>
+                                            <span>連続チャレンジ（上行）</span>
+                                        </div>
+                                        <div class="lesson-history-mobile-meta">11/28 14:00</div>
+                                    </div>
+                                    <div class="lesson-history-mobile-right">
+                                        <div class="lesson-history-mobile-grade grade-b">B</div>
+                                        <div class="lesson-history-mobile-error">±32.1¢</div>
+                                        <i data-lucide="chevron-right" class="text-white-40" style="width: 16px; height: 16px;"></i>
+                                    </div>
+                                </div>
+                                <!-- 12音階: music + purple -->
+                                <div class="lesson-history-mobile-item">
+                                    <div class="lesson-history-mobile-left">
+                                        <div class="lesson-history-mobile-mode">
+                                            <i data-lucide="music" class="text-purple-300" style="width: 14px; height: 14px;"></i>
+                                            <span>12音階（両方向・上行）</span>
+                                        </div>
+                                        <div class="lesson-history-mobile-meta">11/27 20:15</div>
+                                    </div>
+                                    <div class="lesson-history-mobile-right">
+                                        <div class="lesson-history-mobile-grade grade-s">S</div>
+                                        <div class="lesson-history-mobile-error">±12.5¢</div>
+                                        <i data-lucide="chevron-right" class="text-white-40" style="width: 16px; height: 16px;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="code-sample mt-4">
+                        <p class="text-white-60 text-sm mb-2">特徴:</p>
+                        <ul class="text-white-60 text-sm" style="list-style: disc; padding-left: 20px;">
+                            <li>PC: テーブル形式で一覧性向上</li>
+                            <li>モバイル: コンパクトカード形式（レスポンシブ対応）</li>
+                            <li>縦スペース約50%削減</li>
+                            <li>ホバーエフェクトで操作性維持</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- モード別アイコン・グレード色 凡例 -->
+                <section id="icon-color-legend" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">モード別アイコン・グレード色 凡例</h2>
+                    <p class="text-white-70 mb-6">ModeControllerの定義に基づくアイコンと色</p>
+
+                    <div class="flex gap-8 flex-wrap">
+                        <!-- モード別アイコン -->
+                        <div class="glass-card" style="min-width: 280px;">
+                            <h3 class="text-lg font-medium text-white mb-4">モード別アイコン</h3>
+                            <div class="flex flex-col gap-3">
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="shuffle" class="text-green-300" style="width: 20px; height: 20px;"></i>
+                                    <span class="text-white">ランダム基音</span>
+                                    <span class="text-white-40 text-sm">shuffle + green</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="zap" class="text-orange-300" style="width: 20px; height: 20px;"></i>
+                                    <span class="text-white">連続チャレンジ</span>
+                                    <span class="text-white-40 text-sm">zap + orange</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="music" class="text-purple-300" style="width: 20px; height: 20px;"></i>
+                                    <span class="text-white">12音階</span>
+                                    <span class="text-white-40 text-sm">music + purple</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- グレード色（UIカタログ総合評価準拠） -->
+                        <div class="glass-card" style="min-width: 280px;">
+                            <h3 class="text-lg font-medium text-white mb-4">グレード色</h3>
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-yellow-300 text-xl font-bold" style="width: 24px;">S</span>
+                                    <span class="text-white">プロレベル</span>
+                                    <span class="text-white-40 text-sm">yellow-300</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-gray-300 text-xl font-bold" style="width: 24px;">A</span>
+                                    <span class="text-white">楽器アンサンブル</span>
+                                    <span class="text-white-40 text-sm">gray-300</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-orange-300 text-xl font-bold" style="width: 24px;">B</span>
+                                    <span class="text-white">合唱・弾き語り</span>
+                                    <span class="text-white-40 text-sm">orange-300</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-green-300 text-xl font-bold" style="width: 24px;">C</span>
+                                    <span class="text-white">カラオケ・趣味</span>
+                                    <span class="text-white-40 text-sm">green-300</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-blue-300 text-xl font-bold" style="width: 24px;">D</span>
+                                    <span class="text-white">練習中</span>
+                                    <span class="text-white-40 text-sm">blue-300</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-red-300 text-xl font-bold" style="width: 24px;">E</span>
+                                    <span class="text-white">基礎から</span>
+                                    <span class="text-white-40 text-sm">red-300</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- セクション2: 現行レイアウト（比較用） -->
+                <section id="current-layout" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">現行デザイン: Glass Card形式（比較用）</h2>
+                    <p class="text-white-70 mb-6">現在のglass-cardを使用したレイアウト</p>
+
+                    <div class="component-showcase current-layout-demo">
+                        <!-- ランダム基音: shuffle + green, グレードA: green -->
+                        <div class="glass-card" style="cursor: pointer;">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="shuffle" class="text-green-300" style="width: 18px; height: 18px;"></i>
+                                        <div class="text-white font-medium text-sm">ランダム基音（上行）</div>
+                                    </div>
+                                    <div class="text-white-60 text-xs">11/28 15:30</div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="text-white-60 text-xs">8セッション</div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-white-60 text-xs">グレード</span>
+                                            <span class="grade-a text-lg font-bold">A</span>
+                                        </div>
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-white-60 text-xs">誤差</span>
+                                            <span class="text-white text-sm">±25.3¢</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 連続チャレンジ: zap + orange, グレードB: blue -->
+                        <div class="glass-card" style="cursor: pointer;">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="zap" class="text-orange-300" style="width: 18px; height: 18px;"></i>
+                                        <div class="text-white font-medium text-sm">連続チャレンジ（上行）</div>
+                                    </div>
+                                    <div class="text-white-60 text-xs">11/28 14:00</div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="text-white-60 text-xs">12セッション</div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-white-60 text-xs">グレード</span>
+                                            <span class="grade-b text-lg font-bold">B</span>
+                                        </div>
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-white-60 text-xs">誤差</span>
+                                            <span class="text-white text-sm">±32.1¢</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 12音階: music + purple, グレードS: yellow -->
+                        <div class="glass-card" style="cursor: pointer;">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="music" class="text-purple-300" style="width: 18px; height: 18px;"></i>
+                                        <div class="text-white font-medium text-sm">12音階（両方向・上行）</div>
+                                    </div>
+                                    <div class="text-white-60 text-xs">11/27 20:15</div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="text-white-60 text-xs">24セッション</div>
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-white-60 text-xs">グレード</span>
+                                            <span class="grade-s text-lg font-bold">S</span>
+                                        </div>
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-white-60 text-xs">誤差</span>
+                                            <span class="text-white text-sm">±12.5¢</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="code-sample mt-4">
+                        <p class="text-white-60 text-sm mb-2">問題点:</p>
+                        <ul class="text-white-60 text-sm" style="list-style: disc; padding-left: 20px;">
+                            <li>各レッスンがglass-cardで囲まれるため縦に長くなる</li>
+                            <li>10件表示すると画面の大半を占有</li>
+                            <li>一覧性が低い</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- セクション3: 高さ比較 -->
+                <section id="height-comparison" class="catalog-section">
+                    <h2 class="text-2xl font-bold text-white mb-4">高さ比較</h2>
+                    <p class="text-white-70 mb-6">同じ5件のデータでの高さ比較</p>
+
+                    <div class="flex gap-8">
+                        <div class="flex-1">
+                            <h3 class="text-lg font-medium text-white mb-3">新デザイン（テーブル）</h3>
+                            <div class="text-green-300 text-sm mb-2">約250px（5件）</div>
+                            <div style="height: 250px; background: rgba(134, 239, 172, 0.1); border: 2px dashed rgba(134, 239, 172, 0.5); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                <span class="text-green-300">テーブル形式</span>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-medium text-white mb-3">現行デザイン（カード）</h3>
+                            <div class="text-orange-300 text-sm mb-2">約450px（5件）</div>
+                            <div style="height: 450px; background: rgba(251, 146, 60, 0.1); border: 2px dashed rgba(251, 146, 60, 0.5); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                <span class="text-orange-300">Glass Card形式</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 p-4 rounded-lg" style="background: rgba(134, 239, 172, 0.1); border: 1px solid rgba(134, 239, 172, 0.3);">
+                        <p class="text-green-300 font-medium">削減効果: 約45%のスペース節約</p>
+                        <p class="text-white-60 text-sm mt-1">10件表示時: 900px → 500px（約400pxの節約）</p>
+                    </div>
+                </section>
+
+            </main>
+
+            <!-- フッター -->
+            <footer class="text-center mt-12 pt-8 border-t border-white/10">
+                <p class="text-white-60 text-sm">
+                    8va相対音感トレーニング UIカタログ - トレーニング記録コンポーネント
+                </p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Lucideアイコン初期化 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

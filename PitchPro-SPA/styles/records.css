@@ -354,3 +354,213 @@
   background: #1a1a2e;
   color: #ffffff;
 }
+
+/* ================================================================
+   レッスン履歴テーブル（セクション2）
+   ================================================================ */
+
+/* テーブルコンテナ */
+.lesson-history-table-container {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* テーブル本体 */
+.lesson-history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* ヘッダー行 */
+.lesson-history-table thead tr {
+  background: rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.lesson-history-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 500;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.lesson-history-table th:last-child {
+  text-align: center;
+  width: 40px;
+}
+
+/* ヘッダーの評価列: 中央寄せ */
+.lesson-history-table th:nth-child(3) {
+  text-align: center;
+}
+
+/* ヘッダーの誤差列: 右寄せ */
+.lesson-history-table th:nth-child(4) {
+  text-align: right;
+}
+
+/* データ行 */
+.lesson-history-table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.lesson-history-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.lesson-history-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.lesson-history-table td {
+  padding: 14px 16px;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+  vertical-align: middle;
+}
+
+/* 日時列 */
+.lesson-history-table .col-date {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+/* モード列 */
+.lesson-history-table .col-mode {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lesson-history-table .col-mode i {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* グレード列 */
+.lesson-history-table .col-grade {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+/* 誤差列 */
+.lesson-history-table .col-error {
+  text-align: right;
+  font-family: 'Inter', monospace;
+}
+
+/* 矢印列 */
+.lesson-history-table .col-arrow {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* グレード色（UIカタログ総合評価準拠） */
+.col-grade.grade-s,
+.lesson-history-mobile-grade.grade-s {
+  color: #fcd34d; /* yellow-300 */
+}
+
+.col-grade.grade-a,
+.lesson-history-mobile-grade.grade-a {
+  color: #d1d5db; /* gray-300 */
+}
+
+.col-grade.grade-b,
+.lesson-history-mobile-grade.grade-b {
+  color: #fdba74; /* orange-300 */
+}
+
+.col-grade.grade-c,
+.lesson-history-mobile-grade.grade-c {
+  color: #86efac; /* green-300 */
+}
+
+.col-grade.grade-d,
+.lesson-history-mobile-grade.grade-d {
+  color: #93c5fd; /* blue-300 */
+}
+
+.col-grade.grade-e,
+.lesson-history-mobile-grade.grade-e {
+  color: #fca5a5; /* red-300 */
+}
+
+/* === モバイル用コンパクトカード === */
+.lesson-history-mobile {
+  display: none;
+}
+
+.lesson-history-mobile-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.lesson-history-mobile-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.lesson-history-mobile-item:last-child {
+  border-bottom: none;
+}
+
+.lesson-history-mobile-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lesson-history-mobile-mode {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.lesson-history-mobile-meta {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.lesson-history-mobile-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.lesson-history-mobile-grade {
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.lesson-history-mobile-error {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: right;
+}
+
+/* レスポンシブ（PC/モバイル切り替え） */
+@media (max-width: 768px) {
+  .lesson-history-table-container table {
+    display: none;
+  }
+  .lesson-history-mobile {
+    display: block;
+  }
+}
