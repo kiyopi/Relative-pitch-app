@@ -142,11 +142,13 @@ function updateModeAccuracySummary(allSessionData) {
         continuous: { all: [], ascending: [], descending: [] },
         '12tone': {
             all: [],
-            ascending: [],      // scaleDirection: ascending
-            descending: [],     // scaleDirection: descending
-            chromaticAsc: [],   // chromaticDirection: ascending
-            chromaticDesc: [],  // chromaticDirection: descending
-            chromaticBoth: []   // chromaticDirection: both
+            // 6モード個別（chromaticDirection-scaleDirection）
+            ascAsc: [],     // 上昇・上行
+            ascDesc: [],    // 上昇・下行
+            descAsc: [],    // 下降・上行
+            descDesc: [],   // 下降・下行
+            bothAsc: [],    // 両方向・上行
+            bothDesc: []    // 両方向・下行
         }
     };
 
@@ -166,17 +168,19 @@ function updateModeAccuracySummary(allSessionData) {
             if (scaleDir === 'descending') modeData.continuous.descending.push(session);
         } else if (mode === '12tone') {
             modeData['12tone'].all.push(session);
-            if (scaleDir === 'ascending') modeData['12tone'].ascending.push(session);
-            if (scaleDir === 'descending') modeData['12tone'].descending.push(session);
-            if (chromDir === 'ascending') modeData['12tone'].chromaticAsc.push(session);
-            if (chromDir === 'descending') modeData['12tone'].chromaticDesc.push(session);
-            if (chromDir === 'both') modeData['12tone'].chromaticBoth.push(session);
+            // 6モード個別に分類
+            if (chromDir === 'ascending' && scaleDir === 'ascending') modeData['12tone'].ascAsc.push(session);
+            if (chromDir === 'ascending' && scaleDir === 'descending') modeData['12tone'].ascDesc.push(session);
+            if (chromDir === 'descending' && scaleDir === 'ascending') modeData['12tone'].descAsc.push(session);
+            if (chromDir === 'descending' && scaleDir === 'descending') modeData['12tone'].descDesc.push(session);
+            if (chromDir === 'both' && scaleDir === 'ascending') modeData['12tone'].bothAsc.push(session);
+            if (chromDir === 'both' && scaleDir === 'descending') modeData['12tone'].bothDesc.push(session);
         }
     });
 
-    // 平均誤差を計算するヘルパー関数
-    const calcAvgError = (sessions) => {
-        if (sessions.length === 0) return null;
+    // 平均誤差と音数を計算するヘルパー関数
+    const calcStats = (sessions) => {
+        if (sessions.length === 0) return { avgError: null, count: 0 };
         let totalError = 0;
         let count = 0;
         sessions.forEach(session => {
@@ -189,7 +193,10 @@ function updateModeAccuracySummary(allSessionData) {
                 });
             }
         });
-        return count > 0 ? (totalError / count).toFixed(1) : null;
+        return {
+            avgError: count > 0 ? (totalError / count).toFixed(1) : null,
+            count: count
+        };
     };
 
     // 値を表示するヘルパー関数
@@ -205,23 +212,40 @@ function updateModeAccuracySummary(allSessionData) {
         }
     };
 
+    // 音数を表示するヘルパー関数
+    const displayCount = (elementId, count) => {
+        const el = document.getElementById(elementId);
+        if (el) {
+            el.textContent = count > 0 ? `${count}音` : '--';
+        }
+    };
+
+    // 各モードの統計を計算
+    const randomStats = calcStats(modeData.random.all);
+    const continuousStats = calcStats(modeData.continuous.all);
+    const toneStats = calcStats(modeData['12tone'].all);
+
     // ランダム基音
-    displayValue('random-accuracy-value', calcAvgError(modeData.random.all));
-    displayValue('random-asc-value', calcAvgError(modeData.random.ascending));
-    displayValue('random-desc-value', calcAvgError(modeData.random.descending));
+    displayValue('random-accuracy-value', randomStats.avgError);
+    displayCount('random-count', randomStats.count);
+    displayValue('random-asc-value', calcStats(modeData.random.ascending).avgError);
+    displayValue('random-desc-value', calcStats(modeData.random.descending).avgError);
 
     // 連続チャレンジ
-    displayValue('continuous-accuracy-value', calcAvgError(modeData.continuous.all));
-    displayValue('continuous-asc-value', calcAvgError(modeData.continuous.ascending));
-    displayValue('continuous-desc-value', calcAvgError(modeData.continuous.descending));
+    displayValue('continuous-accuracy-value', continuousStats.avgError);
+    displayCount('continuous-count', continuousStats.count);
+    displayValue('continuous-asc-value', calcStats(modeData.continuous.ascending).avgError);
+    displayValue('continuous-desc-value', calcStats(modeData.continuous.descending).avgError);
 
-    // 12音階
-    displayValue('12tone-accuracy-value', calcAvgError(modeData['12tone'].all));
-    displayValue('12tone-asc-value', calcAvgError(modeData['12tone'].ascending));
-    displayValue('12tone-desc-value', calcAvgError(modeData['12tone'].descending));
-    displayValue('12tone-chromatic-asc-value', calcAvgError(modeData['12tone'].chromaticAsc));
-    displayValue('12tone-chromatic-desc-value', calcAvgError(modeData['12tone'].chromaticDesc));
-    displayValue('12tone-chromatic-both-value', calcAvgError(modeData['12tone'].chromaticBoth));
+    // 12音階（6モード個別）
+    displayValue('12tone-accuracy-value', toneStats.avgError);
+    displayCount('12tone-count', toneStats.count);
+    displayValue('12tone-asc-asc-value', calcStats(modeData['12tone'].ascAsc).avgError);
+    displayValue('12tone-asc-desc-value', calcStats(modeData['12tone'].ascDesc).avgError);
+    displayValue('12tone-desc-asc-value', calcStats(modeData['12tone'].descAsc).avgError);
+    displayValue('12tone-desc-desc-value', calcStats(modeData['12tone'].descDesc).avgError);
+    displayValue('12tone-both-asc-value', calcStats(modeData['12tone'].bothAsc).avgError);
+    displayValue('12tone-both-desc-value', calcStats(modeData['12tone'].bothDesc).avgError);
 
     console.log('✅ モード別平均精度を更新しました', {
         random: modeData.random.all.length,

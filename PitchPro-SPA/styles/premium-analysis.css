@@ -1057,7 +1057,13 @@
 .mode-accuracy-card-value {
   font-size: 1.5rem;
   font-weight: 700;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.mode-accuracy-count {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  margin: 0 0 0.75rem 0;
 }
 
 .mode-accuracy-details {
@@ -1083,13 +1089,6 @@
 .mode-accuracy-detail-value {
   color: white;
   font-weight: 600;
-}
-
-/* 12音階の追加行（上昇・下降） */
-.mode-accuracy-12tone-extra {
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* データなし状態 */
