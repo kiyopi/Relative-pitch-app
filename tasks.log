@@ -14728,3 +14728,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-28 15:17:43] コミット: fix: テストデータジェネレーターの12音階モード修正
+
+- mode名を 'twelve' から '12tone' に修正（本番と統一）
+- シナリオAに12音階モードの6種類すべてを追加
+  - 上昇/下降/両方向 × 上行/下行
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

@@ -258,18 +258,23 @@
             const stepError = errorConfig.stepErrors ? errorConfig.stepErrors[step] : errorConfig.baseError;
             const bias = errorConfig.bias || 0;
             const variance = errorConfig.variance || 10;
+            // 【追加】音程ごとの傾向バイアス（セント）
+            // 現実的なユーザーの癖をシミュレート
+            // - 2度: 縮小傾向（狭い音程は狭く取りがち）
+            // - 7度: 縮小傾向（広い音程は広げきれない）
+            // - 5度: わずかに拡大傾向（完全5度は広めに取りがち）
+            const stepBias = errorConfig.stepBias ? errorConfig.stepBias[step] : 0;
 
-            // 誤差を生成（正規分布 + バイアス）
-            let errorInCents = gaussianRandom(bias, variance);
+            // 誤差を生成（正規分布 + 全体バイアス + 音程別バイアス）
+            let errorInCents = gaussianRandom(bias + stepBias, variance);
             // ステップ固有の誤差を加味
             errorInCents += gaussianRandom(0, stepError * 0.3);
             // 絶対値が目標に近づくよう調整
             const targetAbsError = stepError;
-            const currentAbsError = Math.abs(errorInCents);
+            const currentAbsError = Math.abs(errorInCents - stepBias); // バイアス分を除いて評価
             if (currentAbsError < targetAbsError * 0.5) {
-                errorInCents = errorInCents > 0
-                    ? targetAbsError * (0.5 + Math.random() * 0.5)
-                    : -targetAbsError * (0.5 + Math.random() * 0.5);
+                const sign = stepBias !== 0 ? Math.sign(stepBias) : (Math.random() > 0.5 ? 1 : -1);
+                errorInCents = stepBias + sign * targetAbsError * (0.5 + Math.random() * 0.5);
             }
 
             // 検出周波数を誤差から計算
@@ -382,8 +387,11 @@
         const sessions = [];
 
         // 1ヶ月目（60-90日前）: 初心者、フラット傾向
+        // stepBias: [1度, 2度, 3度, 4度, 5度, 6度, 7度, 8度]
+        // 初心者は2度を縮小(-20¢)、7度も縮小(-25¢)、5度はわずかに拡大(+12¢)
         const month1Config = {
             stepErrors: [15, 55, 40, 35, 30, 45, 65, 25], // 2度と7度が苦手
+            stepBias: [0, -20, -5, +8, +12, -8, -25, +5], // 音程傾向バイアス
             bias: -10, // フラット傾向
             variance: 15
         };
@@ -398,8 +406,10 @@
         }
 
         // 1.5ヶ月目（45-60日前）: 改善開始
+        // 2度と7度の縮小傾向が少し改善
         const month15Config = {
             stepErrors: [12, 45, 32, 28, 25, 38, 55, 20],
+            stepBias: [0, -15, -3, +6, +10, -5, -18, +3], // 傾向が緩和
             bias: -5,
             variance: 12
         };
@@ -422,8 +432,10 @@
         }
 
         // 2ヶ月目（30-45日前）: 連続チャレンジ開始
+        // さらに改善、5度の拡大傾向は維持
         const month2Config = {
             stepErrors: [10, 38, 25, 22, 20, 30, 45, 18],
+            stepBias: [0, -12, -2, +4, +8, -3, -15, +2], // さらに改善
             bias: -2,
             variance: 10
         };
@@ -446,8 +458,10 @@
         }
 
         // 3ヶ月目（0-30日前）: 中級到達、全モード挑戦
+        // 中級レベル、まだ2度と7度に縮小傾向が残る
         const month3Config = {
             stepErrors: [8, 30, 20, 18, 16, 24, 35, 15],
+            stepBias: [0, -10, 0, +3, +6, -2, -12, +2], // 癖が残る
             bias: 0,
             variance: 8
         };
@@ -476,8 +490,10 @@
         }
 
         // 12音階モードに挑戦（直近）- 6種類すべて
+        // 上級挑戦中、まだ完全ではない
         const advancedConfig = {
             stepErrors: [10, 32, 22, 20, 18, 26, 38, 16],
+            stepBias: [0, -8, 0, +2, +5, -2, -10, +2], // 傾向は残る
             bias: 2,
             variance: 10
         };
