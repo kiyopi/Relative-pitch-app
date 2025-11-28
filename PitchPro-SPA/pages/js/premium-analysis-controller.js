@@ -145,7 +145,8 @@ function updateModeAccuracySummary(allSessionData) {
             ascending: [],      // scaleDirection: ascending
             descending: [],     // scaleDirection: descending
             chromaticAsc: [],   // chromaticDirection: ascending
-            chromaticDesc: []   // chromaticDirection: descending
+            chromaticDesc: [],  // chromaticDirection: descending
+            chromaticBoth: []   // chromaticDirection: both
         }
     };
 
@@ -169,6 +170,7 @@ function updateModeAccuracySummary(allSessionData) {
             if (scaleDir === 'descending') modeData['12tone'].descending.push(session);
             if (chromDir === 'ascending') modeData['12tone'].chromaticAsc.push(session);
             if (chromDir === 'descending') modeData['12tone'].chromaticDesc.push(session);
+            if (chromDir === 'both') modeData['12tone'].chromaticBoth.push(session);
         }
     });
 
@@ -219,6 +221,7 @@ function updateModeAccuracySummary(allSessionData) {
     displayValue('12tone-desc-value', calcAvgError(modeData['12tone'].descending));
     displayValue('12tone-chromatic-asc-value', calcAvgError(modeData['12tone'].chromaticAsc));
     displayValue('12tone-chromatic-desc-value', calcAvgError(modeData['12tone'].chromaticDesc));
+    displayValue('12tone-chromatic-both-value', calcAvgError(modeData['12tone'].chromaticBoth));
 
     console.log('✅ モード別平均精度を更新しました', {
         random: modeData.random.all.length,
