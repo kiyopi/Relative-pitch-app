@@ -224,7 +224,7 @@ function updateModeAccuracySummary(allSessionData) {
     const displayDetailCount = (elementId, count) => {
         const el = document.getElementById(elementId);
         if (el) {
-            el.textContent = count > 0 ? `(${count})` : '';
+            el.textContent = count > 0 ? `(${count}音)` : '';
         }
     };
 
