@@ -41,10 +41,14 @@
     <section id="tab-accuracy" class="tab-content active">
         <!-- 平均音程精度 -->
         <div class="glass-card">
-            <div class="flex items-center gap-3" style="margin-bottom: 1rem;">
+            <div class="flex items-center gap-3" style="margin-bottom: 0.5rem;">
                 <i data-lucide="music" class="text-blue-300" style="width: 24px; height: 24px;"></i>
                 <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">平均音程精度</h3>
             </div>
+            <p class="text-white-60 text-sm" style="margin-bottom: 1rem;">
+                すべての測定データの平均誤差です。<br>
+                ±20¢以内が「Excellent」、±35¢以内が「Good」の目安です。
+            </p>
             <div style="text-align: center; padding: 2rem 0;">
                 <div id="average-accuracy" style="color: #10b981; font-size: 3rem; font-weight: 700; margin-bottom: 0.5rem;">
                     ±--¢
@@ -57,10 +61,14 @@
 
         <!-- 音程間隔別精度 -->
         <div class="glass-card" style="margin-top: 1.5rem;">
-            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+            <div class="flex items-center gap-3" style="margin-bottom: 0.5rem;">
                 <i data-lucide="bar-chart-3" class="text-yellow-300" style="width: 24px; height: 24px;"></i>
                 <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">音程間隔別精度</h3>
             </div>
+            <p class="text-white-60 text-sm" style="margin-bottom: 1rem;">
+                2度〜8度の各音程間隔ごとの平均誤差を表示します。<br>
+                苦手な音程を特定し、重点的に練習しましょう。
+            </p>
 
             <div id="interval-accuracy-list" style="display: flex; flex-direction: column; gap: 1rem;">
                 <!-- 動的に生成される -->
@@ -90,12 +98,13 @@
 
         <!-- 音域ブロック分析 -->
         <div class="glass-card brain-processing-section" style="margin-top: 1.5rem;">
-            <div class="flex items-center gap-3" style="margin-bottom: 1rem;">
+            <div class="flex items-center gap-3" style="margin-bottom: 0.5rem;">
                 <i data-lucide="layers" class="text-cyan-300" style="width: 24px; height: 24px;"></i>
                 <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">音域ブロック分析</h3>
             </div>
-            <p class="brain-processing-intro">
-                経験則により、C〜F#（Aブロック）とG〜B（Bブロック）の誤差を均等に改善することで、相対音感のさらなる向上が期待できます。
+            <p class="text-white-60 text-sm" style="margin-bottom: 1rem;">
+                12音をAブロック（C〜F#）とBブロック（G〜B）に分け、それぞれの精度を比較します。<br>
+                両ブロックの誤差を均等に改善することで、相対音感のバランスが向上します。
             </p>
 
             <!-- Aブロック vs Bブロック 比較 -->
@@ -214,6 +223,12 @@
 
     <!-- Tab 3: 練習プラン -->
     <section id="tab-practice" class="tab-content">
+        <div class="glass-card" style="margin-bottom: 1.5rem;">
+            <p class="text-white-60 text-sm" style="margin: 0;">
+                あなたのデータを分析し、最も効果的な練習項目を優先順位付けしました。<br>
+                上から順に取り組むことで、効率的に音感を向上させることができます。
+            </p>
+        </div>
         <div id="practice-plan-container">
             <!-- 動的に生成される -->
         </div>
@@ -223,10 +238,14 @@
     <section id="tab-growth" class="tab-content">
         <!-- 月間成長比較 -->
         <div class="glass-card">
-            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+            <div class="flex items-center gap-3" style="margin-bottom: 0.5rem;">
                 <i data-lucide="calendar" class="text-blue-300" style="width: 24px; height: 24px;"></i>
                 <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">月間成長比較</h3>
             </div>
+            <p class="text-white-60 text-sm" style="margin-bottom: 1rem;">
+                1ヶ月前と現在の平均誤差を比較します。<br>
+                継続的な練習の効果を確認しましょう。
+            </p>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                 <div style="text-align: center;">
@@ -246,10 +265,14 @@
 
         <!-- 音程間隔別成長グラフ -->
         <div class="glass-card" style="margin-top: 1.5rem;">
-            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+            <div class="flex items-center gap-3" style="margin-bottom: 0.5rem;">
                 <i data-lucide="bar-chart-2" class="text-blue-300" style="width: 24px; height: 24px;"></i>
                 <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">音程間隔別成長グラフ</h3>
             </div>
+            <p class="text-white-60 text-sm" style="margin-bottom: 1rem;">
+                各音程間隔の1ヶ月前（オレンジ）と現在（緑）の誤差を比較します。<br>
+                棒が短いほど精度が高いことを示します。
+            </p>
 
             <div style="background: rgba(255, 255, 255, 0.05); padding: 1.5rem; border-radius: 12px;">
                 <canvas id="interval-growth-chart" style="max-height: 300px;"></canvas>
@@ -258,10 +281,13 @@
 
         <!-- 最も改善した音程 TOP 3 -->
         <div class="glass-card" style="margin-top: 1.5rem;">
-            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+            <div class="flex items-center gap-3" style="margin-bottom: 0.5rem;">
                 <i data-lucide="trending-up" class="text-green-300" style="width: 24px; height: 24px;"></i>
                 <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">最も改善した音程 TOP 3</h3>
             </div>
+            <p class="text-white-60 text-sm" style="margin-bottom: 1rem;">
+                1ヶ月間で最も誤差が減少した音程です。練習の成果が出ています！
+            </p>
 
             <div id="top3-improved" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
                 <!-- 動的に生成される -->
@@ -270,10 +296,13 @@
 
         <!-- 停滞音程 -->
         <div class="glass-card" style="margin-top: 1.5rem;">
-            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+            <div class="flex items-center gap-3" style="margin-bottom: 0.5rem;">
                 <i data-lucide="trending-down" class="text-orange-300" style="width: 24px; height: 24px;"></i>
                 <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">改善が停滞した音程 TOP 3</h3>
             </div>
+            <p class="text-white-60 text-sm" style="margin-bottom: 1rem;">
+                改善が進んでいない音程です。重点的に練習することをお勧めします。
+            </p>
 
             <div id="top3-stagnant" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
                 <!-- 動的に生成される -->
@@ -282,10 +311,14 @@
 
         <!-- 時系列パフォーマンス分析 -->
         <div class="glass-card" style="margin-top: 1.5rem;">
-            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+            <div class="flex items-center gap-3" style="margin-bottom: 0.5rem;">
                 <i data-lucide="activity" class="text-purple-300" style="width: 24px; height: 24px;"></i>
                 <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">時系列パフォーマンス分析</h3>
             </div>
+            <p class="text-white-60 text-sm" style="margin-bottom: 1rem;">
+                時間帯やセッション回数による精度の変化を分析します。<br>
+                最も調子の良い練習条件を見つけましょう。
+            </p>
 
             <div id="time-series-analysis" style="display: flex; flex-direction: column; gap: 1rem;">
                 <!-- 動的に生成される -->
@@ -294,10 +327,14 @@
 
         <!-- 親モード別分析 -->
         <div class="glass-card" style="margin-top: 1.5rem;">
-            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+            <div class="flex items-center gap-3" style="margin-bottom: 0.5rem;">
                 <i data-lucide="folder" class="text-purple-300" style="width: 24px; height: 24px;"></i>
                 <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">親モード別分析</h3>
             </div>
+            <p class="text-white-60 text-sm" style="margin-bottom: 1rem;">
+                ランダム基音・連続チャレンジ・12音階の各モードでの精度を比較します。<br>
+                モードをタップすると詳細が展開されます。
+            </p>
 
             <!-- 親モードアコーディオンカード -->
             <div id="mode-analysis-accordion">
@@ -307,10 +344,14 @@
 
         <!-- モード別分析 -->
         <div class="glass-card" style="margin-top: 1.5rem;">
-            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+            <div class="flex items-center gap-3" style="margin-bottom: 0.5rem;">
                 <i data-lucide="layers" class="text-cyan-300" style="width: 24px; height: 24px;"></i>
                 <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">モード別分析</h3>
             </div>
+            <p class="text-white-60 text-sm" style="margin-bottom: 1rem;">
+                上行・下行などの方向別の詳細な精度を表示します。<br>
+                得意・苦手な方向を把握しましょう。
+            </p>
 
             <!-- クイックジャンプナビゲーション -->
             <div id="mode-quick-nav" style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
@@ -325,10 +366,13 @@
 
         <!-- モード別詳細統計 -->
         <div class="glass-card" style="margin-top: 1.5rem;">
-            <div class="flex items-center gap-3" style="margin-bottom: 1.5rem;">
+            <div class="flex items-center gap-3" style="margin-bottom: 0.5rem;">
                 <i data-lucide="bar-chart-2" class="text-green-300" style="width: 24px; height: 24px;"></i>
                 <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">モード別詳細統計</h3>
             </div>
+            <p class="text-white-60 text-sm" style="margin-bottom: 1rem;">
+                レッスン数・平均精度・最高グレードなどの詳細な統計データです。
+            </p>
 
             <!-- クイックジャンプナビゲーション -->
             <div id="mode-stats-quick-nav" style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
