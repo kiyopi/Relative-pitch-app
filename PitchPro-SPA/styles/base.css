@@ -3105,6 +3105,7 @@ body::before {
     }
 
     .btn-danger {
+        width: 100%;
         justify-content: center;
     }
 }
