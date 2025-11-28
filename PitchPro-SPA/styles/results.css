@@ -1424,26 +1424,3 @@
     font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.5);
 }
-
-
-/* ================================================================
-   削除セクション（モバイル対応）
-   ================================================================ */
-
-/* モバイルで削除セクションを上下配置 */
-@media (max-width: 480px) {
-    #danger-zone-section > .flex.items-center.justify-between {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 1rem;
-    }
-
-    #danger-zone-section > .flex.items-center.justify-between > div {
-        text-align: center;
-    }
-
-    #danger-zone-section .btn-danger {
-        width: 100%;
-        justify-content: center;
-    }
-}
