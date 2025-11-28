@@ -212,7 +212,7 @@ function updateModeAccuracySummary(allSessionData) {
         }
     };
 
-    // 音数を表示するヘルパー関数
+    // 音数を表示するヘルパー関数（親モード用）
     const displayCount = (elementId, count) => {
         const el = document.getElementById(elementId);
         if (el) {
@@ -220,32 +220,62 @@ function updateModeAccuracySummary(allSessionData) {
         }
     };
 
+    // 音数を表示するヘルパー関数（詳細行用）
+    const displayDetailCount = (elementId, count) => {
+        const el = document.getElementById(elementId);
+        if (el) {
+            el.textContent = count > 0 ? `(${count})` : '';
+        }
+    };
+
     // 各モードの統計を計算
     const randomStats = calcStats(modeData.random.all);
+    const randomAscStats = calcStats(modeData.random.ascending);
+    const randomDescStats = calcStats(modeData.random.descending);
+
     const continuousStats = calcStats(modeData.continuous.all);
+    const continuousAscStats = calcStats(modeData.continuous.ascending);
+    const continuousDescStats = calcStats(modeData.continuous.descending);
+
     const toneStats = calcStats(modeData['12tone'].all);
+    const toneAscAscStats = calcStats(modeData['12tone'].ascAsc);
+    const toneAscDescStats = calcStats(modeData['12tone'].ascDesc);
+    const toneDescAscStats = calcStats(modeData['12tone'].descAsc);
+    const toneDescDescStats = calcStats(modeData['12tone'].descDesc);
+    const toneBothAscStats = calcStats(modeData['12tone'].bothAsc);
+    const toneBothDescStats = calcStats(modeData['12tone'].bothDesc);
 
     // ランダム基音
     displayValue('random-accuracy-value', randomStats.avgError);
     displayCount('random-count', randomStats.count);
-    displayValue('random-asc-value', calcStats(modeData.random.ascending).avgError);
-    displayValue('random-desc-value', calcStats(modeData.random.descending).avgError);
+    displayValue('random-asc-value', randomAscStats.avgError);
+    displayDetailCount('random-asc-count', randomAscStats.count);
+    displayValue('random-desc-value', randomDescStats.avgError);
+    displayDetailCount('random-desc-count', randomDescStats.count);
 
     // 連続チャレンジ
     displayValue('continuous-accuracy-value', continuousStats.avgError);
     displayCount('continuous-count', continuousStats.count);
-    displayValue('continuous-asc-value', calcStats(modeData.continuous.ascending).avgError);
-    displayValue('continuous-desc-value', calcStats(modeData.continuous.descending).avgError);
+    displayValue('continuous-asc-value', continuousAscStats.avgError);
+    displayDetailCount('continuous-asc-count', continuousAscStats.count);
+    displayValue('continuous-desc-value', continuousDescStats.avgError);
+    displayDetailCount('continuous-desc-count', continuousDescStats.count);
 
     // 12音階（6モード個別）
     displayValue('12tone-accuracy-value', toneStats.avgError);
     displayCount('12tone-count', toneStats.count);
-    displayValue('12tone-asc-asc-value', calcStats(modeData['12tone'].ascAsc).avgError);
-    displayValue('12tone-asc-desc-value', calcStats(modeData['12tone'].ascDesc).avgError);
-    displayValue('12tone-desc-asc-value', calcStats(modeData['12tone'].descAsc).avgError);
-    displayValue('12tone-desc-desc-value', calcStats(modeData['12tone'].descDesc).avgError);
-    displayValue('12tone-both-asc-value', calcStats(modeData['12tone'].bothAsc).avgError);
-    displayValue('12tone-both-desc-value', calcStats(modeData['12tone'].bothDesc).avgError);
+    displayValue('12tone-asc-asc-value', toneAscAscStats.avgError);
+    displayDetailCount('12tone-asc-asc-count', toneAscAscStats.count);
+    displayValue('12tone-asc-desc-value', toneAscDescStats.avgError);
+    displayDetailCount('12tone-asc-desc-count', toneAscDescStats.count);
+    displayValue('12tone-desc-asc-value', toneDescAscStats.avgError);
+    displayDetailCount('12tone-desc-asc-count', toneDescAscStats.count);
+    displayValue('12tone-desc-desc-value', toneDescDescStats.avgError);
+    displayDetailCount('12tone-desc-desc-count', toneDescDescStats.count);
+    displayValue('12tone-both-asc-value', toneBothAscStats.avgError);
+    displayDetailCount('12tone-both-asc-count', toneBothAscStats.count);
+    displayValue('12tone-both-desc-value', toneBothDescStats.avgError);
+    displayDetailCount('12tone-both-desc-count', toneBothDescStats.count);
 
     console.log('✅ モード別平均精度を更新しました', {
         random: modeData.random.all.length,
