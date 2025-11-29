@@ -101,7 +101,7 @@ class SimpleRouter {
             },
             'training': {
                 init: 'initializeTrainingPage',
-                dependencies: ['PitchPro'],
+                dependencies: ['PitchPro', 'PitchShifter'],
                 title: 'トレーニング',  // 【v2.13.0追加】
                 cleanup: async () => {
                     console.log('🧹 [Router] Cleaning up training page...');
@@ -750,6 +750,8 @@ class SimpleRouter {
                 return () => typeof window.DistributionChart !== 'undefined';
             case 'PitchPro':
                 return () => typeof window.PitchPro !== 'undefined';
+            case 'PitchShifter':
+                return () => typeof window.PitchShifter !== 'undefined' && window.PitchShifter.AVAILABLE_NOTES;
             default:
                 console.warn(`⚠️ [Router] Unknown dependency: ${dependency}`);
                 return () => true; // 未知の依存関係は常にtrueを返す

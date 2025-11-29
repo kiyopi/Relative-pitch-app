@@ -314,7 +314,7 @@ class NavigationManager {
             console.log('🔍 [NavigationManager] navEntries[0].type:', navType);
             if (navType === 'reload') {
                 console.log('✅ [NavigationManager] リロード検出（Navigation Timing API v2）: type === "reload"');
-                sessionStorage.setItem(this.KEYS.REDIRECT_COMPLETED, 'true');
+                // 【v4.7.0】フラグ設定はhandleAccessRouteCheck内で行う（training/result-session以外のみ）
                 return true;
             } else {
                 console.log('✅ [NavigationManager] 正常な遷移（Navigation Timing API v2）: type === "' + navType + '"');
@@ -325,7 +325,7 @@ class NavigationManager {
         // 6. フォールバック: 古いAPI（非推奨だが念のため）
         if (performance.navigation && performance.navigation.type === 1) {
             console.log('⚠️ [NavigationManager] リロード検出（古いAPI・フォールバック）: type === 1');
-            sessionStorage.setItem(this.KEYS.REDIRECT_COMPLETED, 'true');
+            // 【v4.7.0】フラグ設定はhandleAccessRouteCheck内で行う（training/result-session以外のみ）
             return true;
         }
 
@@ -672,13 +672,19 @@ class NavigationManager {
 
         // 3. リロード検出
         if (config?.preventReload && this.detectReload(page)) {
-            // training/result-sessionページ: PitchProに任せる（Reactiveアプローチ）
+            // 【v4.7.0修正】training/result-sessionページ: ホームにリダイレクト
+            // 理由: リロード時はマイクリソースが解放されるため、トレーニングを続行できない
+            // 仕様書準拠: NAVIGATION_HANDLING_SPECIFICATION.md 1290-1294行目
             if (page === 'training' || page === 'result-session') {
-                console.log(`⚠️ [NavigationManager] ${page}ページでリロード検出 - PitchProのエラーハンドリングに委譲`);
-                // sessionStorageフラグのみクリア
+                console.log(`⚠️ [NavigationManager] ${page}ページでリロード検出 - ホームにリダイレクト`);
+                // sessionStorageフラグをクリア
                 sessionStorage.removeItem(page + 'PageActive');
-                // ページ初期化続行 → PitchProがマイクエラーを処理
-                return { shouldContinue: true, reason: 'reload-handled-by-pitchpro' };
+                sessionStorage.removeItem('currentLessonId');
+                // 【v4.7.0】REDIRECT_COMPLETEDフラグは設定しない
+                // 理由: ホームにリダイレクト後は次回のtrainingアクセスでリロード検出が正常に動作する必要がある
+                // ホームにリダイレクト
+                window.location.hash = 'home';
+                return { shouldContinue: false, reason: 'reload-redirect-home' };
             }
 
             // 【v4.6.0】preparationページ: 常にページ継続（Step 1から再開）
@@ -1261,12 +1267,12 @@ class NavigationManager {
         },
         'training': {
             preventBackNavigation: true,
-            preventReload: true,  // リロード検出は継続（PitchProのエラーハンドリングに委譲）
+            preventReload: true,  // 【v4.7.0】リロード時はホームにリダイレクト
             backPreventionMessage: 'トレーニング中です。\n\nブラウザバックは無効になっています。\nホームボタンからトップページに戻れます。'
         },
         'result-session': {
             preventBackNavigation: true,
-            preventReload: true,  // リロード検出は継続（PitchProのエラーハンドリングに委譲）
+            preventReload: true,  // 【v4.7.0】リロード時はホームにリダイレクト
             directAccessRedirectTo: 'preparation',  // ダイレクトアクセス時のリダイレクト先
             directAccessMessage: 'セッション評価ページには正しいフローでアクセスしてください。準備ページに移動します。',
             backPreventionMessage: 'セッション評価中です。\n\nブラウザバックは無効になっています。\n「次の基音へ」ボタンまたはホームボタンをご利用ください。'

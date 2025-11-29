@@ -12,7 +12,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>8va相対音感トレーニング - ホーム</title>
-    <link rel="stylesheet" href="styles/base.css?v=1764393182">
+    <link rel="stylesheet" href="styles/base.css?v=1764394485">
     <link rel="stylesheet" href="styles/results.css?v=1764305566">
     <link rel="stylesheet" href="styles/training.css?v=20251119001">
     <link rel="stylesheet" href="styles/voice-range.css?v=20251119001">
@@ -201,6 +201,20 @@
                         }
                     }
                 }
+            });
+
+            // ナビゲーションボタンクリック時にメニューを閉じる
+            headerNav.querySelectorAll('.nav-button').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    headerNav.classList.remove('active');
+                    const icon = menuToggle.querySelector('i');
+                    if (icon) {
+                        icon.setAttribute('data-lucide', 'menu');
+                        if (typeof window.initializeLucideIcons === 'function') {
+                            window.initializeLucideIcons({ immediate: true });
+                        }
+                    }
+                });
             });
         });
 

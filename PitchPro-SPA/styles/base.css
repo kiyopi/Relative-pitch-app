@@ -2417,9 +2417,12 @@ body::before {
   border-color: rgba(156, 163, 175, 0.3);
 }
 
-.btn.disabled {
+.btn.disabled,
+.btn.btn-disabled,
+.btn[disabled] {
   opacity: 0.5;
   cursor: not-allowed;
+  pointer-events: none;
 }
 
 .btn-full {
