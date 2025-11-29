@@ -3,7 +3,10 @@
  * ホームページの上行・下行タブナビゲーション管理 + クイックスタート機能
  * 注意: data-direction属性を持つタブのみを対象（詳細分析のdata-tabタブとは干渉しない）
  *
- * @version v202511291400
+ * @version v202511291630
+ * 【v202511291630修正内容】
+ * - クイックスタートの遷移をNavigationManager.navigate()に変更
+ * - ブラウザバック誤判定を解消（正常遷移フラグが設定されるように）
  * 【v202511291400修正内容】
  * - クイックスタート機能追加（前回のモード・方向で開始）
  * - localStorage永続化（pitchpro_last_mode, pitchpro_last_direction）
@@ -278,8 +281,9 @@ class DirectionTabsManager {
 
     /**
      * クイックスタートボタンクリック処理
+     * router.jsの通常ボタンと同等の処理を実装
      */
-    handleQuickStartClick() {
+    async handleQuickStartClick() {
         // 前回の設定を取得
         const lastMode = localStorage.getItem(QUICK_START_MODE_KEY) || 'random';
         const currentDirection = sessionStorage.getItem('trainingDirection') || 'ascending';
@@ -289,14 +293,27 @@ class DirectionTabsManager {
         // sessionStorageに方向を設定（準備ページで使用）
         sessionStorage.setItem('trainingDirection', currentDirection);
 
-        // 準備ページへ遷移
+        // 【v202511291630】準備スキップ判定（router.jsと同等の3層防御アプローチ）
+        if (typeof NavigationManager !== 'undefined' && NavigationManager.canSkipPreparation) {
+            const canSkip = await NavigationManager.canSkipPreparation();
+
+            if (canSkip) {
+                console.log('✅ [HOME] クイックスタート: 準備スキップ可能 - ダイレクトトレーニング開始');
+
+                // ダイレクトトレーニングに遷移
+                // random/continuousモードはchromaticDirection=null
+                NavigationManager.navigateToTraining(lastMode, '1', null, currentDirection);
+                return;
+            }
+        }
+
+        // 準備スキップ不可の場合は準備ページへ遷移
         if (typeof NavigationManager !== 'undefined' && NavigationManager.navigate) {
-            // NavigationManager経由で遷移
-            const params = new URLSearchParams();
-            params.set('mode', lastMode);
-            params.set('session', '1');
-            params.set('scaleDirection', currentDirection);
-            window.location.hash = `preparation?${params.toString()}`;
+            NavigationManager.navigate('preparation', {
+                mode: lastMode,
+                session: '1',
+                scaleDirection: currentDirection
+            });
         } else {
             // フォールバック
             window.location.hash = `preparation?mode=${lastMode}&session=1&scaleDirection=${currentDirection}`;
