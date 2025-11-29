@@ -100,6 +100,75 @@
     color: white;
 }
 
+.help-grade-badge.grade-e {
+    background: linear-gradient(135deg, #f87171, #ef4444);
+    color: white;
+}
+
+/* --- 総合評価ランク名カラー --- */
+.rank-name-s { color: #fcd34d; }
+.rank-name-a { color: #d1d5db; }
+.rank-name-b { color: #fdba74; }
+.rank-name-c { color: #86efac; }
+.rank-name-d { color: #7dd3fc; }
+.rank-name-e { color: #fca5a5; }
+
+/* --- 評価リスト（アイコン主役レイアウト） --- */
+.help-eval-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.help-eval-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.help-eval-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+    min-width: 80px;
+}
+
+/* --- 音程評価バッジ（レガシー） --- */
+.help-grade-badge.grade-excellent {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1f2937;
+    width: auto;
+    min-width: auto;
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+}
+
+.help-grade-badge.grade-good {
+    background: linear-gradient(135deg, #4ade80, #22c55e);
+    color: #1f2937;
+    width: auto;
+    min-width: auto;
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+}
+
+.help-grade-badge.grade-pass {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    color: white;
+    width: auto;
+    min-width: auto;
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+}
+
+.help-grade-badge.grade-practice {
+    background: linear-gradient(135deg, #f87171, #ef4444);
+    color: white;
+    width: auto;
+    min-width: auto;
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+}
+
 /* --- FAQアコーディオン --- */
 .faq-accordion {
     display: flex;
@@ -248,4 +317,159 @@
 
 .help-trouble-list li:last-child {
     margin-bottom: 0;
+}
+
+/* --- 説明文（リストの前などに使用） --- */
+.help-description {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--white-70);
+    margin-bottom: var(--space-3);
+}
+
+/* --- リストの後に続くテキスト用 --- */
+.help-trouble-list + .help-note {
+    margin-top: var(--space-3);
+}
+
+.help-note {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--white-70);
+}
+
+/* --- カテゴリ見出し --- */
+.help-category-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.help-category-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: var(--radius-lg);
+}
+
+.help-category-icon i {
+    width: 22px;
+    height: 22px;
+}
+
+.help-category-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: white;
+}
+
+/* --- モードカードヘッダー --- */
+.help-mode-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+}
+
+.help-mode-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+}
+
+.help-mode-badge {
+    font-size: 0.75rem;
+}
+
+/* --- モードカードリスト（gap調整） --- */
+.help-mode-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+/* --- 情報ボックスヘッダー --- */
+.help-info-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.875rem;
+    color: var(--white-80);
+}
+
+.help-info-header i {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+/* --- 目次（ページ内リンク） --- */
+.help-toc {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2);
+}
+
+.help-toc-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-md);
+    color: var(--white-80);
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.help-toc-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.help-toc-item i {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+/* モバイル時は1列 */
+@media (max-width: 480px) {
+    .help-toc {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- トップへ戻るボタン --- */
+.help-back-to-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    padding: var(--space-2) var(--space-3);
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--white-60);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.help-back-to-top:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--white-80);
+}
+
+.help-back-to-top i {
+    width: 14px;
+    height: 14px;
 }

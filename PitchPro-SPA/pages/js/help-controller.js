@@ -14,7 +14,13 @@ function initHelpPage() {
     // 1. FAQアコーディオン初期化
     setupFaqAccordion();
 
-    // 2. Lucideアイコン初期化
+    // 2. 目次リンク初期化（SPAスムーズスクロール）
+    setupTocLinks();
+
+    // 3. トップへ戻るボタン初期化
+    setupBackToTopButtons();
+
+    // 4. Lucideアイコン初期化
     if (typeof window.initializeLucideIcons === 'function') {
         window.initializeLucideIcons({ immediate: true });
     } else if (typeof lucide !== 'undefined' && lucide.createIcons) {
@@ -24,6 +30,90 @@ function initHelpPage() {
     }
 
     console.log('✅ [help] ページ初期化完了');
+}
+
+/**
+ * 目次リンク設定（SPA対応スムーズスクロール）
+ * hrefの#をSPAルーターに影響させずにスクロール
+ */
+function setupTocLinks() {
+    const tocLinks = document.querySelectorAll('.help-toc-item');
+
+    if (tocLinks.length === 0) {
+        console.warn('⚠️ [help] 目次リンクが見つかりません');
+        return;
+    }
+
+    tocLinks.forEach(link => {
+        link.addEventListener('click', handleTocClick);
+    });
+
+    console.log(`✅ [help] 目次リンク設定完了 (${tocLinks.length}項目)`);
+}
+
+/**
+ * 目次リンククリックハンドラー
+ * @param {Event} event - クリックイベント
+ */
+function handleTocClick(event) {
+    event.preventDefault(); // SPAルーターへの遷移を防止
+
+    const href = event.currentTarget.getAttribute('href');
+    if (!href || !href.startsWith('#')) {
+        return;
+    }
+
+    const targetId = href.substring(1);
+    const targetElement = document.getElementById(targetId);
+
+    if (targetElement) {
+        // スムーズスクロール
+        targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+        console.log(`📍 [help] セクションへスクロール: ${targetId}`);
+    } else {
+        console.warn(`⚠️ [help] スクロール先が見つかりません: ${targetId}`);
+    }
+}
+
+/**
+ * トップへ戻るボタン設定
+ */
+function setupBackToTopButtons() {
+    const buttons = document.querySelectorAll('.help-back-to-top');
+
+    if (buttons.length === 0) {
+        console.log('ℹ️ [help] トップへ戻るボタンなし');
+        return;
+    }
+
+    buttons.forEach(button => {
+        button.addEventListener('click', handleBackToTop);
+    });
+
+    console.log(`✅ [help] トップへ戻るボタン設定完了 (${buttons.length}個)`);
+}
+
+/**
+ * トップへ戻るクリックハンドラー
+ */
+function handleBackToTop() {
+    const tocSection = document.querySelector('.help-toc');
+    if (tocSection) {
+        tocSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    } else {
+        // フォールバック: ページトップへ
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+    console.log('📍 [help] 目次へスクロール');
 }
 
 /**

@@ -1,5 +1,5 @@
 <!-- pages/help.html - ヘルプページテンプレート -->
-<!-- Version: 1.0.0 -->
+<!-- Version: 2.0.0 - カテゴリ別再構成 -->
 
 <!-- ページヘッダー -->
 <div class="page-header">
@@ -16,10 +16,62 @@
     </div>
 </div>
 
-<!-- セクション1: このアプリについて -->
+<!-- 目次 -->
 <section class="glass-card">
     <h4 class="heading-md">
-        <i data-lucide="target" class="text-green-300"></i>
+        <i data-lucide="list" class="text-purple-300"></i>
+        <span>目次</span>
+    </h4>
+    <nav class="help-toc">
+        <a href="#about" class="help-toc-item">
+            <i data-lucide="music" class="text-blue-300"></i>
+            <span>このアプリについて</span>
+        </a>
+        <a href="#how-to-use" class="help-toc-item">
+            <i data-lucide="list-ordered" class="text-blue-300"></i>
+            <span>使い方の流れ</span>
+        </a>
+        <a href="#training-modes" class="help-toc-item">
+            <i data-lucide="layers" class="text-orange-300"></i>
+            <span>トレーニングモード</span>
+        </a>
+        <a href="#direction-modes" class="help-toc-item">
+            <i data-lucide="move-up-right" class="text-blue-300"></i>
+            <span>上行/下行モード</span>
+        </a>
+        <a href="#voice-range" class="help-toc-item">
+            <i data-lucide="ruler" class="text-green-300"></i>
+            <span>音域について</span>
+        </a>
+        <a href="#evaluation" class="help-toc-item">
+            <i data-lucide="bar-chart-2" class="text-yellow-300"></i>
+            <span>評価の仕組み</span>
+        </a>
+        <a href="#faq" class="help-toc-item">
+            <i data-lucide="message-circle" class="text-pink-300"></i>
+            <span>よくある質問</span>
+        </a>
+        <a href="#troubleshooting" class="help-toc-item">
+            <i data-lucide="wrench" class="text-red-300"></i>
+            <span>トラブルシューティング</span>
+        </a>
+    </nav>
+</section>
+
+<!-- ============================================
+     カテゴリ1: はじめに
+     ============================================ -->
+<div class="help-category-header" id="category-intro">
+    <div class="help-category-icon gradient-catalog-blue">
+        <i data-lucide="book-open" class="text-white"></i>
+    </div>
+    <h3 class="help-category-title">はじめに</h3>
+</div>
+
+<!-- セクション1: このアプリについて -->
+<section class="glass-card" id="about">
+    <h4 class="heading-md">
+        <i data-lucide="music" class="text-blue-300"></i>
         <span>このアプリについて</span>
     </h4>
 
@@ -35,6 +87,26 @@
         <p class="text-sm text-white-70">
             この繰り返しトレーニングにより、相対音感（2つの音の関係性を認識する能力）を鍛えることができます。
         </p>
+
+        <!-- オクターブベーストレーニングの重要性 -->
+        <div class="help-trouble-item">
+            <h5 class="text-body font-semibold text-white mb-2 flex items-center gap-2">
+                <i data-lucide="brain" class="text-purple-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>なぜオクターブ単位でトレーニングするのか</span>
+            </h5>
+            <p class="help-description">
+                人間の脳は12音階を左脳と右脳で分担して処理しています。オクターブ（8音）を発声することで、両方の脳をバランスよく鍛えられます。
+            </p>
+            <ul class="help-trouble-list">
+                <li><strong class="text-cyan-300">Aブロック（ド〜ファ#）</strong>：左脳のみで処理、安定した発声が可能</li>
+                <li><strong class="text-purple-300">Bブロック（ソ〜ド）</strong>：両脳で処理、感情を乗せた深みのある音に必要</li>
+            </ul>
+            <p class="help-note">
+                このA/Bブロックの精度差をなくすことが、真の相対音感向上につながります。
+            </p>
+        </div>
+
+        <!-- 期待される効果 -->
         <div class="flex flex-col gap-2 mt-2">
             <div class="flex items-center gap-2">
                 <i data-lucide="check-circle" class="text-green-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
@@ -49,11 +121,28 @@
                 <span class="text-sm text-white-80">コミュニケーション能力向上（脳内ピアノ理論）</span>
             </div>
         </div>
+
+        <!-- 脳内ピアノ理論の補足 -->
+        <div class="help-info-box">
+            <p class="text-sm text-white-80 flex items-center gap-2">
+                <i data-lucide="lightbulb" class="text-yellow-400" style="width: 14px; height: 14px; flex-shrink: 0;"></i>
+                <strong>脳内ピアノ理論とは</strong>
+            </p>
+            <p class="text-sm text-white-70">
+                人の声はフーリエ解析するとピアノと同じ12音律で構成されています。
+                つまり人は脳内にピアノを持っているようなもの。相対音感を鍛えることで、
+                相手の声（音程）を正確に認識し、円滑なコミュニケーションが可能になります。
+            </p>
+        </div>
     </div>
+    <button class="help-back-to-top">
+        <i data-lucide="chevron-up"></i>
+        <span>目次に戻る</span>
+    </button>
 </section>
 
 <!-- セクション2: 使い方の流れ -->
-<section class="glass-card">
+<section class="glass-card" id="how-to-use">
     <h4 class="heading-md">
         <i data-lucide="list-ordered" class="text-blue-300"></i>
         <span>使い方の流れ</span>
@@ -63,16 +152,16 @@
         <div class="flex items-start gap-3">
             <div class="help-step-number">1</div>
             <div class="flex flex-col gap-1">
-                <h5 class="text-body font-semibold text-white">音域テスト</h5>
-                <p class="text-sm text-white-70">最初に音域テストを行い、あなたの声の範囲を測定します。低音テスト（下降測定）と高音テスト（上昇測定）を行います。</p>
+                <h5 class="text-body font-semibold text-white">モード選択</h5>
+                <p class="text-sm text-white-70">ホーム画面でレベルに合ったトレーニングモードを選択します。上行・下行タブで発声方向も選べます。</p>
             </div>
         </div>
 
         <div class="flex items-start gap-3">
             <div class="help-step-number">2</div>
             <div class="flex flex-col gap-1">
-                <h5 class="text-body font-semibold text-white">モード選択</h5>
-                <p class="text-sm text-white-70">レベルに合ったトレーニングモードを選択します。</p>
+                <h5 class="text-body font-semibold text-white">準備（初回のみ）</h5>
+                <p class="text-sm text-white-70">初回はマイクテストと音域テストを行います。音域テストでは低音・高音の限界を測定し、あなたに合った基音を自動選択します。</p>
             </div>
         </div>
 
@@ -80,7 +169,7 @@
             <div class="help-step-number">3</div>
             <div class="flex flex-col gap-1">
                 <h5 class="text-body font-semibold text-white">トレーニング実行</h5>
-                <p class="text-sm text-white-70">ランダムな基音を聴いて、その音程に合わせてドレミファソラシドを発声します。</p>
+                <p class="text-sm text-white-70">基音を聴いて、その音程に合わせて「ド」を発声。そこからドレミファソラシドを順番に発声し、音程精度を測定します。</p>
             </div>
         </div>
 
@@ -88,14 +177,162 @@
             <div class="help-step-number">4</div>
             <div class="flex flex-col gap-1">
                 <h5 class="text-body font-semibold text-white">結果確認</h5>
-                <p class="text-sm text-white-70">セッション終了後、評価と詳細なフィードバックを確認できます。</p>
+                <p class="text-sm text-white-70">セッション終了後に音程評価、レッスン終了後に総合評価を確認できます。詳細分析ページでは弱点の傾向も分析できます。</p>
             </div>
         </div>
     </div>
+    <button class="help-back-to-top">
+        <i data-lucide="chevron-up"></i>
+        <span>目次に戻る</span>
+    </button>
 </section>
 
-<!-- セクション2.5: 音域について -->
-<section class="glass-card">
+<!-- ============================================
+     カテゴリ2: トレーニング
+     ============================================ -->
+<div class="help-category-header">
+    <div class="help-category-icon gradient-catalog-green">
+        <i data-lucide="target" class="text-white"></i>
+    </div>
+    <h3 class="help-category-title">トレーニング</h3>
+</div>
+
+<!-- セクション3: トレーニングモード -->
+<section class="glass-card" id="training-modes">
+    <h4 class="heading-md">
+        <i data-lucide="layers" class="text-orange-300"></i>
+        <span>トレーニングモード</span>
+    </h4>
+
+    <p class="text-sm text-white-70 mb-3">
+        3つのレベルから選べます。各モードで上行・下行の切り替えが可能です（合計6パターン）。
+    </p>
+
+    <div class="help-mode-list">
+        <!-- ランダム基音モード -->
+        <div class="help-mode-card">
+            <div class="help-mode-header">
+                <div class="help-mode-icon gradient-catalog-green">
+                    <i data-lucide="shuffle" class="text-white"></i>
+                </div>
+                <div>
+                    <h5 class="help-mode-title">ランダム基音</h5>
+                    <span class="help-mode-badge text-green-300">初級 • 8セッション</span>
+                </div>
+            </div>
+            <p class="text-sm text-white-70">カラオケなどで音程を合わせて歌えるようになる基礎トレーニング。基本的な相対音感と音程の安定化を養います。</p>
+        </div>
+
+        <!-- 連続チャレンジモード -->
+        <div class="help-mode-card">
+            <div class="help-mode-header">
+                <div class="help-mode-icon gradient-catalog-orange">
+                    <i data-lucide="zap" class="text-white"></i>
+                </div>
+                <div>
+                    <h5 class="help-mode-title">連続チャレンジ</h5>
+                    <span class="help-mode-badge text-orange-300">中級 • 12セッション連続</span>
+                </div>
+            </div>
+            <p class="text-sm text-white-70">半音も含めた音を聞き分け、集中力を維持しながら相対音感を鍛えます。クロマチック12音を連続で挑戦。</p>
+        </div>
+
+        <!-- 12音階モード -->
+        <div class="help-mode-card">
+            <div class="help-mode-header">
+                <div class="help-mode-icon gradient-catalog-purple">
+                    <i data-lucide="music" class="text-white"></i>
+                </div>
+                <div>
+                    <h5 class="help-mode-title">12音階</h5>
+                    <span class="help-mode-badge text-purple-300">上級 • 12-24セッション • S級判定</span>
+                </div>
+            </div>
+            <p class="text-sm text-white-70">すべての音に対して完璧な相対音感を習得するプロレベル練習。上昇・下降・両方向を選択可能。</p>
+        </div>
+
+        <!-- 弱点練習モード（次期バージョン） -->
+        <div class="help-mode-card help-mode-disabled">
+            <div class="help-mode-header">
+                <div class="help-mode-icon gradient-catalog-orange">
+                    <i data-lucide="brain" class="text-white"></i>
+                </div>
+                <div>
+                    <h5 class="help-mode-title">弱点練習</h5>
+                    <span class="help-mode-badge text-orange-300">次期バージョンで提供予定</span>
+                </div>
+            </div>
+            <p class="text-sm text-white-70">AI分析による個別最適化。あなたの弱点音程を自動分析し、効率的に苦手を克服する練習プログラム。</p>
+        </div>
+    </div>
+    <button class="help-back-to-top">
+        <i data-lucide="chevron-up"></i>
+        <span>目次に戻る</span>
+    </button>
+</section>
+
+<!-- セクション4: 上行/下行モード -->
+<section class="glass-card" id="direction-modes">
+    <h4 class="heading-md">
+        <i data-lucide="move-up-right" class="text-blue-300"></i>
+        <span>上行/下行モード</span>
+    </h4>
+
+    <p class="text-sm text-white-70 mb-3">
+        ホームページのタブで上行・下行を切り替えられます。発声の方向によって、異なる音程感覚を鍛えることができます。
+    </p>
+
+    <div class="help-mode-list">
+        <div class="help-mode-card">
+            <div class="help-mode-header">
+                <div class="help-direction-icon gradient-catalog-blue">
+                    <i data-lucide="move-up-right" class="text-white"></i>
+                </div>
+                <div>
+                    <h5 class="help-mode-title">上行モード</h5>
+                    <span class="help-mode-badge text-blue-300">初心者におすすめ</span>
+                </div>
+            </div>
+            <p class="text-sm text-white-70">ランダムな基音を聴き、その音程で「ド」を発声。そこからオクターブ上の「ド」まで上昇：ド→レ→ミ→ファ→ソ→ラ→シ→ド。自然な音階感覚を養います。</p>
+        </div>
+
+        <div class="help-mode-card">
+            <div class="help-mode-header">
+                <div class="help-direction-icon gradient-catalog-red">
+                    <i data-lucide="move-down-right" class="text-white"></i>
+                </div>
+                <div>
+                    <h5 class="help-mode-title">下行モード</h5>
+                    <span class="help-mode-badge text-red-300">より高度な訓練</span>
+                </div>
+            </div>
+            <p class="text-sm text-white-70">ランダムな基音を聴き、その音程で「ド」を発声。そこからオクターブ下の「ド」まで下降：ド→シ→ラ→ソ→ファ→ミ→レ→ド。実用的な歌唱訓練に効果的です。</p>
+        </div>
+    </div>
+
+    <!-- 用語の違い説明 -->
+    <div class="help-info-box mt-3">
+        <p class="help-info-header">
+            <i data-lucide="info" class="text-blue-400"></i>
+            <strong>「上行・下行」と「上昇・下降」の違い</strong>
+        </p>
+        <p class="text-sm text-white-70 mb-2">
+            「上行・下行」は<strong class="text-cyan-300">歌う方向</strong>（全モード共通）、「上昇・下降」は<strong class="text-purple-300">基音の変化パターン</strong>（12音階モード専用）です。
+        </p>
+        <ul class="help-trouble-list">
+            <li><strong class="text-green-300">上昇</strong>：基音を半音ずつ上げて12セッション</li>
+            <li><strong class="text-red-300">下降</strong>：基音を半音ずつ下げて12セッション</li>
+            <li><strong class="text-yellow-300">両方向</strong>：上昇12回＋下降12回＝24セッション</li>
+        </ul>
+    </div>
+    <button class="help-back-to-top">
+        <i data-lucide="chevron-up"></i>
+        <span>目次に戻る</span>
+    </button>
+</section>
+
+<!-- セクション5: 音域について -->
+<section class="glass-card" id="voice-range">
     <h4 class="heading-md">
         <i data-lucide="ruler" class="text-green-300"></i>
         <span>音域について</span>
@@ -109,9 +346,9 @@
 
         <!-- 推奨音域 -->
         <div class="help-trouble-item">
-            <h5 class="text-body font-semibold text-white mb-2">
-                <i data-lucide="check-circle" class="text-green-400" style="width: 16px; height: 16px; vertical-align: middle;"></i>
-                推奨音域：2.0オクターブ以上
+            <h5 class="text-body font-semibold text-white mb-2 flex items-center gap-2">
+                <i data-lucide="check-circle" class="text-green-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>推奨音域：2.0オクターブ以上</span>
             </h5>
             <p class="text-sm text-white-70">
                 すべてのトレーニングモードで最適な体験ができます。基音から1オクターブ上（または下）の音が音域内に収まります。
@@ -120,11 +357,11 @@
 
         <!-- 音域不足時の対応 -->
         <div class="help-trouble-item">
-            <h5 class="text-body font-semibold text-white mb-2">
-                <i data-lucide="alert-triangle" class="text-yellow-400" style="width: 16px; height: 16px; vertical-align: middle;"></i>
-                音域が2オクターブ未満の場合
+            <h5 class="text-body font-semibold text-white mb-2 flex items-center gap-2">
+                <i data-lucide="alert-triangle" class="text-yellow-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>音域が2オクターブ未満の場合</span>
             </h5>
-            <p class="text-sm text-white-70 mb-2">
+            <p class="help-description">
                 音域が不足している場合でも、以下のように自動補完してトレーニングできるようになっています。
             </p>
             <ul class="help-trouble-list">
@@ -135,9 +372,9 @@
         </div>
 
         <!-- 補完機能の説明 -->
-        <div class="flex flex-col gap-2 mt-2" style="background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: 8px;">
-            <p class="text-sm text-white-80">
-                <i data-lucide="info" class="text-blue-400" style="width: 14px; height: 14px; vertical-align: middle;"></i>
+        <div class="help-info-box">
+            <p class="text-sm text-white-80 flex items-center gap-2">
+                <i data-lucide="info" class="text-blue-400" style="width: 14px; height: 14px; flex-shrink: 0;"></i>
                 <strong>自動補完機能</strong>
             </p>
             <p class="text-sm text-white-70">
@@ -147,83 +384,27 @@
             </p>
         </div>
     </div>
+    <button class="help-back-to-top">
+        <i data-lucide="chevron-up"></i>
+        <span>目次に戻る</span>
+    </button>
 </section>
 
-<!-- セクション3: トレーニングモード -->
-<section class="glass-card">
-    <h4 class="heading-md">
-        <i data-lucide="layers" class="text-orange-300"></i>
-        <span>トレーニングモード</span>
-    </h4>
-
-    <p class="text-sm text-white-70 mb-3">
-        ホームページのタブで上行・下行を切り替えられます。上行5モード＋下行5モードの合計10トレーニングがあります。
-    </p>
-
-    <div class="flex flex-col gap-3">
-        <!-- ランダム基音モード -->
-        <div class="help-mode-card">
-            <div class="flex items-center gap-3 mb-2">
-                <div class="help-mode-icon gradient-catalog-green">
-                    <i data-lucide="shuffle" class="text-white" style="width: 20px; height: 20px;"></i>
-                </div>
-                <div>
-                    <h5 class="text-body font-semibold text-white">ランダム基音</h5>
-                    <span class="text-xs text-green-300">初級 • 8セッション</span>
-                </div>
-            </div>
-            <p class="text-sm text-white-70">カラオケなどで音程を合わせて歌えるようになる基礎トレーニング。基本的な相対音感と音程の安定化を養います。</p>
-        </div>
-
-        <!-- 連続チャレンジモード -->
-        <div class="help-mode-card">
-            <div class="flex items-center gap-3 mb-2">
-                <div class="help-mode-icon gradient-catalog-blue">
-                    <i data-lucide="zap" class="text-white" style="width: 20px; height: 20px;"></i>
-                </div>
-                <div>
-                    <h5 class="text-body font-semibold text-white">連続チャレンジ</h5>
-                    <span class="text-xs text-blue-300">中級 • 12セッション連続</span>
-                </div>
-            </div>
-            <p class="text-sm text-white-70">半音も含めた音を聞き分け、集中力を維持しながら相対音感を鍛えます。クロマチック12音を連続で挑戦。</p>
-        </div>
-
-        <!-- 12音階モード -->
-        <div class="help-mode-card">
-            <div class="flex items-center gap-3 mb-2">
-                <div class="help-mode-icon gradient-catalog-purple">
-                    <i data-lucide="trophy" class="text-white" style="width: 20px; height: 20px;"></i>
-                </div>
-                <div>
-                    <h5 class="text-body font-semibold text-white">12音階</h5>
-                    <span class="text-xs text-purple-300">上級 • 12-24セッション • S級判定</span>
-                </div>
-            </div>
-            <p class="text-sm text-white-70">すべての音に対して完璧な相対音感を習得するプロレベル練習。上昇・下降・両方向を選択可能。</p>
-        </div>
-
-        <!-- 弱点練習モード（次期バージョン） -->
-        <div class="help-mode-card" style="opacity: 0.6;">
-            <div class="flex items-center gap-3 mb-2">
-                <div class="help-mode-icon gradient-catalog-orange">
-                    <i data-lucide="brain" class="text-white" style="width: 20px; height: 20px;"></i>
-                </div>
-                <div>
-                    <h5 class="text-body font-semibold text-white">弱点練習</h5>
-                    <span class="text-xs text-orange-300">次期バージョンで提供予定</span>
-                </div>
-            </div>
-            <p class="text-sm text-white-70">AI分析による個別最適化。あなたの弱点音程を自動分析し、効率的に苦手を克服する練習プログラム。</p>
-        </div>
+<!-- ============================================
+     カテゴリ3: 評価システム
+     ============================================ -->
+<div class="help-category-header">
+    <div class="help-category-icon gradient-catalog-yellow">
+        <i data-lucide="bar-chart-2" class="text-white"></i>
     </div>
-</section>
+    <h3 class="help-category-title">評価システム</h3>
+</div>
 
-<!-- セクション4: 評価システム -->
-<section class="glass-card">
+<!-- セクション6: 評価システム -->
+<section class="glass-card" id="evaluation">
     <h4 class="heading-md">
-        <i data-lucide="award" class="text-yellow-300"></i>
-        <span>評価システム</span>
+        <i data-lucide="bar-chart-2" class="text-yellow-300"></i>
+        <span>評価の仕組み</span>
     </h4>
 
     <div class="flex flex-col gap-4">
@@ -232,132 +413,138 @@
             100セント = 半音1つ分の差です。
         </p>
 
-        <div class="help-grade-list">
-            <div class="help-grade-item">
-                <span class="help-grade-badge grade-s">S</span>
-                <span class="text-sm text-white-80">プロレベル（誤差±10セント以内）</span>
-            </div>
-            <div class="help-grade-item">
-                <span class="help-grade-badge grade-a">A</span>
-                <span class="text-sm text-white-80">優秀（誤差±20セント以内）</span>
-            </div>
-            <div class="help-grade-item">
-                <span class="help-grade-badge grade-b">B</span>
-                <span class="text-sm text-white-80">良好（誤差±30セント以内）</span>
-            </div>
-            <div class="help-grade-item">
-                <span class="help-grade-badge grade-c">C</span>
-                <span class="text-sm text-white-80">合格（誤差±50セント以内）</span>
-            </div>
-            <div class="help-grade-item">
-                <span class="help-grade-badge grade-d">D</span>
-                <span class="text-sm text-white-80">要練習（誤差±50セント以上）</span>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- セクション5: 上行/下行モード -->
-<section class="glass-card">
-    <h4 class="heading-md">
-        <i data-lucide="trending-up" class="text-cyan-300"></i>
-        <span>上行/下行モード</span>
-    </h4>
-
-    <div class="flex flex-col gap-3">
-        <p class="text-sm text-white-70">
-            ホームページのタブで上行・下行を切り替えられます。発声の方向によって、異なる音程感覚を鍛えることができます。
-        </p>
-
-        <div class="flex flex-col gap-3">
-            <div class="help-mode-card">
-                <div class="flex items-center gap-3 mb-2">
-                    <div class="help-direction-icon gradient-catalog-cyan">
-                        <i data-lucide="arrow-up" class="text-white" style="width: 20px; height: 20px;"></i>
-                    </div>
-                    <div>
-                        <h5 class="text-body font-semibold text-white">上行モード</h5>
-                        <span class="text-xs text-cyan-300">初心者におすすめ</span>
-                    </div>
-                </div>
-                <p class="text-sm text-white-70">ランダムな基音を聴き、その音程で「ド」を発声。そこからオクターブ上の「ド」まで上昇：ド→レ→ミ→ファ→ソ→ラ→シ→ド。自然な音階感覚を養います。</p>
-            </div>
-
-            <div class="help-mode-card">
-                <div class="flex items-center gap-3 mb-2">
-                    <div class="help-direction-icon gradient-catalog-orange">
-                        <i data-lucide="arrow-down" class="text-white" style="width: 20px; height: 20px;"></i>
-                    </div>
-                    <div>
-                        <h5 class="text-body font-semibold text-white">下行モード</h5>
-                        <span class="text-xs text-orange-300">より高度な訓練</span>
-                    </div>
-                </div>
-                <p class="text-sm text-white-70">ランダムな基音を聴き、その音程で「ド」を発声。そこからオクターブ下の「ド」まで下降：ド→シ→ラ→ソ→ファ→ミ→レ→ド。実用的な歌唱訓練に効果的です。</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- セクション6: 用語の違い（上行・下行 vs 上昇・下降） -->
-<section class="glass-card">
-    <h4 class="heading-md">
-        <i data-lucide="info" class="text-blue-300"></i>
-        <span>用語の違い（混乱しやすいポイント）</span>
-    </h4>
-
-    <div class="flex flex-col gap-4">
-        <p class="text-sm text-white-70">
-            このアプリでは「上行・下行」と「上昇・下降」という似た用語がありますが、それぞれ異なる意味を持ちます。
-        </p>
-
-        <!-- 上行・下行の説明 -->
+        <!-- セッション評価（各セッションの評価） -->
         <div class="help-trouble-item">
-            <h5 class="text-body font-semibold text-white mb-2">
-                <i data-lucide="mic" class="text-cyan-400" style="width: 16px; height: 16px; vertical-align: middle;"></i>
-                上行・下行（発声の方向）
+            <h5 class="text-body font-semibold text-white mb-2 flex items-center gap-2">
+                <i data-lucide="music" class="text-cyan-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>セッション評価と音程評価</span>
             </h5>
-            <p class="text-sm text-white-70 mb-2">
-                <strong class="text-white">全モード共通</strong>の設定で、ホームページのタブで切り替えます。
+            <p class="help-description">
+                各セッション（8音の発声）終了後に表示される評価です。8音の平均誤差で4段階に分類されます。
+                また、各音（ド・レ・ミ...）の個別評価にも同じ4ランクが適用されます。
             </p>
-            <ul class="help-trouble-list">
-                <li><strong class="text-cyan-300">上行</strong>：基音から<strong>オクターブ上</strong>へ発声（ド→レ→ミ→ファ→ソ→ラ→シ→ド↑）</li>
-                <li><strong class="text-orange-300">下行</strong>：基音から<strong>オクターブ下</strong>へ発声（ド→シ→ラ→ソ→ファ→ミ→レ→ド↓）</li>
-            </ul>
+
+            <div class="rank-item">
+                <i data-lucide="trophy" class="text-yellow-300 icon-md flex-shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-excellent">Excellent</div>
+                    <div class="rank-range">平均±20セント以内</div>
+                </div>
+            </div>
+            <div class="rank-item">
+                <i data-lucide="star" class="text-green-300 icon-md flex-shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-good">Good</div>
+                    <div class="rank-range">平均±35セント以内</div>
+                </div>
+            </div>
+            <div class="rank-item">
+                <i data-lucide="thumbs-up" class="text-blue-300 icon-md flex-shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-pass">Pass</div>
+                    <div class="rank-range">平均±50セント以内</div>
+                </div>
+            </div>
+            <div class="rank-item">
+                <i data-lucide="alert-triangle" class="text-red-300 icon-md flex-shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-practice">Practice</div>
+                    <div class="rank-range">平均50セント以上</div>
+                </div>
+            </div>
         </div>
 
-        <!-- 上昇・下降の説明 -->
+        <!-- 総合評価（レッスン評価）の説明 -->
         <div class="help-trouble-item">
-            <h5 class="text-body font-semibold text-white mb-2">
-                <i data-lucide="music" class="text-purple-400" style="width: 16px; height: 16px; vertical-align: middle;"></i>
-                上昇・下降（基音の変化パターン）
+            <h5 class="text-body font-semibold text-white mb-2 flex items-center gap-2">
+                <i data-lucide="award" class="text-purple-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>総合評価（レッスン評価）</span>
             </h5>
-            <p class="text-sm text-white-70 mb-2">
-                <strong class="text-white">12音階モード専用</strong>の設定で、セッション間で基音をどう変化させるかを指定します。
+            <p class="help-description">
+                1レッスン（全セッション）終了後に表示される評価です。平均誤差と優秀音割合から総合的に算出されます。
+                モード（初級・中級・上級）によって基準が異なります。
             </p>
-            <ul class="help-trouble-list">
-                <li><strong class="text-green-300">上昇</strong>：基音を<strong>半音ずつ上げて</strong>12セッション（例：C→C#→D→...→B）</li>
-                <li><strong class="text-red-300">下降</strong>：基音を<strong>半音ずつ下げて</strong>12セッション（例：C→B→B♭→...→C#）</li>
-                <li><strong class="text-yellow-300">両方向</strong>：上昇12回＋下降12回＝<strong>24セッション</strong></li>
-            </ul>
+
+            <div class="rank-item">
+                <i data-lucide="crown" class="text-yellow-400 icon-md flex-shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-s">S級</div>
+                    <div class="rank-description">レコーディング品質の精度</div>
+                    <div class="rank-range">8回モード: ±25¢ / 12回: ±20¢ / 24回: ±15¢</div>
+                </div>
+            </div>
+            <div class="rank-item">
+                <i data-lucide="award" class="text-gray-300 icon-md flex-shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-a">A級</div>
+                    <div class="rank-description">楽器アンサンブルに対応できる精度</div>
+                    <div class="rank-range">8回モード: ±35¢ / 12回: ±30¢ / 24回: ±25¢</div>
+                </div>
+            </div>
+            <div class="rank-item">
+                <i data-lucide="star" class="text-orange-300 icon-md flex-shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-b">B級</div>
+                    <div class="rank-description">合唱や弾き語りに適した精度</div>
+                    <div class="rank-range">8回モード: ±45¢ / 12回: ±40¢ / 24回: ±35¢</div>
+                </div>
+            </div>
+            <div class="rank-item">
+                <i data-lucide="smile" class="text-green-300 icon-md flex-shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-c">C級</div>
+                    <div class="rank-description">カラオケや趣味演奏を楽しめる精度</div>
+                    <div class="rank-range">8回モード: ±55¢ / 12回: ±50¢ / 24回: ±45¢</div>
+                </div>
+            </div>
+            <div class="rank-item">
+                <i data-lucide="meh" class="text-blue-300 icon-md flex-shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-d">D級</div>
+                    <div class="rank-description">基礎を身につけている段階</div>
+                    <div class="rank-range">8回モード: ±65¢ / 12回: ±60¢ / 24回: ±55¢</div>
+                </div>
+            </div>
+            <div class="rank-item">
+                <i data-lucide="frown" class="text-red-300 icon-md flex-shrink-0"></i>
+                <div>
+                    <div class="rank-name rank-name-e">E級</div>
+                    <div class="rank-description">基礎から学んでいる段階</div>
+                    <div class="rank-range">8回モード: ±80¢ / 12回: ±75¢ / 24回: ±70¢</div>
+                </div>
+            </div>
         </div>
 
-        <!-- まとめ -->
-        <div class="flex flex-col gap-2 mt-2" style="background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: 8px;">
-            <p class="text-sm text-white-80">
-                <i data-lucide="lightbulb" class="text-yellow-400" style="width: 14px; height: 14px; vertical-align: middle;"></i>
-                <strong>まとめ</strong>
+        <!-- 補足説明 -->
+        <div class="help-info-box">
+            <p class="text-sm text-white-80 flex items-center gap-2">
+                <i data-lucide="info" class="text-blue-400" style="width: 14px; height: 14px; flex-shrink: 0;"></i>
+                <strong>評価の見方</strong>
             </p>
             <p class="text-sm text-white-70">
-                「上行・下行」は<strong class="text-cyan-300">歌う方向</strong>、「上昇・下降」は<strong class="text-purple-300">基音の変化</strong>です。
-                12音階モードでは両方を組み合わせて練習できます（例：「上行」で「上昇」12セッション）。
+                音程評価は各音の精度を、総合評価はレッスン全体の実力を表します。
+                Excellent（黄色）の割合を増やすことを目標に練習しましょう。
             </p>
         </div>
     </div>
+    <button class="help-back-to-top">
+        <i data-lucide="chevron-up"></i>
+        <span>目次に戻る</span>
+    </button>
 </section>
 
+<!-- ============================================
+     カテゴリ4: サポート
+     ============================================ -->
+<div class="help-category-header">
+    <div class="help-category-icon gradient-catalog-pink">
+        <i data-lucide="life-buoy" class="text-white"></i>
+    </div>
+    <h3 class="help-category-title">サポート</h3>
+</div>
+
 <!-- セクション7: よくある質問 -->
-<section class="glass-card">
+<section class="glass-card" id="faq">
     <h4 class="heading-md">
         <i data-lucide="message-circle" class="text-pink-300"></i>
         <span>よくある質問</span>
@@ -436,10 +623,14 @@
             </div>
         </div>
     </div>
+    <button class="help-back-to-top">
+        <i data-lucide="chevron-up"></i>
+        <span>目次に戻る</span>
+    </button>
 </section>
 
 <!-- セクション8: トラブルシューティング -->
-<section class="glass-card">
+<section class="glass-card" id="troubleshooting">
     <h4 class="heading-md">
         <i data-lucide="wrench" class="text-red-300"></i>
         <span>トラブルシューティング</span>
@@ -448,9 +639,9 @@
     <div class="flex flex-col gap-4">
         <!-- マイクの問題 -->
         <div class="help-trouble-item">
-            <h5 class="text-body font-semibold text-white mb-2">
-                <i data-lucide="mic-off" class="text-red-400" style="width: 16px; height: 16px; vertical-align: middle;"></i>
-                マイクが認識されない
+            <h5 class="text-body font-semibold text-white mb-2 flex items-center gap-2">
+                <i data-lucide="mic-off" class="text-red-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>マイクが認識されない</span>
             </h5>
             <ul class="help-trouble-list">
                 <li>ブラウザのマイク許可を確認してください</li>
@@ -462,9 +653,9 @@
 
         <!-- 音が鳴らない -->
         <div class="help-trouble-item">
-            <h5 class="text-body font-semibold text-white mb-2">
-                <i data-lucide="volume-x" class="text-red-400" style="width: 16px; height: 16px; vertical-align: middle;"></i>
-                音が鳴らない
+            <h5 class="text-body font-semibold text-white mb-2 flex items-center gap-2">
+                <i data-lucide="volume-x" class="text-red-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>音が鳴らない</span>
             </h5>
             <ul class="help-trouble-list">
                 <li>デバイスの音量を確認してください</li>
@@ -475,9 +666,9 @@
 
         <!-- 測定が不安定 -->
         <div class="help-trouble-item">
-            <h5 class="text-body font-semibold text-white mb-2">
-                <i data-lucide="activity" class="text-red-400" style="width: 16px; height: 16px; vertical-align: middle;"></i>
-                測定が不安定
+            <h5 class="text-body font-semibold text-white mb-2 flex items-center gap-2">
+                <i data-lucide="activity" class="text-red-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>測定が不安定</span>
             </h5>
             <ul class="help-trouble-list">
                 <li>静かな環境で練習してください</li>
@@ -486,13 +677,26 @@
                 <li>音域テストを再実行してみてください</li>
             </ul>
         </div>
-    </div>
-</section>
 
-<!-- ホームに戻るボタン -->
-<div class="flex justify-center mt-4 mb-8">
-    <button class="btn btn-secondary" onclick="NavigationManager.navigate('#home')">
-        <i data-lucide="home" style="width: 18px; height: 18px;"></i>
-        <span>ホームに戻る</span>
+        <!-- ワイヤレスイヤホンの問題 -->
+        <div class="help-trouble-item">
+            <h5 class="text-body font-semibold text-white mb-2 flex items-center gap-2">
+                <i data-lucide="headphones" class="text-red-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>ワイヤレスイヤホンだと基音が聞こえにくい</span>
+            </h5>
+            <p class="help-description">
+                Bluetooth（ワイヤレス）イヤホンを使用すると、マイク入力の音量が急激に下がる問題が発生します。
+                これはデバイスの仕様によるもので、アプリ側では対応できません。
+            </p>
+            <ul class="help-trouble-list">
+                <li><strong class="text-green-300">推奨</strong>：有線イヤホン・ヘッドホンを使用してください</li>
+                <li><strong class="text-blue-300">代替</strong>：イヤホンなしでデバイスのスピーカーを使用</li>
+                <li><strong class="text-yellow-300">注意</strong>：AirPods等のBluetoothイヤホンは非対応です</li>
+            </ul>
+        </div>
+    </div>
+    <button class="help-back-to-top">
+        <i data-lucide="chevron-up"></i>
+        <span>目次に戻る</span>
     </button>
-</div>
+</section>
