@@ -200,9 +200,19 @@ class DirectionTabsManager {
      * クイックスタート初期化
      */
     initializeQuickStart() {
+        const quickStartSection = document.getElementById('quick-start-section');
         const quickStartBtn = document.getElementById('quick-start-btn');
-        if (!quickStartBtn) {
-            console.log('ℹ️ [HOME] クイックスタートボタンなし');
+
+        if (!quickStartSection || !quickStartBtn) {
+            console.log('ℹ️ [HOME] クイックスタート要素なし');
+            return;
+        }
+
+        // 初回起動判定：前回のモード設定がない場合は非表示
+        const lastMode = localStorage.getItem(QUICK_START_MODE_KEY);
+        if (!lastMode) {
+            quickStartSection.style.display = 'none';
+            console.log('ℹ️ [HOME] 初回起動のためクイックスタート非表示');
             return;
         }
 

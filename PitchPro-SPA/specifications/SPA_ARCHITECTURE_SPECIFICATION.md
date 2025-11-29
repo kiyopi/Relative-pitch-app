@@ -1,9 +1,9 @@
 # SPA Architecture Specification
 # SPAアーキテクチャ仕様書
 
-**バージョン**: 1.1.0
+**バージョン**: 1.2.0
 **作成日**: 2025-10-29
-**最終更新**: 2025-11-19
+**最終更新**: 2025-11-29
 **プロジェクト**: 8va相対音感トレーニングアプリ
 
 ---
@@ -18,8 +18,9 @@
 6. [ページ追加ガイドライン](#ページ追加ガイドライン)
 7. [キャッシュバスター管理](#キャッシュバスター管理)
 8. [重要な設計原則](#重要な設計原則)
-9. [トレーニングモード一覧](#トレーニングモード一覧)
-10. [ナビゲーション安全機構](#ナビゲーション安全機構)
+9. [ヘッダー・フッター表示制御](#ヘッダーフッター表示制御)
+10. [トレーニングモード一覧](#トレーニングモード一覧)
+11. [ナビゲーション安全機構](#ナビゲーション安全機構)
 
 ---
 
@@ -504,6 +505,113 @@ window.initializeLucideIcons  // Lucideアイコン初期化
 
 ---
 
+## ヘッダー・フッター表示制御
+
+### 概要
+
+本アプリケーションでは、ページの種類に応じてグローバルヘッダーとフッターナビゲーションの表示を動的に制御しています。
+
+### グローバルヘッダーの表示制御
+
+#### 表示対象ページ（v1.2.0更新）
+
+**実装場所**: `/PitchPro-SPA/js/router.js` (loadPage()メソッド内)
+
+```javascript
+// ヘッダーの表示/非表示を切り替え
+// ナビゲーションアイコンがあるページ（home, records, premium-analysis, settings, help）で表示
+const appHeader = document.querySelector('.app-header');
+const showHeaderPages = ['home', 'records', 'premium-analysis', 'settings', 'help'];
+if (appHeader) {
+    if (showHeaderPages.includes(page)) {
+        appHeader.style.display = '';
+    } else {
+        appHeader.style.display = 'none';
+    }
+}
+```
+
+#### ページ別表示状況一覧
+
+| ページ | グローバルヘッダー | フッターホームボタン | 理由 |
+|--------|:--:|:--:|---------|
+| **home** | ✅表示 | ❌非表示 | ナビゲーション機能あり |
+| **records** | ✅表示 | ✅表示 | ナビゲーションボタンから遷移可能 |
+| **premium-analysis** | ✅表示 | ✅表示 | ナビゲーションボタンから遷移可能 |
+| **settings** | ✅表示 | ✅表示 | ナビゲーションボタンから遷移可能 |
+| **help** | ✅表示 | ✅表示 | ナビゲーションボタンから遷移可能 |
+| **preparation** | ❌非表示 | ✅表示 | トレーニングフロー中 |
+| **training** | ❌非表示 | ✅表示 | トレーニングフロー中 |
+| **result-session** | ❌非表示 | ✅表示 | トレーニングフロー中 |
+| **results-overview** | ❌非表示 | ✅表示 | トレーニングフロー中 |
+
+#### 設計思想
+
+1. **ナビゲーション機能があるページ**: グローバルヘッダーを表示（記録、詳細分析、設定、ヘルプへの遷移を可能に）
+2. **トレーニングフロー中のページ**: グローバルヘッダーを非表示（集中を妨げない・ページ固有のヘッダーを使用）
+3. **フッターホームボタン**: ホームページ以外で常に表示（どこからでもホームに戻れる）
+
+### グローバルヘッダーの構造
+
+**実装場所**: `/PitchPro-SPA/index.html`
+
+```html
+<header class="app-header">
+    <!-- ブランド部分（左側） -->
+    <div class="header-brand">
+        <div class="header-icon-wrapper">
+            <div class="header-icon">
+                <i data-lucide="music" class="icon-lg text-white"></i>
+            </div>
+        </div>
+        <div>
+            <h1>8va相対音感トレーニング</h1>
+            <p>あなたの音感を科学的に向上させましょう</p>
+        </div>
+    </div>
+
+    <!-- モバイル用ハンバーガーメニュー -->
+    <button class="menu-toggle" id="menu-toggle">
+        <i data-lucide="menu" class="icon-md"></i>
+    </button>
+
+    <!-- ナビゲーションボタン -->
+    <nav class="header-nav" id="header-nav">
+        <button class="nav-button" onclick="location.hash='records'">記録</button>
+        <button class="nav-button" onclick="location.hash='premium-analysis'">詳細分析</button>
+        <button class="nav-button" onclick="location.hash='settings'">設定</button>
+        <button class="nav-button" onclick="location.hash='help'">ヘルプ</button>
+        <button class="nav-button">共有</button>
+    </nav>
+</header>
+```
+
+### フッターナビゲーションの表示制御
+
+**実装場所**: `/PitchPro-SPA/js/router.js`
+
+```javascript
+// フッターナビゲーションの表示/非表示を切り替え（ホームページ以外で表示）
+const footerNav = document.getElementById('footer-nav');
+if (footerNav) {
+    if (page === 'home') {
+        footerNav.style.display = 'none';
+    } else {
+        footerNav.style.display = 'flex';
+    }
+}
+```
+
+### マイク管理との独立性
+
+**重要**: ヘッダー表示制御とAudioDetector（マイク管理）は完全に独立したシステムです。
+
+- **ヘッダー制御**: ページIDに基づくシンプルな判定
+- **AudioDetector管理**: NavigationManagerが責任を持つ
+- **相互影響なし**: ヘッダーの表示/非表示がマイク権限に影響しない
+
+---
+
 ## トレーニングモード一覧
 
 本アプリケーションは3つのトレーニングモードを提供します。すべてのモード定義は`/js/mode-controller.js`で一元管理されています。
@@ -863,6 +971,14 @@ async setupHomeEvents() {  // async追加
 ---
 
 ## 更新履歴
+
+### v1.2.0 (2025-11-29)
+- **追加**: ヘッダー・フッター表示制御セクション
+  - グローバルヘッダー表示対象ページを拡張（home, records, premium-analysis, settings, help）
+  - ページ別表示状況一覧表
+  - 設計思想の明文化
+  - マイク管理との独立性を明記
+- **更新**: 目次に新セクション追加
 
 ### v1.1.0 (2025-11-19)
 - **追加**: トレーニングモード一覧セクション

@@ -1,8 +1,8 @@
 # データ管理仕様書 - pitchpro-audio統合版
 
-**バージョン**: 2.1.0
+**バージョン**: 2.2.0
 **作成日**: 2025-09-03
-**最終更新**: 2025-11-12
+**最終更新**: 2025-11-29
 **用途**: pitchpro-audio-processing統合によるlocalStorageデータ管理仕様
 **課金モデル**: ランダム無料・その他月額課金対応
 
@@ -335,7 +335,87 @@ pitchpro-audio検出結果 → セッションデータ蓄積 → 評価計算 �
 
 ---
 
+## 🚀 クイックスタート設定 (v2.2.0追加)
+
+### 概要
+
+ホームページのクイックスタート機能で使用するlocalStorageキー。前回のトレーニング設定を保存し、次回起動時に即座にトレーニングを開始できるようにする。
+
+### localStorageキー
+
+| キー名 | 型 | 説明 | 例 |
+|--------|-----|------|-----|
+| `pitchpro_last_mode` | string | 前回使用したトレーニングモード | `"random"`, `"continuous"`, `"12tone"` |
+| `pitchpro_last_direction` | string | 前回使用したスケール方向 | `"ascending"`, `"descending"` |
+
+### 保存タイミング
+
+**実装場所**: `/PitchPro-SPA/js/router.js` (preparationページ遷移時)
+
+```javascript
+} else if (route === 'preparation') {
+    // 【v4.6.0】クイックスタート用：前回設定をlocalStorageに保存
+    if (mode) {
+        localStorage.setItem('pitchpro_last_mode', mode);
+    }
+    const scaleDir = sessionStorage.getItem('trainingDirection') || 'ascending';
+    localStorage.setItem('pitchpro_last_direction', scaleDir);
+}
+```
+
+### クイックスタート表示制御
+
+**実装場所**: `/PitchPro-SPA/js/home-direction-tabs.js`
+
+#### 初回起動時の挙動
+
+`pitchpro_last_mode`が存在しない場合（初回起動時）、クイックスタートセクションは**非表示**となる。
+
+```javascript
+initializeQuickStart() {
+    const quickStartSection = document.getElementById('quick-start-section');
+
+    // 初回起動判定：前回のモード設定がない場合は非表示
+    const lastMode = localStorage.getItem(QUICK_START_MODE_KEY);
+    if (!lastMode) {
+        quickStartSection.style.display = 'none';
+        console.log('ℹ️ [HOME] 初回起動のためクイックスタート非表示');
+        return;
+    }
+    // ...
+}
+```
+
+#### 設計意図
+
+- **初回起動時**: ユーザーがモード内容を確認せずにスタートしてしまうことを防止
+- **2回目以降**: 前回のモードで即座に開始できる利便性を提供
+
+### 表示状態一覧
+
+| 状態 | `pitchpro_last_mode` | クイックスタート | 動作 |
+|------|:--:|:--:|---------|
+| 初回起動 | 存在しない | 非表示 | モード選択から開始 |
+| 2回目以降 | 存在する | 表示 | 前回モードで即座に開始可能 |
+
+### 関連ファイル
+
+- `/PitchPro-SPA/js/home-direction-tabs.js`: クイックスタートUI制御
+- `/PitchPro-SPA/js/router.js`: 設定保存処理
+- `/PitchPro-SPA/templates/home.html`: クイックスタートセクションHTML
+
+---
+
 ## 📝 更新履歴
+
+### v2.2.0 (2025-11-29)
+
+**クイックスタート設定セクション追加**
+
+- `pitchpro_last_mode`: 前回使用したトレーニングモード
+- `pitchpro_last_direction`: 前回使用したスケール方向
+- 初回起動時はクイックスタート非表示（モード確認を促す）
+- 2回目以降はクイックスタート表示（即座に開始可能）
 
 ### v2.1.0 (2025-11-12)
 

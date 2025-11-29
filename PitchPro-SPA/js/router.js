@@ -416,17 +416,29 @@ class SimpleRouter {
             // 3. DOMの更新が完了するまで待機（次のフレームまで）
             await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-            // 4. ヘッダーの表示/非表示を切り替え（ホームページのみ表示）
+            // 4. ヘッダーの表示/非表示を切り替え
+            // ナビゲーションアイコンがあるページ（home, records, premium-analysis, settings, help）で表示
             const appHeader = document.querySelector('.app-header');
+            const showHeaderPages = ['home', 'records', 'premium-analysis', 'settings', 'help'];
             if (appHeader) {
-                if (page === 'home') {
+                if (showHeaderPages.includes(page)) {
                     appHeader.style.display = '';
                 } else {
                     appHeader.style.display = 'none';
                 }
             }
 
-            // 4.5. フッターナビゲーションの表示/非表示を切り替え（ホームページ以外で表示）
+            // 4.5. ヘッダー内ホームボタンの表示/非表示（ホームページでは非表示）
+            const navHomeBtn = document.getElementById('nav-home-btn');
+            if (navHomeBtn) {
+                if (page === 'home') {
+                    navHomeBtn.style.display = 'none';
+                } else {
+                    navHomeBtn.style.display = '';
+                }
+            }
+
+            // 4.6. フッターナビゲーションの表示/非表示を切り替え（ホームページ以外で表示）
             const footerNav = document.getElementById('footer-nav');
             if (footerNav) {
                 if (page === 'home') {
