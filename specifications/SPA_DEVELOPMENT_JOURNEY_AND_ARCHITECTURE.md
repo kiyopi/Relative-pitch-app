@@ -405,7 +405,7 @@ constructor() {
         },
         'training': {
             init: 'initializeTrainingPage',
-            dependencies: ['PitchPro']
+            dependencies: ['PitchPro', 'PitchShifter']  // v4.7.0: PitchShifter追加
         },
         'result-session': {
             init: 'initializeResultSessionPage',

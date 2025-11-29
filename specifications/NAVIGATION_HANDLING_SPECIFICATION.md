@@ -1,9 +1,15 @@
 # ナビゲーション・リソース管理仕様書
 
-**バージョン**: 5.2.0
+**バージョン**: 5.3.0
 **作成日**: 2025-10-22
-**最終更新**: 2025-11-26
+**最終更新**: 2025-11-29
 **対象**: PitchPro-SPA（8va相対音感トレーニングアプリ）
+
+**v5.3.0更新内容**:
+- trainingページリロード時のホームリダイレクト実装（NavigationManager v4.7.0）
+- router.jsにPitchShifter依存関係を追加（リロード時のundefinedエラー修正）
+- REDIRECT_COMPLETEDフラグ設定箇所を整理（detectReload()から削除）
+- training/result-sessionページのリロード処理を統一
 
 **v5.2.0更新内容**:
 - 準備ページ→ホーム遷移時のAudioDetectorクリーンアップ問題を修正（index.html v4.0.5）
@@ -1284,14 +1290,16 @@ trainingController.v2.js - initializeTrainingPage()
 NavigationManager.detectReload()
   ├─ normalTransition フラグ確認 → null
   ├─ performance.navigation.type === 1 → リロード検出
-  ├─ sessionStorage.setItem('reloadRedirected', 'true')
-  └─ return true
+  └─ return true  // v4.7.0: フラグ設定はhandleAccessRouteCheckで行う
   ↓
-NavigationManager.showReloadDialog()  ← ダイアログ表示
-  ↓
-NavigationManager.redirectToPreparation('リロード検出')
-  ↓
-#preparation へリダイレクト（マイク許可再取得）
+NavigationManager.handleAccessRouteCheck()
+  ├─ training/result-sessionページの場合:
+  │   ├─ sessionStorage.removeItem('trainingPageActive')
+  │   ├─ sessionStorage.removeItem('currentLessonId')
+  │   ├─ window.location.hash = 'home'
+  │   └─ return { shouldContinue: false, reason: 'reload-redirect-home' }
+  └─ preparationページの場合:
+      └─ return { shouldContinue: true } // Step 1から再開
 ```
 
 #### v3.0.0 統合フロー - ブラウザバック防止
