@@ -1647,6 +1647,72 @@ color: 'purple' // 履歴・一覧系</div>
         </div>
     </div>
 
+    <!-- 説明文（リストの前などに使用） -->
+    <h3 class="text-xl font-bold text-white mb-3">📝 説明文</h3>
+    <div class="glass-card mb-6">
+        <h4 class="text-white font-semibold mb-4">help-description</h4>
+
+        <div class="mb-4">
+            <p class="text-white-60 text-xs mb-2">リストの前に置く説明文</p>
+            <div style="background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: 8px;">
+                <p class="help-description">
+                    音域が不足している場合でも、以下のように自動補完してトレーニングできるようになっています。
+                </p>
+                <ul class="help-trouble-list">
+                    <li><strong class="text-yellow-300">1.5〜2.0オクターブ</strong>：警告表示</li>
+                    <li><strong class="text-blue-300">1.0〜1.5オクターブ</strong>：制限ありで可能</li>
+                    <li><strong class="text-red-300">1.0オクターブ未満</strong>：再測定が必要</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- コード例 -->
+        <div class="code-sample">
+<pre>&lt;!-- リストの前に説明文 --&gt;
+&lt;p class="help-description"&gt;
+    説明テキスト（リストの前に適切な余白）
+&lt;/p&gt;
+&lt;ul class="help-trouble-list"&gt;
+    &lt;li&gt;リスト項目1&lt;/li&gt;
+    &lt;li&gt;リスト項目2&lt;/li&gt;
+&lt;/ul&gt;
+&lt;!-- リストの後に補足テキスト --&gt;
+&lt;p class="help-note"&gt;
+    補足テキスト（リストの後に適切な余白）
+&lt;/p&gt;</pre>
+        </div>
+    </div>
+
+    <!-- リスト後の補足テキスト -->
+    <h3 class="text-xl font-bold text-white mb-3">📌 リスト後の補足テキスト</h3>
+    <div class="glass-card mb-6">
+        <h4 class="text-white font-semibold mb-4">help-note</h4>
+
+        <div class="mb-4">
+            <p class="text-white-60 text-xs mb-2">リストの後に置く補足テキスト</p>
+            <div style="background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: 8px;">
+                <ul class="help-trouble-list">
+                    <li><strong class="text-cyan-300">Aブロック（ド〜ファ#）</strong>：左脳のみで処理</li>
+                    <li><strong class="text-purple-300">Bブロック（ソ〜ド）</strong>：両脳で処理</li>
+                </ul>
+                <p class="help-note">
+                    このA/Bブロックの精度差をなくすことが、真の相対音感向上につながります。
+                </p>
+            </div>
+        </div>
+
+        <!-- コード例 -->
+        <div class="code-sample">
+<pre>&lt;ul class="help-trouble-list"&gt;
+    &lt;li&gt;リスト項目1&lt;/li&gt;
+    &lt;li&gt;リスト項目2&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p class="help-note"&gt;
+    補足テキスト（リストの後に適切な余白）
+&lt;/p&gt;</pre>
+        </div>
+    </div>
+
     <!-- 無効状態 -->
     <h3 class="text-xl font-bold text-white mb-3">🚫 無効状態（Coming Soon）</h3>
     <div class="glass-card mb-6">

@@ -86,8 +86,8 @@ const t = class t {
       // 2. /pages/js/preparation-pitchpro-cycle.js (line 839-840)
       release: e.release ?? 1.5,
       // Natural release (1.5s) for smooth decay
-      attack: e.attack ?? 0.1,
-      // Slow attack (0.1s) to prevent popping noise naturally
+      attack: e.attack ?? 0.02,
+      // Fast attack (0.02s) for immediate response
       volume: e.volume ?? -6,
       noteRange: e.noteRange || t.AVAILABLE_NOTES.map((i) => i.note)
     };
@@ -215,7 +215,8 @@ const t = class t {
       console.log(`🎵 [PitchShifter] Playing ${e} (${a.frequency.toFixed(2)}Hz) for ${i}s at velocity ${adjustedVelocity.toFixed(2)}`);
 
       // 【修正 v2.9.9】スケジュール再生を廃止し、即時再生に戻す（音の揺れ対策）
-      // ブチ音対策はAttackタイムの延長（0.1s）で行う
+      // ブチ音対策はAttackタイムの延長（0.02s）で行う
+      console.log(`🎵 [PitchShifter] Triggering attack: Note=${e}, Time=Immediate, Velocity=${adjustedVelocity}, ContextState=${l.context.state}`);
       this.sampler.triggerAttack(e, void 0, adjustedVelocity);
 
       // 指定時間後にリリース

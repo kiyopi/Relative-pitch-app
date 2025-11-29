@@ -353,28 +353,28 @@ function displayAccuracyBadge(avgError, allInvalid = false) {
                 <i data-lucide="trophy" class="text-yellow-300 icon-md shrink-0"></i>
                 <div>
                     <div class="rank-name rank-name-excellent">Excellent</div>
-                    <div class="rank-range">±15セント以内</div>
+                    <div class="rank-range">±20セント以内</div>
                 </div>
             </div>
             <div class="rank-item">
                 <i data-lucide="star" class="text-green-300 icon-md shrink-0"></i>
                 <div>
                     <div class="rank-name rank-name-good">Good</div>
-                    <div class="rank-range">15～25セント</div>
+                    <div class="rank-range">±35セント以内</div>
                 </div>
             </div>
             <div class="rank-item">
                 <i data-lucide="thumbs-up" class="text-blue-300 icon-md shrink-0"></i>
                 <div>
                     <div class="rank-name rank-name-pass">Pass</div>
-                    <div class="rank-range">25～40セント</div>
+                    <div class="rank-range">±50セント以内</div>
                 </div>
             </div>
             <div class="rank-item">
                 <i data-lucide="alert-triangle" class="text-red-300 icon-md shrink-0"></i>
                 <div>
                     <div class="rank-name rank-name-practice">Practice</div>
-                    <div class="rank-range">40セント以上</div>
+                    <div class="rank-range">50セント以上</div>
                 </div>
             </div>
         </div>

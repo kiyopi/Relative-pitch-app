@@ -17,6 +17,49 @@
         </div>
     </header>
 
+    <!-- フィルターUI -->
+    <div class="premium-filter-section glass-card">
+        <div class="filter-controls">
+            <!-- モード選択 -->
+            <div class="filter-group">
+                <label class="filter-label" for="filter-mode">モード</label>
+                <select id="filter-mode" class="filter-select">
+                    <option value="all">全体</option>
+                    <option value="random">ランダム基音</option>
+                    <option value="continuous">連続チャレンジ</option>
+                    <option value="12tone">12音階</option>
+                </select>
+            </div>
+
+            <!-- 方向選択 -->
+            <div class="filter-group">
+                <label class="filter-label" for="filter-direction">方向</label>
+                <select id="filter-direction" class="filter-select">
+                    <option value="all">すべて</option>
+                    <option value="ascending">上行のみ</option>
+                    <option value="descending">下行のみ</option>
+                </select>
+            </div>
+
+            <!-- 基音進行選択（12音階のみ表示） -->
+            <div class="filter-group" id="filter-chromatic-group" style="display: none;">
+                <label class="filter-label" for="filter-chromatic">基音進行</label>
+                <select id="filter-chromatic" class="filter-select">
+                    <option value="all">すべて</option>
+                    <option value="ascending">上昇</option>
+                    <option value="descending">下降</option>
+                    <option value="both">両方向</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- タイトル表示エリア -->
+        <div class="filter-title-display">
+            <i id="filter-title-icon" data-lucide="bar-chart-3" class="filter-title-icon"></i>
+            <span id="filter-title-text" class="filter-title-text">全体統計</span>
+        </div>
+    </div>
+
     <!-- タブナビゲーション -->
     <div class="tab-navigation">
         <button class="tab-button active" data-tab="tab-accuracy">
@@ -57,115 +100,6 @@
                     全<span id="total-data-points">--</span>音のデータから算出
                 </p>
             </div>
-
-            <!-- モード別平均精度 -->
-            <div id="mode-accuracy-summary" class="mode-accuracy-summary">
-                <!-- ランダム基音 -->
-                <div class="mode-accuracy-card">
-                    <div class="mode-accuracy-card-title">
-                        <i data-lucide="shuffle" style="width: 16px; height: 16px;"></i>
-                        <span>ランダム基音</span>
-                    </div>
-                    <div id="random-accuracy-value" class="mode-accuracy-card-value text-purple-300">--</div>
-                    <p id="random-count" class="mode-accuracy-count">--音</p>
-                    <div class="mode-accuracy-details">
-                        <div class="mode-accuracy-detail-row">
-                            <span class="mode-accuracy-detail-label">上行</span>
-                            <span class="mode-accuracy-detail-right">
-                                <span id="random-asc-value" class="mode-accuracy-detail-value">--</span>
-                                <span id="random-asc-count" class="mode-accuracy-detail-count">--</span>
-                            </span>
-                        </div>
-                        <div class="mode-accuracy-detail-row">
-                            <span class="mode-accuracy-detail-label">下行</span>
-                            <span class="mode-accuracy-detail-right">
-                                <span id="random-desc-value" class="mode-accuracy-detail-value">--</span>
-                                <span id="random-desc-count" class="mode-accuracy-detail-count">--</span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 連続チャレンジ -->
-                <div class="mode-accuracy-card">
-                    <div class="mode-accuracy-card-title">
-                        <i data-lucide="repeat" style="width: 16px; height: 16px;"></i>
-                        <span>連続チャレンジ</span>
-                    </div>
-                    <div id="continuous-accuracy-value" class="mode-accuracy-card-value text-blue-300">--</div>
-                    <p id="continuous-count" class="mode-accuracy-count">--音</p>
-                    <div class="mode-accuracy-details">
-                        <div class="mode-accuracy-detail-row">
-                            <span class="mode-accuracy-detail-label">上行</span>
-                            <span class="mode-accuracy-detail-right">
-                                <span id="continuous-asc-value" class="mode-accuracy-detail-value">--</span>
-                                <span id="continuous-asc-count" class="mode-accuracy-detail-count">--</span>
-                            </span>
-                        </div>
-                        <div class="mode-accuracy-detail-row">
-                            <span class="mode-accuracy-detail-label">下行</span>
-                            <span class="mode-accuracy-detail-right">
-                                <span id="continuous-desc-value" class="mode-accuracy-detail-value">--</span>
-                                <span id="continuous-desc-count" class="mode-accuracy-detail-count">--</span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 12音階 -->
-                <div class="mode-accuracy-card">
-                    <div class="mode-accuracy-card-title">
-                        <i data-lucide="music-2" style="width: 16px; height: 16px;"></i>
-                        <span>12音階</span>
-                    </div>
-                    <div id="12tone-accuracy-value" class="mode-accuracy-card-value text-green-300">--</div>
-                    <p id="12tone-count" class="mode-accuracy-count">--音</p>
-                    <div class="mode-accuracy-details">
-                        <div class="mode-accuracy-detail-row">
-                            <span class="mode-accuracy-detail-label">上昇・上行</span>
-                            <span class="mode-accuracy-detail-right">
-                                <span id="12tone-asc-asc-value" class="mode-accuracy-detail-value">--</span>
-                                <span id="12tone-asc-asc-count" class="mode-accuracy-detail-count">--</span>
-                            </span>
-                        </div>
-                        <div class="mode-accuracy-detail-row">
-                            <span class="mode-accuracy-detail-label">上昇・下行</span>
-                            <span class="mode-accuracy-detail-right">
-                                <span id="12tone-asc-desc-value" class="mode-accuracy-detail-value">--</span>
-                                <span id="12tone-asc-desc-count" class="mode-accuracy-detail-count">--</span>
-                            </span>
-                        </div>
-                        <div class="mode-accuracy-detail-row">
-                            <span class="mode-accuracy-detail-label">下降・上行</span>
-                            <span class="mode-accuracy-detail-right">
-                                <span id="12tone-desc-asc-value" class="mode-accuracy-detail-value">--</span>
-                                <span id="12tone-desc-asc-count" class="mode-accuracy-detail-count">--</span>
-                            </span>
-                        </div>
-                        <div class="mode-accuracy-detail-row">
-                            <span class="mode-accuracy-detail-label">下降・下行</span>
-                            <span class="mode-accuracy-detail-right">
-                                <span id="12tone-desc-desc-value" class="mode-accuracy-detail-value">--</span>
-                                <span id="12tone-desc-desc-count" class="mode-accuracy-detail-count">--</span>
-                            </span>
-                        </div>
-                        <div class="mode-accuracy-detail-row">
-                            <span class="mode-accuracy-detail-label">両方向・上行</span>
-                            <span class="mode-accuracy-detail-right">
-                                <span id="12tone-both-asc-value" class="mode-accuracy-detail-value">--</span>
-                                <span id="12tone-both-asc-count" class="mode-accuracy-detail-count">--</span>
-                            </span>
-                        </div>
-                        <div class="mode-accuracy-detail-row">
-                            <span class="mode-accuracy-detail-label">両方向・下行</span>
-                            <span class="mode-accuracy-detail-right">
-                                <span id="12tone-both-desc-value" class="mode-accuracy-detail-value">--</span>
-                                <span id="12tone-both-desc-count" class="mode-accuracy-detail-count">--</span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- 音程間隔別精度 -->
@@ -205,26 +139,26 @@
             </div>
         </div>
 
-        <!-- 音域ブロック分析 -->
+        <!-- 音域ブロック分析（脳バランス分析） -->
         <div class="glass-card brain-processing-section" style="margin-top: 1.5rem;">
             <div class="flex items-center gap-3" style="margin-bottom: 0.5rem;">
-                <i data-lucide="layers" class="text-cyan-300" style="width: 24px; height: 24px;"></i>
-                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">音域ブロック分析</h3>
+                <span class="brain-emoji-icon">🧠</span>
+                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">脳バランス分析</h3>
             </div>
             <p class="text-white-60 text-sm" style="margin-bottom: 1rem;">
-                12音をAブロック（C〜F#）とBブロック（G〜B）に分け、それぞれの精度を比較します。<br>
-                両ブロックの誤差を均等に改善することで、相対音感のバランスが向上します。
+                オクターブをAブロック（ド〜ファ#：左脳）とBブロック（ソ〜ド：両脳）に分け、精度を比較します。<br>
+                A-B精度差を0に近づけることが、真の相対音感向上の指標です。
             </p>
 
             <!-- Aブロック vs Bブロック 比較 -->
             <div class="brain-processing-comparison">
-                <!-- Aブロック -->
+                <!-- Aブロック（左脳） -->
                 <div class="brain-group-card">
                     <div class="brain-group-title">
                         <i data-lucide="circle" class="text-blue-300" style="width: 18px; height: 18px;"></i>
-                        <span>Aブロック</span>
+                        <span>Aブロック（左脳）</span>
                     </div>
-                    <div class="brain-group-notes">C C# D D# E F F#</div>
+                    <div class="brain-group-notes">ド レ ミ ファ ファ#</div>
                     <div class="brain-group-avg">
                         <p class="brain-group-avg-label">平均誤差</p>
                         <div id="left-brain-avg" class="brain-group-avg-value" style="color: #10b981;">±--¢</div>
@@ -235,13 +169,13 @@
                     <p id="left-brain-count" class="brain-group-count">測定回数: --</p>
                 </div>
 
-                <!-- Bブロック -->
+                <!-- Bブロック（両脳） -->
                 <div class="brain-group-card">
                     <div class="brain-group-title">
                         <i data-lucide="zap" class="text-purple-300" style="width: 18px; height: 18px;"></i>
-                        <span>Bブロック</span>
+                        <span>Bブロック（両脳）</span>
                     </div>
-                    <div class="brain-group-notes">G G# A B♭ B</div>
+                    <div class="brain-group-notes">ソ ラ シ ド</div>
                     <div class="brain-group-avg">
                         <p class="brain-group-avg-label">平均誤差</p>
                         <div id="both-brain-avg" class="brain-group-avg-value" style="color: #f59e0b;">±--¢</div>
@@ -253,21 +187,27 @@
                 </div>
             </div>
 
-            <!-- ブロック間の誤差 -->
-            <div class="brain-difficulty-section">
-                <div class="brain-difficulty-title">
-                    <i data-lucide="bar-chart-3" class="text-orange-300" style="width: 18px; height: 18px;"></i>
-                    <span>ブロック間の誤差</span>
+            <!-- A-B精度差（脳バランスメーター） -->
+            <div class="brain-balance-meter">
+                <div class="brain-balance-header">
+                    <span class="brain-balance-label">A-B精度差</span>
+                    <span id="brain-balance-value" class="brain-balance-value">--</span>
                 </div>
-                <div id="brain-difficulty-value" class="brain-difficulty-value" style="color: #f59e0b;">--</div>
-                <p id="brain-difficulty-analysis" class="brain-difficulty-analysis"></p>
+                <div class="brain-balance-scale">
+                    <span class="brain-balance-scale-label left">Bが苦手</span>
+                    <div class="brain-balance-bar">
+                        <div id="brain-balance-indicator" class="brain-balance-indicator" style="left: 50%;"></div>
+                    </div>
+                    <span class="brain-balance-scale-label right">Aが苦手</span>
+                </div>
+                <p id="brain-balance-comment" class="brain-balance-comment">--</p>
             </div>
 
-            <!-- Bブロックの詳細分析 -->
+            <!-- 各音の詳細（Bブロック） -->
             <div class="brain-notes-detail-section">
                 <div class="brain-notes-detail-title">
                     <i data-lucide="music" class="text-green-300" style="width: 18px; height: 18px;"></i>
-                    <span>Bブロックの詳細分析</span>
+                    <span>各音の詳細</span>
                 </div>
                 <div id="brain-notes-detail-list" class="brain-notes-detail-list">
                     <!-- 動的に生成される -->
@@ -434,23 +374,6 @@
             </div>
         </div>
 
-        <!-- 親モード別分析 -->
-        <div class="glass-card" style="margin-top: 1.5rem;">
-            <div class="flex items-center gap-3" style="margin-bottom: 0.5rem;">
-                <i data-lucide="folder" class="text-purple-300" style="width: 24px; height: 24px;"></i>
-                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">親モード別分析</h3>
-            </div>
-            <p class="text-white-60 text-sm" style="margin-bottom: 1rem;">
-                ランダム基音・連続チャレンジ・12音階の各モードでの精度を比較します。<br>
-                モードをタップすると詳細が展開されます。
-            </p>
-
-            <!-- 親モードアコーディオンカード -->
-            <div id="mode-analysis-accordion">
-                <!-- 動的に生成される -->
-            </div>
-        </div>
-
         <!-- モード別分析 -->
         <div class="glass-card" style="margin-top: 1.5rem;">
             <div class="flex items-center gap-3" style="margin-bottom: 0.5rem;">
@@ -458,38 +381,12 @@
                 <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">モード別分析</h3>
             </div>
             <p class="text-white-60 text-sm" style="margin-bottom: 1rem;">
-                上行・下行などの方向別の詳細な精度を表示します。<br>
-                得意・苦手な方向を把握しましょう。
+                各モードの精度・セッション数・熟練度を表示します。<br>
+                モードをタップすると詳細が展開されます。
             </p>
-
-            <!-- クイックジャンプナビゲーション -->
-            <div id="mode-quick-nav" style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
-                <!-- 動的に生成される -->
-            </div>
 
             <!-- モード別熟練度コンテンツ -->
             <div id="mode-mastery-content">
-                <!-- 動的に生成される -->
-            </div>
-        </div>
-
-        <!-- モード別詳細統計 -->
-        <div class="glass-card" style="margin-top: 1.5rem;">
-            <div class="flex items-center gap-3" style="margin-bottom: 0.5rem;">
-                <i data-lucide="bar-chart-2" class="text-green-300" style="width: 24px; height: 24px;"></i>
-                <h3 style="color: white; font-size: 1.25rem; font-weight: 600; margin: 0;">モード別詳細統計</h3>
-            </div>
-            <p class="text-white-60 text-sm" style="margin-bottom: 1rem;">
-                レッスン数・平均精度・最高グレードなどの詳細な統計データです。
-            </p>
-
-            <!-- クイックジャンプナビゲーション -->
-            <div id="mode-stats-quick-nav" style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
-                <!-- 動的に生成される -->
-            </div>
-
-            <!-- モード別詳細統計コンテンツ -->
-            <div id="mode-stats-content">
                 <!-- 動的に生成される -->
             </div>
         </div>

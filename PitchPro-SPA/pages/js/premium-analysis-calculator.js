@@ -119,7 +119,7 @@ const MODE_DEFINITIONS = {
         // 12音階 - 上昇順
         'twelve-asc-ascending': {
             name: '12音階 上昇順（上行）',
-            displayName: '上行音程',
+            displayName: '上昇順・上行',
             parent: 'advanced',
             subgroup: 'ascending-order',
             direction: 'ascending',
@@ -127,7 +127,7 @@ const MODE_DEFINITIONS = {
         },
         'twelve-asc-descending': {
             name: '12音階 上昇順（下行）',
-            displayName: '下行音程',
+            displayName: '上昇順・下行',
             parent: 'advanced',
             subgroup: 'ascending-order',
             direction: 'descending',
@@ -137,7 +137,7 @@ const MODE_DEFINITIONS = {
         // 12音階 - 下降順
         'twelve-desc-ascending': {
             name: '12音階 下降順（上行）',
-            displayName: '上行音程',
+            displayName: '下降順・上行',
             parent: 'advanced',
             subgroup: 'descending-order',
             direction: 'ascending',
@@ -145,7 +145,7 @@ const MODE_DEFINITIONS = {
         },
         'twelve-desc-descending': {
             name: '12音階 下降順（下行）',
-            displayName: '下行音程',
+            displayName: '下降順・下行',
             parent: 'advanced',
             subgroup: 'descending-order',
             direction: 'descending',
@@ -155,7 +155,7 @@ const MODE_DEFINITIONS = {
         // 12音階 - 両方向
         'twelve-both-ascending': {
             name: '12音階 両方向（上行）',
-            displayName: '上行音程',
+            displayName: '両方向・上行',
             parent: 'advanced',
             subgroup: 'both-directions',
             direction: 'ascending',
@@ -163,7 +163,7 @@ const MODE_DEFINITIONS = {
         },
         'twelve-both-descending': {
             name: '12音階 両方向（下行）',
-            displayName: '下行音程',
+            displayName: '両方向・下行',
             parent: 'advanced',
             subgroup: 'both-directions',
             direction: 'descending',
@@ -280,9 +280,20 @@ window.PremiumAnalysisCalculator = {
         const avgError = this._calculateAverageError(parentSessions);
         const totalSessions = parentSessions.length;
 
-        // 子モード別統計
+        // 子モード別統計（フィルター後のデータに存在する子モードのみ）
         const childModeStats = {};
-        childModes.forEach(modeKey => {
+
+        // フィルター後のデータに含まれる子モードを収集
+        const existingModeKeys = new Set();
+        sessionData.forEach(session => {
+            const modeKey = this.normalizeSessionMode(session);
+            if (childModes.includes(modeKey)) {
+                existingModeKeys.add(modeKey);
+            }
+        });
+
+        // 存在する子モードのみ統計を計算
+        existingModeKeys.forEach(modeKey => {
             const modeSessions = sessionData.filter(session => {
                 return this.normalizeSessionMode(session) === modeKey;
             });

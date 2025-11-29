@@ -1,10 +1,11 @@
 /**
  * premium-analysis-controller.js
  * プレミアム分析ページコントローラー
- * Version: 1.0.0
+ * Version: 2.0.0
  *
  * 【責任範囲】
  * - セッションデータの読み込みとフィルタリング
+ * - フィルターUI（モード・方向・基音進行）の状態管理
  * - 4タブ（音程精度・エラーパターン・練習プラン・成長記録）のUI更新
  * - タブ切り替え機能
  * - Lucideアイコン初期化
@@ -18,56 +19,95 @@
 console.log('🚀 [premium-analysis-controller] Script loaded');
 
 /**
+ * フィルター状態管理
+ */
+const FilterState = {
+    mode: 'all',           // all, random, continuous, 12tone
+    direction: 'all',      // all, ascending, descending
+    chromatic: 'all',      // all, ascending, descending, both（12音階専用）
+
+    // フィルター状態を更新
+    update(key, value) {
+        this[key] = value;
+        console.log(`🔧 FilterState.${key} = ${value}`);
+    },
+
+    // 現在のフィルター状態を取得
+    getState() {
+        return {
+            mode: this.mode,
+            direction: this.direction,
+            chromatic: this.chromatic
+        };
+    }
+};
+
+/**
+ * モードアイコンマッピング（ホームページのモードカードと統一）
+ */
+const MODE_ICONS = {
+    'all': 'bar-chart-3',
+    'random': 'shuffle',      // ランダム基音
+    'continuous': 'zap',      // 連続チャレンジ
+    '12tone': 'music'         // 12音階
+};
+
+/**
+ * モード表示名マッピング
+ */
+const MODE_DISPLAY_NAMES = {
+    'all': '全体統計',
+    'random': 'ランダム基音',
+    'continuous': '連続チャレンジ',
+    '12tone': '12音階'
+};
+
+/**
+ * 方向表示名マッピング
+ */
+const DIRECTION_DISPLAY_NAMES = {
+    'all': '',
+    'ascending': '上行',
+    'descending': '下行'
+};
+
+/**
+ * 基音進行表示名マッピング
+ */
+const CHROMATIC_DISPLAY_NAMES = {
+    'all': '',
+    'ascending': '上昇',
+    'descending': '下降',
+    'both': '両方向'
+};
+
+/**
+ * 全セッションデータのグローバル参照
+ */
+let allSessionDataCache = null;
+
+/**
  * プレミアム分析ページの初期化
  */
 window.initPremiumAnalysis = async function() {
     console.log('📊 プレミアム分析ページ初期化開始');
 
     // DataManagerから全セッションデータを取得
-    const allSessionData = loadAllSessionDataForPremium();
+    allSessionDataCache = loadAllSessionDataForPremium();
 
-    if (!allSessionData || allSessionData.length === 0) {
+    if (!allSessionDataCache || allSessionDataCache.length === 0) {
         console.warn('⚠️ セッションデータが見つかりません');
         showNoDataMessage();
         return;
     }
 
-    // 全モードのデータを使用（モード別の詳細は親モードカードで表示）
-    const sessionData = allSessionData;
-    console.log(`✅ セッションデータ取得: 全モード=${sessionData.length}セッション`);
+    console.log(`✅ セッションデータ取得: 全モード=${allSessionDataCache.length}セッション`);
 
-    if (sessionData.length === 0) {
-        console.warn(`⚠️ セッションデータが見つかりません`);
-        showNoDataMessage();
-        return;
-    }
+    // フィルターUIの初期化
+    initFilterUI();
 
-    // 分析計算の実行
-    console.log('🔢 分析計算開始...');
-    const intervalAccuracy = window.PremiumAnalysisCalculator.calculateIntervalAccuracy(sessionData);
-    const brainProcessing = window.PremiumAnalysisCalculator.calculateBrainProcessingPattern(sessionData);
-    const errorPatterns = window.PremiumAnalysisCalculator.calculateErrorPatterns(sessionData);
-    const growthRecords = window.PremiumAnalysisCalculator.calculateGrowthRecords(sessionData);
-    const practicePlan = window.PremiumAnalysisCalculator.generatePracticePlan(
-        intervalAccuracy,
-        errorPatterns,
-        growthRecords
-    );
-
-    console.log('✅ 分析計算完了:', {
-        intervalAccuracy,
-        brainProcessing,
-        errorPatterns,
-        growthRecords,
-        practicePlan
-    });
-
-    // UI更新
-    updateTab1UI(intervalAccuracy, brainProcessing, allSessionData);
-    updateTab2UI(errorPatterns);
-    updateTab3UI(practicePlan);
-    updateTab4UI(growthRecords);
-    updateModeAnalysisUI(allSessionData);
+    // フィルター適用してUI更新
+    applyFiltersAndUpdateUI();
 
     // タブ切り替え機能の初期化
     initTabSwitching();
@@ -81,9 +121,233 @@ window.initPremiumAnalysis = async function() {
 };
 
 /**
+ * フィルターUIの初期化
+ */
+function initFilterUI() {
+    console.log('🔧 フィルターUI初期化');
+
+    // モード選択
+    const modeSelect = document.getElementById('filter-mode');
+    if (modeSelect) {
+        modeSelect.addEventListener('change', (e) => {
+            FilterState.update('mode', e.target.value);
+
+            // 12音階モード選択時のみ基音進行フィルターを表示
+            const chromaticGroup = document.getElementById('filter-chromatic-group');
+            if (chromaticGroup) {
+                chromaticGroup.style.display = e.target.value === '12tone' ? 'flex' : 'none';
+            }
+
+            // フィルター適用
+            applyFiltersAndUpdateUI();
+        });
+    }
+
+    // 方向選択
+    const directionSelect = document.getElementById('filter-direction');
+    if (directionSelect) {
+        directionSelect.addEventListener('change', (e) => {
+            FilterState.update('direction', e.target.value);
+            applyFiltersAndUpdateUI();
+        });
+    }
+
+    // 基音進行選択（12音階専用）
+    const chromaticSelect = document.getElementById('filter-chromatic');
+    if (chromaticSelect) {
+        chromaticSelect.addEventListener('change', (e) => {
+            FilterState.update('chromatic', e.target.value);
+            applyFiltersAndUpdateUI();
+        });
+    }
+
+    // タイトル表示の初期化
+    updateFilterTitle();
+}
+
+/**
+ * フィルタータイトル表示の更新
+ */
+function updateFilterTitle() {
+    const titleIcon = document.getElementById('filter-title-icon');
+    const titleText = document.getElementById('filter-title-text');
+
+    if (!titleIcon || !titleText) return;
+
+    const { mode, direction, chromatic } = FilterState.getState();
+
+    // アイコン更新
+    const iconName = MODE_ICONS[mode] || 'bar-chart-3';
+    titleIcon.setAttribute('data-lucide', iconName);
+
+    // タイトルテキスト構築
+    let titleParts = [];
+
+    // モード名
+    titleParts.push(MODE_DISPLAY_NAMES[mode] || '全体統計');
+
+    // 方向（all以外の場合）
+    if (direction !== 'all') {
+        titleParts.push(DIRECTION_DISPLAY_NAMES[direction]);
+    }
+
+    // 基音進行（12音階モードでall以外の場合）
+    if (mode === '12tone' && chromatic !== 'all') {
+        titleParts.push(CHROMATIC_DISPLAY_NAMES[chromatic]);
+    }
+
+    titleText.textContent = titleParts.join(' / ');
+
+    // Lucideアイコン再初期化
+    if (typeof window.initializeLucideIcons === 'function') {
+        window.initializeLucideIcons({ immediate: true });
+    }
+
+    console.log(`📝 タイトル更新: ${titleParts.join(' / ')}`);
+}
+
+/**
+ * フィルター適用してUI更新
+ */
+function applyFiltersAndUpdateUI() {
+    console.log('🔄 フィルター適用開始', FilterState.getState());
+
+    // フィルター適用
+    const filteredData = filterSessionData(allSessionDataCache);
+
+    console.log(`📊 フィルター後データ数: ${filteredData.length}セッション`);
+
+    // タイトル更新
+    updateFilterTitle();
+
+    // フィルター後データが0件の場合
+    if (filteredData.length === 0) {
+        showNoDataMessage();
+        return;
+    }
+
+    // 分析計算の実行
+    console.log('🔢 分析計算開始...');
+    const intervalAccuracy = window.PremiumAnalysisCalculator.calculateIntervalAccuracy(filteredData);
+    const brainProcessing = window.PremiumAnalysisCalculator.calculateBrainProcessingPattern(filteredData);
+    const errorPatterns = window.PremiumAnalysisCalculator.calculateErrorPatterns(filteredData);
+    const growthRecords = window.PremiumAnalysisCalculator.calculateGrowthRecords(filteredData);
+    const practicePlan = window.PremiumAnalysisCalculator.generatePracticePlan(
+        intervalAccuracy,
+        errorPatterns,
+        growthRecords
+    );
+
+    console.log('✅ 分析計算完了');
+
+    // UI更新
+    updateTab1UI(intervalAccuracy, brainProcessing);
+    updateTab2UI(errorPatterns);
+    updateTab3UI(practicePlan);
+    updateTab4UI(growthRecords);
+    // 親モード別分析もフィルター連動
+    updateModeAnalysisUI(filteredData);
+    updateBrainBalanceMeter(brainProcessing);
+
+    // Lucideアイコン再初期化
+    if (typeof window.initializeLucideIcons === 'function') {
+        window.initializeLucideIcons({ immediate: true });
+    }
+}
+
+/**
+ * セッションデータのフィルタリング
+ */
+function filterSessionData(sessionData) {
+    if (!sessionData || sessionData.length === 0) return [];
+
+    const { mode, direction, chromatic } = FilterState.getState();
+
+    return sessionData.filter(session => {
+        // モードフィルター
+        if (mode !== 'all' && session.mode !== mode) {
+            return false;
+        }
+
+        // 方向フィルター（scaleDirection）
+        if (direction !== 'all' && session.scaleDirection !== direction) {
+            return false;
+        }
+
+        // 基音進行フィルター（12音階モードのみ）
+        if (mode === '12tone' && chromatic !== 'all') {
+            if (session.chromaticDirection !== chromatic) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+}
+
+/**
+ * 脳バランスメーターの更新
+ */
+function updateBrainBalanceMeter(brainProcessing) {
+    if (!brainProcessing) return;
+
+    const valueEl = document.getElementById('brain-balance-value');
+    const indicatorEl = document.getElementById('brain-balance-indicator');
+    const commentEl = document.getElementById('brain-balance-comment');
+
+    if (!valueEl || !indicatorEl || !commentEl) return;
+
+    const { leftBrain, bothBrain, difficulty } = brainProcessing;
+
+    if (!leftBrain || !bothBrain || !difficulty) {
+        valueEl.textContent = '--';
+        commentEl.textContent = 'データが不足しています';
+        return;
+    }
+
+    // A-B精度差の計算（Bブロック - Aブロック）
+    const diff = bothBrain.avgError - leftBrain.avgError;
+    const absDiff = Math.abs(diff);
+
+    // 値表示
+    const sign = diff >= 0 ? '+' : '';
+    valueEl.textContent = `${sign}${diff.toFixed(1)}¢`;
+
+    // 色分けクラス
+    valueEl.classList.remove('excellent', 'good', 'warning', 'poor');
+    if (absDiff < 5) {
+        valueEl.classList.add('excellent');
+    } else if (absDiff < 15) {
+        valueEl.classList.add('good');
+    } else if (absDiff < 30) {
+        valueEl.classList.add('warning');
+    } else {
+        valueEl.classList.add('poor');
+    }
+
+    // インジケーター位置（-50¢ ～ +50¢ を 0% ～ 100% にマッピング）
+    const clampedDiff = Math.max(-50, Math.min(50, diff));
+    const indicatorPercent = ((clampedDiff + 50) / 100) * 100;
+    indicatorEl.style.left = `${indicatorPercent}%`;
+
+    // コメント生成
+    let comment = '';
+    if (absDiff < 5) {
+        comment = '素晴らしい！左脳と両脳の処理バランスが理想的です。';
+    } else if (diff > 0) {
+        comment = `Bブロック（両脳処理）が${absDiff.toFixed(0)}¢苦手です。ソ〜ドの練習を強化しましょう。`;
+    } else {
+        comment = `Aブロック（左脳処理）が${absDiff.toFixed(0)}¢苦手です。ド〜ファ#の練習を強化しましょう。`;
+    }
+    commentEl.textContent = comment;
+
+    console.log('✅ 脳バランスメーター更新完了', { diff, indicatorPercent });
+}
+
+/**
  * Tab 1: 音程精度分析のUI更新
  */
-function updateTab1UI(data, brainProcessing, allSessionData) {
+function updateTab1UI(data, brainProcessing) {
     if (!data) return;
 
     // 平均音程精度
@@ -125,163 +389,6 @@ function updateTab1UI(data, brainProcessing, allSessionData) {
 
     // 音域ブロック分析
     updateBrainProcessingUI(brainProcessing);
-
-    // モード別平均精度
-    updateModeAccuracySummary(allSessionData);
-}
-
-/**
- * モード別平均精度のUI更新
- */
-function updateModeAccuracySummary(allSessionData) {
-    if (!allSessionData || allSessionData.length === 0) return;
-
-    // モード別にセッションデータを分類
-    const modeData = {
-        random: { all: [], ascending: [], descending: [] },
-        continuous: { all: [], ascending: [], descending: [] },
-        '12tone': {
-            all: [],
-            // 6モード個別（chromaticDirection-scaleDirection）
-            ascAsc: [],     // 上昇・上行
-            ascDesc: [],    // 上昇・下行
-            descAsc: [],    // 下降・上行
-            descDesc: [],   // 下降・下行
-            bothAsc: [],    // 両方向・上行
-            bothDesc: []    // 両方向・下行
-        }
-    };
-
-    // セッションデータを分類
-    allSessionData.forEach(session => {
-        const mode = session.mode;
-        const scaleDir = session.scaleDirection;
-        const chromDir = session.chromaticDirection;
-
-        if (mode === 'random') {
-            modeData.random.all.push(session);
-            if (scaleDir === 'ascending') modeData.random.ascending.push(session);
-            if (scaleDir === 'descending') modeData.random.descending.push(session);
-        } else if (mode === 'continuous') {
-            modeData.continuous.all.push(session);
-            if (scaleDir === 'ascending') modeData.continuous.ascending.push(session);
-            if (scaleDir === 'descending') modeData.continuous.descending.push(session);
-        } else if (mode === '12tone') {
-            modeData['12tone'].all.push(session);
-            // 6モード個別に分類
-            if (chromDir === 'ascending' && scaleDir === 'ascending') modeData['12tone'].ascAsc.push(session);
-            if (chromDir === 'ascending' && scaleDir === 'descending') modeData['12tone'].ascDesc.push(session);
-            if (chromDir === 'descending' && scaleDir === 'ascending') modeData['12tone'].descAsc.push(session);
-            if (chromDir === 'descending' && scaleDir === 'descending') modeData['12tone'].descDesc.push(session);
-            if (chromDir === 'both' && scaleDir === 'ascending') modeData['12tone'].bothAsc.push(session);
-            if (chromDir === 'both' && scaleDir === 'descending') modeData['12tone'].bothDesc.push(session);
-        }
-    });
-
-    // 平均誤差と音数を計算するヘルパー関数
-    const calcStats = (sessions) => {
-        if (sessions.length === 0) return { avgError: null, count: 0 };
-        let totalError = 0;
-        let count = 0;
-        sessions.forEach(session => {
-            if (session.pitchErrors && Array.isArray(session.pitchErrors)) {
-                session.pitchErrors.forEach(pe => {
-                    if (pe && typeof pe.errorInCents === 'number' && !isNaN(pe.errorInCents)) {
-                        totalError += Math.abs(pe.errorInCents);
-                        count++;
-                    }
-                });
-            }
-        });
-        return {
-            avgError: count > 0 ? (totalError / count).toFixed(1) : null,
-            count: count
-        };
-    };
-
-    // 値を表示するヘルパー関数
-    const displayValue = (elementId, avgError) => {
-        const el = document.getElementById(elementId);
-        if (el) {
-            if (avgError !== null) {
-                el.textContent = `±${avgError}¢`;
-            } else {
-                el.textContent = '--';
-                el.classList.add('mode-accuracy-no-data');
-            }
-        }
-    };
-
-    // 音数を表示するヘルパー関数（親モード用）
-    const displayCount = (elementId, count) => {
-        const el = document.getElementById(elementId);
-        if (el) {
-            el.textContent = count > 0 ? `${count}音` : '--';
-        }
-    };
-
-    // 音数を表示するヘルパー関数（詳細行用）
-    const displayDetailCount = (elementId, count) => {
-        const el = document.getElementById(elementId);
-        if (el) {
-            el.textContent = count > 0 ? `(${count}音)` : '';
-        }
-    };
-
-    // 各モードの統計を計算
-    const randomStats = calcStats(modeData.random.all);
-    const randomAscStats = calcStats(modeData.random.ascending);
-    const randomDescStats = calcStats(modeData.random.descending);
-
-    const continuousStats = calcStats(modeData.continuous.all);
-    const continuousAscStats = calcStats(modeData.continuous.ascending);
-    const continuousDescStats = calcStats(modeData.continuous.descending);
-
-    const toneStats = calcStats(modeData['12tone'].all);
-    const toneAscAscStats = calcStats(modeData['12tone'].ascAsc);
-    const toneAscDescStats = calcStats(modeData['12tone'].ascDesc);
-    const toneDescAscStats = calcStats(modeData['12tone'].descAsc);
-    const toneDescDescStats = calcStats(modeData['12tone'].descDesc);
-    const toneBothAscStats = calcStats(modeData['12tone'].bothAsc);
-    const toneBothDescStats = calcStats(modeData['12tone'].bothDesc);
-
-    // ランダム基音
-    displayValue('random-accuracy-value', randomStats.avgError);
-    displayCount('random-count', randomStats.count);
-    displayValue('random-asc-value', randomAscStats.avgError);
-    displayDetailCount('random-asc-count', randomAscStats.count);
-    displayValue('random-desc-value', randomDescStats.avgError);
-    displayDetailCount('random-desc-count', randomDescStats.count);
-
-    // 連続チャレンジ
-    displayValue('continuous-accuracy-value', continuousStats.avgError);
-    displayCount('continuous-count', continuousStats.count);
-    displayValue('continuous-asc-value', continuousAscStats.avgError);
-    displayDetailCount('continuous-asc-count', continuousAscStats.count);
-    displayValue('continuous-desc-value', continuousDescStats.avgError);
-    displayDetailCount('continuous-desc-count', continuousDescStats.count);
-
-    // 12音階（6モード個別）
-    displayValue('12tone-accuracy-value', toneStats.avgError);
-    displayCount('12tone-count', toneStats.count);
-    displayValue('12tone-asc-asc-value', toneAscAscStats.avgError);
-    displayDetailCount('12tone-asc-asc-count', toneAscAscStats.count);
-    displayValue('12tone-asc-desc-value', toneAscDescStats.avgError);
-    displayDetailCount('12tone-asc-desc-count', toneAscDescStats.count);
-    displayValue('12tone-desc-asc-value', toneDescAscStats.avgError);
-    displayDetailCount('12tone-desc-asc-count', toneDescAscStats.count);
-    displayValue('12tone-desc-desc-value', toneDescDescStats.avgError);
-    displayDetailCount('12tone-desc-desc-count', toneDescDescStats.count);
-    displayValue('12tone-both-asc-value', toneBothAscStats.avgError);
-    displayDetailCount('12tone-both-asc-count', toneBothAscStats.count);
-    displayValue('12tone-both-desc-value', toneBothDescStats.avgError);
-    displayDetailCount('12tone-both-desc-count', toneBothDescStats.count);
-
-    console.log('✅ モード別平均精度を更新しました', {
-        random: modeData.random.all.length,
-        continuous: modeData.continuous.all.length,
-        '12tone': modeData['12tone'].all.length
-    });
 }
 
 /**
@@ -346,23 +453,33 @@ function updateBrainProcessingUI(data) {
         difficultyAnalysisElement.textContent = data.difficulty.analysis;
     }
 
-    // Bブロックの詳細分析
+    // Bブロックの詳細分析（相対音名で表示）
     const notesDetailListElement = document.getElementById('brain-notes-detail-list');
     if (notesDetailListElement && data.bothBrain && data.bothBrain.noteStats) {
         notesDetailListElement.innerHTML = '';
 
+        // 絶対音名 → 相対音名マッピング（Bブロック：ソ〜ド）
+        const noteMapping = {
+            'G': 'ソ',
+            'G#': 'ソ#',
+            'A': 'ラ',
+            'B♭': 'シ♭',
+            'B': 'シ'
+        };
         const notes = ['G', 'G#', 'A', 'B♭', 'B'];
+
         notes.forEach(note => {
             const stats = data.bothBrain.noteStats[note];
             if (!stats || stats.count === 0) return;
 
+            const displayName = noteMapping[note] || note;
             const avgError = stats.avgError.toFixed(1);
             const percentage = Math.max(0, 100 - stats.avgError);
             const color = stats.avgError < 30 ? '#10b981' : stats.avgError < 50 ? '#f59e0b' : '#ef4444';
 
             notesDetailListElement.innerHTML += `
                 <div class="brain-notes-detail-item">
-                    <span class="brain-notes-detail-note">${note}:</span>
+                    <span class="brain-notes-detail-note">${displayName}:</span>
                     <div class="progress-bar" style="flex: 1;">
                         <div class="progress-fill-custom" style="width: ${percentage}%; background: ${color};"></div>
                     </div>
@@ -586,14 +703,25 @@ function updateTab4UI(data) {
 
 /**
  * モード別分析のUI更新（親モードカードアコーディオン方式）
+ * フィルター連動: 選択されたモードのみ表示
  */
-function updateModeAnalysisUI(allSessionData) {
-    console.log('📊 モード別分析UI更新開始');
+function updateModeAnalysisUI(sessionData) {
+    console.log('📊 モード別分析UI更新開始', { dataCount: sessionData?.length || 0 });
 
     // モード別熟練度コンテンツ（親モードカードアコーディオン）
     const modeMasteryElement = document.getElementById('mode-mastery-content');
     if (!modeMasteryElement) {
         console.warn('⚠️ #mode-mastery-content要素が見つかりません');
+        return;
+    }
+
+    // データがない場合
+    if (!sessionData || sessionData.length === 0) {
+        modeMasteryElement.innerHTML = `
+            <div class="parent-mode-no-data" style="text-align: center; padding: 2rem;">
+                <p style="color: #94a3b8;">データがありません。トレーニングを実施してください。</p>
+            </div>
+        `;
         return;
     }
 
@@ -604,27 +732,70 @@ function updateModeAnalysisUI(allSessionData) {
         return;
     }
 
-    // アコーディオンコンテナ作成
-    modeMasteryElement.innerHTML = '<div class="mode-mastery-accordion"></div>';
-    const accordion = modeMasteryElement.querySelector('.mode-mastery-accordion');
+    // フィルター状態を取得
+    const { mode: filterMode } = FilterState.getState();
 
-    // 親モード順（beginner, intermediate, advanced, weakness）
-    const parentModeKeys = ['beginner', 'intermediate', 'advanced', 'weakness'];
+    // フィルターモード → parentModeKeyマッピング
+    const FILTER_TO_PARENT_MODE = {
+        'random': 'beginner',
+        'continuous': 'intermediate',
+        '12tone': 'advanced'
+    };
 
-    parentModeKeys.forEach(parentModeKey => {
-        const parentMode = MODE_DEFINITIONS.parentModes[parentModeKey];
-        if (!parentMode) return;
+    // 表示する親モードを決定
+    let parentModeKeys;
+    if (filterMode === 'all') {
+        // 全体表示時は全モード
+        parentModeKeys = ['beginner', 'intermediate', 'advanced'];
+    } else {
+        // 特定モード選択時はそのモードのみ
+        const targetParentMode = FILTER_TO_PARENT_MODE[filterMode];
+        parentModeKeys = targetParentMode ? [targetParentMode] : [];
+    }
 
-        // 親モード統計を計算
-        const stats = window.PremiumAnalysisCalculator.calculateParentModeStats(allSessionData, parentModeKey);
+    console.log(`📊 表示対象親モード: ${parentModeKeys.join(', ')} (フィルター: ${filterMode})`);
 
-        // 親モードカードHTML生成
-        const cardHTML = generateParentModeCard(parentModeKey, parentMode, stats);
-        accordion.innerHTML += cardHTML;
-    });
+    // フィルター時（1モード選択）はフラット表示、全体表示時はアコーディオン
+    const isFiltered = filterMode !== 'all';
 
-    // アコーディオン展開/折りたたみイベントを設定
-    initParentModeAccordion();
+    if (isFiltered) {
+        // === フィルター時: 子モードカードのみフラット表示 ===
+        modeMasteryElement.innerHTML = '<div class="mode-flat-container"></div>';
+        const flatContainer = modeMasteryElement.querySelector('.mode-flat-container');
+
+        parentModeKeys.forEach(parentModeKey => {
+            const parentMode = MODE_DEFINITIONS.parentModes[parentModeKey];
+            if (!parentMode) return;
+
+            // 親モード統計を計算（子モード情報を取得するため）
+            const stats = window.PremiumAnalysisCalculator.calculateParentModeStats(sessionData, parentModeKey);
+            console.log(`📊 ${parentModeKey}統計（フラット表示）:`, stats);
+
+            // 子モードカードのみ直接表示
+            const childCardsHTML = generateChildModeCards(stats.childModes, parentMode.color);
+            flatContainer.innerHTML += childCardsHTML;
+        });
+    } else {
+        // === 全体表示時: アコーディオン構造 ===
+        modeMasteryElement.innerHTML = '<div class="mode-mastery-accordion"></div>';
+        const accordion = modeMasteryElement.querySelector('.mode-mastery-accordion');
+
+        parentModeKeys.forEach(parentModeKey => {
+            const parentMode = MODE_DEFINITIONS.parentModes[parentModeKey];
+            if (!parentMode) return;
+
+            // 親モード統計を計算（フィルター後のデータを使用）
+            const stats = window.PremiumAnalysisCalculator.calculateParentModeStats(sessionData, parentModeKey);
+            console.log(`📊 ${parentModeKey}統計:`, stats);
+
+            // 親モードカードHTML生成
+            const cardHTML = generateParentModeCard(parentModeKey, parentMode, stats);
+            accordion.innerHTML += cardHTML;
+        });
+
+        // アコーディオン展開/折りたたみイベントを設定
+        initParentModeAccordion();
+    }
 
     // Lucideアイコン初期化
     if (window.initializeLucideIcons) {
@@ -638,7 +809,9 @@ function updateModeAnalysisUI(allSessionData) {
  * 親モードカードHTML生成
  */
 function generateParentModeCard(parentModeKey, parentMode, stats) {
-    const { displayName, color, levelIcon } = parentMode;
+    const { color, levelIcon } = parentMode;
+    // ModeControllerを使用して表示名を統一取得
+    const displayName = getParentModeDisplayName(parentModeKey);
     const { totalSessions, avgError, childModes } = stats;
 
     // データがない場合
@@ -715,6 +888,78 @@ function generateParentModeCard(parentModeKey, parentMode, stats) {
 }
 
 /**
+ * modeKeyからModeController用のパラメータを解析
+ * @param {string} modeKey - 正規化されたモードキー (例: 'random-ascending', 'twelve-asc-descending')
+ * @returns {object} { modeId, scaleDirection, chromaticDirection }
+ */
+function parseModeKey(modeKey) {
+    // 12音階モード
+    if (modeKey.startsWith('twelve-')) {
+        const parts = modeKey.split('-'); // ['twelve', 'asc', 'ascending']
+        const chromaticMap = { 'asc': 'ascending', 'desc': 'descending', 'both': 'both' };
+        return {
+            modeId: '12tone',
+            chromaticDirection: chromaticMap[parts[1]] || 'ascending',
+            scaleDirection: parts[2] || 'ascending'
+        };
+    }
+
+    // random/continuousモード
+    const parts = modeKey.split('-'); // ['random', 'ascending']
+    return {
+        modeId: parts[0],
+        scaleDirection: parts[1] || 'ascending',
+        chromaticDirection: null
+    };
+}
+
+/**
+ * modeKeyからModeControllerを使用して表示名を取得（子モード用）
+ * @param {string} modeKey - 正規化されたモードキー
+ * @returns {string} 表示名
+ */
+function getDisplayNameFromModeKey(modeKey) {
+    if (!window.ModeController) {
+        // フォールバック: MODE_DEFINITIONSから取得
+        const MODE_DEFINITIONS = window.PremiumAnalysisCalculator?.MODE_DEFINITIONS;
+        return MODE_DEFINITIONS?.modes?.[modeKey]?.displayName || modeKey;
+    }
+
+    const { modeId, scaleDirection, chromaticDirection } = parseModeKey(modeKey);
+
+    return window.ModeController.getDisplayName(modeId, {
+        scaleDirection: scaleDirection,
+        direction: chromaticDirection,
+        useShortName: true
+    });
+}
+
+/**
+ * 親モードキーからModeControllerを使用して表示名を取得
+ * @param {string} parentModeKey - 親モードキー ('beginner', 'intermediate', 'advanced')
+ * @returns {string} 表示名
+ */
+function getParentModeDisplayName(parentModeKey) {
+    // 親モードキーからModeController modeIdへのマッピング
+    const PARENT_TO_MODE_ID = {
+        'beginner': 'random',
+        'intermediate': 'continuous',
+        'advanced': '12tone'
+    };
+
+    const modeId = PARENT_TO_MODE_ID[parentModeKey];
+
+    if (!modeId || !window.ModeController) {
+        // フォールバック: MODE_DEFINITIONSから取得
+        const MODE_DEFINITIONS = window.PremiumAnalysisCalculator?.MODE_DEFINITIONS;
+        return MODE_DEFINITIONS?.parentModes?.[parentModeKey]?.displayName || parentModeKey;
+    }
+
+    // ModeController.getModeName()でshortNameを取得
+    return window.ModeController.getModeName(modeId, true);
+}
+
+/**
  * 子モードカードHTML生成
  */
 function generateChildModeCards(childModes, color) {
@@ -724,15 +969,21 @@ function generateChildModeCards(childModes, color) {
         const mode = childModes[modeKey];
         if (!mode || mode.totalSessions === 0) return;
 
-        const { displayName, totalSessions, avgError } = mode;
+        const { totalSessions, avgError } = mode;
+        // ModeControllerを使用して表示名を取得
+        const displayName = getDisplayNameFromModeKey(modeKey);
         const masteryRate = Math.max(0, Math.min(100, 100 - avgError));
         const masteryLevel = Math.floor(masteryRate / 10);
         const masteryColor = masteryLevel >= 8 ? '#10b981' : masteryLevel >= 5 ? '#f59e0b' : '#ef4444';
 
+        // アイコンを方向に応じて設定
+        const { scaleDirection } = parseModeKey(modeKey);
+        const iconName = scaleDirection === 'descending' ? 'arrow-down' : 'arrow-up';
+
         html += `
             <div class="glass-card-sm mode-variant-item">
                 <div class="mode-variant-header">
-                    <i data-lucide="arrow-up" style="width: 18px; height: 18px;"></i>
+                    <i data-lucide="${iconName}" style="width: 18px; height: 18px;"></i>
                     <span>${displayName}</span>
                 </div>
 

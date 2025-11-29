@@ -509,18 +509,9 @@ export async function initializeTrainingPage() {
         newButton.addEventListener('click', async () => {
             console.log('🎯 ボタンクリック検出');
 
-            // 【v4.5.3】AudioContextを即座に再開（ユーザー操作のコンテキスト内）
-            // 初期化やロードで時間がかかるとジェスチャーが無効になるのを防ぐ
-            if (window.Tone && window.Tone.context && window.Tone.context.state !== 'running') {
-                console.log('🔊 [Click] Resuming AudioContext immediately...');
-                try {
-                    await window.Tone.start();
-                    console.log('✅ [Click] AudioContext resumed');
-                } catch (e) {
-                    console.warn('⚠️ [Click] AudioContext resume failed:', e);
-                }
-            }
+            console.log(`🖱 [Click] Button clicked. Context state: ${window.Tone?.context?.state}`);
 
+            console.log('🚀 [Click] Calling startTraining()...');
             startTraining();
         });
         console.log('✅ イベントリスナー登録完了（再登録）');

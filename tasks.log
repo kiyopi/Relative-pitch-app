@@ -14737,3 +14737,146 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-28 15:33:10] コミット: feat: 詳細分析の改善 - 音程バイアス追加・説明文追加
+
+テストデータジェネレーター:
+- 各月の設定にstepBias（音程別バイアス）を追加
+- 2度・7度の縮小傾向、5度の拡大傾向をシミュレート
+- 現実的なユーザーの癖を再現
+
+UI説明文追加:
+- シャープ・フラット傾向の説明
+- 音程拡大・縮小パターンの説明と判定基準
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-28 16:06:35] コミット: docs(premium-analysis): 全セクションに説明文を追加
+
+詳細分析ページの各分析項目に説明文を追加し、
+何を分析しているかを明確化
+
+Tab1: 音程精度
+- 平均音程精度: 評価基準（±20¢/±35¢）を説明
+- 音程間隔別精度: 苦手音程の特定目的を説明
+- 音域ブロック分析: A/Bブロックの意味を説明
+
+Tab3: 練習プラン
+- 優先順位の意味と活用方法を説明
+
+Tab4: 成長記録
+- 月間成長比較: 1ヶ月前との比較説明
+- 音程間隔別成長グラフ: グラフの読み方を説明
+- 最も改善した音程: 練習成果の確認
+- 停滞音程: 重点練習の提案
+- 時系列パフォーマンス分析: 練習条件の最適化
+- 親モード別分析: モードの比較方法
+- モード別分析: 方向別の得意・苦手把握
+- モード別詳細統計: 統計データの説明
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-28 16:22:58] コミット: feat(premium-analysis): 平均音程精度にモード別平均を追加
+
+親モード3つ（ランダム・連続・12音階）の平均精度を
+平均音程精度セクション下部に横並びで表示
+
+- ランダム基音: 全体平均 + 上行/下行
+- 連続チャレンジ: 全体平均 + 上行/下行
+- 12音階: 全体平均 + 上行/下行 + 上昇/下降
+
+変更ファイル:
+- premium-analysis.css: モード別平均精度スタイル追加
+- premium-analysis.html: 3カラムレイアウトのHTML追加
+- premium-analysis-controller.js: updateModeAccuracySummary()追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-28 16:27:57] コミット: fix(premium-analysis): 12音階の「両方向」を追加
+
+chromaticDirection: both が抜けていたため追加
+
+- HTML: 両方向の表示行を追加
+- JS: chromaticBoth の分類と表示処理を追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-28 16:34:34] コミット: fix(premium-analysis): 12音階を6モード個別表示に修正＆音数追加
+
+12音階の表示を方向別集計から6モード個別表示に変更
+（異なるレッスンのデータ混合を防止）
+
+表示形式:
+- 上昇・上行 / 上昇・下行
+- 下降・上行 / 下降・下行
+- 両方向・上行 / 両方向・下行
+
+追加機能:
+- 各親モードに音数表示を追加（例: 960音）
+- .mode-accuracy-count スタイル追加
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-28 16:37:03] コミット: feat(premium-analysis): 各モードの詳細行にも音数を追加
+
+全10モードの詳細行に音数を括弧付きで表示
+
+表示例:
+  上行    ±24¢ (480)
+  下行    ±26¢ (480)
+
+追加スタイル:
+- .mode-accuracy-detail-right: 値と音数の横並び
+- .mode-accuracy-detail-count: 音数表示用
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-28 16:38:47] コミット: fix(premium-analysis): 詳細行の音数表示に「音」を追加
+
+(480) → (480音) に変更
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-29 12:30:59] コミット: feat(help): ヘルプページ改善 - カテゴリ再構成・目次・ナビゲーション追加
+
+- 8セクションを4カテゴリ（はじめに・トレーニング・評価・サポート）に再構成
+- 目次セクション追加（8項目へのページ内リンク）
+- SPA対応スムーズスクロール実装（SPAルーター競合を回避）
+- 各セクション末尾に「目次に戻る」ボタン追加
+- 上行/下行モードのアイコン・色をホームページと統一
+- インラインスタイルをCSSクラスに移行
+- ワイヤレスイヤホン問題のトラブルシューティング追加
+- ホームページから統計サマリーを削除（詳細分析ページに集約）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-29 13:39:58] コミット: feat(home): クイックスタート機能・モード選択ガイド・UIの改善
+
+- クイックスタートボタン追加（前回モードで即座に開始）
+- モード選択ガイドセクション追加（heading-lg + 横線 + 説明文）
+- 上行・下行タブ改善（青/赤アイコン、太線、モバイル用ラベル）
+- mode-cardモバイル対応（高さ自動調整）
+- 弱点練習モードからAI弱点分析を削除
+- localStorage永続化（前回のモード・方向）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-29 14:05:40] コミット: feat(nav): ヘッダー表示拡張・ホームボタン追加・クイックスタート初回非表示
+
+- ヘッダー表示対象ページを拡張（home, records, premium-analysis, settings, help）
+- ヘッダーにホームボタンを追加（ホームページ以外で表示）
+- クイックスタート初回起動時は非表示（モード確認を促す）
+- SPA_ARCHITECTURE_SPECIFICATION.md v1.2.0 更新
+- DATA_MANAGEMENT_SPECIFICATION.md v2.2.0 更新
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
