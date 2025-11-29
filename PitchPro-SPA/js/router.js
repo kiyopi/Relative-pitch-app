@@ -23,7 +23,10 @@ class SimpleRouter {
             'results-overview': 'pages/results-overview.html',
             'premium-analysis': 'pages/premium-analysis.html',
             'settings': 'pages/settings.html',
-            'help': 'pages/help.html'
+            'help': 'pages/help.html',
+            'login': 'pages/login.html',
+            'register': 'pages/register.html',
+            'password-reset': 'pages/password-reset.html'
         };
 
         /**
@@ -227,6 +230,21 @@ class SimpleRouter {
                     }
                     console.log('✅ [Router] Help page cleanup complete');
                 }
+            },
+            'login': {
+                init: 'initLoginPage',
+                dependencies: [],
+                title: 'ログイン'
+            },
+            'register': {
+                init: 'initRegisterPage',
+                dependencies: [],
+                title: '新規登録'
+            },
+            'password-reset': {
+                init: 'initPasswordResetPage',
+                dependencies: [],
+                title: 'パスワードリセット'
             }
         };
 
