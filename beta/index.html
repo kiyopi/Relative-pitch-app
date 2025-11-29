@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>8va βテスト版</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@0.263.0/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-end: #1e293b;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --accent-blue: #3b82f6;
+            --accent-green: #22c55e;
+            --accent-yellow: #eab308;
+            --accent-red: #ef4444;
+            --accent-purple: #a855f7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 24px 16px;
+        }
+
+        /* ヘッダー */
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .beta-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header .subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .version {
+            color: var(--text-muted);
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        /* カード */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-icon.yellow { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+        .card-icon.blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .card-icon.green { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .card-icon.red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .card-icon.purple { background: linear-gradient(135deg, #a855f7, #9333ea); }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        /* リスト */
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .info-list li i {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .info-list .text-yellow { color: var(--accent-yellow); }
+        .info-list .text-blue { color: var(--accent-blue); }
+        .info-list .text-green { color: var(--accent-green); }
+        .info-list .text-red { color: var(--accent-red); }
+
+        /* 警告ボックス */
+        .warning-box {
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .warning-box p {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            color: var(--accent-yellow);
+            font-size: 14px;
+        }
+
+        .warning-box i {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* テスト項目チェックリスト */
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--card-border);
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+
+        .checklist .check-box {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent-blue);
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        /* ボタン */
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), #2563eb);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--accent-green), #16a34a);
+            color: white;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        /* フッター */
+        .footer {
+            text-align: center;
+            padding: 24px 0;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px 12px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ヘッダー -->
+        <header class="header">
+            <div class="beta-badge">
+                <i data-lucide="flask-conical" style="width: 14px; height: 14px;"></i>
+                <span>BETA TEST</span>
+            </div>
+            <h1>8va 相対音感トレーニング</h1>
+            <p class="subtitle">βテスト版へようこそ</p>
+            <p class="version">Version 1.0.0-beta</p>
+        </header>
+
+        <!-- 注意事項 -->
+        <div class="warning-box">
+            <p>
+                <i data-lucide="alert-triangle" style="width: 18px; height: 18px;"></i>
+                <span>これはβテスト版です。予期せぬ動作やデータ消失の可能性があります。正式リリース時にはデータがリセットされる場合があります。</span>
+            </p>
+        </div>
+
+        <!-- 動作環境 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon blue">
+                    <i data-lucide="smartphone" style="width: 20px; height: 20px; color: white;"></i>
+                </div>
+                <h2 class="card-title">動作環境</h2>
+            </div>
+            <ul class="info-list">
+                <li>
+                    <i data-lucide="check-circle" style="width: 16px; height: 16px;" class="text-green"></i>
+                    <span><strong>推奨ブラウザ</strong>：Safari（iOS/Mac）、Chrome</span>
+                </li>
+                <li>
+                    <i data-lucide="check-circle" style="width: 16px; height: 16px;" class="text-green"></i>
+                    <span><strong>マイク</strong>：必須（ブラウザの許可が必要）</span>
+                </li>
+                <li>
+                    <i data-lucide="check-circle" style="width: 16px; height: 16px;" class="text-green"></i>
+                    <span><strong>イヤホン</strong>：有線イヤホン推奨</span>
+                </li>
+                <li>
+                    <i data-lucide="x-circle" style="width: 16px; height: 16px;" class="text-red"></i>
+                    <span><strong>非推奨</strong>：Bluetoothイヤホン（音量低下の問題あり）</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- テスト項目 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon purple">
+                    <i data-lucide="clipboard-check" style="width: 20px; height: 20px; color: white;"></i>
+                </div>
+                <h2 class="card-title">確認してほしいポイント</h2>
+            </div>
+            <ul class="checklist">
+                <li>
+                    <div class="check-box"></div>
+                    <span>マイクテスト・音域テストが正常に動作するか</span>
+                </li>
+                <li>
+                    <div class="check-box"></div>
+                    <span>基音（ピアノ音）の音量は適切か</span>
+                </li>
+                <li>
+                    <div class="check-box"></div>
+                    <span>マイク感度は適切か（声を正しく拾うか）</span>
+                </li>
+                <li>
+                    <div class="check-box"></div>
+                    <span>音量バーがスムーズに反応するか</span>
+                </li>
+                <li>
+                    <div class="check-box"></div>
+                    <span>各トレーニングモードが正常に動作するか</span>
+                </li>
+                <li>
+                    <div class="check-box"></div>
+                    <span>評価結果が妥当に感じるか</span>
+                </li>
+                <li>
+                    <div class="check-box"></div>
+                    <span>画面表示・操作で分かりにくい点はないか</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- テスト手順 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon green">
+                    <i data-lucide="list-ordered" style="width: 20px; height: 20px; color: white;"></i>
+                </div>
+                <h2 class="card-title">テスト手順</h2>
+            </div>
+            <ul class="info-list">
+                <li>
+                    <i data-lucide="circle" style="width: 16px; height: 16px;" class="text-blue"></i>
+                    <span><strong>1.</strong> 下の「アプリを開始」ボタンからアプリを起動</span>
+                </li>
+                <li>
+                    <i data-lucide="circle" style="width: 16px; height: 16px;" class="text-blue"></i>
+                    <span><strong>2.</strong> 準備ページでマイクテスト・音域テストを実行</span>
+                </li>
+                <li>
+                    <i data-lucide="circle" style="width: 16px; height: 16px;" class="text-blue"></i>
+                    <span><strong>3.</strong> 各モード（ランダム基音・連続・12音階）をテスト</span>
+                </li>
+                <li>
+                    <i data-lucide="circle" style="width: 16px; height: 16px;" class="text-blue"></i>
+                    <span><strong>4.</strong> 上行・下行の両方を試してみてください</span>
+                </li>
+                <li>
+                    <i data-lucide="circle" style="width: 16px; height: 16px;" class="text-blue"></i>
+                    <span><strong>5.</strong> 気づいた点をフィードバックフォームで報告</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ボタン -->
+        <div class="btn-group">
+            <a href="../PitchPro-SPA/index.html" class="btn btn-primary">
+                <i data-lucide="play" style="width: 20px; height: 20px;"></i>
+                <span>アプリを開始</span>
+            </a>
+            <a href="#" id="feedback-btn" class="btn btn-secondary">
+                <i data-lucide="message-square" style="width: 20px; height: 20px;"></i>
+                <span>フィードバックを送る</span>
+            </a>
+        </div>
+
+        <!-- フッター -->
+        <footer class="footer">
+            <p>© 2025 8va Pitch Training</p>
+            <p>問題が発生した場合は<a href="#" id="feedback-link">フィードバックフォーム</a>からご報告ください</p>
+        </footer>
+    </div>
+
+    <script>
+        // Lucideアイコン初期化
+        lucide.createIcons();
+
+        // フィードバックボタン（URLは後で設定）
+        const feedbackUrl = 'YOUR_GOOGLE_FORM_URL';
+
+        document.getElementById('feedback-btn').addEventListener('click', function(e) {
+            if (feedbackUrl === 'YOUR_GOOGLE_FORM_URL') {
+                e.preventDefault();
+                alert('フィードバックフォームは準備中です。\n後ほど設定されます。');
+            } else {
+                this.href = feedbackUrl;
+            }
+        });
+
+        document.getElementById('feedback-link').addEventListener('click', function(e) {
+            if (feedbackUrl === 'YOUR_GOOGLE_FORM_URL') {
+                e.preventDefault();
+                alert('フィードバックフォームは準備中です。\n後ほど設定されます。');
+            } else {
+                this.href = feedbackUrl;
+            }
+        });
+    </script>
+</body>
+</html>
