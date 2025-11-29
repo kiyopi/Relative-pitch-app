@@ -31,6 +31,10 @@
             <i data-lucide="list-ordered" class="text-blue-300"></i>
             <span>使い方の流れ</span>
         </a>
+        <a href="#usage-notes" class="help-toc-item">
+            <i data-lucide="alert-circle" class="text-yellow-300"></i>
+            <span>ご利用上の注意</span>
+        </a>
         <a href="#training-modes" class="help-toc-item">
             <i data-lucide="layers" class="text-orange-300"></i>
             <span>トレーニングモード</span>
@@ -183,6 +187,80 @@
                 <h5 class="text-body font-semibold text-white">結果確認</h5>
                 <p class="text-sm text-white-70">セッション終了後に音程評価、レッスン終了後に総合評価を確認できます。詳細分析ページでは弱点の傾向も分析できます。</p>
             </div>
+        </div>
+    </div>
+    <button class="help-back-to-top">
+        <i data-lucide="chevron-up"></i>
+        <span>目次に戻る</span>
+    </button>
+</section>
+
+<!-- セクション2.5: ご利用上の注意 -->
+<section class="glass-card" id="usage-notes">
+    <h4 class="heading-md">
+        <i data-lucide="alert-circle" class="text-yellow-300"></i>
+        <span>ご利用上の注意</span>
+    </h4>
+
+    <p class="text-sm text-white-70 mb-4">
+        快適にご利用いただくために、以下の点にご注意ください。
+    </p>
+
+    <div class="flex flex-col gap-4">
+        <!-- 1タブで使用 -->
+        <div class="help-trouble-item">
+            <h5 class="text-body font-semibold text-white mb-2 flex items-center gap-2">
+                <i data-lucide="app-window" class="text-blue-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>1つのタブで使用してください</span>
+            </h5>
+            <p class="help-description">
+                複数のタブで同時にアプリを開くと、以下の問題が発生します。
+            </p>
+            <ul class="help-trouble-list">
+                <li><strong class="text-red-300">マイク競合</strong>：片方のタブでしかマイクが動作しません</li>
+                <li><strong class="text-red-300">データ上書き</strong>：トレーニング記録が正しく保存されない場合があります</li>
+            </ul>
+            <p class="help-note">
+                必ず1つのタブのみでご利用ください。
+            </p>
+        </div>
+
+        <!-- ブラウザの統一 -->
+        <div class="help-trouble-item">
+            <h5 class="text-body font-semibold text-white mb-2 flex items-center gap-2">
+                <i data-lucide="globe" class="text-green-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>同じブラウザで継続利用を推奨</span>
+            </h5>
+            <p class="help-description">
+                トレーニング記録はブラウザごとに保存されます。
+            </p>
+            <ul class="help-trouble-list">
+                <li>SafariとChromeで別々にデータが保存されます</li>
+                <li>ブラウザ間でデータは自動的に共有・統合されません</li>
+                <li>継続的な記録のため、同じブラウザでのご利用を推奨します</li>
+            </ul>
+            <p class="help-note">
+                別のブラウザのデータを統合したい場合は、エクスポート→インポート機能をご利用ください。
+            </p>
+        </div>
+
+        <!-- プライベートモード -->
+        <div class="help-trouble-item">
+            <h5 class="text-body font-semibold text-white mb-2 flex items-center gap-2">
+                <i data-lucide="eye-off" class="text-red-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>プライベートモードでは使用しないでください</span>
+            </h5>
+            <p class="help-description">
+                プライベートモード（シークレットモード）では、ブラウザを閉じた時点で全てのデータが消去されます。
+            </p>
+            <ul class="help-trouble-list">
+                <li><strong class="text-red-300">音域設定</strong>：毎回再測定が必要になります</li>
+                <li><strong class="text-red-300">トレーニング記録</strong>：保存されません</li>
+                <li><strong class="text-red-300">設定値</strong>：初期化されます</li>
+            </ul>
+            <p class="help-note">
+                通常モードでのご利用を強くおすすめします。
+            </p>
         </div>
     </div>
     <button class="help-back-to-top">
