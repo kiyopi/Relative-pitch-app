@@ -1,13 +1,36 @@
+<!-- クイックスタート -->
+<section class="glass-card quick-start-card" id="quick-start-section">
+    <div class="quick-start-row">
+        <h4 class="quick-start-title">クイックスタート</h4>
+        <button class="btn btn-primary" id="quick-start-btn">
+            <i data-lucide="play"></i>
+            <span id="quick-start-mode">ランダム基音 上行</span>
+        </button>
+    </div>
+</section>
+
+<!-- モード選択ガイド -->
+<section class="mode-selection-guide">
+    <h2 class="heading-lg">
+        <i data-lucide="list" class="text-purple-300"></i>
+        <span>モード選択</span>
+    </h2>
+    <hr class="section-divider">
+    <p class="mode-selection-desc">上行・下行を選んでから、下のモードの開始ボタンを押してスタート</p>
+</section>
+
 <!-- Direction Selection Tabs -->
 <section class="direction-selection-section">
     <div class="direction-tab-navigation">
         <button class="tab-button active" data-direction="ascending" id="ascending-tab">
-            <i data-lucide="move-up-right"></i>
-            <span>上行モード</span>
+            <i data-lucide="move-up-right" class="text-blue-400"></i>
+            <span class="tab-label-short">上行</span>
+            <span class="tab-label-full">モード</span>
         </button>
         <button class="tab-button" data-direction="descending" id="descending-tab">
-            <i data-lucide="move-down-right"></i>
-            <span>下行モード</span>
+            <i data-lucide="move-down-right" class="text-red-400"></i>
+            <span class="tab-label-short">下行</span>
+            <span class="tab-label-full">モード</span>
         </button>
     </div>
 
@@ -189,10 +212,6 @@
                         <span>個別最適化</span>
                     </div>
                     <ul class="feature-list">
-                        <li>
-                            <i data-lucide="check" class="icon-xs text-green-300"></i>
-                            AI弱点分析
-                        </li>
                         <li>
                             <i data-lucide="check" class="icon-xs text-green-300"></i>
                             カスタム練習

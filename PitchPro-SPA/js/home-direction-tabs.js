@@ -1,13 +1,21 @@
 /**
  * home-direction-tabs.js
- * ホームページの上行・下行タブナビゲーション管理
+ * ホームページの上行・下行タブナビゲーション管理 + クイックスタート機能
  * 注意: data-direction属性を持つタブのみを対象（詳細分析のdata-tabタブとは干渉しない）
  *
- * @version v202511181300
+ * @version v202511291400
+ * 【v202511291400修正内容】
+ * - クイックスタート機能追加（前回のモード・方向で開始）
+ * - localStorage永続化（pitchpro_last_mode, pitchpro_last_direction）
+ * - 上行=青、下行=赤の色分け対応
  * 【v202511181300修正内容】
  * - ランダム基音・連続チャレンジのボタンにdata-direction属性を動的追加
  * - 準備ページ遷移時に方向パラメータが正しく渡されるように修正
  */
+
+// クイックスタート設定のlocalStorageキー
+const QUICK_START_MODE_KEY = 'pitchpro_last_mode';
+const QUICK_START_DIRECTION_KEY = 'pitchpro_last_direction';
 
 // 上行・下行タブナビゲーション初期化
 class DirectionTabsManager {
@@ -36,6 +44,9 @@ class DirectionTabsManager {
         if (directionTabs.length === 0 || directionPanels.length === 0) {
             return; // タブが存在しないページではスキップ
         }
+
+        // クイックスタート初期化
+        this.initializeQuickStart();
 
         // デフォルトで上行モードを設定
         if (!sessionStorage.getItem('trainingDirection')) {
@@ -180,6 +191,105 @@ class DirectionTabsManager {
         // Lucideアイコンを再初期化
         if (typeof window.initializeLucideIcons === 'function') {
             window.initializeLucideIcons({ immediate: true });
+        }
+
+        // クイックスタートはタブ切り替えと同期しない（前回設定を維持）
+    }
+
+    /**
+     * クイックスタート初期化
+     */
+    initializeQuickStart() {
+        const quickStartBtn = document.getElementById('quick-start-btn');
+        if (!quickStartBtn) {
+            console.log('ℹ️ [HOME] クイックスタートボタンなし');
+            return;
+        }
+
+        // クリックイベント設定
+        quickStartBtn.addEventListener('click', () => this.handleQuickStartClick());
+
+        // 初期表示更新
+        this.updateQuickStartButton();
+
+        console.log('✅ [HOME] クイックスタート初期化完了');
+    }
+
+    /**
+     * クイックスタートボタンの表示を更新
+     */
+    updateQuickStartButton() {
+        const quickStartBtn = document.getElementById('quick-start-btn');
+        const quickStartMode = document.getElementById('quick-start-mode');
+        if (!quickStartBtn || !quickStartMode) return;
+
+        // 前回の設定を取得（localStorage）、なければデフォルト
+        const lastMode = localStorage.getItem(QUICK_START_MODE_KEY) || 'random';
+        const lastDirection = localStorage.getItem(QUICK_START_DIRECTION_KEY) || 'ascending';
+
+        // 現在のタブ選択状態を取得（sessionStorage優先）
+        const currentDirection = sessionStorage.getItem('trainingDirection') || lastDirection;
+
+        // ModeControllerからモード表示名を取得
+        let displayName = 'ランダム基音 上行';
+        if (typeof ModeController !== 'undefined' && ModeController.getDisplayName) {
+            displayName = ModeController.getDisplayName(lastMode, {
+                scaleDirection: currentDirection,
+                useShortName: true
+            });
+        } else {
+            // フォールバック
+            const modeNames = {
+                'random': 'ランダム基音',
+                'continuous': '連続チャレンジ',
+                '12tone': '12音階'
+            };
+            const directionNames = {
+                'ascending': '上行',
+                'descending': '下行'
+            };
+            displayName = `${modeNames[lastMode] || 'ランダム基音'} ${directionNames[currentDirection] || '上行'}`;
+        }
+
+        // テキスト更新
+        quickStartMode.textContent = displayName;
+
+        // 色更新（上行=青、下行=赤）
+        if (currentDirection === 'descending') {
+            quickStartBtn.classList.remove('btn-primary');
+            quickStartBtn.classList.add('btn-danger');
+        } else {
+            quickStartBtn.classList.remove('btn-danger');
+            quickStartBtn.classList.add('btn-primary');
+        }
+
+        console.log(`🔄 [HOME] クイックスタート更新: ${displayName}, direction=${currentDirection}`);
+    }
+
+    /**
+     * クイックスタートボタンクリック処理
+     */
+    handleQuickStartClick() {
+        // 前回の設定を取得
+        const lastMode = localStorage.getItem(QUICK_START_MODE_KEY) || 'random';
+        const currentDirection = sessionStorage.getItem('trainingDirection') || 'ascending';
+
+        console.log(`🚀 [HOME] クイックスタート: mode=${lastMode}, direction=${currentDirection}`);
+
+        // sessionStorageに方向を設定（準備ページで使用）
+        sessionStorage.setItem('trainingDirection', currentDirection);
+
+        // 準備ページへ遷移
+        if (typeof NavigationManager !== 'undefined' && NavigationManager.navigate) {
+            // NavigationManager経由で遷移
+            const params = new URLSearchParams();
+            params.set('mode', lastMode);
+            params.set('session', '1');
+            params.set('scaleDirection', currentDirection);
+            window.location.hash = `preparation?${params.toString()}`;
+        } else {
+            // フォールバック
+            window.location.hash = `preparation?mode=${lastMode}&session=1&scaleDirection=${currentDirection}`;
         }
     }
 }

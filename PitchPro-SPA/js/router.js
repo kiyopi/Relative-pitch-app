@@ -838,6 +838,14 @@ class SimpleRouter {
                 if (route === 'training') {
                     NavigationManager.navigateToTraining(mode, session);
                 } else if (route === 'preparation') {
+                    // 【v4.6.0】クイックスタート用：前回設定をlocalStorageに保存
+                    if (mode) {
+                        localStorage.setItem('pitchpro_last_mode', mode);
+                    }
+                    const scaleDir = sessionStorage.getItem('trainingDirection') || 'ascending';
+                    localStorage.setItem('pitchpro_last_direction', scaleDir);
+                    console.log(`💾 [HOME] 前回設定保存: mode=${mode}, direction=${scaleDir}`);
+
                     // 【v4.3.4】準備スキップ判定（3層防御アプローチ）
                     const canSkip = await NavigationManager.canSkipPreparation();
 
