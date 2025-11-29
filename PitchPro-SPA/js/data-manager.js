@@ -980,7 +980,7 @@ class DataManager {
       // ダウンロードリンク生成
       const a = document.createElement('a');
       a.href = url;
-      a.download = `pitchpro-data-${Date.now()}.json`;
+      a.download = `8va-pitchtraining-data-${Date.now()}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

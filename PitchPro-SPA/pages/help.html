@@ -55,6 +55,10 @@
             <i data-lucide="wrench" class="text-red-300"></i>
             <span>トラブルシューティング</span>
         </a>
+        <a href="#data-migration" class="help-toc-item">
+            <i data-lucide="smartphone" class="text-cyan-300"></i>
+            <span>デバイス移行</span>
+        </a>
     </nav>
 </section>
 
@@ -622,6 +626,21 @@
                 </p>
             </div>
         </div>
+
+        <!-- FAQ 6 -->
+        <div class="faq-item">
+            <button class="faq-question" data-faq="6">
+                <span>機種変更や別のデバイスで使うには？</span>
+                <i data-lucide="chevron-down" class="faq-icon"></i>
+            </button>
+            <div class="faq-answer" id="faq-answer-6">
+                <p class="text-sm text-white-70">
+                    設定ページの「データエクスポート」機能でトレーニング記録をファイルに保存し、
+                    新しいデバイスで「データインポート」を行うことでデータを移行できます。
+                    詳しくは下の「<a href="#data-migration" class="text-cyan-300">デバイス移行</a>」セクションをご覧ください。
+                </p>
+            </div>
+        </div>
     </div>
     <button class="help-back-to-top">
         <i data-lucide="chevron-up"></i>
@@ -692,6 +711,80 @@
                 <li><strong class="text-green-300">推奨</strong>：有線イヤホン・ヘッドホンを使用してください</li>
                 <li><strong class="text-blue-300">代替</strong>：イヤホンなしでデバイスのスピーカーを使用</li>
                 <li><strong class="text-yellow-300">注意</strong>：AirPods等のBluetoothイヤホンは非対応です</li>
+            </ul>
+        </div>
+    </div>
+    <button class="help-back-to-top">
+        <i data-lucide="chevron-up"></i>
+        <span>目次に戻る</span>
+    </button>
+</section>
+
+<!-- セクション9: デバイス移行 -->
+<section class="glass-card" id="data-migration">
+    <h4 class="heading-md">
+        <i data-lucide="smartphone" class="text-cyan-300"></i>
+        <span>デバイス移行</span>
+    </h4>
+
+    <p class="text-sm text-white-70 mb-4">
+        機種変更や別のデバイスでトレーニングを続ける場合、以下の手順でデータを移行できます。
+    </p>
+
+    <div class="flex flex-col gap-4">
+        <!-- 移行元での操作 -->
+        <div class="help-trouble-item">
+            <h5 class="text-body font-semibold text-white mb-2 flex items-center gap-2">
+                <i data-lucide="upload" class="text-blue-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>移行元デバイスでの操作</span>
+            </h5>
+            <ol class="help-trouble-list" style="list-style-type: decimal; padding-left: 1.5rem;">
+                <li>設定ページを開く</li>
+                <li>「データエクスポート」をタップ</li>
+                <li><code class="text-cyan-300">8va-pitchtraining-data-[数字].json</code> というファイルがダウンロードされる</li>
+                <li>保存されたファイルを、クラウドストレージ（iCloud、Google Drive等）や
+                    メール、AirDropなどで新しいデバイスに転送</li>
+            </ol>
+        </div>
+
+        <!-- 移行先での操作 -->
+        <div class="help-trouble-item">
+            <h5 class="text-body font-semibold text-white mb-2 flex items-center gap-2">
+                <i data-lucide="download" class="text-green-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>移行先デバイスでの操作</span>
+            </h5>
+            <ol class="help-trouble-list" style="list-style-type: decimal; padding-left: 1.5rem;">
+                <li>新しいデバイスでアプリを開く</li>
+                <li>設定ページを開く</li>
+                <li>「データインポート」をタップ</li>
+                <li>転送したJSONファイルを選択</li>
+                <li>インポート完了後、トレーニング記録が復元される</li>
+            </ol>
+        </div>
+
+        <!-- 注意事項 -->
+        <div class="help-info-box">
+            <p class="text-sm text-white-80 flex items-center gap-2">
+                <i data-lucide="alert-triangle" class="text-yellow-400" style="width: 14px; height: 14px; flex-shrink: 0;"></i>
+                <strong>注意事項</strong>
+            </p>
+            <ul class="help-trouble-list">
+                <li><strong class="text-yellow-300">音域データ</strong>：新しいデバイスでは音域テストの再実行を推奨します（マイク特性が異なるため）</li>
+                <li><strong class="text-yellow-300">上書き確認</strong>：インポート時、既存のデータがある場合は上書きされます</li>
+                <li><strong class="text-green-300">バックアップ</strong>：定期的にエクスポートしておくと、データ消失時にも安心です</li>
+            </ul>
+        </div>
+
+        <!-- 移行されるデータ -->
+        <div class="help-trouble-item">
+            <h5 class="text-body font-semibold text-white mb-2 flex items-center gap-2">
+                <i data-lucide="database" class="text-purple-400" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>移行されるデータ</span>
+            </h5>
+            <ul class="help-trouble-list">
+                <li><strong class="text-cyan-300">トレーニング記録</strong>：全セッションの評価履歴</li>
+                <li><strong class="text-cyan-300">音域設定</strong>：測定した音域データ</li>
+                <li><strong class="text-cyan-300">各種設定</strong>：基音音量などの設定値</li>
             </ul>
         </div>
     </div>
