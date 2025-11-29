@@ -110,8 +110,12 @@
  * - iOS Safari MediaStreamバグ（WebKit Bug 230902）を回避
  * - canSkipPreparation()機能との互換性を維持
  *
- * @version 4.6.3
- * @date 2025-11-27
+ * 【v4.7.1更新】
+ * - results-overviewからtrainingへのブラウザバックを禁止
+ * - allowedTransitionsからtrainingを削除（総合評価完了後は新規トレーニングのみ）
+ *
+ * @version 4.7.1
+ * @date 2025-11-29
  */
 
 class NavigationManager {
@@ -1249,7 +1253,7 @@ class NavigationManager {
         ['preparation', ['training', 'home']],
         ['training', ['result-session', 'results-overview', 'home']],
         ['result-session', ['training', 'results-overview', 'home']],
-        ['results-overview', ['home', 'preparation', 'records', 'training']]
+        ['results-overview', ['home', 'preparation', 'records']]
     ]);
 
     /**

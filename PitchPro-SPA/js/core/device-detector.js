@@ -6,12 +6,14 @@
  * - iPadOS 13+の"Macintosh"偽装対策
  * - デバイス別最適化設定（音量・感度）
  *
- * @version 1.0.5
+ * @version 1.0.6
  * @date 2025-11-29
  * @dependencies なし
  * @usedBy trainingController.js, preparation-pitchpro-cycle.js
  *
  * Changelog:
+ *   v1.0.6 (2025-11-29) - iPad音量微調整
+ *     - iPad音量: 0dB → 3dB（音量不足改善）
  *   v1.0.5 (2025-11-29) - iPad音量・感度調整
  *     - iPad音量: 6dB → 0dB（デバイス音量50%での大音量問題解決）
  *     - iPad感度: 7.0x → 10.0x（マイク距離問題改善）
@@ -117,7 +119,7 @@
             const volumeSettings = {
                 pc: -12,       // -12dB: Mac音量50%環境での適切な音量
                 iphone: 0,     // 0dB: デバイス音量50%時の適切な音量（v1.0.3で10dB→0dBに調整）
-                ipad: 0,       // 0dB: v1.0.5で6dB→0dBに調整（iPhoneと統一、大音量問題解決）
+                ipad: +3,      // +3dB: v1.0.6で0dB→3dBに調整（音量不足改善）
                 android: 0     // 0dB: v1.0.4でiPhoneに合わせて統一（18dB→0dB）
             };
             return volumeSettings[device] || -12;
@@ -175,6 +177,6 @@
         }
     };
 
-    console.log('✅ DeviceDetector loaded (v1.0.5 - iPad 0dB/10.0x)');
+    console.log('✅ DeviceDetector loaded (v1.0.6 - iPad 3dB/10.0x)');
 
 })();
