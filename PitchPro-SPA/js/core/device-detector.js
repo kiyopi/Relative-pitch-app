@@ -6,12 +6,15 @@
  * - iPadOS 13+の"Macintosh"偽装対策
  * - デバイス別最適化設定（音量・感度）
  *
- * @version 1.0.4
- * @date 2025-11-25
+ * @version 1.0.5
+ * @date 2025-11-29
  * @dependencies なし
  * @usedBy trainingController.js, preparation-pitchpro-cycle.js
  *
  * Changelog:
+ *   v1.0.5 (2025-11-29) - iPad音量・感度調整
+ *     - iPad音量: 6dB → 0dB（デバイス音量50%での大音量問題解決）
+ *     - iPad感度: 7.0x → 10.0x（マイク距離問題改善）
  *   v1.0.4 (2025-11-25) - iPad/Android音量調整
  *     - iPad音量: 12dB → 6dB（大音量問題解決）
  *     - Android音量: 18dB → 0dB（iPhoneに合わせて統一）
@@ -114,7 +117,7 @@
             const volumeSettings = {
                 pc: -12,       // -12dB: Mac音量50%環境での適切な音量
                 iphone: 0,     // 0dB: デバイス音量50%時の適切な音量（v1.0.3で10dB→0dBに調整）
-                ipad: +6,      // +6dB: v1.0.4で12dB→6dBに調整（大音量問題解決）
+                ipad: 0,       // 0dB: v1.0.5で6dB→0dBに調整（iPhoneと統一、大音量問題解決）
                 android: 0     // 0dB: v1.0.4でiPhoneに合わせて統一（18dB→0dB）
             };
             return volumeSettings[device] || -12;
@@ -130,7 +133,7 @@
             const sensitivitySettings = {
                 pc: 4.0,       // 4.0x: PC内蔵マイク
                 iphone: 4.5,   // 4.5x: iPhone最適化（edf9fc0で正常動作確認）
-                ipad: 7.0,     // 7.0x: iPad最適化
+                ipad: 10.0,    // 10.0x: v1.0.5で7.0x→10.0xに調整（マイク距離問題改善）
                 android: 4.5   // 4.5x: iPhoneと同等
             };
             return sensitivitySettings[device] || 4.0;
@@ -172,6 +175,6 @@
         }
     };
 
-    console.log('✅ DeviceDetector loaded (v1.0.4 - iPad 6dB, Android 0dB)');
+    console.log('✅ DeviceDetector loaded (v1.0.5 - iPad 0dB/10.0x)');
 
 })();
