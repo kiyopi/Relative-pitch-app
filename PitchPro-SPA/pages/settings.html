@@ -188,6 +188,44 @@
             </div>
         </section>
 
+        <!-- プレミアムプランセクション -->
+        <section class="glass-card" id="premium-section">
+            <h4 class="heading-md">
+                <i data-lucide="crown" class="text-yellow-300"></i>
+                <span>プレミアムプラン</span>
+            </h4>
+
+            <div class="flex flex-col gap-4">
+                <!-- プレミアム利用中の場合 -->
+                <div id="premium-active" style="display: none;">
+                    <div class="flex flex-col gap-3 mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-white-80">現在のプラン:</span>
+                            <span class="text-sm text-green-400" id="premium-plan-name">プレミアム</span>
+                            <span class="text-sm text-green-400" id="premium-status">（利用中）</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline" onclick="location.hash='upgrade'">
+                        <i data-lucide="settings" style="width: 20px; height: 20px;"></i>
+                        <span>サブスクリプション管理</span>
+                    </button>
+                </div>
+
+                <!-- 無料プランの場合 -->
+                <div id="premium-inactive">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="text-sm text-white-80">現在のプラン:</span>
+                        <span class="text-sm text-white-60">無料プラン</span>
+                    </div>
+                    <p class="text-sm text-white-60 mb-4">プレミアムプランで連続チャレンジモード・12音階モード・詳細分析が利用可能になります。</p>
+                    <button class="btn btn-primary" onclick="location.hash='upgrade'">
+                        <i data-lucide="crown" style="width: 20px; height: 20px;"></i>
+                        <span>プレミアムプランの詳細</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
         <!-- アカウントセクション -->
         <section class="glass-card" id="account-section">
             <h4 class="heading-md">

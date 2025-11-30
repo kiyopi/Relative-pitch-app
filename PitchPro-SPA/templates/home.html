@@ -11,10 +11,18 @@
 
 <!-- モード選択ガイド -->
 <section class="mode-selection-guide">
-    <h2 class="heading-lg">
-        <i data-lucide="list" class="text-purple-300"></i>
-        <span>モード選択</span>
-    </h2>
+    <div class="mode-selection-header">
+        <h2 class="heading-lg">
+            <i data-lucide="list" class="text-purple-300"></i>
+            <span>モード選択</span>
+        </h2>
+        <button class="upgrade-btn" id="home-upgrade-btn" onclick="window.location.hash='upgrade'">
+            <div class="upgrade-btn-icon">
+                <i data-lucide="crown"></i>
+            </div>
+            <span id="home-upgrade-btn-text">プレミアムプランの詳細</span>
+        </button>
+    </div>
     <hr class="section-divider">
     <p class="mode-selection-desc">上行・下行を選んでから、下のモードの開始ボタンを押してスタート</p>
 </section>

@@ -857,6 +857,9 @@ class SimpleRouter {
     }
 
     async setupHomeEvents() {
+        // プレミアム状態に応じてアップグレードボタンを更新
+        this.updateHomeUpgradeButton();
+
         // ホームページのボタンイベント設定
         const trainingButtons = document.querySelectorAll('[data-route]');
 
@@ -940,6 +943,43 @@ class SimpleRouter {
                 }
             });
         });
+    }
+
+    /**
+     * ホームページのアップグレードボタンをプレミアム状態に応じて更新
+     */
+    async updateHomeUpgradeButton() {
+        const upgradeBtn = document.getElementById('home-upgrade-btn');
+        const upgradeBtnText = document.getElementById('home-upgrade-btn-text');
+
+        if (!upgradeBtn || !upgradeBtnText) {
+            return;
+        }
+
+        // RevenueCatManagerが利用可能か確認
+        if (!window.RevenueCatManager) {
+            console.log('📦 [Home] RevenueCatManager not available - showing default button');
+            return;
+        }
+
+        try {
+            const { isPremium, isTrialing } = await window.RevenueCatManager.checkStatus();
+
+            if (isPremium || isTrialing) {
+                // プレミアム利用中の表示
+                upgradeBtnText.textContent = 'プレミアム利用中';
+                upgradeBtn.classList.add('premium-active');
+                console.log('👑 [Home] Premium user - button updated');
+            } else {
+                // 無料プランの表示
+                upgradeBtnText.textContent = 'プレミアムプランの詳細';
+                upgradeBtn.classList.remove('premium-active');
+                console.log('📦 [Home] Free user - showing upgrade button');
+            }
+        } catch (error) {
+            console.warn('⚠️ [Home] Failed to check premium status:', error);
+            // エラー時はデフォルト表示のまま
+        }
     }
 
     // PitchShifterをバックグラウンドで初期化（完了を待たない）

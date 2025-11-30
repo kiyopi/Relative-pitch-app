@@ -27,6 +27,9 @@
         // アカウントセクション更新
         updateAccountSection();
 
+        // プレミアムセクション更新
+        updatePremiumSection();
+
         // イベントリスナー登録
         registerEventListeners();
 
@@ -75,6 +78,72 @@
             loggedOutDiv.style.display = 'block';
 
             console.log('👤 アカウント: 未ログイン');
+        }
+
+        // Lucideアイコン再初期化
+        if (typeof window.initializeLucideIcons === 'function') {
+            window.initializeLucideIcons({ immediate: true });
+        }
+    }
+
+    /**
+     * プレミアムセクションを更新
+     */
+    async function updatePremiumSection() {
+        const premiumActiveDiv = document.getElementById('premium-active');
+        const premiumInactiveDiv = document.getElementById('premium-inactive');
+        const planNameSpan = document.getElementById('premium-plan-name');
+        const statusSpan = document.getElementById('premium-status');
+
+        if (!premiumActiveDiv || !premiumInactiveDiv) {
+            console.warn('⚠️ プレミアムセクションが見つかりません');
+            return;
+        }
+
+        // RevenueCatManagerが利用可能か確認
+        if (!window.RevenueCatManager) {
+            console.log('📦 [Settings] RevenueCatManager not available - showing free plan');
+            premiumActiveDiv.style.display = 'none';
+            premiumInactiveDiv.style.display = 'block';
+            return;
+        }
+
+        try {
+            const { isPremium, isTrialing } = await window.RevenueCatManager.checkStatus();
+
+            if (isPremium || isTrialing) {
+                // プレミアム利用中
+                premiumActiveDiv.style.display = 'block';
+                premiumInactiveDiv.style.display = 'none';
+
+                if (planNameSpan) {
+                    planNameSpan.textContent = 'プレミアム';
+                }
+                if (statusSpan) {
+                    if (isTrialing) {
+                        statusSpan.textContent = '（トライアル中）';
+                        statusSpan.classList.remove('text-green-400');
+                        statusSpan.classList.add('text-blue-400');
+                    } else {
+                        statusSpan.textContent = '（利用中）';
+                        statusSpan.classList.remove('text-blue-400');
+                        statusSpan.classList.add('text-green-400');
+                    }
+                }
+
+                console.log('👑 [Settings] Premium user:', isTrialing ? 'Trial' : 'Active');
+            } else {
+                // 無料プラン
+                premiumActiveDiv.style.display = 'none';
+                premiumInactiveDiv.style.display = 'block';
+
+                console.log('📦 [Settings] Free user');
+            }
+        } catch (error) {
+            console.warn('⚠️ [Settings] Failed to check premium status:', error);
+            // エラー時は無料プラン表示
+            premiumActiveDiv.style.display = 'none';
+            premiumInactiveDiv.style.display = 'block';
         }
 
         // Lucideアイコン再初期化
