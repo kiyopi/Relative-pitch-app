@@ -73,19 +73,26 @@ async function updateUpgradeUI() {
  * ステータスセクションを更新
  */
 function updateStatusSection(isLoggedIn) {
+    const statusSection = document.getElementById('current-status-section');
     const statusIcon = document.getElementById('status-icon');
     const statusLabel = document.getElementById('status-label');
     const statusValue = document.getElementById('status-value');
 
     if (!isLoggedIn) {
-        statusIcon.innerHTML = '<i data-lucide="user-x" class="text-white-60 icon-lg"></i>';
-        statusLabel.textContent = 'ログイン状態';
-        statusValue.textContent = '未ログイン';
-    } else {
-        statusIcon.innerHTML = '<i data-lucide="user" class="text-white icon-lg"></i>';
-        statusLabel.textContent = '現在のプラン';
-        statusValue.textContent = '無料プラン';
+        // 未ログイン時はステータスセクションを非表示
+        if (statusSection) {
+            statusSection.style.display = 'none';
+        }
+        return;
     }
+
+    // ログイン時はステータスセクションを表示
+    if (statusSection) {
+        statusSection.style.display = 'block';
+    }
+    statusIcon.innerHTML = '<i data-lucide="user" class="text-white icon-lg"></i>';
+    statusLabel.textContent = '現在のプラン';
+    statusValue.textContent = '無料プラン';
 
     // アイコン再初期化
     if (typeof window.initializeLucideIcons === 'function') {

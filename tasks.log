@@ -15102,3 +15102,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.ai/code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-30 15:15:37] コミット: feat(upgrade): UIカタログ準拠のUI改善
+
+- ヘッダーをUIカタログ旧版構造に変更（page-header-icon-wrapper）
+- プレミアムプランの全機能にfeature-highlightクラスを適用
+- ログインボタン上のテキストにマージン追加（upgrade-action-note-top）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

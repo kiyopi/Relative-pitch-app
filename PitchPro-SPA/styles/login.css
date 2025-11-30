@@ -432,7 +432,33 @@
     margin: 0 auto;
 }
 
-/* ヘッダー */
+/* ヘッダー - 縦並び中央寄せ（UIカタログ旧版準拠） */
+.upgrade-page .page-header {
+    width: 100%;
+    padding: 1.5rem 0;
+}
+
+.upgrade-page .page-header-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+}
+
+.upgrade-page .page-header-icon {
+    width: 6rem;
+    height: 6rem;
+}
+
+.upgrade-page .page-title {
+    font-size: 1.75rem;
+    margin-top: 0.5rem;
+}
+
+.upgrade-page .page-subtitle {
+    font-size: 1rem;
+}
+
+/* ヘッダー（旧定義 - 未使用） */
 .upgrade-header {
     text-align: center;
     margin-bottom: 0.5rem;
@@ -536,6 +562,12 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.upgrade-plan-description {
+    font-size: 0.875rem;
+    color: var(--text-white-70, rgba(255, 255, 255, 0.7));
     margin-bottom: 1rem;
 }
 
@@ -594,6 +626,10 @@
 
 .upgrade-plan-features .feature-highlight {
     font-weight: 500;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    margin: 0.25rem 0;
 }
 
 /* トライアル情報 */

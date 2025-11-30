@@ -551,6 +551,7 @@ body::before {
 .gradient-catalog-green { background: linear-gradient(135deg, #10b981, #059669); }
 .gradient-catalog-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
 .gradient-catalog-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.gradient-catalog-yellow { background: linear-gradient(135deg, #eab308, #ca8a04); }
 
 /* =================================================
    6. コンポーネント

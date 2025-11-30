@@ -102,11 +102,15 @@ async function initializeResultSessionPage() {
 }
 
 // SPAでない場合の従来のDOMContentLoaded初期化も残す
-// 【v3.5.2修正】SPAのindex.htmlで誤って初期化されないよう条件を修正
-// GitHub Pagesでは pathname が /Relative-pitch-app/PitchPro-SPA/ となり index.html を含まないため
-// パスに 'PitchPro-SPA' が含まれる場合もSPAとして扱う
+// 【v3.5.3修正】SPA検出条件を拡張
+// - GitHub Pages: pathname に 'PitchPro-SPA' が含まれる
+// - ローカル開発: pathname が '/' でもハッシュルーティング使用時はSPA
+// - Firebase Hosting: pathname が '/' でもハッシュルーティング使用時はSPA
 const isSPA = window.location.pathname.includes('index.html') ||
-              window.location.pathname.includes('PitchPro-SPA');
+              window.location.pathname.includes('PitchPro-SPA') ||
+              window.location.hash.length > 0 ||
+              window.location.pathname === '/' ||
+              window.location.pathname === '/index.html';
 if (!isSPA) {
     document.addEventListener('DOMContentLoaded', initializeResultSessionPage);
 }
