@@ -15111,3 +15111,15 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
+[2025-11-30 16:00:46] コミット: fix(upgrade): アップグレードページのUI改善とSPA検出修正
+
+- ヘッダーを縦並び中央寄せに変更（UIカタログ旧版準拠）
+- gradient-catalog-yellowをbase.cssに追加
+- feature-highlightにグラス背景・パディング・マージン追加
+- 未ログイン時のステータスセクションを非表示に
+- プレミアムプランに「すべての機能が使用可能」説明文追加
+- result-session-controller.js: SPA検出条件を修正（ローカル開発対応）
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
