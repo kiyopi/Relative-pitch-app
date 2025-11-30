@@ -35,6 +35,8 @@ const FREE_TRIAL_DAYS = 7;
 
 /**
  * RevenueCat初期化
+ * 注意: Web SDKは匿名ユーザーをサポートしていないため、
+ * ログイン済みユーザーのみ初期化する
  */
 async function initializeRevenueCat() {
     // Purchases SDKが読み込まれているか確認
@@ -43,17 +45,24 @@ async function initializeRevenueCat() {
         return null;
     }
 
-    try {
-        // ユーザーIDを取得（Firebase認証から）
-        const appUserId = window.currentUser?.uid || null;
+    // ユーザーIDを取得（Firebase認証から）
+    const appUserId = window.currentUser?.uid;
 
-        // RevenueCat設定
+    // 未ログインの場合は初期化をスキップ
+    if (!appUserId) {
+        console.log('ℹ️ [RevenueCat] 未ログインのため初期化スキップ（ログイン後に初期化）');
+        window.revenueCatPurchases = null;
+        return null;
+    }
+
+    try {
+        // RevenueCat設定（ログイン済みユーザーのみ）
         const purchases = Purchases.Purchases.configure({
             apiKey: REVENUECAT_API_KEY,
             appUserId: appUserId
         });
 
-        console.log('✅ [RevenueCat] 初期化完了', appUserId ? `(User: ${appUserId})` : '(Anonymous)');
+        console.log('✅ [RevenueCat] 初期化完了 (User:', appUserId, ')');
 
         // グローバルに公開
         window.revenueCatPurchases = purchases;
