@@ -1,11 +1,14 @@
-console.log('🚀 [results-overview-controller] Script loaded - START v4.17.0 (2025-11-28)');
+console.log('🚀 [results-overview-controller] Script loaded - START v4.18.0 (2025-11-29)');
 
 /**
  * results-overview-controller.js
  * 総合評価ページコントローラー
- * Version: 4.17.0
- * Date: 2025-11-28
+ * Version: 4.18.0
+ * Date: 2025-11-29
  * Changelog:
+ *   v4.18.0 - 【下行モード対応】詳細分析の音名表示を音階方向に応じて切り替え
+ *            - 上行: ド→レ→ミ→ファ→ソ→ラ→シ→ド（周波数上昇）
+ *            - 下行: ド→シ→ラ→ソ→ファ→ミ→レ→ド（周波数下降）
  *   v4.17.0 - 【詳細分析の無音対応】showSessionDetailでEvaluationCalculator統合
  *            - extractSessionMetrics()で一元管理（avgError, invalidCount, allInvalid取得）
  *            - 全無音セッション: Practiceバッジ + mic-offアイコン + 専用メッセージ
@@ -763,7 +766,13 @@ window.showSessionDetail = function(sessionIndex) {
     // 7. 音別詳細結果を表示（v2.0.0: EvaluationCalculator統合 + 外れ値アイコン）
     const container = document.getElementById('detail-note-results');
     if (container && session.pitchErrors) {
-        const noteNames = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド'];
+        // 音階方向に応じた音名配列
+        // 上行: ド→レ→ミ→ファ→ソ→ラ→シ→ド（周波数上昇）
+        // 下行: ド→シ→ラ→ソ→ファ→ミ→レ→ド（周波数下降）
+        const scaleDirection = session.scaleDirection || 'ascending';
+        const noteNames = scaleDirection === 'descending'
+            ? ['ド', 'シ', 'ラ', 'ソ', 'ファ', 'ミ', 'レ', 'ド']
+            : ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド'];
         container.innerHTML = '';
 
         session.pitchErrors.forEach((error, index) => {

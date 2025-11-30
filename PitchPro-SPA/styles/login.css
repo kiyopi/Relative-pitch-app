@@ -1,7 +1,7 @@
 /**
- * login.css - ログイン・登録画面用スタイル
- * Version: 1.0.1
- * Date: 2025-11-29
+ * login.css - ログイン・登録・アップグレード画面用スタイル
+ * Version: 1.1.0
+ * Date: 2025-11-30
  *
  * 使用するCSS変数（base.cssから）:
  * - --text-white, --text-white-60, --text-white-70
@@ -415,5 +415,291 @@
     .login-logo-icon i {
         width: 36px !important;
         height: 36px !important;
+    }
+}
+
+/* ========================================
+   アップグレードページ レイアウト
+======================================== */
+
+.upgrade-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+    gap: 1.5rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* ヘッダー */
+.upgrade-header {
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.upgrade-icon {
+    margin-bottom: 1rem;
+}
+
+.upgrade-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-white);
+    margin-bottom: 0.5rem;
+}
+
+.upgrade-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-white-60);
+}
+
+/* ========================================
+   現在のステータス
+======================================== */
+
+.upgrade-status {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.upgrade-status-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.upgrade-status-info {
+    flex: 1;
+}
+
+.upgrade-status-label {
+    font-size: 0.75rem;
+    color: var(--text-white-60);
+    margin-bottom: 0.25rem;
+}
+
+.upgrade-status-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-white);
+}
+
+/* ========================================
+   プラン比較セクション
+======================================== */
+
+.upgrade-plans-section {
+    width: 100%;
+}
+
+.upgrade-plans-section .heading-md {
+    margin-bottom: 1rem;
+}
+
+/* プランカード（グラスカード重複を避けるため独自実装） */
+.upgrade-plan-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.upgrade-plan-card.upgrade-plan-premium {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(99, 102, 241, 0.15));
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+/* おすすめバッジ */
+.upgrade-plan-badge {
+    position: absolute;
+    top: -10px;
+    right: 16px;
+    background: linear-gradient(135deg, #a855f7, #6366f1);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+}
+
+/* プランヘッダー */
+.upgrade-plan-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.upgrade-plan-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.upgrade-plan-title h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-white);
+    margin-bottom: 0.25rem;
+}
+
+.upgrade-plan-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-white);
+}
+
+.upgrade-plan-period {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: var(--text-white-60);
+}
+
+/* 機能リスト */
+.upgrade-plan-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.upgrade-plan-features li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+}
+
+.upgrade-plan-features .feature-included {
+    color: var(--text-white);
+}
+
+.upgrade-plan-features .feature-excluded {
+    color: var(--text-white-40, rgba(255, 255, 255, 0.4));
+}
+
+.upgrade-plan-features .feature-highlight {
+    font-weight: 500;
+}
+
+/* トライアル情報 */
+.upgrade-trial-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.875rem;
+    color: var(--text-blue-200, #93c5fd);
+}
+
+/* ========================================
+   アクションセクション
+======================================== */
+
+.upgrade-actions {
+    width: 100%;
+}
+
+.upgrade-action-group {
+    text-align: center;
+}
+
+.upgrade-action-note {
+    font-size: 0.75rem;
+    color: var(--text-white-60);
+    margin-top: 0.75rem;
+}
+
+.upgrade-action-note-top {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+/* プレミアム利用中 */
+.upgrade-premium-active,
+.upgrade-trial-active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+.upgrade-premium-active p,
+.upgrade-trial-active p {
+    font-size: 1rem;
+    color: var(--text-white);
+}
+
+.upgrade-trial-active {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.upgrade-trial-remaining {
+    font-size: 0.875rem;
+    color: var(--text-white-60);
+}
+
+/* ローディング */
+.upgrade-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem;
+}
+
+.upgrade-loading p {
+    font-size: 0.875rem;
+    color: var(--text-white-60);
+}
+
+/* ========================================
+   レスポンシブ対応
+======================================== */
+
+@media (max-width: 480px) {
+    .upgrade-page {
+        padding: 1.5rem 1rem;
+    }
+
+    .upgrade-title {
+        font-size: 1.25rem;
+    }
+
+    .upgrade-plan-card {
+        padding: 1rem;
+    }
+
+    .upgrade-plan-header {
+        gap: 0.75rem;
+    }
+
+    .upgrade-plan-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .upgrade-plan-price {
+        font-size: 1.125rem;
     }
 }

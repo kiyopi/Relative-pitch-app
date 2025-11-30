@@ -1,9 +1,12 @@
 /**
  * セッション結果ページコントローラー
- * @version 3.5.2
- * @lastUpdate 2025-11-28
+ * @version 3.6.0
+ * @lastUpdate 2025-11-29
  *
  * 変更履歴:
+ * - 3.6.0: 下行モード対応 - 詳細分析の音名表示を音階方向に応じて切り替え
+ *   - 上行: ド→レ→ミ→ファ→ソ→ラ→シ→ド（周波数上昇）
+ *   - 下行: ド→シ→ラ→ソ→ファ→ミ→レ→ド（周波数下降）
  * - 3.5.2: GitHub Pages SPA対応のDOMContentLoaded条件修正
  *   - pathname に 'PitchPro-SPA' が含まれる場合もSPAとして扱う
  *   - ホームページリロード時の誤初期化を防止
@@ -255,8 +258,9 @@ function updateSessionUI(sessionData, sessionNumber) {
     // 【v3.5.1】全無音の場合はPractice + 専用メッセージ
     displayAccuracyBadge(allInvalid ? null : Math.abs(avgError), allInvalid);
 
-    // 詳細分析表示（外れ値アイコン表示）
-    displayDetailedAnalysis(sessionData.pitchErrors, EvaluationCalculator.OUTLIER_THRESHOLD);
+    // 詳細分析表示（外れ値アイコン表示、音階方向を考慮）
+    const scaleDirection = sessionData.scaleDirection || 'ascending';
+    displayDetailedAnalysis(sessionData.pitchErrors, EvaluationCalculator.OUTLIER_THRESHOLD, scaleDirection);
 
     // 【追加】外れ値説明セクション表示（詳細分析の下）- 無音でない場合のみ
     if (!allInvalid) {
@@ -389,15 +393,23 @@ function displayAccuracyBadge(avgError, allInvalid = false) {
 
 /**
  * 詳細分析を表示（v2.0.0: EvaluationCalculator統合）
+ * @param {Array} pitchErrors - ピッチエラーデータ
+ * @param {number} outlierThreshold - 外れ値閾値
+ * @param {string} scaleDirection - 音階方向 'ascending' | 'descending'
  */
-function displayDetailedAnalysis(pitchErrors, outlierThreshold) {
+function displayDetailedAnalysis(pitchErrors, outlierThreshold, scaleDirection = 'ascending') {
     const container = document.getElementById('note-results');
     if (!container) {
         console.warn('⚠️ #note-resultsコンテナが見つかりません');
         return;
     }
 
-    const noteNames = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド'];
+    // 音階方向に応じた音名配列
+    // 上行: ド→レ→ミ→ファ→ソ→ラ→シ→ド（周波数上昇）
+    // 下行: ド→シ→ラ→ソ→ファ→ミ→レ→ド（周波数下降）
+    const noteNames = scaleDirection === 'descending'
+        ? ['ド', 'シ', 'ラ', 'ソ', 'ファ', 'ミ', 'レ', 'ド']
+        : ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド'];
     container.innerHTML = '';
 
     pitchErrors.forEach((error, index) => {

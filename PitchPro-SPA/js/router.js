@@ -26,7 +26,8 @@ class SimpleRouter {
             'help': 'pages/help.html',
             'login': 'pages/login.html',
             'register': 'pages/register.html',
-            'password-reset': 'pages/password-reset.html'
+            'password-reset': 'pages/password-reset.html',
+            'upgrade': 'pages/upgrade.html'
         };
 
         /**
@@ -245,6 +246,11 @@ class SimpleRouter {
                 init: 'initPasswordResetPage',
                 dependencies: [],
                 title: 'パスワードリセット'
+            },
+            'upgrade': {
+                init: 'initUpgradePage',
+                dependencies: [],
+                title: 'プレミアムにアップグレード'
             }
         };
 
@@ -456,10 +462,12 @@ class SimpleRouter {
                 }
             }
 
-            // 4.6. フッターナビゲーションの表示/非表示を切り替え（ホームページ以外で表示）
+            // 4.6. フッターナビゲーションの表示/非表示を切り替え
+            // ホーム・認証関連ページでは非表示
             const footerNav = document.getElementById('footer-nav');
             if (footerNav) {
-                if (page === 'home') {
+                const hideFooterPages = ['home', 'login', 'register', 'password-reset', 'upgrade'];
+                if (hideFooterPages.includes(page)) {
                     footerNav.style.display = 'none';
                 } else {
                     footerNav.style.display = 'flex';

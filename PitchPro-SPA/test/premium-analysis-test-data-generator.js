@@ -1,3 +1,4 @@
+
 /**
  * premium-analysis-test-data-generator.js
  * 詳細分析ページ テストデータ生成スクリプト

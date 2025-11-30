@@ -1,0 +1,169 @@
+<!-- upgrade.html - アップグレード画面 -->
+<!-- Version: 1.1.0 -->
+
+<div class="page-content upgrade-page">
+    <!-- ヘッダー（UIカタログ旧版準拠） -->
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="page-header-icon-wrapper">
+                <div class="page-header-icon gradient-catalog-yellow">
+                    <i data-lucide="crown" class="text-white" data-stroke-width="2" style="width: 48px; height: 48px;"></i>
+                </div>
+            </div>
+            <h1 class="page-title">プレミアムにアップグレード</h1>
+            <p class="page-subtitle text-white-70">すべての機能で音感トレーニングを最大限に活用</p>
+        </div>
+    </div>
+
+    <!-- 現在のステータス -->
+    <section id="current-status-section" class="glass-card">
+        <div class="upgrade-status">
+            <div class="upgrade-status-icon" id="status-icon">
+                <i data-lucide="user" class="text-white icon-lg"></i>
+            </div>
+            <div class="upgrade-status-info">
+                <p class="upgrade-status-label" id="status-label">現在のプラン</p>
+                <p class="upgrade-status-value" id="status-value">無料プラン</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- プラン比較 -->
+    <section class="upgrade-plans-section">
+        <h2 class="heading-md">
+            <i data-lucide="sparkles" class="text-purple-300"></i>
+            <span>プラン比較</span>
+        </h2>
+
+        <!-- 無料プラン -->
+        <div class="upgrade-plan-card">
+            <div class="upgrade-plan-header">
+                <div class="upgrade-plan-icon">
+                    <i data-lucide="gift" class="text-blue-300 icon-md"></i>
+                </div>
+                <div class="upgrade-plan-title">
+                    <h3>無料プラン</h3>
+                    <p class="upgrade-plan-price">¥0</p>
+                </div>
+            </div>
+            <ul class="upgrade-plan-features">
+                <li class="feature-included">
+                    <i data-lucide="check" class="text-green-300 icon-sm"></i>
+                    <span>ランダム基音モード（上行・下行）</span>
+                </li>
+                <li class="feature-excluded">
+                    <i data-lucide="x" class="text-white-40 icon-sm"></i>
+                    <span>連続チャレンジモード</span>
+                </li>
+                <li class="feature-excluded">
+                    <i data-lucide="x" class="text-white-40 icon-sm"></i>
+                    <span>12音階モード</span>
+                </li>
+                <li class="feature-excluded">
+                    <i data-lucide="x" class="text-white-40 icon-sm"></i>
+                    <span>プレミアム分析</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- プレミアムプラン -->
+        <div class="upgrade-plan-card upgrade-plan-premium">
+            <div class="upgrade-plan-badge">おすすめ</div>
+            <div class="upgrade-plan-header">
+                <div class="upgrade-plan-icon">
+                    <i data-lucide="crown" class="text-yellow-300 icon-md"></i>
+                </div>
+                <div class="upgrade-plan-title">
+                    <h3>プレミアム</h3>
+                    <p class="upgrade-plan-price">$4.99<span class="upgrade-plan-period">/月</span></p>
+                </div>
+            </div>
+            <ul class="upgrade-plan-features">
+                <li class="feature-included feature-highlight">
+                    <i data-lucide="check" class="text-green-300 icon-sm"></i>
+                    <span>ランダム基音モード（上行・下行）</span>
+                </li>
+                <li class="feature-included feature-highlight">
+                    <i data-lucide="check" class="text-green-300 icon-sm"></i>
+                    <span>連続チャレンジモード</span>
+                </li>
+                <li class="feature-included feature-highlight">
+                    <i data-lucide="check" class="text-green-300 icon-sm"></i>
+                    <span>12音階モード（S級判定対応）</span>
+                </li>
+                <li class="feature-included feature-highlight">
+                    <i data-lucide="check" class="text-green-300 icon-sm"></i>
+                    <span>プレミアム分析（詳細レポート）</span>
+                </li>
+            </ul>
+
+            <!-- 無料トライアル案内 -->
+            <div class="upgrade-trial-info">
+                <i data-lucide="info" class="text-blue-300 icon-sm"></i>
+                <span>7日間の無料トライアル付き</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- アクションボタン -->
+    <section class="upgrade-actions" id="upgrade-actions">
+        <!-- 未ログイン時 -->
+        <div id="action-login" class="upgrade-action-group" style="display: none;">
+            <p class="upgrade-action-note upgrade-action-note-top">アップグレードするにはログインが必要です</p>
+            <button class="btn btn-primary btn-w-full" onclick="window.location.hash='login'">
+                <i data-lucide="log-in"></i>
+                <span>ログインする</span>
+            </button>
+        </div>
+
+        <!-- ログイン済み・無料プラン時 -->
+        <div id="action-upgrade" class="upgrade-action-group" style="display: none;">
+            <button class="btn btn-success btn-w-full" id="upgrade-btn">
+                <i data-lucide="crown"></i>
+                <span>プレミアムを始める（7日間無料）</span>
+            </button>
+            <p class="upgrade-action-note">いつでもキャンセル可能</p>
+        </div>
+
+        <!-- プレミアム利用中 -->
+        <div id="action-premium" class="upgrade-action-group" style="display: none;">
+            <div class="upgrade-premium-active">
+                <i data-lucide="check-circle" class="text-green-300 icon-lg"></i>
+                <p>プレミアムプランをご利用中です</p>
+            </div>
+            <button class="btn btn-outline btn-w-full" id="manage-subscription-btn">
+                <i data-lucide="settings"></i>
+                <span>サブスクリプション管理</span>
+            </button>
+        </div>
+
+        <!-- トライアル中 -->
+        <div id="action-trial" class="upgrade-action-group" style="display: none;">
+            <div class="upgrade-trial-active">
+                <i data-lucide="clock" class="text-blue-300 icon-lg"></i>
+                <p>無料トライアル中</p>
+                <p class="upgrade-trial-remaining" id="trial-remaining"></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ローディング -->
+    <section id="upgrade-loading" class="upgrade-loading" style="display: none;">
+        <i data-lucide="loader-2" class="text-purple-300 animate-spin icon-xl"></i>
+        <p>処理中...</p>
+    </section>
+
+    <!-- エラーメッセージ -->
+    <section id="upgrade-error" class="form-error" style="display: none;">
+        <i data-lucide="alert-circle" class="icon-sm"></i>
+        <span id="upgrade-error-message"></span>
+    </section>
+
+    <!-- ホームに戻るボタン -->
+    <div class="settings-home-button">
+        <button class="btn btn-outline" onclick="window.location.hash='home'">
+            <i data-lucide="home"></i>
+            <span>ホームに戻る</span>
+        </button>
+    </div>
+</div>

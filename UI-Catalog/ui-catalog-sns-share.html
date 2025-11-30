@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SNS Sharing Demo - 8va Relative Pitch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
+        :root {
+            /* App Side Theme (Dark Purple - Matching User Screenshot) */
+            --bg-gradient-start: #4c1d95; /* Deep Purple */
+            --bg-gradient-end: #2e1065;   /* Darker Purple */
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --accent-yellow: #f59e0b;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        /* Result Card (App Side) */
+        .result-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .header-icon i { color: white; }
+
+        .grade-section {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-shadow: none;
+        }
+        
+        .stat-value.grade { 
+            font-size: 2.5rem; 
+            margin-bottom: 0;
+        }
+        .stat-value.yellow { color: var(--accent-yellow); }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 0.25rem;
+        }
+
+        .divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 2rem 0;
+            width: 100%;
+        }
+
+        .share-section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-shadow: none;
+        }
+
+        .share-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .share-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            backdrop-filter: none;
+        }
+
+        .share-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: none;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            border-radius: 24px;
+            padding: 1.5rem;
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        #generated-image {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.75rem;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .action-btn.primary {
+            background: white;
+            color: #0f172a;
+        }
+        .action-btn.instagram {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            border: none;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: -3rem;
+            right: 0;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Canvas hidden */
+        #score-canvas { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- Header Info -->
+    <div class="text-center mb-6">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-orange-500 mb-2">
+            <i data-lucide="zap" class="w-6 h-6 text-white"></i>
+        </div>
+        <h1 class="text-2xl font-bold">連続チャレンジ 上行</h1>
+        <p class="text-sm text-white/70">12セッション (96音) の総合評価</p>
+    </div>
+
+    <!-- Result Card (UI - Matches User Screenshot) -->
+    <div class="result-card">
+        <h2 class="text-lg font-bold mb-6">連続チャレンジ 上行</h2>
+
+        <div class="header-icon">
+            <i data-lucide="meh" class="w-10 h-10 text-white"></i>
+        </div>
+
+        <div class="grade-section">
+            <div class="stat-item">
+                <span class="stat-value grade">D</span>
+                <span class="stat-label">総合グレード</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value yellow">±48.3¢</span>
+                <span class="stat-label">平均誤差</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">37.5%</span>
+                <span class="stat-label">優秀率</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">12</span>
+                <span class="stat-label">セッション</span>
+            </div>
+        </div>
+
+        <p class="text-sm text-white/80 mb-6">
+            中級レベルでD級達成！実用的相対音感レベルに向けて順調に成長中です。
+        </p>
+
+        <div class="divider"></div>
+
+        <div class="share-section">
+            <h3><i data-lucide="share-2" class="inline w-4 h-4 mr-2"></i>みんなに成果をシェアしよう！</h3>
+            
+            <div class="share-buttons">
+                <!-- X (Twitter) -->
+                <button onclick="openShareModal('twitter')" class="share-btn" aria-label="Share on X">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                </button>
+                
+                <!-- LINE -->
+                <button onclick="openShareModal('line')" class="share-btn" aria-label="Share on LINE">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20.5 10.5c0-4.7-4.3-8.5-9.5-8.5s-9.5 3.8-9.5 8.5c0 4.2 3.4 7.7 8 8.4.3 0 .7.1.8.3.1.2.1.5 0 .8-.1.5-.4 1.7-.5 2.1-.1.5-.3 1.2.5 1.2.2 0 .4-.1.6-.2 2.5-1.8 5.4-3.8 7.3-6.5 1.5-1.7 2.3-3.8 2.3-6.1zm-15.4 0c0-.6.4-1 1-1h1.5c.6 0 1 .4 1 1s-.4 1-1 1h-.5v2.5c0 .6-.4 1-1 1s-1-.4-1-1v-3.5zm4.5 0c0-.6.4-1 1-1h.5v3.5h2c.6 0 1 .4 1 1s-.4 1-1 1h-3c-.6 0-1-.4-1-1v-3.5zm5.5 0c0-.6.4-1 1-1h.5v2.3l2.1-2.8c.2-.3.5-.5.9-.5.6 0 1 .4 1 1v3.5c0 .6-.4 1-1 1s-1-.4-1-1v-2.2l-2.1 2.8c-.2.3-.5.5-.9.5-.6 0-1-.4-1-1v-3.6zm6.5 0c0-.6.4-1 1-1h3c.6 0 1 .4 1 1s-.4 1-1 1h-2v.5h2c.6 0 1 .4 1 1s-.4 1-1 1h-2v.5h2c.6 0 1 .4 1 1s-.4 1-1 1h-2v.5h2c.6 0 1 .4 1 1s-.4 1-1 1h-3z"/>
+                    </svg>
+                </button>
+
+                <!-- Facebook -->
+                <button onclick="openShareModal('facebook')" class="share-btn" aria-label="Share on Facebook">
+                    <i data-lucide="facebook" class="w-5 h-5"></i>
+                </button>
+
+                <!-- Copy Link -->
+                <button onclick="openShareModal('copy')" class="share-btn" aria-label="Copy Link">
+                    <i data-lucide="copy" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal-overlay" id="shareModal">
+        <div class="modal-content">
+            <button onclick="closeShareModal()" class="close-btn">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            
+            <h3 class="text-xl font-serif italic mb-4 text-white drop-shadow-md">Certificate of Pitch</h3>
+            
+            <!-- Generated Image Preview -->
+            <img id="generated-image" src="" alt="Certificate Preview">
+            
+            <div class="modal-actions">
+                <button onclick="shareToX()" class="action-btn primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    X
+                </button>
+                <button onclick="shareToInstagram()" class="action-btn instagram">
+                    <i data-lucide="instagram" class="w-5 h-5"></i>
+                    Stories
+                </button>
+                <button onclick="shareToLine()" class="action-btn" style="background:#06C755; border:none;">
+                    LINE
+                </button>
+                <button onclick="downloadImage()" class="action-btn">
+                    <i data-lucide="download" class="w-5 h-5"></i>
+                    保存
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Canvas -->
+    <canvas id="score-canvas" width="1080" height="1920"></canvas>
+
+    <script>
+        lucide.createIcons();
+
+        // Data from Result Screen (Mock Data)
+        const resultData = {
+            mode: "連続チャレンジ",
+            subMode: "上行", 
+            grade: "A", 
+            error: "±12.3",
+            rate: "85.0",
+            sessions: "12",
+            date: "2025.11.29",
+            comment: "中級レベルでD級達成！\n実用的相対音感レベルに向けて順調に成長中です。"
+        };
+
+        function openShareModal(platform) {
+            generateElegantCard();
+            document.getElementById('shareModal').classList.add('active');
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.remove('active');
+        }
+
+        // Helper to load image
+        function loadImage(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = src;
+            });
+        }
+
+        function getBackgroundImageForGrade(grade) {
+            // S/A: Space/Cosmic (Rare)
+            if (['S', 'A'].includes(grade)) {
+                return 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop';
+            }
+            // B/C: Focus/Abstract (Good)
+            if (['B', 'C'].includes(grade)) {
+                return 'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?q=80&w=2664&auto=format&fit=crop';
+            }
+            // D/E: Piano/Standard (Normal)
+            return 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?q=80&w=2070&auto=format&fit=crop';
+        }
+
+        async function generateElegantCard() {
+            const canvas = document.getElementById('score-canvas');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // --- 1. Background (Rank Based) ---
+            try {
+                const bgSrc = getBackgroundImageForGrade(resultData.grade);
+                const bgImage = await loadImage(bgSrc);
+                
+                // Draw image covering the canvas (object-fit: cover)
+                const scale = Math.max(width / bgImage.width, height / bgImage.height);
+                const x = (width / scale - bgImage.width) / 2;
+                const y = (height / scale - bgImage.height) / 2;
+                
+                ctx.drawImage(bgImage, x * scale, y * scale, bgImage.width * scale, bgImage.height * scale);
+                
+            } catch (e) {
+                console.error("Failed to load background image", e);
+                ctx.fillStyle = '#1a1a2e';
+                ctx.fillRect(0, 0, width, height);
+            }
+
+            // Gradient Overlay (Onboarding Style)
+            // Top: Light/Transparent, Bottom: Darker
+            const overlay = ctx.createLinearGradient(0, 0, 0, height);
+            overlay.addColorStop(0, 'rgba(15, 23, 42, 0.2)');
+            overlay.addColorStop(0.6, 'rgba(15, 23, 42, 0.7)');
+            overlay.addColorStop(1, 'rgba(15, 23, 42, 0.9)');
+            ctx.fillStyle = overlay;
+            ctx.fillRect(0, 0, width, height);
+
+
+            // --- 2. Layout Calculation (Onboarding Slide Structure) ---
+            // The "Slide" is a card in the middle.
+            const slideW = width * 0.85;
+            const slideH = height * 0.7; // Taller to fit content
+            const slideX = (width - slideW) / 2;
+            const slideY = (height - slideH) / 2;
+
+            // Removed Glass Background & Border as requested
+
+
+            // --- 3. Icon Circle (Displaying GRADE) ---
+            const iconSize = 220;
+            const iconX = width / 2;
+            const iconY = slideY + 180;
+
+            // Circle BG
+            const iconGrad = ctx.createLinearGradient(iconX - iconSize/2, iconY - iconSize/2, iconX + iconSize/2, iconY + iconSize/2);
+            iconGrad.addColorStop(0, 'rgba(255, 255, 255, 0.25)');
+            iconGrad.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+            
+            ctx.save();
+            ctx.shadowColor = 'rgba(129, 140, 248, 0.5)';
+            ctx.shadowBlur = 40;
+            ctx.fillStyle = iconGrad;
+            ctx.beginPath();
+            ctx.arc(iconX, iconY, iconSize/2, 0, Math.PI*2);
+            ctx.fill();
+            ctx.restore();
+
+            // Circle Border
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // GRADE Text (S, A, B...)
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '700 140px "Inter", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            // Add a subtle glow to the grade
+            ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+            ctx.shadowBlur = 20;
+            ctx.fillText(resultData.grade, iconX, iconY); 
+            ctx.shadowBlur = 0;
+
+            // Rank Label (Below Icon)
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '700 32px "Noto Sans JP", sans-serif';
+            ctx.fillText(`総合ランク ${resultData.grade}`, iconX, iconY + 150);
+
+
+            // --- 4. Title Area (Average Error) ---
+            // "Average Error: ±XX.X¢" -> Value then Label
+            const titleY = iconY + 350;
+            
+            // Value "±12.3¢"
+            // Gradient Text
+            const textGrad = ctx.createLinearGradient(0, titleY - 50, width, titleY + 50);
+            textGrad.addColorStop(0, '#ffffff');
+            textGrad.addColorStop(1, '#e0e7ff');
+            ctx.fillStyle = textGrad;
+            ctx.font = '800 110px "Inter", sans-serif';
+            ctx.shadowColor = 'rgba(0,0,0,0.3)';
+            ctx.shadowBlur = 20;
+            ctx.textBaseline = 'alphabetic';
+            ctx.fillText(`${resultData.error}¢`, width / 2, titleY);
+            ctx.shadowBlur = 0;
+
+            // Label "Average Error" (Below Value)
+            ctx.fillStyle = '#c7d2fe'; // Indigo 200
+            ctx.font = '700 32px "Noto Sans JP", sans-serif';
+            ctx.fillText('平均誤差', width / 2, titleY + 60);
+
+
+            // --- 5. Body Text (Mode & Lifestyle) ---
+            const bodyY = titleY + 200;
+            
+            // Mode Name
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.font = '700 50px "Noto Sans JP", sans-serif';
+            ctx.fillText(resultData.mode + ' ' + resultData.subMode, width / 2, bodyY);
+
+            // Evaluation Text (New)
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.font = '500 28px "Noto Sans JP", sans-serif';
+            const comments = resultData.comment.split('\n');
+            comments.forEach((line, i) => {
+                ctx.fillText(line, width / 2, bodyY + 70 + (i * 40));
+            });
+
+            // Lifestyle Text
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'; // Slightly brighter
+            ctx.font = '500 40px "Noto Sans JP", sans-serif';
+            ctx.fillText('日々の積み重ねが、', width / 2, bodyY + 230);
+            ctx.fillText('洗練された習慣をつくる。', width / 2, bodyY + 280);
+
+
+            // --- 6. Footer / Button Area (App Logo & URL) ---
+            // Anchored to the bottom of the canvas to prevent overlap
+            const footerY = height - 180; 
+
+            // CTA Catchphrase (Moved to bottom)
+            ctx.fillStyle = '#a5b4fc'; // Indigo 300
+            ctx.font = '500 32px "Noto Sans JP", sans-serif';
+            ctx.fillText('あなたも音感を鍛えて、', width / 2, footerY - 250);
+            ctx.fillText('円滑なコミュニケーションを。', width / 2, footerY - 200);
+
+            // App Logo (English)
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '800 48px "Inter", sans-serif';
+            ctx.fillText('8va Relative Pitch', width / 2, footerY - 90);
+
+            // App Logo (Japanese)
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.font = '500 28px "Noto Sans JP", sans-serif';
+            ctx.fillText('8va 相対音感トレーニング', width / 2, footerY - 40);
+
+            // URL / CTA
+            ctx.fillStyle = '#818cf8'; // Indigo 400
+            ctx.font = '600 36px "Inter", sans-serif';
+            ctx.fillText('8va-pitch.app', width / 2, footerY + 20);
+
+            // Removed Decorative Dots as requested
+
+            // Convert to Image
+            const dataUrl = canvas.toDataURL('image/png');
+            document.getElementById('generated-image').src = dataUrl;
+        }
+
+        function shareToX() {
+            const text = `本日の音感記録: グレード${resultData.grade} (平均誤差 ${resultData.error}¢)\n日々の積み重ねが、洗練された習慣をつくる。\n#8va相対音感トレーニング #大人の音感トレーニング`;
+            const url = "https://8va-pitch.app";
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+        }
+
+        function shareToLine() {
+            const text = `本日の音感記録: グレード${resultData.grade}`;
+            const url = "https://8va-pitch.app";
+            window.open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        async function shareToInstagram() {
+            // Web Share API for Mobile
+            if (navigator.share) {
+                const canvas = document.getElementById('score-canvas');
+                canvas.toBlob(async (blob) => {
+                    const file = new File([blob], '8va-story.png', { type: 'image/png' });
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: '8va Relative Pitch',
+                            text: '本日の音感記録'
+                        });
+                    } catch (err) {
+                        console.log('Share failed', err);
+                        downloadImage(); // Fallback
+                    }
+                });
+            } else {
+                alert('Instagram共有はモバイル端末で画像を保存して行ってください。');
+                downloadImage();
+            }
+        }
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = `8va-record-${resultData.date}.png`;
+            link.href = document.getElementById('generated-image').src;
+            link.click();
+        }
+    </script>
+</body>
+</html>
