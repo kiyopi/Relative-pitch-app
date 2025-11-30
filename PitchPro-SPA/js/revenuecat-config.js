@@ -138,8 +138,16 @@ async function getAvailablePackages() {
     try {
         const offerings = await window.revenueCatPurchases.getOfferings();
 
+        // premium_offering を優先的に使用
+        const premiumOffering = offerings.all['premium_offering'];
+        if (premiumOffering) {
+            console.log('📦 [RevenueCat] premium_offering パッケージ:', premiumOffering.availablePackages);
+            return premiumOffering.availablePackages;
+        }
+
+        // フォールバック: current offering
         if (offerings.current) {
-            console.log('📦 [RevenueCat] 利用可能なパッケージ:', offerings.current.availablePackages);
+            console.log('📦 [RevenueCat] current パッケージ:', offerings.current.availablePackages);
             return offerings.current.availablePackages;
         }
 

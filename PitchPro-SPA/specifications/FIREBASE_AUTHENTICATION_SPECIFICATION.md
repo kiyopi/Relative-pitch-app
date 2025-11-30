@@ -1,6 +1,6 @@
 # Firebase Authentication 仕様書
 
-**Version:** 1.2.0
+**Version:** 1.3.0
 **作成日:** 2025-11-30
 **最終更新:** 2025-11-30
 
@@ -308,8 +308,30 @@ Firestoreを使用する際は適切なルールに更新が必要。
 | RevenueCatアカウント作成 | ✅ 完了 | https://www.revenuecat.com/ |
 | SDK組み込み | ✅ 完了 | unpkg CDN経由で読み込み |
 | Firebase連携設定 | ✅ 完了 | onAuthStateChangedで自動初期化 |
-| 商品（サブスク）設定 | 📋 未着手 | RevenueCatダッシュボードで設定 |
+| 商品（サブスク）設定 | ✅ 完了 | RevenueCatダッシュボードで設定済み |
 | 課金UI実装 | 📋 未着手 | アップグレード画面の実装 |
+
+### 10.4 RevenueCatダッシュボード設定
+
+**プロジェクト名:** 8va Relative Pitch Training
+
+#### Products（商品）
+| ID | 価格 | 期間 | 説明 |
+|----|------|------|------|
+| `premium_monthly` | $4.99/月 | Monthly | プレミアム月額プラン |
+
+#### Entitlements（権限）
+| ID | 説明 |
+|----|------|
+| `premium` | プレミアム機能へのアクセス権限 |
+
+#### Offerings（提供プラン）
+| ID | パッケージ | 説明 |
+|----|-----------|------|
+| `premium_offering` | premium_monthly | プレミアムプランの提供構成 |
+
+**設定完了日:** 2025-11-30
+**動作確認:** パッケージ取得成功（`📦 [RevenueCat] premium_offering パッケージ`）
 
 ### 10.5 SDK設定
 
@@ -354,12 +376,12 @@ const result = await window.RevenueCatManager.purchase(package);
 - `chromatic-both` - 12音階（両方向）
 - `premium-analysis` - プレミアム分析
 
-### 10.4 未決定事項
+### 10.8 未決定事項
 
-- 月額料金
-- 年額プラン
+- 年額プラン（現在は月額$4.99のみ）
 - 具体的な課金導線（アップグレード促進画面）
 - 詳細な機能制限仕様
+- 本番用APIキーへの切り替え
 
 ---
 
@@ -421,3 +443,4 @@ console.log(window.firebaseAuth.currentUser);
 | 1.0.0 | 2025-11-30 | 初版作成 |
 | 1.1.0 | 2025-11-30 | 課金システム計画（RevenueCat）を追加 |
 | 1.2.0 | 2025-11-30 | RevenueCat SDK組み込み、API仕様追加 |
+| 1.3.0 | 2025-11-30 | RevenueCatダッシュボード設定完了（商品・権限・提供プラン）|
