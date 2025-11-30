@@ -22,15 +22,25 @@ firebase.initializeApp(firebaseConfig);
 window.firebaseAuth = firebase.auth();
 
 // 認証状態の監視
-window.firebaseAuth.onAuthStateChanged((user) => {
+window.firebaseAuth.onAuthStateChanged(async (user) => {
     if (user) {
         console.log('🔥 [Firebase] ユーザーログイン中:', user.email);
         window.currentUser = user;
         updateAuthUI(user);
+
+        // RevenueCat初期化（ユーザーIDを紐付け）
+        if (window.RevenueCatManager) {
+            await window.RevenueCatManager.initialize();
+        }
     } else {
         console.log('🔥 [Firebase] 未ログイン');
         window.currentUser = null;
         updateAuthUI(null);
+
+        // 匿名ユーザーとしてRevenueCat初期化
+        if (window.RevenueCatManager) {
+            await window.RevenueCatManager.initialize();
+        }
     }
 });
 

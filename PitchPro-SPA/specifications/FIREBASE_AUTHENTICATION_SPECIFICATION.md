@@ -1,6 +1,6 @@
 # Firebase Authentication 仕様書
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 **作成日:** 2025-11-30
 **最終更新:** 2025-11-30
 
@@ -305,11 +305,54 @@ Firestoreを使用する際は適切なルールに更新が必要。
 
 | ステップ | ステータス | 説明 |
 |----------|----------|------|
-| RevenueCatアカウント作成 | ⏳ 作業中 | https://www.revenuecat.com/ |
-| Firebase連携設定 | 📋 未着手 | - |
-| 商品（サブスク）設定 | 📋 未着手 | - |
-| SDK組み込み | 📋 未着手 | - |
-| 課金UI実装 | 📋 未着手 | - |
+| RevenueCatアカウント作成 | ✅ 完了 | https://www.revenuecat.com/ |
+| SDK組み込み | ✅ 完了 | unpkg CDN経由で読み込み |
+| Firebase連携設定 | ✅ 完了 | onAuthStateChangedで自動初期化 |
+| 商品（サブスク）設定 | 📋 未着手 | RevenueCatダッシュボードで設定 |
+| 課金UI実装 | 📋 未着手 | アップグレード画面の実装 |
+
+### 10.5 SDK設定
+
+**APIキー（テスト用）:** `test_TOGsPuIHRNyeJNRXHVRwwetnSaY`
+
+**読み込み方法:**
+```html
+<!-- index.html -->
+<script src="https://unpkg.com/@revenuecat/purchases-js"></script>
+<script src="js/revenuecat-config.js"></script>
+```
+
+**利用可能なAPI:**
+```javascript
+// 初期化
+await window.RevenueCatManager.initialize();
+
+// 課金状態確認
+const { isPremium, isTrialing } = await window.RevenueCatManager.checkStatus();
+
+// 機能アクセス確認
+const canAccess = await window.RevenueCatManager.canAccess('premium-analysis');
+
+// パッケージ取得
+const packages = await window.RevenueCatManager.getPackages();
+
+// 購入
+const result = await window.RevenueCatManager.purchase(package);
+```
+
+### 10.6 機能制限定義
+
+**無料機能:**
+- `random-ascending` - ランダム基音（上行）
+- `random-descending` - ランダム基音（下行）
+
+**プレミアム機能:**
+- `continuous-ascending` - 連続チャレンジ（上行）
+- `continuous-descending` - 連続チャレンジ（下行）
+- `chromatic-ascending` - 12音階（上行）
+- `chromatic-descending` - 12音階（下行）
+- `chromatic-both` - 12音階（両方向）
+- `premium-analysis` - プレミアム分析
 
 ### 10.4 未決定事項
 
@@ -377,3 +420,4 @@ console.log(window.firebaseAuth.currentUser);
 |-----------|------|---------|
 | 1.0.0 | 2025-11-30 | 初版作成 |
 | 1.1.0 | 2025-11-30 | 課金システム計画（RevenueCat）を追加 |
+| 1.2.0 | 2025-11-30 | RevenueCat SDK組み込み、API仕様追加 |
