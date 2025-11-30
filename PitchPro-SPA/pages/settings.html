@@ -188,6 +188,52 @@
             </div>
         </section>
 
+        <!-- アカウントセクション -->
+        <section class="glass-card" id="account-section">
+            <h4 class="heading-md">
+                <i data-lucide="user" class="text-cyan-300"></i>
+                <span>アカウント</span>
+            </h4>
+
+            <!-- ログイン状態表示 -->
+            <div class="flex flex-col gap-4">
+                <!-- ログイン中の場合 -->
+                <div id="account-logged-in" style="display: none;">
+                    <div class="flex flex-col gap-3 mb-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-white-80">ログイン状態</span>
+                            <span class="text-sm text-green-400">ログイン中</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-white-80">ユーザー名</span>
+                            <span class="text-sm text-white" id="account-user-name">-</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-white-80">メールアドレス</span>
+                            <span class="text-sm text-white" id="account-user-email">-</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-danger" id="btn-logout" onclick="handleLogout()">
+                        <i data-lucide="log-out" style="width: 20px; height: 20px;"></i>
+                        <span>ログアウト</span>
+                    </button>
+                </div>
+
+                <!-- 未ログインの場合 -->
+                <div id="account-logged-out">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-sm text-white-80">ログイン状態</span>
+                        <span class="text-sm text-yellow-400">未ログイン</span>
+                    </div>
+                    <p class="text-sm text-white-60 mb-4">ログインすると、トレーニング記録をクラウドに保存できます。</p>
+                    <button class="btn btn-primary" onclick="location.hash='login'">
+                        <i data-lucide="log-in" style="width: 20px; height: 20px;"></i>
+                        <span>ログイン / 新規登録</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
         <!-- アプリ情報セクション -->
         <section class="glass-card">
             <h4 class="heading-md">

@@ -141,6 +141,22 @@
                     <i data-lucide="share" class="icon-md"></i>
                     <span class="nav-text">共有</span>
                 </button>
+                <!-- ユーザー認証エリア -->
+                <div class="nav-auth" id="nav-auth">
+                    <!-- 未ログイン時 -->
+                    <button class="nav-button nav-auth-login" id="nav-login-btn" onclick="location.hash='login'" title="ログイン">
+                        <i data-lucide="log-in" class="icon-md"></i>
+                        <span class="nav-text">ログイン</span>
+                    </button>
+                    <!-- ログイン時 -->
+                    <div class="nav-auth-user" id="nav-user-info" style="display: none;">
+                        <span class="nav-user-name" id="nav-user-name"></span>
+                        <button class="nav-button nav-logout-btn" id="nav-logout-btn" onclick="handleLogout()" title="ログアウト">
+                            <i data-lucide="log-out" class="icon-md"></i>
+                            <span class="nav-text">ログアウト</span>
+                        </button>
+                    </div>
+                </div>
             </nav>
         </header>
 

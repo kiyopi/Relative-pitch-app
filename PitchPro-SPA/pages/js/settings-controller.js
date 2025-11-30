@@ -24,6 +24,9 @@
         // 音量スライダー初期化
         initializeVolumeSlider();
 
+        // アカウントセクション更新
+        updateAccountSection();
+
         // イベントリスナー登録
         registerEventListeners();
 
@@ -33,6 +36,51 @@
         }
 
         console.log('✅ 設定ページ初期化完了');
+    }
+
+    /**
+     * アカウントセクションを更新
+     */
+    function updateAccountSection() {
+        const loggedInDiv = document.getElementById('account-logged-in');
+        const loggedOutDiv = document.getElementById('account-logged-out');
+        const userNameSpan = document.getElementById('account-user-name');
+        const userEmailSpan = document.getElementById('account-user-email');
+
+        if (!loggedInDiv || !loggedOutDiv) {
+            console.warn('⚠️ アカウントセクションが見つかりません');
+            return;
+        }
+
+        // Firebase認証状態を確認
+        const user = window.currentUser || (window.firebaseAuth && window.firebaseAuth.currentUser);
+
+        if (user) {
+            // ログイン中
+            loggedInDiv.style.display = 'block';
+            loggedOutDiv.style.display = 'none';
+
+            // ユーザー情報を表示
+            if (userNameSpan) {
+                userNameSpan.textContent = user.displayName || user.email.split('@')[0];
+            }
+            if (userEmailSpan) {
+                userEmailSpan.textContent = user.email;
+            }
+
+            console.log('👤 アカウント: ログイン中 -', user.email);
+        } else {
+            // 未ログイン
+            loggedInDiv.style.display = 'none';
+            loggedOutDiv.style.display = 'block';
+
+            console.log('👤 アカウント: 未ログイン');
+        }
+
+        // Lucideアイコン再初期化
+        if (typeof window.initializeLucideIcons === 'function') {
+            window.initializeLucideIcons({ immediate: true });
+        }
     }
 
     /**

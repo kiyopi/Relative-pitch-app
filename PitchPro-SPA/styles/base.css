@@ -3213,3 +3213,66 @@ body::before {
         justify-content: center;
     }
 }
+
+/* =================================================
+   ヘッダー認証エリア
+   ================================================= */
+
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 0.5rem;
+  padding-left: 0.5rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-auth-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.nav-user-name {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav-logout-btn {
+  color: #f87171 !important;
+}
+
+.nav-logout-btn:hover {
+  background: rgba(239, 68, 68, 0.2) !important;
+}
+
+/* モバイルメニュー内の認証エリア */
+.header-nav.active .nav-auth {
+  width: 100%;
+  margin-left: 0;
+  padding-left: 0;
+  border-left: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.header-nav.active .nav-auth-user {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.header-nav.active .nav-user-name {
+  max-width: none;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  text-align: center;
+}
